@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/examples/democoin/types"
-	"github.com/cosmos/cosmos-sdk/examples/democoin/x/cool"
-	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
+	"github.com/ixo.foundation/ixo-cosmos/types"
+	"github.com/ixo.foundation/ixo-cosmos/x/cool"
+	"github.com/ixo.foundation/ixo-cosmos/x/pow"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"

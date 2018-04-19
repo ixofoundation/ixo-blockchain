@@ -17,18 +17,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
-	"github.com/cosmos/cosmos-sdk/examples/democoin/types"
-	"github.com/cosmos/cosmos-sdk/examples/democoin/x/cool"
-	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
-	"github.com/cosmos/cosmos-sdk/examples/democoin/x/sketchy"
+	"github.com/ixo.foundation/ixo-cosmos/types"
+	"github.com/ixo.foundation/ixo-cosmos/x/cool"
+	"github.com/ixo.foundation/ixo-cosmos/x/pow"
+	"github.com/ixo.foundation/ixo-cosmos/x/sketchy"
 )
 
 const (
-	appName = "DemocoinApp"
+	appName = "ixoApp"
 )
 
 // Extended ABCI application
-type DemocoinApp struct {
+type IxoApp struct {
 	*bam.BaseApp
 	cdc *wire.Codec
 
@@ -43,9 +43,9 @@ type DemocoinApp struct {
 	accountMapper sdk.AccountMapper
 }
 
-func NewDemocoinApp(logger log.Logger, dbs map[string]dbm.DB) *DemocoinApp {
+func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	// create your application object
-	var app = &DemocoinApp{
+	var app = &IxoApp{
 		BaseApp:            bam.NewBaseApp(appName, logger, dbs["main"]),
 		cdc:                MakeCodec(),
 		capKeyMainStore:    sdk.NewKVStoreKey("main"),
@@ -134,7 +134,7 @@ func MakeCodec() *wire.Codec {
 }
 
 // custom logic for transaction decoding
-func (app *DemocoinApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
+func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	var tx = sdk.StdTx{}
 
 	if len(txBytes) == 0 {
@@ -151,7 +151,7 @@ func (app *DemocoinApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 }
 
 // custom logic for democoin initialization
-func (app *DemocoinApp) initChainerFn(coolKeeper cool.Keeper, powKeeper pow.Keeper) sdk.InitChainer {
+func (app *IxoApp) initChainerFn(coolKeeper cool.Keeper, powKeeper pow.Keeper) sdk.InitChainer {
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 		stateJSON := req.AppStateBytes
 
