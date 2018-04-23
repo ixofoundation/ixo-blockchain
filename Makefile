@@ -14,6 +14,7 @@ ci: get_tools get_vendor_deps build test_cover
 
 # This can be unified later, here for easy demos
 build:
+	rm -rf build
 ifeq ($(OS),Windows_NT)
 	go build $(BUILD_FLAGS) -o build/ixod.exe ./cmd/ixod
 	go build $(BUILD_FLAGS) -o build/ixocli.exe ./cmd/ixocli
