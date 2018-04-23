@@ -24,12 +24,6 @@
     "client/lcd",
     "client/rpc",
     "client/tx",
-    "examples/democoin/app",
-    "examples/democoin/types",
-    "examples/democoin/x/cool",
-    "examples/democoin/x/pow",
-    "examples/democoin/x/pow/commands",
-    "examples/democoin/x/sketchy",
     "mock",
     "server",
     "store",
@@ -497,6 +491,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7241c399a1d01ba7c9944fd36d450c928c84efb5d9839194f94629693d95e2b4"
+  inputs-digest = "6940c754604608386ee82255af8348d6a5000f0f51fb59a329aaeb184395b822"
   solver-name = "gps-cdcl"
   solver-version = 1

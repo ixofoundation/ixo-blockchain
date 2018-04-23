@@ -19,19 +19,15 @@ import (
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/commands"
 	simplestakingcmd "github.com/cosmos/cosmos-sdk/x/simplestake/commands"
 
-	"github.com/cosmos/cosmos-sdk/examples/democoin/app"
-	"github.com/cosmos/cosmos-sdk/examples/democoin/types"
-	powcmd "github.com/cosmos/cosmos-sdk/examples/democoin/x/pow/commands"
-
-	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/commands"
-
+	"github.com/ixofoundation/ixo-cosmos/app"
+	"github.com/ixofoundation/ixo-cosmos/types"
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "democli",
-		Short: "Democoin light-client",
+		Use:   "ixocli",
+		Short: "Ixo light-client",
 	}
 )
 
@@ -53,7 +49,6 @@ func main() {
 	rootCmd.AddCommand(client.LineBreak)
 
 	// add query/post commands (custom to binary)
-	// start with commands common to basecoin
 	rootCmd.AddCommand(
 		client.GetCommands(
 			authcmd.GetAccountCmd("main", cdc, types.GetAccountDecoder(cdc)),
@@ -75,13 +70,6 @@ func main() {
 		client.PostCommands(
 			simplestakingcmd.UnbondTxCmd(cdc),
 		)...)
-	// and now democoin specific commands
-	rootCmd.AddCommand(
-		client.PostCommands(
-			projectcmd.QuizTxCmd(cdc),
-			projectcmd.SetTrendTxCmd(cdc),
-			powcmd.MineCmd(cdc),
-		)...)
 
 	// add proxy, version and key info
 	rootCmd.AddCommand(
@@ -93,6 +81,6 @@ func main() {
 	)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "BC", os.ExpandEnv("$HOME/.democli"))
+	executor := cli.PrepareMainCmd(rootCmd, "BC", os.ExpandEnv("$HOME/.basecli"))
 	executor.Execute()
 }

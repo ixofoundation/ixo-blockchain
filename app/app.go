@@ -17,26 +17,21 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
-	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
-
-	//ixo code
 	"github.com/ixofoundation/ixo-cosmos/types"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 const (
-	appName = "IxoNodeApp"
+	appName = "ixoApp"
 )
 
 // Extended ABCI application
-type IxoNodeApp struct {
+type IxoApp struct {
 	*bam.BaseApp
 	cdc *wire.Codec
 
 	// keys to access the substores
 	capKeyMainStore    *sdk.KVStoreKey
 	capKeyAccountStore *sdk.KVStoreKey
-	capKeyPowStore     *sdk.KVStoreKey
 	capKeyIBCStore     *sdk.KVStoreKey
 	capKeyStakingStore *sdk.KVStoreKey
 
@@ -44,14 +39,13 @@ type IxoNodeApp struct {
 	accountMapper sdk.AccountMapper
 }
 
-func NewIxoNodeApp(logger log.Logger, dbs map[string]dbm.DB) *IxoNodeApp {
+func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	// create your application object
-	var app = &IxoNodeApp{
+	var app = &IxoApp{
 		BaseApp:            bam.NewBaseApp(appName, logger, dbs["main"]),
 		cdc:                MakeCodec(),
 		capKeyMainStore:    sdk.NewKVStoreKey("main"),
 		capKeyAccountStore: sdk.NewKVStoreKey("acc"),
-		capKeyPowStore:     sdk.NewKVStoreKey("pow"),
 		capKeyIBCStore:     sdk.NewKVStoreKey("ibc"),
 		capKeyStakingStore: sdk.NewKVStoreKey("stake"),
 	}
@@ -64,23 +58,18 @@ func NewIxoNodeApp(logger log.Logger, dbs map[string]dbm.DB) *IxoNodeApp {
 
 	// add handlers
 	coinKeeper := bank.NewCoinKeeper(app.accountMapper)
-	projectKeeper := project.NewKeeper(app.capKeyMainStore, coinKeeper)
-	powKeeper := pow.NewKeeper(app.capKeyPowStore, pow.NewPowConfig("pow", int64(1)), coinKeeper)
 	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
-		AddRoute("project", project.NewHandler(projectKeeper)).
-		AddRoute("pow", powKeeper.Handler).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper))
 
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
-	app.SetInitChainer(app.initChainerFn(projectKeeper, powKeeper))
+	app.SetInitChainer(app.initChainer)
 	app.MountStoreWithDB(app.capKeyMainStore, sdk.StoreTypeIAVL, dbs["main"])
 	app.MountStoreWithDB(app.capKeyAccountStore, sdk.StoreTypeIAVL, dbs["acc"])
-	app.MountStoreWithDB(app.capKeyPowStore, sdk.StoreTypeIAVL, dbs["pow"])
 	app.MountStoreWithDB(app.capKeyIBCStore, sdk.StoreTypeIAVL, dbs["ibc"])
 	app.MountStoreWithDB(app.capKeyStakingStore, sdk.StoreTypeIAVL, dbs["staking"])
 	// NOTE: Broken until #532 lands
@@ -101,18 +90,14 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIssue = 0x2
 	const msgTypeQuiz = 0x3
 	const msgTypeSetTrend = 0x4
-	const msgTypeMine = 0x5
-	const msgTypeIBCTransferMsg = 0x6
-	const msgTypeIBCReceiveMsg = 0x7
-	const msgTypeBondMsg = 0x8
-	const msgTypeUnbondMsg = 0x9
+	const msgTypeIBCTransferMsg = 0x5
+	const msgTypeIBCReceiveMsg = 0x6
+	const msgTypeBondMsg = 0x7
+	const msgTypeUnbondMsg = 0x8
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
 		oldwire.ConcreteType{bank.IssueMsg{}, msgTypeIssue},
-		oldwire.ConcreteType{project.QuizMsg{}, msgTypeQuiz},
-		oldwire.ConcreteType{project.SetTrendMsg{}, msgTypeSetTrend},
-		oldwire.ConcreteType{pow.MineMsg{}, msgTypeMine},
 		oldwire.ConcreteType{ibc.IBCTransferMsg{}, msgTypeIBCTransferMsg},
 		oldwire.ConcreteType{ibc.IBCReceiveMsg{}, msgTypeIBCReceiveMsg},
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
@@ -134,7 +119,7 @@ func MakeCodec() *wire.Codec {
 }
 
 // custom logic for transaction decoding
-func (app *IxoNodeApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
+func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	var tx = sdk.StdTx{}
 
 	if len(txBytes) == 0 {
@@ -150,40 +135,24 @@ func (app *IxoNodeApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	return tx, nil
 }
 
-// custom logic for democoin initialization
-func (app *IxoNodeApp) initChainerFn(projectKeeper project.Keeper, powKeeper pow.Keeper) sdk.InitChainer {
-	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-		stateJSON := req.AppStateBytes
+// custom logic for ixo initialization
+func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+	stateJSON := req.AppStateBytes
 
-		genesisState := new(types.GenesisState)
-		err := json.Unmarshal(stateJSON, genesisState)
-		if err != nil {
-			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-			// return sdk.ErrGenesisParse("").TraceCause(err, "")
-		}
-
-		for _, gacc := range genesisState.Accounts {
-			acc, err := gacc.ToAppAccount()
-			if err != nil {
-				panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-				//	return sdk.ErrGenesisParse("").TraceCause(err, "")
-			}
-			app.accountMapper.SetAccount(ctx, acc)
-		}
-
-		// Application specific genesis handling
-		err = projectKeeper.InitGenesis(ctx, genesisState.ProjectGenesis)
-		if err != nil {
-			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-			//	return sdk.ErrGenesisParse("").TraceCause(err, "")
-		}
-
-		err = powKeeper.InitGenesis(ctx, genesisState.PowGenesis)
-		if err != nil {
-			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-			//	return sdk.ErrGenesisParse("").TraceCause(err, "")
-		}
-
-		return abci.ResponseInitChain{}
+	genesisState := new(types.GenesisState)
+	err := json.Unmarshal(stateJSON, genesisState)
+	if err != nil {
+		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
+		// return sdk.ErrGenesisParse("").TraceCause(err, "")
 	}
+
+	for _, gacc := range genesisState.Accounts {
+		acc, err := gacc.ToAppAccount()
+		if err != nil {
+			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
+			//	return sdk.ErrGenesisParse("").TraceCause(err, "")
+		}
+		app.accountMapper.SetAccount(ctx, acc)
+	}
+	return abci.ResponseInitChain{}
 }
