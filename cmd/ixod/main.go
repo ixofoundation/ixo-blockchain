@@ -16,7 +16,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-cosmos/app"
-
 )
 
 // rootCmd is the entry point for this binary
@@ -41,41 +40,19 @@ func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.Ra
 	if err != nil {
 		return nil, err
 	}
-	// TODO Remove this
-	jsonMap["project"] = json.RawMessage(`{
-        "trend": "ice-cold"
-      }`)
+
 	bz, err := json.Marshal(jsonMap)
 	return json.RawMessage(bz), err
 }
 
 func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
-	dbMain, err := dbm.NewGoLevelDB("democoin", filepath.Join(rootDir, "data"))
+	dbMain, err := dbm.NewGoLevelDB("ixo-node", filepath.Join(rootDir, "data"))
 	if err != nil {
 		return nil, err
 	}
-	dbAcc, err := dbm.NewGoLevelDB("democoin-acc", filepath.Join(rootDir, "data"))
-	if err != nil {
-		return nil, err
-	}
-	dbPow, err := dbm.NewGoLevelDB("democoin-pow", filepath.Join(rootDir, "data"))
-	if err != nil {
-		return nil, err
-	}
-	dbIBC, err := dbm.NewGoLevelDB("democoin-ibc", filepath.Join(rootDir, "data"))
-	if err != nil {
-		return nil, err
-	}
-	dbStaking, err := dbm.NewGoLevelDB("democoin-staking", filepath.Join(rootDir, "data"))
-	if err != nil {
-		return nil, err
-	}
+
 	dbs := map[string]dbm.DB{
-		"main":    dbMain,
-		"acc":     dbAcc,
-		"pow":     dbPow,
-		"ibc":     dbIBC,
-		"staking": dbStaking,
+		"main": dbMain,
 	}
 	bapp := app.NewIxoNodeApp(logger, dbs)
 	return bapp, nil
@@ -85,7 +62,7 @@ func main() {
 	server.AddCommands(rootCmd, defaultAppState, generateApp, context)
 
 	// prepare and add flags
-	rootDir := os.ExpandEnv("$HOME/.democoind")
+	rootDir := os.ExpandEnv("$HOME/.ixo-node")
 	executor := cli.PrepareBaseCmd(rootCmd, "BC", rootDir)
 	executor.Execute()
 }
