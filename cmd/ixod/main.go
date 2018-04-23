@@ -15,7 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixo.foundation/ixo-cosmos/app"
+	"github.com/ixofoundation/ixo-cosmos/app"
 
 )
 

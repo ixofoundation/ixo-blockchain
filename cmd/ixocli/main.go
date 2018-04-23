@@ -23,7 +23,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/examples/democoin/types"
 	powcmd "github.com/cosmos/cosmos-sdk/examples/democoin/x/pow/commands"
 
-	projectcmd "github.com/ixo.foundation/ixo-cosmos/x/project/commands"
+	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/commands"
 
 )
 

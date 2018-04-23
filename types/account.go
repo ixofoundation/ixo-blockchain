@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
 
-	"github.com/ixo.foundation/ixo-cosmos/x/project"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 
 )
 

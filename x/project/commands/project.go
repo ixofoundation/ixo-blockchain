@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 
-	"github.com/ixo.foundation/ixo-cosmos/x/project"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 // take the quiz transaction

@@ -20,8 +20,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
 
 	//ixo code
-	"github.com/ixo.foundation/ixo-cosmos/types"
-	"github.com/ixo.foundation/ixo-cosmos/x/project"
+	"github.com/ixofoundation/ixo-cosmos/types"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 const (
