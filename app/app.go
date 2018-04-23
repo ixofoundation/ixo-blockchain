@@ -17,18 +17,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
+
+	//ixo code
 	"github.com/ixo.foundation/ixo-cosmos/types"
-	"github.com/ixo.foundation/ixo-cosmos/x/cool"
-	"github.com/ixo.foundation/ixo-cosmos/x/pow"
-	"github.com/ixo.foundation/ixo-cosmos/x/sketchy"
+	"github.com/ixo.foundation/ixo-cosmos/x/project"
 )
 
 const (
-	appName = "ixoApp"
+	appName = "IxoNodeApp"
 )
 
 // Extended ABCI application
-type IxoApp struct {
+type IxoNodeApp struct {
 	*bam.BaseApp
 	cdc *wire.Codec
 
@@ -43,9 +44,9 @@ type IxoApp struct {
 	accountMapper sdk.AccountMapper
 }
 
-func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
+func NewIxoNodeApp(logger log.Logger, dbs map[string]dbm.DB) *IxoNodeApp {
 	// create your application object
-	var app = &IxoApp{
+	var app = &IxoNodeApp{
 		BaseApp:            bam.NewBaseApp(appName, logger, dbs["main"]),
 		cdc:                MakeCodec(),
 		capKeyMainStore:    sdk.NewKVStoreKey("main"),
@@ -63,21 +64,20 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 
 	// add handlers
 	coinKeeper := bank.NewCoinKeeper(app.accountMapper)
-	coolKeeper := cool.NewKeeper(app.capKeyMainStore, coinKeeper)
+	projectKeeper := project.NewKeeper(app.capKeyMainStore, coinKeeper)
 	powKeeper := pow.NewKeeper(app.capKeyPowStore, pow.NewPowConfig("pow", int64(1)), coinKeeper)
 	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
-		AddRoute("cool", cool.NewHandler(coolKeeper)).
+		AddRoute("project", project.NewHandler(projectKeeper)).
 		AddRoute("pow", powKeeper.Handler).
-		AddRoute("sketchy", sketchy.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper))
 
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
-	app.SetInitChainer(app.initChainerFn(coolKeeper, powKeeper))
+	app.SetInitChainer(app.initChainerFn(projectKeeper, powKeeper))
 	app.MountStoreWithDB(app.capKeyMainStore, sdk.StoreTypeIAVL, dbs["main"])
 	app.MountStoreWithDB(app.capKeyAccountStore, sdk.StoreTypeIAVL, dbs["acc"])
 	app.MountStoreWithDB(app.capKeyPowStore, sdk.StoreTypeIAVL, dbs["pow"])
@@ -110,8 +110,8 @@ func MakeCodec() *wire.Codec {
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
 		oldwire.ConcreteType{bank.IssueMsg{}, msgTypeIssue},
-		oldwire.ConcreteType{cool.QuizMsg{}, msgTypeQuiz},
-		oldwire.ConcreteType{cool.SetTrendMsg{}, msgTypeSetTrend},
+		oldwire.ConcreteType{project.QuizMsg{}, msgTypeQuiz},
+		oldwire.ConcreteType{project.SetTrendMsg{}, msgTypeSetTrend},
 		oldwire.ConcreteType{pow.MineMsg{}, msgTypeMine},
 		oldwire.ConcreteType{ibc.IBCTransferMsg{}, msgTypeIBCTransferMsg},
 		oldwire.ConcreteType{ibc.IBCReceiveMsg{}, msgTypeIBCReceiveMsg},
@@ -134,7 +134,7 @@ func MakeCodec() *wire.Codec {
 }
 
 // custom logic for transaction decoding
-func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
+func (app *IxoNodeApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	var tx = sdk.StdTx{}
 
 	if len(txBytes) == 0 {
@@ -151,7 +151,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 }
 
 // custom logic for democoin initialization
-func (app *IxoApp) initChainerFn(coolKeeper cool.Keeper, powKeeper pow.Keeper) sdk.InitChainer {
+func (app *IxoNodeApp) initChainerFn(projectKeeper project.Keeper, powKeeper pow.Keeper) sdk.InitChainer {
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 		stateJSON := req.AppStateBytes
 
@@ -172,7 +172,7 @@ func (app *IxoApp) initChainerFn(coolKeeper cool.Keeper, powKeeper pow.Keeper) s
 		}
 
 		// Application specific genesis handling
-		err = coolKeeper.InitGenesis(ctx, genesisState.CoolGenesis)
+		err = projectKeeper.InitGenesis(ctx, genesisState.ProjectGenesis)
 		if err != nil {
 			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
 			//	return sdk.ErrGenesisParse("").TraceCause(err, "")

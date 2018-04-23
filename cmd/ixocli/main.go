@@ -19,17 +19,19 @@ import (
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/commands"
 	simplestakingcmd "github.com/cosmos/cosmos-sdk/x/simplestake/commands"
 
-	"github.com/ixo.foundation/ixo-cosmos/app"
-	"github.com/ixo.foundation/ixo-cosmos/types"
-	coolcmd "github.com/ixo.foundation/ixo-cosmos/x/cool/commands"
-	powcmd "github.com/ixo.foundation/ixo-cosmos/x/pow/commands"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/app"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/types"
+	powcmd "github.com/cosmos/cosmos-sdk/examples/democoin/x/pow/commands"
+
+	projectcmd "github.com/ixo.foundation/ixo-cosmos/x/project/commands"
+
 )
 
 // rootCmd is the entry point for this binary
 var (
 	rootCmd = &cobra.Command{
-		Use:   "ixocli",
-		Short: "ixo light-client",
+		Use:   "democli",
+		Short: "Democoin light-client",
 	}
 )
 
@@ -73,11 +75,11 @@ func main() {
 		client.PostCommands(
 			simplestakingcmd.UnbondTxCmd(cdc),
 		)...)
-	// and now ixo specific commands
+	// and now democoin specific commands
 	rootCmd.AddCommand(
 		client.PostCommands(
-			coolcmd.QuizTxCmd(cdc),
-			coolcmd.SetTrendTxCmd(cdc),
+			projectcmd.QuizTxCmd(cdc),
+			projectcmd.SetTrendTxCmd(cdc),
 			powcmd.MineCmd(cdc),
 		)...)
 
@@ -91,6 +93,6 @@ func main() {
 	)
 
 	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "BC", os.ExpandEnv("$HOME/.ixocli"))
+	executor := cli.PrepareMainCmd(rootCmd, "BC", os.ExpandEnv("$HOME/.democli"))
 	executor.Execute()
 }

@@ -17,10 +17,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
-	"github.com/ixo.foundation/ixo-cosmos/types"
-	"github.com/ixo.foundation/ixo-cosmos/x/cool"
-	"github.com/ixo.foundation/ixo-cosmos/x/pow"
-	"github.com/ixo.foundation/ixo-cosmos/x/sketchy"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/types"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/cool"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/sketchy"
 )
 
 const (

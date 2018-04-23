@@ -27,7 +27,6 @@
     "examples/democoin/app",
     "examples/democoin/types",
     "examples/democoin/x/cool",
-    "examples/democoin/x/cool/commands",
     "examples/democoin/x/pow",
     "examples/democoin/x/pow/commands",
     "examples/democoin/x/sketchy",
@@ -498,6 +497,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8f171eacbb4c11063c6ecbfd3f2978b5e11a91e520f12bbae9df4fe14b92bcc2"
+  inputs-digest = "7241c399a1d01ba7c9944fd36d450c928c84efb5d9839194f94629693d95e2b4"
   solver-name = "gps-cdcl"
   solver-version = 1

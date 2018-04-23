@@ -12,9 +12,11 @@ import (
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
 
-	"github.com/ixo.foundation/ixo-cosmos/app"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/ixo.foundation/ixo-cosmos/app"
+
 )
 
 // rootCmd is the entry point for this binary
@@ -39,7 +41,8 @@ func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.Ra
 	if err != nil {
 		return nil, err
 	}
-	jsonMap["cool"] = json.RawMessage(`{
+	// TODO Remove this
+	jsonMap["project"] = json.RawMessage(`{
         "trend": "ice-cold"
       }`)
 	bz, err := json.Marshal(jsonMap)
@@ -47,23 +50,23 @@ func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.Ra
 }
 
 func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
-	dbMain, err := dbm.NewGoLevelDB("ixo", filepath.Join(rootDir, "data"))
+	dbMain, err := dbm.NewGoLevelDB("democoin", filepath.Join(rootDir, "data"))
 	if err != nil {
 		return nil, err
 	}
-	dbAcc, err := dbm.NewGoLevelDB("ixo-acc", filepath.Join(rootDir, "data"))
+	dbAcc, err := dbm.NewGoLevelDB("democoin-acc", filepath.Join(rootDir, "data"))
 	if err != nil {
 		return nil, err
 	}
-	dbPow, err := dbm.NewGoLevelDB("ixo-pow", filepath.Join(rootDir, "data"))
+	dbPow, err := dbm.NewGoLevelDB("democoin-pow", filepath.Join(rootDir, "data"))
 	if err != nil {
 		return nil, err
 	}
-	dbIBC, err := dbm.NewGoLevelDB("ixo-ibc", filepath.Join(rootDir, "data"))
+	dbIBC, err := dbm.NewGoLevelDB("democoin-ibc", filepath.Join(rootDir, "data"))
 	if err != nil {
 		return nil, err
 	}
-	dbStaking, err := dbm.NewGoLevelDB("ixo-staking", filepath.Join(rootDir, "data"))
+	dbStaking, err := dbm.NewGoLevelDB("democoin-staking", filepath.Join(rootDir, "data"))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +77,7 @@ func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
 		"ibc":     dbIBC,
 		"staking": dbStaking,
 	}
-	bapp := app.NewIxoApp(logger, dbs)
+	bapp := app.NewIxoNodeApp(logger, dbs)
 	return bapp, nil
 }
 
@@ -82,7 +85,7 @@ func main() {
 	server.AddCommands(rootCmd, defaultAppState, generateApp, context)
 
 	// prepare and add flags
-	rootDir := os.ExpandEnv("$HOME/.ixod")
+	rootDir := os.ExpandEnv("$HOME/.democoind")
 	executor := cli.PrepareBaseCmd(rootCmd, "BC", rootDir)
 	executor.Execute()
 }

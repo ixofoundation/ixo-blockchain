@@ -5,8 +5,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 
-	"github.com/ixo.foundation/ixo-cosmos/x/cool"
-	"github.com/ixo.foundation/ixo-cosmos/x/pow"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/cool"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
 )
 
 var _ sdk.Account = (*AppAccount)(nil)

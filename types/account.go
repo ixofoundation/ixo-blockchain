@@ -5,8 +5,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 
-	"github.com/ixo.foundation/ixo-cosmos/x/cool"
-	"github.com/ixo.foundation/ixo-cosmos/x/pow"
+	"github.com/cosmos/cosmos-sdk/examples/democoin/x/pow"
+
+	"github.com/ixo.foundation/ixo-cosmos/x/project"
+
 )
 
 var _ sdk.Account = (*AppAccount)(nil)
@@ -46,7 +48,7 @@ func GetAccountDecoder(cdc *wire.Codec) sdk.AccountDecoder {
 type GenesisState struct {
 	Accounts    []*GenesisAccount `json:"accounts"`
 	PowGenesis  pow.PowGenesis    `json:"pow"`
-	CoolGenesis cool.CoolGenesis  `json:"cool"`
+	ProjectGenesis project.ProjectGenesis  `json:"project"`
 }
 
 // GenesisAccount doesn't need pubkey or sequence
