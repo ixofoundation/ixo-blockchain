@@ -21,6 +21,7 @@ import (
 
 	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/ixofoundation/ixo-cosmos/types"
+	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/cmd"
 )
 
 // rootCmd is the entry point for this binary
@@ -69,6 +70,12 @@ func main() {
 	rootCmd.AddCommand(
 		client.PostCommands(
 			simplestakingcmd.UnbondTxCmd(cdc),
+		)...)
+
+	// and now ixo specific commands
+	rootCmd.AddCommand(
+		client.PostCommands(
+			projectcmd.CreateProjectCmd(cdc),
 		)...)
 
 	// add proxy, version and key info

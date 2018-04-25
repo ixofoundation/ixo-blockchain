@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
 	"github.com/ixofoundation/ixo-cosmos/types"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 const (
@@ -62,6 +63,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
+		AddRoute("project", project.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper))
 
@@ -74,7 +76,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	app.MountStoreWithDB(app.capKeyStakingStore, sdk.StoreTypeIAVL, dbs["staking"])
 	// NOTE: Broken until #532 lands
 	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
-	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper))
+	//	app.SetAnteHandler(auth.NewAnteHandler(app.accountMapper))
 	err := app.LoadLatestVersion(app.capKeyMainStore)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -94,10 +96,12 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
+	const msgTypeNewProjectMsg = 0x9
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
 		oldwire.ConcreteType{bank.IssueMsg{}, msgTypeIssue},
+		oldwire.ConcreteType{project.NewProjectMsg{}, msgTypeNewProjectMsg},
 		oldwire.ConcreteType{ibc.IBCTransferMsg{}, msgTypeIBCTransferMsg},
 		oldwire.ConcreteType{ibc.IBCReceiveMsg{}, msgTypeIBCReceiveMsg},
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
