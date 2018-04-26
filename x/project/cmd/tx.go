@@ -8,9 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	crypto "github.com/tendermint/go-crypto"
 
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
@@ -28,34 +26,15 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 			ctx := context.NewCoreContextFromViper()
 
 			// create the message
-			msg := project.CreateProjectMsg(args[0])
+			msg := project.CreateProjectMsg("3J56r8ZGfD6ThhwhaDv9iA", args[0])
 
-			fee := sdk.NewStdFee(1,
-				sdk.Coin{"atom", 100},
-			)
-			sigs := make([]sdk.StdSignature, 1)
-
-			sig := crypto.SignatureEd25519FromBytes([]byte("3HfXrQopkQefk2ChMpyAJxSaMdWnCzt1Ho3ewVD6PKwNp5qFmaC6JPmNZsNYU3KqDH8okvNq563DPENvs5dn9ViNLo2z8Hvz5QYUKb5C6dq2LvrqVoQJFvZFTNU77MdswEatbGGDyXKiGRTHc1UQpjTH9Wp2qiFZaQ6FT1JjprPpvZaVcsXWs4toB1uEePxcKVtCR4zRanajEHwjfdiCKZw4sVNQT44mjWJnTU47NpbHRECUQUksHC4jzdrChj1dLQbzRJWyQtRpda5RZZoJhLGnpuSQJ7EKx7Ez7sS"))
-
-			sigs[0] = sdk.StdSignature{Signature: sig, Sequence: 1}
-
-			tx := sdk.NewStdTx(msg, fee, sigs)
-
-			// get account name
-			/*			name := viper.GetString(client.FlagName)
-
-						// build and sign the transaction, then broadcast to Tendermint
-						res, err := ctx.SignBuildBroadcast(name, msg, cdc)
-						if err != nil {
-							return err
-						}
-			*/
+			tx := project.NewIxoTx(msg)
 			bz, err := cdc.MarshalBinary(tx)
 			if err != nil {
 				panic(err)
 			}
 
-			// build and sign the transaction, then broadcast to Tendermint
+			// Broadcast to Tendermint
 			res, err := ctx.BroadcastTx(bz)
 			if err != nil {
 				return err

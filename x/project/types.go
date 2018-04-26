@@ -8,19 +8,37 @@ import (
 )
 
 //_______________________________________________________________________
+// Define the IxoTx
+
+type IxoTx struct {
+	Msg sdk.Msg
+}
+
+func NewIxoTx(msg sdk.Msg) sdk.Tx {
+	return IxoTx{
+		Msg: msg,
+	}
+}
+
+func (tx IxoTx) GetMsg() sdk.Msg                   { return tx.Msg }
+func (tx IxoTx) GetSignatures() []sdk.StdSignature { return nil }
+
+// enforce the msg type at compile time
+var _ sdk.Tx = IxoTx{}
+
+// Define Did as an Address
+type Did = sdk.Address
 
 // A message type to quiz how cool you are. these fields are can be entirely
 // arbitrary and custom to your message
 type NewProjectMsg struct {
-	Sender sdk.Address
-	Data   string
+	Payload string `json:"payload"`
 }
 
 // New Project message
-func CreateProjectMsg(projectData string) NewProjectMsg {
+func CreateProjectMsg(did string, projectData string) NewProjectMsg {
 	return NewProjectMsg{
-		Sender: sdk.Address([]byte("3J56r8ZGfD6ThhwhaDv9iA")),
-		Data:   projectData,
+		Payload: projectData,
 	}
 }
 
@@ -30,9 +48,9 @@ var _ sdk.Msg = NewProjectMsg{}
 // nolint
 func (msg NewProjectMsg) Type() string                            { return "project" }
 func (msg NewProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg NewProjectMsg) GetSigners() []sdk.Address               { return []sdk.Address{msg.Sender} }
+func (msg NewProjectMsg) GetSigners() []sdk.Address               { return nil }
 func (msg NewProjectMsg) String() string {
-	return fmt.Sprintf("NewProjectMsg{Data: %v}", msg.Data)
+	return fmt.Sprintf("NewProjectMsg{Data: %v}", msg.Payload)
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
