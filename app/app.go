@@ -19,7 +19,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
 	"github.com/ixofoundation/ixo-cosmos/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 const (
@@ -64,7 +64,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
-		AddRoute("ixo", ixo.NewHandler()).
+		AddRoute("project", project.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper))
 
@@ -97,7 +97,7 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
-	const msgTypeIxoMsg = 0x9
+	const msgTypeProjectMsg = 0x9
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -107,7 +107,7 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
-		oldwire.ConcreteType{ixo.IxoMsg{}, msgTypeIxoMsg},
+		oldwire.ConcreteType{project.ProjectMsg{}, msgTypeProjectMsg},
 	)
 
 	const accTypeApp = 0x1
@@ -126,7 +126,7 @@ func MakeCodec() *wire.Codec {
 
 // custom logic for transaction decoding
 func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
-	var tx = ixo.IxoTx{}
+	var tx = project.ProjectTx{}
 
 	if len(txBytes) == 0 {
 		return nil, sdk.ErrTxDecode("txBytes are empty")
@@ -173,7 +173,7 @@ func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		msg := tx.GetMsg()
-		if msg.Type() != "ixo" {
+		if msg.Type() != "project" {
 			// Not an ixo message so execute the wrappered version
 			return cosmosAnteHandler(ctx, tx)
 		}
