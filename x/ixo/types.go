@@ -1,4 +1,4 @@
-package project
+package ixo
 
 import (
 	"encoding/json"
@@ -29,37 +29,36 @@ var _ sdk.Tx = IxoTx{}
 // Define Did as an Address
 type Did = sdk.Address
 
-// A message type to quiz how cool you are. these fields are can be entirely
-// arbitrary and custom to your message
-type NewProjectMsg struct {
+// Define the ixo message type
+type IxoMsg struct {
 	Payload string `json:"payload"`
 }
 
-// New Project message
-func CreateProjectMsg(did string, projectData string) NewProjectMsg {
-	return NewProjectMsg{
-		Payload: projectData,
+// New Ixo message
+func NewIxoMsg(did string, payload string) IxoMsg {
+	return IxoMsg{
+		Payload: payload,
 	}
 }
 
 // enforce the msg type at compile time
-var _ sdk.Msg = NewProjectMsg{}
+var _ sdk.Msg = IxoMsg{}
 
 // nolint
-func (msg NewProjectMsg) Type() string                            { return "project" }
-func (msg NewProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg NewProjectMsg) GetSigners() []sdk.Address               { return nil }
-func (msg NewProjectMsg) String() string {
-	return fmt.Sprintf("NewProjectMsg{Data: %v}", msg.Payload)
+func (msg IxoMsg) Type() string                            { return "ixo" }
+func (msg IxoMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg IxoMsg) GetSigners() []sdk.Address               { return nil }
+func (msg IxoMsg) String() string {
+	return fmt.Sprintf("IxoMsg{Payload: %v}", msg.Payload)
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
-func (msg NewProjectMsg) ValidateBasic() sdk.Error {
+func (msg IxoMsg) ValidateBasic() sdk.Error {
 	return nil
 }
 
 // Get the bytes for the message signer to sign on
-func (msg NewProjectMsg) GetSignBytes() []byte {
+func (msg IxoMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)

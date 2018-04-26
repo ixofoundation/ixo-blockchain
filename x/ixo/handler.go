@@ -1,4 +1,4 @@
-package project
+package ixo
 
 import (
 	"fmt"

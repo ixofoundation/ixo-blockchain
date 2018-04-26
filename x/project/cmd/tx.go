@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 
-	"github.com/ixofoundation/ixo-cosmos/x/project"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 // take the coolness quiz transaction
@@ -26,9 +26,9 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 			ctx := context.NewCoreContextFromViper()
 
 			// create the message
-			msg := project.CreateProjectMsg("3J56r8ZGfD6ThhwhaDv9iA", args[0])
+			msg := ixo.NewIxoMsg("3J56r8ZGfD6ThhwhaDv9iA", args[0])
 
-			tx := project.NewIxoTx(msg)
+			tx := ixo.NewIxoTx(msg)
 			bz, err := cdc.MarshalBinary(tx)
 			if err != nil {
 				panic(err)
