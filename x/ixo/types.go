@@ -29,6 +29,13 @@ var _ sdk.Tx = IxoTx{}
 // Define Did as an Address
 type Did = sdk.Address
 
+type DidDoc interface {
+	SetDid(did Did) error
+	GetDid() Did
+	SetPubKey(pubkey string) error
+	GetPubKey() string
+}
+
 // Define the ixo message type
 type IxoMsg struct {
 	Payload string `json:"payload"`

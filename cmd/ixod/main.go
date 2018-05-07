@@ -11,8 +11,8 @@ import (
 	dbm "github.com/tendermint/tmlibs/db"
 	"github.com/tendermint/tmlibs/log"
 
-	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/ixofoundation/ixo-cosmos/app"
 )
 
 // rootCmd is the entry point for this binary
@@ -44,11 +44,17 @@ func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
 		return nil, err
 	}
 
+	dbDid, err := dbm.NewGoLevelDB("ixo-did", dataDir)
+	if err != nil {
+		return nil, err
+	}
+
 	dbs := map[string]dbm.DB{
 		"main":    dbMain,
 		"acc":     dbAcc,
 		"ibc":     dbIBC,
 		"staking": dbStaking,
+		"did":     dbDid,
 	}
 	bapp := app.NewIxoApp(logger, dbs)
 	return bapp, nil

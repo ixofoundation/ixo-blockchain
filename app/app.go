@@ -1,6 +1,7 @@
 package app
 
 import (
+
 	//	"cosmos-test/types"
 	"encoding/json"
 
@@ -19,7 +20,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
 	"github.com/ixofoundation/ixo-cosmos/types"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 const (
@@ -36,9 +38,13 @@ type IxoApp struct {
 	capKeyAccountStore *sdk.KVStoreKey
 	capKeyIBCStore     *sdk.KVStoreKey
 	capKeyStakingStore *sdk.KVStoreKey
+	capKeyDIDStore     *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper sdk.AccountMapper
+
+	// Manage getting and setting dids
+	didMapper did.SealedDidMapper
 }
 
 func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
@@ -50,6 +56,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 		capKeyAccountStore: sdk.NewKVStoreKey("acc"),
 		capKeyIBCStore:     sdk.NewKVStoreKey("ibc"),
 		capKeyStakingStore: sdk.NewKVStoreKey("stake"),
+		capKeyDIDStore:     sdk.NewKVStoreKey("did"),
 	}
 
 	// define the accountMapper
@@ -58,15 +65,23 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 		&types.AppAccount{}, // prototype
 	)
 
+	// define the didMapper
+	app.didMapper = did.NewDidMapperSealed(
+		app.capKeyDIDStore, // target store
+		&did.BaseDidDoc{},  // prototype
+	)
+
 	// add handlers
 	coinKeeper := bank.NewCoinKeeper(app.accountMapper)
 	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
+	didKeeper := did.NewKeeper(app.didMapper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
-		AddRoute("project", project.NewHandler()).
+		//		AddRoute("project", project.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
-		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper))
+		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper)).
+		AddRoute("did", did.NewHandler(didKeeper))
 
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
@@ -75,6 +90,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	app.MountStoreWithDB(app.capKeyAccountStore, sdk.StoreTypeIAVL, dbs["acc"])
 	app.MountStoreWithDB(app.capKeyIBCStore, sdk.StoreTypeIAVL, dbs["ibc"])
 	app.MountStoreWithDB(app.capKeyStakingStore, sdk.StoreTypeIAVL, dbs["staking"])
+	app.MountStoreWithDB(app.capKeyDIDStore, sdk.StoreTypeIAVL, dbs["did"])
 	// NOTE: Broken until #532 lands
 	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
 	app.SetAnteHandler(NewIxoAnteHandler(auth.NewAnteHandler(app.accountMapper)))
@@ -97,7 +113,9 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
-	const msgTypeProjectMsg = 0x9
+	const msgTypeIxoMsg = 0x9
+	const msgTypeDidMsg = 0xA
+	const msgTypeAddDidMsg = 0xB
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -107,7 +125,9 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
-		oldwire.ConcreteType{project.ProjectMsg{}, msgTypeProjectMsg},
+		oldwire.ConcreteType{ixo.IxoMsg{}, msgTypeIxoMsg},
+		oldwire.ConcreteType{did.DidMsg{}, msgTypeDidMsg},
+		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
 	)
 
 	const accTypeApp = 0x1
@@ -126,7 +146,7 @@ func MakeCodec() *wire.Codec {
 
 // custom logic for transaction decoding
 func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
-	var tx = project.ProjectTx{}
+	var tx = ixo.IxoTx{}
 
 	if len(txBytes) == 0 {
 		return nil, sdk.ErrTxDecode("txBytes are empty")
@@ -173,7 +193,7 @@ func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		msg := tx.GetMsg()
-		if msg.Type() != "project" {
+		if msg.Type() != "project" && msg.Type() != "did" {
 			// Not an ixo message so execute the wrappered version
 			return cosmosAnteHandler(ctx, tx)
 		}

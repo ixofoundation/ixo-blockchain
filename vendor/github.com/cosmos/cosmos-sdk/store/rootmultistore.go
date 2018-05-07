@@ -80,7 +80,6 @@ func (rs *rootMultiStore) LoadLatestVersion() error {
 
 // Implements CommitMultiStore.
 func (rs *rootMultiStore) LoadVersion(ver int64) error {
-
 	// Special logic for version 0
 	if ver == 0 {
 		for key, storeParams := range rs.storesParams {

@@ -21,6 +21,7 @@ import (
 
 	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/ixofoundation/ixo-cosmos/types"
+	didcmd "github.com/ixofoundation/ixo-cosmos/x/did/cmd"
 	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/cmd"
 )
 
@@ -70,6 +71,13 @@ func main() {
 	rootCmd.AddCommand(
 		client.PostCommands(
 			simplestakingcmd.UnbondTxCmd(cdc),
+		)...)
+
+	// and now ixo specific commands
+	rootCmd.AddCommand(
+		client.PostCommands(
+			didcmd.AddDidDocCmd(cdc),
+			didcmd.GetDidDocCmd(cdc),
 		)...)
 
 	// and now ixo specific commands
