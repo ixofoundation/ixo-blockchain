@@ -62,7 +62,7 @@ type GetDidMsg struct {
 // New Ixo message
 func NewGetDidMsg(did string) GetDidMsg {
 	return GetDidMsg{
-		Did: []byte(did),
+		Did: did,
 	}
 }
 
@@ -99,7 +99,7 @@ type AddDidMsg struct {
 // New Ixo message
 func NewAddDidMsg(did string, publicKey string) AddDidMsg {
 	didDoc := BaseDidDoc{
-		Did:    []byte(did),
+		Did:    did,
 		PubKey: publicKey,
 	}
 	return AddDidMsg{
@@ -113,9 +113,9 @@ var _ sdk.Msg = AddDidMsg{}
 // nolint
 func (msg AddDidMsg) Type() string                            { return "did" }
 func (msg AddDidMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg AddDidMsg) GetSigners() []sdk.Address               { return []sdk.Address{msg.DidDoc.GetDid()} }
+func (msg AddDidMsg) GetSigners() []sdk.Address               { return []sdk.Address{[]byte(msg.DidDoc.GetDid())} }
 func (msg AddDidMsg) String() string {
-	return fmt.Sprintf("AddDidMsg{Did: %v, publicKey: %v}", msg.DidDoc.GetDid, msg.DidDoc.GetPubKey)
+	return fmt.Sprintf("AddDidMsg{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly

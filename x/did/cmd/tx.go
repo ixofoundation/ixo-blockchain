@@ -59,11 +59,11 @@ func GetDidDocCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) 
 
 			// find the key to look up the account
 			didAddr := args[0]
-			key := ixo.Did([]byte(didAddr))
+			key := ixo.Did(didAddr)
 
 			ctx := context.NewCoreContextFromViper()
 
-			res, err := ctx.Query(key, storeName)
+			res, err := ctx.Query([]byte(key), storeName)
 			if err != nil {
 				return err
 			}

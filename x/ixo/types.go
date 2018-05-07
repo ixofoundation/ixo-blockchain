@@ -27,7 +27,7 @@ func (tx IxoTx) GetSignatures() []sdk.StdSignature { return nil }
 var _ sdk.Tx = IxoTx{}
 
 // Define Did as an Address
-type Did = sdk.Address
+type Did = string
 
 type DidDoc interface {
 	SetDid(did Did) error

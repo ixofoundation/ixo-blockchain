@@ -55,14 +55,14 @@ func (dm DidMapper) Seal() SealedDidMapper {
 
 func (dm DidMapper) NewDidDoc(ctx sdk.Context, msg AddDidMsg) ixo.DidDoc {
 	did := dm.clonePrototype()
-	did.SetDid([]byte(msg.DidDoc.GetDid()))
+	did.SetDid(msg.DidDoc.GetDid())
 	did.SetPubKey(msg.DidDoc.GetPubKey())
 	return did
 }
 
 func (dm DidMapper) GetDidDoc(ctx sdk.Context, addr ixo.Did) ixo.DidDoc {
 	store := ctx.KVStore(dm.key)
-	bz := store.Get(addr)
+	bz := store.Get([]byte(addr))
 	if bz == nil {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (dm DidMapper) GetDidDoc(ctx sdk.Context, addr ixo.Did) ixo.DidDoc {
 }
 
 func (dm DidMapper) SetDidDoc(ctx sdk.Context, did ixo.DidDoc) {
-	addr := did.GetDid()
+	addr := []byte(did.GetDid())
 	store := ctx.KVStore(dm.key)
 	bz := dm.encodeDid(did)
 	store.Set(addr, bz)
