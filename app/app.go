@@ -114,7 +114,7 @@ func MakeCodec() *wire.Codec {
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
 	const msgTypeIxoMsg = 0x9
-	const msgTypeDidMsg = 0xA
+	const msgTypeGetDidMsg = 0xA
 	const msgTypeAddDidMsg = 0xB
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
@@ -126,7 +126,7 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
 		oldwire.ConcreteType{ixo.IxoMsg{}, msgTypeIxoMsg},
-		oldwire.ConcreteType{did.DidMsg{}, msgTypeDidMsg},
+		oldwire.ConcreteType{did.GetDidMsg{}, msgTypeGetDidMsg},
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
 	)
 

@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/ixofoundation/ixo-cosmos/x/did"
+
 	"github.com/spf13/cobra"
 
 	"github.com/tendermint/tmlibs/cli"
@@ -77,7 +79,7 @@ func main() {
 	rootCmd.AddCommand(
 		client.PostCommands(
 			didcmd.AddDidDocCmd(cdc),
-			didcmd.GetDidDocCmd(cdc),
+			didcmd.GetDidDocCmd("did", cdc, did.GetDidDocDecoder(cdc)),
 		)...)
 
 	// and now ixo specific commands

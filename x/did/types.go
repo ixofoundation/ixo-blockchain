@@ -6,10 +6,13 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	wire "github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 //_______________________________________________________________________
+// DidDocDecoder unmarshals account bytes
+type DidDocDecoder func(didDocBytes []byte) (ixo.DidDoc, error)
 
 type BaseDidDoc struct {
 	Did    ixo.Did `json:"did"`
@@ -33,39 +36,54 @@ func (dd BaseDidDoc) SetPubKey(pubKey string) error {
 }
 func (dd BaseDidDoc) GetPubKey() string { return dd.PubKey }
 
+// Get the DidDocDecoder function for the custom AppAccount
+func GetDidDocDecoder(cdc *wire.Codec) DidDocDecoder {
+	return func(didDocBytes []byte) (res ixo.DidDoc, err error) {
+		if len(didDocBytes) == 0 {
+			return nil, sdk.ErrTxDecode("didDocBytes are empty")
+		}
+		didDoc := BaseDidDoc{}
+		err = cdc.UnmarshalBinary(didDocBytes, &didDoc)
+		if err != nil {
+			panic(err)
+		}
+		return didDoc, err
+	}
+}
+
 // enforce the DidDoc type at compile time
 var _ ixo.DidDoc = (*BaseDidDoc)(nil)
 
 // Define the did message type
-type DidMsg struct {
+type GetDidMsg struct {
 	Did ixo.Did `json:"did"`
 }
 
 // New Ixo message
-func NewGetDidMsg(did string) DidMsg {
-	return DidMsg{
+func NewGetDidMsg(did string) GetDidMsg {
+	return GetDidMsg{
 		Did: []byte(did),
 	}
 }
 
 // enforce the msg type at compile time
-var _ sdk.Msg = DidMsg{}
+var _ sdk.Msg = GetDidMsg{}
 
 // nolint
-func (msg DidMsg) Type() string                            { return "did" }
-func (msg DidMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg DidMsg) GetSigners() []sdk.Address               { return nil }
-func (msg DidMsg) String() string {
+func (msg GetDidMsg) Type() string                            { return "did" }
+func (msg GetDidMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg GetDidMsg) GetSigners() []sdk.Address               { return nil }
+func (msg GetDidMsg) String() string {
 	return fmt.Sprintf("DidMsg{Did: %v}", msg.Did)
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
-func (msg DidMsg) ValidateBasic() sdk.Error {
+func (msg GetDidMsg) ValidateBasic() sdk.Error {
 	return nil
 }
 
 // Get the bytes for the message signer to sign on
-func (msg DidMsg) GetSignBytes() []byte {
+func (msg GetDidMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
