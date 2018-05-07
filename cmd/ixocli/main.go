@@ -11,7 +11,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
-	"github.com/cosmos/cosmos-sdk/client/lcd"
+	//	"github.com/cosmos/cosmos-sdk/client/lcd"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 
@@ -24,6 +24,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/ixofoundation/ixo-cosmos/types"
 	didcmd "github.com/ixofoundation/ixo-cosmos/x/did/cmd"
+	ixolcd "github.com/ixofoundation/ixo-cosmos/x/ixo/lcd"
 	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/cmd"
 )
 
@@ -91,7 +92,7 @@ func main() {
 	// add proxy, version and key info
 	rootCmd.AddCommand(
 		client.LineBreak,
-		lcd.ServeCommand(cdc),
+		ixolcd.ServeCommand(cdc),
 		keys.Commands(),
 		client.LineBreak,
 		version.VersionCmd,

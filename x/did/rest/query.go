@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,6 +9,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
+	did "github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 type commander struct {
@@ -25,15 +26,9 @@ func QueryDidDocRequestHandler(storeName string, cdc *wire.Codec, decoder did.Di
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 
-		bz, err := hex.DecodeString(didAddr)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-			return
-		}
-		key := did.Did(bz)
+		key := ixo.Did(didAddr)
 
-		res, err := ctx.Query(key, c.storeName)
+		res, err := ctx.Query([]byte(key), c.storeName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
