@@ -12,7 +12,7 @@ func NewHandler(k DidKeeper) sdk.Handler {
 		case AddDidMsg:
 			return handleAddDidDocMsg(ctx, k, msg)
 		case GetDidMsg:
-			return handleGetDidDocdMsg(ctx, k, msg)
+			return handleGetDidDocMsg(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -36,7 +36,7 @@ func handleAddDidDocMsg(ctx sdk.Context, k DidKeeper, msg AddDidMsg) sdk.Result 
 	}
 }
 
-func handleGetDidDocdMsg(ctx sdk.Context, k DidKeeper, msg GetDidMsg) sdk.Result {
+func handleGetDidDocMsg(ctx sdk.Context, k DidKeeper, msg GetDidMsg) sdk.Result {
 	didDoc := k.GetDidDoc(ctx, msg.Did)
 
 	return sdk.Result{

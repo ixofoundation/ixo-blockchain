@@ -95,7 +95,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	app.MountStoreWithDB(app.capKeyDIDStore, sdk.StoreTypeIAVL, dbs["did"])
 	// NOTE: Broken until #532 lands
 	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
-	app.SetAnteHandler(NewIxoAnteHandler(auth.NewAnteHandler(app.accountMapper)))
+	app.SetAnteHandler(NewIxoAnteHandler(didKeeper, auth.NewAnteHandler(app.accountMapper)))
 	err := app.LoadLatestVersion(app.capKeyMainStore)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -187,7 +187,7 @@ func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 // the default cosmos one for signature checking. Based on
 // the message type it either checks the Sovrin signature
 // or executes the defualt cosmos version
-func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
+func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
@@ -203,91 +203,38 @@ func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
 		}
 
+		pubKey := [32]byte{}
 		if msg.Type() == "did" {
-
 			addDidMsg := msg.(did.AddDidMsg)
-			pubKey := [32]byte{}
 			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
-
-			// Assert that there are signatures.
-			var sigs = tx.GetSignatures()
-			if len(sigs) != 1 {
-				return ctx,
-					sdk.ErrUnauthorized("no signers").Result(),
-					true
-			}
 
 			// Assert dids are the same
 			if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
 				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
 			}
-
-			res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-			if !res {
-				return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
+		} else {
+			didDoc := dk.GetDidDoc(ctx, ixoTx.Signature.Creator)
+			if didDoc != nil {
+				return ctx, sdk.ErrInternal("did not found").Result(), true
 			}
+			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
+		}
+
+		// Assert that there are signatures.
+		var sigs = tx.GetSignatures()
+		if len(sigs) != 1 {
+			return ctx,
+				sdk.ErrUnauthorized("no signers").Result(),
+				true
+		}
+
+		res := ixo.VerifySignature(msg, pubKey, sigs[0])
+
+		if !res {
+			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
 		}
 		fmt.Println("Signature Verified!")
 
-		/*
-			// Assert that number of signatures is correct.
-			var signerAddrs = msg.GetSigners()
-			if len(sigs) != len(signerAddrs) {
-				return ctx,
-					sdk.ErrUnauthorized("wrong number of signers").Result(),
-					true
-			}
-
-			// Get the sign bytes (requires all sequence numbers and the fee)
-			sequences := make([]int64, len(signerAddrs))
-			for i := 0; i < len(signerAddrs); i++ {
-				sequences[i] = sigs[i].Sequence
-			}
-			fee := stdTx.Fee
-			chainID := ctx.ChainID()
-			// XXX: major hack; need to get ChainID
-			// into the app right away (#565)
-			if chainID == "" {
-				chainID = viper.GetString("chain-id")
-			}
-			signBytes := sdk.StdSignBytes(ctx.ChainID(), sequences, fee, msg)
-
-			// Check sig and nonce and collect signer accounts.
-			var signerAccs = make([]sdk.Account, len(signerAddrs))
-			for i := 0; i < len(sigs); i++ {
-				signerAddr, sig := signerAddrs[i], sigs[i]
-
-				// check signature, return account with incremented nonce
-				signerAcc, res := processSig(
-					ctx, accountMapper,
-					signerAddr, sig, signBytes,
-				)
-				if !res.IsOK() {
-					return ctx, res, true
-				}
-
-				// first sig pays the fees
-				if i == 0 {
-					// TODO: min fee
-					if !fee.Amount.IsZero() {
-						signerAcc, res = deductFees(signerAcc, fee)
-						if !res.IsOK() {
-							return ctx, res, true
-						}
-					}
-				}
-
-				// Save the account.
-				accountMapper.SetAccount(ctx, signerAcc)
-				signerAccs[i] = signerAcc
-			}
-
-			// cache the signer accounts in the context
-			ctx = WithSigners(ctx, signerAccs)
-
-			// TODO: tx tags (?)
-		*/
 		return ctx, sdk.Result{}, false // continue...
 	}
 }

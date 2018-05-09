@@ -59,16 +59,6 @@ func AddDidDocCmd(cdc *wire.Codec) *cobra.Command {
 
 			tx := ixo.NewIxoTx(msg, signature)
 
-			/*
-				pubKey := [32]byte{}
-				copy(pubKey[:], base58.Decode(sovrinDid.VerifyKey))
-				sig := tx.GetSignatures()[0]
-				fmt.Println(sig.Signature.SignatureInner.Bytes())
-				resul := ixo.VerifySignature(msg, pubKey, tx.GetSignatures()[0])
-				fmt.Println("Result")
-				fmt.Println(resul)
-			*/
-
 			fmt.Println("*******Transaction*******")
 			fmt.Println(tx.String())
 
