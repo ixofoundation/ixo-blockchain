@@ -16,7 +16,7 @@ type DidDocDecoder func(didDocBytes []byte) (ixo.DidDoc, error)
 
 type BaseDidDoc struct {
 	Did    ixo.Did `json:"did"`
-	PubKey string  `json:"pub_key"` // May be nil, if not known.
+	PubKey string  `json:"pubKey"` // May be nil, if not known.
 }
 
 func (dd BaseDidDoc) SetDid(did ixo.Did) error {
@@ -93,7 +93,7 @@ func (msg GetDidMsg) GetSignBytes() []byte {
 
 // Define the AddDid message type
 type AddDidMsg struct {
-	DidDoc BaseDidDoc
+	DidDoc BaseDidDoc `json:"didDoc"`
 }
 
 // New Ixo message
@@ -129,5 +129,7 @@ func (msg AddDidMsg) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("SignBytes")
+	fmt.Println(string(b))
 	return b
 }

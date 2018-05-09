@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 
 	//	"cosmos-test/types"
 	"encoding/json"
@@ -19,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
+	base58 "github.com/btcsuite/btcutil/base58"
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -113,7 +115,6 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
-	const msgTypeIxoMsg = 0x9
 	const msgTypeGetDidMsg = 0xA
 	const msgTypeAddDidMsg = 0xB
 	var _ = oldwire.RegisterInterface(
@@ -125,7 +126,6 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
-		oldwire.ConcreteType{ixo.IxoMsg{}, msgTypeIxoMsg},
 		oldwire.ConcreteType{did.GetDidMsg{}, msgTypeGetDidMsg},
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
 	)
@@ -197,21 +197,40 @@ func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 			// Not an ixo message so execute the wrappered version
 			return cosmosAnteHandler(ctx, tx)
 		}
-		/*
+		// This always be a IxoTx
+		ixoTx, ok := tx.(ixo.IxoTx)
+		if !ok {
+			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
+		}
+
+		if msg.Type() == "did" {
+
+			addDidMsg := msg.(did.AddDidMsg)
+			pubKey := [32]byte{}
+			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
+
 			// Assert that there are signatures.
 			var sigs = tx.GetSignatures()
-			if len(sigs) == 0 {
+			if len(sigs) != 1 {
 				return ctx,
 					sdk.ErrUnauthorized("no signers").Result(),
 					true
 			}
 
-			// TODO: will this always be a stdtx? should that be used in the function signature?
-			stdTx, ok := tx.(sdk.StdTx)
-			if !ok {
-				return ctx, sdk.ErrInternal("tx must be sdk.StdTx").Result(), true
+			// Assert dids are the same
+			if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
+				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
 			}
 
+			res := ixo.VerifySignature(msg, pubKey, sigs[0])
+
+			if !res {
+				return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
+			}
+		}
+		fmt.Println("Signature Verified!")
+
+		/*
 			// Assert that number of signatures is correct.
 			var signerAddrs = msg.GetSigners()
 			if len(sigs) != len(signerAddrs) {

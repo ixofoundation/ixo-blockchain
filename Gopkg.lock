@@ -14,6 +14,12 @@
   revision = "675abc5df3c5531bc741b56a765e35623459da6d"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/btcsuite/btcutil"
+  packages = ["base58"]
+  revision = "501929d3d046174c3d39f0ea54ece471aa17238c"
+
+[[projects]]
   name = "github.com/cosmos/cosmos-sdk"
   packages = [
     "baseapp",
@@ -21,7 +27,6 @@
     "client/context",
     "client/core",
     "client/keys",
-    "client/lcd",
     "client/rpc",
     "client/tx",
     "mock",
@@ -400,6 +405,8 @@
   packages = [
     "blowfish",
     "curve25519",
+    "ed25519",
+    "ed25519/internal/edwards25519",
     "nacl/box",
     "nacl/secretbox",
     "openpgp/armor",
@@ -491,6 +498,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6940c754604608386ee82255af8348d6a5000f0f51fb59a329aaeb184395b822"
+  inputs-digest = "87f9d1dad0f7ac249ad637248bd08efee527db62ca5cd972521a0ebaf34dc395"
   solver-name = "gps-cdcl"
   solver-version = 1
