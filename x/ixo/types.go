@@ -36,6 +36,16 @@ type DidDoc interface {
 	GetPubKey() string
 }
 
+// Define Project
+type Project = string
+
+type ProjectDoc interface {
+	SetData(project Project) error
+	GetData() Project
+	SetDid(did Did) error
+	GetDid() Did
+}
+
 // Define the ixo message type
 type IxoMsg struct {
 	Payload string `json:"payload"`

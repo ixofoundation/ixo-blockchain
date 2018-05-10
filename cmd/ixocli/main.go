@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 
 	"github.com/spf13/cobra"
 
@@ -11,7 +12,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
-	//	"github.com/cosmos/cosmos-sdk/client/lcd"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 
@@ -83,10 +83,10 @@ func main() {
 			didcmd.GetDidDocCmd("did", cdc, did.GetDidDocDecoder(cdc)),
 		)...)
 
-	// and now ixo specific commands
 	rootCmd.AddCommand(
 		client.PostCommands(
-			projectcmd.CreateProjectCmd(cdc),
+			projectcmd.AddProjectDocCmd(cdc),
+			projectcmd.GetProjectDocCmd("project", cdc, project.GetProjectDocDecoder(cdc)),
 		)...)
 
 	// add proxy, version and key info

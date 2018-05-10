@@ -3,7 +3,6 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	//	"encoding/json"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"

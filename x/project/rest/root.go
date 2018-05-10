@@ -7,6 +7,6 @@ import (
 )
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
-func RegisterRoutes(r *mux.Router, cdc *wire.Codec, kb keys.Keybase) {
-	r.HandleFunc("/project", CreateProjectRequestHandler(cdc, kb)).Methods("POST")
+func RegisterRoutes(r *mux.Router, cdc *wire.Codec, kb keys.Keybase, storeName string) {
+	r.HandleFunc("/project", CreateProjectRequestHandler(storeName, cdc, kb)).Methods("POST")
 }

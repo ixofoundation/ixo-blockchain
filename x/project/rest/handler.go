@@ -16,7 +16,7 @@ type sendBody struct {
 }
 
 //CreateProjectRequestHandler create project handler
-func CreateProjectRequestHandler(cdc *wire.Codec, kb keys.Keybase) func(http.ResponseWriter, *http.Request) {
+func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keybase) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// collect data
 
