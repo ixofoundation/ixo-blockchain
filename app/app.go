@@ -210,6 +210,9 @@ func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		msg := tx.GetMsg()
+
+		fmt.Println("********MSG_TYPE********* \n", msg.Type())
+
 		if msg.Type() != "project" && msg.Type() != "did" {
 			// Not an ixo message so execute the wrappered version
 			return cosmosAnteHandler(ctx, tx)
@@ -221,12 +224,21 @@ func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.
 		}
 
 		pubKey := [32]byte{}
+
 		if msg.Type() == "did" {
 			addDidMsg := msg.(did.AddDidMsg)
 			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
 
 			// Assert dids are the same
 			if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
+				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
+			}
+		} else if msg.Type() == "project" {
+			addProjectMsg := msg.(project.AddProjectMsg)
+			copy(pubKey[:], base58.Decode(addProjectMsg.ProjectDoc.PubKey))
+
+			// Assert dids are the same
+			if addProjectMsg.ProjectDoc.Did != ixoTx.Signature.Creator {
 				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
 			}
 		} else {

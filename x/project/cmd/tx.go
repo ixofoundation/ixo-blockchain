@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	ixo "github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 
 	base58 "github.com/btcsuite/btcutil/base58"
@@ -35,24 +35,9 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 				return errors.New("You must provide the project data and the projects private key")
 			}
 
-			b := JsonString{args[0]}
-			jo := b.ParseJSON()
+			projectDoc := ixo.JsonString{args[0]}
+			projectDocJSON := projectDoc.ParseJSON()
 
-
-			var projectDoc map[string]interface{}
-			projectErr := json.Unmarshal([]byte(json.RawMessage(args[0])), &projectDoc)
-			if projectErr != nil {
-				panic(projectErr)
-			}
-
-			projectData := projectDoc["projectDoc"].(map[string]interface{})["data"]
-
-			dataJson, err := json.MarshalIndent(projectData, "", "  ")
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println("*******PROJECT_DATA_JSON******* \n", string(dataJson))
 
 			sovrinDid := ixo.SovrinDid{}
 			sovrinErr := json.Unmarshal([]byte(args[1]), &sovrinDid)
@@ -61,7 +46,7 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			// create the message
-			msg := project.NewAddProjectMsg(string(dataJson), sovrinDid.Did, sovrinDid.VerifyKey)
+			msg := project.NewAddProjectMsg(projectDocJSON.String(), sovrinDid.Did, sovrinDid.VerifyKey)
 			fmt.Println("*******PROJECT_MSG******* \n", msg)
 
 			// Force the length to 64
