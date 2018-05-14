@@ -35,6 +35,10 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 				return errors.New("You must provide the project data and the projects private key")
 			}
 
+			b := JsonString{args[0]}
+			jo := b.ParseJSON()
+
+
 			var projectDoc map[string]interface{}
 			projectErr := json.Unmarshal([]byte(json.RawMessage(args[0])), &projectDoc)
 			if projectErr != nil {
