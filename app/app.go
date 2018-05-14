@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 
 	//	"cosmos-test/types"
 	"encoding/json"
@@ -19,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
+	base58 "github.com/btcsuite/btcutil/base58"
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -107,7 +109,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	app.MountStoreWithDB(app.capKeyProjectStore, sdk.StoreTypeIAVL, dbs["project"])
 	// NOTE: Broken until #532 lands
 	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
-	app.SetAnteHandler(NewIxoAnteHandler(auth.NewAnteHandler(app.accountMapper)))
+	app.SetAnteHandler(NewIxoAnteHandler(didKeeper, auth.NewAnteHandler(app.accountMapper)))
 	err := app.LoadLatestVersion(app.capKeyMainStore)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -127,7 +129,6 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
-	const msgTypeIxoMsg = 0x9
 	const msgTypeGetDidMsg = 0xA
 	const msgTypeAddDidMsg = 0xB
 	const msgTypeAddProjectMsg = 0xC
@@ -140,7 +141,6 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
-		oldwire.ConcreteType{ixo.IxoMsg{}, msgTypeIxoMsg},
 		oldwire.ConcreteType{did.GetDidMsg{}, msgTypeGetDidMsg},
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
 		oldwire.ConcreteType{project.AddProjectMsg{}, msgTypeAddProjectMsg},
@@ -168,6 +168,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		return nil, sdk.ErrTxDecode("txBytes are empty")
 	}
 
+	fmt.Println("********DECODED_TXN********* \n", string(txBytes))
 	// StdTx.Msg is an interface. The concrete types
 	// are registered by MakeTxCodec in bank.RegisterWire.
 	err := app.cdc.UnmarshalBinary(txBytes, &tx)
@@ -203,7 +204,7 @@ func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 // the default cosmos one for signature checking. Based on
 // the message type it either checks the Sovrin signature
 // or executes the defualt cosmos version
-func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
+func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
@@ -213,78 +214,44 @@ func NewIxoAnteHandler(cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
 			// Not an ixo message so execute the wrappered version
 			return cosmosAnteHandler(ctx, tx)
 		}
-		/*
-			// Assert that there are signatures.
-			var sigs = tx.GetSignatures()
-			if len(sigs) == 0 {
-				return ctx,
-					sdk.ErrUnauthorized("no signers").Result(),
-					true
+		// This always be a IxoTx
+		ixoTx, ok := tx.(ixo.IxoTx)
+		if !ok {
+			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
+		}
+
+		pubKey := [32]byte{}
+		if msg.Type() == "did" {
+			addDidMsg := msg.(did.AddDidMsg)
+			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
+
+			// Assert dids are the same
+			if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
+				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
 			}
-
-			// TODO: will this always be a stdtx? should that be used in the function signature?
-			stdTx, ok := tx.(sdk.StdTx)
-			if !ok {
-				return ctx, sdk.ErrInternal("tx must be sdk.StdTx").Result(), true
+		} else {
+			didDoc := dk.GetDidDoc(ctx, ixoTx.Signature.Creator)
+			if didDoc != nil {
+				return ctx, sdk.ErrInternal("did not found").Result(), true
 			}
+			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
+		}
 
-			// Assert that number of signatures is correct.
-			var signerAddrs = msg.GetSigners()
-			if len(sigs) != len(signerAddrs) {
-				return ctx,
-					sdk.ErrUnauthorized("wrong number of signers").Result(),
-					true
-			}
+		// Assert that there are signatures.
+		var sigs = tx.GetSignatures()
+		if len(sigs) != 1 {
+			return ctx,
+				sdk.ErrUnauthorized("no signers").Result(),
+				true
+		}
 
-			// Get the sign bytes (requires all sequence numbers and the fee)
-			sequences := make([]int64, len(signerAddrs))
-			for i := 0; i < len(signerAddrs); i++ {
-				sequences[i] = sigs[i].Sequence
-			}
-			fee := stdTx.Fee
-			chainID := ctx.ChainID()
-			// XXX: major hack; need to get ChainID
-			// into the app right away (#565)
-			if chainID == "" {
-				chainID = viper.GetString("chain-id")
-			}
-			signBytes := sdk.StdSignBytes(ctx.ChainID(), sequences, fee, msg)
+		res := ixo.VerifySignature(msg, pubKey, sigs[0])
 
-			// Check sig and nonce and collect signer accounts.
-			var signerAccs = make([]sdk.Account, len(signerAddrs))
-			for i := 0; i < len(sigs); i++ {
-				signerAddr, sig := signerAddrs[i], sigs[i]
+		if !res {
+			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
+		}
+		fmt.Println("Signature Verified!")
 
-				// check signature, return account with incremented nonce
-				signerAcc, res := processSig(
-					ctx, accountMapper,
-					signerAddr, sig, signBytes,
-				)
-				if !res.IsOK() {
-					return ctx, res, true
-				}
-
-				// first sig pays the fees
-				if i == 0 {
-					// TODO: min fee
-					if !fee.Amount.IsZero() {
-						signerAcc, res = deductFees(signerAcc, fee)
-						if !res.IsOK() {
-							return ctx, res, true
-						}
-					}
-				}
-
-				// Save the account.
-				accountMapper.SetAccount(ctx, signerAcc)
-				signerAccs[i] = signerAcc
-			}
-
-			// cache the signer accounts in the context
-			ctx = WithSigners(ctx, signerAccs)
-
-			// TODO: tx tags (?)
-		*/
 		return ctx, sdk.Result{}, false // continue...
 	}
 }

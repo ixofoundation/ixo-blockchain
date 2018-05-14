@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -10,9 +10,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 
-	"github.com/ixofoundation/ixo-cosmos/x/project"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
+
+	base58 "github.com/btcsuite/btcutil/base58"
 )
+
+type ProjectDoc struct {
+	Data string `json:"data"`
+}
+
+type ProjectPayload struct {
+	ProjectDoc ProjectDoc `json:"projectDoc"`
+}
 
 // Add a project doc to the ledger
 func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
@@ -20,15 +30,50 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "addProjectDoc did projectData",
 		Short: "Add a new ProjectDoc",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
-				return errors.New("You must provide the did and the project data")
-			}
 			ctx := context.NewCoreContextFromViper()
+			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
+				return errors.New("You must provide the project data and the projects private key")
+			}
+
+			var projectDoc map[string]interface{}
+			projectErr := json.Unmarshal([]byte(json.RawMessage(args[0])), &projectDoc)
+			if projectErr != nil {
+				panic(projectErr)
+			}
+
+			projectData := projectDoc["projectDoc"].(map[string]interface{})["data"]
+
+			dataJson, err := json.MarshalIndent(projectData, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Println("*******PROJECT_DATA_JSON******* \n", string(dataJson))
+
+			sovrinDid := ixo.SovrinDid{}
+			sovrinErr := json.Unmarshal([]byte(args[1]), &sovrinDid)
+			if sovrinErr != nil {
+				panic(sovrinErr)
+			}
 
 			// create the message
-			msg := project.NewAddProjectMsg(args[0], args[1])
+			msg := project.NewAddProjectMsg(string(dataJson), sovrinDid.Did, sovrinDid.VerifyKey)
+			fmt.Println("*******PROJECT_MSG******* \n", msg)
 
-			tx := ixo.NewIxoTx(msg)
+			// Force the length to 64
+			privKey := [64]byte{}
+			copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
+			copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+
+			//Create the Signature
+			signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+
+			fmt.Println("*******DID******* \n", sovrinDid.Did)
+			fmt.Println("*******PRIV_KEY******* \n", privKey)
+
+			tx := ixo.NewIxoTx(msg, signature)
+
+			fmt.Println("*******TRANSACTION******* \n", tx.String())
 
 			bz, err := cdc.MarshalBinary(tx)
 			if err != nil {

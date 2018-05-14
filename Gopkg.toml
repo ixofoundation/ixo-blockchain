@@ -73,6 +73,14 @@
   version = "~0.18.0"
   name = "github.com/tendermint/tendermint"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/btcsuite/btcutil"
+
+[[constant]]
+  branch = "master"
+  name = "golang.org/x/crypto/ed25519"
+
 [[override]]
   version = "~0.8.1"
   name = "github.com/tendermint/tmlibs"

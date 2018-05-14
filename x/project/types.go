@@ -2,8 +2,8 @@ package project
 
 import (
 	"encoding/json"
-	"fmt"
 	"errors"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
@@ -15,12 +15,19 @@ var _ ixo.ProjectDoc = (*BaseProjectDoc)(nil)
 
 type BaseProjectDoc struct {
 	Did    ixo.Did `json:"did"`
-	Data string  `json:"data"` // May be nil, if not known.
+	PubKey string  `json:pubKey`
+	Data   string  `json:"data"` // May be nil, if not known.
 }
 
 //GETTERS
-func (pd BaseProjectDoc) GetDid() ixo.Did   { return pd.Did }
-func (pd BaseProjectDoc) GetData() string { return pd.Data }
+func (pd BaseProjectDoc) GetDid() ixo.Did { return pd.Did }
+func (pd BaseProjectDoc) GetData() string {
+	data, err := json.Marshal(pd.Data)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}
 
 //SETTERS
 func (pd BaseProjectDoc) SetDid(did ixo.Did) error {
@@ -31,7 +38,7 @@ func (pd BaseProjectDoc) SetDid(did ixo.Did) error {
 	return nil
 }
 func (pd BaseProjectDoc) SetData(data string) error {
-	if len(pd.Data) != 0 {
+	if len(data) != 0 {
 		return errors.New("cannot override BaseProjectDoc data")
 	}
 	pd.Data = data
@@ -62,10 +69,11 @@ type AddProjectMsg struct {
 	ProjectDoc BaseProjectDoc
 }
 
-func NewAddProjectMsg(did string, data string) AddProjectMsg {
+func NewAddProjectMsg(data string, did string, pubKey string) AddProjectMsg {
 	projectDoc := BaseProjectDoc{
 		Did:    did,
-		Data: data,
+		PubKey: pubKey,
+		Data:   data,
 	}
 	return AddProjectMsg{
 		ProjectDoc: projectDoc,
@@ -76,7 +84,9 @@ var _ sdk.Msg = AddProjectMsg{}
 
 func (msg AddProjectMsg) Type() string                            { return "project" }
 func (msg AddProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg AddProjectMsg) GetSigners() []sdk.Address               { return []sdk.Address{[]byte(msg.ProjectDoc.GetDid())} }
+func (msg AddProjectMsg) GetSigners() []sdk.Address {
+	return []sdk.Address{[]byte(msg.ProjectDoc.GetDid())}
+}
 func (msg AddProjectMsg) String() string {
 	return fmt.Sprintf("AddProjectMsg{Did: %v, data: %v}", string(msg.ProjectDoc.GetDid()), msg.ProjectDoc.GetData())
 }
@@ -127,13 +137,3 @@ func (msg GetProjectMsg) GetSignBytes() []byte {
 	}
 	return b
 }
-
-
-
-
-
-
-
-
-
-
