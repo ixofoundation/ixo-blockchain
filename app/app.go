@@ -24,6 +24,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 const (
@@ -41,12 +42,14 @@ type IxoApp struct {
 	capKeyIBCStore     *sdk.KVStoreKey
 	capKeyStakingStore *sdk.KVStoreKey
 	capKeyDIDStore     *sdk.KVStoreKey
+	capKeyProjectStore *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
 	accountMapper sdk.AccountMapper
 
 	// Manage getting and setting dids
-	didMapper did.SealedDidMapper
+	didMapper     did.SealedDidMapper
+	projectMapper project.SealedProjectMapper
 }
 
 func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
@@ -59,6 +62,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 		capKeyIBCStore:     sdk.NewKVStoreKey("ibc"),
 		capKeyStakingStore: sdk.NewKVStoreKey("stake"),
 		capKeyDIDStore:     sdk.NewKVStoreKey("did"),
+		capKeyProjectStore: sdk.NewKVStoreKey("project"),
 	}
 
 	// define the accountMapper
@@ -73,17 +77,26 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 		&did.BaseDidDoc{},  // prototype
 	)
 
+	// define the projectMapper
+	app.projectMapper = project.NewProjectMapperSealed(
+		app.capKeyProjectStore,    // target store
+		&project.BaseProjectDoc{}, // prototype
+	)
+
 	// add handlers
 	coinKeeper := bank.NewCoinKeeper(app.accountMapper)
 	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
 	didKeeper := did.NewKeeper(app.didMapper)
+	projectKeeper := project.NewKeeper(app.projectMapper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
 		//		AddRoute("project", project.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper)).
-		AddRoute("did", did.NewHandler(didKeeper))
+		AddRoute("did", did.NewHandler(didKeeper)).
+		AddRoute("project", project.NewHandler(projectKeeper))
+
 
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
@@ -93,6 +106,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	app.MountStoreWithDB(app.capKeyIBCStore, sdk.StoreTypeIAVL, dbs["ibc"])
 	app.MountStoreWithDB(app.capKeyStakingStore, sdk.StoreTypeIAVL, dbs["staking"])
 	app.MountStoreWithDB(app.capKeyDIDStore, sdk.StoreTypeIAVL, dbs["did"])
+	app.MountStoreWithDB(app.capKeyProjectStore, sdk.StoreTypeIAVL, dbs["project"])
 	// NOTE: Broken until #532 lands
 	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
 	app.SetAnteHandler(NewIxoAnteHandler(didKeeper, auth.NewAnteHandler(app.accountMapper)))
@@ -117,6 +131,7 @@ func MakeCodec() *wire.Codec {
 	const msgTypeUnbondMsg = 0x8
 	const msgTypeGetDidMsg = 0xA
 	const msgTypeAddDidMsg = 0xB
+	const msgTypeAddProjectMsg = 0xC
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -128,6 +143,7 @@ func MakeCodec() *wire.Codec {
 
 		oldwire.ConcreteType{did.GetDidMsg{}, msgTypeGetDidMsg},
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
+		oldwire.ConcreteType{project.AddProjectMsg{}, msgTypeAddProjectMsg},
 	)
 
 	const accTypeApp = 0x1
@@ -152,6 +168,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		return nil, sdk.ErrTxDecode("txBytes are empty")
 	}
 
+	fmt.Println("********DECODED_TXN********* \n", string(txBytes))
 	// StdTx.Msg is an interface. The concrete types
 	// are registered by MakeTxCodec in bank.RegisterWire.
 	err := app.cdc.UnmarshalBinary(txBytes, &tx)
@@ -193,6 +210,9 @@ func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		msg := tx.GetMsg()
+
+		fmt.Println("********MSG_TYPE********* \n", msg.Type())
+
 		if msg.Type() != "project" && msg.Type() != "did" {
 			// Not an ixo message so execute the wrappered version
 			return cosmosAnteHandler(ctx, tx)
@@ -204,12 +224,21 @@ func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.
 		}
 
 		pubKey := [32]byte{}
+
 		if msg.Type() == "did" {
 			addDidMsg := msg.(did.AddDidMsg)
 			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
 
 			// Assert dids are the same
 			if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
+				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
+			}
+		} else if msg.Type() == "project" {
+			addProjectMsg := msg.(project.AddProjectMsg)
+			copy(pubKey[:], base58.Decode(addProjectMsg.ProjectDoc.PubKey))
+
+			// Assert dids are the same
+			if addProjectMsg.ProjectDoc.Did != ixoTx.Signature.Creator {
 				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
 			}
 		} else {

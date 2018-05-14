@@ -66,3 +66,13 @@ type DidDoc interface {
 	SetPubKey(pubkey string) error
 	GetPubKey() string
 }
+
+// Define Project
+type Project = string
+
+type ProjectDoc interface {
+	SetData(project Project) error
+	GetData() Project
+	SetDid(did Did) error
+	GetDid() Did
+}

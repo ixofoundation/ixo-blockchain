@@ -49,12 +49,18 @@ func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
 		return nil, err
 	}
 
+	dbProject, err := dbm.NewGoLevelDB("ixo-project", dataDir)
+	if err != nil {
+		return nil, err
+	}
+
 	dbs := map[string]dbm.DB{
 		"main":    dbMain,
 		"acc":     dbAcc,
 		"ibc":     dbIBC,
 		"staking": dbStaking,
 		"did":     dbDid,
+		"project": dbProject,
 	}
 	bapp := app.NewIxoApp(logger, dbs)
 	return bapp, nil

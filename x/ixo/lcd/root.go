@@ -23,6 +23,7 @@ import (
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/rest"
 
 	did "github.com/ixofoundation/ixo-cosmos/x/did/rest"
+	project "github.com/ixofoundation/ixo-cosmos/x/project/rest"
 )
 
 const (
@@ -83,5 +84,6 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	bank.RegisterRoutes(r, cdc, kb)
 	ibc.RegisterRoutes(r, cdc, kb)
 	did.RegisterRoutes(r, cdc, "did")
+	project.RegisterRoutes(r, cdc, kb, "did")
 	return r
 }

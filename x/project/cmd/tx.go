@@ -1,8 +1,8 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
-	//	"encoding/json"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -10,30 +10,64 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 
+	ixo "github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
+
+	base58 "github.com/btcsuite/btcutil/base58"
 )
 
-// take the coolness quiz transaction
-func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
+type ProjectDoc struct {
+	Data string `json:"data"`
+}
+
+type ProjectPayload struct {
+	ProjectDoc ProjectDoc `json:"projectDoc"`
+}
+
+// Add a project doc to the ledger
+func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createProject projectData",
-		Short: "Create a new Project for the given data",
+		Use:   "addProjectDoc did projectData",
+		Short: "Add a new ProjectDoc",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide the project data")
+			ctx := context.NewCoreContextFromViper()
+			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
+				return errors.New("You must provide the project data and the projects private key")
 			}
 
-			ctx := context.NewCoreContextFromViper()
+			projectDoc := ixo.JsonString{args[0]}
+			projectDocJSON := projectDoc.ParseJSON()
+
+
+			sovrinDid := ixo.SovrinDid{}
+			sovrinErr := json.Unmarshal([]byte(args[1]), &sovrinDid)
+			if sovrinErr != nil {
+				panic(sovrinErr)
+			}
 
 			// create the message
-			msg := project.NewProjectMsg("3J56r8ZGfD6ThhwhaDv9iA", args[0])
+			msg := project.NewAddProjectMsg(projectDocJSON.String(), sovrinDid.Did, sovrinDid.VerifyKey)
+			fmt.Println("*******PROJECT_MSG******* \n", msg)
 
-			tx := project.NewProjectTx(msg)
+			// Force the length to 64
+			privKey := [64]byte{}
+			copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
+			copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+
+			//Create the Signature
+			signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+
+			fmt.Println("*******DID******* \n", sovrinDid.Did)
+			fmt.Println("*******PRIV_KEY******* \n", privKey)
+
+			tx := ixo.NewIxoTx(msg, signature)
+
+			fmt.Println("*******TRANSACTION******* \n", tx.String())
+
 			bz, err := cdc.MarshalBinary(tx)
 			if err != nil {
 				panic(err)
 			}
-
 			// Broadcast to Tendermint
 			res, err := ctx.BroadcastTx(bz)
 			if err != nil {
@@ -46,59 +80,40 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 	}
 }
 
-/*
-// sign and build the transaction from the msg
-func SignWithDidBuildBroadcast(ctx sdk.Context, msg sdk.Msg, cdc *wire.Codec) (*ctypes.ResultBroadcastTxCommit, error) {
-	did, err := GetDidFromStdin()
-	if err != nil {
-		return nil, err
+// Get a project doc from the ledger
+func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.ProjectDocDecoder) *cobra.Command {
+	return &cobra.Command{
+		Use:   "getProjectDoc did",
+		Short: "Get a new ProjectDoc for a Did",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 || len(args[0]) == 0 {
+				return errors.New("You must provide an did")
+			}
+
+			// find the key to look up the account
+			didAddr := args[0]
+			key := ixo.Did(didAddr)
+
+			ctx := context.NewCoreContextFromViper()
+
+			res, err := ctx.Query([]byte(key), storeName)
+			if err != nil {
+				return err
+			}
+
+			// decode the value
+			projectDoc, err := decoder(res)
+			if err != nil {
+				return err
+			}
+			// print out whole account
+			output, err := json.MarshalIndent(projectDoc, "", "  ")
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(output))
+
+			return nil
+		},
 	}
-
-	secret, err := GetSecretKeyFromStdin(did)
-	if err != nil {
-		return nil, err
-	}
-
-	txBytes, err := SignWithDidAndBuild(ctx, did, secret, msg, cdc)
-	if err != nil {
-		return nil, err
-	}
-
-	return ctx.BroadcastTx(txBytes)
 }
-
-func SignWithDidAndBuild(ctx core.CoreContext, did string, secret string, msg sdk.Msg, cdc *wire.Codec) ([]byte, error) {
-
-	// sign and build
-	bz := msg.Bytes()
-
-	sig, pubkey, err := keybase.Sign(name, passphrase, bz)
-	if err != nil {
-		return nil, err
-	}
-	sigs := []sdk.StdSignature{{
-		PubKey:    pubkey,
-		Signature: sig,
-		Sequence:  sequence,
-	}}
-
-	// marshal bytes
-	tx := sdk.NewStdTx(signMsg.Msg, signMsg.Fee, sigs)
-
-	return cdc.MarshalBinary(tx)
-}
-
-// get did from std input
-func GetDidFromStdin() (did string, err error) {
-	buf := client.BufferStdin()
-	prompt := fmt.Sprintf("Sovrin did to sign with:")
-	return ixoClient.GetString(prompt, 10, buf)
-}
-
-// get secret from std input
-func GetSecretKeyFromStdin(did string) (secretKey string, err error) {
-	buf := client.BufferStdin()
-	prompt := fmt.Sprintf("Sovrin secret key to sign with '%s':", did)
-	return ixoClient.GetString(prompt, 32, buf)
-}
-*/
