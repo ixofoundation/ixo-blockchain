@@ -11,8 +11,6 @@ func NewHandler(k ProjectKeeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case AddProjectMsg:
 			return handleAddProjectDocMsg(ctx, k, msg)
-		case GetProjectMsg:
-			return handleGetProjectDocMsg(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -35,11 +33,3 @@ func handleAddProjectDocMsg(ctx sdk.Context, k ProjectKeeper, msg AddProjectMsg)
 	}
 }
 
-func handleGetProjectDocMsg(ctx sdk.Context, k ProjectKeeper, msg GetProjectMsg) sdk.Result {
-	projectDoc := k.GetProjectDoc(ctx, msg.Did)
-
-	return sdk.Result{
-		Code: sdk.CodeOK,
-		Data: k.pm.encodeProject(projectDoc),
-	}
-}

@@ -16,14 +16,6 @@ import (
 	base58 "github.com/btcsuite/btcutil/base58"
 )
 
-type ProjectDoc struct {
-	Data string `json:"data"`
-}
-
-type ProjectPayload struct {
-	ProjectDoc ProjectDoc `json:"projectDoc"`
-}
-
 // Add a project doc to the ledger
 func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 	return &cobra.Command{
@@ -35,9 +27,11 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 				return errors.New("You must provide the project data and the projects private key")
 			}
 
-			projectDoc := ixo.JsonString{args[0]}
-			projectDocJSON := projectDoc.ParseJSON()
-
+			projectDoc := project.ProjectDoc{}
+			err := json.Unmarshal([]byte(args[0]), &projectDoc)
+			if err != nil {
+				panic(err)
+			}
 
 			sovrinDid := ixo.SovrinDid{}
 			sovrinErr := json.Unmarshal([]byte(args[1]), &sovrinDid)
@@ -46,7 +40,7 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			// create the message
-			msg := project.NewAddProjectMsg(projectDocJSON.String(), sovrinDid.Did, sovrinDid.VerifyKey)
+			msg := project.NewAddProjectMsg(projectDoc, sovrinDid)
 			fmt.Println("*******PROJECT_MSG******* \n", msg)
 
 			// Force the length to 64

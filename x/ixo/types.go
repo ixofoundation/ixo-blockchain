@@ -7,7 +7,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	crypto "github.com/tendermint/go-crypto"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 //_______________________________________________________________________
@@ -69,11 +68,11 @@ type DidDoc interface {
 }
 
 // Define Project
-type Project = project.ProjectDoc
+type Project = string
 
 type ProjectDoc interface {
 	SetCreatedBy(did Did) error
-	GetCreatedBy() Project.CreatedBy
+	GetCreatedBy() Project
 	SetDid(did Did) error
-	GetDid() Project.Did
+	GetDid() Project
 }

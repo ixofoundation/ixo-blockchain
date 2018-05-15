@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
@@ -12,7 +11,7 @@ import (
 )
 
 //DOC SETUP
-var _ ixo.ProjectDoc = (*BaseProjectDoc)(nil)
+var _ ixo.ProjectDoc = (*ProjectDoc)(nil)
 
 type ProjectDoc struct {
 	Did              string    `json:"did"`
@@ -21,7 +20,7 @@ type ProjectDoc struct {
 	ShortDescription string    `json:"shortDescription"`
 	LongDescription  string    `json:"longDescription"`
 	ImpactAction     string    `json:"impactAction"`
-	CreatedOn        time.Time `json:"createdOn"`
+	CreatedOn        string    `json:"createdOn"`
 	CreatedBy        string    `json:"createdBy"`
 	Country          string    `json:"country"`
 	Sdgs             []string  `json:"sdgs"`
@@ -37,14 +36,8 @@ type ProjectDoc struct {
 }
 
 //GETTERS
-func (pd ProjectDoc) GetDid() ixo.Did { return pd.Did }
-func (pd ProjectDoc) GetData() string {
-	data, err := json.Marshal(pd)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
-}
+func (pd ProjectDoc) GetDid() ixo.Did      { return pd.Did }
+func (pd ProjectDoc) GetCreatedBy() string { return pd.CreatedBy }
 
 //SETTERS
 func (pd ProjectDoc) SetDid(did ixo.Did) error {
@@ -81,14 +74,31 @@ func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
 
 //**************************************************************************************
 
-//ADD ProjectDoc
+//ADD PROJECTDOC
 type AddProjectMsg struct {
 	ProjectDoc ProjectDoc
 }
 
-func NewAddProjectMsg(projectDoc ProjectDoc) AddProjectMsg {
+func NewAddProjectMsg(projectDoc ProjectDoc, didDoc ixo.SovrinDid) AddProjectMsg {
+	projectDocMsg := ProjectDoc{
+		Did:              didDoc.Did,
+		PubKey:           didDoc.VerifyKey,
+		Title:            projectDoc.Title,
+		ShortDescription: projectDoc.ShortDescription,
+		LongDescription:  projectDoc.LongDescription,
+		ImpactAction:     projectDoc.ImpactAction,
+		CreatedOn:        projectDoc.CreatedOn,
+		CreatedBy:        didDoc.Did,
+		Country:          projectDoc.Country,
+		Sdgs:             projectDoc.Sdgs,
+		ImpactsRequired:  projectDoc.ImpactsRequired,
+		ClaimTemplate:    projectDoc.ClaimTemplate,
+		SocialMedia:      projectDoc.SocialMedia,
+		WebLink:          projectDoc.WebLink,
+		Image:            projectDoc.Image,
+	}
 	return AddProjectMsg{
-		ProjectDoc: projectDoc,
+		ProjectDoc: projectDocMsg,
 	}
 }
 
@@ -100,7 +110,7 @@ func (msg AddProjectMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.ProjectDoc.GetDid())}
 }
 func (msg AddProjectMsg) String() string {
-	return fmt.Sprintf("AddProjectMsg{Did: %v, data: %v}", string(msg.ProjectDoc.GetDid()), msg.ProjectDoc.GetData())
+	return fmt.Sprintf("AddProjectMsg{Did: %v, projectDoc: %v}", string(msg.ProjectDoc.GetDid()), msg.ProjectDoc)
 }
 
 func (msg AddProjectMsg) ValidateBasic() sdk.Error {
@@ -108,41 +118,6 @@ func (msg AddProjectMsg) ValidateBasic() sdk.Error {
 }
 
 func (msg AddProjectMsg) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return b
-}
-
-//**************************************************************************************
-
-//GET ProjectDoc
-
-type GetProjectMsg struct {
-	Did ixo.Did `json:"did"`
-}
-
-func NewGetDidMsg(did string) GetProjectMsg {
-	return GetProjectMsg{
-		Did: did,
-	}
-}
-
-var _ sdk.Msg = GetProjectMsg{}
-
-func (msg GetProjectMsg) Type() string                            { return "project" }
-func (msg GetProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg GetProjectMsg) GetSigners() []sdk.Address               { return nil }
-func (msg GetProjectMsg) String() string {
-	return fmt.Sprintf("ProjectMsg{ProjectDoc: %v}", msg.Did)
-}
-
-func (msg GetProjectMsg) ValidateBasic() sdk.Error {
-	return nil
-}
-
-func (msg GetProjectMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)

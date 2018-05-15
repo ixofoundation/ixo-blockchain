@@ -1,6 +1,7 @@
 package ixo
 
 import (
+	"fmt"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,6 +10,8 @@ import (
 )
 
 func SignIxoMessage(msg sdk.Msg, did string, privKey [64]byte) IxoSignature {
+	fmt.Println("*******SIGNING_MSG******* \n", string(msg.GetSignBytes()))
+
 	signatureBytes := ed25519.Sign(&privKey, msg.GetSignBytes())
 	signature := crypto.SignatureEd25519(*signatureBytes).Wrap()
 
@@ -16,6 +19,7 @@ func SignIxoMessage(msg sdk.Msg, did string, privKey [64]byte) IxoSignature {
 }
 
 func VerifySignature(msg sdk.Msg, publicKey [32]byte, sig sdk.StdSignature) bool {
+	fmt.Println("*******VERIFY_MSG******* \n", string(msg.GetSignBytes()))
 
 	// First we unwrap the crypto.Signature to the crypto.SignatureEd25519 then we cast it to bytes
 	innerSignature := sig.Signature.Unwrap().(crypto.SignatureEd25519)

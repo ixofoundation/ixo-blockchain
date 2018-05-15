@@ -80,6 +80,8 @@ func Gen() SovrinDid {
 
 func SignMessage(message []byte, signKey string, verifyKey string) []byte {
 	// Force the length to 64
+	fmt.Println("*******SIGNING_MSG******* \n", string(message))
+
 	fullPrivKey := ed25519.PrivateKey{}
 	copy(fullPrivKey[:], getArrayFromKey(signKey))
 	copy(fullPrivKey[32:], getArrayFromKey(verifyKey))
