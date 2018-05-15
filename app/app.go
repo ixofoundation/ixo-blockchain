@@ -79,8 +79,8 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 
 	// define the projectMapper
 	app.projectMapper = project.NewProjectMapperSealed(
-		app.capKeyProjectStore,    // target store
-		&project.ProjectDoc{}, // prototype
+		app.capKeyProjectStore, // target store
+		&project.ProjectDoc{},  // prototype
 	)
 
 	// add handlers
@@ -155,13 +155,6 @@ func MakeCodec() *wire.Codec {
 	// crypto.RegisterWire(cdc) // Register crypto.[PubKey,PrivKey,Signature] types.
 	// ibc.RegisterWire(cdc) // Register ibc.[IBCTransferMsg, IBCReceiveMsg] types.
 	return cdc
-}
-
-func (app *IxoApp) Commit() (res abci.ResponseCommit) {
-	result := app.BaseApp.Commit()
-	fmt.Println("IxoAppCommit")
-	fmt.Println(result)
-	return result
 }
 
 // custom logic for transaction decoding

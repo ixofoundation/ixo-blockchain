@@ -23,6 +23,12 @@ func (pk ProjectKeeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) ixo.ProjectD
 	return projectDoc
 }
 
+// GetAllDids returns all the dids.
+func (pk ProjectKeeper) GetAllDids(ctx sdk.Context) []ixo.Did {
+	didDoc := pk.pm.GetAllDids(ctx)
+	return didDoc
+}
+
 // AddDidDoc adds the did_doc at the addr.
 func (pk ProjectKeeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.ProjectDoc) (ixo.ProjectDoc, sdk.Error) {
 	projectDoc := pk.pm.GetProjectDoc(ctx, newProjectDoc.GetDid())

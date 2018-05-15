@@ -23,6 +23,12 @@ func (dk DidKeeper) GetDidDoc(ctx sdk.Context, did ixo.Did) ixo.DidDoc {
 	return didDoc
 }
 
+// GetAllDids returns all the dids.
+func (dk DidKeeper) GetAllDids(ctx sdk.Context) []ixo.Did {
+	didDoc := dk.dm.GetAllDids(ctx)
+	return didDoc
+}
+
 // AddDidDoc adds the did_doc at the addr.
 func (dk DidKeeper) AddDidDoc(ctx sdk.Context, newDidDoc ixo.DidDoc) (ixo.DidDoc, sdk.Error) {
 	didDoc := dk.dm.GetDidDoc(ctx, newDidDoc.GetDid())
@@ -32,5 +38,4 @@ func (dk DidKeeper) AddDidDoc(ctx sdk.Context, newDidDoc ixo.DidDoc) (ixo.DidDoc
 	} else {
 		return didDoc, nil
 	}
-
 }

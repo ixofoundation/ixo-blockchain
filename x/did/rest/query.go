@@ -65,11 +65,9 @@ func QueryAllDidsRequestHandler(storeName string, cdc *wire.Codec, decoder did.D
 	c := commander{storeName, cdc, decoder}
 	ctx := context.NewCoreContextFromViper()
 	return func(w http.ResponseWriter, r *http.Request) {
-		didAddr := "RUSs3qbo56BAbWQHKKvGS"
+		allKey := "ALL"
 
-		key := ixo.Did(didAddr)
-
-		res, err := ctx.Query([]byte(key), c.storeName)
+		res, err := ctx.Query([]byte(allKey), c.storeName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
@@ -83,7 +81,8 @@ func QueryAllDidsRequestHandler(storeName string, cdc *wire.Codec, decoder did.D
 		}
 
 		// decode the value
-		didDoc, err := c.decoder(res)
+		dids := []ixo.Did{}
+		err = cdc.UnmarshalBinary(res, &dids)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
@@ -91,7 +90,7 @@ func QueryAllDidsRequestHandler(storeName string, cdc *wire.Codec, decoder did.D
 		}
 
 		// print out whole didDoc
-		output, err := json.MarshalIndent(didDoc, "", "  ")
+		output, err := json.MarshalIndent(dids, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
