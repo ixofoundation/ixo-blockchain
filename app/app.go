@@ -80,7 +80,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	// define the projectMapper
 	app.projectMapper = project.NewProjectMapperSealed(
 		app.capKeyProjectStore,    // target store
-		&project.BaseProjectDoc{}, // prototype
+		&project.ProjectDoc{}, // prototype
 	)
 
 	// add handlers
@@ -128,9 +128,8 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
-	const msgTypeGetDidMsg = 0xA
-	const msgTypeAddDidMsg = 0xB
-	const msgTypeAddProjectMsg = 0xC
+	const msgTypeAddDidMsg = 0xA
+	const msgTypeAddProjectMsg = 0xB
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -261,7 +260,7 @@ func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.
 				sdk.ErrUnauthorized("no signers").Result(),
 				true
 		}
-
+		fmt.Println("*******VERIFY_MSG******* \n", string(msg.GetSignBytes()))
 		res := ixo.VerifySignature(msg, pubKey, sigs[0])
 
 		if !res {

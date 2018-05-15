@@ -60,7 +60,7 @@ func (pm ProjectMapper) Seal() SealedProjectMapper {
 func (pm ProjectMapper) NewProjectDoc(ctx sdk.Context, msg AddProjectMsg) ixo.ProjectDoc {
 	project := pm.clonePrototype()
 	project.SetDid(msg.ProjectDoc.GetDid())
-	project.SetData(msg.ProjectDoc.GetData())
+	project.SetCreatedBy(msg.ProjectDoc.GetCreatedBy())
 	return project
 }
 
@@ -122,7 +122,7 @@ func (pm ProjectMapper) encodeProject(projectDoc ixo.ProjectDoc) []byte {
 
 func (pm ProjectMapper) decodeProject(bz []byte) ixo.ProjectDoc {
 
-	projectDoc := BaseProjectDoc{}
+	projectDoc := ProjectDoc{}
 	err := pm.cdc.UnmarshalBinary(bz, &projectDoc)
 	if err != nil {
 		panic(err)

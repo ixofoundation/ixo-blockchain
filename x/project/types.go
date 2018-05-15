@@ -11,37 +11,47 @@ import (
 )
 
 //DOC SETUP
-var _ ixo.ProjectDoc = (*BaseProjectDoc)(nil)
+var _ ixo.ProjectDoc = (*ProjectDoc)(nil)
 
-type BaseProjectDoc struct {
-	Did    ixo.Did `json:"did"`
-	PubKey string  `json:pubKey`
-	Data   string  `json:"data"` // May be nil, if not known.
+type ProjectDoc struct {
+	Did              string    `json:"did"`
+	PubKey           string    `json:"pubKey"`
+	Title            string    `json:"title"`
+	ShortDescription string    `json:"shortDescription"`
+	LongDescription  string    `json:"longDescription"`
+	ImpactAction     string    `json:"impactAction"`
+	CreatedOn        string    `json:"createdOn"`
+	CreatedBy        string    `json:"createdBy"`
+	Country          string    `json:"country"`
+	Sdgs             []string  `json:"sdgs"`
+	ImpactsRequired  string    `json:"impactsRequired"`
+	ClaimTemplate    string    `json:"claimTemplate"`
+	SocialMedia      struct {
+		FacebookLink  string `json:"facebookLink"`
+		InstagramLink string `json:"instagramLink"`
+		TwitterLink   string `json:"twitterLink"`
+	} `json:"socialMedia"`
+	WebLink string `json:"webLink"`
+	Image   string `json:"image"`
 }
 
 //GETTERS
-func (pd BaseProjectDoc) GetDid() ixo.Did { return pd.Did }
-func (pd BaseProjectDoc) GetData() string {
-	data, err := json.Marshal(pd.Data)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
-}
+func (pd ProjectDoc) GetDid() ixo.Did      { return pd.Did }
+func (pd ProjectDoc) GetCreatedBy() string { return pd.CreatedBy }
 
 //SETTERS
-func (pd BaseProjectDoc) SetDid(did ixo.Did) error {
+func (pd ProjectDoc) SetDid(did ixo.Did) error {
 	if len(pd.Did) != 0 {
 		return errors.New("cannot override BaseProjectDoc did")
 	}
 	pd.Did = did
 	return nil
 }
-func (pd BaseProjectDoc) SetData(data string) error {
-	if len(data) != 0 {
+func (pd ProjectDoc) SetCreatedBy(did ixo.Did) error {
+	if len(pd.CreatedBy) != 0 {
 		return errors.New("cannot override BaseProjectDoc data")
 	}
-	pd.Data = data
+	pd.CreatedBy = did
 	return nil
 }
 
@@ -53,7 +63,7 @@ func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := BaseProjectDoc{}
+		projectDoc := ProjectDoc{}
 		err = cdc.UnmarshalBinary(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)
@@ -64,19 +74,31 @@ func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
 
 //**************************************************************************************
 
-//ADD ProjectDoc
+//ADD PROJECTDOC
 type AddProjectMsg struct {
-	ProjectDoc BaseProjectDoc
+	ProjectDoc ProjectDoc
 }
 
-func NewAddProjectMsg(data string, did string, pubKey string) AddProjectMsg {
-	projectDoc := BaseProjectDoc{
-		Did:    did,
-		PubKey: pubKey,
-		Data:   data,
+func NewAddProjectMsg(projectDoc ProjectDoc, didDoc ixo.SovrinDid) AddProjectMsg {
+	projectDocMsg := ProjectDoc{
+		Did:              didDoc.Did,
+		PubKey:           didDoc.VerifyKey,
+		Title:            projectDoc.Title,
+		ShortDescription: projectDoc.ShortDescription,
+		LongDescription:  projectDoc.LongDescription,
+		ImpactAction:     projectDoc.ImpactAction,
+		CreatedOn:        projectDoc.CreatedOn,
+		CreatedBy:        didDoc.Did,
+		Country:          projectDoc.Country,
+		Sdgs:             projectDoc.Sdgs,
+		ImpactsRequired:  projectDoc.ImpactsRequired,
+		ClaimTemplate:    projectDoc.ClaimTemplate,
+		SocialMedia:      projectDoc.SocialMedia,
+		WebLink:          projectDoc.WebLink,
+		Image:            projectDoc.Image,
 	}
 	return AddProjectMsg{
-		ProjectDoc: projectDoc,
+		ProjectDoc: projectDocMsg,
 	}
 }
 
@@ -88,7 +110,7 @@ func (msg AddProjectMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.ProjectDoc.GetDid())}
 }
 func (msg AddProjectMsg) String() string {
-	return fmt.Sprintf("AddProjectMsg{Did: %v, data: %v}", string(msg.ProjectDoc.GetDid()), msg.ProjectDoc.GetData())
+	return fmt.Sprintf("AddProjectMsg{Did: %v, projectDoc: %v}", string(msg.ProjectDoc.GetDid()), msg.ProjectDoc)
 }
 
 func (msg AddProjectMsg) ValidateBasic() sdk.Error {
@@ -96,41 +118,6 @@ func (msg AddProjectMsg) ValidateBasic() sdk.Error {
 }
 
 func (msg AddProjectMsg) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return b
-}
-
-//**************************************************************************************
-
-//GET ProjectDoc
-
-type GetProjectMsg struct {
-	Did ixo.Did `json:"did"`
-}
-
-func NewGetDidMsg(did string) GetProjectMsg {
-	return GetProjectMsg{
-		Did: did,
-	}
-}
-
-var _ sdk.Msg = GetProjectMsg{}
-
-func (msg GetProjectMsg) Type() string                            { return "project" }
-func (msg GetProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg GetProjectMsg) GetSigners() []sdk.Address               { return nil }
-func (msg GetProjectMsg) String() string {
-	return fmt.Sprintf("ProjectMsg{Did: %v}", msg.Did)
-}
-
-func (msg GetProjectMsg) ValidateBasic() sdk.Error {
-	return nil
-}
-
-func (msg GetProjectMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)

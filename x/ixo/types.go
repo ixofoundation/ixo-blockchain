@@ -71,8 +71,8 @@ type DidDoc interface {
 type Project = string
 
 type ProjectDoc interface {
-	SetData(project Project) error
-	GetData() Project
+	SetCreatedBy(did Did) error
+	GetCreatedBy() Project
 	SetDid(did Did) error
-	GetDid() Did
+	GetDid() Project
 }
