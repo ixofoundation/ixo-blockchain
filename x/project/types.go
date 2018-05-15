@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
@@ -13,16 +14,32 @@ import (
 //DOC SETUP
 var _ ixo.ProjectDoc = (*BaseProjectDoc)(nil)
 
-type BaseProjectDoc struct {
-	Did    ixo.Did `json:"did"`
-	PubKey string  `json:pubKey`
-	Data   string  `json:"data"` // May be nil, if not known.
+type ProjectDoc struct {
+	Did              string    `json:"did"`
+	PubKey           string    `json:"pubKey"`
+	Title            string    `json:"title"`
+	ShortDescription string    `json:"shortDescription"`
+	LongDescription  string    `json:"longDescription"`
+	ImpactAction     string    `json:"impactAction"`
+	CreatedOn        time.Time `json:"createdOn"`
+	CreatedBy        string    `json:"createdBy"`
+	Country          string    `json:"country"`
+	Sdgs             []string  `json:"sdgs"`
+	ImpactsRequired  string    `json:"impactsRequired"`
+	ClaimTemplate    string    `json:"claimTemplate"`
+	SocialMedia      struct {
+		FacebookLink  string `json:"facebookLink"`
+		InstagramLink string `json:"instagramLink"`
+		TwitterLink   string `json:"twitterLink"`
+	} `json:"socialMedia"`
+	WebLink string `json:"webLink"`
+	Image   string `json:"image"`
 }
 
 //GETTERS
-func (pd BaseProjectDoc) GetDid() ixo.Did { return pd.Did }
-func (pd BaseProjectDoc) GetData() string {
-	data, err := json.Marshal(pd.Data)
+func (pd ProjectDoc) GetDid() ixo.Did { return pd.Did }
+func (pd ProjectDoc) GetData() string {
+	data, err := json.Marshal(pd)
 	if err != nil {
 		panic(err)
 	}
@@ -30,18 +47,18 @@ func (pd BaseProjectDoc) GetData() string {
 }
 
 //SETTERS
-func (pd BaseProjectDoc) SetDid(did ixo.Did) error {
+func (pd ProjectDoc) SetDid(did ixo.Did) error {
 	if len(pd.Did) != 0 {
 		return errors.New("cannot override BaseProjectDoc did")
 	}
 	pd.Did = did
 	return nil
 }
-func (pd BaseProjectDoc) SetData(data string) error {
-	if len(data) != 0 {
+func (pd ProjectDoc) SetCreatedBy(did ixo.Did) error {
+	if len(pd.CreatedBy) != 0 {
 		return errors.New("cannot override BaseProjectDoc data")
 	}
-	pd.Data = data
+	pd.CreatedBy = did
 	return nil
 }
 
@@ -53,7 +70,7 @@ func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := BaseProjectDoc{}
+		projectDoc := ProjectDoc{}
 		err = cdc.UnmarshalBinary(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)
@@ -66,15 +83,10 @@ func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
 
 //ADD ProjectDoc
 type AddProjectMsg struct {
-	ProjectDoc BaseProjectDoc
+	ProjectDoc ProjectDoc
 }
 
-func NewAddProjectMsg(data string, did string, pubKey string) AddProjectMsg {
-	projectDoc := BaseProjectDoc{
-		Did:    did,
-		PubKey: pubKey,
-		Data:   data,
-	}
+func NewAddProjectMsg(projectDoc ProjectDoc) AddProjectMsg {
 	return AddProjectMsg{
 		ProjectDoc: projectDoc,
 	}
@@ -123,7 +135,7 @@ func (msg GetProjectMsg) Type() string                            { return "proj
 func (msg GetProjectMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg GetProjectMsg) GetSigners() []sdk.Address               { return nil }
 func (msg GetProjectMsg) String() string {
-	return fmt.Sprintf("ProjectMsg{Did: %v}", msg.Did)
+	return fmt.Sprintf("ProjectMsg{ProjectDoc: %v}", msg.Did)
 }
 
 func (msg GetProjectMsg) ValidateBasic() sdk.Error {
