@@ -54,43 +54,6 @@ func GetDidDocDecoder(cdc *wire.Codec) DidDocDecoder {
 // enforce the DidDoc type at compile time
 var _ ixo.DidDoc = (*BaseDidDoc)(nil)
 
-// Define the did message type
-type GetDidMsg struct {
-	Did ixo.Did `json:"did"`
-}
-
-// New Ixo message
-func NewGetDidMsg(did string) GetDidMsg {
-	return GetDidMsg{
-		Did: did,
-	}
-}
-
-// enforce the msg type at compile time
-var _ sdk.Msg = GetDidMsg{}
-
-// nolint
-func (msg GetDidMsg) Type() string                            { return "did" }
-func (msg GetDidMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg GetDidMsg) GetSigners() []sdk.Address               { return nil }
-func (msg GetDidMsg) String() string {
-	return fmt.Sprintf("DidMsg{Did: %v}", msg.Did)
-}
-
-// Validate Basic is used to quickly disqualify obviously invalid messages quickly
-func (msg GetDidMsg) ValidateBasic() sdk.Error {
-	return nil
-}
-
-// Get the bytes for the message signer to sign on
-func (msg GetDidMsg) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return b
-}
-
 // Define the AddDid message type
 type AddDidMsg struct {
 	DidDoc BaseDidDoc `json:"didDoc"`

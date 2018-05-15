@@ -97,7 +97,6 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 		AddRoute("did", did.NewHandler(didKeeper)).
 		AddRoute("project", project.NewHandler(projectKeeper))
 
-
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
 	app.SetInitChainer(app.initChainer)
@@ -141,7 +140,6 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
-		oldwire.ConcreteType{did.GetDidMsg{}, msgTypeGetDidMsg},
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
 		oldwire.ConcreteType{project.AddProjectMsg{}, msgTypeAddProjectMsg},
 	)
@@ -158,6 +156,13 @@ func MakeCodec() *wire.Codec {
 	// crypto.RegisterWire(cdc) // Register crypto.[PubKey,PrivKey,Signature] types.
 	// ibc.RegisterWire(cdc) // Register ibc.[IBCTransferMsg, IBCReceiveMsg] types.
 	return cdc
+}
+
+func (app *IxoApp) Commit() (res abci.ResponseCommit) {
+	result := app.BaseApp.Commit()
+	fmt.Println("IxoAppCommit")
+	fmt.Println(result)
+	return result
 }
 
 // custom logic for transaction decoding
