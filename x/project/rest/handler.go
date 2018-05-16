@@ -29,19 +29,14 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 	ctx := context.NewCoreContextFromViper()
 	return func(w http.ResponseWriter, r *http.Request) {
 		// collect data
-
 		projectDocParam := r.URL.Query().Get("projectDoc")
-
 		didDocParam := r.URL.Query().Get("didDoc")
-
-		fmt.Println("PROJECT_DOC: ", projectDocParam)
-		fmt.Println("DID_DOC: ", didDocParam)
 
 		projectDoc := project.ProjectDoc{}
 		err := json.Unmarshal([]byte(projectDocParam), &projectDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			w.Write([]byte(fmt.Sprintf("Could not unmarshall projectDoc into struct. Error: %s", err.Error())))
 			return
 		}
 
@@ -49,7 +44,7 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 		sovrinErr := json.Unmarshal([]byte(didDocParam), &sovrinDid)
 		if sovrinErr != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
 			return
 		}
 
@@ -63,7 +58,6 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 
 		//Create the Signature
 		signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
-
 		tx := ixo.NewIxoTx(msg, signature)
 
 		fmt.Println("*******TRANSACTION******* \n", tx.String())
@@ -71,14 +65,14 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 		bz, err := cdc.MarshalBinary(tx)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
 			return
 		}
 
 		res, err := ctx.BroadcastTx(bz)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
+			w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
 			return
 		}
 
