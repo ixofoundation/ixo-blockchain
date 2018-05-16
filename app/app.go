@@ -168,7 +168,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	fmt.Println("********DECODED_TXN********* \n", string(txBytes))
 	// StdTx.Msg is an interface. The concrete types
 	// are registered by MakeTxCodec in bank.RegisterWire.
-	err := app.cdc.UnmarshalBinary(txBytes, &tx)
+	err := app.cdc.UnmarshalJSON(txBytes, &tx)
 	if err != nil {
 		return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 	}

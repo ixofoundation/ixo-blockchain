@@ -47,7 +47,7 @@ func AddDidDocCmd(cdc *wire.Codec) *cobra.Command {
 			fmt.Println("*******Transaction*******")
 			fmt.Println(tx.String())
 
-			bz, err := cdc.MarshalBinary(tx)
+			bz, err := cdc.MarshalJSON(tx)
 			if err != nil {
 				panic(err)
 			}

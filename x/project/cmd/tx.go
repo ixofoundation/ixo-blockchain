@@ -54,7 +54,7 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 
 			fmt.Println("*******TRANSACTION******* \n", tx.String())
 
-			bz, err := cdc.MarshalBinary(tx)
+			bz, err := cdc.MarshalJSON(tx)
 			if err != nil {
 				panic(err)
 			}
@@ -77,7 +77,7 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 		Short: "Get a new ProjectDoc for a Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCoreContextFromViper()
-			
+
 			if len(args) != 1 || len(args[0]) == 0 {
 				return errors.New("You must provide an did")
 			}
