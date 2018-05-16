@@ -1,80 +1,75 @@
 package rest
 
 import (
-	"fmt"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"net/http"
 
-	"github.com/tendermint/go-crypto/keys"
-
+	base58 "github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
+	"github.com/tendermint/go-crypto/keys"
+	"github.com/cosmos/cosmos-sdk/client/context"
 )
-
-type sendBody struct {
-	Data string `json:"data"`
-}
 
 //CreateProjectRequestHandler create project handler
 func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keybase) func(http.ResponseWriter, *http.Request) {
+	ctx := context.NewCoreContextFromViper()
 	return func(w http.ResponseWriter, r *http.Request) {
 		// collect data
 
-		var m sendBody
-		body, err := ioutil.ReadAll(r.Body)
+		projectDocParam := r.URL.Query().Get("projectDoc")
 
-		fmt.Println("REQUEST : " , body)
+		didDocParam := r.URL.Query().Get("didDoc")
 
+		fmt.Println("PROJECT_DOC: ", projectDocParam)
+		fmt.Println("DID_DOC: ", didDocParam)
+
+		projectDoc := project.ProjectDoc{}
+		err := json.Unmarshal([]byte(projectDocParam), &projectDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
 		}
-		err = json.Unmarshal(body, &m)
-		if err != nil {
+
+		sovrinDid := ixo.SovrinDid{}
+		sovrinErr := json.Unmarshal([]byte(didDocParam), &sovrinDid)
+		if sovrinErr != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
 		}
+		
+		// create the message
+		msg := project.NewAddProjectMsg(projectDoc, sovrinDid)
 
-		/* info, err := kb.Get(m.LocalAccountName)
+		// Force the length to 64
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+
+		//Create the Signature
+		signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+
+		tx := ixo.NewIxoTx(msg, signature)
+
+		fmt.Println("*******TRANSACTION******* \n", tx.String())
+
+		bz, err := cdc.MarshalBinary(tx)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(err.Error()))
-			return
-		} */
-
-		/* bz, err := hex.DecodeString(address)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-			return
-		} */
-
-		/* // build message
-		msg := commands.BuildMsg(info.PubKey.Address(), to, m.Amount)
-		if err != nil { // XXX rechecking same error ?
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		// sign
-		ctx = ctx.WithSequence(m.Sequence)
-		txBytes, err := ctx.SignAndBuild(m.LocalAccountName, m.Password, msg, c.Cdc)
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(err.Error()))
-			return
-		}
-
-		// send
-		res, err := ctx.BroadcastTx(txBytes)
+		res, err := ctx.BroadcastTx(bz)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
-		} 
+		}
 
 		output, err := json.MarshalIndent(res, "", "  ")
 		if err != nil {
@@ -83,7 +78,15 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 			return
 		}
 
-		w.Write(output)*/
-
+		w.Write(output)
 	}
 }
+
+// Example curl request
+/*
+curl -X POST -G \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d projectDoc='{"did":"","pubKey":"","title":"ReforestationCongo","shortDescription":"DescriptionaboutReforestation","longDescription":"DescriptionaboutReforestationlong","impactAction":"treesplanted","createdOn":"2018-05-14T13:56:16+00:00","createdBy":"","country":"CO","sdgs":["12.1","8.2"],"impactsRequired":"34","claimTemplate":"default","serviceURI":"http://localhost:8080/pds","socialMedia":{"facebookLink":"","instagramLink":"","twitterLink":""},"webLink":"","image":""}' \
+-d didDoc='{"did":"CCzPRoyPQsTxVwoAwTZXcK","verifyKey":"77GSw8G26F1e3qwtmzzTvWicZSCCkFKK43NSntpfuJKx","encryptionPublicKey":"AhKmLwrPdPMY3yeBpPqUy8qsphgXGaFEWHNgeUxKa3bV","secret":{"seed":"ea25949b56257a8f16435af37d333fb11258fe9f7a1c2a8eebbebb4d0ea2ae85","signKey":"Gm1dz5ToFcw3Ur7aRqpfzXh9kFJ8C6FZTTueCSGaZDH6","encryptionPrivateKey":"Gm1dz5ToFcw3Ur7aRqpfzXh9kFJ8C6FZTTueCSGaZDH6"}}' \
+http://localhost:1317/project*/
