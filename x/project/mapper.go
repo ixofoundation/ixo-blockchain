@@ -9,6 +9,8 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
+const AllKey = "ALL"
+
 // Implements ProjectMapper.
 // This ProjectMapper encodes/decodes accounts using the
 // go-wire (binary) encoding/decoding library.
@@ -74,13 +76,27 @@ func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) ixo.Project
 	return project
 }
 
+func (pm ProjectMapper) GetAllDids(ctx sdk.Context) []ixo.Did {
+	store := ctx.KVStore(pm.key)
+	bz := store.Get([]byte(AllKey))
+	if bz == nil {
+		return []ixo.Did{}
+	} else {
+		dids := []ixo.Did{}
+		err := pm.cdc.UnmarshalBinary(bz, &dids)
+		if err != nil {
+			panic(err)
+		}
+		return dids
+	}
+}
+
 func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.ProjectDoc) {
 	addr := []byte(project.GetDid())
 	store := ctx.KVStore(pm.key)
 	bz := pm.encodeProject(project)
 	store.Set(addr, bz)
 }
-
 
 // There's no way for external modules to mutate the
 // spm.ProjectMapper.ctx from here, even with reflection.
@@ -129,4 +145,15 @@ func (pm ProjectMapper) decodeProject(bz []byte) ixo.ProjectDoc {
 	}
 	return projectDoc
 
+}
+
+func (pm ProjectMapper) appendDidToAll(ctx sdk.Context, newDid ixo.Did) {
+	dids := pm.GetAllDids(ctx)
+	store := ctx.KVStore(pm.key)
+	newDids := append(dids, newDid)
+	bz, err := pm.cdc.MarshalBinary(newDids)
+	if err != nil {
+		panic(err)
+	}
+	store.Set([]byte(AllKey), bz)
 }

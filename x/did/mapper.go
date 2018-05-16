@@ -9,6 +9,8 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
+const AllKey = "ALL"
+
 // Implements DidMapper.
 // This DidMapper encodes/decodes accounts using the
 // go-wire (binary) encoding/decoding library.
@@ -70,11 +72,27 @@ func (dm DidMapper) GetDidDoc(ctx sdk.Context, addr ixo.Did) ixo.DidDoc {
 	return did
 }
 
+func (dm DidMapper) GetAllDids(ctx sdk.Context) []ixo.Did {
+	store := ctx.KVStore(dm.key)
+	bz := store.Get([]byte(AllKey))
+	if bz == nil {
+		return []ixo.Did{}
+	} else {
+		dids := []ixo.Did{}
+		err := dm.cdc.UnmarshalBinary(bz, &dids)
+		if err != nil {
+			panic(err)
+		}
+		return dids
+	}
+}
+
 func (dm DidMapper) SetDidDoc(ctx sdk.Context, did ixo.DidDoc) {
 	addr := []byte(did.GetDid())
 	store := ctx.KVStore(dm.key)
 	bz := dm.encodeDid(did)
 	store.Set(addr, bz)
+	dm.appendDidToAll(ctx, ixo.Did(did.GetDid()))
 }
 
 //----------------------------------------
@@ -134,4 +152,15 @@ func (dm DidMapper) decodeDid(bz []byte) ixo.DidDoc {
 	}
 	return didDoc
 
+}
+
+func (dm DidMapper) appendDidToAll(ctx sdk.Context, newDid ixo.Did) {
+	dids := dm.GetAllDids(ctx)
+	store := ctx.KVStore(dm.key)
+	newDids := append(dids, newDid)
+	bz, err := dm.cdc.MarshalBinary(newDids)
+	if err != nil {
+		panic(err)
+	}
+	store.Set([]byte(AllKey), bz)
 }
