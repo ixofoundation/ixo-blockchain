@@ -41,7 +41,6 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 
 			// create the message
 			msg := project.NewAddProjectMsg(projectDoc, sovrinDid)
-			fmt.Println("*******PROJECT_MSG******* \n", msg)
 
 			// Force the length to 64
 			privKey := [64]byte{}
@@ -50,9 +49,6 @@ func AddProjectDocCmd(cdc *wire.Codec) *cobra.Command {
 
 			//Create the Signature
 			signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
-
-			fmt.Println("*******DID******* \n", sovrinDid.Did)
-			fmt.Println("*******PRIV_KEY******* \n", privKey)
 
 			tx := ixo.NewIxoTx(msg, signature)
 
@@ -80,6 +76,8 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 		Use:   "getProjectDoc did",
 		Short: "Get a new ProjectDoc for a Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCoreContextFromViper()
+			
 			if len(args) != 1 || len(args[0]) == 0 {
 				return errors.New("You must provide an did")
 			}
@@ -87,8 +85,6 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 			// find the key to look up the account
 			didAddr := args[0]
 			key := ixo.Did(didAddr)
-
-			ctx := context.NewCoreContextFromViper()
 
 			res, err := ctx.Query([]byte(key), storeName)
 			if err != nil {
@@ -100,6 +96,7 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 			if err != nil {
 				return err
 			}
+
 			// print out whole account
 			output, err := json.MarshalIndent(projectDoc, "", "  ")
 			if err != nil {
