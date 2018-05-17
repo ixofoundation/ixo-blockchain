@@ -7,16 +7,73 @@ import (
 
 	"github.com/gorilla/mux"
 
+	base58 "github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/wire"
 	did "github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/tendermint/go-crypto/keys"
 )
 
 type commander struct {
 	storeName string
 	cdc       *wire.Codec
 	decoder   did.DidDocDecoder
+}
+
+//CreateProjectRequestHandler create project handler
+func CreateDidRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keybase) func(http.ResponseWriter, *http.Request) {
+	ctx := context.NewCoreContextFromViper()
+	return func(w http.ResponseWriter, r *http.Request) {
+		// collect data
+		didDocParam := r.URL.Query().Get("didDoc")
+
+		sovrinDid := ixo.SovrinDid{}
+		err := json.Unmarshal([]byte(didDocParam), &sovrinDid)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			return
+		}
+
+		// create the message
+		msg := did.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey)
+
+		// Force the length to 64
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+
+		//Create the Signature
+		signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+
+		tx := ixo.NewIxoTx(msg, signature)
+
+		fmt.Println("*******TRANSACTION******* \n", tx.String())
+
+		bz, err := cdc.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+			return
+		}
+
+		res, err := ctx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
+	}
 }
 
 func QueryDidDocRequestHandler(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) func(http.ResponseWriter, *http.Request) {

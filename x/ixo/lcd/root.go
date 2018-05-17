@@ -83,7 +83,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	auth.RegisterRoutes(r, cdc, "main")
 	bank.RegisterRoutes(r, cdc, kb)
 	ibc.RegisterRoutes(r, cdc, kb)
-	did.RegisterRoutes(r, cdc, "did")
+	did.RegisterRoutes(r, cdc, kb, "did")
 	project.RegisterRoutes(r, cdc, kb, "project")
 	return r
 }

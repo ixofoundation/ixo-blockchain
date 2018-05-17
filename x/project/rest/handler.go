@@ -62,7 +62,7 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 
 		fmt.Println("*******TRANSACTION******* \n", tx.String())
 
-		bz, err := cdc.MarshalBinary(tx)
+		bz, err := cdc.MarshalJSON(tx)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
