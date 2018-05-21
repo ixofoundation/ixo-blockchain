@@ -85,8 +85,12 @@ func main() {
 
 	rootCmd.AddCommand(
 		client.PostCommands(
-			projectcmd.AddProjectDocCmd(cdc),
+			projectcmd.CreateProjectCmd(cdc),
 			projectcmd.GetProjectDocCmd("project", cdc, project.GetProjectDocDecoder(cdc)),
+			projectcmd.CreateAgentCmd(cdc),
+			projectcmd.UpdateAgentCmd(cdc),
+			projectcmd.CreateClaimCmd(cdc),
+			projectcmd.CreateEvaluationCmd(cdc),
 		)...)
 
 	// add proxy, version and key info

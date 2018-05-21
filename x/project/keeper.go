@@ -31,7 +31,7 @@ func (pk ProjectKeeper) GetAllDids(ctx sdk.Context) []ixo.Did {
 
 // AddDidDoc adds the did_doc at the addr.
 func (pk ProjectKeeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.ProjectDoc) (ixo.ProjectDoc, sdk.Error) {
-	projectDoc := pk.pm.GetProjectDoc(ctx, newProjectDoc.GetDid())
+	projectDoc := pk.pm.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
 	if projectDoc == nil {
 		pk.pm.SetProjectDoc(ctx, newProjectDoc)
 		return newProjectDoc, nil

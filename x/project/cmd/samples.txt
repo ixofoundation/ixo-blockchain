@@ -1,0 +1,32 @@
+
+NOTE: All calls must be submitted with Sovrin generated DID json as last parameter.  This is the DID for the project
+eg.
+'{"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}}'
+
+// createProject
+./build/ixocli createProject '{"txHash":"1000000","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","title":"Togo Water Project","shortDescription":"To provide clean water and sanitation to the rural areas of Togo","longDescription":"","impactAction":"successful water systems built","createdOn":"2018-05-21T15:53:18.484Z","createdBy":"6Fu7FbbGoCJ8tX3vMMCss9","country":"TG","sdgs":["3","6","15"],"impactsRequired":1298,"claimTemplate":"togo_default","socialMedia":{
+"facebookLink":"","instagramLink":"","twitterLink":"","webLink":""},"serviceEndpoint":"https://togo.pds.ixo.network","imageLink":"https://togo.pds.ixo.network/image/1"}'
+
+// createAgent Service Agent
+./build/ixocli createAgent 1000001 6Fu7FbbGoCJ8tX3vMMCss9 6Fu7FbbGoCJ8tX3vMMCss9 SA
+
+// createAgent Evaluation Agent
+./build/ixocli createAgent 1000002 39GGD78xjfe5CzTTxFTxMD 39GGD78xjfe5CzTTxFTxMD EA
+
+// updateAgent Service Agent to approved
+./build/ixocli updateAgent 1000003 6Fu7FbbGoCJ8tX3vMMCss9 6Fu7FbbGoCJ8tX3vMMCss9 1
+
+// updateAgent Evaluation Agent to approved
+./build/ixocli updateAgent 1000004 6Fu7FbbGoCJ8tX3vMMCss9 39GGD78xjfe5CzTTxFTxMD 1
+
+// createClaim 
+./build/ixocli createClaim 1000005 6Fu7FbbGoCJ8tX3vMMCss9 1000005
+
+// createEvaluation approved
+./build/ixocli createEvaluation 1000006 39GGD78xjfe5CzTTxFTxMD 1000005 1
+
+// createClaim 
+./build/ixocli createClaim 1000007 6Fu7FbbGoCJ8tX3vMMCss9 1000007
+
+// createEvaluation approved
+./build/ixocli createEvaluation 1000008 39GGD78xjfe5CzTTxFTxMD 1000007 2

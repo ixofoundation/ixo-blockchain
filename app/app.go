@@ -20,7 +20,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
-	base58 "github.com/btcsuite/btcutil/base58"
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -108,7 +107,7 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	app.MountStoreWithDB(app.capKeyProjectStore, sdk.StoreTypeIAVL, dbs["project"])
 	// NOTE: Broken until #532 lands
 	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
-	app.SetAnteHandler(NewIxoAnteHandler(didKeeper, auth.NewAnteHandler(app.accountMapper)))
+	app.SetAnteHandler(NewIxoAnteHandler(app))
 	err := app.LoadLatestVersion(app.capKeyMainStore)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -128,8 +127,15 @@ func MakeCodec() *wire.Codec {
 	const msgTypeIBCReceiveMsg = 0x6
 	const msgTypeBondMsg = 0x7
 	const msgTypeUnbondMsg = 0x8
+
 	const msgTypeAddDidMsg = 0xA
-	const msgTypeAddProjectMsg = 0xB
+
+	const msgTypeCreateProjectMsg = 0x10
+	const msgTypeCreateAgentMsg = 0x11
+	const msgTypeUpdateAgentMsg = 0x12
+	const msgTypeCreateClaimMsg = 0x13
+	const msgTypeCreateEvaluationMsg = 0x14
+
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -140,7 +146,12 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
-		oldwire.ConcreteType{project.AddProjectMsg{}, msgTypeAddProjectMsg},
+
+		oldwire.ConcreteType{project.CreateProjectMsg{}, msgTypeCreateProjectMsg},
+		oldwire.ConcreteType{project.CreateAgentMsg{}, msgTypeCreateAgentMsg},
+		oldwire.ConcreteType{project.UpdateAgentMsg{}, msgTypeUpdateAgentMsg},
+		oldwire.ConcreteType{project.CreateClaimMsg{}, msgTypeCreateClaimMsg},
+		oldwire.ConcreteType{project.CreateEvaluationMsg{}, msgTypeCreateEvaluationMsg},
 	)
 
 	const accTypeApp = 0x1
@@ -165,7 +176,8 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		return nil, sdk.ErrTxDecode("txBytes are empty")
 	}
 
-	fmt.Println("********DECODED_TXN********* \n", string(txBytes))
+	fmt.Println("********DECODED_TXN*********")
+	fmt.Println(string(txBytes))
 	// StdTx.Msg is an interface. The concrete types
 	// are registered by MakeTxCodec in bank.RegisterWire.
 	err := app.cdc.UnmarshalJSON(txBytes, &tx)
@@ -201,7 +213,11 @@ func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 // the default cosmos one for signature checking. Based on
 // the message type it either checks the Sovrin signature
 // or executes the defualt cosmos version
-func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.AnteHandler {
+func NewIxoAnteHandler(app *IxoApp) sdk.AnteHandler {
+	cosmosAnteHandler := auth.NewAnteHandler(app.accountMapper)
+	didAnteHandler := did.NewAnteHandler(app.didMapper)
+	projectAnteHandler := project.NewAnteHandler(app.projectMapper)
+
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
@@ -210,57 +226,14 @@ func NewIxoAnteHandler(dk did.DidKeeper, cosmosAnteHandler sdk.AnteHandler) sdk.
 
 		fmt.Println("********MSG_TYPE********* \n", msg.Type())
 
-		if msg.Type() != "project" && msg.Type() != "did" {
-			// Not an ixo message so execute the wrappered version
+		switch msg.Type() {
+
+		case "did":
+			return didAnteHandler(ctx, tx)
+		case "project":
+			return projectAnteHandler(ctx, tx)
+		default:
 			return cosmosAnteHandler(ctx, tx)
 		}
-		// This always be a IxoTx
-		ixoTx, ok := tx.(ixo.IxoTx)
-		if !ok {
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
-		}
-
-		pubKey := [32]byte{}
-
-		if msg.Type() == "did" {
-			addDidMsg := msg.(did.AddDidMsg)
-			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
-
-			// Assert dids are the same
-			if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
-				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
-			}
-		} else if msg.Type() == "project" {
-			addProjectMsg := msg.(project.AddProjectMsg)
-			copy(pubKey[:], base58.Decode(addProjectMsg.ProjectDoc.PubKey))
-
-			// Assert dids are the same
-			if addProjectMsg.ProjectDoc.Did != ixoTx.Signature.Creator {
-				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
-			}
-		} else {
-			didDoc := dk.GetDidDoc(ctx, ixoTx.Signature.Creator)
-			if didDoc != nil {
-				return ctx, sdk.ErrInternal("did not found").Result(), true
-			}
-			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
-		}
-
-		// Assert that there are signatures.
-		var sigs = tx.GetSignatures()
-		if len(sigs) != 1 {
-			return ctx,
-				sdk.ErrUnauthorized("no signers").Result(),
-				true
-		}
-		fmt.Println("*******VERIFY_MSG******* \n", string(msg.GetSignBytes()))
-		res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-		if !res {
-			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
-		}
-		fmt.Println("Signature Verified!")
-
-		return ctx, sdk.Result{}, false // continue...
 	}
 }

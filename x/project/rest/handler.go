@@ -49,7 +49,7 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 		}
 
 		// create the message
-		msg := project.NewAddProjectMsg(projectDoc, sovrinDid)
+		msg := project.NewCreateProjectMsg(projectDoc, sovrinDid)
 
 		// Force the length to 64
 		privKey := [64]byte{}
