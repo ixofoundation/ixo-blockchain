@@ -30,3 +30,21 @@ eg.
 
 // createEvaluation approved
 ./build/ixocli createEvaluation 1000008 39GGD78xjfe5CzTTxFTxMD 1000007 2
+
+
+TX Clear Text
+-------------
+Create Project
+{"payload":[16,{"data":{"txHash":"1000000","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","projectDid":"6iftm1hHdaU6LJGKayRMEV","pubKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","title":"Togo Water Project","shortDescription":"To provide clean water and sanitation to the rural areas of Togo","longDescription":"","impactAction":"successful water systems built","createdOn":"2018-05-21T15:53:18.484Z","createdBy":"6Fu7FbbGoCJ8tX3vMMCss9","country":"TG","sdgs":["3","6","15"],"impactsRequired":1298,"claimTemplate":"togo_default","socialMedia":{"facebookLink":"","instagramLink":"","twitterLink":"","webLink":""},"serviceEndpoint":"https://togo.pds.ixo.network","imageLink":"https://togo.pds.ixo.network/image/1"}}],"signature":{"signatureValue":[1,"5600F6F4AFFB4720171FF2EA3397FFF6631681BA11FFDCFC47D0C9F835E55371AB1D71EDC177C2DD8C1889E9089FC3575F1FF25CD996255405FBEB8AE9AB6C08"],"created":"2018-05-21T12:32:12.237Z","creator":"6iftm1hHdaU6LJGKayRMEV"}}
+
+Create Agent: role is either "SA", "EA" or "IA"
+{"payload":[17,{"data":{"txHash":"1000001","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","did":"6Fu7FbbGoCJ8tX3vMMCss9","role":"SA"}}],"signature":{"signatureValue":[1,"804A8277E9A428B9FD2DCB16823F3463EBD5D29F7AE7F52D5C633AADC4717B0DCC3ACD450ADC0E3E9962112E028A62B7BD57613EEADD0E1D3A161FC022AA1D00"],"created":"2018-05-21T12:35:57.190Z","creator":"6iftm1hHdaU6LJGKayRMEV"}}
+
+Update Agent: status is 0 (Pending), 1 (Approved) or 2 (Revoked)
+{"payload":[18,{"data":{"txHash":"1000003","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","did":"6Fu7FbbGoCJ8tX3vMMCss9","status":1}}],"signature":{"signatureValue":[1,"BD00A3F37C795F4E6A9C5AF85BCDD8EB636071BDECC56A9C8B3534645F064F9DB5F8DDD5E376887ADB55D577F1EED1ACEBCD86988D82E96188B78B260FFB9C07"],"created":"2018-05-21T12:40:24.896Z","creator":"6iftm1hHdaU6LJGKayRMEV"}}
+
+Create Claim 
+{"payload":[19,{"data":{"txHash":"1000005","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","claimID":"1000005"}}],"signature":{"signatureValue":[1,"65C26B12EB8BA3878449E08E803FD0780C242736C1D55AECE8179B2492779BECC748AFF4BD3705DF2DC682F36781BD1B3591713879EB24DC858B8F21536BCC0E"],"created":"2018-05-21T12:41:12.878Z","creator":"6iftm1hHdaU6LJGKayRMEV"}}
+
+Create Evaluation: status is 0 (Pending), 1 (Approved) or 2 (Rejected)
+{"payload":[20,{"data":{"txHash":"1000006","senderDid":"39GGD78xjfe5CzTTxFTxMD","claimID":"1000005","status":1}}],"signature":{"signatureValue":[1,"3A4E60A7C96B0F396DCEDFA47A4CD949F266E40D6D4850FB2D9153670689093BCF31772F1360C59C01AF57BAA789B81A9F356B968037465605B9C2415790D30B"],"created":"2018-05-21T12:41:30.208Z","creator":"6iftm1hHdaU6LJGKayRMEV"}}
