@@ -71,8 +71,6 @@ type DidDoc interface {
 type Project = string
 
 type ProjectDoc interface {
-	SetCreatedBy(did Did) error
-	GetCreatedBy() Project
-	SetDid(did Did) error
-	GetDid() Project
+	GetProjectDid() Did
+	GetPubKey() string
 }

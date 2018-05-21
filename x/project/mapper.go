@@ -59,13 +59,6 @@ func (pm ProjectMapper) Seal() SealedProjectMapper {
 	return SealedProjectMapper{pm}
 }
 
-func (pm ProjectMapper) NewProjectDoc(ctx sdk.Context, msg AddProjectMsg) ixo.ProjectDoc {
-	project := pm.clonePrototype()
-	project.SetDid(msg.ProjectDoc.GetDid())
-	project.SetCreatedBy(msg.ProjectDoc.GetCreatedBy())
-	return project
-}
-
 func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) ixo.ProjectDoc {
 	store := ctx.KVStore(pm.key)
 	bz := store.Get([]byte(addr))
@@ -92,7 +85,7 @@ func (pm ProjectMapper) GetAllDids(ctx sdk.Context) []ixo.Did {
 }
 
 func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.ProjectDoc) {
-	addr := []byte(project.GetDid())
+	addr := []byte(project.GetProjectDid())
 	store := ctx.KVStore(pm.key)
 	bz := pm.encodeProject(project)
 	store.Set(addr, bz)
