@@ -1,6 +1,9 @@
 package project
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -9,7 +12,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-const AllKey = "ALL"
+const AccountMapPrefix = "ACC-"
 
 // Implements ProjectMapper.
 // This ProjectMapper encodes/decodes accounts using the
@@ -59,29 +62,66 @@ func (pm ProjectMapper) Seal() SealedProjectMapper {
 	return SealedProjectMapper{pm}
 }
 
-func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) ixo.ProjectDoc {
+// Returns the array of account maps for a project
+func (pm ProjectMapper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {
+	store := ctx.KVStore(pm.key)
+	key := generateAccountsKey(projectDid)
+	fmt.Println("Key: " + string(key))
+	bz := store.Get(key)
+	if bz == nil {
+		fmt.Println("Not Found: " + string(key))
+		return make(map[string]interface{})
+	} else {
+		fmt.Println("Found: " + string(key))
+		didMap := pm.decodeAccountMap(bz)
+		return didMap
+	}
+}
+func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, accountAddr sdk.Address) {
+	accMap := pm.GetAccountMap(ctx, projectDid)
+	fmt.Println("*********AccountMap **********")
+	fmt.Println(accMap)
+	_, found := accMap[accountDid]
+	if found {
+		return
+	}
+
+	store := ctx.KVStore(pm.key)
+	key := generateAccountsKey(projectDid)
+	accountAddrString := hex.EncodeToString(accountAddr)
+	accMap[string(accountDid)] = accountAddrString
+	fmt.Println(accMap)
+	bz := pm.encodeAccountMap(accMap)
+	store.Set(key, bz)
+}
+
+func (pm ProjectMapper) decodeAccountMap(accMapBytes []byte) map[string]interface{} {
+	jsonBytes := []byte(accMapBytes)
+	var f interface{}
+	err := json.Unmarshal(jsonBytes, &f)
+	if err != nil {
+		panic(err)
+	}
+	m := f.(map[string]interface{})
+	return m
+}
+
+func (pm ProjectMapper) encodeAccountMap(accMap map[string]interface{}) []byte {
+	json, err := json.Marshal(accMap)
+	if err != nil {
+		panic(err)
+	}
+	return []byte(json)
+}
+
+func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) (ixo.ProjectDoc, bool) {
 	store := ctx.KVStore(pm.key)
 	bz := store.Get([]byte(addr))
 	if bz == nil {
-		return nil
+		return nil, false
 	}
 	project := pm.decodeProject(bz)
-	return project
-}
-
-func (pm ProjectMapper) GetAllDids(ctx sdk.Context) []ixo.Did {
-	store := ctx.KVStore(pm.key)
-	bz := store.Get([]byte(AllKey))
-	if bz == nil {
-		return []ixo.Did{}
-	} else {
-		dids := []ixo.Did{}
-		err := pm.cdc.UnmarshalBinary(bz, &dids)
-		if err != nil {
-			panic(err)
-		}
-		return dids
-	}
+	return project, true
 }
 
 func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.ProjectDoc) {
@@ -139,14 +179,9 @@ func (pm ProjectMapper) decodeProject(bz []byte) ixo.ProjectDoc {
 	return projectDoc
 
 }
-
-func (pm ProjectMapper) appendDidToAll(ctx sdk.Context, newDid ixo.Did) {
-	dids := pm.GetAllDids(ctx)
-	store := ctx.KVStore(pm.key)
-	newDids := append(dids, newDid)
-	bz, err := pm.cdc.MarshalBinary(newDids)
-	if err != nil {
-		panic(err)
-	}
-	store.Set([]byte(AllKey), bz)
+func generateAccountsKey(did ixo.Did) []byte {
+	var buffer bytes.Buffer
+	buffer.WriteString(AccountMapPrefix)
+	buffer.WriteString(did)
+	return buffer.Bytes()
 }

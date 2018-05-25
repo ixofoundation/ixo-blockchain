@@ -23,11 +23,12 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
 const (
-	appName = "ixoApp"
+	APP_NAME = "ixoApp"
 )
 
 // Extended ABCI application
@@ -54,7 +55,7 @@ type IxoApp struct {
 func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	// create your application object
 	var app = &IxoApp{
-		BaseApp:            bam.NewBaseApp(appName, logger, dbs["main"]),
+		BaseApp:            bam.NewBaseApp(APP_NAME, logger, dbs["main"]),
 		cdc:                MakeCodec(),
 		capKeyMainStore:    sdk.NewKVStoreKey("main"),
 		capKeyAccountStore: sdk.NewKVStoreKey("acc"),
@@ -87,14 +88,14 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
 	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
 	didKeeper := did.NewKeeper(app.didMapper)
-	projectKeeper := project.NewKeeper(app.projectMapper)
+	projectKeeper := project.NewKeeper(app.projectMapper, app.accountMapper)
 	app.Router().
 		AddRoute("bank", bank.NewHandler(coinKeeper)).
 		//		AddRoute("project", project.NewHandler()).
 		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
 		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper)).
 		AddRoute("did", did.NewHandler(didKeeper)).
-		AddRoute("project", project.NewHandler(projectKeeper))
+		AddRoute("project", project.NewHandler(projectKeeper, coinKeeper))
 
 	// initialize BaseApp
 	app.SetTxDecoder(app.txDecoder)
@@ -136,6 +137,9 @@ func MakeCodec() *wire.Codec {
 	const msgTypeCreateClaimMsg = 0x13
 	const msgTypeCreateEvaluationMsg = 0x14
 
+	const msgTypeFundProjectMsg = 0x15
+	const msgTypeWithdrawFundsMsg = 0x16
+
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -152,6 +156,9 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{project.UpdateAgentMsg{}, msgTypeUpdateAgentMsg},
 		oldwire.ConcreteType{project.CreateClaimMsg{}, msgTypeCreateClaimMsg},
 		oldwire.ConcreteType{project.CreateEvaluationMsg{}, msgTypeCreateEvaluationMsg},
+
+		oldwire.ConcreteType{project.FundProjectMsg{}, msgTypeFundProjectMsg},
+		oldwire.ConcreteType{project.WithdrawFundsMsg{}, msgTypeWithdrawFundsMsg},
 	)
 
 	const accTypeApp = 0x1
@@ -170,21 +177,39 @@ func MakeCodec() *wire.Codec {
 
 // custom logic for transaction decoding
 func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
-	var tx = ixo.IxoTx{}
 
 	if len(txBytes) == 0 {
 		return nil, sdk.ErrTxDecode("txBytes are empty")
 	}
 
-	fmt.Println("********DECODED_TXN*********")
-	fmt.Println(string(txBytes))
-	// StdTx.Msg is an interface. The concrete types
-	// are registered by MakeTxCodec in bank.RegisterWire.
-	err := app.cdc.UnmarshalJSON(txBytes, &tx)
-	if err != nil {
-		return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+	//Check if bytes start with a curly bracket
+	txByteString := string(txBytes[0:1])
+	if txByteString == "{" {
+		var tx = ixo.IxoTx{}
+
+		fmt.Println("********DECODED_TXN*********")
+		fmt.Println(string(txBytes))
+		// StdTx.Msg is an interface. The concrete types
+		// are registered by MakeTxCodec in bank.RegisterWire.
+		err := app.cdc.UnmarshalJSON(txBytes, &tx)
+		if err != nil {
+			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+		}
+		return tx, nil
+
+	} else {
+		var tx = sdk.StdTx{}
+
+		// StdTx.Msg is an interface. The concrete types
+		// are registered by MakeTxCodec in bank.RegisterWire.
+		err := app.cdc.UnmarshalBinary(txBytes, &tx)
+		if err != nil {
+			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+		}
+		fmt.Println(tx)
+		return tx, nil
+
 	}
-	return tx, nil
 }
 
 // custom logic for ixo initialization
@@ -197,6 +222,15 @@ func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
 		// return sdk.ErrGenesisParse("").TraceCause(err, "")
 	}
+
+	projectGenesis := genesisState.ProjectGenesis
+	fmt.Println("peg_key: %s", projectGenesis.PegPubKey)
+	ethPegDidDoc := did.BaseDidDoc{
+		Did:    "ETH_PEG",
+		PubKey: projectGenesis.PegPubKey,
+	}
+
+	app.didMapper.SetDidDoc(ctx, ethPegDidDoc)
 
 	for _, gacc := range genesisState.Accounts {
 		acc, err := gacc.ToAppAccount()
@@ -216,7 +250,7 @@ func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 func NewIxoAnteHandler(app *IxoApp) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(app.accountMapper)
 	didAnteHandler := did.NewAnteHandler(app.didMapper)
-	projectAnteHandler := project.NewAnteHandler(app.projectMapper)
+	projectAnteHandler := project.NewAnteHandler(app.projectMapper, app.didMapper)
 
 	return func(
 		ctx sdk.Context, tx sdk.Tx,

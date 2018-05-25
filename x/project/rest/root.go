@@ -11,5 +11,5 @@ import (
 func RegisterRoutes(r *mux.Router, cdc *wire.Codec, kb keys.Keybase, storeName string) {
 	r.HandleFunc("/project", CreateProjectRequestHandler(storeName, cdc, kb)).Methods("POST")
 	r.HandleFunc("/project/{did}", QueryProjectDocRequestHandler(storeName, cdc, project.GetProjectDocDecoder(cdc))).Methods("GET")
-	r.HandleFunc("/project", QueryAllDidsRequestHandler("did", cdc, project.GetProjectDocDecoder(cdc))).Methods("GET")
+	r.HandleFunc("/projectAccounts/{projectDid}", QueryProjectAccountsRequestHandler(storeName, cdc, project.GetProjectDocDecoder(cdc))).Methods("GET")
 }

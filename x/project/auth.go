@@ -5,16 +5,17 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-func NewAnteHandler(projectMapper SealedProjectMapper) sdk.AnteHandler {
+func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMapper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		// This always be a IxoTx
-		ixoTx, ok := tx.(ixo.IxoTx)
+		_, ok := tx.(ixo.IxoTx)
 		if !ok {
 			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
 		}
@@ -24,24 +25,26 @@ func NewAnteHandler(projectMapper SealedProjectMapper) sdk.AnteHandler {
 		fmt.Println("Auth: check")
 		pubKey := [32]byte{}
 
-		if projectMsg.IsNewDid() {
-			createProjectMsg := msg.(CreateProjectMsg)
-			//Get public key from payload
-			copy(pubKey[:], base58.Decode(createProjectMsg.ProjectDoc.PubKey))
-
-			// Assert dids are the same
-			if createProjectMsg.ProjectDoc.ProjectDid != ixoTx.Signature.Creator {
-				return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
-			}
+		if projectMsg.IsPegMsg() {
+			pegDid := ixo.Did(msg.GetSigners()[0])
+			didDoc := didMapper.GetDidDoc(ctx, pegDid)
+			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
 		} else {
-			// Get Project Doc
-			projectDoc := projectMapper.GetProjectDoc(ctx, ixoTx.Signature.Creator)
-			if projectDoc == nil {
-				return ctx, sdk.ErrInternal("did not found").Result(), true
-			}
-			copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
-		}
+			if projectMsg.IsNewDid() {
+				createProjectMsg := msg.(CreateProjectMsg)
+				//Get public key from payload
+				copy(pubKey[:], base58.Decode(createProjectMsg.ProjectDoc.PubKey))
 
+			} else {
+				projectDid := ixo.Did(msg.GetSigners()[0])
+				// Get Project Doc
+				projectDoc, found := projectMapper.GetProjectDoc(ctx, projectDid)
+				if !found {
+					return ctx, sdk.ErrInternal("project did not found").Result(), true
+				}
+				copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
+			}
+		}
 		// Assert that there are signatures.
 		var sigs = tx.GetSignatures()
 		if len(sigs) != 1 {

@@ -1,4 +1,4 @@
-package ixo
+package sovrin
 
 import (
 	"bytes"

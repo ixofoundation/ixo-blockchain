@@ -12,7 +12,7 @@ func NewAnteHandler(didMapper SealedDidMapper) sdk.AnteHandler {
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		// This always be a IxoTx
-		ixoTx, ok := tx.(ixo.IxoTx)
+		_, ok := tx.(ixo.IxoTx)
 		if !ok {
 			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
 		}
@@ -22,11 +22,6 @@ func NewAnteHandler(didMapper SealedDidMapper) sdk.AnteHandler {
 
 		pubKey := [32]byte{}
 		copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
-
-		// Assert dids are the same
-		if addDidMsg.DidDoc.Did != ixoTx.Signature.Creator {
-			return ctx, sdk.ErrInternal("did in payload does not match creator").Result(), true
-		}
 
 		// Assert that there are signatures.
 		var sigs = tx.GetSignatures()

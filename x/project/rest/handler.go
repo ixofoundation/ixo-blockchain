@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 	"github.com/tendermint/go-crypto/keys"
 )
@@ -40,7 +42,7 @@ func CreateProjectRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keyb
 			return
 		}
 
-		sovrinDid := ixo.SovrinDid{}
+		sovrinDid := sovrin.SovrinDid{}
 		sovrinErr := json.Unmarshal([]byte(didDocParam), &sovrinDid)
 		if sovrinErr != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -138,13 +140,20 @@ func QueryProjectDocRequestHandler(storeName string, cdc *wire.Codec, decoder pr
 	}
 }
 
-func QueryAllDidsRequestHandler(storeName string, cdc *wire.Codec, decoder project.ProjectDocDecoder) func(http.ResponseWriter, *http.Request) {
+func QueryProjectAccountsRequestHandler(storeName string, cdc *wire.Codec, decoder project.ProjectDocDecoder) func(http.ResponseWriter, *http.Request) {
 	c := commander{storeName, cdc, decoder}
 	ctx := context.NewCoreContextFromViper()
 	return func(w http.ResponseWriter, r *http.Request) {
-		allKey := "ALL"
 
-		res, err := ctx.Query([]byte(allKey), c.storeName)
+		vars := mux.Vars(r)
+		projectDid := vars["projectDid"]
+
+		var buffer bytes.Buffer
+		buffer.WriteString("ACC-")
+		buffer.WriteString(projectDid)
+		key := buffer.Bytes()
+
+		res, err := ctx.Query(key, c.storeName)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
@@ -158,16 +167,17 @@ func QueryAllDidsRequestHandler(storeName string, cdc *wire.Codec, decoder proje
 		}
 
 		// decode the value
-		dids := []ixo.Did{}
-		err = cdc.UnmarshalBinary(res, &dids)
+		var f interface{}
+		err = json.Unmarshal(res, &f)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
 			return
 		}
+		accMap := f.(map[string]interface{})
 
 		// print out whole didDoc
-		output, err := json.MarshalIndent(dids, "", "  ")
+		output, err := json.MarshalIndent(accMap, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
