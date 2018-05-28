@@ -57,6 +57,7 @@ func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper
 }
 
 func handleCreateAgentMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateAgentMsg) sdk.Result {
+	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
 	return sdk.Result{
 		Code: sdk.CodeOK,
 		Data: []byte("Action complete"),
@@ -100,9 +101,9 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKee
 	} else {
 		senderAccAddr = senderAccAddrInterface.(string)
 	}
-	err := ck.SendCoins(ctx, toHexBytes(projectAddr), toHexBytes(senderAccAddr), sdk.Coins{{COIN_DENOM, projectDoc.GetEvaluatorPay()}})
+	err := ck.SendCoins(ctx, toHexBytes(projectAddr), toHexBytes(senderAccAddr), sdk.Coins{{Denom: COIN_DENOM, Amount: projectDoc.GetEvaluatorPay()}})
 	if err != nil {
-		panic(err)
+		return err.Result()
 	}
 	return sdk.Result{
 		Code: sdk.CodeOK,

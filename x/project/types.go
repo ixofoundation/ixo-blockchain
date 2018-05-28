@@ -40,11 +40,15 @@ type ProjectDoc struct {
 //GETTERS
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
-	i, err := strconv.ParseInt(pd.EvaluatorPay, 10, 64)
-	if err != nil {
-		panic(err)
+	if pd.EvaluatorPay == "" {
+		return 0
+	} else {
+		i, err := strconv.ParseInt(pd.EvaluatorPay, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		return i
 	}
-	return i
 }
 
 //DECODERS
@@ -70,12 +74,12 @@ type CreateAgentDoc struct {
 	Role     string  `json:"role"`
 }
 
-type AgentStatus int
+type AgentStatus string
 
 const (
-	PendingAgent  AgentStatus = 0
-	ApprovedAgent AgentStatus = 1
-	RevokedAgent  AgentStatus = 2
+	PendingAgent  AgentStatus = "0"
+	ApprovedAgent AgentStatus = "1"
+	RevokedAgent  AgentStatus = "2"
 )
 
 // Define CreateAgent
@@ -89,12 +93,12 @@ type CreateClaimDoc struct {
 	ClaimID string `json:"claimID"`
 }
 
-type ClaimStatus int
+type ClaimStatus string
 
 const (
-	PendingClaim  ClaimStatus = 0
-	ApprovedClaim ClaimStatus = 1
-	RejectedClaim ClaimStatus = 2
+	PendingClaim  ClaimStatus = "0"
+	ApprovedClaim ClaimStatus = "1"
+	RejectedClaim ClaimStatus = "2"
 )
 
 // Define CreateAgent
