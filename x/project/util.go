@@ -5,38 +5,46 @@ import (
 )
 
 func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) CreateProjectMsg {
-	projectDoc.ProjectDid = projectDid.Did
-	projectDoc.PubKey = projectDid.VerifyKey
 	return CreateProjectMsg{
-		projectDoc,
+		Data:       projectDoc,
+		ProjectDid: projectDid.Did,
+		PubKey:     projectDid.VerifyKey,
 	}
 }
 
-func NewCreateAgentMsg(createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) CreateAgentMsg {
-	createAgentDoc.ProjectDid = projectDid.Did
+func NewCreateAgentMsg(txHash string, senderDid string, createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) CreateAgentMsg {
 	return CreateAgentMsg{
-		createAgentDoc,
+		Data:       createAgentDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 
-func NewUpdateAgentMsg(updateAgentDoc UpdateAgentDoc, projectDid sovrin.SovrinDid) UpdateAgentMsg {
-	updateAgentDoc.ProjectDid = projectDid.Did
+func NewUpdateAgentMsg(txHash string, senderDid string, updateAgentDoc UpdateAgentDoc, projectDid sovrin.SovrinDid) UpdateAgentMsg {
 	return UpdateAgentMsg{
-		updateAgentDoc,
+		Data:       updateAgentDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 
-func NewCreateClaimMsg(createClaimDoc CreateClaimDoc, projectDid sovrin.SovrinDid) CreateClaimMsg {
-	createClaimDoc.ProjectDid = projectDid.Did
+func NewCreateClaimMsg(txHash string, senderDid string, createClaimDoc CreateClaimDoc, projectDid sovrin.SovrinDid) CreateClaimMsg {
 	return CreateClaimMsg{
-		createClaimDoc,
+		Data:       createClaimDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 
-func NewCreateEvaluationMsg(createEvaluationDoc CreateEvaluationDoc, projectDid sovrin.SovrinDid) CreateEvaluationMsg {
-	createEvaluationDoc.ProjectDid = projectDid.Did
+func NewCreateEvaluationMsg(txHash string, senderDid string, createEvaluationDoc CreateEvaluationDoc, projectDid sovrin.SovrinDid) CreateEvaluationMsg {
 	return CreateEvaluationMsg{
-		createEvaluationDoc,
+		Data:       createEvaluationDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 

@@ -33,7 +33,7 @@ func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMa
 			if projectMsg.IsNewDid() {
 				createProjectMsg := msg.(CreateProjectMsg)
 				//Get public key from payload
-				copy(pubKey[:], base58.Decode(createProjectMsg.ProjectDoc.PubKey))
+				copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
 
 			} else {
 				projectDid := ixo.Did(msg.GetSigners()[0])

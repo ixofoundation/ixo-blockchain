@@ -15,13 +15,7 @@ const COIN_DENOM = "ixo"
 //DOC SETUP
 
 //Define ProjectDoc
-var _ ixo.ProjectDoc = (*ProjectDoc)(nil)
-
 type ProjectDoc struct {
-	TxHash           string   `json:"txHash"`
-	SenderDid        string   `json:"senderDid"`
-	ProjectDid       string   `json:"projectDid"`
-	PubKey           string   `json:"pubKey"`
 	Title            string   `json:"title"`
 	ShortDescription string   `json:"shortDescription"`
 	LongDescription  string   `json:"longDescription"`
@@ -44,8 +38,6 @@ type ProjectDoc struct {
 }
 
 //GETTERS
-func (pd ProjectDoc) GetProjectDid() ixo.Did { return pd.ProjectDid }
-func (pd ProjectDoc) GetPubKey() string      { return pd.PubKey }
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
 	i, err := strconv.ParseInt(pd.EvaluatorPay, 10, 64)
@@ -56,14 +48,14 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 }
 
 //DECODERS
-type ProjectDocDecoder func(projectEntryBytes []byte) (ixo.ProjectDoc, error)
+type ProjectDocDecoder func(projectEntryBytes []byte) (ixo.StoredProjectDoc, error)
 
 func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
-	return func(projectDocBytes []byte) (res ixo.ProjectDoc, err error) {
+	return func(projectDocBytes []byte) (res ixo.StoredProjectDoc, err error) {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := ProjectDoc{}
+		projectDoc := StoredProjectDoc{}
 		err = cdc.UnmarshalBinary(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)
@@ -74,14 +66,9 @@ func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
 
 // Define CreateAgent
 type CreateAgentDoc struct {
-	TxHash     string  `json:"txHash"`
-	SenderDid  ixo.Did `json:"senderDid"`
-	ProjectDid ixo.Did `json:"projectDid"`
-	AgentDid   ixo.Did `json:"did"`
-	Role       string  `json:"role"`
+	AgentDid ixo.Did `json:"did"`
+	Role     string  `json:"role"`
 }
-
-func (cd CreateAgentDoc) GetProjectDid() ixo.Did { return cd.ProjectDid }
 
 type AgentStatus int
 
@@ -93,26 +80,14 @@ const (
 
 // Define CreateAgent
 type UpdateAgentDoc struct {
-	TxHash     string      `json:"txHash"`
-	SenderDid  ixo.Did     `json:"senderDid"`
-	ProjectDid ixo.Did     `json:"projectDid"`
-	Did        ixo.Did     `json:"did"`
-	Status     AgentStatus `json:"status"`
+	Did    ixo.Did     `json:"did"`
+	Status AgentStatus `json:"status"`
 }
-
-func (ud UpdateAgentDoc) GetProjectDid() ixo.Did { return ud.ProjectDid }
-func (ud UpdateAgentDoc) GetSenderDid() ixo.Did  { return ud.SenderDid }
 
 // Define CreateAgent
 type CreateClaimDoc struct {
-	TxHash     string  `json:"txHash"`
-	SenderDid  ixo.Did `json:"senderDid"`
-	ProjectDid ixo.Did `json:"projectDid"`
-	ClaimID    string  `json:"claimID"`
+	ClaimID string `json:"claimID"`
 }
-
-func (cd CreateClaimDoc) GetProjectDid() ixo.Did { return cd.ProjectDid }
-func (cd CreateClaimDoc) GetSenderDid() ixo.Did  { return cd.SenderDid }
 
 type ClaimStatus int
 
@@ -124,15 +99,9 @@ const (
 
 // Define CreateAgent
 type CreateEvaluationDoc struct {
-	TxHash     string      `json:"txHash"`
-	SenderDid  ixo.Did     `json:"senderDid"`
-	ProjectDid ixo.Did     `json:"projectDid"`
-	ClaimID    string      `json:"claimID"`
-	Status     ClaimStatus `json:"status"`
+	ClaimID string      `json:"claimID"`
+	Status  ClaimStatus `json:"status"`
 }
-
-func (cd CreateEvaluationDoc) GetProjectDid() ixo.Did { return cd.ProjectDid }
-func (cd CreateEvaluationDoc) GetSenderDid() ixo.Did  { return cd.SenderDid }
 
 type FundProjectDoc struct {
 	Signer     ixo.Did `json:"signer"`
@@ -168,7 +137,11 @@ type ProjectMsg interface {
 
 //CreateProjectMsg
 type CreateProjectMsg struct {
-	ProjectDoc ProjectDoc `json:"data"`
+	Data       ProjectDoc `json:"data"`
+	TxHash     string     `json:"txHash"`
+	SenderDid  ixo.Did    `json:"senderDid"`
+	ProjectDid ixo.Did    `json:"projectDid"`
+	PubKey     string     `json:"pubKey"`
 }
 
 var _ sdk.Msg = CreateProjectMsg{}
@@ -178,8 +151,10 @@ func (msg CreateProjectMsg) Get(key interface{}) (value interface{}) { return ni
 func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg CreateProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg CreateProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg CreateProjectMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.ProjectDoc.GetProjectDid())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateProjectMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
@@ -191,12 +166,21 @@ func (msg CreateProjectMsg) GetSignBytes() []byte {
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
 func (msg CreateProjectMsg) IsPegMsg() bool { return false }
 func (msg CreateProjectMsg) String() string {
-	return fmt.Sprintf("CreateProjectMsg{Did: %v, projectDoc: %v}", string(msg.ProjectDoc.GetProjectDid()), msg.ProjectDoc)
+	return fmt.Sprintf("CreateProjectMsg{Did: %v, projectDoc: %v}", string(msg.GetProjectDid()), msg.Data)
 }
+func (msg CreateProjectMsg) GetPubKey() string      { return msg.PubKey }
+func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.Data.GetEvaluatorPay() }
+
+type StoredProjectDoc = CreateProjectMsg
+
+var _ ixo.StoredProjectDoc = (*StoredProjectDoc)(nil)
 
 //CreateAgentMsg
 type CreateAgentMsg struct {
-	Data CreateAgentDoc `json:"data"`
+	Data       CreateAgentDoc `json:"data"`
+	TxHash     string         `json:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid"`
 }
 
 var _ sdk.Msg = CreateAgentMsg{}
@@ -206,8 +190,10 @@ func (msg CreateAgentMsg) Get(key interface{}) (value interface{}) { return nil 
 func (msg CreateAgentMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg CreateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg CreateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg CreateAgentMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.Data.GetProjectDid())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateAgentMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
@@ -225,7 +211,10 @@ func (msg CreateAgentMsg) String() string {
 
 //UpdateAgentMsg
 type UpdateAgentMsg struct {
-	Data UpdateAgentDoc `json:"data"`
+	Data       UpdateAgentDoc `json:"data"`
+	TxHash     string         `json:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid"`
 }
 
 var _ sdk.Msg = UpdateAgentMsg{}
@@ -235,8 +224,10 @@ func (msg UpdateAgentMsg) Get(key interface{}) (value interface{}) { return nil 
 func (msg UpdateAgentMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg UpdateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg UpdateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg UpdateAgentMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.Data.GetProjectDid())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg UpdateAgentMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
@@ -255,7 +246,10 @@ func (msg UpdateAgentMsg) String() string {
 
 //CreateClaimMsg
 type CreateClaimMsg struct {
-	Data CreateClaimDoc `json:"data"`
+	Data       CreateClaimDoc `json:"data"`
+	TxHash     string         `json:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid"`
 }
 
 var _ sdk.Msg = CreateClaimMsg{}
@@ -265,8 +259,10 @@ func (msg CreateClaimMsg) Get(key interface{}) (value interface{}) { return nil 
 func (msg CreateClaimMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg CreateClaimMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg CreateClaimMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg CreateClaimMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.Data.GetProjectDid())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateClaimMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
@@ -284,7 +280,10 @@ func (msg CreateClaimMsg) String() string {
 
 //CreateEvaluationMsg
 type CreateEvaluationMsg struct {
-	Data CreateEvaluationDoc `json:"data"`
+	Data       CreateEvaluationDoc `json:"data"`
+	TxHash     string              `json:"txHash"`
+	SenderDid  ixo.Did             `json:"senderDid"`
+	ProjectDid ixo.Did             `json:"projectDid"`
 }
 
 var _ sdk.Msg = CreateEvaluationMsg{}
@@ -294,8 +293,10 @@ func (msg CreateEvaluationMsg) Get(key interface{}) (value interface{}) { return
 func (msg CreateEvaluationMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg CreateEvaluationMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg CreateEvaluationMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg CreateEvaluationMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.Data.GetProjectDid())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateEvaluationMsg) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)

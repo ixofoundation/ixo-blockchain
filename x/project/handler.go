@@ -41,12 +41,12 @@ func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
 func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateProjectMsg) sdk.Result {
 	fmt.Println("Handler")
 	fmt.Println(msg)
-	fmt.Println(msg.ProjectDoc)
-	newProjectDoc := msg.ProjectDoc
-	addAccountToAccountProjectAccounts(ctx, k, newProjectDoc.GetProjectDid(), newProjectDoc.GetProjectDid())
+	fmt.Println(msg.Data)
+	newProjectDoc := msg.Data
+	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
 	fmt.Println(newProjectDoc)
-	projectDoc, err := k.AddProjectDoc(ctx, newProjectDoc)
+	projectDoc, err := k.AddProjectDoc(ctx, msg)
 	if err != nil {
 		return err.Result()
 	}
@@ -75,16 +75,15 @@ func handleCreateClaimMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, 
 	}
 }
 func handleCreateEvaluationMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateEvaluationMsg) sdk.Result {
-	evaluationDoc := msg.Data
-	projectDoc, found := getProjectDoc(ctx, k, evaluationDoc.ProjectDid)
+	projectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if !found {
 		return sdk.Result{
 			Code: sdk.CodeInvalidAddress,
 			Data: []byte("Could not find Project"),
 		}
 	}
-	accMap := getProjectAccountMap(ctx, k, evaluationDoc.ProjectDid)
-	projectAddrInterface, found := accMap[evaluationDoc.ProjectDid]
+	accMap := getProjectAccountMap(ctx, k, msg.GetProjectDid())
+	projectAddrInterface, found := accMap[msg.GetProjectDid()]
 	if !found {
 		return sdk.Result{
 			Code: sdk.CodeInvalidAddress,
@@ -92,10 +91,10 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKee
 		}
 	}
 	projectAddr := projectAddrInterface.(string)
-	senderAccAddrInterface, found := accMap[evaluationDoc.SenderDid]
+	senderAccAddrInterface, found := accMap[msg.GetSenderDid()]
 	var senderAccAddr string
 	if !found {
-		newAcc := addAccountToAccountProjectAccounts(ctx, k, evaluationDoc.ProjectDid, evaluationDoc.SenderDid)
+		newAcc := addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetSenderDid())
 
 		senderAccAddr = hex.EncodeToString(newAcc.GetAddress())
 	} else {
@@ -155,9 +154,9 @@ func toHexBytes(address string) common.HexBytes {
 	return sdk.Address(bz)
 }
 
-func getProjectDoc(ctx sdk.Context, k ProjectKeeper, projectDid ixo.Did) (ProjectDoc, bool) {
+func getProjectDoc(ctx sdk.Context, k ProjectKeeper, projectDid ixo.Did) (StoredProjectDoc, bool) {
 	ixoProjectDoc, found := k.GetProjectDoc(ctx, projectDid)
-	return ixoProjectDoc.(ProjectDoc), found
+	return ixoProjectDoc.(StoredProjectDoc), found
 }
 
 func getProjectAccountMap(ctx sdk.Context, k ProjectKeeper, projectDid ixo.Did) map[string]interface{} {

@@ -82,7 +82,8 @@ func SignMessage(message []byte, signKey string, verifyKey string) []byte {
 	// Force the length to 64
 	fmt.Println("*******SIGNING_MSG******* \n", string(message))
 
-	fullPrivKey := ed25519.PrivateKey{}
+	privateKey := make([]byte, ed25519.PrivateKeySize)
+	fullPrivKey := ed25519.PrivateKey(privateKey)
 	copy(fullPrivKey[:], getArrayFromKey(signKey))
 	copy(fullPrivKey[32:], getArrayFromKey(verifyKey))
 
@@ -106,6 +107,7 @@ func GetNonce() [24]byte {
 }
 
 func getArrayFromKey(key string) []byte {
+	fmt.Println(len(base58.Decode(key)))
 	return base58.Decode(key)
 }
 

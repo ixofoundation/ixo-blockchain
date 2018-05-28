@@ -79,8 +79,8 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 
 	// define the projectMapper
 	app.projectMapper = project.NewProjectMapperSealed(
-		app.capKeyProjectStore, // target store
-		&project.ProjectDoc{},  // prototype
+		app.capKeyProjectStore,      // target store
+		&project.StoredProjectDoc{}, // prototype
 	)
 
 	// add handlers

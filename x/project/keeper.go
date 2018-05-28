@@ -26,13 +26,13 @@ func NewKeeper(pm SealedProjectMapper, am sdk.AccountMapper) ProjectKeeper {
 }
 
 // GetDidDoc returns the did_doc at the addr.
-func (pk ProjectKeeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) (ixo.ProjectDoc, bool) {
+func (pk ProjectKeeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) (ixo.StoredProjectDoc, bool) {
 	projectDoc, found := pk.pm.GetProjectDoc(ctx, did)
 	return projectDoc, found
 }
 
 // AddDidDoc adds the did_doc at the addr.
-func (pk ProjectKeeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.ProjectDoc) (ixo.ProjectDoc, sdk.Error) {
+func (pk ProjectKeeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.StoredProjectDoc) (ixo.StoredProjectDoc, sdk.Error) {
 	projectDoc, found := pk.pm.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
 	if !found {
 		pk.pm.SetProjectDoc(ctx, newProjectDoc)

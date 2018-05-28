@@ -29,6 +29,7 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 
 	//Create the Signature
 	signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+	fmt.Println(signature)
 
 	tx := ixo.NewIxoTx(msg, signature)
 
@@ -70,6 +71,8 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 				return errors.New("You must provide the project data and the projects private key")
 			}
 
+			//			sig := sovrin.SignMessage([]byte("A"), "BGsfxvVMmzcUEnYmXvso3fEGjmbk5He9HpuuPvEdPNUg", "6xRWNCMc4CiJ2A3kgjpFdkJFT7oboy41dtjB8J1F7U52")
+			//			fmt.Println(hex.EncodeToString(sig))
 			projectDoc := project.ProjectDoc{}
 			err := json.Unmarshal([]byte(args[0]), &projectDoc)
 			if err != nil {
@@ -107,16 +110,14 @@ func CreateAgentCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			createAgentDoc := project.CreateAgentDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				AgentDid:  agentDid,
-				Role:      role,
+				AgentDid: agentDid,
+				Role:     role,
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[4])
 
 			// create the message
-			msg := project.NewCreateAgentMsg(createAgentDoc, sovrinDid)
+			msg := project.NewCreateAgentMsg(txHash, senderDid, createAgentDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -148,16 +149,14 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			updateAgentDoc := project.UpdateAgentDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				Did:       agentDid,
-				Status:    agentStatus,
+				Did:    agentDid,
+				Status: agentStatus,
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[4])
 
 			// create the message
-			msg := project.NewUpdateAgentMsg(updateAgentDoc, sovrinDid)
+			msg := project.NewUpdateAgentMsg(txHash, senderDid, updateAgentDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -180,15 +179,13 @@ func CreateClaimCmd(cdc *wire.Codec) *cobra.Command {
 			claimId := args[2]
 
 			createClaimDoc := project.CreateClaimDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				ClaimID:   claimId,
+				ClaimID: claimId,
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[3])
 
 			// create the message
-			msg := project.NewCreateClaimMsg(createClaimDoc, sovrinDid)
+			msg := project.NewCreateClaimMsg(txHash, senderDid, createClaimDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -220,16 +217,14 @@ func CreateEvaluationCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			createEvaluationDoc := project.CreateEvaluationDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				ClaimID:   claimId,
-				Status:    claimStatus,
+				ClaimID: claimId,
+				Status:  claimStatus,
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[4])
 
 			// create the message
-			msg := project.NewCreateEvaluationMsg(createEvaluationDoc, sovrinDid)
+			msg := project.NewCreateEvaluationMsg(txHash, senderDid, createEvaluationDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

@@ -68,8 +68,8 @@ type DidDoc interface {
 // Define Project
 type Project = string
 
-type ProjectDoc interface {
+type StoredProjectDoc interface {
+	GetEvaluatorPay() int64
 	GetProjectDid() Did
 	GetPubKey() string
-	GetEvaluatorPay() int64
 }

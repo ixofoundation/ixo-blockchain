@@ -23,14 +23,14 @@ type ProjectMapper struct {
 	key sdk.StoreKey
 
 	// The prototypical ixo.ProjectDoc concrete type.
-	proto ixo.ProjectDoc
+	proto ixo.StoredProjectDoc
 
 	// The wire codec for binary encoding/decoding of projects.
 	cdc *wire.Codec
 }
 
 // Create and return a sealed account mapper
-func NewProjectMapperSealed(key sdk.StoreKey, proto ixo.ProjectDoc) SealedProjectMapper {
+func NewProjectMapperSealed(key sdk.StoreKey, proto ixo.StoredProjectDoc) SealedProjectMapper {
 	cdc := wire.NewCodec()
 	pm := ProjectMapper{
 		key:   key,
@@ -114,7 +114,7 @@ func (pm ProjectMapper) encodeAccountMap(accMap map[string]interface{}) []byte {
 	return []byte(json)
 }
 
-func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) (ixo.ProjectDoc, bool) {
+func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) (ixo.StoredProjectDoc, bool) {
 	store := ctx.KVStore(pm.key)
 	bz := store.Get([]byte(addr))
 	if bz == nil {
@@ -124,7 +124,7 @@ func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) (ixo.Projec
 	return project, true
 }
 
-func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.ProjectDoc) {
+func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.StoredProjectDoc) {
 	addr := []byte(project.GetProjectDid())
 	store := ctx.KVStore(pm.key)
 	bz := pm.encodeProject(project)
@@ -138,45 +138,45 @@ func (spm SealedProjectMapper) WireCodec() *wire.Codec {
 }
 
 // Creates a new struct (or pointer to struct) from am.proto.
-func (pm ProjectMapper) clonePrototype() ixo.ProjectDoc {
+func (pm ProjectMapper) clonePrototype() ixo.StoredProjectDoc {
 	protoRt := reflect.TypeOf(pm.proto)
 	if protoRt.Kind() == reflect.Ptr {
 		protoCrt := protoRt.Elem()
 		if protoCrt.Kind() != reflect.Struct {
-			panic("ProjectMapper requires a struct proto ixo.ProjectDoc, or a pointer to one")
+			panic("ProjectMapper requires a struct proto ixo.StoredProjectDoc, or a pointer to one")
 		}
 		protoRv := reflect.New(protoCrt)
-		clone, ok := protoRv.Interface().(ixo.ProjectDoc)
+		clone, ok := protoRv.Interface().(ixo.StoredProjectDoc)
 		if !ok {
-			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.ProjectDoc", protoRt))
+			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.StoredProjectDoc", protoRt))
 		}
 		return clone
 	} else {
 		protoRv := reflect.New(protoRt).Elem()
-		clone, ok := protoRv.Interface().(ixo.ProjectDoc)
+		clone, ok := protoRv.Interface().(ixo.StoredProjectDoc)
 		if !ok {
-			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.ProjectDoc", protoRt))
+			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.StoredProjectDoc", protoRt))
 		}
 		return clone
 	}
 }
 
-func (pm ProjectMapper) encodeProject(projectDoc ixo.ProjectDoc) []byte {
-	bz, err := pm.cdc.MarshalBinary(projectDoc)
+func (pm ProjectMapper) encodeProject(storedProjectDoc ixo.StoredProjectDoc) []byte {
+	bz, err := pm.cdc.MarshalBinary(storedProjectDoc)
 	if err != nil {
 		panic(err)
 	}
 	return bz
 }
 
-func (pm ProjectMapper) decodeProject(bz []byte) ixo.ProjectDoc {
+func (pm ProjectMapper) decodeProject(bz []byte) ixo.StoredProjectDoc {
 
-	projectDoc := ProjectDoc{}
-	err := pm.cdc.UnmarshalBinary(bz, &projectDoc)
+	storedProjectDoc := StoredProjectDoc{}
+	err := pm.cdc.UnmarshalBinary(bz, &storedProjectDoc)
 	if err != nil {
 		panic(err)
 	}
-	return projectDoc
+	return storedProjectDoc
 
 }
 func generateAccountsKey(did ixo.Did) []byte {
