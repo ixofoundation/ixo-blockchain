@@ -1,11 +1,16 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/ixofoundation/ixo-cosmos/x/project"
+
 	"github.com/spf13/cobra"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/abci/types"
 	"github.com/tendermint/tmlibs/cli"
 	dbm "github.com/tendermint/tmlibs/db"
@@ -13,6 +18,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/ixofoundation/ixo-cosmos/app"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 )
 
 // rootCmd is the entry point for this binary
@@ -66,8 +72,36 @@ func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
 	return bapp, nil
 }
 
+// defaultAppState sets up the app_state for the
+// default genesis file
+func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.RawMessage, error) {
+
+	// Add ETH_PEG key for signing
+	sovrinDid := sovrin.Gen()
+	fmt.Println("********* Note ***********************************************************")
+	fmt.Println("This is the Ethereum Peg Key and needs to be used to release Project Funds")
+	fmt.Println(sovrinDid.String())
+	fmt.Println("**************************************************************************")
+	opts := fmt.Sprintf(`{
+		"accounts": [{
+			"address": "%s",
+			"coins": [
+				{
+					"denom": "%s",
+					"amount": 9007199254740992
+				}
+			],
+			"name":"coinbase"
+		}],
+		"project": {
+			"pegPubKey":"%s"
+		}
+	}`, addr.String(), project.COIN_DENOM, sovrinDid.VerifyKey)
+	return json.RawMessage(opts), nil
+}
+
 func main() {
-	server.AddCommands(rootCmd, server.DefaultGenAppState, generateApp, context)
+	server.AddCommands(rootCmd, defaultAppState, generateApp, context)
 
 	// prepare and add flags
 	rootDir := os.ExpandEnv("$HOME/.ixo-node")

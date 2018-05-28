@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	did "github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"github.com/tendermint/go-crypto/keys"
 )
 
@@ -28,7 +29,7 @@ func CreateDidRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keybase)
 		// collect data
 		didDocParam := r.URL.Query().Get("didDoc")
 
-		sovrinDid := ixo.SovrinDid{}
+		sovrinDid := sovrin.SovrinDid{}
 		err := json.Unmarshal([]byte(didDocParam), &sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)

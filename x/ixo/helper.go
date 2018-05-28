@@ -13,9 +13,10 @@ func SignIxoMessage(msg sdk.Msg, did string, privKey [64]byte) IxoSignature {
 	fmt.Println("*******SIGNING_MSG******* \n", string(msg.GetSignBytes()))
 
 	signatureBytes := ed25519.Sign(&privKey, msg.GetSignBytes())
+	fmt.Println(string(msg.GetSignBytes()))
 	signature := crypto.SignatureEd25519(*signatureBytes).Wrap()
 
-	return NewSignature(time.Now(), did, signature)
+	return NewSignature(time.Now(), signature)
 }
 
 func VerifySignature(msg sdk.Msg, publicKey [32]byte, sig sdk.StdSignature) bool {

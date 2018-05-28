@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -14,12 +15,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 
 	ixo "github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 
 	base58 "github.com/btcsuite/btcutil/base58"
 )
 
-func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sovrinDid ixo.SovrinDid) error {
+func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
 	// Force the length to 64
 	privKey := [64]byte{}
 	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
@@ -27,6 +29,7 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 
 	//Create the Signature
 	signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+	fmt.Println(signature)
 
 	tx := ixo.NewIxoTx(msg, signature)
 
@@ -48,8 +51,8 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 }
 
 // Unmarshal sovrinDID
-func unmarshalSovrinDID(sovrinJson string) ixo.SovrinDid {
-	sovrinDid := ixo.SovrinDid{}
+func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
+	sovrinDid := sovrin.SovrinDid{}
 	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
 	if sovrinErr != nil {
 		panic(sovrinErr)
@@ -68,6 +71,8 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 				return errors.New("You must provide the project data and the projects private key")
 			}
 
+			//			sig := sovrin.SignMessage([]byte("A"), "BGsfxvVMmzcUEnYmXvso3fEGjmbk5He9HpuuPvEdPNUg", "6xRWNCMc4CiJ2A3kgjpFdkJFT7oboy41dtjB8J1F7U52")
+			//			fmt.Println(hex.EncodeToString(sig))
 			projectDoc := project.ProjectDoc{}
 			err := json.Unmarshal([]byte(args[0]), &projectDoc)
 			if err != nil {
@@ -105,16 +110,14 @@ func CreateAgentCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			createAgentDoc := project.CreateAgentDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				Did:       agentDid,
-				Role:      role,
+				AgentDid: agentDid,
+				Role:     role,
 			}
 
-			// create the message
-			msg := project.NewCreateAgentMsg(createAgentDoc)
-
 			sovrinDid := unmarshalSovrinDID(args[4])
+
+			// create the message
+			msg := project.NewCreateAgentMsg(txHash, senderDid, createAgentDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -146,16 +149,14 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			updateAgentDoc := project.UpdateAgentDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				Did:       agentDid,
-				Status:    agentStatus,
+				Did:    agentDid,
+				Status: agentStatus,
 			}
 
-			// create the message
-			msg := project.NewUpdateAgentMsg(updateAgentDoc)
-
 			sovrinDid := unmarshalSovrinDID(args[4])
+
+			// create the message
+			msg := project.NewUpdateAgentMsg(txHash, senderDid, updateAgentDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -178,15 +179,13 @@ func CreateClaimCmd(cdc *wire.Codec) *cobra.Command {
 			claimId := args[2]
 
 			createClaimDoc := project.CreateClaimDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				ClaimID:   claimId,
+				ClaimID: claimId,
 			}
 
-			// create the message
-			msg := project.NewCreateClaimMsg(createClaimDoc)
-
 			sovrinDid := unmarshalSovrinDID(args[3])
+
+			// create the message
+			msg := project.NewCreateClaimMsg(txHash, senderDid, createClaimDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -218,16 +217,42 @@ func CreateEvaluationCmd(cdc *wire.Codec) *cobra.Command {
 			}
 
 			createEvaluationDoc := project.CreateEvaluationDoc{
-				TxHash:    txHash,
-				SenderDid: senderDid,
-				ClaimID:   claimId,
-				Status:    claimStatus,
+				ClaimID: claimId,
+				Status:  claimStatus,
 			}
 
-			// create the message
-			msg := project.NewCreateEvaluationMsg(createEvaluationDoc)
-
 			sovrinDid := unmarshalSovrinDID(args[4])
+
+			// create the message
+			msg := project.NewCreateEvaluationMsg(txHash, senderDid, createEvaluationDoc, sovrinDid)
+
+			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+		},
+	}
+}
+
+// take the coolness quiz transaction
+func FundProjectTxCmd(cdc *wire.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "fundProject projectDid ethTx amount sovrinDid",
+		Short: "Create tokens to fund project",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
+				return errors.New("You must provide a valid projectDid, ethereum transaction hash, amount of ixo and sovrinDid")
+			}
+
+			ctx := context.NewCoreContextFromViper()
+
+			// create the message
+			fundProjectDoc := project.FundProjectDoc{
+				ProjectDid: args[0],
+				EthTxHash:  args[1],
+				Amount:     args[2],
+			}
+			sovrinDid := unmarshalSovrinDID(args[3])
+
+			// create the message
+			msg := project.NewFundProjectMsg(fundProjectDoc)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -268,6 +293,54 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 			}
 			fmt.Println(string(output))
 
+			return nil
+		},
+	}
+}
+
+func GetProjectAccountsCmd(storeName string) *cobra.Command {
+	return &cobra.Command{
+		Use:   "getProjectAccounts did",
+		Short: "Get a Project accounts for a Did",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCoreContextFromViper()
+
+			if len(args) != 1 || len(args[0]) == 0 {
+				return errors.New("You must provide a project did")
+			}
+
+			// find the key to look up the account
+			projectDid := args[0]
+			var buffer bytes.Buffer
+			buffer.WriteString("ACC-")
+			buffer.WriteString(projectDid)
+			key := buffer.Bytes()
+
+			res, err := ctx.Query(key, storeName)
+			if err != nil {
+				return err
+			}
+
+			// the query will return empty if there is no data for this did
+			if len(res) == 0 {
+				return errors.New("Project does not exist")
+			}
+
+			// decode the value
+			var f interface{}
+			err = json.Unmarshal(res, &f)
+			if err != nil {
+				return err
+			}
+			accMap := f.(map[string]interface{})
+
+			// print out whole didDoc
+			output, err := json.MarshalIndent(accMap, "", "  ")
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
 			return nil
 		},
 	}

@@ -1,6 +1,9 @@
 package project
 
 import (
+	"bytes"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -9,7 +12,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-const AllKey = "ALL"
+const AccountMapPrefix = "ACC-"
 
 // Implements ProjectMapper.
 // This ProjectMapper encodes/decodes accounts using the
@@ -20,14 +23,14 @@ type ProjectMapper struct {
 	key sdk.StoreKey
 
 	// The prototypical ixo.ProjectDoc concrete type.
-	proto ixo.ProjectDoc
+	proto ixo.StoredProjectDoc
 
 	// The wire codec for binary encoding/decoding of projects.
 	cdc *wire.Codec
 }
 
 // Create and return a sealed account mapper
-func NewProjectMapperSealed(key sdk.StoreKey, proto ixo.ProjectDoc) SealedProjectMapper {
+func NewProjectMapperSealed(key sdk.StoreKey, proto ixo.StoredProjectDoc) SealedProjectMapper {
 	cdc := wire.NewCodec()
 	pm := ProjectMapper{
 		key:   key,
@@ -59,32 +62,69 @@ func (pm ProjectMapper) Seal() SealedProjectMapper {
 	return SealedProjectMapper{pm}
 }
 
-func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) ixo.ProjectDoc {
+// Returns the array of account maps for a project
+func (pm ProjectMapper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {
+	store := ctx.KVStore(pm.key)
+	key := generateAccountsKey(projectDid)
+	fmt.Println("Key: " + string(key))
+	bz := store.Get(key)
+	if bz == nil {
+		fmt.Println("Not Found: " + string(key))
+		return make(map[string]interface{})
+	} else {
+		fmt.Println("Found: " + string(key))
+		didMap := pm.decodeAccountMap(bz)
+		return didMap
+	}
+}
+func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, accountAddr sdk.Address) {
+	accMap := pm.GetAccountMap(ctx, projectDid)
+	fmt.Println("*********AccountMap **********")
+	fmt.Println(accMap)
+	_, found := accMap[accountDid]
+	if found {
+		return
+	}
+
+	store := ctx.KVStore(pm.key)
+	key := generateAccountsKey(projectDid)
+	accountAddrString := hex.EncodeToString(accountAddr)
+	accMap[string(accountDid)] = accountAddrString
+	fmt.Println(accMap)
+	bz := pm.encodeAccountMap(accMap)
+	store.Set(key, bz)
+}
+
+func (pm ProjectMapper) decodeAccountMap(accMapBytes []byte) map[string]interface{} {
+	jsonBytes := []byte(accMapBytes)
+	var f interface{}
+	err := json.Unmarshal(jsonBytes, &f)
+	if err != nil {
+		panic(err)
+	}
+	m := f.(map[string]interface{})
+	return m
+}
+
+func (pm ProjectMapper) encodeAccountMap(accMap map[string]interface{}) []byte {
+	json, err := json.Marshal(accMap)
+	if err != nil {
+		panic(err)
+	}
+	return []byte(json)
+}
+
+func (pm ProjectMapper) GetProjectDoc(ctx sdk.Context, addr ixo.Did) (ixo.StoredProjectDoc, bool) {
 	store := ctx.KVStore(pm.key)
 	bz := store.Get([]byte(addr))
 	if bz == nil {
-		return nil
+		return nil, false
 	}
 	project := pm.decodeProject(bz)
-	return project
+	return project, true
 }
 
-func (pm ProjectMapper) GetAllDids(ctx sdk.Context) []ixo.Did {
-	store := ctx.KVStore(pm.key)
-	bz := store.Get([]byte(AllKey))
-	if bz == nil {
-		return []ixo.Did{}
-	} else {
-		dids := []ixo.Did{}
-		err := pm.cdc.UnmarshalBinary(bz, &dids)
-		if err != nil {
-			panic(err)
-		}
-		return dids
-	}
-}
-
-func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.ProjectDoc) {
+func (pm ProjectMapper) SetProjectDoc(ctx sdk.Context, project ixo.StoredProjectDoc) {
 	addr := []byte(project.GetProjectDid())
 	store := ctx.KVStore(pm.key)
 	bz := pm.encodeProject(project)
@@ -98,55 +138,50 @@ func (spm SealedProjectMapper) WireCodec() *wire.Codec {
 }
 
 // Creates a new struct (or pointer to struct) from am.proto.
-func (pm ProjectMapper) clonePrototype() ixo.ProjectDoc {
+func (pm ProjectMapper) clonePrototype() ixo.StoredProjectDoc {
 	protoRt := reflect.TypeOf(pm.proto)
 	if protoRt.Kind() == reflect.Ptr {
 		protoCrt := protoRt.Elem()
 		if protoCrt.Kind() != reflect.Struct {
-			panic("ProjectMapper requires a struct proto ixo.ProjectDoc, or a pointer to one")
+			panic("ProjectMapper requires a struct proto ixo.StoredProjectDoc, or a pointer to one")
 		}
 		protoRv := reflect.New(protoCrt)
-		clone, ok := protoRv.Interface().(ixo.ProjectDoc)
+		clone, ok := protoRv.Interface().(ixo.StoredProjectDoc)
 		if !ok {
-			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.ProjectDoc", protoRt))
+			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.StoredProjectDoc", protoRt))
 		}
 		return clone
 	} else {
 		protoRv := reflect.New(protoRt).Elem()
-		clone, ok := protoRv.Interface().(ixo.ProjectDoc)
+		clone, ok := protoRv.Interface().(ixo.StoredProjectDoc)
 		if !ok {
-			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.ProjectDoc", protoRt))
+			panic(fmt.Sprintf("accountMapper requires a proto ixo.ProjectDoc, but %v doesn't implement ixo.StoredProjectDoc", protoRt))
 		}
 		return clone
 	}
 }
 
-func (pm ProjectMapper) encodeProject(projectDoc ixo.ProjectDoc) []byte {
-	bz, err := pm.cdc.MarshalBinary(projectDoc)
+func (pm ProjectMapper) encodeProject(storedProjectDoc ixo.StoredProjectDoc) []byte {
+	bz, err := pm.cdc.MarshalBinary(storedProjectDoc)
 	if err != nil {
 		panic(err)
 	}
 	return bz
 }
 
-func (pm ProjectMapper) decodeProject(bz []byte) ixo.ProjectDoc {
+func (pm ProjectMapper) decodeProject(bz []byte) ixo.StoredProjectDoc {
 
-	projectDoc := ProjectDoc{}
-	err := pm.cdc.UnmarshalBinary(bz, &projectDoc)
+	storedProjectDoc := StoredProjectDoc{}
+	err := pm.cdc.UnmarshalBinary(bz, &storedProjectDoc)
 	if err != nil {
 		panic(err)
 	}
-	return projectDoc
+	return storedProjectDoc
 
 }
-
-func (pm ProjectMapper) appendDidToAll(ctx sdk.Context, newDid ixo.Did) {
-	dids := pm.GetAllDids(ctx)
-	store := ctx.KVStore(pm.key)
-	newDids := append(dids, newDid)
-	bz, err := pm.cdc.MarshalBinary(newDids)
-	if err != nil {
-		panic(err)
-	}
-	store.Set([]byte(AllKey), bz)
+func generateAccountsKey(did ixo.Did) []byte {
+	var buffer bytes.Buffer
+	buffer.WriteString(AccountMapPrefix)
+	buffer.WriteString(did)
+	return buffer.Bytes()
 }

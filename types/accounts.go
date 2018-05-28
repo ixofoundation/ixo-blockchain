@@ -41,7 +41,13 @@ func GetAccountDecoder(cdc *wire.Codec) sdk.AccountDecoder {
 
 // State to Unmarshal
 type GenesisState struct {
-	Accounts []*GenesisAccount `json:"accounts"`
+	Accounts       []*GenesisAccount `json:"accounts"`
+	ProjectGenesis ProjectGenesis    `json:"project"`
+}
+
+// ProjectGenesis
+type ProjectGenesis struct {
+	PegPubKey string `json:"pegPubKey"`
 }
 
 // GenesisAccount doesn't need pubkey or sequence

@@ -20,14 +20,12 @@ type IxoTx struct {
 type IxoSignature struct {
 	SignatureValue crypto.Signature `json:"signatureValue"`
 	Created        time.Time        `json:"created"`
-	Creator        Did              `json:"creator"`
 }
 
-func NewSignature(created time.Time, did string, signature crypto.Signature) IxoSignature {
+func NewSignature(created time.Time, signature crypto.Signature) IxoSignature {
 	return IxoSignature{
 		SignatureValue: signature,
 		Created:        created,
-		Creator:        did,
 	}
 }
 
@@ -70,7 +68,8 @@ type DidDoc interface {
 // Define Project
 type Project = string
 
-type ProjectDoc interface {
+type StoredProjectDoc interface {
+	GetEvaluatorPay() int64
 	GetProjectDid() Did
 	GetPubKey() string
 }

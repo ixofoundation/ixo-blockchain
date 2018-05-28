@@ -1,37 +1,57 @@
 package project
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 )
 
-func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid ixo.SovrinDid) CreateProjectMsg {
-	projectDoc.ProjectDid = projectDid.Did
-	projectDoc.PubKey = projectDid.VerifyKey
+func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) CreateProjectMsg {
 	return CreateProjectMsg{
-		projectDoc,
+		Data:       projectDoc,
+		ProjectDid: projectDid.Did,
+		PubKey:     projectDid.VerifyKey,
 	}
 }
 
-func NewCreateAgentMsg(createAgentDoc CreateAgentDoc) CreateAgentMsg {
+func NewCreateAgentMsg(txHash string, senderDid string, createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) CreateAgentMsg {
 	return CreateAgentMsg{
-		createAgentDoc,
+		Data:       createAgentDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 
-func NewUpdateAgentMsg(updateAgentDoc UpdateAgentDoc) UpdateAgentMsg {
+func NewUpdateAgentMsg(txHash string, senderDid string, updateAgentDoc UpdateAgentDoc, projectDid sovrin.SovrinDid) UpdateAgentMsg {
 	return UpdateAgentMsg{
-		updateAgentDoc,
+		Data:       updateAgentDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 
-func NewCreateClaimMsg(createClaimDoc CreateClaimDoc) CreateClaimMsg {
+func NewCreateClaimMsg(txHash string, senderDid string, createClaimDoc CreateClaimDoc, projectDid sovrin.SovrinDid) CreateClaimMsg {
 	return CreateClaimMsg{
-		createClaimDoc,
+		Data:       createClaimDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
 	}
 }
 
-func NewCreateEvaluationMsg(createEvaluationDoc CreateEvaluationDoc) CreateEvaluationMsg {
+func NewCreateEvaluationMsg(txHash string, senderDid string, createEvaluationDoc CreateEvaluationDoc, projectDid sovrin.SovrinDid) CreateEvaluationMsg {
 	return CreateEvaluationMsg{
-		createEvaluationDoc,
+		Data:       createEvaluationDoc,
+		ProjectDid: projectDid.Did,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+	}
+}
+
+func NewFundProjectMsg(fundProjectDoc FundProjectDoc) FundProjectMsg {
+	// This did is initialized when the node is initialized
+	fundProjectDoc.Signer = "ETH_PEG"
+	return FundProjectMsg{
+		fundProjectDoc,
 	}
 }
