@@ -2,14 +2,19 @@ package rest
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	base58 "github.com/btcsuite/btcutil/base58"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/core"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
@@ -24,6 +29,12 @@ type commander struct {
 
 type sendBody struct {
 	Data string `json:"data"`
+}
+
+type AccDetails struct {
+	Did     string `json:"did"`
+	Account string `json:"account"`
+	Balance int64  `json:"balance"`
 }
 
 //CreateProjectRequestHandler create project handler
@@ -176,8 +187,21 @@ func QueryProjectAccountsRequestHandler(storeName string, cdc *wire.Codec, decod
 		}
 		accMap := f.(map[string]interface{})
 
+		accDetails := make([]AccDetails, len(accMap))
+		i := 0
+		for k, v := range accMap {
+			addr := v.(string)
+
+			balance, err := GetAccountBalance(ctx, addr, types.GetAccountDecoder(cdc))
+			if err != nil {
+				panic(err)
+			}
+			accDetails[i] = AccDetails{Did: k, Account: addr, Balance: balance}
+			i = i + 1
+		}
+
 		// print out whole didDoc
-		output, err := json.MarshalIndent(accMap, "", "  ")
+		output, err := json.MarshalIndent(accDetails, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
@@ -186,5 +210,29 @@ func QueryProjectAccountsRequestHandler(storeName string, cdc *wire.Codec, decod
 
 		w.Write(output)
 	}
+
+}
+
+func GetAccountBalance(ctx core.CoreContext, addr string, decoder sdk.AccountDecoder) (int64, error) {
+	bz, err := hex.DecodeString(addr)
+	if err != nil {
+		return 0, err
+	}
+	key := sdk.Address(bz)
+
+	res, err := ctx.Query(key, "main")
+	if err != nil {
+		return 0, err
+	}
+
+	// decode the value
+	account, err := decoder(res)
+	if err != nil {
+		return 0, err
+	}
+
+	baseAcc := account.(*types.AppAccount)
+
+	return baseAcc.Coins.AmountOf(project.COIN_DENOM), nil
 
 }
