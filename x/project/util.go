@@ -6,7 +6,7 @@ import (
 
 func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) CreateProjectMsg {
 	return CreateProjectMsg{
-		Data:       projectDoc,
+		ProjectDoc: projectDoc,
 		ProjectDid: projectDid.Did,
 		PubKey:     projectDid.VerifyKey,
 	}
