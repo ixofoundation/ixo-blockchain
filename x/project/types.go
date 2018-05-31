@@ -35,11 +35,11 @@ type ProjectDoc struct {
 		Claim string `json:"claim"`
 	} `json:"templates"`
 	Agents struct {
-		EvaluatorsList               int `json:"evaluatorsList"`
-		EvaluatorsPendingCount       int `json:"evaluatorsPendingCount"`
-		ServiceProviders             int `json:"serviceProviders"`
-		ServiceProvidersPendingCount int `json:"serviceProvidersPendingCount"`
-		Investors                    int `json:"investors"`
+		Evaluators              int `json:"evaluators"`
+		EvaluatorsPending       int `json:"evaluatorsPending"`
+		ServiceProviders        int `json:"serviceProviders"`
+		ServiceProvidersPending int `json:"serviceProvidersPending"`
+		Investors               int `json:"investors"`
 	} `json:"agents"`
 	EvaluatorPayPerClaim int `json:"evaluatorPayPerClaim"`
 	SocialMedia          struct {
