@@ -17,33 +17,58 @@ const COIN_DENOM = "ixo"
 //Define ProjectDoc
 type ProjectDoc struct {
 	Title            string   `json:"title"`
+	OwnerName        string   `json:"ownerName"`
 	ShortDescription string   `json:"shortDescription"`
 	LongDescription  string   `json:"longDescription"`
 	ImpactAction     string   `json:"impactAction"`
 	CreatedOn        string   `json:"createdOn"`
 	CreatedBy        string   `json:"createdBy"`
-	Country          string   `json:"country"`
+	ProjectLocation  string   `json:"projectLocation"`
 	Sdgs             []string `json:"sdgs"`
-	ImpactsRequired  int      `json:"impactsRequired"`
-	ClaimTemplate    string   `json:"claimTemplate"`
-	EvaluatorPay     string   `json:"evaluatorPay"`
-	SocialMedia      struct {
+	Claims           struct {
+		Required         int `json:"required"`
+		CurrentSucessful int `json:"currentSucessful"`
+		CurrentRejected  int `json:"currentRejected"`
+	} `json:"claims"`
+	Templates struct {
+		Claim string `json:"claim"`
+	} `json:"templates"`
+	Agent struct {
+		EvaluatorsList               int `json:"evaluatorsList"`
+		EvaluatorsPendingCount       int `json:"evaluatorsPendingCount"`
+		ServiceProviders             int `json:"serviceProviders"`
+		ServiceProvidersPendingCount int `json:"serviceProvidersPendingCount"`
+		Investors                    int `json:"investors"`
+	} `json:"agent"`
+	EvaluatorPayPerClaim int `json:"evaluatorPayPerClaim"`
+	SocialMedia          struct {
 		FacebookLink  string `json:"facebookLink"`
 		InstagramLink string `json:"instagramLink"`
 		TwitterLink   string `json:"twitterLink"`
 		WebLink       string `json:"webLink"`
 	} `json:"socialMedia"`
+	Ixo struct {
+		TotalStaked int `json:"totalStaked"`
+		TotalUsed   int `json:"totalUsed"`
+	} `json:"ixo"`
 	ServiceEndpoint string `json:"serviceEndpoint"`
 	ImageLink       string `json:"imageLink"`
+	Founder         struct {
+		Name             string `json:"name"`
+		CountryOfOrigin  string `json:"countryOfOrigin"`
+		ShortDescription string `json:"shortDescription"`
+		WebsiteURL       string `json:"websiteURL"`
+		LogoLink         string `json:"logoLink"`
+	} `json:"founder"`
 }
 
 //GETTERS
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
-	if pd.EvaluatorPay == "" {
+	if pd.EvaluatorPayPerClaim == 0 {
 		return 0
 	} else {
-		i, err := strconv.ParseInt(pd.EvaluatorPay, 10, 64)
+		i, err := strconv.ParseInt(string(pd.EvaluatorPayPerClaim), 10, 64)
 		if err != nil {
 			panic(err)
 		}
