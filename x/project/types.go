@@ -34,13 +34,13 @@ type ProjectDoc struct {
 	Templates struct {
 		Claim string `json:"claim"`
 	} `json:"templates"`
-	Agent struct {
+	Agents struct {
 		EvaluatorsList               int `json:"evaluatorsList"`
 		EvaluatorsPendingCount       int `json:"evaluatorsPendingCount"`
 		ServiceProviders             int `json:"serviceProviders"`
 		ServiceProvidersPendingCount int `json:"serviceProvidersPendingCount"`
 		Investors                    int `json:"investors"`
-	} `json:"agent"`
+	} `json:"agents"`
 	EvaluatorPayPerClaim int `json:"evaluatorPayPerClaim"`
 	SocialMedia          struct {
 		FacebookLink  string `json:"facebookLink"`
