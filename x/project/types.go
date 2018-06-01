@@ -57,6 +57,7 @@ type ProjectDoc struct {
 	ImageLink       string `json:"imageLink"`
 	Founder         struct {
 		Name             string `json:"name"`
+		Email            string `json:"email"`
 		CountryOfOrigin  string `json:"countryOfOrigin"`
 		ShortDescription string `json:"shortDescription"`
 		WebsiteURL       string `json:"websiteURL"`
