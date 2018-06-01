@@ -17,7 +17,6 @@ const COIN_DENOM = "ixo"
 //Define ProjectDoc
 type ProjectDoc struct {
 	Title            string   `json:"title"`
-	ProjectDid       string   `json:"projectDid"`
 	OwnerName        string   `json:"ownerName"`
 	OwnerEmail       string   `json:"ownerEmail"`
 	ShortDescription string   `json:"shortDescription"`
@@ -28,9 +27,9 @@ type ProjectDoc struct {
 	ProjectLocation  string   `json:"projectLocation"`
 	Sdgs             []string `json:"sdgs"`
 	Claims           struct {
-		Required         int `json:"required"`
-		CurrentSucessful int `json:"currentSucessful"`
-		CurrentRejected  int `json:"currentRejected"`
+		Required          int `json:"required"`
+		CurrentSuccessful int `json:"currentSuccessful"`
+		CurrentRejected   int `json:"currentRejected"`
 	} `json:"claims"`
 	Templates struct {
 		Claim string `json:"claim"`
@@ -42,7 +41,7 @@ type ProjectDoc struct {
 		ServiceProvidersPending int `json:"serviceProvidersPending"`
 		Investors               int `json:"investors"`
 	} `json:"agents"`
-	EvaluatorPayPerClaim int `json:"evaluatorPayPerClaim"`
+	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
 	SocialMedia          struct {
 		FacebookLink  string `json:"facebookLink"`
 		InstagramLink string `json:"instagramLink"`
@@ -68,10 +67,10 @@ type ProjectDoc struct {
 //GETTERS
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
-	if pd.EvaluatorPayPerClaim == 0 {
+	if pd.EvaluatorPayPerClaim == "" {
 		return 0
 	} else {
-		i, err := strconv.ParseInt(string(pd.EvaluatorPayPerClaim), 10, 64)
+		i, err := strconv.ParseInt(pd.EvaluatorPayPerClaim, 10, 64)
 		if err != nil {
 			panic(err)
 		}
