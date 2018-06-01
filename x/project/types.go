@@ -19,6 +19,7 @@ type ProjectDoc struct {
 	Title            string   `json:"title"`
 	ProjectDid       string   `json:"projectDid"`
 	OwnerName        string   `json:"ownerName"`
+	OwnerEmail       string   `json:"ownerEmail"`
 	ShortDescription string   `json:"shortDescription"`
 	LongDescription  string   `json:"longDescription"`
 	ImpactAction     string   `json:"impactAction"`
