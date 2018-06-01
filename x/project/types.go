@@ -169,7 +169,7 @@ type ProjectMsg interface {
 
 //CreateProjectMsg
 type CreateProjectMsg struct {
-	ProjectDoc ProjectDoc `json:"projectDoc"`
+	Data       ProjectDoc `json:"data"`
 	TxHash     string     `json:"txHash"`
 	SenderDid  ixo.Did    `json:"senderDid"`
 	ProjectDid ixo.Did    `json:"projectDid"`
@@ -198,10 +198,10 @@ func (msg CreateProjectMsg) GetSignBytes() []byte {
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
 func (msg CreateProjectMsg) IsPegMsg() bool { return false }
 func (msg CreateProjectMsg) String() string {
-	return fmt.Sprintf("CreateProjectMsg{Did: %v, projectDoc: %v}", string(msg.GetProjectDid()), msg.ProjectDoc)
+	return fmt.Sprintf("CreateProjectMsg{Did: %v, projectDoc: %v}", string(msg.GetProjectDid()), msg.Data)
 }
 func (msg CreateProjectMsg) GetPubKey() string      { return msg.PubKey }
-func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.ProjectDoc.GetEvaluatorPay() }
+func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.Data.GetEvaluatorPay() }
 
 type StoredProjectDoc = CreateProjectMsg
 
