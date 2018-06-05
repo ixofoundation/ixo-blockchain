@@ -195,6 +195,9 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		if err != nil {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
+
+		fmt.Println("TXN_PAYLOAD" , tx)
+
 		return tx, nil
 
 	} else {
