@@ -113,6 +113,7 @@ const (
 type UpdateAgentDoc struct {
 	Did    ixo.Did     `json:"did"`
 	Status AgentStatus `json:"status"`
+	Role   string      `json:"role"`
 }
 
 // Define CreateAgent
