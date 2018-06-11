@@ -26,4 +26,4 @@ jobs:
       - run: go install ./cmd/ixod
       - run: go install ./cmd/ixocli
       - run: go build -o build/ixod ./cmd/ixod
-      - run: go build -o -o build/ixocli ./cmd/ixocli
+      - run: go build -o build/ixocli ./cmd/ixocli
