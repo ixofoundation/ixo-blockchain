@@ -4,15 +4,14 @@ services:
     container_name: blockchain
     image: trustlab/ixo-blockchain:latest
     restart: always
-    build: .
     ports:
       - "46657:46657"
-    links:
-      - rest
-      
+    
   rest:
     container_name: rest
     image: trustlab/ixo-blockchain-rest:latest
     restart: always
     ports:
       - "1317:1317"
+    links:
+      - blockchain
