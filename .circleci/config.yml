@@ -27,3 +27,5 @@ jobs:
       - run: go install ./cmd/ixocli
       - run: go build -o build/ixod ./cmd/ixod
       - run: go build -o build/ixocli ./cmd/ixocli
+      - run: echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+      - run: cat ${HOME}/gcloud-service-key.json
