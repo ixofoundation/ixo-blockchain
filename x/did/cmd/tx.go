@@ -33,7 +33,7 @@ func AddDidDocCmd(cdc *wire.Codec) *cobra.Command {
 
 			ctx := context.NewCoreContextFromViper()
 			// create the message
-			msg := did.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey)
+			msg := did.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey, sovrinDid.Kyc)
 
 			// Force the length to 64
 			privKey := [64]byte{}

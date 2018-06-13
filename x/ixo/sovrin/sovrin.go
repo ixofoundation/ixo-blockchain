@@ -31,6 +31,7 @@ func (ss SovrinSecret) String() string {
 type SovrinDid struct {
 	Did                 string       `json:"did"`
 	VerifyKey           string       `json:"verifyKey"`
+	Kyc                 bool         `json:"kyc"`
 	EncryptionPublicKey string       `json:"encryptionPublicKey"`
 	Secret              SovrinSecret `json:"secret"`
 }
