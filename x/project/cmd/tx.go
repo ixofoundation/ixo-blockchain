@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -92,7 +91,7 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 // Create Agent
 func CreateAgentCmd(cdc *wire.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createAgent txHash senderDid agentDid role sovrinDid",
+		Use:   "createAgent txHash senderDid agentDid role projectDid",
 		Short: "Create a new agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCoreContextFromViper()
@@ -131,19 +130,16 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 		Short: "Update the status of an agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCoreContextFromViper()
-			if len(args) != 5 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 {
+			if len(args) != 6 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 || len(args[5]) == 0{
 				return errors.New("You must provide the agentDid, status and the projects private key")
 			}
 
 			txHash := args[0]
 			senderDid := args[1]
 			agentDid := args[2]
+			agentRole := args[4]
 
-			status, err := strconv.Atoi(args[3])
-			if err != nil {
-				panic(err)
-			}
-			agentStatus := project.AgentStatus(status)
+			agentStatus := project.AgentStatus(args[3])
 			if agentStatus != project.PendingAgent && agentStatus != project.ApprovedAgent && agentStatus != project.RevokedAgent {
 				return errors.New("The status must be one of '0' (Pending), '1' (Approved) or '2' (Revoked)")
 			}
@@ -151,9 +147,10 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 			updateAgentDoc := project.UpdateAgentDoc{
 				Did:    agentDid,
 				Status: agentStatus,
+				Role: agentRole,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[4])
+			sovrinDid := unmarshalSovrinDID(args[5])
 
 			// create the message
 			msg := project.NewUpdateAgentMsg(txHash, senderDid, updateAgentDoc, sovrinDid)
@@ -207,11 +204,7 @@ func CreateEvaluationCmd(cdc *wire.Codec) *cobra.Command {
 			senderDid := args[1]
 			claimId := args[2]
 
-			status, err := strconv.Atoi(args[3])
-			if err != nil {
-				panic(err)
-			}
-			claimStatus := project.ClaimStatus(status)
+			claimStatus := project.ClaimStatus(args[3])
 			if claimStatus != project.PendingClaim && claimStatus != project.ApprovedClaim && claimStatus != project.RejectedClaim {
 				return errors.New("The status must be one of '0' (Pending), '1' (Approved) or '2' (Rejected)")
 			}

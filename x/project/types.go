@@ -25,22 +25,11 @@ type ProjectDoc struct {
 	CreatedOn        string   `json:"createdOn"`
 	CreatedBy        string   `json:"createdBy"`
 	ProjectLocation  string   `json:"projectLocation"`
+	RequiredClaims   int      `json:"requiredClaims"`
 	Sdgs             []string `json:"sdgs"`
-	Claims           struct {
-		Required          int `json:"required"`
-		CurrentSuccessful int `json:"currentSuccessful"`
-		CurrentRejected   int `json:"currentRejected"`
-	} `json:"claims"`
 	Templates struct {
 		Claim string `json:"claim"`
 	} `json:"templates"`
-	Agents struct {
-		Evaluators              int `json:"evaluators"`
-		EvaluatorsPending       int `json:"evaluatorsPending"`
-		ServiceProviders        int `json:"serviceProviders"`
-		ServiceProvidersPending int `json:"serviceProvidersPending"`
-		Investors               int `json:"investors"`
-	} `json:"agents"`
 	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
 	SocialMedia          struct {
 		FacebookLink  string `json:"facebookLink"`

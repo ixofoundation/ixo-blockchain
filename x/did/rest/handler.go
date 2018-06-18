@@ -38,7 +38,7 @@ func CreateDidRequestHandler(storeName string, cdc *wire.Codec, kb keys.Keybase)
 		}
 
 		// create the message
-		msg := did.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey, sovrinDid.Kyc)
+		msg := did.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey)
 
 		// Force the length to 64
 		privKey := [64]byte{}

@@ -17,13 +17,11 @@ var _ ixo.DidDoc = (*BaseDidDoc)(nil)
 type BaseDidDoc struct {
 	Did    ixo.Did `json:"did"`
 	PubKey string  `json:"pubKey"` // May be nil, if not known.
-	Kyc    bool    `json:"kyc"`
 }
 
 //GETTERS
 func (dd BaseDidDoc) GetDid() ixo.Did   { return dd.Did }
 func (dd BaseDidDoc) GetPubKey() string { return dd.PubKey }
-func (dd BaseDidDoc) GetKyc() bool { return dd.Kyc }
 
 //SETTERS
 func (dd BaseDidDoc) SetDid(did ixo.Did) error {
@@ -38,11 +36,6 @@ func (dd BaseDidDoc) SetPubKey(pubKey string) error {
 		return errors.New("cannot override BaseDidDoc pubKey")
 	}
 	dd.PubKey = pubKey
-	return nil
-}
-
-func (dd BaseDidDoc) SetKyc(kyc bool) error {
-	dd.Kyc = kyc
 	return nil
 }
 
@@ -71,11 +64,10 @@ type AddDidMsg struct {
 }
 
 // New Ixo message
-func NewAddDidMsg(did string, publicKey string, kyc bool) AddDidMsg {
+func NewAddDidMsg(did string, publicKey string) AddDidMsg {
 	didDoc := BaseDidDoc{
 		Did:    did,
 		PubKey: publicKey,
-		Kyc: kyc,
 	}
 	return AddDidMsg{
 		DidDoc: didDoc,
@@ -90,7 +82,7 @@ func (msg AddDidMsg) Type() string                            { return "did" }
 func (msg AddDidMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg AddDidMsg) GetSigners() []sdk.Address               { return []sdk.Address{[]byte(msg.DidDoc.GetDid())} }
 func (msg AddDidMsg) String() string {
-	return fmt.Sprintf("AddDidMsg{Did: %v, publicKey: %v, kyc: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey(), msg.DidDoc.GetKyc())
+	return fmt.Sprintf("AddDidMsg{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
