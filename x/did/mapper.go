@@ -56,10 +56,7 @@ func (dm DidMapper) Seal() SealedDidMapper {
 }
 
 func (dm DidMapper) NewDidDoc(ctx sdk.Context, msg AddDidMsg) ixo.DidDoc {
-	did := dm.clonePrototype()
-	did.SetDid(msg.DidDoc.GetDid())
-	did.SetPubKey(msg.DidDoc.GetPubKey())
-	return did
+	return msg.DidDoc
 }
 
 func (dm DidMapper) GetDidDoc(ctx sdk.Context, addr ixo.Did) ixo.DidDoc {
@@ -122,14 +119,14 @@ func (dm DidMapper) clonePrototype() ixo.DidDoc {
 		protoRv := reflect.New(protoCrt)
 		clone, ok := protoRv.Interface().(ixo.DidDoc)
 		if !ok {
-			panic(fmt.Sprintf("accountMapper requires a proto ixo.DidDoc, but %v doesn't implement ixo.DidDoc", protoRt))
+			panic(fmt.Sprintf("DidMapper requires a proto ixo.DidDoc, but %v doesn't implement ixo.DidDoc", protoRt))
 		}
 		return clone
 	} else {
 		protoRv := reflect.New(protoRt).Elem()
 		clone, ok := protoRv.Interface().(ixo.DidDoc)
 		if !ok {
-			panic(fmt.Sprintf("accountMapper requires a proto ixo.DidDoc, but %v doesn't implement ixo.DidDoc", protoRt))
+			panic(fmt.Sprintf("DidMapper requires a proto ixo.DidDoc, but %v doesn't implement ixo.DidDoc", protoRt))
 		}
 		return clone
 	}
