@@ -27,8 +27,11 @@ type ProjectDoc struct {
 	ProjectLocation  string   `json:"projectLocation"`
 	RequiredClaims   int      `json:"requiredClaims"`
 	Sdgs             []string `json:"sdgs"`
-	Templates struct {
-		Claim string `json:"claim"`
+	Templates        struct {
+		Claim struct {
+			Schema string `json:"schema"`
+			Form   string `json:"form"`
+		} `json:"claim"`
 	} `json:"templates"`
 	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
 	SocialMedia          struct {
@@ -37,10 +40,6 @@ type ProjectDoc struct {
 		TwitterLink   string `json:"twitterLink"`
 		WebLink       string `json:"webLink"`
 	} `json:"socialMedia"`
-	Ixo struct {
-		TotalStaked int `json:"totalStaked"`
-		TotalUsed   int `json:"totalUsed"`
-	} `json:"ixo"`
 	ServiceEndpoint string `json:"serviceEndpoint"`
 	ImageLink       string `json:"imageLink"`
 	Founder         struct {
