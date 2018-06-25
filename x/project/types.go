@@ -22,8 +22,6 @@ type ProjectDoc struct {
 	ShortDescription string   `json:"shortDescription"`
 	LongDescription  string   `json:"longDescription"`
 	ImpactAction     string   `json:"impactAction"`
-	CreatedOn        string   `json:"createdOn"`
-	CreatedBy        string   `json:"createdBy"`
 	ProjectLocation  string   `json:"projectLocation"`
 	RequiredClaims   int      `json:"requiredClaims"`
 	Sdgs             []string `json:"sdgs"`
@@ -50,6 +48,8 @@ type ProjectDoc struct {
 		WebsiteURL       string `json:"websiteURL"`
 		LogoLink         string `json:"logoLink"`
 	} `json:"founder"`
+	CreatedOn        string   `json:"createdOn"`
+	CreatedBy        string   `json:"createdBy"`
 }
 
 //GETTERS
