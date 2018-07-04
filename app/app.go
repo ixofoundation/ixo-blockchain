@@ -140,6 +140,8 @@ func MakeCodec() *wire.Codec {
 	const msgTypeFundProjectMsg = 0x15
 	const msgTypeWithdrawFundsMsg = 0x16
 
+	const msgTypeAddCredentialMsg = 0x18
+
 	var _ = oldwire.RegisterInterface(
 		struct{ sdk.Msg }{},
 		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
@@ -150,6 +152,7 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
 
 		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
+		oldwire.ConcreteType{did.AddCredentialMsg{}, msgTypeAddCredentialMsg},
 
 		oldwire.ConcreteType{project.CreateProjectMsg{}, msgTypeCreateProjectMsg},
 		oldwire.ConcreteType{project.CreateAgentMsg{}, msgTypeCreateAgentMsg},
@@ -196,7 +199,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		fmt.Println("TXN_PAYLOAD" , tx)
+		fmt.Println("TXN_PAYLOAD", tx)
 
 		return tx, nil
 

@@ -39,3 +39,8 @@ func (dk DidKeeper) AddDidDoc(ctx sdk.Context, newDidDoc ixo.DidDoc) (ixo.DidDoc
 		return didDoc, nil
 	}
 }
+
+func (dk DidKeeper) AddCredential(ctx sdk.Context, did ixo.Did, credential DidCredential) (ixo.DidDoc, sdk.Error) {
+	didDoc := dk.dm.AddCredential(ctx, did, credential)
+	return didDoc, nil
+}

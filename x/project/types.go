@@ -22,25 +22,15 @@ type ProjectDoc struct {
 	ShortDescription string   `json:"shortDescription"`
 	LongDescription  string   `json:"longDescription"`
 	ImpactAction     string   `json:"impactAction"`
-	CreatedOn        string   `json:"createdOn"`
-	CreatedBy        string   `json:"createdBy"`
 	ProjectLocation  string   `json:"projectLocation"`
+	RequiredClaims   int      `json:"requiredClaims"`
 	Sdgs             []string `json:"sdgs"`
-	Claims           struct {
-		Required          int `json:"required"`
-		CurrentSuccessful int `json:"currentSuccessful"`
-		CurrentRejected   int `json:"currentRejected"`
-	} `json:"claims"`
-	Templates struct {
-		Claim string `json:"claim"`
+	Templates        struct {
+		Claim struct {
+			Schema string `json:"schema"`
+			Form   string `json:"form"`
+		} `json:"claim"`
 	} `json:"templates"`
-	Agents struct {
-		Evaluators              int `json:"evaluators"`
-		EvaluatorsPending       int `json:"evaluatorsPending"`
-		ServiceProviders        int `json:"serviceProviders"`
-		ServiceProvidersPending int `json:"serviceProvidersPending"`
-		Investors               int `json:"investors"`
-	} `json:"agents"`
 	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
 	SocialMedia          struct {
 		FacebookLink  string `json:"facebookLink"`
@@ -48,10 +38,6 @@ type ProjectDoc struct {
 		TwitterLink   string `json:"twitterLink"`
 		WebLink       string `json:"webLink"`
 	} `json:"socialMedia"`
-	Ixo struct {
-		TotalStaked int `json:"totalStaked"`
-		TotalUsed   int `json:"totalUsed"`
-	} `json:"ixo"`
 	ServiceEndpoint string `json:"serviceEndpoint"`
 	ImageLink       string `json:"imageLink"`
 	Founder         struct {
@@ -62,6 +48,8 @@ type ProjectDoc struct {
 		WebsiteURL       string `json:"websiteURL"`
 		LogoLink         string `json:"logoLink"`
 	} `json:"founder"`
+	CreatedOn        string   `json:"createdOn"`
+	CreatedBy        string   `json:"createdBy"`
 }
 
 //GETTERS

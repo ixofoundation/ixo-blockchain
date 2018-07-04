@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/btcsuite/btcutil/base58"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -22,7 +24,7 @@ type BaseDidDoc struct {
 
 type DidCredential struct {
 	Type   string  `json:"type"`
-	Owner  ixo.Did `json:"owner"`
+	Data   string  `json:"data"`
 	Signer ixo.Did `json:"signer"`
 }
 
@@ -82,6 +84,10 @@ func GetDidDocDecoder(cdc *wire.Codec) DidDocDecoder {
 
 //**************************************************************************************
 
+type DidMsg interface {
+	IsNewDid() bool
+}
+
 //ADD DIDDOC
 type AddDidMsg struct {
 	DidDoc BaseDidDoc `json:"didDoc"`
@@ -112,6 +118,15 @@ func (msg AddDidMsg) String() string {
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
 func (msg AddDidMsg) ValidateBasic() sdk.Error {
+	// Check that the Did and the PublicKey correspond
+	pk := msg.DidDoc.GetPubKey()
+	decodedPk := base58.Decode(pk)
+	decodedDid := decodedPk[0:16]
+	calculatedDid := base58.Encode(decodedDid)
+
+	if calculatedDid != msg.DidDoc.GetDid() {
+		return sdk.ErrInvalidPubKey("Did does not match publicKey")
+	}
 	return nil
 }
 
@@ -121,23 +136,24 @@ func (msg AddDidMsg) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("SignBytes")
-	fmt.Println(string(b))
 	return b
 }
+func (msg AddDidMsg) IsNewDid() bool { return true }
 
 type AddCredentialMsg struct {
-	DidCredential DidCredential `json:"didCredential"`
+	Did           ixo.Did       `json:"did"`
+	DidCredential DidCredential `json:"credential"`
 }
 
 // New Ixo message
-func NewAddCredentialMsg(credType string, owner string, signer string) AddCredentialMsg {
+func NewAddCredentialMsg(did string, credType string, data string, signer string) AddCredentialMsg {
 	didCredential := DidCredential{
 		Type:   credType,
-		Owner:  owner,
+		Data:   data,
 		Signer: signer,
 	}
 	return AddCredentialMsg{
+		Did:           did,
 		DidCredential: didCredential,
 	}
 }
@@ -152,7 +168,7 @@ func (msg AddCredentialMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.DidCredential.Signer)}
 }
 func (msg AddCredentialMsg) String() string {
-	return fmt.Sprintf("AddCredentialMsg{Type: %v, Owner: %v, Signer: %v}", msg.DidCredential.Type, string(msg.DidCredential.Owner), string(msg.DidCredential.Signer))
+	return fmt.Sprintf("AddCredentialMsg{Did: %v, Type: %v, Signer: %v}", string(msg.Did), msg.DidCredential.Type, string(msg.DidCredential.Signer))
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
@@ -166,7 +182,6 @@ func (msg AddCredentialMsg) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("SignBytes")
-	fmt.Println(string(b))
 	return b
 }
+func (msg AddCredentialMsg) IsNewDid() bool { return false }

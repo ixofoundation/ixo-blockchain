@@ -1,6 +1,7 @@
 package did
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -90,6 +91,20 @@ func (dm DidMapper) SetDidDoc(ctx sdk.Context, did ixo.DidDoc) {
 	bz := dm.encodeDid(did)
 	store.Set(addr, bz)
 	dm.appendDidToAll(ctx, ixo.Did(did.GetDid()))
+}
+
+func (dm DidMapper) AddCredential(ctx sdk.Context, did ixo.Did, credential DidCredential) ixo.DidDoc {
+	addr := []byte(did)
+	didDoc := dm.GetDidDoc(ctx, did)
+	if didDoc == nil {
+		panic(errors.New("Did does not exist"))
+	}
+	baseDidDoc := didDoc.(BaseDidDoc)
+	baseDidDoc.AddCredential(credential)
+	store := ctx.KVStore(dm.key)
+	bz := dm.encodeDid(baseDidDoc)
+	store.Set(addr, bz)
+	return baseDidDoc
 }
 
 //----------------------------------------

@@ -9,6 +9,8 @@ func NewHandler(k DidKeeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case AddDidMsg:
 			return handleAddDidDocMsg(ctx, k, msg)
+		case AddCredentialMsg:
+			return handleAddCredentialMsg(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -18,6 +20,18 @@ func NewHandler(k DidKeeper) sdk.Handler {
 func handleAddDidDocMsg(ctx sdk.Context, k DidKeeper, msg AddDidMsg) sdk.Result {
 	newDidDoc := msg.DidDoc
 	didDoc, err := k.AddDidDoc(ctx, newDidDoc)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Code: sdk.CodeOK,
+		Data: k.dm.encodeDid(didDoc),
+	}
+}
+
+func handleAddCredentialMsg(ctx sdk.Context, k DidKeeper, msg AddCredentialMsg) sdk.Result {
+	didDoc, err := k.AddCredential(ctx, msg.Did, msg.DidCredential)
 	if err != nil {
 		return err.Result()
 	}

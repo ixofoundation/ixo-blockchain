@@ -81,6 +81,7 @@ func main() {
 		client.PostCommands(
 			didcmd.AddDidDocCmd(cdc),
 			didcmd.GetDidDocCmd("did", cdc, did.GetDidDocDecoder(cdc)),
+			didcmd.AddCredentialCmd("did", cdc, did.GetDidDocDecoder(cdc)),
 			client.LineBreak,
 		)...)
 
