@@ -119,6 +119,7 @@ func (msg AddDidMsg) String() string {
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
 func (msg AddDidMsg) ValidateBasic() sdk.Error {
 	// Check that the Did and the PublicKey correspond
+	// NOTE: this will fail if the key has been rotated
 	pk := msg.DidDoc.GetPubKey()
 	decodedPk := base58.Decode(pk)
 	decodedDid := decodedPk[0:16]
