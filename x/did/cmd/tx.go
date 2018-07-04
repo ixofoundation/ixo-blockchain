@@ -71,7 +71,7 @@ func GetDidDocCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) 
 		Short: "Get a new DidDoc for a Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide an did")
+				return errors.New("You must provide a did")
 			}
 
 			// find the key to look up the account
@@ -97,6 +97,67 @@ func GetDidDocCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) 
 			}
 			fmt.Println(string(output))
 
+			return nil
+		},
+	}
+}
+
+// Add a did doc to the ledger
+func AddCredentialCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) *cobra.Command {
+	return &cobra.Command{
+		Use:   "addCredential did type data signerDidDoc",
+		Short: "Add a new Credential for a Did using the type, data and signer",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
+				return errors.New("You must provide a did, type, data and signer's sovrin did doc")
+			}
+
+			// find the key to look up the account
+			didAddr := args[0]
+
+			ctx := context.NewCoreContextFromViper()
+
+			_, err := ctx.Query([]byte(didAddr), storeName)
+			if err != nil {
+				return errors.New("The did is not on the blockchain")
+			}
+
+			credType := args[1]
+			data := args[2]
+
+			sovrinDid := sovrin.SovrinDid{}
+			err = json.Unmarshal([]byte(args[3]), &sovrinDid)
+			if err != nil {
+				panic(err)
+			}
+
+			// create the message
+			msg := did.NewAddCredentialMsg(didAddr, credType, data, sovrinDid.Did)
+
+			// Force the length to 64
+			privKey := [64]byte{}
+			copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
+			copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+
+			//Create the Signature
+			signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+
+			tx := ixo.NewIxoTx(msg, signature)
+
+			fmt.Println("*******Transaction*******")
+			fmt.Println(tx.String())
+
+			bz, err := cdc.MarshalJSON(tx)
+			if err != nil {
+				panic(err)
+			}
+			// Broadcast to Tendermint
+			res, err := ctx.BroadcastTx(bz)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.Hash.String())
 			return nil
 		},
 	}

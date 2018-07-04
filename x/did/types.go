@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/btcsuite/btcutil/base58"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -15,15 +17,33 @@ import (
 var _ ixo.DidDoc = (*BaseDidDoc)(nil)
 
 type BaseDidDoc struct {
-	Did    ixo.Did `json:"did"`
-	PubKey string  `json:"pubKey"` // May be nil, if not known.
+	Did         ixo.Did         `json:"did"`
+	PubKey      string          `json:"pubKey"` // May be nil, if not known.
+	Credentials []DidCredential `json:"credentials"`
+}
+
+type DidCredential struct {
+	Type   string  `json:"type"`
+	Data   string  `json:"data"`
+	Signer ixo.Did `json:"signer"`
+}
+
+type Credential struct {
 }
 
 //GETTERS
-func (dd BaseDidDoc) GetDid() ixo.Did   { return dd.Did }
-func (dd BaseDidDoc) GetPubKey() string { return dd.PubKey }
+func (dd BaseDidDoc) GetDid() ixo.Did                 { return dd.Did }
+func (dd BaseDidDoc) GetPubKey() string               { return dd.PubKey }
+func (dd BaseDidDoc) GetCredentials() []DidCredential { return dd.Credentials }
 
 //SETTERS
+func (dd *BaseDidDoc) Init(did ixo.Did, pubKey string) *BaseDidDoc {
+	dd.SetDid(did)
+	dd.SetPubKey(pubKey)
+	dd.Credentials = make([]DidCredential, 0)
+	return dd
+}
+
 func (dd BaseDidDoc) SetDid(did ixo.Did) error {
 	if len(dd.Did) != 0 {
 		return errors.New("cannot override BaseDidDoc did")
@@ -37,6 +57,12 @@ func (dd BaseDidDoc) SetPubKey(pubKey string) error {
 	}
 	dd.PubKey = pubKey
 	return nil
+}
+func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
+	if dd.Credentials == nil {
+		dd.Credentials = make([]DidCredential, 0)
+	}
+	dd.Credentials = append(dd.Credentials, cred)
 }
 
 //DECODERS
@@ -58,6 +84,10 @@ func GetDidDocDecoder(cdc *wire.Codec) DidDocDecoder {
 
 //**************************************************************************************
 
+type DidMsg interface {
+	IsNewDid() bool
+}
+
 //ADD DIDDOC
 type AddDidMsg struct {
 	DidDoc BaseDidDoc `json:"didDoc"`
@@ -66,8 +96,9 @@ type AddDidMsg struct {
 // New Ixo message
 func NewAddDidMsg(did string, publicKey string) AddDidMsg {
 	didDoc := BaseDidDoc{
-		Did:    did,
-		PubKey: publicKey,
+		Did:         did,
+		PubKey:      publicKey,
+		Credentials: make([]DidCredential, 0),
 	}
 	return AddDidMsg{
 		DidDoc: didDoc,
@@ -87,6 +118,16 @@ func (msg AddDidMsg) String() string {
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly
 func (msg AddDidMsg) ValidateBasic() sdk.Error {
+	// Check that the Did and the PublicKey correspond
+	// NOTE: this will fail if the key has been rotated
+	pk := msg.DidDoc.GetPubKey()
+	decodedPk := base58.Decode(pk)
+	decodedDid := decodedPk[0:16]
+	calculatedDid := base58.Encode(decodedDid)
+
+	if calculatedDid != msg.DidDoc.GetDid() {
+		return sdk.ErrInvalidPubKey("Did does not match publicKey")
+	}
 	return nil
 }
 
@@ -96,7 +137,52 @@ func (msg AddDidMsg) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("SignBytes")
-	fmt.Println(string(b))
 	return b
 }
+func (msg AddDidMsg) IsNewDid() bool { return true }
+
+type AddCredentialMsg struct {
+	Did           ixo.Did       `json:"did"`
+	DidCredential DidCredential `json:"credential"`
+}
+
+// New Ixo message
+func NewAddCredentialMsg(did string, credType string, data string, signer string) AddCredentialMsg {
+	didCredential := DidCredential{
+		Type:   credType,
+		Data:   data,
+		Signer: signer,
+	}
+	return AddCredentialMsg{
+		Did:           did,
+		DidCredential: didCredential,
+	}
+}
+
+// enforce the msg type at compile time
+var _ sdk.Msg = AddCredentialMsg{}
+
+// nolint
+func (msg AddCredentialMsg) Type() string                            { return "did" }
+func (msg AddCredentialMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg AddCredentialMsg) GetSigners() []sdk.Address {
+	return []sdk.Address{[]byte(msg.DidCredential.Signer)}
+}
+func (msg AddCredentialMsg) String() string {
+	return fmt.Sprintf("AddCredentialMsg{Did: %v, Type: %v, Signer: %v}", string(msg.Did), msg.DidCredential.Type, string(msg.DidCredential.Signer))
+}
+
+// Validate Basic is used to quickly disqualify obviously invalid messages quickly
+func (msg AddCredentialMsg) ValidateBasic() sdk.Error {
+	return nil
+}
+
+// Get the bytes for the message signer to sign on
+func (msg AddCredentialMsg) GetSignBytes() []byte {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+func (msg AddCredentialMsg) IsNewDid() bool { return false }

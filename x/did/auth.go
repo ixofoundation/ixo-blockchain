@@ -18,10 +18,17 @@ func NewAnteHandler(didMapper SealedDidMapper) sdk.AnteHandler {
 		}
 
 		msg := tx.GetMsg()
-		addDidMsg := msg.(AddDidMsg)
-
+		didMsg := msg.(DidMsg)
 		pubKey := [32]byte{}
-		copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
+
+		if didMsg.IsNewDid() {
+			addDidMsg := didMsg.(AddDidMsg)
+			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
+		} else {
+			did := ixo.Did(msg.GetSigners()[0])
+			didDoc := didMapper.GetDidDoc(ctx, did)
+			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
+		}
 
 		// Assert that there are signatures.
 		var sigs = tx.GetSignatures()
