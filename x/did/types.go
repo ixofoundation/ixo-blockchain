@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/btcsuite/btcutil/base58"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	wire "github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -120,14 +118,15 @@ func (msg AddDidMsg) String() string {
 func (msg AddDidMsg) ValidateBasic() sdk.Error {
 	// Check that the Did and the PublicKey correspond
 	// NOTE: this will fail if the key has been rotated
-	pk := msg.DidDoc.GetPubKey()
-	decodedPk := base58.Decode(pk)
-	decodedDid := decodedPk[0:16]
-	calculatedDid := base58.Encode(decodedDid)
+	/*	pk := msg.DidDoc.GetPubKey()
+		decodedPk := base58.Decode(pk)
+		decodedDid := decodedPk[0:16]
+		calculatedDid := base58.Encode(decodedDid)
 
-	if calculatedDid != msg.DidDoc.GetDid() {
-		return sdk.ErrInvalidPubKey("Did does not match publicKey")
-	}
+		if calculatedDid != msg.DidDoc.GetDid() {
+			return sdk.ErrInvalidPubKey("Did does not match publicKey")
+		}
+	*/
 	return nil
 }
 
