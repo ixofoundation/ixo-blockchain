@@ -31,7 +31,7 @@ func handleAddDidDocMsg(ctx sdk.Context, k DidKeeper, msg AddDidMsg) sdk.Result 
 }
 
 func handleAddCredentialMsg(ctx sdk.Context, k DidKeeper, msg AddCredentialMsg) sdk.Result {
-	didDoc, err := k.AddCredential(ctx, msg.Did, msg.DidCredential)
+	didDoc, err := k.AddCredential(ctx, msg.DidCredential.Claim.Id, msg.DidCredential)
 	if err != nil {
 		return err.Result()
 	}
