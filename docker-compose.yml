@@ -9,6 +9,8 @@ services:
     logging:
       options:
         max-size: 30m
+    volumes:
+      - ./data/blockchain:/root/.ixo-node
     
   rest:
     container_name: rest
@@ -18,6 +20,8 @@ services:
       - "1317:1317"
     links:
       - blockchain
+    volumes:
+      - ./data/blockchain:/root/.ixo-node
   
   block-sync:
     container_name: block-sync
@@ -43,3 +47,5 @@ services:
     image: mongo
     ports:
       - "27017:27017"
+    volumes:
+      - ./data/db:/data/db
