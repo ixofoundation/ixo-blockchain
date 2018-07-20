@@ -3,7 +3,10 @@
 ## Setup a new ixo.hub node
 
 ### Prerequisites:
-Ensure docker and docker compose are installed
+* Ensure docker and docker compose are installed
+* Expose the following ports: 
+`46656`, `46657`,`1317`
+
 
 ### Setup
 * Create an `ixo` folder in a place of your choice on your host

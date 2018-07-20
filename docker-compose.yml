@@ -5,6 +5,7 @@ services:
     image: trustlab/ixo-blockchain:latest
     restart: always
     ports:
+      - "46656:46656"
       - "46657:46657"
     logging:
       options:
