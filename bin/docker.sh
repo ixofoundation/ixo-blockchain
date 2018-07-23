@@ -8,7 +8,6 @@ CURRENT_DIR=`dirname $0`
 ROOT_DIR=$CURRENT_DIR/..
 
 docker build -t trustlab/ixo-blockchain -f - $ROOT_DIR < $ROOT_DIR/docker/blockchain/Dockerfile
-# docker build -t trustlab/ixo-blockchain-rest -f - $ROOT_DIR < $ROOT_DIR/docker/rest/Dockerfile
 docker-compose up -d
 
 docker-compose up --no-start
