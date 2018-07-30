@@ -16,8 +16,7 @@ node {
     stage('Build blockchain image') {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
-        sh 'cd docker/blockchain'
-        blockchain = docker.build("trustlab/ixo-web")
+        blockchain = docker.build("trustlab/ixo-blockchain", "./docker/blockchain/")
     }
 
     stage('Test image') {
@@ -40,30 +39,4 @@ node {
         }
     }
 
-    stage('Build rest service image') {
-        /* This builds the actual image; synonymous to
-         * docker build on the command line */
-        sh 'cd docker/rest'
-        rest = docker.build("trustlab/ixo-web")
-    }
-
-    stage('Test image') {
-        /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
-
-        rest.inside {
-            sh 'echo "Tests passed"'
-        }
-    }
-
-    stage('Push image') {
-        /* Finally, we'll push the image with two tags:
-         * First, the incremental build number from Jenkins
-         * Second, the 'latest' tag.
-         * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-            rest.push("${env.BUILD_NUMBER}")
-            rest.push("latest")
-        }
-    }
 }
