@@ -21,9 +21,15 @@ type BaseDidDoc struct {
 }
 
 type DidCredential struct {
-	Type   string  `json:"type"`
-	Data   string  `json:"data"`
-	Signer ixo.Did `json:"signer"`
+	CredType []string `json:"type"`
+	Issuer   ixo.Did  `json:"issuer"`
+	Issued   string   `json:"issued"`
+	Claim    Claim    `json:"claim"`
+}
+
+type Claim struct {
+	Id           ixo.Did `json:"id"`
+	KYCValidated bool    `json:"KYCValidated"`
 }
 
 type Credential struct {
@@ -141,19 +147,21 @@ func (msg AddDidMsg) GetSignBytes() []byte {
 func (msg AddDidMsg) IsNewDid() bool { return true }
 
 type AddCredentialMsg struct {
-	Did           ixo.Did       `json:"did"`
 	DidCredential DidCredential `json:"credential"`
 }
 
 // New Ixo message
-func NewAddCredentialMsg(did string, credType string, data string, signer string) AddCredentialMsg {
+func NewAddCredentialMsg(did string, credType []string, issuer string, issued string) AddCredentialMsg {
 	didCredential := DidCredential{
-		Type:   credType,
-		Data:   data,
-		Signer: signer,
+		CredType: credType,
+		Issuer:   issuer,
+		Issued:   issued,
+		Claim: Claim{
+			Id:           did,
+			KYCValidated: true,
+		},
 	}
 	return AddCredentialMsg{
-		Did:           did,
 		DidCredential: didCredential,
 	}
 }
@@ -165,10 +173,10 @@ var _ sdk.Msg = AddCredentialMsg{}
 func (msg AddCredentialMsg) Type() string                            { return "did" }
 func (msg AddCredentialMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg AddCredentialMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.DidCredential.Signer)}
+	return []sdk.Address{[]byte(msg.DidCredential.Issuer)}
 }
 func (msg AddCredentialMsg) String() string {
-	return fmt.Sprintf("AddCredentialMsg{Did: %v, Type: %v, Signer: %v}", string(msg.Did), msg.DidCredential.Type, string(msg.DidCredential.Signer))
+	return fmt.Sprintf("AddCredentialMsg{Did: %v, Type: %v, Signer: %v}", string(msg.DidCredential.Claim.Id), msg.DidCredential.CredType, string(msg.DidCredential.Issuer))
 }
 
 // Validate Basic is used to quickly disqualify obviously invalid messages quickly

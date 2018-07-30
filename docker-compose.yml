@@ -5,19 +5,26 @@ services:
     image: trustlab/ixo-blockchain:latest
     restart: always
     ports:
+      - "46656:46656"
       - "46657:46657"
     logging:
       options:
         max-size: 30m
+    volumes:
+      - ./data/blockchain:/root/.ixo-node
+    command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/startBlockchain.sh
     
   rest:
     container_name: rest
-    image: trustlab/ixo-blockchain-rest:latest
+    image: trustlab/ixo-blockchain:latest
     restart: always
     ports:
       - "1317:1317"
     links:
       - blockchain
+    volumes:
+      - ./data/blockchain:/root/.ixo-node
+    command: ixocli rest-server -n tcp://blockchain:46657 -a tcp://0.0.0.0:1317
   
   block-sync:
     container_name: block-sync
@@ -43,3 +50,5 @@ services:
     image: mongo
     ports:
       - "27017:27017"
+    volumes:
+      - ./data/db:/data/db

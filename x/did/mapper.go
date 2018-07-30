@@ -100,10 +100,19 @@ func (dm DidMapper) AddCredential(ctx sdk.Context, did ixo.Did, credential DidCr
 		panic(errors.New("Did does not exist"))
 	}
 	baseDidDoc := didDoc.(BaseDidDoc)
-	baseDidDoc.AddCredential(credential)
-	store := ctx.KVStore(dm.key)
-	bz := dm.encodeDid(baseDidDoc)
-	store.Set(addr, bz)
+	credentials := baseDidDoc.GetCredentials()
+	found := false
+	for _, v := range credentials {
+		if v.Issuer == credential.Issuer && v.CredType[0] == credential.CredType[0] && v.CredType[1] == credential.CredType[1] && v.Claim.KYCValidated == credential.Claim.KYCValidated {
+			found = true
+		}
+	}
+	if !found {
+		baseDidDoc.AddCredential(credential)
+		store := ctx.KVStore(dm.key)
+		bz := dm.encodeDid(baseDidDoc)
+		store.Set(addr, bz)
+	}
 	return baseDidDoc
 }
 

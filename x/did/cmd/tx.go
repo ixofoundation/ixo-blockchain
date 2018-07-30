@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -105,11 +106,11 @@ func GetDidDocCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) 
 // Add a did doc to the ledger
 func AddCredentialCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) *cobra.Command {
 	return &cobra.Command{
-		Use:   "addCredential did type data signerDidDoc",
-		Short: "Add a new Credential for a Did using the type, data and signer",
+		Use:   "addKycCredential did signerDidDoc",
+		Short: "Add a new KYC Credential for a Did by the signer",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
-				return errors.New("You must provide a did, type, data and signer's sovrin did doc")
+			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
+				return errors.New("You must provide a did and the signer's sovrin didDoc")
 			}
 
 			// find the key to look up the account
@@ -122,17 +123,19 @@ func AddCredentialCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecod
 				return errors.New("The did is not on the blockchain")
 			}
 
-			credType := args[1]
-			data := args[2]
-
 			sovrinDid := sovrin.SovrinDid{}
-			err = json.Unmarshal([]byte(args[3]), &sovrinDid)
+			err = json.Unmarshal([]byte(args[1]), &sovrinDid)
 			if err != nil {
 				panic(err)
 			}
 
+			t := time.Now()
+			issued := t.Format(time.RFC3339)
+
+			credTypes := []string{"Credential", "ProofOfKYC"}
+
 			// create the message
-			msg := did.NewAddCredentialMsg(didAddr, credType, data, sovrinDid.Did)
+			msg := did.NewAddCredentialMsg(didAddr, credTypes, sovrinDid.Did, issued)
 
 			// Force the length to 64
 			privKey := [64]byte{}
