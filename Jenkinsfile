@@ -27,7 +27,9 @@ pipeline {
             /* This builds the actual image; synonymous to
             * docker build on the command line */
             steps {
-                blockchain = docker.build("trustlab/ixo-blockchain", "./docker/blockchain/")
+                 script {
+                    def blockchain = docker.build("trustlab/ixo-blockchain", "./docker/blockchain/")
+                 }
             }
         }
 
@@ -48,8 +50,10 @@ pipeline {
             * Pushing multiple tags is cheap, as all the layers are reused. */
             steps {
                 docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                    blockchain.push("${env.BUILD_NUMBER}")
-                    blockchain.push("latest")
+                     script {
+                        blockchain.push("${env.BUILD_NUMBER}")
+                        blockchain.push("latest")
+                     }
                 }
             }
         }
