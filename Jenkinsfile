@@ -9,7 +9,6 @@ node {
 
     stage('Build source') {
         /* Let's make sure we have the repository cloned to our workspace */
-        sh 'go get -d ./...'
         sh 'make build'
     }
 
