@@ -1,5 +1,4 @@
-node {
-
+pipeline {
     agent {
         label {
             label 'ixo-blockchain'
@@ -55,5 +54,4 @@ node {
             }
         }
     }
-
 }
