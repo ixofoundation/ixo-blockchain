@@ -1,4 +1,4 @@
-node {
+pipeline {
 
     agent {
         label {
@@ -6,7 +6,7 @@ node {
             customWorkspace '$GOPATH/src/github.com/ixofoundation/ixo-cosmos'
         }
     }
-    
+
     stages {
         stage('Pull repository') {
             /* Let's make sure we have the repository cloned to our workspace */
