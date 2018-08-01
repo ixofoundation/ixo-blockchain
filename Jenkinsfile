@@ -3,7 +3,7 @@ node {
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
 
-        checkout scm
+        sh 'go get github.com/ixofoundation/ixo-cosmos'
     }
 
     stage('Build source') {
