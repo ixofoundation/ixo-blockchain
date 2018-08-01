@@ -19,7 +19,8 @@ node {
 
                 stage('Building'){
                     sh 'pwd'
-                    sh 'ls $GOPATH/'
+                    sh 'cd $GOPATH/'
+                    sh 'pwd'
                 }
             }
         }
