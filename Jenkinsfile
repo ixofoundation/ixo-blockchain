@@ -4,7 +4,7 @@ node {
         /* Let's make sure we have the repository cloned to our workspace */
         sh 'go version'
         sh 'cd $GOPATH/src/github.com/ixofoundation/ixo-cosmos'
-        sh 'git pull'
+        sh 'git pull origin master'
     }
 
     stage('Build source') {
