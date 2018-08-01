@@ -19,7 +19,7 @@ node {
 
                 stage('Building'){
                     sh 'pwd'
-                    sh """ls $GOPATH/src/cmd/project/"""
+                    sh 'ls $GOPATH/src/cmd/project/'
                 }
             }
         }
