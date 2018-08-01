@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label {
+        node {
             customWorkspace '$GOPATH/src/github.com/ixofoundation/ixo-cosmos'
         }
     }
