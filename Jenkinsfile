@@ -2,12 +2,13 @@ node {
 
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
-
-        sh 'go get github.com/ixofoundation/ixo-cosmos'
+        sh 'go version'
+        sh 'go get -u github.com/ixofoundation/ixo-cosmos'
     }
 
     stage('Build source') {
         /* Let's make sure we have the repository cloned to our workspace */
+        sh 'cd $GOPATH/src/github.com/ixofoundation/ixo-cosmos && dep ensure'
         sh 'go get -d ./...'
         sh 'make build'
     }
