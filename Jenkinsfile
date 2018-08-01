@@ -10,7 +10,7 @@ node {
                     checkout scm
                 }
                 
-                stage('Pre Test'){
+                stage('Install Dependencies'){
                     echo 'Pulling Dependencies'
             
                     sh 'go version'
@@ -20,7 +20,7 @@ node {
                     sh 'go get github.com/tebeka/go2xunit'
                 }
 
-                stage('Test'){
+                stage('Building'){
                     
                     //List all our project files with 'go list ./... | grep -v /vendor/ | grep -v github.com | grep -v golang.org'
                     //Push our project files relative to ./src
