@@ -9,7 +9,9 @@ node {
 
     stage('Build source') {
         /* Let's make sure we have the repository cloned to our workspace */
+        sh 'cd $GOPATH/src/github.com/ixofoundation/ixo-cosmos'
         sh 'make build'
+        sh 'make install'
     }
 
     stage('Build blockchain image') {
