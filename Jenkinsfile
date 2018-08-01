@@ -37,9 +37,11 @@ pipeline {
             /* Ideally, we would run a test framework against our image.
             * For this example, we're using a Volkswagen-type approach ;-) */
             steps {
-                blockchain.inside {
-                    sh 'echo "Tests passed"'
-                }
+                 script {
+                    blockchain.inside {
+                        sh 'echo "Tests passed"'
+                    }
+                 }
             }
         }
 
@@ -49,11 +51,12 @@ pipeline {
             * Second, the 'latest' tag.
             * Pushing multiple tags is cheap, as all the layers are reused. */
             steps {
-                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                     script {
-                        blockchain.push("${env.BUILD_NUMBER}")
-                        blockchain.push("latest")
-                     }
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                        
+                            blockchain.push("${env.BUILD_NUMBER}")
+                            blockchain.push("latest")
+                    }
                 }
             }
         }
