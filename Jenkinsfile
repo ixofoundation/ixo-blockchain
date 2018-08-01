@@ -8,7 +8,7 @@ node {
     }
 
     stage('Build source') {
-        dir($GOPATH/src/github.com/ixofoundation/ixo-cosmos){
+        dir('$GOPATH/src/github.com/ixofoundation/ixo-cosmos'){
             sh 'pwd'
             sh 'make build'
             sh 'make install'
