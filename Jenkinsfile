@@ -19,7 +19,7 @@ node {
 
                 stage('Building'){
                     sh 'pwd'
-                    sh 'ls $GOPATH/jobs'
+                    sh 'ls $GOPATH/'
                 }
             }
         }
