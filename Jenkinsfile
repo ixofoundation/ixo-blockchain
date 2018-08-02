@@ -24,6 +24,10 @@ node {
                 stage('Building') {
                     sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build && make install' 
                 } 
+
+                 stage('Building Docker Image') {
+                    sh 'pwd' 
+                } 
             }
         }
     } catch (e) {
