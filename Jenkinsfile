@@ -5,12 +5,12 @@ node {
             withEnv(["GOPATH=${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"]) {
                 env.PATH="${GOPATH}/bin:$PATH"
                 
-                stage('Checkout'){
+                stage('Checkout') {
                     echo 'Checking out SCM'
                     checkout scm
                 }
                 
-                stage('Install Dependencies'){
+                stage('Install Dependencies') {
                     echo 'Pulling Dependencies'
             
                     sh 'go version'
@@ -19,13 +19,10 @@ node {
                     sh 'go get github.com/tebeka/go2xunit'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
-                   
                 }
 
-                stage('Building'){
-                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/' 
-                    sh 'make build'
-                    sh 'make install'
+                stage('Building') {
+                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build && make install' 
                 } 
             }
         }
