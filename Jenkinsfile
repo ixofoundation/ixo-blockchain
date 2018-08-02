@@ -26,7 +26,7 @@ node {
                 } 
 
                  stage('Building Docker Image') {
-                    sh 'pwd' 
+                    sh 'ls' 
                 } 
             }
         }
