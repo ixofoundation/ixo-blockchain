@@ -19,14 +19,14 @@ node {
                     sh 'go get github.com/tebeka/go2xunit'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
-                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build' 
+                   
                 }
 
-                /* stage('Building'){
-                    sh 'pwd'
-                    sh 'cd $GOPATH/'
-                    sh 'pwd'
-                } */
+                stage('Building'){
+                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/' 
+                    sh 'make build'
+                    sh 'make install'
+                } 
             }
         }
     } catch (e) {
