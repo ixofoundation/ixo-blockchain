@@ -18,7 +18,7 @@ node {
                     sh 'go get -u github.com/golang/lint/golint'
                     sh 'go get github.com/tebeka/go2xunit'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
-                    sh 'go get -u github.com/ixofoundation/ixo-cosmos'
+                    sh 'go get -d -u github.com/ixofoundation/ixo-cosmos'
                     sh 'cd ${GOPATH}/src/github.com/ && ls' 
                 }
 
