@@ -29,7 +29,7 @@ node {
 
                 stage('Building Docker Image') {
                     sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/docker/blockchain/' 
-                    blockchain = docker.build("trustlab/ixo-blockchain")
+                    blockchain = docker.build('trustlab/ixo-blockchain', '-f ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/docker/blockchain/Dockerfile .')
                 } 
 
                 stage('Test Image') {
