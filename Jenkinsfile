@@ -44,8 +44,8 @@ node {
                     }
                 }
 
-                stage('Delete Image') {
-                    sh 'docker rmi trustlab/ixo-blockchain'
+                stage('Prune Docker Images') {
+                    sh 'docker image prune -a --force --filter "label!=trustlab/ixo-ci-jenkins"'
                 }
             }
         }
