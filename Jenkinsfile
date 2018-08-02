@@ -26,7 +26,7 @@ node {
 
                 stage('Building Docker Image') {
                     sh 'pwd'
-                    dir('${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/') {
+                    dir('src/github.com/ixofoundation/ixo-cosmos/') {
                         blockchain = docker.build('trustlab/ixo-blockchain', '-f - ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ < ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/docker/blockchain/Dockerfile')
                     }
                 } 
