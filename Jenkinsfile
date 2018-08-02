@@ -5,7 +5,7 @@ node {
             withEnv(["GOPATH=${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"]) {
                 env.PATH="${GOPATH}/bin:$PATH"
                 
-                def blockchain
+                def app
 
                 stage('Checkout') {
                     echo 'Checking out SCM'
@@ -27,25 +27,27 @@ node {
                 stage('Building Docker Image') {
                     sh 'pwd'
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
-                        blockchain = docker.build('trustlab/ixo-blockchain')
+                        app = docker.build('trustlab/ixo-blockchain')
                     }
                 } 
 
                 stage('Test Image') {
-                    blockchain.inside {
+                    app.inside {
                         sh 'echo "Tests passed"'
                     }
                 }
 
                 stage('Push Image') {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        blockchain.push("${env.BUILD_NUMBER}")
-                        blockchain.push("latest")
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
                     }
                 }
 
-                stage('Prune Docker Images') {
-                    sh 'docker image prune -a --force --filter "label!=trustlab/ixo-ci-jenkins"'
+                stage('Removing Images') {
+                    sh "docker rmi ${app.id}"
+                    sh "docker rmi registry.hub.docker.com/${app.id}"
+                    sh "docker rmi registry.hub.docker.com/${app.id}:${env.BUILD_NUMBER}"
                 }
             }
         }
