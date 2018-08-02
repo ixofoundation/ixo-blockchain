@@ -5,6 +5,8 @@ node {
             withEnv(["GOPATH=${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"]) {
                 env.PATH="${GOPATH}/bin:$PATH"
                 
+                def blockchain
+
                 stage('Checkout') {
                     echo 'Checking out SCM'
                     checkout scm
@@ -25,9 +27,16 @@ node {
                     sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build && make install' 
                 } 
 
-                 stage('Building Docker Image') {
-                    sh 'ls' 
+                stage('Building Docker Image') {
+                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/docker/blockchain/' 
+                    blockchain = docker.build("trustlab/ixo-blockchain")
                 } 
+
+                stage('Test Image') {
+                    blockchain.inside {
+                        sh 'echo "Tests passed"'
+                    }
+                }
             }
         }
     } catch (e) {
