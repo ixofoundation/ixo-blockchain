@@ -18,7 +18,7 @@ node {
                     sh 'go get -u github.com/golang/lint/golint'
                     sh 'go get github.com/tebeka/go2xunit'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
-                    sh 'cd ${GOPATH}/src/cmd/project/ && dep ensure' 
+                    sh 'cd ${GOPATH} && dep ensure' 
                 }
 
                 /* stage('Building'){
