@@ -19,7 +19,7 @@ node {
                     sh 'go get github.com/tebeka/go2xunit'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
-                    sh 'cd ${GOPATH}/src/github.com/ && ls' 
+                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build' 
                 }
 
                 /* stage('Building'){
