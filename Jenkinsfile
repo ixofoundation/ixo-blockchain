@@ -37,6 +37,13 @@ node {
                     }
                 }
 
+                stage('Push Image') {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                        blockchain.push("${env.BUILD_NUMBER}")
+                        blockchain.push("latest")
+                    }
+                }
+
                 stage('Delete Image') {
                     sh 'docker rmi trustlab/ixo-blockchain'
                 }
