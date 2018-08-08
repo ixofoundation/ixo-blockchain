@@ -7,13 +7,21 @@ echo "Preparing IXO Block Sync"
 CURRENT_DIR=`dirname $0`
 ROOT_DIR=$CURRENT_DIR/..
 
-if [ "$1" != "skip" ]
+if [ "$1" != "skip-building" ]
 then
     echo "Building Images"
     docker build -t trustlab/ixo-blockchain $ROOT_DIR
 fi
 
-docker-compose up --no-start
+if [ "$2" != "expose-over-port80" ]
+then
+    echo "exposing on port 8080"
+    docker-compose up --no-start
+else
+    echo "exposing on port 80"
+    docker-compose -f $ROOT_DIR/docker-compose.yml -f $ROOT_DIR/docker-compose.port80.yml up --no-start
+fi
+
 # docker-compose create
 docker-compose start block-sync-db
 

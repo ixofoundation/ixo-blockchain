@@ -1,0 +1,5 @@
+version: "2"
+services:
+  block-sync:
+    ports:
+      - "80:8080"
