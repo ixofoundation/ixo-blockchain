@@ -4,9 +4,6 @@ services:
     container_name: blockchain
     image: trustlab/ixo-blockchain:latest
     restart: always
-    ports:
-      - "46656:46656"
-      - "46657:46657"
     logging:
       options:
         max-size: 30m
@@ -18,8 +15,6 @@ services:
     container_name: rest
     image: trustlab/ixo-blockchain:latest
     restart: always
-    ports:
-      - "1317:1317"
     links:
       - blockchain
     volumes:
@@ -34,8 +29,6 @@ services:
       - MONGODB_URI=mongodb://block-sync-db:27017/block-sync
       - CHAIN_URI=blockchain:46657
     restart: always
-    ports:
-      - "8080:8080"
     links:
       - block-sync-db
       - blockchain
@@ -48,7 +41,5 @@ services:
   block-sync-db:
     container_name: block-sync-db
     image: mongo
-    ports:
-      - "27017:27017"
     volumes:
       - ./data/db:/data/db

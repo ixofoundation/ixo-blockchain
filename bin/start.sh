@@ -7,9 +7,16 @@ echo "Build IXO Block Sync"
 CURRENT_DIR=`dirname $0`
 ROOT_DIR=$CURRENT_DIR/..
 
-docker build -t trustlab/ixo-blockchain $ROOT_DIR
+if [ "$1" = "dev" ]
+then
+  echo "Building Developer images"
+  docker build -t trustlab/ixo-blockchain $ROOT_DIR
+  docker-compose -f $ROOT_DIR/docker-compose.yml -f $ROOT_DIR/docker-compose.dev.yml up --no-start
+else
+  echo "Building Production images"
+  docker-compose -f $ROOT_DIR/docker-compose.yml -f $ROOT_DIR/docker-compose.prod.yml up --no-start
+fi
 
-docker-compose up --no-start
 # docker-compose create
 docker-compose start block-sync-db
 
