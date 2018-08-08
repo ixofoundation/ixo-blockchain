@@ -1,0 +1,18 @@
+version: "2"
+services:
+  blockchain:
+    ports:
+      - "46656:46656"
+      - "46657:46657"
+    
+  rest:
+    ports:
+      - "1317:1317"
+  
+  block-sync:
+    ports:
+      - "8080:8080"
+      
+  block-sync-db:
+    ports:
+      - "27017:27017"
