@@ -13,14 +13,7 @@ then
     docker build -t trustlab/ixo-blockchain $ROOT_DIR
 fi
 
-if [ "$2" != "expose-over-port80" ]
-then
-    echo "exposing on port 8080"
-    docker-compose up --no-start
-else
-    echo "exposing on port 80"
-    docker-compose -f $ROOT_DIR/docker-compose.yml -f $ROOT_DIR/docker-compose.port80.yml up --no-start
-fi
+ docker-compose up --no-start
 
 # docker-compose create
 docker-compose start block-sync-db
