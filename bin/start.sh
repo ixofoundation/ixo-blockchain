@@ -3,14 +3,18 @@ echo "***********************************"
 echo "* IXO BLOCKCHAIN                  *"
 echo "***********************************"
 echo ""
-echo "Build IXO Block Sync"
+echo "Preparing IXO Block Sync"
 CURRENT_DIR=`dirname $0`
 ROOT_DIR=$CURRENT_DIR/..
 
-docker build -t trustlab/ixo-blockchain -f - $ROOT_DIR < $ROOT_DIR/docker/blockchain/Dockerfile
-docker-compose up -d
+if [ "$1" != "skip-building" ]
+then
+    echo "Building Images"
+    docker build -t trustlab/ixo-blockchain $ROOT_DIR
+fi
 
-docker-compose up --no-start
+ docker-compose up --no-start
+
 # docker-compose create
 docker-compose start block-sync-db
 

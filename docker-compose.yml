@@ -35,7 +35,7 @@ services:
       - CHAIN_URI=blockchain:46657
     restart: always
     ports:
-      - "8080:8080"
+      - "80:8080"
     links:
       - block-sync-db
       - blockchain
