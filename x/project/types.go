@@ -48,8 +48,8 @@ type ProjectDoc struct {
 		WebsiteURL       string `json:"websiteURL"`
 		LogoLink         string `json:"logoLink"`
 	} `json:"founder"`
-	CreatedOn        string   `json:"createdOn"`
-	CreatedBy        string   `json:"createdBy"`
+	CreatedOn string `json:"createdOn"`
+	CreatedBy string `json:"createdBy"`
 }
 
 //GETTERS
@@ -177,11 +177,7 @@ func (msg CreateProjectMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateProjectMsg) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return b
+	return ixo.JSONStringify(msg)
 }
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
 func (msg CreateProjectMsg) IsPegMsg() bool { return false }
@@ -216,6 +212,8 @@ func (msg CreateAgentMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateAgentMsg) GetSignBytes() []byte {
+	// TODO: Change to
+	// 	return ixo.JSONStringify(msg)
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -250,6 +248,8 @@ func (msg UpdateAgentMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg UpdateAgentMsg) GetSignBytes() []byte {
+	// TODO: Change to
+	// 	return ixo.JSONStringify(msg)
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -285,6 +285,8 @@ func (msg CreateClaimMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateClaimMsg) GetSignBytes() []byte {
+	// TODO: Change to
+	// 	return ixo.JSONStringify(msg)
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -319,6 +321,8 @@ func (msg CreateEvaluationMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateEvaluationMsg) GetSignBytes() []byte {
+	// TODO: Change to
+	// 	return ixo.JSONStringify(msg)
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -348,6 +352,8 @@ func (msg FundProjectMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.Data.GetSigner())}
 }
 func (msg FundProjectMsg) GetSignBytes() []byte {
+	// TODO: Change to
+	// 	return ixo.JSONStringify(msg)
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -377,6 +383,8 @@ func (msg WithdrawFundsMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.Data.GetProjectDid())}
 }
 func (msg WithdrawFundsMsg) GetSignBytes() []byte {
+	// TODO: Change to
+	// 	return ixo.JSONStringify(msg)
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)

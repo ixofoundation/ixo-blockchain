@@ -1,6 +1,8 @@
 package ixo
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -20,7 +22,8 @@ func SignIxoMessage(msg sdk.Msg, did string, privKey [64]byte) IxoSignature {
 }
 
 func VerifySignature(msg sdk.Msg, publicKey [32]byte, sig sdk.StdSignature) bool {
-	fmt.Println("*******VERIFY_MSG******* \n", string(msg.GetSignBytes()))
+	fmt.Println("*******VERIFY_MSG******* ")
+	fmt.Println(string(msg.GetSignBytes()))
 
 	// First we unwrap the crypto.Signature to the crypto.SignatureEd25519 then we cast it to bytes
 	innerSignature := sig.Signature.Unwrap().(crypto.SignatureEd25519)
@@ -28,4 +31,19 @@ func VerifySignature(msg sdk.Msg, publicKey [32]byte, sig sdk.StdSignature) bool
 	result := ed25519.Verify(&publicKey, msg.GetSignBytes(), &signatureBytes)
 
 	return result
+}
+
+func JSONStringify(msg sdk.Msg) []byte {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "")
+	err := encoder.Encode(msg)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes.Trim(buffer.Bytes(), " \n")
+
 }
