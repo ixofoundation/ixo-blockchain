@@ -6,10 +6,13 @@ node {
                 env.PATH="${GOPATH}/bin:$PATH"
                 
                 def app
+                def branch
 
                 stage('Checkout') {
                     echo 'Checking out SCM'
                     checkout scm
+                    branch = scm.branches[0].name.drop(2)
+                    echo 'Branch Name: ' + branch
                 }
                 
                 stage('Install Dependencies') {
@@ -27,7 +30,7 @@ node {
                 stage('Building Docker Image') {
                     sh 'pwd'
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
-                        app = docker.build('trustlab/ixo-blockchain')
+                        app = docker.build('trustlab/ixo-blockchain:' + branch)
                     }
                 } 
 
@@ -39,15 +42,15 @@ node {
 
                 stage('Push Image') {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
+                        app.push(branch + "-" + "${env.BUILD_NUMBER}")
+                        app.push(branch)
                     }
                 }
 
                 stage('Removing Images') {
                     sh "docker rmi ${app.id}"
                     sh "docker rmi registry.hub.docker.com/${app.id}"
-                    sh "docker rmi registry.hub.docker.com/${app.id}:${env.BUILD_NUMBER}"
+                    sh "docker rmi registry.hub.docker.com/${app.id}-${env.BUILD_NUMBER}"
                 }
             }
         }
