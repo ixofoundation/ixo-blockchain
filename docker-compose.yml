@@ -2,7 +2,7 @@ version: "2"
 services:
   blockchain:
     container_name: blockchain
-    image: trustlab/ixo-blockchain:latest
+    image: trustlab/ixo-blockchain:master
     restart: always
     ports:
       - "46656:46656"
