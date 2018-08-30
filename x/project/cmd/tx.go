@@ -130,7 +130,7 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 		Short: "Update the status of an agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCoreContextFromViper()
-			if len(args) != 6 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 || len(args[5]) == 0{
+			if len(args) != 6 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 || len(args[5]) == 0 {
 				return errors.New("You must provide the agentDid, status and the projects private key")
 			}
 
@@ -147,7 +147,7 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 			updateAgentDoc := project.UpdateAgentDoc{
 				Did:    agentDid,
 				Status: agentStatus,
-				Role: agentRole,
+				Role:   agentRole,
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[5])
@@ -245,7 +245,7 @@ func FundProjectTxCmd(cdc *wire.Codec) *cobra.Command {
 			sovrinDid := unmarshalSovrinDID(args[3])
 
 			// create the message
-			msg := project.NewFundProjectMsg(fundProjectDoc)
+			msg := project.NewFundProjectMsg(args[1], "", fundProjectDoc, sovrinDid)
 
 			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

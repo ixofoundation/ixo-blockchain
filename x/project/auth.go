@@ -25,26 +25,21 @@ func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMa
 		fmt.Println("Auth: check")
 		pubKey := [32]byte{}
 
-		if projectMsg.IsPegMsg() {
-			pegDid := ixo.Did(msg.GetSigners()[0])
-			didDoc := didMapper.GetDidDoc(ctx, pegDid)
-			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
-		} else {
-			if projectMsg.IsNewDid() {
-				createProjectMsg := msg.(CreateProjectMsg)
-				//Get public key from payload
-				copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
+		if projectMsg.IsNewDid() {
+			createProjectMsg := msg.(CreateProjectMsg)
+			//Get public key from payload
+			copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
 
-			} else {
-				projectDid := ixo.Did(msg.GetSigners()[0])
-				// Get Project Doc
-				projectDoc, found := projectMapper.GetProjectDoc(ctx, projectDid)
-				if !found {
-					return ctx, sdk.ErrInternal("project did not found").Result(), true
-				}
-				copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
+		} else {
+			projectDid := ixo.Did(msg.GetSigners()[0])
+			// Get Project Doc
+			projectDoc, found := projectMapper.GetProjectDoc(ctx, projectDid)
+			if !found {
+				return ctx, sdk.ErrInternal("project did not found").Result(), true
 			}
+			copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
 		}
+
 		// Assert that there are signatures.
 		var sigs = tx.GetSignatures()
 		if len(sigs) != 1 {
