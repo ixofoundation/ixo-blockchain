@@ -2,7 +2,6 @@ package project
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,40 +15,11 @@ const COIN_DENOM = "ixo"
 
 //Define ProjectDoc
 type ProjectDoc struct {
-	Title            string   `json:"title"`
-	OwnerName        string   `json:"ownerName"`
-	OwnerEmail       string   `json:"ownerEmail"`
-	ShortDescription string   `json:"shortDescription"`
-	LongDescription  string   `json:"longDescription"`
-	ImpactAction     string   `json:"impactAction"`
-	ProjectLocation  string   `json:"projectLocation"`
-	RequiredClaims   int      `json:"requiredClaims"`
-	Sdgs             []string `json:"sdgs"`
-	Templates        struct {
-		Claim struct {
-			Schema string `json:"schema"`
-			Form   string `json:"form"`
-		} `json:"claim"`
-	} `json:"templates"`
+	RequiredClaims       int    `json:"requiredClaims"`
 	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
-	SocialMedia          struct {
-		FacebookLink  string `json:"facebookLink"`
-		InstagramLink string `json:"instagramLink"`
-		TwitterLink   string `json:"twitterLink"`
-		WebLink       string `json:"webLink"`
-	} `json:"socialMedia"`
-	ServiceEndpoint string `json:"serviceEndpoint"`
-	ImageLink       string `json:"imageLink"`
-	Founder         struct {
-		Name             string `json:"name"`
-		Email            string `json:"email"`
-		CountryOfOrigin  string `json:"countryOfOrigin"`
-		ShortDescription string `json:"shortDescription"`
-		WebsiteURL       string `json:"websiteURL"`
-		LogoLink         string `json:"logoLink"`
-	} `json:"founder"`
-	CreatedOn string `json:"createdOn"`
-	CreatedBy string `json:"createdBy"`
+	ServiceEndpoint      string `json:"serviceEndpoint"`
+	CreatedOn            string `json:"createdOn"`
+	CreatedBy            string `json:"createdBy"`
 }
 
 //GETTERS
@@ -149,19 +119,19 @@ func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }
 
 //**************************************************************************************
 // Message
-
 type ProjectMsg interface {
+	sdk.Msg
 	IsNewDid() bool
-	IsPegMsg() bool
 }
 
 //CreateProjectMsg
 type CreateProjectMsg struct {
-	Data       ProjectDoc `json:"data"`
+	SignBytes  string     `json:"signBytes"`
 	TxHash     string     `json:"txHash"`
 	SenderDid  ixo.Did    `json:"senderDid"`
 	ProjectDid ixo.Did    `json:"projectDid"`
 	PubKey     string     `json:"pubKey"`
+	Data       ProjectDoc `json:"data"`
 }
 
 var _ sdk.Msg = CreateProjectMsg{}
@@ -176,16 +146,19 @@ func (msg CreateProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg CreateProjectMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
-func (msg CreateProjectMsg) GetSignBytes() []byte {
-	return ixo.JSONStringify(msg)
-}
-func (msg CreateProjectMsg) IsNewDid() bool { return true }
-func (msg CreateProjectMsg) IsPegMsg() bool { return false }
 func (msg CreateProjectMsg) String() string {
-	return fmt.Sprintf("CreateProjectMsg{Did: %v, projectDoc: %v}", string(msg.GetProjectDid()), msg.Data)
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
 }
 func (msg CreateProjectMsg) GetPubKey() string      { return msg.PubKey }
 func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.Data.GetEvaluatorPay() }
+func (msg CreateProjectMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+func (msg CreateProjectMsg) IsNewDid() bool { return true }
 
 type StoredProjectDoc = CreateProjectMsg
 
@@ -193,14 +166,14 @@ var _ ixo.StoredProjectDoc = (*StoredProjectDoc)(nil)
 
 //CreateAgentMsg
 type CreateAgentMsg struct {
-	Data       CreateAgentDoc `json:"data"`
+	SignBytes  string         `json:"signBytes"`
 	TxHash     string         `json:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid"`
 	ProjectDid ixo.Did        `json:"projectDid"`
+	Data       CreateAgentDoc `json:"data"`
 }
 
-var _ sdk.Msg = CreateAgentMsg{}
-
+func (msg CreateAgentMsg) IsNewDid() bool                          { return false }
 func (msg CreateAgentMsg) Type() string                            { return "project" }
 func (msg CreateAgentMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateAgentMsg) ValidateBasic() sdk.Error {
@@ -212,31 +185,29 @@ func (msg CreateAgentMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateAgentMsg) GetSignBytes() []byte {
-	// TODO: Change to
-	// 	return ixo.JSONStringify(msg)
+	return []byte(msg.SignBytes)
+}
+
+func (msg CreateAgentMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return string(b)
 }
-func (msg CreateAgentMsg) IsNewDid() bool { return false }
-func (msg CreateAgentMsg) IsPegMsg() bool { return false }
-func (msg CreateAgentMsg) String() string {
-	msgString := string(msg.GetSignBytes())
-	return fmt.Sprintf("CreateAgentMsg: %v", msgString)
-}
+
+var _ sdk.Msg = CreateAgentMsg{}
 
 //UpdateAgentMsg
 type UpdateAgentMsg struct {
-	Data       UpdateAgentDoc `json:"data"`
+	SignBytes  string         `json:"signBytes"`
 	TxHash     string         `json:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid"`
 	ProjectDid ixo.Did        `json:"projectDid"`
+	Data       UpdateAgentDoc `json:"data"`
 }
 
-var _ sdk.Msg = UpdateAgentMsg{}
-
+func (msg UpdateAgentMsg) IsNewDid() bool                          { return false }
 func (msg UpdateAgentMsg) Type() string                            { return "project" }
 func (msg UpdateAgentMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg UpdateAgentMsg) ValidateBasic() sdk.Error {
@@ -248,32 +219,28 @@ func (msg UpdateAgentMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg UpdateAgentMsg) GetSignBytes() []byte {
-	// TODO: Change to
-	// 	return ixo.JSONStringify(msg)
+	return []byte(msg.SignBytes)
+}
+func (msg UpdateAgentMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return string(b)
 }
-func (msg UpdateAgentMsg) IsNewDid() bool { return false }
-func (msg UpdateAgentMsg) IsPegMsg() bool { return false }
 
-func (msg UpdateAgentMsg) String() string {
-	msgString := string(msg.GetSignBytes())
-	return fmt.Sprintf("UpdateAgentMsg: %v", msgString)
-}
+var _ sdk.Msg = UpdateAgentMsg{}
 
 //CreateClaimMsg
 type CreateClaimMsg struct {
-	Data       CreateClaimDoc `json:"data"`
+	SignBytes  string         `json:"signBytes"`
 	TxHash     string         `json:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid"`
 	ProjectDid ixo.Did        `json:"projectDid"`
+	Data       CreateClaimDoc `json:"data"`
 }
 
-var _ sdk.Msg = CreateClaimMsg{}
-
+func (msg CreateClaimMsg) IsNewDid() bool                          { return false }
 func (msg CreateClaimMsg) Type() string                            { return "project" }
 func (msg CreateClaimMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateClaimMsg) ValidateBasic() sdk.Error {
@@ -285,31 +252,28 @@ func (msg CreateClaimMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateClaimMsg) GetSignBytes() []byte {
-	// TODO: Change to
-	// 	return ixo.JSONStringify(msg)
+	return []byte(msg.SignBytes)
+}
+func (msg CreateClaimMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return string(b)
 }
-func (msg CreateClaimMsg) IsNewDid() bool { return false }
-func (msg CreateClaimMsg) IsPegMsg() bool { return false }
-func (msg CreateClaimMsg) String() string {
-	msgString := string(msg.GetSignBytes())
-	return fmt.Sprintf("CreateClaimMsg: %v", msgString)
-}
+
+var _ sdk.Msg = CreateClaimMsg{}
 
 //CreateEvaluationMsg
 type CreateEvaluationMsg struct {
-	Data       CreateEvaluationDoc `json:"data"`
+	SignBytes  string              `json:"signBytes"`
 	TxHash     string              `json:"txHash"`
 	SenderDid  ixo.Did             `json:"senderDid"`
 	ProjectDid ixo.Did             `json:"projectDid"`
+	Data       CreateEvaluationDoc `json:"data"`
 }
 
-var _ sdk.Msg = CreateEvaluationMsg{}
-
+func (msg CreateEvaluationMsg) IsNewDid() bool                          { return false }
 func (msg CreateEvaluationMsg) Type() string                            { return "project" }
 func (msg CreateEvaluationMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateEvaluationMsg) ValidateBasic() sdk.Error {
@@ -321,79 +285,80 @@ func (msg CreateEvaluationMsg) GetSigners() []sdk.Address {
 	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateEvaluationMsg) GetSignBytes() []byte {
-	// TODO: Change to
-	// 	return ixo.JSONStringify(msg)
+	return []byte(msg.SignBytes)
+}
+func (msg CreateEvaluationMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return string(b)
 }
-func (msg CreateEvaluationMsg) IsNewDid() bool { return false }
-func (msg CreateEvaluationMsg) IsPegMsg() bool { return false }
-func (msg CreateEvaluationMsg) String() string {
-	msgString := string(msg.GetSignBytes())
-	return fmt.Sprintf("CreateEvaluationMsg: %v", msgString)
-}
+
+var _ sdk.Msg = CreateEvaluationMsg{}
 
 //FundProjectMsg
 type FundProjectMsg struct {
-	Data FundProjectDoc `json:"data"`
+	SignBytes  string         `json:"signBytes"`
+	TxHash     string         `json:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid"`
+	Data       FundProjectDoc `json:"data"`
 }
 
-var _ sdk.Msg = FundProjectMsg{}
-
+func (msg FundProjectMsg) IsNewDid() bool                          { return false }
 func (msg FundProjectMsg) Type() string                            { return "project" }
 func (msg FundProjectMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg FundProjectMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg FundProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg FundProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg FundProjectMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.Data.GetSigner())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg FundProjectMsg) GetSignBytes() []byte {
-	// TODO: Change to
-	// 	return ixo.JSONStringify(msg)
+	return []byte(msg.SignBytes)
+}
+func (msg FundProjectMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return string(b)
 }
-func (msg FundProjectMsg) IsNewDid() bool { return false }
-func (msg FundProjectMsg) IsPegMsg() bool { return true }
-func (msg FundProjectMsg) String() string {
-	msgString := string(msg.GetSignBytes())
-	return fmt.Sprintf("FundProjectMsg: %v", msgString)
-}
+
+var _ sdk.Msg = FundProjectMsg{}
 
 //WithdrawFundsMsg
 type WithdrawFundsMsg struct {
-	Data WithdrawFundsDoc `json:"data"`
+	SignBytes  string           `json:"signBytes"`
+	TxHash     string           `json:"txHash"`
+	SenderDid  ixo.Did          `json:"senderDid"`
+	ProjectDid ixo.Did          `json:"projectDid"`
+	Data       WithdrawFundsDoc `json:"data"`
 }
 
-var _ sdk.Msg = WithdrawFundsMsg{}
-
+func (msg WithdrawFundsMsg) IsNewDid() bool                          { return false }
 func (msg WithdrawFundsMsg) Type() string                            { return "project" }
 func (msg WithdrawFundsMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
 	return nil
 }
+func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
 func (msg WithdrawFundsMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.Data.GetProjectDid())}
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (msg WithdrawFundsMsg) GetSignBytes() []byte {
-	// TODO: Change to
-	// 	return ixo.JSONStringify(msg)
+	return []byte(msg.SignBytes)
+}
+func (msg WithdrawFundsMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return string(b)
 }
-func (msg WithdrawFundsMsg) IsNewDid() bool { return false }
-func (msg WithdrawFundsMsg) IsPegMsg() bool { return false }
-func (msg WithdrawFundsMsg) String() string {
-	msgString := string(msg.GetSignBytes())
-	return fmt.Sprintf("WithdrawFundsMsg: %v", msgString)
-}
+
+var _ sdk.Msg = WithdrawFundsMsg{}

@@ -2,7 +2,6 @@ package project
 
 import (
 	"encoding/hex"
-	"fmt"
 
 	"github.com/tendermint/tmlibs/common"
 
@@ -15,8 +14,6 @@ const CURRENCY = "ixo-atom"
 
 func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
-		fmt.Println("Handler")
-		fmt.Println(msg)
 		switch msg := msg.(type) {
 		case CreateProjectMsg:
 			return handleCreateProjectMsg(ctx, k, ck, msg)
@@ -39,10 +36,8 @@ func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
 }
 
 func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateProjectMsg) sdk.Result {
-	newProjectDoc := msg.Data
 	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
-	fmt.Println(newProjectDoc)
 	projectDoc, err := k.AddProjectDoc(ctx, msg)
 	if err != nil {
 		return err.Result()
