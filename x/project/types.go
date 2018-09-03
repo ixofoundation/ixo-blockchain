@@ -15,40 +15,11 @@ const COIN_DENOM = "ixo"
 
 //Define ProjectDoc
 type ProjectDoc struct {
-	Title            string   `json:"title"`
-	OwnerName        string   `json:"ownerName"`
-	OwnerEmail       string   `json:"ownerEmail"`
-	ShortDescription string   `json:"shortDescription"`
-	LongDescription  string   `json:"longDescription"`
-	ImpactAction     string   `json:"impactAction"`
-	ProjectLocation  string   `json:"projectLocation"`
-	RequiredClaims   int      `json:"requiredClaims"`
-	Sdgs             []string `json:"sdgs"`
-	Templates        struct {
-		Claim struct {
-			Schema string `json:"schema"`
-			Form   string `json:"form"`
-		} `json:"claim"`
-	} `json:"templates"`
+	RequiredClaims       int    `json:"requiredClaims"`
 	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
-	SocialMedia          struct {
-		FacebookLink  string `json:"facebookLink"`
-		InstagramLink string `json:"instagramLink"`
-		TwitterLink   string `json:"twitterLink"`
-		WebLink       string `json:"webLink"`
-	} `json:"socialMedia"`
-	ServiceEndpoint string `json:"serviceEndpoint"`
-	ImageLink       string `json:"imageLink"`
-	Founder         struct {
-		Name             string `json:"name"`
-		Email            string `json:"email"`
-		CountryOfOrigin  string `json:"countryOfOrigin"`
-		ShortDescription string `json:"shortDescription"`
-		WebsiteURL       string `json:"websiteURL"`
-		LogoLink         string `json:"logoLink"`
-	} `json:"founder"`
-	CreatedOn string `json:"createdOn"`
-	CreatedBy string `json:"createdBy"`
+	ServiceEndpoint      string `json:"serviceEndpoint"`
+	CreatedOn            string `json:"createdOn"`
+	CreatedBy            string `json:"createdBy"`
 }
 
 //GETTERS
@@ -185,10 +156,6 @@ func (msg CreateProjectMsg) String() string {
 func (msg CreateProjectMsg) GetPubKey() string      { return msg.PubKey }
 func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.Data.GetEvaluatorPay() }
 func (msg CreateProjectMsg) GetSignBytes() []byte {
-	// jsonBytes := make([]byte, hex.DecodedLen(len(msg.SignBytes)))
-	// jsonBytes, _ = hex.DecodeString(msg.SignBytes)
-
-	// return jsonBytes
 	return []byte(msg.SignBytes)
 }
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
@@ -220,6 +187,7 @@ func (msg CreateAgentMsg) GetSigners() []sdk.Address {
 func (msg CreateAgentMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
+
 func (msg CreateAgentMsg) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
