@@ -1,8 +1,6 @@
 package project
 
 import (
-	"fmt"
-
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
@@ -22,7 +20,6 @@ func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMa
 
 		msg := tx.GetMsg()
 		projectMsg := msg.(ProjectMsg)
-		fmt.Println("Auth: check")
 		pubKey := [32]byte{}
 
 		if projectMsg.IsNewDid() {
@@ -47,7 +44,6 @@ func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMa
 				sdk.ErrUnauthorized("there can only be one signer").Result(),
 				true
 		}
-
 		res := ixo.VerifySignature(msg, pubKey, sigs[0])
 
 		if !res {
