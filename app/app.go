@@ -219,7 +219,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		fmt.Println("TXN_PAYLOAD", tx)
+		//	fmt.Println("TXN_PAYLOAD", tx)
 
 		return tx, nil
 
@@ -283,8 +283,6 @@ func NewIxoAnteHandler(app *IxoApp) sdk.AnteHandler {
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		msg := tx.GetMsg()
-
-		fmt.Println("********MSG_TYPE********* \n", msg.Type())
 
 		switch msg.Type() {
 

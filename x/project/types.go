@@ -189,7 +189,7 @@ func (msg CreateProjectMsg) GetSignBytes() []byte {
 	// jsonBytes, _ = hex.DecodeString(msg.SignBytes)
 
 	// return jsonBytes
-	return []byte("\"" + msg.SignBytes + "\"")
+	return []byte(msg.SignBytes)
 }
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
 

@@ -36,7 +36,6 @@ func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
 }
 
 func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateProjectMsg) sdk.Result {
-	newProjectDoc := msg.Data
 	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
 	projectDoc, err := k.AddProjectDoc(ctx, msg)
