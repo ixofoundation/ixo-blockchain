@@ -1,7 +1,10 @@
 package app
 
 import (
+	"bytes"
+	"encoding/hex"
 	"fmt"
+	"strings"
 
 	//	"cosmos-test/types"
 	"encoding/json"
@@ -192,6 +195,23 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 
 		fmt.Println("********DECODED_TXN*********")
 		fmt.Println(string(txBytes))
+		// Lets replace the hex encoded Msg with it's unhexed json equivalent so it can be parsed correctly
+		var upTx map[string]interface{}
+		json.Unmarshal(txBytes, &upTx)
+		strs := upTx["payload"].([]interface{})
+		signedBytes := strs[1].(string)
+		// Check if it is not json
+		if strings.Index(signedBytes, "{") == -1 {
+			jsonBytes := make([]byte, hex.DecodedLen(len(signedBytes)))
+			jsonBytes, hexErr := hex.DecodeString(signedBytes)
+			if hexErr != nil {
+				fmt.Print("Error decoding hex payload: ", signedBytes)
+				fmt.Println()
+				return nil, sdk.ErrTxDecode("").TraceCause(hexErr, "")
+			}
+			jsonBytes = bytes.Replace(jsonBytes, []byte("{"), []byte("{\"signBytes\":\""+signedBytes+"\","), 1)
+			txBytes = bytes.Replace(txBytes, []byte("\""+signedBytes+"\""), jsonBytes, 1)
+		}
 		// StdTx.Msg is an interface. The concrete types
 		// are registered by MakeTxCodec in bank.RegisterWire.
 		err := app.cdc.UnmarshalJSON(txBytes, &tx)
@@ -199,7 +219,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		fmt.Println("TXN_PAYLOAD", tx)
+		//	fmt.Println("TXN_PAYLOAD", tx)
 
 		return tx, nil
 
@@ -263,8 +283,6 @@ func NewIxoAnteHandler(app *IxoApp) sdk.AnteHandler {
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		msg := tx.GetMsg()
-
-		fmt.Println("********MSG_TYPE********* \n", msg.Type())
 
 		switch msg.Type() {
 

@@ -66,21 +66,16 @@ func (pm ProjectMapper) Seal() SealedProjectMapper {
 func (pm ProjectMapper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {
 	store := ctx.KVStore(pm.key)
 	key := generateAccountsKey(projectDid)
-	fmt.Println("Key: " + string(key))
 	bz := store.Get(key)
 	if bz == nil {
-		fmt.Println("Not Found: " + string(key))
 		return make(map[string]interface{})
 	} else {
-		fmt.Println("Found: " + string(key))
 		didMap := pm.decodeAccountMap(bz)
 		return didMap
 	}
 }
 func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, accountAddr sdk.Address) {
 	accMap := pm.GetAccountMap(ctx, projectDid)
-	fmt.Println("*********AccountMap **********")
-	fmt.Println(accMap)
 	_, found := accMap[accountDid]
 	if found {
 		return
@@ -90,7 +85,6 @@ func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.D
 	key := generateAccountsKey(projectDid)
 	accountAddrString := hex.EncodeToString(accountAddr)
 	accMap[string(accountDid)] = accountAddrString
-	fmt.Println(accMap)
 	bz := pm.encodeAccountMap(accMap)
 	store.Set(key, bz)
 }
