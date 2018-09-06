@@ -15,6 +15,7 @@ func NewAnteHandler(accountMapper sdk.AccountMapper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
+
 		// Assert that there are signatures.
 		var sigs = tx.GetSignatures()
 		if len(sigs) == 0 {
@@ -54,12 +55,10 @@ func NewAnteHandler(accountMapper sdk.AccountMapper) sdk.AnteHandler {
 		}
 		signBytes := sdk.StdSignBytes(ctx.ChainID(), sequences, fee, msg)
 
-		fmt.Println("In cosmos handler")
 		// Check sig and nonce and collect signer accounts.
 		var signerAccs = make([]sdk.Account, len(signerAddrs))
 		for i := 0; i < len(sigs); i++ {
 			signerAddr, sig := signerAddrs[i], sigs[i]
-			fmt.Println(signerAddr)
 
 			// check signature, return account with incremented nonce
 			signerAcc, res := processSig(
@@ -104,10 +103,6 @@ func processSig(
 
 	// Get the account.
 	acc = am.GetAccount(ctx, addr)
-	fmt.Println("GetAcc")
-	fmt.Println(acc)
-	fmt.Println("GetAcc---")
-
 	if acc == nil {
 		return nil, sdk.ErrUnknownAddress(addr.String()).Result()
 	}
