@@ -1,6 +1,6 @@
 PACKAGES=$(shell go list ./... | grep -v '/vendor/')
-COMMIT_HASH := $(shell git rev-parse --short HEAD)
-BUILD_FLAGS = -ldflags "-X github.com/ixofoundation/ixo-cosmos/version.GitCommit=${COMMIT_HASH}"
+# COMMIT_HASH := $(shell git rev-parse --short HEAD)
+# BUILD_FLAGS = -ldflags "-X github.com/ixofoundation/ixo-cosmos/version.GitCommit=${COMMIT_HASH}"
 
 all: check_tools get_vendor_deps build test
 
@@ -24,8 +24,8 @@ else
 endif
 
 install: 
-	go install $(BUILD_FLAGS) ./cmd/ixod
-	go install $(BUILD_FLAGS) ./cmd/ixocli
+	go install $(BUILD_FLAGS) ./ixod
+	go install $(BUILD_FLAGS) ./ixocli
 
 #dist:
 #	@bash publish/dist.sh
