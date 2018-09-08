@@ -1,6 +1,6 @@
 PACKAGES=$(shell go list ./... | grep -v '/vendor/')
-# COMMIT_HASH := $(shell git rev-parse --short HEAD)
-# BUILD_FLAGS = -ldflags "-X github.com/ixofoundation/ixo-cosmos/version.GitCommit=${COMMIT_HASH}"
+# COMMIT_HASH is an argument passed from the Dockerfile
+BUILD_FLAGS = -ldflags "-X github.com/ixofoundation/ixo-cosmos/version.GitCommit=${COMMIT_HASH}"
 
 all: check_tools get_vendor_deps build test
 
@@ -16,11 +16,11 @@ ci: get_tools get_vendor_deps build test_cover
 build:
 	rm -rf build
 ifeq ($(OS),Windows_NT)
-	go build $(BUILD_FLAGS) -o build/ixod.exe ./cmd/ixod
-	go build $(BUILD_FLAGS) -o build/ixocli.exe ./cmd/ixocli
+	go build $(BUILD_FLAGS) -o build/ixod.exe ./ixod
+	go build $(BUILD_FLAGS) -o build/ixocli.exe ./ixocli
 else
-	go build $(BUILD_FLAGS) -o build/ixod ./cmd/ixod
-	go build $(BUILD_FLAGS) -o build/ixocli ./cmd/ixocli
+	go build $(BUILD_FLAGS) -o build/ixod ./ixod
+	go build $(BUILD_FLAGS) -o build/ixocli ./ixocli
 endif
 
 install: 
