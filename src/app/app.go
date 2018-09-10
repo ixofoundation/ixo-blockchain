@@ -201,6 +201,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		json.Unmarshal(txBytes, &upTx)
 		strs := upTx["payload"].([]interface{})
 		signedBytes := strs[1].(string)
+		fmt.Println("** signedBytes: ", signedBytes)
 		// Check if it is not json
 		if strings.Index(signedBytes, "{") == -1 {
 			jsonBytes := make([]byte, hex.DecodedLen(len(signedBytes)))
@@ -220,7 +221,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		//	fmt.Println("TXN_PAYLOAD", tx)
+		fmt.Println("** TXN_PAYLOAD", tx)
 
 		return tx, nil
 	}
