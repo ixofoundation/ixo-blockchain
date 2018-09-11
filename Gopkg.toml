@@ -28,9 +28,9 @@
   name = "github.com/bgentry/speakeasy"
   version = "~0.1.0"
 
-# [[constraint]]
-#   name = "github.com/golang/protobuf"
-#   version = "~1.0.0"
+[[constraint]]
+  name = "github.com/golang/protobuf"
+  version = "~1.0.0"
 
 [[constraint]]
   name = "github.com/mattn/go-isatty"
@@ -48,9 +48,9 @@
   name = "github.com/spf13/viper"
   version = "~1.0.0"
 
-# [[constraint]]
-#   name = "github.com/stretchr/testify"
-#   version = "~1.2.1"
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "~1.2.1"
 
 [[constraint]]
   version = "~0.10.2"
@@ -65,9 +65,9 @@
   source = "github.com/tendermint/go-amino"
   name = "github.com/tendermint/go-wire"
 
-# [[constraint]]
-#   version = "~0.7.0"
-#   name = "github.com/tendermint/iavl"
+[[constraint]]
+  version = "~0.7.0"
+  name = "github.com/tendermint/iavl"
 
 [[constraint]]
   version = "~0.18.0"
