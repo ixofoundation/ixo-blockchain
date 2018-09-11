@@ -10,18 +10,7 @@ all: check_tools get_vendor_deps build test
 ci: get_tools get_vendor_deps build test_cover
 
 ########################################
-### Build
-
-# This can be unified later, here for easy demos
-build:
-	rm -rf build
-ifeq ($(OS),Windows_NT)
-	go build $(BUILD_FLAGS) -o build/ixod.exe ./ixod
-	go build $(BUILD_FLAGS) -o build/ixocli.exe ./ixocli
-else
-	go build $(BUILD_FLAGS) -o build/ixod ./ixod
-	go build $(BUILD_FLAGS) -o build/ixocli ./ixocli
-endif
+### Install, which builds and installs
 
 install: 
 	go install $(BUILD_FLAGS) ./ixod

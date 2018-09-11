@@ -193,7 +193,6 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	if txByteString == "{" {
 		var tx = ixo.IxoTx{}
 
-		fmt.Println("********DEBUG_APP.GO*********")
 		fmt.Println("********DECODED_TXN*********")
 		fmt.Println(string(txBytes))
 		// Lets replace the hex encoded Msg with it's unhexed json equivalent so it can be parsed correctly
@@ -221,7 +220,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		fmt.Println("** TXN_PAYLOAD", tx)
+		// fmt.Println("** TXN_PAYLOAD", tx)
 
 		return tx, nil
 	}
