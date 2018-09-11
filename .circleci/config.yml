@@ -23,10 +23,10 @@ jobs:
 
       # specify any bash command here prefixed with `run: `
       - run: go get github.com/btcsuite/btcutil/base58 golang.org/x/crypto/ed25519
-      - run: go install ./cmd/ixod
-      - run: go install ./cmd/ixocli
-      - run: go build -o build/ixod ./cmd/ixod
-      - run: go build -o build/ixocli ./cmd/ixocli
+      - run: go install ./ixod
+      - run: go install ./ixocli
+      - run: go build -o build/ixod ./ixod
+      - run: go build -o build/ixocli ./ixocli
       - run: echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
       - run: sudo gcloud --quiet components update
       - run: sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
