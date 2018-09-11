@@ -24,6 +24,7 @@ jobs:
       # specify any bash command here prefixed with `run: `
       - run: go get github.com/btcsuite/btcutil/base58 golang.org/x/crypto/ed25519
       - run: pwd
+      - run: echo $GOROOT
       - run: go install ./ixod
       - run: go install ./ixocli
       - run: go build -o build/ixod ./ixod
