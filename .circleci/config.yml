@@ -25,6 +25,7 @@ jobs:
       - run: go get github.com/btcsuite/btcutil/base58 golang.org/x/crypto/ed25519
       - run: pwd
       - run: echo $GOPATH
+      - run: ls -alh
       - run: go install ./ixod
       - run: go install ./ixocli
       - run: go build -o build/ixod ./ixod
