@@ -5,8 +5,8 @@ ARG COMMIT_HASH=''
 
 COPY ./src $SRC_DIR
 COPY ./bin/startBlockchain.sh $SRC_DIR/bin/
-COPY ./data $SRC_DIR/data
 COPY ./Makefile $SRC_DIR
+RUN mkdir $SRC_DIR/data
 
 RUN go get github.com/btcsuite/btcutil/base58 golang.org/x/crypto/ed25519
 # COMMIT_HASH is an argument passed from the build-docker-image.sh utility script executed from within the Git repository
