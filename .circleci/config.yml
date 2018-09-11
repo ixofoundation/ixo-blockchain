@@ -24,8 +24,8 @@ jobs:
       # specify any bash command here prefixed with `run: `
       - run: go get github.com/btcsuite/btcutil/base58 golang.org/x/crypto/ed25519
       - run: pwd
-      - run: go install ixod
-      - run: go install ixocli
+      - run: go install ./ixod
+      - run: go install ./ixocli
       - run: go build -o build/ixod ./ixod
       - run: go build -o build/ixocli ./ixocli
       - run: echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
