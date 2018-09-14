@@ -17,6 +17,8 @@ func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case CreateProjectMsg:
 			return handleCreateProjectMsg(ctx, k, ck, msg)
+		case UpdateProjectStatusMsg:
+			return handleUpdateProjectStatusMsg(ctx, k, ck, msg)
 		case CreateAgentMsg:
 			return handleCreateAgentMsg(ctx, k, ck, msg)
 		case UpdateAgentMsg:
@@ -45,6 +47,28 @@ func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper
 	return sdk.Result{
 		Code: sdk.CodeOK,
 		Data: k.pm.encodeProject(projectDoc),
+	}
+}
+
+func handleUpdateProjectStatusMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg UpdateProjectStatusMsg) sdk.Result {
+	existingProjectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
+	if !found {
+		return sdk.Result{
+			Code: sdk.CodeInvalidAddress,
+			Data: []byte("Could not find Project"),
+		}
+	}
+
+	newStatus := msg.GetStatus()
+	existingProjectDoc.SetStatus(newStatus)
+
+	storedProjectDoc, err := k.AddProjectDoc(ctx, existingProjectDoc)
+	if err != nil {
+		return err.Result()
+	}
+	return sdk.Result{
+		Code: sdk.CodeOK,
+		Data: k.pm.encodeProject(storedProjectDoc),
 	}
 }
 

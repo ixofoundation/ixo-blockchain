@@ -37,9 +37,8 @@ func (pk ProjectKeeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.StoredP
 	if !found {
 		pk.pm.SetProjectDoc(ctx, newProjectDoc)
 		return newProjectDoc, nil
-	} else {
-		return projectDoc, nil
 	}
+	return projectDoc, nil
 }
 
 func (pk ProjectKeeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {

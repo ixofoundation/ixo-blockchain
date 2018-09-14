@@ -69,11 +69,12 @@ func (pm ProjectMapper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[s
 	bz := store.Get(key)
 	if bz == nil {
 		return make(map[string]interface{})
-	} else {
-		didMap := pm.decodeAccountMap(bz)
-		return didMap
 	}
+
+	didMap := pm.decodeAccountMap(bz)
+	return didMap
 }
+
 func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, accountAddr sdk.Address) {
 	accMap := pm.GetAccountMap(ctx, projectDid)
 	_, found := accMap[accountDid]

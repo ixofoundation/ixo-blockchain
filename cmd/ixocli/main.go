@@ -88,6 +88,7 @@ func main() {
 	rootCmd.AddCommand(
 		client.PostCommands(
 			projectcmd.CreateProjectCmd(cdc),
+			projectcmd.UpdateProjectStatusCmd(cdc),
 			projectcmd.GetProjectDocCmd("project", cdc, project.GetProjectDocDecoder(cdc)),
 			projectcmd.GetProjectAccountsCmd("project"),
 			projectcmd.CreateAgentCmd(cdc),
