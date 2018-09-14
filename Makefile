@@ -1,5 +1,5 @@
 PACKAGES=$(shell go list ./... | grep -v '/vendor/')
-COMMIT_HASH := $(shell git rev-parse --short HEAD)
+# COMMIT_HASH is an argument passed from the Dockerfile
 BUILD_FLAGS = -ldflags "-X github.com/ixofoundation/ixo-cosmos/version.GitCommit=${COMMIT_HASH}"
 
 all: check_tools get_vendor_deps build test
