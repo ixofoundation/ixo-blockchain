@@ -75,7 +75,6 @@ func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
 // defaultAppState sets up the app_state for the
 // default genesis file
 func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.RawMessage, error) {
-	fmt.Println("********MAIN.GO*********")
 	// Add ETH_PEG key for signing
 	sovrinDid := sovrin.Gen()
 	fmt.Println("********* Note ***********************************************************")
