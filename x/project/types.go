@@ -210,6 +210,7 @@ func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
 func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
 	return ups.Data.Status
 }
+func (msg UpdateProjectStatusMsg) IsNewDid() bool { return false }
 
 //CreateAgentMsg
 type CreateAgentMsg struct {

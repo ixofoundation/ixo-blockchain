@@ -48,7 +48,6 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 	txPayload := txMap["payload"].([]interface{})
 	txType := txPayload[0]
 	txMessage := txPayload[1]
-	txSignature := txMap["signature"]
 
 	txMessageJSON, err := json.Marshal(txMessage)
 	if err != nil {
@@ -57,11 +56,9 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 
 	newTxPayload := []interface{}{txType, hex.EncodeToString(txMessageJSON)}
 	txMap["payload"] = newTxPayload
+	fmt.Println(">adjusted txMap : ", txMap)
 
-	newTxMap := map[string]interface{}{"payload": newTxPayload, "signature": txSignature}
-	fmt.Println(">newTxMap : ", newTxMap)
-
-	newBroadcast, err := json.Marshal(newTxMap)
+	newBroadcast, err := json.Marshal(txMap)
 	if err != nil {
 		panic(err)
 	}
@@ -124,8 +121,8 @@ func UpdateProjectStatusCmd(cdc *wire.Codec) *cobra.Command {
 		Short: "Update a a project status and ethereum funding txn id signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCoreContextFromViper()
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
-				return errors.New("You must provide the parameters")
+			if len(args) != 3 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the status ethTxFundingID and the projectDid")
 			}
 
 			projectStatus := project.ProjectStatus(args[0])
@@ -135,14 +132,12 @@ func UpdateProjectStatusCmd(cdc *wire.Codec) *cobra.Command {
 
 			ethFundingTxnID := args[1]
 
-			// projectID := args[2]
-
 			updateProjectDoc := project.UpdateProjectStatusDoc{
 				Status:          projectStatus,
 				EthFundingTxnID: ethFundingTxnID,
 			}
 
-			projectDid := unmarshalSovrinDID(args[3])
+			projectDid := unmarshalSovrinDID(args[2])
 
 			// create the message
 			msg := project.NewUpdateProjectStatusMsg(updateProjectDoc, projectDid)

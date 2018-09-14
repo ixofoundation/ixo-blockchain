@@ -8,7 +8,7 @@ eg.
 "facebookLink":"","instagramLink":"","twitterLink":"","webLink":""},"serviceEndpoint":"https://togo.pds.ixo.network","imageLink":"https://togo.pds.ixo.network/image/1"}' '{"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}}'
 
 // updateProjectStatus Project Status (ProjectStatus)to "FUNDED"
-./build/ixocli updateProjectStatus PENDING 1000003 ?project-id? '{"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}}'
+./build/ixocli updateProjectStatus PENDING 1000003 '{"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}}'
 
 // createAgent Service Agent
 ./build/ixocli createAgent 1000001 6Fu7FbbGoCJ8tX3vMMCss9 6Fu7FbbGoCJ8tX3vMMCss9 SA

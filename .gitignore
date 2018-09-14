@@ -1,6 +1,7 @@
 vendor
 
 build/*
+*/*/debug
 
 data
 
