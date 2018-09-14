@@ -44,7 +44,7 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 	if err := json.Unmarshal(bz, &txMap); err != nil {
 		panic(err)
 	}
-	fmt.Println(">txMap : ", txMap)
+	// fmt.Println(">txMap : ", txMap)
 	txPayload := txMap["payload"].([]interface{})
 	txType := txPayload[0]
 	txMessage := txPayload[1]
@@ -56,13 +56,13 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sov
 
 	newTxPayload := []interface{}{txType, hex.EncodeToString(txMessageJSON)}
 	txMap["payload"] = newTxPayload
-	fmt.Println(">adjusted txMap : ", txMap)
+	// fmt.Println(">adjusted txMap : ", txMap)
 
 	newBroadcast, err := json.Marshal(txMap)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("\n***\n>newBroadcast : ", string(newBroadcast))
+	// fmt.Println("\n***\n>newBroadcast : ", string(newBroadcast))
 
 	// Broadcast to Tendermint
 	res, err := ctx.BroadcastTx(newBroadcast)
