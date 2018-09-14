@@ -135,6 +135,7 @@ func MakeCodec() *wire.Codec {
 	const msgTypeAddDidMsg = 0xA
 
 	const msgTypeCreateProjectMsg = 0x10
+	const msgTypeUpdateProjectStatusMsg = 0x19
 	const msgTypeCreateAgentMsg = 0x11
 	const msgTypeUpdateAgentMsg = 0x12
 	const msgTypeCreateClaimMsg = 0x13
@@ -158,6 +159,7 @@ func MakeCodec() *wire.Codec {
 		oldwire.ConcreteType{did.AddCredentialMsg{}, msgTypeAddCredentialMsg},
 
 		oldwire.ConcreteType{project.CreateProjectMsg{}, msgTypeCreateProjectMsg},
+		oldwire.ConcreteType{project.UpdateProjectStatusMsg{}, msgTypeUpdateProjectStatusMsg},
 		oldwire.ConcreteType{project.CreateAgentMsg{}, msgTypeCreateAgentMsg},
 		oldwire.ConcreteType{project.UpdateAgentMsg{}, msgTypeUpdateAgentMsg},
 		oldwire.ConcreteType{project.CreateClaimMsg{}, msgTypeCreateClaimMsg},
@@ -200,6 +202,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		json.Unmarshal(txBytes, &upTx)
 		strs := upTx["payload"].([]interface{})
 		signedBytes := strs[1].(string)
+		fmt.Println("** signedBytes: ", signedBytes)
 		// Check if it is not json
 		if strings.Index(signedBytes, "{") == -1 {
 			jsonBytes := make([]byte, hex.DecodedLen(len(signedBytes)))
@@ -219,23 +222,22 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		//	fmt.Println("TXN_PAYLOAD", tx)
+		// fmt.Println("** TXN_PAYLOAD", tx)
 
 		return tx, nil
-
-	} else {
-		var tx = sdk.StdTx{}
-
-		// StdTx.Msg is an interface. The concrete types
-		// are registered by MakeTxCodec in bank.RegisterWire.
-		err := app.cdc.UnmarshalBinary(txBytes, &tx)
-		if err != nil {
-			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
-		}
-		fmt.Println(tx)
-		return tx, nil
-
 	}
+
+	var tx = sdk.StdTx{}
+
+	// StdTx.Msg is an interface. The concrete types
+	// are registered by MakeTxCodec in bank.RegisterWire.
+	err := app.cdc.UnmarshalBinary(txBytes, &tx)
+	if err != nil {
+		return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+	}
+	fmt.Println(tx)
+	return tx, nil
+
 }
 
 // custom logic for ixo initialization

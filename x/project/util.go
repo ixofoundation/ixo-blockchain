@@ -15,6 +15,16 @@ func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) Cre
 	}
 }
 
+func NewUpdateProjectStatusMsg(updateProjectDoc UpdateProjectStatusDoc, projectDid sovrin.SovrinDid) UpdateProjectStatusMsg {
+	return UpdateProjectStatusMsg{
+		SignBytes:  "",
+		TxHash:     "",
+		SenderDid:  "",
+		ProjectDid: projectDid.Did,
+		Data:       updateProjectDoc,
+	}
+}
+
 func NewCreateAgentMsg(txHash string, senderDid string, createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) CreateAgentMsg {
 	return CreateAgentMsg{
 		SignBytes:  "",

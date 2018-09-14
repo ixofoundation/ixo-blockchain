@@ -5,7 +5,10 @@ eg.
 
 // createProject
 ./build/ixocli createProject '{"txHash":"1000000","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","projectDid":"6iftm1hHdaU6LJGKayRMEV","title":"Togo Water Project","shortDescription":"To provide clean water and sanitation to the rural areas of Togo","longDescription":"","impactAction":"successful water systems built","createdOn":"2018-05-21T15:53:18.484Z","createdBy":"6Fu7FbbGoCJ8tX3vMMCss9","country":"TG","sdgs":["3","6","15"],"impactsRequired":1298,"claimTemplate":"togo_default","evaluatorPay":"10234030","socialMedia":{
-"facebookLink":"","instagramLink":"","twitterLink":"","webLink":""},"serviceEndpoint":"https://togo.pds.ixo.network","imageLink":"https://togo.pds.ixo.network/image/1"}'
+"facebookLink":"","instagramLink":"","twitterLink":"","webLink":""},"serviceEndpoint":"https://togo.pds.ixo.network","imageLink":"https://togo.pds.ixo.network/image/1"}' '{"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}}'
+
+// updateProjectStatus Project Status (ProjectStatus)to "FUNDED"
+./build/ixocli updateProjectStatus PENDING 1000003 ?project-id? '{"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}}'
 
 // createAgent Service Agent
 ./build/ixocli createAgent 1000001 6Fu7FbbGoCJ8tX3vMMCss9 6Fu7FbbGoCJ8tX3vMMCss9 SA

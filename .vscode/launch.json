@@ -8,7 +8,7 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceRoot}/cmd/ixod",
+            "program": "${workspaceRoot}/ixod",
             "args": [
                 "start"
             ]
@@ -61,6 +61,29 @@
                     }
                 }
             ]
-        }
+        },
+        {
+            "name": "CLI CREATE PROJECT ",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/cmd/ixocli",
+            "args": [
+                "createProject",
+                {"txHash":"1000000","senderDid":"6Fu7FbbGoCJ8tX3vMMCss9","projectDid":"6iftm1hHdaU6LJGKayRMEV","title":"Togo Water Project","shortDescription":"To provide clean water and sanitation to the rural areas of Togo","longDescription":"","impactAction":"successful water systems built","createdOn":"2018-05-21T15:53:18.484Z","createdBy":"6Fu7FbbGoCJ8tX3vMMCss9","country":"TG","sdgs":["3","6","15"],"impactsRequired":1298,"claimTemplate":"togo_default","evaluatorPay":"10234030","socialMedia":{
+                    "facebookLink":"","instagramLink":"","twitterLink":"","webLink":""},"serviceEndpoint":"https://togo.pds.ixo.network","imageLink":"https://togo.pds.ixo.network/image/1"},
+                    {"did":"6iftm1hHdaU6LJGKayRMEV","verifyKey":"47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU","encryptionPublicKey":"Gef5J3sk4H1GRMzLNxkAqoRQd5vwezswPzvixLqkCay","secret":{"seed":"06f82d22d4c031122778186c5115619bbd05f8db9632f98d4fea012a49c70cb2","signKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP","encryptionPrivateKey":"UCwCuvZG68T6hh8Tr7KAYqF85r7CrSWrj1ENP53fWmP"}},
+                {
+                    "did": "did:ixo:CDFEqQjgJ1dGRnv6duhNh5",
+                    "verifyKey": "77QYRtui3yBjt9vqhbrD8S25jxbmLwkG3DFA7b7pnzWa",
+                    "encryptionPublicKey": "3tvci1rnmP55cDVom2f4SYhuncQmLX5MwftFhnHg8NCK",
+                    "secret": {
+                        "seed": "353aff9ec3a245b7c53c0b92e5a81721f5905a109ea9bbcba5f964f46926569f",
+                        "signKey": "4annd1uRYaSRwvgRYeCrPR6CaUn2HzjGE8ZNbk8DCWqL",
+                        "encryptionPrivateKey": "4annd1uRYaSRwvgRYeCrPR6CaUn2HzjGE8ZNbk8DCWqL"
+                    }
+                }
+            ]
+        }        
     ]
 }
