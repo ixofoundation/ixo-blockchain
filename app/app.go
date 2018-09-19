@@ -214,6 +214,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			}
 			jsonBytes = bytes.Replace(jsonBytes, []byte("{"), []byte("{\"signBytes\":\""+signedBytes+"\","), 1)
 			txBytes = bytes.Replace(txBytes, []byte("\""+signedBytes+"\""), jsonBytes, 1)
+			fmt.Println("** TXN_BYTES ", string(txBytes))
 		}
 		// StdTx.Msg is an interface. The concrete types
 		// are registered by MakeTxCodec in bank.RegisterWire.
@@ -222,7 +223,7 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
 		}
 
-		// fmt.Println("** TXN_PAYLOAD", tx)
+		fmt.Println("** TXN_PAYLOAD ", tx)
 
 		return tx, nil
 	}
