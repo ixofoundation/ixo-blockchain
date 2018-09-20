@@ -16,7 +16,6 @@ node {
                 
                 stage('Install Dependencies') {
                     echo 'Pulling Dependencies'
-                    sh 'echo' + branch
                     sh 'go version'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
