@@ -12,8 +12,7 @@ node {
                     echo 'Checking out SCM'
                     checkout scm
                     branch = scm.branches[0].name.drop(2)
-                    echo "Switching to branch: ${branch}"
-                    sh "git checkout ${branch}"
+                    echo 'Branch Name: ' + branch
                 }
                 
                 stage('Install Dependencies') {
