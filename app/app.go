@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"strings"
 
 	//	"cosmos-test/types"
 	"encoding/json"
@@ -197,25 +196,26 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 
 		fmt.Println("********DECODED_TXN*********")
 		fmt.Println(string(txBytes))
+
 		// Lets replace the hex encoded Msg with it's unhexed json equivalent so it can be parsed correctly
 		var upTx map[string]interface{}
 		json.Unmarshal(txBytes, &upTx)
-		strs := upTx["payload"].([]interface{})
-		signedBytes := strs[1].(string)
-		fmt.Println("** signedBytes: ", signedBytes)
+		payloadArray := upTx["payload"].([]interface{})
+
 		// Check if it is not json
-		if strings.Index(signedBytes, "{") == -1 {
-			jsonBytes := make([]byte, hex.DecodedLen(len(signedBytes)))
-			jsonBytes, hexErr := hex.DecodeString(signedBytes)
+		payloadBody, isString := payloadArray[1].(string)
+		if isString {
+			jsonBytes := make([]byte, hex.DecodedLen(len(payloadBody)))
+			jsonBytes, hexErr := hex.DecodeString(payloadBody)
 			if hexErr != nil {
-				fmt.Print("Error decoding hex payload: ", signedBytes)
-				fmt.Println()
+				fmt.Print("Error decoding hex payload: ", payloadBody)
 				return nil, sdk.ErrTxDecode("").TraceCause(hexErr, "")
 			}
-			jsonBytes = bytes.Replace(jsonBytes, []byte("{"), []byte("{\"signBytes\":\""+signedBytes+"\","), 1)
-			txBytes = bytes.Replace(txBytes, []byte("\""+signedBytes+"\""), jsonBytes, 1)
+			jsonBytes = bytes.Replace(jsonBytes, []byte("{"), []byte("{\"signBytes\":\""+payloadBody+"\","), 1)
+			txBytes = bytes.Replace(txBytes, []byte("\""+payloadBody+"\""), jsonBytes, 1)
 			fmt.Println("** TXN_BYTES ", string(txBytes))
 		}
+
 		// StdTx.Msg is an interface. The concrete types
 		// are registered by MakeTxCodec in bank.RegisterWire.
 		err := app.cdc.UnmarshalJSON(txBytes, &tx)
