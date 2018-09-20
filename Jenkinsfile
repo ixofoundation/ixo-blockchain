@@ -29,8 +29,6 @@ node {
                 } 
 
                 stage('Building Docker Image') {
-                    sh 'pwd'
-                    sh './build-docker-image.sh + ${branch}'
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
                         app = docker.build('trustlab/ixo-blockchain:' + branch)
                     } 
