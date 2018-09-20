@@ -10,7 +10,7 @@ node {
 
                 stage('Checkout') {
                     echo 'Checking out SCM'
-                    sh 'echo $GOPATH'
+                    
                     checkout scm
                     branch = scm.branches[0].name.drop(2)
                     echo 'Branch Name: ' + branch
@@ -18,7 +18,7 @@ node {
                 
                 stage('Install Dependencies') {
                     echo 'Pulling Dependencies'
-            
+                    sh 'echo $GOPATH'
                     sh 'go version'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
