@@ -8,31 +8,30 @@ node {
                 def app
                 def branch
 
-                stage('Checkout') {
-                    echo 'Checking out SCM'
-                    
-                    checkout scm
+                stage('Get Branch Name') {
+                    echo 'Getting branch name from Jenkins settings'
                     branch = scm.branches[0].name.drop(2)
                     echo 'Branch Name: ' + branch
                 }
                 
                 stage('Install Dependencies') {
                     echo 'Pulling Dependencies'
-                    sh 'echo $GOPATH'
+                    sh 'echo ${branch}'
                     sh 'go version'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
                 }
 
                 stage('Building') {
-                    sh 'cd ${GOPATH} && make build && make install' 
+                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build && make install' 
                 } 
 
                 stage('Building Docker Image') {
                     sh 'pwd'
+                    sh './build-docker-image.sh + ${branch}'
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
                         app = docker.build('trustlab/ixo-blockchain:' + branch)
-                    }
+                    } 
                 } 
 
                 stage('Test Image') {
