@@ -16,14 +16,16 @@ node {
                 
                 stage('Install Dependencies') {
                     echo 'Pulling Dependencies'
-                    sh 'echo ${branch}'
+                    sh 'echo' + branch
                     sh 'go version'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
                 }
 
                 stage('Building') {
-                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build && make install' 
+                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/'
+                    sh 'git checkout ' + branch
+                    sh 'make build && make install' 
                 } 
 
                 stage('Building Docker Image') {
