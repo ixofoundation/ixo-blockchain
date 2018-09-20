@@ -10,6 +10,7 @@ node {
 
                 stage('Checkout') {
                     echo 'Checking out SCM'
+                    sh 'echo $GOPATH'
                     checkout scm
                     branch = scm.branches[0].name.drop(2)
                     echo 'Branch Name: ' + branch
