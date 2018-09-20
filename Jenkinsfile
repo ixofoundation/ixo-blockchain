@@ -22,9 +22,10 @@ node {
                 }
 
                 stage('Building') {
-                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/'
-                    sh 'git checkout ' + branch
-                    sh 'make build && make install' 
+                    dir('src/github.com/ixofoundation/ixo-cosmos/') {
+                         sh 'git checkout ' + branch
+                         sh 'make build && make install' 
+                    }
                 } 
 
                 stage('Building Docker Image') {
