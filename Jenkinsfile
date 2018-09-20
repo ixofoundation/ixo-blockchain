@@ -9,6 +9,7 @@ node {
                 def branch
 
                 stage('Checkout') {
+                    echo '#PIZZA!'
                     echo 'Checking out SCM'
                     checkout scm
                     branch = scm.branches[0].name.drop(2)
