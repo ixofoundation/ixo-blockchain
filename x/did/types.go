@@ -94,7 +94,8 @@ type DidMsg interface {
 
 //ADD DIDDOC
 type AddDidMsg struct {
-	DidDoc BaseDidDoc `json:"didDoc"`
+	DidDoc    BaseDidDoc `json:"didDoc"`
+	SignBytes string     `json:"signedBytes"`
 }
 
 // New Ixo message
@@ -115,7 +116,9 @@ var _ sdk.Msg = AddDidMsg{}
 // nolint
 func (msg AddDidMsg) Type() string                            { return "did" }
 func (msg AddDidMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg AddDidMsg) GetSigners() []sdk.Address               { return []sdk.Address{[]byte(msg.DidDoc.GetDid())} }
+func (msg AddDidMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.DidDoc.GetDid())}
+}
 func (msg AddDidMsg) String() string {
 	return fmt.Sprintf("AddDidMsg{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
 }
@@ -138,11 +141,7 @@ func (msg AddDidMsg) ValidateBasic() sdk.Error {
 
 // Get the bytes for the message signer to sign on
 func (msg AddDidMsg) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return b
+	return []byte(msg.SignBytes)
 }
 func (msg AddDidMsg) IsNewDid() bool { return true }
 
@@ -172,8 +171,8 @@ var _ sdk.Msg = AddCredentialMsg{}
 // nolint
 func (msg AddCredentialMsg) Type() string                            { return "did" }
 func (msg AddCredentialMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg AddCredentialMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.DidCredential.Issuer)}
+func (msg AddCredentialMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.DidCredential.Issuer)}
 }
 func (msg AddCredentialMsg) String() string {
 	return fmt.Sprintf("AddCredentialMsg{Did: %v, Type: %v, Signer: %v}", string(msg.DidCredential.Claim.Id), msg.DidCredential.CredType, string(msg.DidCredential.Issuer))

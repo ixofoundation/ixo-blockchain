@@ -74,7 +74,7 @@ func (pm ProjectMapper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[s
 		return didMap
 	}
 }
-func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, accountAddr sdk.Address) {
+func (pm ProjectMapper) AddAccountToAccountMap(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, accountAddr sdk.AccAddress) {
 	accMap := pm.GetAccountMap(ctx, projectDid)
 	_, found := accMap[accountDid]
 	if found {

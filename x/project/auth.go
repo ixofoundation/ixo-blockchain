@@ -7,18 +7,18 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMapper) sdk.AnteHandler {
+func NewAnteHandler(projectMapper SealedProjectMapper, didKeeper did.Keeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		// This always be a IxoTx
-		_, ok := tx.(ixo.IxoTx)
+		ixoTx, ok := tx.(ixo.IxoTx)
 		if !ok {
 			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
 		}
 
-		msg := tx.GetMsg()
+		msg := ixoTx.GetMsgs()[0]
 		projectMsg := msg.(ProjectMsg)
 		pubKey := [32]byte{}
 
@@ -38,7 +38,7 @@ func NewAnteHandler(projectMapper SealedProjectMapper, didMapper did.SealedDidMa
 		}
 
 		// Assert that there are signatures.
-		var sigs = tx.GetSignatures()
+		var sigs = ixoTx.GetSignatures()
 		if len(sigs) != 1 {
 			return ctx,
 				sdk.ErrUnauthorized("there can only be one signer").Result(),

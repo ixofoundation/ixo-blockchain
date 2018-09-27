@@ -1,12 +1,11 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
 
-	"github.com/tendermint/tendermint/types"
+	"github.com/tendermint/tendermint/privval"
 )
 
 // GenValidatorCmd allows the generation of a keypair for a
@@ -18,11 +17,11 @@ var GenValidatorCmd = &cobra.Command{
 }
 
 func genValidator(cmd *cobra.Command, args []string) {
-	privValidator := types.GenPrivValidatorFS("")
-	privValidatorJSONBytes, err := json.MarshalIndent(privValidator, "", "\t")
+	pv := privval.GenFilePV("")
+	jsbz, err := cdc.MarshalJSON(pv)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf(`%v
-`, string(privValidatorJSONBytes))
+`, string(jsbz))
 }

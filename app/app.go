@@ -2,32 +2,29 @@ package app
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
-	"strings"
 
 	//	"cosmos-test/types"
 	"encoding/json"
 
-	abci "github.com/tendermint/abci/types"
-	oldwire "github.com/tendermint/go-wire"
-	cmn "github.com/tendermint/tmlibs/common"
-	dbm "github.com/tendermint/tmlibs/db"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/cosmos/cosmos-sdk/wire"
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
-	"github.com/cosmos/cosmos-sdk/x/simplestake"
 
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 
 	"github.com/ixofoundation/ixo-cosmos/x/project"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 const (
@@ -40,79 +37,85 @@ type IxoApp struct {
 	cdc *wire.Codec
 
 	// keys to access the substores
-	capKeyMainStore    *sdk.KVStoreKey
-	capKeyAccountStore *sdk.KVStoreKey
-	capKeyIBCStore     *sdk.KVStoreKey
-	capKeyStakingStore *sdk.KVStoreKey
-	capKeyDIDStore     *sdk.KVStoreKey
-	capKeyProjectStore *sdk.KVStoreKey
+	keyMain    *sdk.KVStoreKey
+	keyAccount *sdk.KVStoreKey
+	keyIBC     *sdk.KVStoreKey
+	keyStake   *sdk.KVStoreKey
+	keyDID     *sdk.KVStoreKey
+	keyProject *sdk.KVStoreKey
 
 	// Manage getting and setting accounts
-	accountMapper sdk.AccountMapper
+	accountMapper auth.AccountMapper
+
+	// Manage keeper
+	coinKeeper          bank.Keeper
+	feeCollectionKeeper auth.FeeCollectionKeeper
+	ibcMapper           ibc.Mapper
+	didKeeper           did.Keeper
+	projectKeeper       project.Keeper
 
 	// Manage getting and setting dids
-	didMapper     did.SealedDidMapper
 	projectMapper project.SealedProjectMapper
 }
 
-func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
+func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IxoApp {
+
+	cdc := MakeCodec()
 	// create your application object
 	var app = &IxoApp{
-		BaseApp:            bam.NewBaseApp(APP_NAME, logger, dbs["main"]),
-		cdc:                MakeCodec(),
-		capKeyMainStore:    sdk.NewKVStoreKey("main"),
-		capKeyAccountStore: sdk.NewKVStoreKey("acc"),
-		capKeyIBCStore:     sdk.NewKVStoreKey("ibc"),
-		capKeyStakingStore: sdk.NewKVStoreKey("stake"),
-		capKeyDIDStore:     sdk.NewKVStoreKey("did"),
-		capKeyProjectStore: sdk.NewKVStoreKey("project"),
+		cdc:        cdc,
+		BaseApp:    bam.NewBaseApp(APP_NAME, logger, db, nil, baseAppOptions...),
+		keyMain:    sdk.NewKVStoreKey("main"),
+		keyAccount: sdk.NewKVStoreKey("acc"),
+		keyIBC:     sdk.NewKVStoreKey("ibc"),
+		keyStake:   sdk.NewKVStoreKey("stake"),
+		keyDID:     sdk.NewKVStoreKey("did"),
+		keyProject: sdk.NewKVStoreKey("project"),
 	}
 
-	// define the accountMapper
-	app.accountMapper = auth.NewAccountMapperSealed(
-		app.capKeyMainStore, // target store
-		&types.AppAccount{}, // prototype
+	// define and attach the mappers and keepers
+	app.accountMapper = auth.NewAccountMapper(
+		cdc,
+		app.keyAccount, // target store
+		func() auth.Account {
+			return &types.AppAccount{}
+		},
 	)
 
 	// define the didMapper
-	app.didMapper = did.NewDidMapperSealed(
-		app.capKeyDIDStore, // target store
-		&did.BaseDidDoc{},  // prototype
-	)
+	/**** DELETE */
+	// app.didMapper = did.NewDidMapperSealed(
+	// 	app.keyDID,        // target store
+	// 	&did.BaseDidDoc{}, // prototype
+	// )
 
 	// define the projectMapper
 	app.projectMapper = project.NewProjectMapperSealed(
-		app.capKeyProjectStore,      // target store
+		app.keyProject,              // target store
 		&project.StoredProjectDoc{}, // prototype
 	)
 
 	// add handlers
-	coinKeeper := bank.NewCoinKeeper(app.accountMapper)
-	ibcMapper := ibc.NewIBCMapper(app.cdc, app.capKeyIBCStore)
-	stakeKeeper := simplestake.NewKeeper(app.capKeyStakingStore, coinKeeper)
-	didKeeper := did.NewKeeper(app.didMapper)
-	projectKeeper := project.NewKeeper(app.projectMapper, app.accountMapper)
+	app.coinKeeper = bank.NewKeeper(app.accountMapper)
+	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
+	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
+	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper)
+
 	app.Router().
-		AddRoute("bank", bank.NewHandler(coinKeeper)).
+		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
 		//		AddRoute("project", project.NewHandler()).
-		AddRoute("ibc", ibc.NewHandler(ibcMapper, coinKeeper)).
-		AddRoute("simplestake", simplestake.NewHandler(stakeKeeper)).
-		AddRoute("did", did.NewHandler(didKeeper)).
-		AddRoute("project", project.NewHandler(projectKeeper, coinKeeper))
+		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("did", did.NewHandler(app.didKeeper)).
+		AddRoute("project", project.NewHandler(app.projectKeeper, app.coinKeeper))
 
 	// initialize BaseApp
+	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper))
+	app.SetBeginBlocker(app.BeginBlocker)
+	app.SetEndBlocker(app.EndBlocker)
 	app.SetTxDecoder(app.txDecoder)
-	app.SetInitChainer(app.initChainer)
-	app.MountStoreWithDB(app.capKeyMainStore, sdk.StoreTypeIAVL, dbs["main"])
-	app.MountStoreWithDB(app.capKeyAccountStore, sdk.StoreTypeIAVL, dbs["acc"])
-	app.MountStoreWithDB(app.capKeyIBCStore, sdk.StoreTypeIAVL, dbs["ibc"])
-	app.MountStoreWithDB(app.capKeyStakingStore, sdk.StoreTypeIAVL, dbs["staking"])
-	app.MountStoreWithDB(app.capKeyDIDStore, sdk.StoreTypeIAVL, dbs["did"])
-	app.MountStoreWithDB(app.capKeyProjectStore, sdk.StoreTypeIAVL, dbs["project"])
-	// NOTE: Broken until #532 lands
-	//app.MountStoresIAVL(app.capKeyMainStore, app.capKeyIBCStore, app.capKeyStakingStore)
-	app.SetAnteHandler(NewIxoAnteHandler(app))
-	err := app.LoadLatestVersion(app.capKeyMainStore)
+	app.SetAnteHandler(NewIxoAnteHandler(app, app.feeCollectionKeeper))
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keyDID, app.keyProject)
+	err := app.LoadLatestVersion(app.keyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
 	}
@@ -123,61 +126,22 @@ func NewIxoApp(logger log.Logger, dbs map[string]dbm.DB) *IxoApp {
 // custom tx codec
 // TODO: use new go-wire
 func MakeCodec() *wire.Codec {
-	const msgTypeSend = 0x1
-	const msgTypeIssue = 0x2
-	const msgTypeQuiz = 0x3
-	const msgTypeSetTrend = 0x4
-	const msgTypeIBCTransferMsg = 0x5
-	const msgTypeIBCReceiveMsg = 0x6
-	const msgTypeBondMsg = 0x7
-	const msgTypeUnbondMsg = 0x8
 
-	const msgTypeAddDidMsg = 0xA
-
-	const msgTypeCreateProjectMsg = 0x10
-	const msgTypeCreateAgentMsg = 0x11
-	const msgTypeUpdateAgentMsg = 0x12
-	const msgTypeCreateClaimMsg = 0x13
-	const msgTypeCreateEvaluationMsg = 0x14
-
-	const msgTypeFundProjectMsg = 0x15
-	const msgTypeWithdrawFundsMsg = 0x16
-
-	const msgTypeAddCredentialMsg = 0x18
-
-	var _ = oldwire.RegisterInterface(
-		struct{ sdk.Msg }{},
-		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
-		oldwire.ConcreteType{bank.IssueMsg{}, msgTypeIssue},
-		oldwire.ConcreteType{ibc.IBCTransferMsg{}, msgTypeIBCTransferMsg},
-		oldwire.ConcreteType{ibc.IBCReceiveMsg{}, msgTypeIBCReceiveMsg},
-		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
-		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
-
-		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
-		oldwire.ConcreteType{did.AddCredentialMsg{}, msgTypeAddCredentialMsg},
-
-		oldwire.ConcreteType{project.CreateProjectMsg{}, msgTypeCreateProjectMsg},
-		oldwire.ConcreteType{project.CreateAgentMsg{}, msgTypeCreateAgentMsg},
-		oldwire.ConcreteType{project.UpdateAgentMsg{}, msgTypeUpdateAgentMsg},
-		oldwire.ConcreteType{project.CreateClaimMsg{}, msgTypeCreateClaimMsg},
-		oldwire.ConcreteType{project.CreateEvaluationMsg{}, msgTypeCreateEvaluationMsg},
-
-		oldwire.ConcreteType{project.FundProjectMsg{}, msgTypeFundProjectMsg},
-		oldwire.ConcreteType{project.WithdrawFundsMsg{}, msgTypeWithdrawFundsMsg},
-	)
-
-	const accTypeApp = 0x1
-	var _ = oldwire.RegisterInterface(
-		struct{ sdk.Account }{},
-		oldwire.ConcreteType{&types.AppAccount{}, accTypeApp},
-	)
 	cdc := wire.NewCodec()
 
-	// cdc.RegisterInterface((*sdk.Msg)(nil), nil)
-	// bank.RegisterWire(cdc)   // Register bank.[SendMsg,IssueMsg] types.
-	// crypto.RegisterWire(cdc) // Register crypto.[PubKey,PrivKey,Signature] types.
-	// ibc.RegisterWire(cdc) // Register ibc.[IBCTransferMsg, IBCReceiveMsg] types.
+	wire.RegisterCrypto(cdc)
+	sdk.RegisterWire(cdc)
+	bank.RegisterWire(cdc)
+	ibc.RegisterWire(cdc)
+	auth.RegisterWire(cdc)
+	did.RegisterWire(cdc)
+	project.RegisterWire(cdc)
+
+	// register custom type
+	cdc.RegisterConcrete(&types.AppAccount{}, "basecoin/Account", nil)
+
+	cdc.Seal()
+
 	return cdc
 }
 
@@ -198,39 +162,43 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 		// Lets replace the hex encoded Msg with it's unhexed json equivalent so it can be parsed correctly
 		var upTx map[string]interface{}
 		json.Unmarshal(txBytes, &upTx)
-		strs := upTx["payload"].([]interface{})
-		signedBytes := strs[1].(string)
-		// Check if it is not json
-		if strings.Index(signedBytes, "{") == -1 {
-			jsonBytes := make([]byte, hex.DecodedLen(len(signedBytes)))
-			jsonBytes, hexErr := hex.DecodeString(signedBytes)
-			if hexErr != nil {
-				fmt.Print("Error decoding hex payload: ", signedBytes)
-				fmt.Println()
-				return nil, sdk.ErrTxDecode("").TraceCause(hexErr, "")
-			}
-			jsonBytes = bytes.Replace(jsonBytes, []byte("{"), []byte("{\"signBytes\":\""+signedBytes+"\","), 1)
-			txBytes = bytes.Replace(txBytes, []byte("\""+signedBytes+"\""), jsonBytes, 1)
+		payloadArray := upTx["payload"].([]interface{})
+		if len(payloadArray) != 1 {
+			return nil, sdk.ErrTxDecode("Multiple messages not supported")
 		}
+
+		// Parse out the signed bytes
+		signByteString := getSignBytes(txBytes)
+		fmt.Println("******** SignBytes *********")
+		fmt.Println(signByteString)
+
+		// Add them back to the message
+		msgPayload := payloadArray[0].(map[string]interface{})
+		msg := msgPayload["value"].(map[string]interface{})
+		msg["signedBytes"] = signByteString
+
+		// Repack the message
+		txBytes, _ = json.Marshal(upTx)
+
 		// StdTx.Msg is an interface. The concrete types
 		// are registered by MakeTxCodec in bank.RegisterWire.
 		err := app.cdc.UnmarshalJSON(txBytes, &tx)
 		if err != nil {
-			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+			return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 		}
 
-		//	fmt.Println("TXN_PAYLOAD", tx)
+		// fmt.Println("TXN_PAYLOAD", tx)
 
 		return tx, nil
 
 	} else {
-		var tx = sdk.StdTx{}
+		var tx = auth.StdTx{}
 
 		// StdTx.Msg is an interface. The concrete types
 		// are registered by MakeTxCodec in bank.RegisterWire.
 		err := app.cdc.UnmarshalBinary(txBytes, &tx)
 		if err != nil {
-			return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+			return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 		}
 		fmt.Println(tx)
 		return tx, nil
@@ -238,51 +206,100 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	}
 }
 
-// custom logic for ixo initialization
-func (app *IxoApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	stateJSON := req.AppStateBytes
+func getSignBytes(txBytes []byte) string {
+	const strtTxt string = "\"value\":"
+	const endTxt string = "}],\"signatures\":"
 
-	genesisState := new(types.GenesisState)
-	err := json.Unmarshal(stateJSON, genesisState)
-	if err != nil {
-		panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-		// return sdk.ErrGenesisParse("").TraceCause(err, "")
-	}
+	strt := bytes.Index(txBytes, []byte(strtTxt)) + len(strtTxt)
+	end := bytes.Index(txBytes, []byte(endTxt))
 
-	projectGenesis := genesisState.ProjectGenesis
-	fmt.Println("peg_key: %s", projectGenesis.PegPubKey)
-	ethPegDidDoc := did.BaseDidDoc{
-		Did:    "ETH_PEG",
-		PubKey: projectGenesis.PegPubKey,
-	}
-
-	app.didMapper.SetDidDoc(ctx, ethPegDidDoc)
-
-	for _, gacc := range genesisState.Accounts {
-		acc, err := gacc.ToAppAccount()
-		if err != nil {
-			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-			//	return sdk.ErrGenesisParse("").TraceCause(err, "")
-		}
-		app.accountMapper.SetAccount(ctx, acc)
-	}
-	return abci.ResponseInitChain{}
+	signBytes := txBytes[strt:end]
+	return string(signBytes)
 }
 
+// BeginBlocker reflects logic to run before any TXs application are processed
+// by the application.
+func (app *IxoApp) BeginBlocker(_ sdk.Context, _ abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	return abci.ResponseBeginBlock{}
+}
+
+// EndBlocker reflects logic to run after all TXs are processed by the
+// application.
+func (app *IxoApp) EndBlocker(_ sdk.Context, _ abci.RequestEndBlock) abci.ResponseEndBlock {
+	return abci.ResponseEndBlock{}
+}
+
+// initChainer implements the custom application logic that the BaseApp will
+// invoke upon initialization. In this case, it will take the application's
+// state provided by 'req' and attempt to deserialize said state. The state
+// should contain all the genesis accounts. These accounts will be added to the
+// application's account mapper.
+func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper) sdk.InitChainer {
+	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+		stateJSON := req.AppStateBytes
+
+		genesisState := new(types.GenesisState)
+		err := app.cdc.UnmarshalJSON(stateJSON, genesisState)
+		if err != nil {
+			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
+			// return sdk.ErrGenesisParse("").TraceCause(err, "")
+		}
+
+		for _, gacc := range genesisState.Accounts {
+			acc, err := gacc.ToAppAccount()
+			if err != nil {
+				panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
+				//	return sdk.ErrGenesisParse("").TraceCause(err, "")
+			}
+			app.accountMapper.SetAccount(ctx, acc)
+		}
+
+		return abci.ResponseInitChain{}
+	}
+}
+
+// Custom logic for state export
+func (app *IxoApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+	ctx := app.NewContext(true, abci.Header{})
+
+	// iterate to get the accounts
+	accounts := []*types.GenesisAccount{}
+	appendAccount := func(acc auth.Account) (stop bool) {
+		account := &types.GenesisAccount{
+			Address: acc.GetAddress(),
+			Coins:   acc.GetCoins(),
+		}
+		accounts = append(accounts, account)
+		return false
+	}
+	app.accountMapper.IterateAccounts(ctx, appendAccount)
+
+	genState := types.GenesisState{
+		Accounts: accounts,
+	}
+
+	appState, err = wire.MarshalJSONIndent(app.cdc, genState)
+	if err != nil {
+		return nil, nil, err
+	}
+	return appState, validators, nil
+}
+
+// custom logic for ixo initialization
 // NewIxoAnteHandler returns an AnteHandler that wrappers
 // the default cosmos one for signature checking. Based on
 // the message type it either checks the Sovrin signature
 // or executes the defualt cosmos version
-func NewIxoAnteHandler(app *IxoApp) sdk.AnteHandler {
-	cosmosAnteHandler := auth.NewAnteHandler(app.accountMapper)
-	didAnteHandler := did.NewAnteHandler(app.didMapper)
-	projectAnteHandler := project.NewAnteHandler(app.projectMapper, app.didMapper)
+func NewIxoAnteHandler(app *IxoApp, fck auth.FeeCollectionKeeper) sdk.AnteHandler {
+	cosmosAnteHandler := auth.NewAnteHandler(app.accountMapper, fck)
+	didAnteHandler := did.NewAnteHandler(app.didKeeper)
+	projectAnteHandler := project.NewAnteHandler(app.projectMapper, app.didKeeper)
 
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
 
-		msg := tx.GetMsg()
+		msg := tx.GetMsgs()[0]
 
 		switch msg.Type() {
 

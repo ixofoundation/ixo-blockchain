@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,36 +10,83 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-func validatorCommand() *cobra.Command {
+// TODO these next two functions feel kinda hacky based on their placement
+
+//ValidatorCommand returns the validator set for a given height
+func ValidatorCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "validatorset <height>",
-		Short: "Get the full validator set at given height",
+		Use:   "validator-set [height]",
+		Short: "Get the full tendermint validator set at given height",
+		Args:  cobra.MaximumNArgs(1),
 		RunE:  printValidators,
 	}
-	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:46657", "Node to connect to")
+	cmd.Flags().StringP(client.FlagNode, "n", "tcp://localhost:26657", "Node to connect to")
 	// TODO: change this to false when we can
 	cmd.Flags().Bool(client.FlagTrustNode, true, "Don't verify proofs for responses")
 	return cmd
 }
 
-func GetValidators(height *int64) ([]byte, error) {
+// Validator output in bech32 format
+type ValidatorOutput struct {
+	Address     sdk.ValAddress `json:"address"` // in bech32
+	PubKey      string         `json:"pub_key"` // in bech32
+	Accum       int64          `json:"accum"`
+	VotingPower int64          `json:"voting_power"`
+}
+
+// Validators at a certain height output in bech32 format
+type ResultValidatorsOutput struct {
+	BlockHeight int64             `json:"block_height"`
+	Validators  []ValidatorOutput `json:"validators"`
+}
+
+func bech32ValidatorOutput(validator *tmtypes.Validator) (ValidatorOutput, error) {
+	bechValPubkey, err := sdk.Bech32ifyValPub(validator.PubKey)
+	if err != nil {
+		return ValidatorOutput{}, err
+	}
+
+	return ValidatorOutput{
+		Address:     sdk.ValAddress(validator.Address),
+		PubKey:      bechValPubkey,
+		Accum:       validator.Accum,
+		VotingPower: validator.VotingPower,
+	}, nil
+}
+
+func getValidators(cliCtx context.CLIContext, height *int64) ([]byte, error) {
 	// get the node
-	node, err := context.NewCoreContextFromViper().GetNode()
+	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := node.Validators(height)
+	validatorsRes, err := node.Validators(height)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := json.MarshalIndent(res, "", "  ")
+	outputValidatorsRes := ResultValidatorsOutput{
+		BlockHeight: validatorsRes.BlockHeight,
+		Validators:  make([]ValidatorOutput, len(validatorsRes.Validators)),
+	}
+
+	for i := 0; i < len(validatorsRes.Validators); i++ {
+		outputValidatorsRes.Validators[i], err = bech32ValidatorOutput(validatorsRes.Validators[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	output, err := cdc.MarshalJSON(outputValidatorsRes)
 	if err != nil {
 		return nil, err
 	}
+
 	return output, nil
 }
 
@@ -60,7 +106,7 @@ func printValidators(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	output, err := GetValidators(height)
+	output, err := getValidators(context.NewCLIContext(), height)
 	if err != nil {
 		return err
 	}
@@ -71,41 +117,53 @@ func printValidators(cmd *cobra.Command, args []string) error {
 
 // REST
 
-func ValidatorsetRequestHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	height, err := strconv.ParseInt(vars["height"], 10, 64)
-	if err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte("ERROR: Couldn't parse block height. Assumed format is '/validatorsets/{height}'."))
-		return
+// Validator Set at a height REST handler
+func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		height, err := strconv.ParseInt(vars["height"], 10, 64)
+		if err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte("ERROR: Couldn't parse block height. Assumed format is '/validatorsets/{height}'."))
+			return
+		}
+
+		chainHeight, err := GetChainHeight(cliCtx)
+		if height > chainHeight {
+			w.WriteHeader(404)
+			w.Write([]byte("ERROR: Requested block height is bigger then the chain length."))
+			return
+		}
+
+		output, err := getValidators(cliCtx, &height)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
 	}
-	chainHeight, err := GetChainHeight()
-	if height > chainHeight {
-		w.WriteHeader(404)
-		w.Write([]byte("ERROR: Requested block height is bigger then the chain length."))
-		return
-	}
-	output, err := GetValidators(&height)
-	if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	w.Write(output)
 }
 
-func LatestValidatorsetRequestHandler(w http.ResponseWriter, r *http.Request) {
-	height, err := GetChainHeight()
-	if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte(err.Error()))
-		return
+// Latest Validator Set REST handler
+func LatestValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		height, err := GetChainHeight(cliCtx)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		output, err := getValidators(cliCtx, &height)
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write(output)
 	}
-	output, err := GetValidators(&height)
-	if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	w.Write(output)
 }

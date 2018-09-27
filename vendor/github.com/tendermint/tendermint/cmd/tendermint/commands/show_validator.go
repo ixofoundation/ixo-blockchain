@@ -5,8 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/tendermint/go-wire/data"
-	"github.com/tendermint/tendermint/types"
+	"github.com/tendermint/tendermint/privval"
 )
 
 // ShowValidatorCmd adds capabilities for showing the validator info.
@@ -17,7 +16,7 @@ var ShowValidatorCmd = &cobra.Command{
 }
 
 func showValidator(cmd *cobra.Command, args []string) {
-	privValidator := types.LoadOrGenPrivValidatorFS(config.PrivValidatorFile())
-	pubKeyJSONBytes, _ := data.ToJSON(privValidator.PubKey)
+	privValidator := privval.LoadOrGenFilePV(config.PrivValidatorFile())
+	pubKeyJSONBytes, _ := cdc.MarshalJSON(privValidator.GetPubKey())
 	fmt.Println(string(pubKeyJSONBytes))
 }
