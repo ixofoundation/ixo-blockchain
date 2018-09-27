@@ -2,23 +2,20 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"io"
 	"os"
-	"path/filepath"
-
-	"github.com/ixofoundation/ixo-cosmos/x/project"
 
 	"github.com/spf13/cobra"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/abci/types"
-	"github.com/tendermint/tmlibs/cli"
-	dbm "github.com/tendermint/tmlibs/db"
-	"github.com/tendermint/tmlibs/log"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/cli"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
+	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/app"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 )
 
 // rootCmd is the entry point for this binary
@@ -31,80 +28,61 @@ var (
 	}
 )
 
-func generateApp(rootDir string, logger log.Logger) (abci.Application, error) {
-	dataDir := filepath.Join(rootDir, "data")
-	dbMain, err := dbm.NewGoLevelDB("ixo", dataDir)
-	if err != nil {
-		return nil, err
-	}
-	dbAcc, err := dbm.NewGoLevelDB("ixo-acc", dataDir)
-	if err != nil {
-		return nil, err
-	}
-	dbIBC, err := dbm.NewGoLevelDB("ixo-ibc", dataDir)
-	if err != nil {
-		return nil, err
-	}
-	dbStaking, err := dbm.NewGoLevelDB("ixo-staking", dataDir)
-	if err != nil {
-		return nil, err
-	}
-
-	dbDid, err := dbm.NewGoLevelDB("ixo-did", dataDir)
-	if err != nil {
-		return nil, err
-	}
-
-	dbProject, err := dbm.NewGoLevelDB("ixo-project", dataDir)
-	if err != nil {
-		return nil, err
-	}
-
-	dbs := map[string]dbm.DB{
-		"main":    dbMain,
-		"acc":     dbAcc,
-		"ibc":     dbIBC,
-		"staking": dbStaking,
-		"did":     dbDid,
-		"project": dbProject,
-	}
-	bapp := app.NewIxoApp(logger, dbs)
-	return bapp, nil
+// init parameters
+var IxoAppInit = server.AppInit{
+	AppGenState: IxoAppGenState,
+	AppGenTx:    server.SimpleAppGenTx,
 }
 
-// defaultAppState sets up the app_state for the
-// default genesis file
-func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.RawMessage, error) {
+// ixoGenAppParams sets up the app_state and appends the ixo app state
+func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json.RawMessage, err error) {
+	appState, err = server.SimpleAppGenState(cdc, appGenTxs)
+	if err != nil {
+		return
+	}
 
-	// Add ETH_PEG key for signing
-	sovrinDid := sovrin.Gen()
-	fmt.Println("********* Note ***********************************************************")
-	fmt.Println("This is the Ethereum Peg Key and needs to be used to release Project Funds")
-	fmt.Println(sovrinDid.String())
-	fmt.Println("**************************************************************************")
-	opts := fmt.Sprintf(`{
-		"accounts": [{
-			"address": "%s",
-			"coins": [
-				{
-					"denom": "%s",
-					"amount": 9007199254740992
-				}
-			],
-			"name":"coinbase"
-		}],
-		"project": {
-			"pegPubKey":"%s"
-		}
-	}`, addr.String(), project.COIN_DENOM, sovrinDid.VerifyKey)
-	return json.RawMessage(opts), nil
+	// key := "cool"
+	// value := json.RawMessage(`{
+	//       "trend": "ice-cold"
+	//     }`)
+
+	// appState, err = server.InsertKeyJSON(cdc, appState, key, value)
+	// if err != nil {
+	// 	return
+	// }
+
+	return
+}
+
+func newApp(logger log.Logger, db dbm.DB, _ io.Writer) abci.Application {
+	return app.NewIxoApp(logger, db)
+}
+
+func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB, _ io.Writer) (json.RawMessage, []tmtypes.GenesisValidator, error) {
+	dapp := app.NewIxoApp(logger, db)
+	return dapp.ExportAppStateAndValidators()
 }
 
 func main() {
-	server.AddCommands(rootCmd, defaultAppState, generateApp, context)
+	cdc := app.MakeCodec()
+	ctx := server.NewDefaultContext()
+
+	rootCmd := &cobra.Command{
+		Use:               "ixod",
+		Short:             "ixo Daemon (server)",
+		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
+	}
+
+	server.AddCommands(ctx, cdc, rootCmd, IxoAppInit,
+		server.ConstructAppCreator(newApp, "ixo"),
+		server.ConstructAppExporter(exportAppStateAndTMValidators, "ixo"))
 
 	// prepare and add flags
 	rootDir := os.ExpandEnv("$HOME/.ixo-node")
 	executor := cli.PrepareBaseCmd(rootCmd, "BC", rootDir)
-	executor.Execute()
+	err := executor.Execute()
+	if err != nil {
+		// handle with #870
+		panic(err)
+	}
 }

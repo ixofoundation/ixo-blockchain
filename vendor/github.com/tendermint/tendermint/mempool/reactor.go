@@ -1,15 +1,14 @@
 package mempool
 
 import (
-	"bytes"
 	"fmt"
 	"reflect"
 	"time"
 
-	abci "github.com/tendermint/abci/types"
-	wire "github.com/tendermint/go-wire"
-	"github.com/tendermint/tmlibs/clist"
-	"github.com/tendermint/tmlibs/log"
+	amino "github.com/tendermint/go-amino"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/clist"
+	"github.com/tendermint/tendermint/libs/log"
 
 	cfg "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/p2p"
@@ -19,7 +18,7 @@ import (
 const (
 	MempoolChannel = byte(0x30)
 
-	maxMempoolMessageSize      = 1048576 // 1MB TODO make it configurable
+	maxMsgSize                 = 1048576 // 1MB TODO make it configurable
 	peerCatchupSleepIntervalMS = 100     // If peer is behind, sleep this amount
 )
 
@@ -44,6 +43,14 @@ func NewMempoolReactor(config *cfg.MempoolConfig, mempool *Mempool) *MempoolReac
 func (memR *MempoolReactor) SetLogger(l log.Logger) {
 	memR.Logger = l
 	memR.Mempool.SetLogger(l)
+}
+
+// OnStart implements p2p.BaseReactor.
+func (memR *MempoolReactor) OnStart() error {
+	if !memR.config.Broadcast {
+		memR.Logger.Info("Tx broadcasting is disabled")
+	}
+	return nil
 }
 
 // GetChannels implements Reactor.
@@ -71,7 +78,7 @@ func (memR *MempoolReactor) RemovePeer(peer p2p.Peer, reason interface{}) {
 // Receive implements Reactor.
 // It adds any received transactions to the mempool.
 func (memR *MempoolReactor) Receive(chID byte, src p2p.Peer, msgBytes []byte) {
-	_, msg, err := DecodeMessage(msgBytes)
+	msg, err := decodeMsg(msgBytes)
 	if err != nil {
 		memR.Logger.Error("Error decoding message", "src", src, "chId", chID, "msg", msg, "err", err, "bytes", msgBytes)
 		memR.Switch.StopPeerForError(src, err)
@@ -83,7 +90,7 @@ func (memR *MempoolReactor) Receive(chID byte, src p2p.Peer, msgBytes []byte) {
 	case *TxMessage:
 		err := memR.Mempool.CheckTx(msg.Tx, nil)
 		if err != nil {
-			memR.Logger.Info("Could not check tx", "tx", msg.Tx, "err", err)
+			memR.Logger.Info("Could not check tx", "tx", TxID(msg.Tx), "err", err)
 		}
 		// broadcasting happens from go routines per peer
 	default:
@@ -130,14 +137,15 @@ func (memR *MempoolReactor) broadcastTxRoutine(peer p2p.Peer) {
 		height := memTx.Height()
 		if peerState_i := peer.Get(types.PeerStateKey); peerState_i != nil {
 			peerState := peerState_i.(PeerState)
-			if peerState.GetHeight() < height-1 { // Allow for a lag of 1 block
+			peerHeight := peerState.GetHeight()
+			if peerHeight < height-1 { // Allow for a lag of 1 block
 				time.Sleep(peerCatchupSleepIntervalMS * time.Millisecond)
 				continue
 			}
 		}
 		// send memTx
 		msg := &TxMessage{Tx: memTx.tx}
-		success := peer.Send(MempoolChannel, struct{ MempoolMessage }{msg})
+		success := peer.Send(MempoolChannel, cdc.MustMarshalBinaryBare(msg))
 		if !success {
 			time.Sleep(peerCatchupSleepIntervalMS * time.Millisecond)
 			continue
@@ -158,24 +166,19 @@ func (memR *MempoolReactor) broadcastTxRoutine(peer p2p.Peer) {
 //-----------------------------------------------------------------------------
 // Messages
 
-const (
-	msgTypeTx = byte(0x01)
-)
-
 // MempoolMessage is a message sent or received by the MempoolReactor.
 type MempoolMessage interface{}
 
-var _ = wire.RegisterInterface(
-	struct{ MempoolMessage }{},
-	wire.ConcreteType{&TxMessage{}, msgTypeTx},
-)
+func RegisterMempoolMessages(cdc *amino.Codec) {
+	cdc.RegisterInterface((*MempoolMessage)(nil), nil)
+	cdc.RegisterConcrete(&TxMessage{}, "tendermint/mempool/TxMessage", nil)
+}
 
-// DecodeMessage decodes a byte-array into a MempoolMessage.
-func DecodeMessage(bz []byte) (msgType byte, msg MempoolMessage, err error) {
-	msgType = bz[0]
-	n := new(int)
-	r := bytes.NewReader(bz)
-	msg = wire.ReadBinary(struct{ MempoolMessage }{}, r, maxMempoolMessageSize, n, &err).(struct{ MempoolMessage }).MempoolMessage
+func decodeMsg(bz []byte) (msg MempoolMessage, err error) {
+	if len(bz) > maxMsgSize {
+		return msg, fmt.Errorf("Msg exceeds max size (%d > %d)", len(bz), maxMsgSize)
+	}
+	err = cdc.UnmarshalBinaryBare(bz, &msg)
 	return
 }
 

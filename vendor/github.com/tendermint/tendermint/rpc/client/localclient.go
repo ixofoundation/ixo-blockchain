@@ -3,12 +3,12 @@ package client
 import (
 	"context"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
+	tmpubsub "github.com/tendermint/tendermint/libs/pubsub"
 	nm "github.com/tendermint/tendermint/node"
 	"github.com/tendermint/tendermint/rpc/core"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/tendermint/tendermint/types"
-	cmn "github.com/tendermint/tmlibs/common"
-	tmpubsub "github.com/tendermint/tmlibs/pubsub"
 )
 
 /*
@@ -84,6 +84,10 @@ func (Local) DumpConsensusState() (*ctypes.ResultDumpConsensusState, error) {
 	return core.DumpConsensusState()
 }
 
+func (Local) ConsensusState() (*ctypes.ResultConsensusState, error) {
+	return core.ConsensusState()
+}
+
 func (Local) Health() (*ctypes.ResultHealth, error) {
 	return core.Health()
 }
@@ -124,8 +128,8 @@ func (Local) Tx(hash []byte, prove bool) (*ctypes.ResultTx, error) {
 	return core.Tx(hash, prove)
 }
 
-func (Local) TxSearch(query string, prove bool) ([]*ctypes.ResultTx, error) {
-	return core.TxSearch(query, prove)
+func (Local) TxSearch(query string, prove bool, page, perPage int) (*ctypes.ResultTxSearch, error) {
+	return core.TxSearch(query, prove, page, perPage)
 }
 
 func (c *Local) Subscribe(ctx context.Context, subscriber string, query tmpubsub.Query, out chan<- interface{}) error {

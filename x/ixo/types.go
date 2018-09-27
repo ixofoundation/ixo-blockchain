@@ -6,50 +6,70 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	crypto "github.com/tendermint/go-crypto"
 )
 
 //_______________________________________________________________________
 // Define the IxoTx
 
 type IxoTx struct {
-	Msg       sdk.Msg      `json:"payload"`
-	Signature IxoSignature `json:"signature"`
+	Msgs       []sdk.Msg      `json:"payload"`
+	Signatures []IxoSignature `json:"signatures"`
 }
 
 type IxoSignature struct {
-	SignatureValue crypto.Signature `json:"signatureValue"`
-	Created        time.Time        `json:"created"`
+	SignatureValue [64]byte  `json:"signatureValue"`
+	Created        time.Time `json:"created"`
 }
 
-func NewSignature(created time.Time, signature crypto.Signature) IxoSignature {
+func NewSignature(created time.Time, signature [64]byte) IxoSignature {
 	return IxoSignature{
 		SignatureValue: signature,
 		Created:        created,
 	}
 }
 
-func NewIxoTx(msg sdk.Msg, signature IxoSignature) IxoTx {
+func NewIxoTx(msgs []sdk.Msg, sigs []IxoSignature) IxoTx {
 	return IxoTx{
-		Msg:       msg,
-		Signature: signature,
+		Msgs:       msgs,
+		Signatures: sigs,
 	}
 }
 
-func (tx IxoTx) GetMsg() sdk.Msg { return tx.Msg }
-func (tx IxoTx) GetSignatures() []sdk.StdSignature {
-	//TODO: Is is necesasary to create a new one
-	stdSig := sdk.StdSignature{
-		Signature: tx.Signature.SignatureValue,
+func NewIxoTxSingleMsg(msg sdk.Msg, signature IxoSignature) IxoTx {
+	sigs := make([]IxoSignature, 0)
+	sigs = append(sigs, signature)
+
+	msgs := make([]sdk.Msg, 0)
+	msgs = append(msgs, msg)
+
+	return IxoTx{
+		Msgs:       msgs,
+		Signatures: sigs,
 	}
-	return []sdk.StdSignature{stdSig}
 }
+
+func (tx IxoTx) GetMsgs() []sdk.Msg { return tx.Msgs }
+
+//nolint
+func (tx IxoTx) GetMemo() string { return "" }
+
+func (tx IxoTx) GetSignatures() []IxoSignature {
+	return tx.Signatures
+}
+
 func (tx IxoTx) String() string {
 	output, err := json.MarshalIndent(tx, "", "  ")
 	if err != nil {
 		panic(err)
 	}
 	return fmt.Sprintf("%v", string(output))
+}
+
+// FeePayer returns the address responsible for paying the fees
+// for the transactions. It's the first address returned by msg.GetSigners().
+// If GetSigners() is empty, this panics.
+func FeePayer(tx sdk.Tx) sdk.AccAddress {
+	return tx.GetMsgs()[0].GetSigners()[0]
 }
 
 // enforce the msg type at compile time

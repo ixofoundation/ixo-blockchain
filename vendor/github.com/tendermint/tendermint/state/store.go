@@ -3,11 +3,10 @@ package state
 import (
 	"fmt"
 
-	abci "github.com/tendermint/abci/types"
-	wire "github.com/tendermint/go-wire"
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/types"
-	cmn "github.com/tendermint/tmlibs/common"
-	dbm "github.com/tendermint/tmlibs/db"
 )
 
 //------------------------------------------------------------------------
@@ -69,7 +68,7 @@ func loadState(db dbm.DB, key []byte) (state State) {
 		return state
 	}
 
-	err := wire.UnmarshalBinary(buf, &state)
+	err := cdc.UnmarshalBinaryBare(buf, &state)
 	if err != nil {
 		// DATA HAS BEEN CORRUPTED OR THE SPEC HAS CHANGED
 		cmn.Exit(cmn.Fmt(`LoadState: Data has been corrupted or its spec has changed:
@@ -81,15 +80,16 @@ func loadState(db dbm.DB, key []byte) (state State) {
 }
 
 // SaveState persists the State, the ValidatorsInfo, and the ConsensusParamsInfo to the database.
-func SaveState(db dbm.DB, s State) {
-	saveState(db, s, stateKey)
+// This flushes the writes (e.g. calls SetSync).
+func SaveState(db dbm.DB, state State) {
+	saveState(db, state, stateKey)
 }
 
-func saveState(db dbm.DB, s State, key []byte) {
-	nextHeight := s.LastBlockHeight + 1
-	saveValidatorsInfo(db, nextHeight, s.LastHeightValidatorsChanged, s.Validators)
-	saveConsensusParamsInfo(db, nextHeight, s.LastHeightConsensusParamsChanged, s.ConsensusParams)
-	db.SetSync(stateKey, s.Bytes())
+func saveState(db dbm.DB, state State, key []byte) {
+	nextHeight := state.LastBlockHeight + 1
+	saveValidatorsInfo(db, nextHeight, state.LastHeightValidatorsChanged, state.Validators)
+	saveConsensusParamsInfo(db, nextHeight, state.LastHeightConsensusParamsChanged, state.ConsensusParams)
+	db.SetSync(stateKey, state.Bytes())
 }
 
 //------------------------------------------------------------------------
@@ -104,22 +104,23 @@ type ABCIResponses struct {
 
 // NewABCIResponses returns a new ABCIResponses
 func NewABCIResponses(block *types.Block) *ABCIResponses {
+	resDeliverTxs := make([]*abci.ResponseDeliverTx, block.NumTxs)
+	if block.NumTxs == 0 {
+		// This makes Amino encoding/decoding consistent.
+		resDeliverTxs = nil
+	}
 	return &ABCIResponses{
-		DeliverTx: make([]*abci.ResponseDeliverTx, block.NumTxs),
+		DeliverTx: resDeliverTxs,
 	}
 }
 
-// Bytes serializes the ABCIResponse using go-wire
-func (a *ABCIResponses) Bytes() []byte {
-	bz, err := wire.MarshalBinary(*a)
-	if err != nil {
-		panic(err)
-	}
-	return bz
+// Bytes serializes the ABCIResponse using go-amino.
+func (arz *ABCIResponses) Bytes() []byte {
+	return cdc.MustMarshalBinaryBare(arz)
 }
 
-func (a *ABCIResponses) ResultsHash() []byte {
-	results := types.NewResults(a.DeliverTx)
+func (arz *ABCIResponses) ResultsHash() []byte {
+	results := types.NewResults(arz.DeliverTx)
 	return results.Hash()
 }
 
@@ -133,7 +134,7 @@ func LoadABCIResponses(db dbm.DB, height int64) (*ABCIResponses, error) {
 	}
 
 	abciResponses := new(ABCIResponses)
-	err := wire.UnmarshalBinary(buf, abciResponses)
+	err := cdc.UnmarshalBinaryBare(buf, abciResponses)
 	if err != nil {
 		// DATA HAS BEEN CORRUPTED OR THE SPEC HAS CHANGED
 		cmn.Exit(cmn.Fmt(`LoadABCIResponses: Data has been corrupted or its spec has
@@ -159,13 +160,9 @@ type ValidatorsInfo struct {
 	LastHeightChanged int64
 }
 
-// Bytes serializes the ValidatorsInfo using go-wire
+// Bytes serializes the ValidatorsInfo using go-amino.
 func (valInfo *ValidatorsInfo) Bytes() []byte {
-	bz, err := wire.MarshalBinary(*valInfo)
-	if err != nil {
-		panic(err)
-	}
-	return bz
+	return cdc.MustMarshalBinaryBare(valInfo)
 }
 
 // LoadValidators loads the ValidatorSet for a given height.
@@ -177,11 +174,17 @@ func LoadValidators(db dbm.DB, height int64) (*types.ValidatorSet, error) {
 	}
 
 	if valInfo.ValidatorSet == nil {
-		valInfo = loadValidatorsInfo(db, valInfo.LastHeightChanged)
-		if valInfo == nil {
-			cmn.PanicSanity(fmt.Sprintf(`Couldn't find validators at height %d as
-                        last changed from height %d`, valInfo.LastHeightChanged, height))
+		valInfo2 := loadValidatorsInfo(db, valInfo.LastHeightChanged)
+		if valInfo2 == nil {
+			panic(
+				fmt.Sprintf(
+					"Couldn't find validators at height %d as last changed from height %d",
+					valInfo.LastHeightChanged,
+					height,
+				),
+			)
 		}
+		valInfo = valInfo2
 	}
 
 	return valInfo.ValidatorSet, nil
@@ -194,7 +197,7 @@ func loadValidatorsInfo(db dbm.DB, height int64) *ValidatorsInfo {
 	}
 
 	v := new(ValidatorsInfo)
-	err := wire.UnmarshalBinary(buf, v)
+	err := cdc.UnmarshalBinaryBare(buf, v)
 	if err != nil {
 		// DATA HAS BEEN CORRUPTED OR THE SPEC HAS CHANGED
 		cmn.Exit(cmn.Fmt(`LoadValidators: Data has been corrupted or its spec has changed:
@@ -216,7 +219,7 @@ func saveValidatorsInfo(db dbm.DB, nextHeight, changeHeight int64, valSet *types
 	if changeHeight == nextHeight {
 		valInfo.ValidatorSet = valSet
 	}
-	db.SetSync(calcValidatorsKey(nextHeight), valInfo.Bytes())
+	db.Set(calcValidatorsKey(nextHeight), valInfo.Bytes())
 }
 
 //-----------------------------------------------------------------------------
@@ -227,13 +230,9 @@ type ConsensusParamsInfo struct {
 	LastHeightChanged int64
 }
 
-// Bytes serializes the ConsensusParamsInfo using go-wire
+// Bytes serializes the ConsensusParamsInfo using go-amino.
 func (params ConsensusParamsInfo) Bytes() []byte {
-	bz, err := wire.MarshalBinary(params)
-	if err != nil {
-		panic(err)
-	}
-	return bz
+	return cdc.MustMarshalBinaryBare(params)
 }
 
 // LoadConsensusParams loads the ConsensusParams for a given height.
@@ -246,11 +245,17 @@ func LoadConsensusParams(db dbm.DB, height int64) (types.ConsensusParams, error)
 	}
 
 	if paramsInfo.ConsensusParams == empty {
-		paramsInfo = loadConsensusParamsInfo(db, paramsInfo.LastHeightChanged)
-		if paramsInfo == nil {
-			cmn.PanicSanity(fmt.Sprintf(`Couldn't find consensus params at height %d as
-                        last changed from height %d`, paramsInfo.LastHeightChanged, height))
+		paramsInfo2 := loadConsensusParamsInfo(db, paramsInfo.LastHeightChanged)
+		if paramsInfo2 == nil {
+			panic(
+				fmt.Sprintf(
+					"Couldn't find consensus params at height %d as last changed from height %d",
+					paramsInfo.LastHeightChanged,
+					height,
+				),
+			)
 		}
+		paramsInfo = paramsInfo2
 	}
 
 	return paramsInfo.ConsensusParams, nil
@@ -263,7 +268,7 @@ func loadConsensusParamsInfo(db dbm.DB, height int64) *ConsensusParamsInfo {
 	}
 
 	paramsInfo := new(ConsensusParamsInfo)
-	err := wire.UnmarshalBinary(buf, paramsInfo)
+	err := cdc.UnmarshalBinaryBare(buf, paramsInfo)
 	if err != nil {
 		// DATA HAS BEEN CORRUPTED OR THE SPEC HAS CHANGED
 		cmn.Exit(cmn.Fmt(`LoadConsensusParams: Data has been corrupted or its spec has changed:
@@ -285,5 +290,5 @@ func saveConsensusParamsInfo(db dbm.DB, nextHeight, changeHeight int64, params t
 	if changeHeight == nextHeight {
 		paramsInfo.ConsensusParams = params
 	}
-	db.SetSync(calcConsensusParamsKey(nextHeight), paramsInfo.Bytes())
+	db.Set(calcConsensusParamsKey(nextHeight), paramsInfo.Bytes())
 }

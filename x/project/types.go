@@ -143,8 +143,8 @@ func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateProjectMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateProjectMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateProjectMsg) String() string {
 	b, err := json.Marshal(msg)
@@ -181,8 +181,8 @@ func (msg CreateAgentMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateAgentMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateAgentMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateAgentMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -215,8 +215,8 @@ func (msg UpdateAgentMsg) ValidateBasic() sdk.Error {
 }
 func (msg UpdateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg UpdateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg UpdateAgentMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg UpdateAgentMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg UpdateAgentMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -248,8 +248,8 @@ func (msg CreateClaimMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateClaimMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateClaimMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateClaimMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateClaimMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateClaimMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -281,8 +281,8 @@ func (msg CreateEvaluationMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateEvaluationMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateEvaluationMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateEvaluationMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateEvaluationMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateEvaluationMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -314,8 +314,8 @@ func (msg FundProjectMsg) ValidateBasic() sdk.Error {
 }
 func (msg FundProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg FundProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg FundProjectMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg FundProjectMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg FundProjectMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -347,8 +347,8 @@ func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
 }
 func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg WithdrawFundsMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg WithdrawFundsMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg WithdrawFundsMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)

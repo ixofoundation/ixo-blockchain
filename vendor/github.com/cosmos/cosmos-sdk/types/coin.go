@@ -11,7 +11,18 @@ import (
 // Coin hold some amount of one currency
 type Coin struct {
 	Denom  string `json:"denom"`
-	Amount int64  `json:"amount"`
+	Amount Int    `json:"amount"`
+}
+
+func NewCoin(denom string, amount Int) Coin {
+	return Coin{
+		Denom:  denom,
+		Amount: amount,
+	}
+}
+
+func NewInt64Coin(denom string, amount int64) Coin {
+	return NewCoin(denom, NewInt(amount))
 }
 
 // String provides a human-readable representation of a coin
@@ -26,28 +37,28 @@ func (coin Coin) SameDenomAs(other Coin) bool {
 
 // IsZero returns if this represents no money
 func (coin Coin) IsZero() bool {
-	return coin.Amount == 0
+	return coin.Amount.IsZero()
 }
 
 // IsGTE returns true if they are the same type and the receiver is
 // an equal or greater value
 func (coin Coin) IsGTE(other Coin) bool {
-	return coin.SameDenomAs(other) && (coin.Amount >= other.Amount)
+	return coin.SameDenomAs(other) && (!coin.Amount.LT(other.Amount))
 }
 
 // IsEqual returns true if the two sets of Coins have the same value
 func (coin Coin) IsEqual(other Coin) bool {
-	return coin.SameDenomAs(other) && (coin.Amount == other.Amount)
+	return coin.SameDenomAs(other) && (coin.Amount.Equal(other.Amount))
 }
 
 // IsPositive returns true if coin amount is positive
 func (coin Coin) IsPositive() bool {
-	return (coin.Amount > 0)
+	return (coin.Amount.Sign() == 1)
 }
 
 // IsNotNegative returns true if coin amount is not negative
 func (coin Coin) IsNotNegative() bool {
-	return (coin.Amount >= 0)
+	return (coin.Amount.Sign() != -1)
 }
 
 // Adds amounts of two coins with same denom
@@ -55,7 +66,7 @@ func (coin Coin) Plus(coinB Coin) Coin {
 	if !coin.SameDenomAs(coinB) {
 		return coin
 	}
-	return Coin{coin.Denom, coin.Amount + coinB.Amount}
+	return Coin{coin.Denom, coin.Amount.Add(coinB.Amount)}
 }
 
 // Subtracts amounts of two coins with same denom
@@ -63,7 +74,7 @@ func (coin Coin) Minus(coinB Coin) Coin {
 	if !coin.SameDenomAs(coinB) {
 		return coin
 	}
-	return Coin{coin.Denom, coin.Amount - coinB.Amount}
+	return Coin{coin.Denom, coin.Amount.Sub(coinB.Amount)}
 }
 
 //----------------------------------------
@@ -110,7 +121,7 @@ func (coins Coins) IsValid() bool {
 // Plus combines two sets of coins
 // CONTRACT: Plus will never return Coins where one Coin has a 0 amount.
 func (coins Coins) Plus(coinsB Coins) Coins {
-	sum := []Coin{}
+	sum := ([]Coin)(nil)
 	indexA, indexB := 0, 0
 	lenA, lenB := len(coins), len(coinsB)
 	for {
@@ -128,7 +139,7 @@ func (coins Coins) Plus(coinsB Coins) Coins {
 			sum = append(sum, coinA)
 			indexA++
 		case 0:
-			if coinA.Amount+coinB.Amount == 0 {
+			if coinA.Amount.Add(coinB.Amount).IsZero() {
 				// ignore 0 sum coin type
 			} else {
 				sum = append(sum, coinA.Plus(coinB))
@@ -148,7 +159,7 @@ func (coins Coins) Negative() Coins {
 	for _, coin := range coins {
 		res = append(res, Coin{
 			Denom:  coin.Denom,
-			Amount: -coin.Amount,
+			Amount: coin.Amount.Neg(),
 		})
 	}
 	return res
@@ -187,7 +198,7 @@ func (coins Coins) IsEqual(coinsB Coins) bool {
 		return false
 	}
 	for i := 0; i < len(coins); i++ {
-		if coins[i] != coinsB[i] {
+		if coins[i].Denom != coinsB[i].Denom || !coins[i].Amount.Equal(coinsB[i].Amount) {
 			return false
 		}
 	}
@@ -223,25 +234,25 @@ func (coins Coins) IsNotNegative() bool {
 }
 
 // Returns the amount of a denom from coins
-func (coins Coins) AmountOf(denom string) int64 {
+func (coins Coins) AmountOf(denom string) Int {
 	switch len(coins) {
 	case 0:
-		return 0
+		return ZeroInt()
 	case 1:
 		coin := coins[0]
 		if coin.Denom == denom {
 			return coin.Amount
 		}
-		return 0
+		return ZeroInt()
 	default:
 		midIdx := len(coins) / 2 // 2:1, 3:1, 4:2
 		coin := coins[midIdx]
 		if denom < coin.Denom {
-			return Coins(coins[:midIdx]).AmountOf(denom)
+			return coins[:midIdx].AmountOf(denom)
 		} else if denom == coin.Denom {
 			return coin.Amount
 		} else {
-			return Coins(coins[midIdx+1:]).AmountOf(denom)
+			return coins[midIdx+1:].AmountOf(denom)
 		}
 	}
 }
@@ -280,7 +291,7 @@ func ParseCoin(coinStr string) (coin Coin, err error) {
 
 	matches := reCoin.FindStringSubmatch(coinStr)
 	if matches == nil {
-		err = fmt.Errorf("Invalid coin expression: %s", coinStr)
+		err = fmt.Errorf("invalid coin expression: %s", coinStr)
 		return
 	}
 	denomStr, amountStr := matches[2], matches[1]
@@ -290,7 +301,7 @@ func ParseCoin(coinStr string) (coin Coin, err error) {
 		return
 	}
 
-	return Coin{denomStr, int64(amount)}, nil
+	return Coin{denomStr, NewInt(int64(amount))}, nil
 }
 
 // ParseCoins will parse out a list of coins separated by commas.
@@ -316,7 +327,7 @@ func ParseCoins(coinsStr string) (coins Coins, err error) {
 
 	// Validate coins before returning.
 	if !coins.IsValid() {
-		return nil, fmt.Errorf("ParseCoins invalid: %#v", coins)
+		return nil, fmt.Errorf("parseCoins invalid: %#v", coins)
 	}
 
 	return coins, nil

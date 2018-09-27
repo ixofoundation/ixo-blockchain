@@ -1,12 +1,14 @@
 package p2p
 
 import (
+	"net"
 	"sync"
 )
 
 // IPeerSet has a (immutable) subset of the methods of PeerSet.
 type IPeerSet interface {
 	Has(key ID) bool
+	HasIP(ip net.IP) bool
 	Get(key ID) Peer
 	List() []Peer
 	Size() int
@@ -36,12 +38,13 @@ func NewPeerSet() *PeerSet {
 }
 
 // Add adds the peer to the PeerSet.
-// It returns ErrSwitchDuplicatePeer if the peer is already present.
+// It returns an error carrying the reason, if the peer is already present.
 func (ps *PeerSet) Add(peer Peer) error {
 	ps.mtx.Lock()
 	defer ps.mtx.Unlock()
+
 	if ps.lookup[peer.ID()] != nil {
-		return ErrSwitchDuplicatePeer
+		return ErrSwitchDuplicatePeerID{peer.ID()}
 	}
 
 	index := len(ps.list)
@@ -52,8 +55,8 @@ func (ps *PeerSet) Add(peer Peer) error {
 	return nil
 }
 
-// Has returns true iff the PeerSet contains
-// the peer referred to by this peerKey.
+// Has returns true if the set contains the peer referred to by this
+// peerKey, otherwise false.
 func (ps *PeerSet) Has(peerKey ID) bool {
 	ps.mtx.Lock()
 	_, ok := ps.lookup[peerKey]
@@ -61,7 +64,29 @@ func (ps *PeerSet) Has(peerKey ID) bool {
 	return ok
 }
 
-// Get looks up a peer by the provided peerKey.
+// HasIP returns true if the set contains the peer referred to by this IP
+// address, otherwise false.
+func (ps *PeerSet) HasIP(peerIP net.IP) bool {
+	ps.mtx.Lock()
+	defer ps.mtx.Unlock()
+
+	return ps.hasIP(peerIP)
+}
+
+// hasIP does not acquire a lock so it can be used in public methods which
+// already lock.
+func (ps *PeerSet) hasIP(peerIP net.IP) bool {
+	for _, item := range ps.lookup {
+		if item.peer.RemoteIP().Equal(peerIP) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Get looks up a peer by the provided peerKey. Returns nil if peer is not
+// found.
 func (ps *PeerSet) Get(peerKey ID) Peer {
 	ps.mtx.Lock()
 	defer ps.mtx.Unlock()
@@ -76,6 +101,7 @@ func (ps *PeerSet) Get(peerKey ID) Peer {
 func (ps *PeerSet) Remove(peer Peer) {
 	ps.mtx.Lock()
 	defer ps.mtx.Unlock()
+
 	item := ps.lookup[peer.ID()]
 	if item == nil {
 		return

@@ -28,12 +28,17 @@ func GetPassword(prompt string, buf *bufio.Reader) (pass string, err error) {
 	} else {
 		pass, err = readLineFromBuf(buf)
 	}
+
 	if err != nil {
 		return "", err
 	}
+
 	if len(pass) < MinPassLength {
-		return "", errors.Errorf("Password must be at least %d characters", MinPassLength)
+		// Return the given password to the upstream client so it can handle a
+		// non-STDIN failure gracefully.
+		return pass, errors.Errorf("password must be at least %d characters", MinPassLength)
 	}
+
 	return pass, nil
 }
 
@@ -68,7 +73,7 @@ func GetCheckPassword(prompt, prompt2 string, buf *bufio.Reader) (string, error)
 		return "", err
 	}
 	if pass != pass2 {
-		return "", errors.New("Passphrases don't match")
+		return "", errors.New("passphrases don't match")
 	}
 	return pass, nil
 }

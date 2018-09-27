@@ -6,9 +6,8 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	keys "github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
-	keys "github.com/tendermint/go-crypto/keys"
 
 	"github.com/spf13/cobra"
 )
@@ -18,24 +17,27 @@ func deleteKeyCommand() *cobra.Command {
 		Use:   "delete <name>",
 		Short: "Delete the given key",
 		RunE:  runDeleteCmd,
+		Args:  cobra.ExactArgs(1),
 	}
 	return cmd
 }
 
 func runDeleteCmd(cmd *cobra.Command, args []string) error {
-	if len(args) != 1 || len(args[0]) == 0 {
-		return errors.New("You must provide a name for the key")
-	}
 	name := args[0]
 
-	buf := client.BufferStdin()
-	oldpass, err := client.GetPassword(
-		"DANGER - enter password to permanently delete key:", buf)
+	kb, err := GetKeyBase()
 	if err != nil {
 		return err
 	}
 
-	kb, err := GetKeyBase()
+	_, err = kb.Get(name)
+	if err != nil {
+		return err
+	}
+
+	buf := client.BufferStdin()
+	oldpass, err := client.GetPassword(
+		"DANGER - enter password to permanently delete key:", buf)
 	if err != nil {
 		return err
 	}
@@ -48,12 +50,15 @@ func runDeleteCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+////////////////////////
 // REST
 
+// delete key request REST body
 type DeleteKeyBody struct {
 	Password string `json:"password"`
 }
 
+// delete key REST handler
 func DeleteKeyRequestHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]

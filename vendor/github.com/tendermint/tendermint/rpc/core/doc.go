@@ -7,11 +7,11 @@ Tendermint supports the following RPC protocols:
 * JSONRPC over HTTP
 * JSONRPC over websockets
 
-Tendermint RPC is built using [our own RPC library](https://github.com/tendermint/tendermint/tree/master/rpc/lib). Documentation and tests for that library could be found at `tendermint/rpc/lib` directory.
+Tendermint RPC is built using [our own RPC library](https://github.com/tendermint/tendermint/tree/master/rpc/lib) which contains its own set of documentation and tests.
 
 ## Configuration
 
-Set the `laddr` config parameter under `[rpc]` table in the `$TMHOME/config/config.toml` file or the `--rpc.laddr` command-line flag to the desired protocol://host:port setting.  Default: `tcp://0.0.0.0:46657`.
+Set the `laddr` config parameter under `[rpc]` table in the `$TMHOME/config/config.toml` file or the `--rpc.laddr` command-line flag to the desired protocol://host:port setting.  Default: `tcp://0.0.0.0:26657`.
 
 ## Arguments
 
@@ -20,7 +20,7 @@ Arguments which expect strings or byte arrays may be passed as quoted strings, l
 ## URI/HTTP
 
 ```bash
-curl 'localhost:46657/broadcast_tx_sync?tx="abc"'
+curl 'localhost:26657/broadcast_tx_sync?tx="abc"'
 ```
 
 > Response:
@@ -39,11 +39,9 @@ curl 'localhost:46657/broadcast_tx_sync?tx="abc"'
 }
 ```
 
-The first entry in the result-array (`96`) is the method this response correlates with. `96` refers to "ResultTypeBroadcastTx", see [responses.go](https://github.com/tendermint/tendermint/blob/master/rpc/core/types/responses.go) for a complete overview.
-
 ## JSONRPC/HTTP
 
-JSONRPC requests can be POST'd to the root RPC endpoint via HTTP (e.g. `http://localhost:46657/`).
+JSONRPC requests can be POST'd to the root RPC endpoint via HTTP (e.g. `http://localhost:26657/`).
 
 ```json
 {
@@ -56,7 +54,7 @@ JSONRPC requests can be POST'd to the root RPC endpoint via HTTP (e.g. `http://l
 
 ## JSONRPC/websockets
 
-JSONRPC requests can be made via websocket. The websocket endpoint is at `/websocket`, e.g. `localhost:46657/websocket`.  Asynchronous RPC functions like event `subscribe` and `unsubscribe` are only available via websockets.
+JSONRPC requests can be made via websocket. The websocket endpoint is at `/websocket`, e.g. `localhost:26657/websocket`.  Asynchronous RPC functions like event `subscribe` and `unsubscribe` are only available via websockets.
 
 
 ## More Examples
@@ -68,7 +66,7 @@ See the various bash tests using curl in `test/`, and examples using the `Go` AP
 An HTTP Get request to the root RPC endpoint shows a list of available endpoints.
 
 ```bash
-curl 'localhost:46657'
+curl 'localhost:26657'
 ```
 
 > Response:

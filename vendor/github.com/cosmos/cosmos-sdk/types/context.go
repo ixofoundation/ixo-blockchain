@@ -6,10 +6,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	abci "github.com/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
-
-// TODO: Add a default logger.
 
 /*
 The intent of Context is for it to be an immutable object that can be
@@ -31,7 +30,7 @@ type Context struct {
 }
 
 // create a new context
-func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, txBytes []byte) Context {
+func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Logger) Context {
 	c := Context{
 		Context: context.Background(),
 		pst:     newThePast(),
@@ -41,8 +40,10 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, txBytes []byt
 	c = c.WithBlockHeader(header)
 	c = c.WithBlockHeight(header.Height)
 	c = c.WithChainID(header.ChainID)
-	c = c.WithIsCheckTx(isCheckTx)
-	c = c.WithTxBytes(txBytes)
+	c = c.WithTxBytes(nil)
+	c = c.WithLogger(logger)
+	c = c.WithSigningValidators(nil)
+	c = c.WithGasMeter(NewInfiniteGasMeter())
 	return c
 }
 
@@ -68,7 +69,12 @@ func (c Context) Value(key interface{}) interface{} {
 
 // KVStore fetches a KVStore from the MultiStore.
 func (c Context) KVStore(key StoreKey) KVStore {
-	return c.multiStore().GetKVStore(key)
+	return c.multiStore().GetKVStore(key).Gas(c.GasMeter(), cachedDefaultGasConfig)
+}
+
+// TransientStore fetches a TransientStore from the MultiStore.
+func (c Context) TransientStore(key StoreKey) KVStore {
+	return c.multiStore().GetKVStore(key).Gas(c.GasMeter(), cachedTransientGasConfig)
 }
 
 //----------------------------------------
@@ -123,9 +129,12 @@ const (
 	contextKeyMultiStore contextKey = iota
 	contextKeyBlockHeader
 	contextKeyBlockHeight
+	contextKeyConsensusParams
 	contextKeyChainID
-	contextKeyIsCheckTx
 	contextKeyTxBytes
+	contextKeyLogger
+	contextKeySigningValidators
+	contextKeyGasMeter
 )
 
 // NOTE: Do not expose MultiStore.
@@ -142,14 +151,23 @@ func (c Context) BlockHeader() abci.Header {
 func (c Context) BlockHeight() int64 {
 	return c.Value(contextKeyBlockHeight).(int64)
 }
+func (c Context) ConsensusParams() abci.ConsensusParams {
+	return c.Value(contextKeyConsensusParams).(abci.ConsensusParams)
+}
 func (c Context) ChainID() string {
 	return c.Value(contextKeyChainID).(string)
 }
-func (c Context) IsCheckTx() bool {
-	return c.Value(contextKeyIsCheckTx).(bool)
-}
 func (c Context) TxBytes() []byte {
 	return c.Value(contextKeyTxBytes).([]byte)
+}
+func (c Context) Logger() log.Logger {
+	return c.Value(contextKeyLogger).(log.Logger)
+}
+func (c Context) SigningValidators() []abci.SigningValidator {
+	return c.Value(contextKeySigningValidators).([]abci.SigningValidator)
+}
+func (c Context) GasMeter() GasMeter {
+	return c.Value(contextKeyGasMeter).(GasMeter)
 }
 func (c Context) WithMultiStore(ms MultiStore) Context {
 	return c.withValue(contextKeyMultiStore, ms)
@@ -161,14 +179,35 @@ func (c Context) WithBlockHeader(header abci.Header) Context {
 func (c Context) WithBlockHeight(height int64) Context {
 	return c.withValue(contextKeyBlockHeight, height)
 }
+func (c Context) WithConsensusParams(params *abci.ConsensusParams) Context {
+	if params == nil {
+		return c
+	}
+	return c.withValue(contextKeyConsensusParams, params).
+		WithGasMeter(NewGasMeter(params.TxSize.MaxGas))
+}
 func (c Context) WithChainID(chainID string) Context {
 	return c.withValue(contextKeyChainID, chainID)
 }
-func (c Context) WithIsCheckTx(isCheckTx bool) Context {
-	return c.withValue(contextKeyIsCheckTx, isCheckTx)
-}
 func (c Context) WithTxBytes(txBytes []byte) Context {
 	return c.withValue(contextKeyTxBytes, txBytes)
+}
+func (c Context) WithLogger(logger log.Logger) Context {
+	return c.withValue(contextKeyLogger, logger)
+}
+func (c Context) WithSigningValidators(SigningValidators []abci.SigningValidator) Context {
+	return c.withValue(contextKeySigningValidators, SigningValidators)
+}
+func (c Context) WithGasMeter(meter GasMeter) Context {
+	return c.withValue(contextKeyGasMeter, meter)
+}
+
+// Cache the multistore and return a new cached context. The cached context is
+// written to the context when writeCache is called.
+func (c Context) CacheContext() (cc Context, writeCache func()) {
+	cms := c.multiStore().CacheMultiStore()
+	cc = c.WithMultiStore(cms)
+	return cc, cms.Write
 }
 
 //----------------------------------------

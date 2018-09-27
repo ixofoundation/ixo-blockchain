@@ -1,5 +1,7 @@
+package client
+
 /*
-package client provides a general purpose interface (Client) for connecting
+The client package provides a general purpose interface (Client) for connecting
 to a tendermint node, as well as higher-level functionality.
 
 The main implementation for production code is client.HTTP, which
@@ -17,25 +19,24 @@ for maximum flexibility and testability, and two implementations,
 this package also provides helper functions that work on any Client
 implementation.
 */
-package client
 
 import (
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/tendermint/tendermint/types"
-	cmn "github.com/tendermint/tmlibs/common"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 // ABCIClient groups together the functionality that principally
 // affects the ABCI app. In many cases this will be all we want,
 // so we can accept an interface which is easier to mock
 type ABCIClient interface {
-	// reading from abci app
+	// Reading from abci app
 	ABCIInfo() (*ctypes.ResultABCIInfo, error)
 	ABCIQuery(path string, data cmn.HexBytes) (*ctypes.ResultABCIQuery, error)
 	ABCIQueryWithOptions(path string, data cmn.HexBytes,
 		opts ABCIQueryOptions) (*ctypes.ResultABCIQuery, error)
 
-	// writing to abci app
+	// Writing to abci app
 	BroadcastTxCommit(tx types.Tx) (*ctypes.ResultBroadcastTxCommit, error)
 	BroadcastTxAsync(tx types.Tx) (*ctypes.ResultBroadcastTx, error)
 	BroadcastTxSync(tx types.Tx) (*ctypes.ResultBroadcastTx, error)
@@ -49,7 +50,7 @@ type SignClient interface {
 	Commit(height *int64) (*ctypes.ResultCommit, error)
 	Validators(height *int64) (*ctypes.ResultValidators, error)
 	Tx(hash []byte, prove bool) (*ctypes.ResultTx, error)
-	TxSearch(query string, prove bool) ([]*ctypes.ResultTx, error)
+	TxSearch(query string, prove bool, page, perPage int) (*ctypes.ResultTxSearch, error)
 }
 
 // HistoryClient shows us data from genesis to now in large chunks.
@@ -59,7 +60,7 @@ type HistoryClient interface {
 }
 
 type StatusClient interface {
-	// general chain info
+	// General chain info
 	Status() (*ctypes.ResultStatus, error)
 }
 
@@ -83,6 +84,7 @@ type Client interface {
 type NetworkClient interface {
 	NetInfo() (*ctypes.ResultNetInfo, error)
 	DumpConsensusState() (*ctypes.ResultDumpConsensusState, error)
+	ConsensusState() (*ctypes.ResultConsensusState, error)
 	Health() (*ctypes.ResultHealth, error)
 }
 

@@ -3,16 +3,16 @@ package project
 import (
 	"encoding/hex"
 
-	"github.com/tendermint/tmlibs/common"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	ixo "github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 const CURRENCY = "ixo-atom"
 
-func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
+func NewHandler(k Keeper, ck bank.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case CreateProjectMsg:
@@ -35,7 +35,7 @@ func NewHandler(k ProjectKeeper, ck bank.CoinKeeper) sdk.Handler {
 	}
 }
 
-func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateProjectMsg) sdk.Result {
+func handleCreateProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateProjectMsg) sdk.Result {
 	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
 	projectDoc, err := k.AddProjectDoc(ctx, msg)
@@ -43,35 +43,35 @@ func handleCreateProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper
 		return err.Result()
 	}
 	return sdk.Result{
-		Code: sdk.CodeOK,
-		Data: k.pm.encodeProject(projectDoc),
+		Code: sdk.ABCICodeOK,
+		Data: k.encodeProject(projectDoc),
 	}
 }
 
-func handleCreateAgentMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateAgentMsg) sdk.Result {
+func handleCreateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateAgentMsg) sdk.Result {
 	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
 	return sdk.Result{
-		Code: sdk.CodeOK,
+		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}
 }
-func handleUpdateAgentMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg UpdateAgentMsg) sdk.Result {
+func handleUpdateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg UpdateAgentMsg) sdk.Result {
 	return sdk.Result{
-		Code: sdk.CodeOK,
+		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}
 }
-func handleCreateClaimMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateClaimMsg) sdk.Result {
+func handleCreateClaimMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateClaimMsg) sdk.Result {
 	return sdk.Result{
-		Code: sdk.CodeOK,
+		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}
 }
-func handleCreateEvaluationMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateEvaluationMsg) sdk.Result {
+func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateEvaluationMsg) sdk.Result {
 	projectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if !found {
 		return sdk.Result{
-			Code: sdk.CodeInvalidAddress,
+			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
 			Data: []byte("Could not find Project"),
 		}
 	}
@@ -79,7 +79,7 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKee
 	projectAddrInterface, found := accMap[msg.GetProjectDid()]
 	if !found {
 		return sdk.Result{
-			Code: sdk.CodeInvalidAddress,
+			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
 			Data: []byte("Could not find Project Account"),
 		}
 	}
@@ -93,22 +93,22 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKee
 	} else {
 		senderAccAddr = senderAccAddrInterface.(string)
 	}
-	err := ck.SendCoins(ctx, toHexBytes(projectAddr), toHexBytes(senderAccAddr), sdk.Coins{{Denom: COIN_DENOM, Amount: projectDoc.GetEvaluatorPay()}})
+	_, err := ck.SendCoins(ctx, sdk.AccAddress(projectAddr), sdk.AccAddress(senderAccAddr), sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, projectDoc.GetEvaluatorPay())})
 	if err != nil {
 		return err.Result()
 	}
 	return sdk.Result{
-		Code: sdk.CodeOK,
+		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}
 }
 
-func handleFundProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg FundProjectMsg) sdk.Result {
+func handleFundProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg FundProjectMsg) sdk.Result {
 	fundProjectDoc := msg.Data
 	_, found := getProjectDoc(ctx, k, fundProjectDoc.ProjectDid)
 	if !found {
 		return sdk.Result{
-			Code: sdk.CodeInvalidAddress,
+			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
 			Data: []byte("Could not find Project"),
 		}
 	}
@@ -116,47 +116,39 @@ func handleFundProjectMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, 
 	projectAddrInterface, found := accMap[fundProjectDoc.ProjectDid]
 	if !found {
 		return sdk.Result{
-			Code: sdk.CodeInvalidAddress,
+			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
 			Data: []byte("Could not find Project Account"),
 		}
 	}
 	projectAddr := projectAddrInterface.(string)
 
-	_, err := ck.AddCoins(ctx, toHexBytes(projectAddr), sdk.Coins{{COIN_DENOM, fundProjectDoc.GetAmount()}})
+	_, _, err := ck.AddCoins(ctx, sdk.AccAddress(projectAddr), sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, fundProjectDoc.GetAmount())})
 	if err != nil {
 		panic(err)
 	}
 
 	return sdk.Result{
-		Code: sdk.CodeOK,
+		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}
 }
-func handleWithdrawFundsMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg WithdrawFundsMsg) sdk.Result {
+func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg WithdrawFundsMsg) sdk.Result {
 	return sdk.Result{
-		Code: sdk.CodeOK,
+		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}
 }
 
-func toHexBytes(address string) common.HexBytes {
-	bz, err := hex.DecodeString(address)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.Address(bz)
-}
-
-func getProjectDoc(ctx sdk.Context, k ProjectKeeper, projectDid ixo.Did) (StoredProjectDoc, bool) {
+func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProjectDoc, bool) {
 	ixoProjectDoc, found := k.GetProjectDoc(ctx, projectDid)
 	return ixoProjectDoc.(StoredProjectDoc), found
 }
 
-func getProjectAccountMap(ctx sdk.Context, k ProjectKeeper, projectDid ixo.Did) map[string]interface{} {
+func getProjectAccountMap(ctx sdk.Context, k Keeper, projectDid ixo.Did) map[string]interface{} {
 	return k.GetAccountMap(ctx, projectDid)
 }
 
-func addAccountToAccountProjectAccounts(ctx sdk.Context, k ProjectKeeper, projectDid ixo.Did, accountDid ixo.Did) sdk.Account {
+func addAccountToAccountProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountDid ixo.Did) auth.Account {
 	acc := k.CreateNewAccount(ctx, projectDid, accountDid)
 	k.AddAccountToAccountProjectAccounts(ctx, projectDid, accountDid, acc)
 

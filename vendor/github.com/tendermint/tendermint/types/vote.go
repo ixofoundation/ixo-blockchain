@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	crypto "github.com/tendermint/go-crypto"
-	"github.com/tendermint/tendermint/wire"
-	cmn "github.com/tendermint/tmlibs/common"
+	crypto "github.com/tendermint/tendermint/crypto"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 var (
@@ -62,21 +61,18 @@ type Address = cmn.HexBytes
 
 // Represents a prevote, precommit, or commit vote from validators for consensus.
 type Vote struct {
-	ValidatorAddress Address          `json:"validator_address"`
-	ValidatorIndex   int              `json:"validator_index"`
-	Height           int64            `json:"height"`
-	Round            int              `json:"round"`
-	Timestamp        time.Time        `json:"timestamp"`
-	Type             byte             `json:"type"`
-	BlockID          BlockID          `json:"block_id"` // zero if vote is nil.
-	Signature        crypto.Signature `json:"signature"`
+	ValidatorAddress Address   `json:"validator_address"`
+	ValidatorIndex   int       `json:"validator_index"`
+	Height           int64     `json:"height"`
+	Round            int       `json:"round"`
+	Timestamp        time.Time `json:"timestamp"`
+	Type             byte      `json:"type"`
+	BlockID          BlockID   `json:"block_id"` // zero if vote is nil.
+	Signature        []byte    `json:"signature"`
 }
 
 func (vote *Vote) SignBytes(chainID string) []byte {
-	bz, err := wire.MarshalJSON(CanonicalJSONOnceVote{
-		chainID,
-		CanonicalVote(vote),
-	})
+	bz, err := cdc.MarshalJSON(CanonicalVote(chainID, vote))
 	if err != nil {
 		panic(err)
 	}
@@ -102,10 +98,11 @@ func (vote *Vote) String() string {
 		cmn.PanicSanity("Unknown vote type")
 	}
 
-	return fmt.Sprintf("Vote{%v:%X %v/%02d/%v(%v) %X %v @ %s}",
+	return fmt.Sprintf("Vote{%v:%X %v/%02d/%v(%v) %X %X @ %s}",
 		vote.ValidatorIndex, cmn.Fingerprint(vote.ValidatorAddress),
 		vote.Height, vote.Round, vote.Type, typeString,
-		cmn.Fingerprint(vote.BlockID.Hash), vote.Signature,
+		cmn.Fingerprint(vote.BlockID.Hash),
+		cmn.Fingerprint(vote.Signature),
 		CanonicalTime(vote.Timestamp))
 }
 

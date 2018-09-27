@@ -5,19 +5,28 @@ import (
 )
 
 // Import cosmos-sdk/types/store.go for convenience.
-type Store = types.Store
-type Committer = types.Committer
-type CommitStore = types.CommitStore
-type MultiStore = types.MultiStore
-type CacheMultiStore = types.CacheMultiStore
-type CommitMultiStore = types.CommitMultiStore
-type KVStore = types.KVStore
-type Iterator = types.Iterator
-type CacheKVStore = types.CacheKVStore
-type CommitKVStore = types.CommitKVStore
-type CacheWrapper = types.CacheWrapper
-type CacheWrap = types.CacheWrap
-type CommitID = types.CommitID
-type StoreKey = types.StoreKey
-type StoreType = types.StoreType
-type Queryable = types.Queryable
+// nolint
+type (
+	PruningStrategy  = types.PruningStrategy
+	Store            = types.Store
+	Committer        = types.Committer
+	CommitStore      = types.CommitStore
+	MultiStore       = types.MultiStore
+	CacheMultiStore  = types.CacheMultiStore
+	CommitMultiStore = types.CommitMultiStore
+	KVStore          = types.KVStore
+	KVPair           = types.KVPair
+	Iterator         = types.Iterator
+	CacheKVStore     = types.CacheKVStore
+	CommitKVStore    = types.CommitKVStore
+	CacheWrapper     = types.CacheWrapper
+	CacheWrap        = types.CacheWrap
+	CommitID         = types.CommitID
+	StoreKey         = types.StoreKey
+	StoreType        = types.StoreType
+	Queryable        = types.Queryable
+	TraceContext     = types.TraceContext
+	Gas              = types.Gas
+	GasMeter         = types.GasMeter
+	GasConfig        = types.GasConfig
+)
