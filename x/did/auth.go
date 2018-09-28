@@ -27,6 +27,11 @@ func NewAnteHandler(didKeeper Keeper) sdk.AnteHandler {
 		} else {
 			did := ixo.Did(msg.GetSigners()[0])
 			didDoc := didKeeper.GetDidDoc(ctx, did)
+			if didDoc == nil {
+				return ctx,
+					sdk.ErrUnauthorized("Issuer did not found").Result(),
+					true
+			}
 			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
 		}
 
