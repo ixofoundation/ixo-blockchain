@@ -38,8 +38,13 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper) Keeper 
 
 // GetDidDoc returns the did_doc at the addr.
 func (k Keeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) (ixo.StoredProjectDoc, bool) {
-	projectDoc, found := k.GetProjectDoc(ctx, did)
-	return projectDoc, found
+	store := ctx.KVStore(k.key)
+	bz := store.Get([]byte(did))
+	if bz == nil {
+		return nil, false
+	}
+	project := k.decodeProject(bz)
+	return project, true
 }
 
 func (k Keeper) SetProjectDoc(ctx sdk.Context, project ixo.StoredProjectDoc) {
@@ -103,7 +108,16 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountDid
 
 	return acc
 }
+func (k Keeper) decodeProject(bz []byte) ixo.StoredProjectDoc {
 
+	storedProjectDoc := StoredProjectDoc{}
+	err := k.cdc.UnmarshalBinary(bz, &storedProjectDoc)
+	if err != nil {
+		panic(err)
+	}
+	return storedProjectDoc
+
+}
 func (k Keeper) encodeProject(storedProjectDoc ixo.StoredProjectDoc) []byte {
 	bz, err := k.cdc.MarshalBinary(storedProjectDoc)
 	if err != nil {

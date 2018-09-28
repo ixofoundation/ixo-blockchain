@@ -95,7 +95,7 @@ type DidMsg interface {
 //ADD DIDDOC
 type AddDidMsg struct {
 	DidDoc    BaseDidDoc `json:"didDoc"`
-	SignBytes string     `json:"signedBytes"`
+	SignBytes string     `json:"signBytes"`
 }
 
 // New Ixo message

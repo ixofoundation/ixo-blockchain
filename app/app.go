@@ -82,19 +82,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp
 		},
 	)
 
-	// define the didMapper
-	/**** DELETE */
-	// app.didMapper = did.NewDidMapperSealed(
-	// 	app.keyDID,        // target store
-	// 	&did.BaseDidDoc{}, // prototype
-	// )
-
-	// define the projectMapper
-	app.projectMapper = project.NewProjectMapperSealed(
-		app.keyProject,              // target store
-		&project.StoredProjectDoc{}, // prototype
-	)
-
 	// add handlers
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
@@ -169,13 +156,13 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 
 		// Parse out the signed bytes
 		signByteString := getSignBytes(txBytes)
-		fmt.Println("******** SignBytes *********")
-		fmt.Println(signByteString)
+		// fmt.Println("******** SignBytes *********")
+		// fmt.Println(signByteString)
 
 		// Add them back to the message
 		msgPayload := payloadArray[0].(map[string]interface{})
 		msg := msgPayload["value"].(map[string]interface{})
-		msg["signedBytes"] = signByteString
+		msg["signBytes"] = signByteString
 
 		// Repack the message
 		txBytes, _ = json.Marshal(upTx)
@@ -293,7 +280,7 @@ func (app *IxoApp) ExportAppStateAndValidators() (appState json.RawMessage, vali
 func NewIxoAnteHandler(app *IxoApp, fck auth.FeeCollectionKeeper) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(app.accountMapper, fck)
 	didAnteHandler := did.NewAnteHandler(app.didKeeper)
-	projectAnteHandler := project.NewAnteHandler(app.projectMapper, app.didKeeper)
+	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
 
 	return func(
 		ctx sdk.Context, tx sdk.Tx,

@@ -7,7 +7,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-func NewAnteHandler(projectMapper SealedProjectMapper, didKeeper did.Keeper) sdk.AnteHandler {
+func NewAnteHandler(projectKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx,
 	) (_ sdk.Context, _ sdk.Result, abort bool) {
@@ -30,7 +30,7 @@ func NewAnteHandler(projectMapper SealedProjectMapper, didKeeper did.Keeper) sdk
 		} else {
 			projectDid := ixo.Did(msg.GetSigners()[0])
 			// Get Project Doc
-			projectDoc, found := projectMapper.GetProjectDoc(ctx, projectDid)
+			projectDoc, found := projectKeeper.GetProjectDoc(ctx, projectDid)
 			if !found {
 				return ctx, sdk.ErrInternal("project did not found").Result(), true
 			}
