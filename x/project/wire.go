@@ -7,6 +7,7 @@ import (
 // Register concrete types on wire codec
 func RegisterWire(cdc *wire.Codec) {
 	cdc.RegisterConcrete(CreateProjectMsg{}, "project/CreateProject", nil)
+	cdc.RegisterConcrete(UpdateProjectStatusMsg{}, "project/UpdateProjectStatus", nil)
 	cdc.RegisterConcrete(CreateAgentMsg{}, "project/CreateAgent", nil)
 	cdc.RegisterConcrete(UpdateAgentMsg{}, "project/UpdateAgent", nil)
 	cdc.RegisterConcrete(CreateClaimMsg{}, "project/CreateClaim", nil)

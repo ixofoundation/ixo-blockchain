@@ -17,6 +17,8 @@ func NewHandler(k Keeper, ck bank.Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case CreateProjectMsg:
 			return handleCreateProjectMsg(ctx, k, ck, msg)
+		case UpdateProjectStatusMsg:
+			return handleUpdateProjectStatusMsg(ctx, k, ck, msg)
 		case CreateAgentMsg:
 			return handleCreateAgentMsg(ctx, k, ck, msg)
 		case UpdateAgentMsg:
@@ -38,13 +40,35 @@ func NewHandler(k Keeper, ck bank.Keeper) sdk.Handler {
 func handleCreateProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateProjectMsg) sdk.Result {
 	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
-	projectDoc, err := k.AddProjectDoc(ctx, msg)
+	projectDoc, err := k.AddProjectDoc(ctx, &msg)
 	if err != nil {
 		return err.Result()
 	}
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
 		Data: k.encodeProject(projectDoc),
+	}
+}
+
+func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg UpdateProjectStatusMsg) sdk.Result {
+	existingProjectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
+	if !found {
+		return sdk.Result{
+			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
+			Data: []byte("Could not find Project"),
+		}
+	}
+
+	newStatus := msg.GetStatus()
+	existingProjectDoc.SetStatus(newStatus)
+
+	storedProjectDoc, err := k.AddProjectDoc(ctx, existingProjectDoc)
+	if err != nil {
+		return err.Result()
+	}
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: k.encodeProject(storedProjectDoc),
 	}
 }
 
