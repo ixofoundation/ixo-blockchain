@@ -62,9 +62,12 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg
 	newStatus := msg.GetStatus()
 	existingProjectDoc.SetStatus(newStatus)
 
-	storedProjectDoc, err := k.AddProjectDoc(ctx, existingProjectDoc)
-	if err != nil {
-		return err.Result()
+	storedProjectDoc, updated := k.UpdateProjectDoc(ctx, existingProjectDoc)
+	if !updated {
+		return sdk.Result{
+			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
+			Data: []byte("Could not find Project"),
+		}
 	}
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
