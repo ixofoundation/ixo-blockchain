@@ -23,6 +23,7 @@ type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
 	GetProjectDid() ixo.Did
 	GetPubKey() string
+	GetStatus() ProjectStatus
 	SetStatus(status ProjectStatus)
 }
 
@@ -70,6 +71,18 @@ func (k Keeper) AddProjectDoc(ctx sdk.Context, newProjectDoc StoredProjectDoc) (
 		return newProjectDoc, nil
 	} else {
 		return projectDoc, nil
+	}
+}
+
+// AddDidDoc adds the did_doc at the addr.
+func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc StoredProjectDoc) (StoredProjectDoc, bool) {
+	projectDoc, found := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
+	if !found {
+		return StoredProjectDoc(nil), false
+	} else {
+		projectDoc.SetStatus(newProjectDoc.GetStatus())
+		k.SetProjectDoc(ctx, newProjectDoc)
+		return projectDoc, true
 	}
 }
 
