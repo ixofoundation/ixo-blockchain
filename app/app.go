@@ -18,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
+	"github.com/cosmos/cosmos-sdk/x/stake"
 
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
@@ -51,6 +52,7 @@ type IxoApp struct {
 	coinKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	ibcMapper           ibc.Mapper
+	stakeKeeper         stake.Keeper
 	didKeeper           did.Keeper
 	projectKeeper       project.Keeper
 
@@ -85,12 +87,13 @@ func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp
 	// add handlers
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
+	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
 	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper)
 
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
-		//		AddRoute("project", project.NewHandler()).
+		AddRoute("stake", stake.NewHandler(app.stakeKeeper)).
 		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("did", did.NewHandler(app.didKeeper)).
 		AddRoute("project", project.NewHandler(app.projectKeeper, app.coinKeeper))
@@ -212,7 +215,7 @@ func (app *IxoApp) BeginBlocker(_ sdk.Context, _ abci.RequestBeginBlock) abci.Re
 
 // EndBlocker reflects logic to run after all TXs are processed by the
 // application.
-func (app *IxoApp) EndBlocker(_ sdk.Context, _ abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *IxoApp) EndBlocker(_ sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return abci.ResponseEndBlock{}
 }
 
