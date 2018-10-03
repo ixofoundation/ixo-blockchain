@@ -38,7 +38,6 @@ func GetAccountDecoder(cdc *wire.Codec) auth.AccountDecoder {
 }
 
 //___________________________________________________________________________________
-
 // State to Unmarshal
 type GenesisState struct {
 	Accounts []*GenesisAccount `json:"accounts"`

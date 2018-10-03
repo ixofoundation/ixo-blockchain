@@ -19,6 +19,7 @@ import (
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
+	stakecmd "github.com/cosmos/cosmos-sdk/x/stake/client/cli"
 
 	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/ixofoundation/ixo-cosmos/types"
@@ -46,6 +47,34 @@ func main() {
 	// TODO: setup keybase, viper object, etc. to be passed into
 	// the below functions and eliminate global vars, like we do
 	// with the cdc
+
+	//Add stake commands
+	stakeCmd := &cobra.Command{
+		Use:   "stake",
+		Short: "Stake and validation subcommands",
+	}
+	stakeCmd.AddCommand(
+		client.GetCommands(
+			stakecmd.GetCmdQueryValidator("stake", cdc),
+			stakecmd.GetCmdQueryValidators("stake", cdc),
+			stakecmd.GetCmdQueryDelegation("stake", cdc),
+			stakecmd.GetCmdQueryDelegations("stake", cdc),
+			stakecmd.GetCmdQueryUnbondingDelegation("stake", cdc),
+			stakecmd.GetCmdQueryUnbondingDelegations("stake", cdc),
+			stakecmd.GetCmdQueryRedelegation("stake", cdc),
+			stakecmd.GetCmdQueryRedelegations("stake", cdc),
+		)...)
+	stakeCmd.AddCommand(
+		client.PostCommands(
+			stakecmd.GetCmdCreateValidator(cdc),
+			stakecmd.GetCmdEditValidator(cdc),
+			stakecmd.GetCmdDelegate(cdc),
+			stakecmd.GetCmdUnbond("stake", cdc),
+			stakecmd.GetCmdRedelegate("stake", cdc),
+		)...)
+	rootCmd.AddCommand(
+		stakeCmd,
+	)
 
 	// add standard rpc, and tx commands
 	rpc.AddCommands(rootCmd)
