@@ -12,14 +12,32 @@ import (
 const COIN_DENOM = "ixo"
 
 //DOC SETUP
+type ProjectStatus string
+
+const (
+	NullStatus     ProjectStatus = ""
+	CreatedProject ProjectStatus = "CREATED"
+	PendingStatus  ProjectStatus = "PENDING"
+	FundedStatus   ProjectStatus = "FUNDED"
+	StartedStatus  ProjectStatus = "STARTED"
+	StoppedStatus  ProjectStatus = "STOPPED"
+	PaidoutStatus  ProjectStatus = "PAIDOUT"
+)
+
+//Define UpdateProjectStatusDoc
+type UpdateProjectStatusDoc struct {
+	Status          ProjectStatus `json:"status"`
+	EthFundingTxnID string        `json:"ethFundingTxnID"`
+}
 
 //Define ProjectDoc
 type ProjectDoc struct {
-	RequiredClaims       int    `json:"requiredClaims"`
-	EvaluatorPayPerClaim string `json:"evaluatorPayPerClaim"`
-	ServiceEndpoint      string `json:"serviceEndpoint"`
-	CreatedOn            string `json:"createdOn"`
-	CreatedBy            string `json:"createdBy"`
+	RequiredClaims       string        `json:"requiredClaims"`
+	EvaluatorPayPerClaim string        `json:"evaluatorPayPerClaim"`
+	ServiceEndpoint      string        `json:"serviceEndpoint"`
+	CreatedOn            string        `json:"createdOn"`
+	CreatedBy            string        `json:"createdBy"`
+	Status               ProjectStatus `json:"status"`
 }
 
 //GETTERS
@@ -37,19 +55,19 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 }
 
 //DECODERS
-type ProjectDocDecoder func(projectEntryBytes []byte) (ixo.StoredProjectDoc, error)
+type ProjectDocDecoder func(projectEntryBytes []byte) (StoredProjectDoc, error)
 
 func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
-	return func(projectDocBytes []byte) (res ixo.StoredProjectDoc, err error) {
+	return func(projectDocBytes []byte) (res StoredProjectDoc, err error) {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := StoredProjectDoc{}
+		projectDoc := CreateProjectMsg{}
 		err = cdc.UnmarshalBinary(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)
 		}
-		return projectDoc, err
+		return &projectDoc, err
 	}
 }
 
@@ -153,16 +171,44 @@ func (msg CreateProjectMsg) String() string {
 	}
 	return string(b)
 }
-func (msg CreateProjectMsg) GetPubKey() string      { return msg.PubKey }
-func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.Data.GetEvaluatorPay() }
+func (msg CreateProjectMsg) GetPubKey() string        { return msg.PubKey }
+func (msg CreateProjectMsg) GetEvaluatorPay() int64   { return msg.Data.GetEvaluatorPay() }
+func (msg CreateProjectMsg) GetStatus() ProjectStatus { return msg.Data.Status }
+func (msg *CreateProjectMsg) SetStatus(status ProjectStatus) {
+	msg.Data.Status = status
+}
 func (msg CreateProjectMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
 
-type StoredProjectDoc = CreateProjectMsg
+var _ StoredProjectDoc = (*CreateProjectMsg)(nil)
 
-var _ ixo.StoredProjectDoc = (*StoredProjectDoc)(nil)
+//UpdateProjectStatusMsg
+type UpdateProjectStatusMsg struct {
+	SignBytes  string                 `json:"signBytes"`
+	TxHash     string                 `json:"txHash"`
+	SenderDid  ixo.Did                `json:"senderDid"`
+	ProjectDid ixo.Did                `json:"projectDid"`
+	Data       UpdateProjectStatusDoc `json:"data"`
+}
+
+func (msg UpdateProjectStatusMsg) Type() string                            { return "project" }
+func (msg UpdateProjectStatusMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg UpdateProjectStatusMsg) ValidateBasic() sdk.Error                { return nil }
+func (msg UpdateProjectStatusMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+func (msg UpdateProjectStatusMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+}
+func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
+	return ups.ProjectDid
+}
+func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
+	return ups.Data.Status
+}
+func (msg UpdateProjectStatusMsg) IsNewDid() bool { return false }
 
 //CreateAgentMsg
 type CreateAgentMsg struct {
