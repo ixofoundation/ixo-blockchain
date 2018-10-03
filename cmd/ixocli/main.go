@@ -115,6 +115,7 @@ func main() {
 		client.PostCommands(
 			projectcmd.CreateProjectCmd(cdc),
 			projectcmd.GetProjectDocCmd("project", cdc, project.GetProjectDocDecoder(cdc)),
+			projectcmd.UpdateProjectStatusCmd(cdc),
 			projectcmd.GetProjectAccountsCmd("project", cdc),
 			projectcmd.CreateAgentCmd(cdc),
 			projectcmd.UpdateAgentCmd(cdc),

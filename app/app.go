@@ -55,9 +55,6 @@ type IxoApp struct {
 	stakeKeeper         stake.Keeper
 	didKeeper           did.Keeper
 	projectKeeper       project.Keeper
-
-	// Manage getting and setting dids
-	projectMapper project.SealedProjectMapper
 }
 
 func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IxoApp {

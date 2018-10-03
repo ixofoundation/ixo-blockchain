@@ -95,6 +95,47 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 	}
 }
 
+// Update Project Status
+func UpdateProjectStatusCmd(cdc *wire.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "updateProjectStatus txHash senderDid status sovrinDid",
+		Short: "Update the status of a project signed by the sovrinDID of the project",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
+
+			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
+				return errors.New("You must provide the status and the projects private key")
+			}
+
+			txHash := args[0]
+			senderDid := args[1]
+
+			projectStatus := project.ProjectStatus(args[2])
+			if projectStatus != project.CreatedProject &&
+				projectStatus != project.PendingStatus &&
+				projectStatus != project.FundedStatus &&
+				projectStatus != project.StartedStatus &&
+				projectStatus != project.StoppedStatus &&
+				projectStatus != project.PaidoutStatus {
+				return errors.New("The status must be one of 'CREATED', 'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
+			}
+
+			updateProjectStatusDoc := project.UpdateProjectStatusDoc{
+				Status: projectStatus,
+			}
+
+			sovrinDid := unmarshalSovrinDID(args[3])
+
+			// create the message
+			msg := project.NewUpdateProjectStatusMsg(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
+
+			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+		},
+	}
+}
+
 // Create Agent
 func CreateAgentCmd(cdc *wire.Codec) *cobra.Command {
 	return &cobra.Command{

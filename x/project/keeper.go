@@ -1,6 +1,7 @@
 package project
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -16,6 +17,14 @@ import (
 // module users must specify coin denomination and reward (constant) per PoW solution
 type Config struct {
 	accountMapPrefix string
+}
+
+type StoredProjectDoc interface {
+	GetEvaluatorPay() int64
+	GetProjectDid() ixo.Did
+	GetPubKey() string
+	GetStatus() ProjectStatus
+	SetStatus(status ProjectStatus)
 }
 
 // ProjectKeeper manages dids
@@ -37,7 +46,7 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper) Keeper 
 }
 
 // GetDidDoc returns the did_doc at the addr.
-func (k Keeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) (ixo.StoredProjectDoc, bool) {
+func (k Keeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) (StoredProjectDoc, bool) {
 	store := ctx.KVStore(k.key)
 	bz := store.Get([]byte(did))
 	if bz == nil {
@@ -47,7 +56,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, did ixo.Did) (ixo.StoredProjectDo
 	return project, true
 }
 
-func (k Keeper) SetProjectDoc(ctx sdk.Context, project ixo.StoredProjectDoc) {
+func (k Keeper) SetProjectDoc(ctx sdk.Context, project StoredProjectDoc) {
 	addr := []byte(project.GetProjectDid())
 	store := ctx.KVStore(k.key)
 	bz := k.encodeProject(project)
@@ -55,7 +64,7 @@ func (k Keeper) SetProjectDoc(ctx sdk.Context, project ixo.StoredProjectDoc) {
 }
 
 // AddDidDoc adds the did_doc at the addr.
-func (k Keeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.StoredProjectDoc) (ixo.StoredProjectDoc, sdk.Error) {
+func (k Keeper) AddProjectDoc(ctx sdk.Context, newProjectDoc StoredProjectDoc) (StoredProjectDoc, sdk.Error) {
 	projectDoc, found := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
 	if !found {
 		k.SetProjectDoc(ctx, newProjectDoc)
@@ -65,9 +74,21 @@ func (k Keeper) AddProjectDoc(ctx sdk.Context, newProjectDoc ixo.StoredProjectDo
 	}
 }
 
+// AddDidDoc adds the did_doc at the addr.
+func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc StoredProjectDoc) (StoredProjectDoc, bool) {
+	projectDoc, found := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
+	if !found {
+		return StoredProjectDoc(nil), false
+	} else {
+		projectDoc.SetStatus(newProjectDoc.GetStatus())
+		k.SetProjectDoc(ctx, newProjectDoc)
+		return projectDoc, true
+	}
+}
+
 func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {
 	store := ctx.KVStore(k.key)
-	key := generateAccountsKey(projectDid)
+	key := generateAccountsKey(k, projectDid)
 	bz := store.Get(key)
 	if bz == nil {
 		return make(map[string]interface{})
@@ -85,7 +106,7 @@ func (k Keeper) AddAccountToAccountProjectAccounts(ctx sdk.Context, projectDid i
 	}
 
 	store := ctx.KVStore(k.key)
-	key := generateAccountsKey(projectDid)
+	key := generateAccountsKey(k, projectDid)
 	accountAddrString := hex.EncodeToString(account.GetAddress())
 	accMap[string(accountDid)] = accountAddrString
 	bz := k.encodeAccountMap(accMap)
@@ -108,17 +129,17 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountDid
 
 	return acc
 }
-func (k Keeper) decodeProject(bz []byte) ixo.StoredProjectDoc {
+func (k Keeper) decodeProject(bz []byte) StoredProjectDoc {
 
-	storedProjectDoc := StoredProjectDoc{}
+	storedProjectDoc := CreateProjectMsg{}
 	err := k.cdc.UnmarshalBinary(bz, &storedProjectDoc)
 	if err != nil {
 		panic(err)
 	}
-	return storedProjectDoc
+	return &storedProjectDoc
 
 }
-func (k Keeper) encodeProject(storedProjectDoc ixo.StoredProjectDoc) []byte {
+func (k Keeper) encodeProject(storedProjectDoc StoredProjectDoc) []byte {
 	bz, err := k.cdc.MarshalBinary(storedProjectDoc)
 	if err != nil {
 		panic(err)
@@ -143,4 +164,11 @@ func (k Keeper) decodeAccountMap(accMapBytes []byte) map[string]interface{} {
 	}
 	m := f.(map[string]interface{})
 	return m
+}
+
+func generateAccountsKey(k Keeper, did ixo.Did) []byte {
+	var buffer bytes.Buffer
+	buffer.WriteString(k.config.accountMapPrefix)
+	buffer.WriteString(did)
+	return buffer.Bytes()
 }
