@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -46,4 +47,13 @@ func JSONStringify(msg sdk.Msg) []byte {
 
 	return bytes.Trim(buffer.Bytes(), " \n")
 
+}
+
+// Looks up and ENV value and returns the defaultValue if not found
+func LookupEnv(name string, defaultValue string) string {
+	val, found := os.LookupEnv(name)
+	if found && len(val) > 0 {
+		return val
+	}
+	return defaultValue
 }
