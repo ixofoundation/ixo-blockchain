@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/INFURA/go-libs/jsonrpc_client"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const ETH_URL = "ETH_URL"
@@ -18,6 +19,11 @@ type EthClient struct {
 
 func NewEthClient() (EthClient, error) {
 	url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
+	ethClient, err := ethclient.Dial(url)
+
+	if err {
+		return EthClient{}, err
+	}
 	registryContract := LookupEnv(ETH_REGISTRY_CONTRACT, "")
 	if len(registryContract) == 0 {
 		return EthClient{}, errors.New("Ethereum Registry contract now set on env. ETH_REGISTRY_CONTRACT=")
@@ -28,9 +34,7 @@ func NewEthClient() (EthClient, error) {
 	}
 
 	return EthClient{
-		jsonrpc_client.EthereumClient{
-			url,
-		},
+		ethClient,
 		registryContract,
 		erc20Token,
 	}, nil
