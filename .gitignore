@@ -1,6 +1,8 @@
 vendor
 
 build/*
+*/*/debug
 
 data
 
+.DS_Store

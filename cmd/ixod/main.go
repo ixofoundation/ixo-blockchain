@@ -54,13 +54,31 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
 	return
 }
 
-func newApp(logger log.Logger, db dbm.DB, _ io.Writer) abci.Application {
-	return app.NewIxoApp(logger, db)
-}
-
-func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB, _ io.Writer) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	dapp := app.NewIxoApp(logger, db)
-	return dapp.ExportAppStateAndValidators()
+// defaultAppState sets up the app_state for the
+// default genesis file
+func defaultAppState(args []string, addr sdk.Address, coinDenom string) (json.RawMessage, error) {
+	// Add ETH_PEG key for signing
+	sovrinDid := sovrin.Gen()
+	fmt.Println("********* Note ***********************************************************")
+	fmt.Println("This is the Ethereum Peg Key and needs to be used to release Project Funds")
+	fmt.Println(sovrinDid.String())
+	fmt.Println("**************************************************************************")
+	opts := fmt.Sprintf(`{
+		"accounts": [{
+			"address": "%s",
+			"coins": [
+				{
+					"denom": "%s",
+					"amount": 9007199254740992
+				}
+			],
+			"name":"coinbase"
+		}],
+		"project": {
+			"pegPubKey":"%s"
+		}
+	}`, addr.String(), project.COIN_DENOM, sovrinDid.VerifyKey)
+	return json.RawMessage(opts), nil
 }
 
 func main() {

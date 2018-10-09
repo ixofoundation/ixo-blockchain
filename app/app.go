@@ -110,6 +110,51 @@ func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp
 // custom tx codec
 // TODO: use new go-wire
 func MakeCodec() *wire.Codec {
+	const msgTypeSend = 0x1
+	const msgTypeIssue = 0x2
+	const msgTypeQuiz = 0x3
+	const msgTypeSetTrend = 0x4
+	const msgTypeIBCTransferMsg = 0x5
+	const msgTypeIBCReceiveMsg = 0x6
+	const msgTypeBondMsg = 0x7
+	const msgTypeUnbondMsg = 0x8
+
+	const msgTypeAddDidMsg = 0xA
+
+	const msgTypeCreateProjectMsg = 0x10
+	const msgTypeUpdateProjectStatusMsg = 0x19
+	const msgTypeCreateAgentMsg = 0x11
+	const msgTypeUpdateAgentMsg = 0x12
+	const msgTypeCreateClaimMsg = 0x13
+	const msgTypeCreateEvaluationMsg = 0x14
+
+	const msgTypeFundProjectMsg = 0x15
+	const msgTypeWithdrawFundsMsg = 0x16
+
+	const msgTypeAddCredentialMsg = 0x18
+
+	var _ = oldwire.RegisterInterface(
+		struct{ sdk.Msg }{},
+		oldwire.ConcreteType{bank.SendMsg{}, msgTypeSend},
+		oldwire.ConcreteType{bank.IssueMsg{}, msgTypeIssue},
+		oldwire.ConcreteType{ibc.IBCTransferMsg{}, msgTypeIBCTransferMsg},
+		oldwire.ConcreteType{ibc.IBCReceiveMsg{}, msgTypeIBCReceiveMsg},
+		oldwire.ConcreteType{simplestake.BondMsg{}, msgTypeBondMsg},
+		oldwire.ConcreteType{simplestake.UnbondMsg{}, msgTypeUnbondMsg},
+
+		oldwire.ConcreteType{did.AddDidMsg{}, msgTypeAddDidMsg},
+		oldwire.ConcreteType{did.AddCredentialMsg{}, msgTypeAddCredentialMsg},
+
+		oldwire.ConcreteType{project.CreateProjectMsg{}, msgTypeCreateProjectMsg},
+		oldwire.ConcreteType{project.UpdateProjectStatusMsg{}, msgTypeUpdateProjectStatusMsg},
+		oldwire.ConcreteType{project.CreateAgentMsg{}, msgTypeCreateAgentMsg},
+		oldwire.ConcreteType{project.UpdateAgentMsg{}, msgTypeUpdateAgentMsg},
+		oldwire.ConcreteType{project.CreateClaimMsg{}, msgTypeCreateClaimMsg},
+		oldwire.ConcreteType{project.CreateEvaluationMsg{}, msgTypeCreateEvaluationMsg},
+
+		oldwire.ConcreteType{project.FundProjectMsg{}, msgTypeFundProjectMsg},
+		oldwire.ConcreteType{project.WithdrawFundsMsg{}, msgTypeWithdrawFundsMsg},
+	)
 
 	cdc := wire.NewCodec()
 
@@ -143,26 +188,25 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 
 		fmt.Println("********DECODED_TXN*********")
 		fmt.Println(string(txBytes))
+
 		// Lets replace the hex encoded Msg with it's unhexed json equivalent so it can be parsed correctly
 		var upTx map[string]interface{}
 		json.Unmarshal(txBytes, &upTx)
 		payloadArray := upTx["payload"].([]interface{})
-		if len(payloadArray) != 1 {
-			return nil, sdk.ErrTxDecode("Multiple messages not supported")
+
+		// Check if it is not json
+		payloadBody, isString := payloadArray[1].(string)
+		if isString {
+			jsonBytes := make([]byte, hex.DecodedLen(len(payloadBody)))
+			jsonBytes, hexErr := hex.DecodeString(payloadBody)
+			if hexErr != nil {
+				fmt.Print("Error decoding hex payload: ", payloadBody)
+				return nil, sdk.ErrTxDecode("").TraceCause(hexErr, "")
+			}
+			jsonBytes = bytes.Replace(jsonBytes, []byte("{"), []byte("{\"signBytes\":\""+payloadBody+"\","), 1)
+			txBytes = bytes.Replace(txBytes, []byte("\""+payloadBody+"\""), jsonBytes, 1)
+			fmt.Println("** TXN_BYTES ", string(txBytes))
 		}
-
-		// Parse out the signed bytes
-		signByteString := getSignBytes(txBytes)
-		// fmt.Println("******** SignBytes *********")
-		// fmt.Println(signByteString)
-
-		// Add them back to the message
-		msgPayload := payloadArray[0].(map[string]interface{})
-		msg := msgPayload["value"].(map[string]interface{})
-		msg["signBytes"] = signByteString
-
-		// Repack the message
-		txBytes, _ = json.Marshal(upTx)
 
 		// StdTx.Msg is an interface. The concrete types
 		// are registered by MakeTxCodec in bank.RegisterWire.
@@ -171,23 +215,22 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 			return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 		}
 
-		// fmt.Println("TXN_PAYLOAD", tx)
+		fmt.Println("** TXN_PAYLOAD ", tx)
 
 		return tx, nil
-
-	} else {
-		var tx = auth.StdTx{}
-
-		// StdTx.Msg is an interface. The concrete types
-		// are registered by MakeTxCodec in bank.RegisterWire.
-		err := app.cdc.UnmarshalBinary(txBytes, &tx)
-		if err != nil {
-			return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
-		}
-		fmt.Println(tx)
-		return tx, nil
-
 	}
+
+	var tx = sdk.StdTx{}
+
+	// StdTx.Msg is an interface. The concrete types
+	// are registered by MakeTxCodec in bank.RegisterWire.
+	err := app.cdc.UnmarshalBinary(txBytes, &tx)
+	if err != nil {
+		return nil, sdk.ErrTxDecode("").TraceCause(err, "")
+	}
+	fmt.Println(tx)
+	return tx, nil
+
 }
 
 func getSignBytes(txBytes []byte) string {

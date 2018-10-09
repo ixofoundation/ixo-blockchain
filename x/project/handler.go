@@ -75,7 +75,29 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg
 	}
 }
 
-func handleCreateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateAgentMsg) sdk.Result {
+func handleUpdateProjectStatusMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg UpdateProjectStatusMsg) sdk.Result {
+	existingProjectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
+	if !found {
+		return sdk.Result{
+			Code: sdk.CodeInvalidAddress,
+			Data: []byte("Could not find Project"),
+		}
+	}
+
+	newStatus := msg.GetStatus()
+	existingProjectDoc.SetStatus(newStatus)
+
+	storedProjectDoc, err := k.AddProjectDoc(ctx, existingProjectDoc)
+	if err != nil {
+		return err.Result()
+	}
+	return sdk.Result{
+		Code: sdk.CodeOK,
+		Data: k.pm.encodeProject(storedProjectDoc),
+	}
+}
+
+func handleCreateAgentMsg(ctx sdk.Context, k ProjectKeeper, ck bank.CoinKeeper, msg CreateAgentMsg) sdk.Result {
 	addAccountToAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,

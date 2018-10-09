@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -42,8 +43,33 @@ func ixoSignAndBroadcast(cdc *wire.Codec, ctx context.CLIContext, msg sdk.Msg, s
 	if err != nil {
 		panic(err)
 	}
+
+	var txMap map[string]interface{}
+	if err := json.Unmarshal(bz, &txMap); err != nil {
+		panic(err)
+	}
+	// fmt.Println(">txMap : ", txMap)
+	txPayload := txMap["payload"].([]interface{})
+	txType := txPayload[0]
+	txMessage := txPayload[1]
+
+	txMessageJSON, err := json.Marshal(txMessage)
+	if err != nil {
+		panic(err)
+	}
+
+	newTxPayload := []interface{}{txType, hex.EncodeToString(txMessageJSON)}
+	txMap["payload"] = newTxPayload
+	// fmt.Println(">adjusted txMap : ", txMap)
+
+	newBroadcast, err := json.Marshal(txMap)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println("\n***\n>newBroadcast : ", string(newBroadcast))
+
 	// Broadcast to Tendermint
-	res, err := ctx.BroadcastTx(bz)
+	res, err := ctx.BroadcastTx(newBroadcast)
 	if err != nil {
 		return err
 	}
@@ -98,40 +124,32 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 // Update Project Status
 func UpdateProjectStatusCmd(cdc *wire.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateProjectStatus txHash senderDid status sovrinDid",
-		Short: "Update the status of a project signed by the sovrinDID of the project",
+		Use:   "updateProjectStatus status ethFundingTxnID projectDid",
+		Short: "Update a a project status and ethereum funding txn id signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout)
-
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
-				return errors.New("You must provide the status and the projects private key")
+			ctx := context.NewCoreContextFromViper()
+			if len(args) != 3 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the status ethTxFundingID and the projectDid")
 			}
 
-			txHash := args[0]
-			senderDid := args[1]
-
-			projectStatus := project.ProjectStatus(args[2])
-			if projectStatus != project.CreatedProject &&
-				projectStatus != project.PendingStatus &&
-				projectStatus != project.FundedStatus &&
-				projectStatus != project.StartedStatus &&
-				projectStatus != project.StoppedStatus &&
-				projectStatus != project.PaidoutStatus {
-				return errors.New("The status must be one of 'CREATED', 'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
+			projectStatus := project.ProjectStatus(args[0])
+			if projectStatus != project.NullStatus && projectStatus != project.PendingStatus && projectStatus != project.FundedStatus && projectStatus != project.StartedStatus && projectStatus != project.StoppedStatus && projectStatus != project.PaidoutStatus {
+				return errors.New("The status must be one of 'CREATED', 'PENDING', 'FUNDED', 'STARTED', 'STOPPED', 'PAIDOUT'")
 			}
 
-			updateProjectStatusDoc := project.UpdateProjectStatusDoc{
-				Status: projectStatus,
+			ethFundingTxnID := args[1]
+
+			updateProjectDoc := project.UpdateProjectStatusDoc{
+				Status:          projectStatus,
+				EthFundingTxnID: ethFundingTxnID,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[3])
+			projectDid := unmarshalSovrinDID(args[2])
 
 			// create the message
-			msg := project.NewUpdateProjectStatusMsg(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
+			msg := project.NewUpdateProjectStatusMsg(updateProjectDoc, projectDid)
 
-			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixoSignAndBroadcast(cdc, ctx, msg, projectDid)
 		},
 	}
 }

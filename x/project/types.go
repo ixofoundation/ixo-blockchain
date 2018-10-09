@@ -32,12 +32,30 @@ type UpdateProjectStatusDoc struct {
 
 //Define ProjectDoc
 type ProjectDoc struct {
-	RequiredClaims       string        `json:"requiredClaims"`
+	RequiredClaims       int           `json:"requiredClaims"`
 	EvaluatorPayPerClaim string        `json:"evaluatorPayPerClaim"`
 	ServiceEndpoint      string        `json:"serviceEndpoint"`
 	CreatedOn            string        `json:"createdOn"`
 	CreatedBy            string        `json:"createdBy"`
 	Status               ProjectStatus `json:"status"`
+}
+
+type ProjectStatus string
+
+const (
+	NullStatus     ProjectStatus = ""
+	CreatedProject ProjectStatus = "CREATED"
+	PendingStatus  ProjectStatus = "PENDING"
+	FundedStatus   ProjectStatus = "FUNDED"
+	StartedStatus  ProjectStatus = "STARTED"
+	StoppedStatus  ProjectStatus = "STOPPED"
+	PaidoutStatus  ProjectStatus = "PAIDOUT"
+)
+
+//Define UpdateProjectStatusDoc
+type UpdateProjectStatusDoc struct {
+	Status          ProjectStatus `json:"status"`
+	EthFundingTxnID string        `json:"ethFundingTxnID"`
 }
 
 //GETTERS
@@ -181,6 +199,9 @@ func (msg CreateProjectMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 func (msg CreateProjectMsg) IsNewDid() bool { return true }
+func (pd *CreateProjectMsg) SetStatus(status ProjectStatus) {
+	pd.Data.Status = status
+}
 
 var _ StoredProjectDoc = (*CreateProjectMsg)(nil)
 
@@ -201,6 +222,32 @@ func (msg UpdateProjectStatusMsg) GetSignBytes() []byte {
 }
 func (msg UpdateProjectStatusMsg) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+}
+func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
+	return ups.ProjectDid
+}
+func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
+	return ups.Data.Status
+}
+func (msg UpdateProjectStatusMsg) IsNewDid() bool { return false }
+
+//UpdateProjectStatusMsg
+type UpdateProjectStatusMsg struct {
+	SignBytes  string                 `json:"signBytes"`
+	TxHash     string                 `json:"txHash"`
+	SenderDid  ixo.Did                `json:"senderDid"`
+	ProjectDid ixo.Did                `json:"projectDid"`
+	Data       UpdateProjectStatusDoc `json:"data"`
+}
+
+func (msg UpdateProjectStatusMsg) Type() string                            { return "project" }
+func (msg UpdateProjectStatusMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg UpdateProjectStatusMsg) ValidateBasic() sdk.Error                { return nil }
+func (msg UpdateProjectStatusMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+func (msg UpdateProjectStatusMsg) GetSigners() []sdk.Address {
+	return []sdk.Address{[]byte(msg.GetProjectDid())}
 }
 func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
 	return ups.ProjectDid

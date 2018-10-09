@@ -69,9 +69,8 @@ func (k Keeper) AddProjectDoc(ctx sdk.Context, newProjectDoc StoredProjectDoc) (
 	if !found {
 		k.SetProjectDoc(ctx, newProjectDoc)
 		return newProjectDoc, nil
-	} else {
-		return projectDoc, nil
 	}
+	return projectDoc, nil
 }
 
 // AddDidDoc adds the did_doc at the addr.
