@@ -3,11 +3,14 @@ package app
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
 
 	//	"cosmos-test/types"
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/go-kit/kit/log/term"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
@@ -18,11 +21,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/ibc"
-	"github.com/cosmos/cosmos-sdk/x/stake"
 
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/pool"
 
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -52,24 +55,45 @@ type IxoApp struct {
 	coinKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	ibcMapper           ibc.Mapper
-	stakeKeeper         stake.Keeper
+	poolKeeper          pool.Keeper
 	didKeeper           did.Keeper
 	projectKeeper       project.Keeper
+
+	// Eth client
+	ethClient ixo.EthClient
 }
 
-func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp)) *IxoApp {
+func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOptions ...func(*bam.BaseApp)) *IxoApp {
+
+	colorFn := func(keyvals ...interface{}) term.FgBgColor {
+		return term.FgBgColor{Fg: term.Blue}
+	}
+	newLogger := log.NewTMLoggerWithColorFn(os.Stdout, colorFn)
+	newLogger = log.Logger.With(newLogger, "module", "ixo")
 
 	cdc := MakeCodec()
+
+	bApp := bam.NewBaseApp(APP_NAME, newLogger, db, nil, baseAppOptions...)
+	bApp.SetCommitMultiStoreTracer(traceStore)
+
+	ethClient, cErr := ixo.NewEthClient()
+	if cErr != nil {
+		logger.Error(cErr.Error())
+		//		panic(cErr)
+	}
+
 	// create your application object
 	var app = &IxoApp{
 		cdc:        cdc,
-		BaseApp:    bam.NewBaseApp(APP_NAME, logger, db, nil, baseAppOptions...),
+		BaseApp:    bApp,
 		keyMain:    sdk.NewKVStoreKey("main"),
 		keyAccount: sdk.NewKVStoreKey("acc"),
 		keyIBC:     sdk.NewKVStoreKey("ibc"),
 		keyStake:   sdk.NewKVStoreKey("stake"),
 		keyDID:     sdk.NewKVStoreKey("did"),
 		keyProject: sdk.NewKVStoreKey("project"),
+
+		ethClient: ethClient,
 	}
 
 	// define and attach the mappers and keepers
@@ -84,16 +108,16 @@ func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp
 	// add handlers
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
-	app.stakeKeeper = stake.NewKeeper(app.cdc, app.keyStake, app.coinKeeper, app.RegisterCodespace(stake.DefaultCodespace))
+	app.poolKeeper = pool.NewKeeper(app.cdc, app.keyStake)
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
 	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper)
 
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
-		AddRoute("stake", stake.NewHandler(app.stakeKeeper)).
+		//		AddRoute("pool", pool.NewHandler(app.poolKeeper)).
 		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
 		AddRoute("did", did.NewHandler(app.didKeeper)).
-		AddRoute("project", project.NewHandler(app.projectKeeper, app.coinKeeper))
+		AddRoute("project", project.NewHandler(app.projectKeeper, app.coinKeeper, app.ethClient))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper))
@@ -110,8 +134,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp
 	return app
 }
 
-// custom tx codec
-// TODO: use new go-wire
 func MakeCodec() *wire.Codec {
 
 	cdc := wire.NewCodec()
@@ -144,8 +166,8 @@ func (app *IxoApp) txDecoder(txBytes []byte) (sdk.Tx, sdk.Error) {
 	if txByteString == "{" {
 		var tx = ixo.IxoTx{}
 
-		fmt.Println("********DECODED_TXN*********")
-		fmt.Println(string(txBytes))
+		app.Logger.Info("********DECODED_TXN*********")
+		app.Logger.Info(string(txBytes))
 		// Lets replace the hex encoded Msg with it's unhexed json equivalent so it can be parsed correctly
 		var upTx map[string]interface{}
 		json.Unmarshal(txBytes, &upTx)
@@ -222,25 +244,34 @@ func (app *IxoApp) EndBlocker(_ sdk.Context, req abci.RequestEndBlock) abci.Resp
 // should contain all the genesis accounts. These accounts will be added to the
 // application's account mapper.
 func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper) sdk.InitChainer {
+	app.Logger.Info("******InitChainer")
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+		app.Logger.Info("******InitChainer called")
 		stateJSON := req.AppStateBytes
 
 		genesisState := new(types.GenesisState)
 		err := app.cdc.UnmarshalJSON(stateJSON, genesisState)
 		if err != nil {
-			panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-			// return sdk.ErrGenesisParse("").TraceCause(err, "")
+			panic(err)
 		}
 
 		for _, gacc := range genesisState.Accounts {
 			acc, err := gacc.ToAppAccount()
 			if err != nil {
-				panic(err) // TODO https://github.com/cosmos/cosmos-sdk/issues/468
-				//	return sdk.ErrGenesisParse("").TraceCause(err, "")
+				panic(err)
 			}
 			app.accountMapper.SetAccount(ctx, acc)
 		}
+		app.Logger.Info("******InitPool Genesis")
+		// load the initial stake information
+		validators, err := pool.InitGenesis(ctx, app.poolKeeper, genesisState.PoolData)
+		if err != nil {
+			panic(err)
+		}
 
+		for val := range validators {
+			fmt.Println(val)
+		}
 		return abci.ResponseInitChain{}
 	}
 }

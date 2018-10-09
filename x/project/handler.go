@@ -10,15 +10,13 @@ import (
 	ixo "github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-const CURRENCY = "ixo-atom"
-
-func NewHandler(k Keeper, ck bank.Keeper) sdk.Handler {
+func NewHandler(k Keeper, ck bank.Keeper, ethClient ixo.EthClient) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case CreateProjectMsg:
 			return handleCreateProjectMsg(ctx, k, ck, msg)
 		case UpdateProjectStatusMsg:
-			return handleUpdateProjectStatusMsg(ctx, k, ck, msg)
+			return handleUpdateProjectStatusMsg(ctx, k, ck, ethClient, msg)
 		case CreateAgentMsg:
 			return handleCreateAgentMsg(ctx, k, ck, msg)
 		case UpdateAgentMsg:
@@ -27,8 +25,6 @@ func NewHandler(k Keeper, ck bank.Keeper) sdk.Handler {
 			return handleCreateClaimMsg(ctx, k, ck, msg)
 		case CreateEvaluationMsg:
 			return handleCreateEvaluationMsg(ctx, k, ck, msg)
-		case FundProjectMsg:
-			return handleFundProjectMsg(ctx, k, ck, msg)
 		case WithdrawFundsMsg:
 			return handleWithdrawFundsMsg(ctx, k, ck, msg)
 		default:
@@ -50,7 +46,7 @@ func handleCreateProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg Creat
 	}
 }
 
-func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg UpdateProjectStatusMsg) sdk.Result {
+func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient ixo.EthClient, msg UpdateProjectStatusMsg) sdk.Result {
 	existingProjectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if !found {
 		return sdk.Result{
@@ -61,6 +57,35 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg
 
 	newStatus := msg.GetStatus()
 	existingProjectDoc.SetStatus(newStatus)
+
+	if newStatus == FundedStatus {
+		if existingProjectDoc.GetStatus() != CreatedProject {
+			return sdk.Result{
+				Code: sdk.ABCICodeType(sdk.CodeInternal),
+				Data: []byte("Could not find Project"),
+			}
+		} else {
+			// Check that the Project wallet is funded and mint equivalent tokens on project
+
+			ethTx, err := ethClient.Eth_getTransactionByHash(msg.GetEthFundingTxnID())
+			if err != nil {
+				return sdk.Result{
+					Code: sdk.ABCICodeType(sdk.CodeInternal),
+					Data: []byte("ETH tx not valid"),
+				}
+			}
+			fundingTx := ethClient.IsProjectFundingTx(existingProjectDoc.GetProjectDid(), ethTx.Input)
+			if !fundingTx {
+				return sdk.Result{
+					Code: sdk.ABCICodeType(sdk.CodeInternal),
+					Data: []byte("ETH tx not valid"),
+				}
+			}
+			amt := ethClient.GetFundingAmt(ethTx.Input)
+			coin := sdk.NewInt64Coin(COIN_DENOM, amt)
+			return fundProject(ctx, k, ck, existingProjectDoc, coin)
+		}
+	}
 
 	storedProjectDoc, updated := k.UpdateProjectDoc(ctx, existingProjectDoc)
 	if !updated {
@@ -130,17 +155,9 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg Cr
 	}
 }
 
-func handleFundProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg FundProjectMsg) sdk.Result {
-	fundProjectDoc := msg.Data
-	_, found := getProjectDoc(ctx, k, fundProjectDoc.ProjectDid)
-	if !found {
-		return sdk.Result{
-			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
-			Data: []byte("Could not find Project"),
-		}
-	}
-	accMap := getProjectAccountMap(ctx, k, fundProjectDoc.ProjectDid)
-	projectAddrInterface, found := accMap[fundProjectDoc.ProjectDid]
+func fundProject(ctx sdk.Context, k Keeper, ck bank.Keeper, projectDoc StoredProjectDoc, coin sdk.Coin) sdk.Result {
+	accMap := getProjectAccountMap(ctx, k, projectDoc.GetProjectDid())
+	projectAddrInterface, found := accMap[projectDoc.GetProjectDid()]
 	if !found {
 		return sdk.Result{
 			Code: sdk.ABCICodeType(sdk.CodeInvalidAddress),
@@ -149,14 +166,14 @@ func handleFundProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg FundPro
 	}
 	projectAddr := projectAddrInterface.(string)
 
-	_, _, err := ck.AddCoins(ctx, sdk.AccAddress(projectAddr), sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, fundProjectDoc.GetAmount())})
+	_, _, err := ck.AddCoins(ctx, sdk.AccAddress(projectAddr), sdk.Coins{coin})
 	if err != nil {
 		panic(err)
 	}
 
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
+		Data: []byte("Project Funded"),
 	}
 }
 func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg WithdrawFundsMsg) sdk.Result {
