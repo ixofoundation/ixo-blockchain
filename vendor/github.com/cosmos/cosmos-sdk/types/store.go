@@ -2,12 +2,28 @@ package types
 
 import (
 	"fmt"
+	"io"
 
-	abci "github.com/tendermint/abci/types"
-	dbm "github.com/tendermint/tmlibs/db"
+	abci "github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
 )
 
 // NOTE: These are implemented in cosmos-sdk/store.
+
+// PruningStrategy specfies how old states will be deleted over time
+type PruningStrategy uint8
+
+const (
+	// PruneSyncable means only those states not needed for state syncing will be deleted (keeps last 100 + every 10000th)
+	PruneSyncable PruningStrategy = iota
+
+	// PruneEverything means all saved states will be deleted, storing only the current state
+	PruneEverything PruningStrategy = iota
+
+	// PruneNothing means all historic states will be saved, nothing will be deleted
+	PruneNothing PruningStrategy = iota
+)
 
 type Store interface { //nolint
 	GetStoreType() StoreType
@@ -18,6 +34,7 @@ type Store interface { //nolint
 type Committer interface {
 	Commit() CommitID
 	LastCommitID() CommitID
+	SetPruning(PruningStrategy)
 }
 
 // Stores of MultiStore must implement CommitStore.
@@ -48,6 +65,21 @@ type MultiStore interface { //nolint
 	// Convenience for fetching substores.
 	GetStore(StoreKey) Store
 	GetKVStore(StoreKey) KVStore
+
+	// TracingEnabled returns if tracing is enabled for the MultiStore.
+	TracingEnabled() bool
+
+	// WithTracer sets the tracer for the MultiStore that the underlying
+	// stores will utilize to trace operations. A MultiStore is returned.
+	WithTracer(w io.Writer) MultiStore
+
+	// WithTracingContext sets the tracing context for a MultiStore. It is
+	// implied that the caller should update the context when necessary between
+	// tracing operations. A MultiStore is returned.
+	WithTracingContext(TraceContext) MultiStore
+
+	// ResetTraceContext resets the current tracing context.
+	ResetTraceContext() MultiStore
 }
 
 // From MultiStore.CacheMultiStore()....
@@ -82,7 +114,7 @@ type CommitMultiStore interface {
 	LoadVersion(ver int64) error
 }
 
-//----------------------------------------
+//---------subsp-------------------------------
 // KVStore
 
 // KVStore is a simple interface to get/set data
@@ -103,11 +135,14 @@ type KVStore interface {
 
 	// Iterator over a domain of keys in ascending order. End is exclusive.
 	// Start must be less than end, or the Iterator is invalid.
+	// Iterator must be closed by caller.
+	// To iterate over entire domain, use store.Iterator(nil, nil)
 	// CONTRACT: No writes may happen within a domain while an iterator exists over it.
 	Iterator(start, end []byte) Iterator
 
 	// Iterator over a domain of keys in descending order. End is exclusive.
 	// Start must be greater than end, or the Iterator is invalid.
+	// Iterator must be closed by caller.
 	// CONTRACT: No writes may happen within a domain while an iterator exists over it.
 	ReverseIterator(start, end []byte) Iterator
 
@@ -117,10 +152,29 @@ type KVStore interface {
 	// TODO Not yet implemented.
 	// GetSubKVStore(key *storeKey) KVStore
 
+	// Prefix applied keys with the argument
+	// CONTRACT: when Prefix is called on a KVStore more than once,
+	// the concatanation of the prefixes is applied
+	Prefix(prefix []byte) KVStore
+
+	// Gas consuming store
+	// CONTRACT: when Gas is called on a KVStore more than once,
+	// the concatanation of the meters/configs is applied
+	Gas(GasMeter, GasConfig) KVStore
 }
 
 // Alias iterator to db's Iterator for convenience.
 type Iterator = dbm.Iterator
+
+// Iterator over all the keys with a certain prefix in ascending order
+func KVStorePrefixIterator(kvs KVStore, prefix []byte) Iterator {
+	return kvs.Iterator(prefix, PrefixEndBytes(prefix))
+}
+
+// Iterator over all the keys with a certain prefix in descending order.
+func KVStoreReversePrefixIterator(kvs KVStore, prefix []byte) Iterator {
+	return kvs.ReverseIterator(prefix, PrefixEndBytes(prefix))
+}
 
 // CacheKVStore cache-wraps a KVStore.  After calling .Write() on
 // the CacheKVStore, all previously created CacheKVStores on the
@@ -141,25 +195,27 @@ type CommitKVStore interface {
 //----------------------------------------
 // CacheWrap
 
-/*
-	CacheWrap() makes the most appropriate cache-wrap.  For example,
-	IAVLStore.CacheWrap() returns a CacheKVStore.
-
-	CacheWrap() should not return a Committer, since Commit() on
-	cache-wraps make no sense.  It can return KVStore, HeapStore,
-	SpaceStore, etc.
-*/
+// CacheWrap makes the most appropriate cache-wrap. For example,
+// IAVLStore.CacheWrap() returns a CacheKVStore. CacheWrap should not return
+// a Committer, since Commit cache-wraps make no sense. It can return KVStore,
+// HeapStore, SpaceStore, etc.
 type CacheWrap interface {
-
 	// Write syncs with the underlying store.
 	Write()
 
 	// CacheWrap recursively wraps again.
 	CacheWrap() CacheWrap
+
+	// CacheWrapWithTrace recursively wraps again with tracing enabled.
+	CacheWrapWithTrace(w io.Writer, tc TraceContext) CacheWrap
 }
 
 type CacheWrapper interface { //nolint
+	// CacheWrap cache wraps.
 	CacheWrap() CacheWrap
+
+	// CacheWrapWithTrace cache wraps with tracing enabled.
+	CacheWrapWithTrace(w io.Writer, tc TraceContext) CacheWrap
 }
 
 //----------------------------------------
@@ -190,6 +246,7 @@ const (
 	StoreTypeMulti StoreType = iota
 	StoreTypeDB
 	StoreTypeIAVL
+	StoreTypeTransient
 )
 
 //----------------------------------------
@@ -222,3 +279,63 @@ func (key *KVStoreKey) Name() string {
 func (key *KVStoreKey) String() string {
 	return fmt.Sprintf("KVStoreKey{%p, %s}", key, key.name)
 }
+
+// PrefixEndBytes returns the []byte that would end a
+// range query for all []byte with a certain prefix
+// Deals with last byte of prefix being FF without overflowing
+func PrefixEndBytes(prefix []byte) []byte {
+	if prefix == nil {
+		return nil
+	}
+
+	end := make([]byte, len(prefix))
+	copy(end, prefix)
+
+	for {
+		if end[len(end)-1] != byte(255) {
+			end[len(end)-1]++
+			break
+		} else {
+			end = end[:len(end)-1]
+			if len(end) == 0 {
+				end = nil
+				break
+			}
+		}
+	}
+	return end
+}
+
+// TransientStoreKey is used for indexing transient stores in a MultiStore
+type TransientStoreKey struct {
+	name string
+}
+
+// Constructs new TransientStoreKey
+// Must return a pointer according to the ocap principle
+func NewTransientStoreKey(name string) *TransientStoreKey {
+	return &TransientStoreKey{
+		name: name,
+	}
+}
+
+// Implements StoreKey
+func (key *TransientStoreKey) Name() string {
+	return key.name
+}
+
+// Implements StoreKey
+func (key *TransientStoreKey) String() string {
+	return fmt.Sprintf("TransientStoreKey{%p, %s}", key, key.name)
+}
+
+//----------------------------------------
+
+// key-value result for iterator queries
+type KVPair cmn.KVPair
+
+//----------------------------------------
+
+// TraceContext contains TraceKVStore context data. It will be written with
+// every trace operation.
+type TraceContext map[string]interface{}

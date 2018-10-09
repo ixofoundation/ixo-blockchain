@@ -3,21 +3,21 @@ package core
 import (
 	"fmt"
 
+	cmn "github.com/tendermint/tendermint/libs/common"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	sm "github.com/tendermint/tendermint/state"
 	"github.com/tendermint/tendermint/types"
-	cmn "github.com/tendermint/tmlibs/common"
 )
 
 // Get block headers for minHeight <= height <= maxHeight.
 // Block headers are returned in descending order (highest first).
 //
 // ```shell
-// curl 'localhost:46657/blockchain?minHeight=10&maxHeight=10'
+// curl 'localhost:26657/blockchain?minHeight=10&maxHeight=10'
 // ```
 //
 // ```go
-// client := client.NewHTTP("tcp://0.0.0.0:46657", "/websocket")
+// client := client.NewHTTP("tcp://0.0.0.0:26657", "/websocket")
 // info, err := client.BlockchainInfo(10, 10)
 // ```
 //
@@ -64,25 +64,15 @@ import (
 //
 // <aside class="notice">Returns at most 20 items.</aside>
 func BlockchainInfo(minHeight, maxHeight int64) (*ctypes.ResultBlockchainInfo, error) {
-	if minHeight == 0 {
-		minHeight = 1
-	}
-
-	if maxHeight == 0 {
-		maxHeight = blockStore.Height()
-	} else {
-		maxHeight = cmn.MinInt64(blockStore.Height(), maxHeight)
-	}
 
 	// maximum 20 block metas
 	const limit int64 = 20
-	minHeight = cmn.MaxInt64(minHeight, maxHeight-limit)
-
-	logger.Debug("BlockchainInfoHandler", "maxHeight", maxHeight, "minHeight", minHeight)
-
-	if minHeight > maxHeight {
-		return nil, fmt.Errorf("min height %d can't be greater than max height %d", minHeight, maxHeight)
+	var err error
+	minHeight, maxHeight, err = filterMinMax(blockStore.Height(), minHeight, maxHeight, limit)
+	if err != nil {
+		return nil, err
 	}
+	logger.Debug("BlockchainInfoHandler", "maxHeight", maxHeight, "minHeight", minHeight)
 
 	blockMetas := []*types.BlockMeta{}
 	for height := maxHeight; height >= minHeight; height-- {
@@ -93,15 +83,46 @@ func BlockchainInfo(minHeight, maxHeight int64) (*ctypes.ResultBlockchainInfo, e
 	return &ctypes.ResultBlockchainInfo{blockStore.Height(), blockMetas}, nil
 }
 
+// error if either min or max are negative or min < max
+// if 0, use 1 for min, latest block height for max
+// enforce limit.
+// error if min > max
+func filterMinMax(height, min, max, limit int64) (int64, int64, error) {
+	// filter negatives
+	if min < 0 || max < 0 {
+		return min, max, fmt.Errorf("heights must be non-negative")
+	}
+
+	// adjust for default values
+	if min == 0 {
+		min = 1
+	}
+	if max == 0 {
+		max = height
+	}
+
+	// limit max to the height
+	max = cmn.MinInt64(height, max)
+
+	// limit min to within `limit` of max
+	// so the total number of blocks returned will be `limit`
+	min = cmn.MaxInt64(min, max-limit+1)
+
+	if min > max {
+		return min, max, fmt.Errorf("min height %d can't be greater than max height %d", min, max)
+	}
+	return min, max, nil
+}
+
 // Get block at a given height.
 // If no height is provided, it will fetch the latest block.
 //
 // ```shell
-// curl 'localhost:46657/block?height=10'
+// curl 'localhost:26657/block?height=10'
 // ```
 //
 // ```go
-// client := client.NewHTTP("tcp://0.0.0.0:46657", "/websocket")
+// client := client.NewHTTP("tcp://0.0.0.0:26657", "/websocket")
 // info, err := client.Block(10)
 // ```
 //
@@ -209,11 +230,11 @@ func Block(heightPtr *int64) (*ctypes.ResultBlock, error) {
 // If no height is provided, it will fetch the commit for the latest block.
 //
 // ```shell
-// curl 'localhost:46657/commit?height=11'
+// curl 'localhost:26657/commit?height=11'
 // ```
 //
 // ```go
-// client := client.NewHTTP("tcp://0.0.0.0:46657", "/websocket")
+// client := client.NewHTTP("tcp://0.0.0.0:26657", "/websocket")
 // info, err := client.Commit(11)
 // ```
 //
@@ -288,12 +309,12 @@ func Commit(heightPtr *int64) (*ctypes.ResultCommit, error) {
 	// use a non-canonical commit
 	if height == storeHeight {
 		commit := blockStore.LoadSeenCommit(height)
-		return ctypes.NewResultCommit(header, commit, false), nil
+		return ctypes.NewResultCommit(&header, commit, false), nil
 	}
 
 	// Return the canonical commit (comes from the block at height+1)
 	commit := blockStore.LoadBlockCommit(height)
-	return ctypes.NewResultCommit(header, commit, true), nil
+	return ctypes.NewResultCommit(&header, commit, true), nil
 }
 
 // BlockResults gets ABCIResults at a given height.
@@ -303,11 +324,11 @@ func Commit(heightPtr *int64) (*ctypes.ResultCommit, error) {
 // Thus response.results[5] is the results of executing getBlock(h).Txs[5]
 //
 // ```shell
-// curl 'localhost:46657/block_results?height=10'
+// curl 'localhost:26657/block_results?height=10'
 // ```
 //
 // ```go
-// client := client.NewHTTP("tcp://0.0.0.0:46657", "/websocket")
+// client := client.NewHTTP("tcp://0.0.0.0:26657", "/websocket")
 // info, err := client.BlockResults(10)
 // ```
 //

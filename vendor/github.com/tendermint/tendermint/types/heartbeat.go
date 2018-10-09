@@ -3,9 +3,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/tendermint/go-crypto"
-	"github.com/tendermint/tendermint/wire"
-	cmn "github.com/tendermint/tmlibs/common"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 // Heartbeat is a simple vote-like structure so validators can
@@ -14,21 +12,18 @@ import (
 // json field tags because we always want the JSON
 // representation to be in its canonical form.
 type Heartbeat struct {
-	ValidatorAddress Address          `json:"validator_address"`
-	ValidatorIndex   int              `json:"validator_index"`
-	Height           int64            `json:"height"`
-	Round            int              `json:"round"`
-	Sequence         int              `json:"sequence"`
-	Signature        crypto.Signature `json:"signature"`
+	ValidatorAddress Address `json:"validator_address"`
+	ValidatorIndex   int     `json:"validator_index"`
+	Height           int64   `json:"height"`
+	Round            int     `json:"round"`
+	Sequence         int     `json:"sequence"`
+	Signature        []byte  `json:"signature"`
 }
 
 // SignBytes returns the Heartbeat bytes for signing.
 // It panics if the Heartbeat is nil.
 func (heartbeat *Heartbeat) SignBytes(chainID string) []byte {
-	bz, err := wire.MarshalJSON(CanonicalJSONOnceHeartbeat{
-		chainID,
-		CanonicalHeartbeat(heartbeat),
-	})
+	bz, err := cdc.MarshalJSON(CanonicalHeartbeat(chainID, heartbeat))
 	if err != nil {
 		panic(err)
 	}
@@ -52,5 +47,6 @@ func (heartbeat *Heartbeat) String() string {
 
 	return fmt.Sprintf("Heartbeat{%v:%X %v/%02d (%v) %v}",
 		heartbeat.ValidatorIndex, cmn.Fingerprint(heartbeat.ValidatorAddress),
-		heartbeat.Height, heartbeat.Round, heartbeat.Sequence, heartbeat.Signature)
+		heartbeat.Height, heartbeat.Round, heartbeat.Sequence,
+		fmt.Sprintf("/%X.../", cmn.Fingerprint(heartbeat.Signature[:])))
 }

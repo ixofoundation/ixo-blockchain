@@ -2,18 +2,21 @@ package node
 
 import (
 	"bytes"
-	"encoding/json"
+	"context"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 
-	abci "github.com/tendermint/abci/types"
-	crypto "github.com/tendermint/go-crypto"
-	wire "github.com/tendermint/go-wire"
-	cmn "github.com/tendermint/tmlibs/common"
-	dbm "github.com/tendermint/tmlibs/db"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	amino "github.com/tendermint/go-amino"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	dbm "github.com/tendermint/tendermint/libs/db"
+	"github.com/tendermint/tendermint/libs/log"
 
 	bc "github.com/tendermint/tendermint/blockchain"
 	cfg "github.com/tendermint/tendermint/config"
@@ -22,9 +25,10 @@ import (
 	mempl "github.com/tendermint/tendermint/mempool"
 	"github.com/tendermint/tendermint/p2p"
 	"github.com/tendermint/tendermint/p2p/pex"
-	"github.com/tendermint/tendermint/p2p/trust"
+	"github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
 	rpccore "github.com/tendermint/tendermint/rpc/core"
+	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	grpccore "github.com/tendermint/tendermint/rpc/grpc"
 	rpc "github.com/tendermint/tendermint/rpc/lib"
 	rpcserver "github.com/tendermint/tendermint/rpc/lib/server"
@@ -33,7 +37,6 @@ import (
 	"github.com/tendermint/tendermint/state/txindex/kv"
 	"github.com/tendermint/tendermint/state/txindex/null"
 	"github.com/tendermint/tendermint/types"
-	priv_val "github.com/tendermint/tendermint/types/priv_validator"
 	"github.com/tendermint/tendermint/version"
 
 	_ "net/http/pprof"
@@ -78,12 +81,27 @@ type NodeProvider func(*cfg.Config, log.Logger) (*Node, error)
 // It implements NodeProvider.
 func DefaultNewNode(config *cfg.Config, logger log.Logger) (*Node, error) {
 	return NewNode(config,
-		types.LoadOrGenPrivValidatorFS(config.PrivValidatorFile()),
+		privval.LoadOrGenFilePV(config.PrivValidatorFile()),
 		proxy.DefaultClientCreator(config.ProxyApp, config.ABCI, config.DBDir()),
 		DefaultGenesisDocProviderFunc(config),
 		DefaultDBProvider,
+		DefaultMetricsProvider(config.Instrumentation),
 		logger,
 	)
+}
+
+// MetricsProvider returns a consensus, p2p and mempool Metrics.
+type MetricsProvider func() (*cs.Metrics, *p2p.Metrics, *mempl.Metrics)
+
+// DefaultMetricsProvider returns Metrics build using Prometheus client library
+// if Prometheus is enabled. Otherwise, it returns no-op Metrics.
+func DefaultMetricsProvider(config *cfg.InstrumentationConfig) MetricsProvider {
+	return func() (*cs.Metrics, *p2p.Metrics, *mempl.Metrics) {
+		if config.Prometheus {
+			return cs.PrometheusMetrics(), p2p.PrometheusMetrics(), mempl.PrometheusMetrics()
+		}
+		return cs.NopMetrics(), p2p.NopMetrics(), mempl.NopMetrics()
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -99,9 +117,8 @@ type Node struct {
 	privValidator types.PrivValidator // local node's validator key
 
 	// network
-	sw               *p2p.Switch             // p2p connections
-	addrBook         pex.AddrBook            // known peers
-	trustMetricStore *trust.TrustMetricStore // trust metrics for all peers
+	sw       *p2p.Switch  // p2p connections
+	addrBook pex.AddrBook // known peers
 
 	// services
 	eventBus         *types.EventBus // pub/sub for services
@@ -116,6 +133,7 @@ type Node struct {
 	rpcListeners     []net.Listener         // rpc servers
 	txIndexer        txindex.TxIndexer
 	indexerService   *txindex.IndexerService
+	prometheusSrv    *http.Server
 }
 
 // NewNode returns a new, ready to go, Tendermint Node.
@@ -124,6 +142,7 @@ func NewNode(config *cfg.Config,
 	clientCreator proxy.ClientCreator,
 	genesisDocProvider GenesisDocProvider,
 	dbProvider DBProvider,
+	metricsProvider MetricsProvider,
 	logger log.Logger) (*Node, error) {
 
 	// Get BlockStore
@@ -161,7 +180,7 @@ func NewNode(config *cfg.Config,
 	// and sync tendermint and the app by performing a handshake
 	// and replaying any necessary blocks
 	consensusLogger := logger.With("module", "consensus")
-	handshaker := cs.NewHandshaker(stateDB, state, blockStore, genDoc.AppState())
+	handshaker := cs.NewHandshaker(stateDB, state, blockStore, genDoc)
 	handshaker.SetLogger(consensusLogger)
 	proxyApp := proxy.NewAppConns(clientCreator, handshaker)
 	proxyApp.SetLogger(logger.With("module", "proxy"))
@@ -178,9 +197,9 @@ func NewNode(config *cfg.Config,
 		var (
 			// TODO: persist this key so external signer
 			// can actually authenticate us
-			privKey = crypto.GenPrivKeyEd25519()
-			pvsc    = priv_val.NewSocketClient(
-				logger.With("module", "priv_val"),
+			privKey = ed25519.GenPrivKey()
+			pvsc    = privval.NewSocketPV(
+				logger.With("module", "privval"),
 				config.PrivValidatorListenAddr,
 				privKey,
 			)
@@ -210,11 +229,18 @@ func NewNode(config *cfg.Config,
 		consensusLogger.Info("This node is not a validator", "addr", privValidator.GetAddress(), "pubKey", privValidator.GetPubKey())
 	}
 
+	csMetrics, p2pMetrics, memplMetrics := metricsProvider()
+
 	// Make MempoolReactor
 	mempoolLogger := logger.With("module", "mempool")
-	mempool := mempl.NewMempool(config.Mempool, proxyApp.Mempool(), state.LastBlockHeight)
-	mempool.InitWAL() // no need to have the mempool wal during tests
+	mempool := mempl.NewMempool(
+		config.Mempool,
+		proxyApp.Mempool(),
+		state.LastBlockHeight,
+		mempl.WithMetrics(memplMetrics),
+	)
 	mempool.SetLogger(mempoolLogger)
+	mempool.InitWAL() // no need to have the mempool wal during tests
 	mempoolReactor := mempl.NewMempoolReactor(config.Mempool, mempool)
 	mempoolReactor.SetLogger(mempoolLogger)
 
@@ -243,8 +269,15 @@ func NewNode(config *cfg.Config,
 	bcReactor.SetLogger(logger.With("module", "blockchain"))
 
 	// Make ConsensusReactor
-	consensusState := cs.NewConsensusState(config.Consensus, state.Copy(),
-		blockExec, blockStore, mempool, evidencePool)
+	consensusState := cs.NewConsensusState(
+		config.Consensus,
+		state.Copy(),
+		blockExec,
+		blockStore,
+		mempool,
+		evidencePool,
+		cs.WithMetrics(csMetrics),
+	)
 	consensusState.SetLogger(consensusLogger)
 	if privValidator != nil {
 		consensusState.SetPrivValidator(privValidator)
@@ -254,7 +287,7 @@ func NewNode(config *cfg.Config,
 
 	p2pLogger := logger.With("module", "p2p")
 
-	sw := p2p.NewSwitch(config.P2P)
+	sw := p2p.NewSwitch(config.P2P, p2p.WithMetrics(p2pMetrics))
 	sw.SetLogger(p2pLogger)
 	sw.AddReactor("MEMPOOL", mempoolReactor)
 	sw.AddReactor("BLOCKCHAIN", bcReactor)
@@ -262,25 +295,26 @@ func NewNode(config *cfg.Config,
 	sw.AddReactor("EVIDENCE", evidenceReactor)
 
 	// Optionally, start the pex reactor
-	var addrBook pex.AddrBook
-	var trustMetricStore *trust.TrustMetricStore
+	//
+	// TODO:
+	//
+	// We need to set Seeds and PersistentPeers on the switch,
+	// since it needs to be able to use these (and their DNS names)
+	// even if the PEX is off. We can include the DNS name in the NetAddress,
+	// but it would still be nice to have a clear list of the current "PersistentPeers"
+	// somewhere that we can return with net_info.
+	//
+	// If PEX is on, it should handle dialing the seeds. Otherwise the switch does it.
+	// Note we currently use the addrBook regardless at least for AddOurAddress
+	addrBook := pex.NewAddrBook(config.P2P.AddrBookFile(), config.P2P.AddrBookStrict)
+	addrBook.SetLogger(p2pLogger.With("book", config.P2P.AddrBookFile()))
 	if config.P2P.PexReactor {
-		addrBook = pex.NewAddrBook(config.P2P.AddrBookFile(), config.P2P.AddrBookStrict)
-		addrBook.SetLogger(p2pLogger.With("book", config.P2P.AddrBookFile()))
-
-		// Get the trust metric history data
-		trustHistoryDB, err := dbProvider(&DBContext{"trusthistory", config})
-		if err != nil {
-			return nil, err
-		}
-		trustMetricStore = trust.NewTrustMetricStore(trustHistoryDB, trust.DefaultConfig())
-		trustMetricStore.SetLogger(p2pLogger)
-
+		// TODO persistent peers ? so we can have their DNS addrs saved
 		pexReactor := pex.NewPEXReactor(addrBook,
 			&pex.PEXReactorConfig{
-				Seeds:          cmn.SplitAndTrim(config.P2P.Seeds, ",", " "),
-				SeedMode:       config.P2P.SeedMode,
-				PrivatePeerIDs: cmn.SplitAndTrim(config.P2P.PrivatePeerIDs, ",", " ")})
+				Seeds:    cmn.SplitAndTrim(config.P2P.Seeds, ",", " "),
+				SeedMode: config.P2P.SeedMode,
+			})
 		pexReactor.SetLogger(p2pLogger)
 		sw.AddReactor("PEX", pexReactor)
 	}
@@ -303,7 +337,7 @@ func NewNode(config *cfg.Config,
 			return nil
 		})
 		sw.SetIDFilter(func(id p2p.ID) error {
-			resQuery, err := proxyApp.Query().QuerySync(abci.RequestQuery{Path: cmn.Fmt("/p2p/filter/pubkey/%s", id)})
+			resQuery, err := proxyApp.Query().QuerySync(abci.RequestQuery{Path: cmn.Fmt("/p2p/filter/id/%s", id)})
 			if err != nil {
 				return err
 			}
@@ -341,6 +375,7 @@ func NewNode(config *cfg.Config,
 	}
 
 	indexerService := txindex.NewIndexerService(txIndexer, eventBus)
+	indexerService.SetLogger(logger.With("module", "txindex"))
 
 	// run the profile server
 	profileHost := config.ProfListenAddress
@@ -355,9 +390,8 @@ func NewNode(config *cfg.Config,
 		genesisDoc:    genDoc,
 		privValidator: privValidator,
 
-		sw:               sw,
-		addrBook:         addrBook,
-		trustMetricStore: trustMetricStore,
+		sw:       sw,
+		addrBook: addrBook,
 
 		stateDB:          stateDB,
 		blockStore:       blockStore,
@@ -382,19 +416,12 @@ func (n *Node) OnStart() error {
 		return err
 	}
 
-	// Run the RPC server first
-	// so we can eg. receive txs for the first block
-	if n.config.RPC.ListenAddress != "" {
-		listeners, err := n.startRPC()
-		if err != nil {
-			return err
-		}
-		n.rpcListeners = listeners
-	}
-
 	// Create & add listener
-	protocol, address := cmn.ProtocolAndAddress(n.config.P2P.ListenAddress)
-	l := p2p.NewDefaultListener(protocol, address, n.config.P2P.SkipUPNP, n.Logger.With("module", "p2p"))
+	l := p2p.NewDefaultListener(
+		n.config.P2P.ListenAddress,
+		n.config.P2P.ExternalAddress,
+		n.config.P2P.UPNP,
+		n.Logger.With("module", "p2p"))
 	n.sw.AddListener(l)
 
 	// Generate node PrivKey
@@ -405,14 +432,32 @@ func (n *Node) OnStart() error {
 	}
 	n.Logger.Info("P2P Node ID", "ID", nodeKey.ID(), "file", n.config.NodeKeyFile())
 
-	nodeInfo := n.makeNodeInfo(nodeKey.PubKey())
+	nodeInfo := n.makeNodeInfo(nodeKey.ID())
 	n.sw.SetNodeInfo(nodeInfo)
 	n.sw.SetNodeKey(nodeKey)
 
 	// Add ourselves to addrbook to prevent dialing ourselves
 	n.addrBook.AddOurAddress(nodeInfo.NetAddress())
 
-	// Start the switch
+	// Add private IDs to addrbook to block those peers being added
+	n.addrBook.AddPrivateIDs(cmn.SplitAndTrim(n.config.P2P.PrivatePeerIDs, ",", " "))
+
+	// Start the RPC server before the P2P server
+	// so we can eg. receive txs for the first block
+	if n.config.RPC.ListenAddress != "" {
+		listeners, err := n.startRPC()
+		if err != nil {
+			return err
+		}
+		n.rpcListeners = listeners
+	}
+
+	if n.config.Instrumentation.Prometheus &&
+		n.config.Instrumentation.PrometheusListenAddr != "" {
+		n.prometheusSrv = n.startPrometheusServer(n.config.Instrumentation.PrometheusListenAddr)
+	}
+
+	// Start the switch (the P2P server).
 	err = n.sw.Start()
 	if err != nil {
 		return err
@@ -435,9 +480,16 @@ func (n *Node) OnStop() {
 	n.BaseService.OnStop()
 
 	n.Logger.Info("Stopping Node")
+
+	// first stop the non-reactor services
+	n.eventBus.Stop()
+	n.indexerService.Stop()
+
+	// now stop the reactors
 	// TODO: gracefully disconnect from peers.
 	n.sw.Stop()
 
+	// finally stop the listeners / external services
 	for _, l := range n.rpcListeners {
 		n.Logger.Info("Closing rpc listener", "listener", l)
 		if err := l.Close(); err != nil {
@@ -445,12 +497,16 @@ func (n *Node) OnStop() {
 		}
 	}
 
-	n.eventBus.Stop()
-	n.indexerService.Stop()
-
-	if pvsc, ok := n.privValidator.(*priv_val.SocketClient); ok {
+	if pvsc, ok := n.privValidator.(*privval.SocketPV); ok {
 		if err := pvsc.Stop(); err != nil {
 			n.Logger.Error("Error stopping priv validator socket client", "err", err)
+		}
+	}
+
+	if n.prometheusSrv != nil {
+		if err := n.prometheusSrv.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			n.Logger.Error("Prometheus HTTP server Shutdown", "err", err)
 		}
 	}
 }
@@ -492,6 +548,8 @@ func (n *Node) ConfigureRPC() {
 func (n *Node) startRPC() ([]net.Listener, error) {
 	n.ConfigureRPC()
 	listenAddrs := cmn.SplitAndTrim(n.config.RPC.ListenAddress, ",", " ")
+	coreCodec := amino.NewCodec()
+	ctypes.RegisterAmino(coreCodec)
 
 	if n.config.RPC.Unsafe {
 		rpccore.AddUnsafeRoutes()
@@ -502,11 +560,16 @@ func (n *Node) startRPC() ([]net.Listener, error) {
 	for i, listenAddr := range listenAddrs {
 		mux := http.NewServeMux()
 		rpcLogger := n.Logger.With("module", "rpc-server")
-		wm := rpcserver.NewWebsocketManager(rpccore.Routes, rpcserver.EventSubscriber(n.eventBus))
+		wm := rpcserver.NewWebsocketManager(rpccore.Routes, coreCodec, rpcserver.EventSubscriber(n.eventBus))
 		wm.SetLogger(rpcLogger.With("protocol", "websocket"))
 		mux.HandleFunc("/websocket", wm.WebsocketHandler)
-		rpcserver.RegisterRPCFuncs(mux, rpccore.Routes, rpcLogger)
-		listener, err := rpcserver.StartHTTPServer(listenAddr, mux, rpcLogger)
+		rpcserver.RegisterRPCFuncs(mux, rpccore.Routes, coreCodec, rpcLogger)
+		listener, err := rpcserver.StartHTTPServer(
+			listenAddr,
+			mux,
+			rpcLogger,
+			rpcserver.Config{MaxOpenConnections: n.config.RPC.MaxOpenConnections},
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -516,7 +579,12 @@ func (n *Node) startRPC() ([]net.Listener, error) {
 	// we expose a simplified api over grpc for convenience to app devs
 	grpcListenAddr := n.config.RPC.GRPCListenAddress
 	if grpcListenAddr != "" {
-		listener, err := grpccore.StartGRPCServer(grpcListenAddr)
+		listener, err := grpccore.StartGRPCServer(
+			grpcListenAddr,
+			grpccore.Config{
+				MaxOpenConnections: n.config.RPC.GRPCMaxOpenConnections,
+			},
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -524,6 +592,27 @@ func (n *Node) startRPC() ([]net.Listener, error) {
 	}
 
 	return listeners, nil
+}
+
+// startPrometheusServer starts a Prometheus HTTP server, listening for metrics
+// collectors on addr.
+func (n *Node) startPrometheusServer(addr string) *http.Server {
+	srv := &http.Server{
+		Addr: addr,
+		Handler: promhttp.InstrumentMetricHandler(
+			prometheus.DefaultRegisterer, promhttp.HandlerFor(
+				prometheus.DefaultGatherer,
+				promhttp.HandlerOpts{MaxRequestsInFlight: n.config.Instrumentation.MaxOpenConnections},
+			),
+		),
+	}
+	go func() {
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			// Error starting or closing listener:
+			n.Logger.Error("Prometheus HTTP server ListenAndServe", "err", err)
+		}
+	}()
+	return srv
 }
 
 // Switch returns the Node's Switch.
@@ -577,13 +666,13 @@ func (n *Node) ProxyApp() proxy.AppConns {
 	return n.proxyApp
 }
 
-func (n *Node) makeNodeInfo(pubKey crypto.PubKey) p2p.NodeInfo {
+func (n *Node) makeNodeInfo(nodeID p2p.ID) p2p.NodeInfo {
 	txIndexerStatus := "on"
 	if _, ok := n.txIndexer.(*null.TxIndex); ok {
 		txIndexerStatus = "off"
 	}
 	nodeInfo := p2p.NodeInfo{
-		PubKey:  pubKey,
+		ID:      nodeID,
 		Network: n.genesisDoc.ChainID,
 		Version: version.Version,
 		Channels: []byte{
@@ -594,7 +683,7 @@ func (n *Node) makeNodeInfo(pubKey crypto.PubKey) p2p.NodeInfo {
 		},
 		Moniker: n.config.Moniker,
 		Other: []string{
-			cmn.Fmt("wire_version=%v", wire.Version),
+			cmn.Fmt("amino_version=%v", amino.Version),
 			cmn.Fmt("p2p_version=%v", p2p.Version),
 			cmn.Fmt("consensus_version=%v", cs.Version),
 			cmn.Fmt("rpc_version=%v/%v", rpc.Version, rpccore.Version),
@@ -614,7 +703,7 @@ func (n *Node) makeNodeInfo(pubKey crypto.PubKey) p2p.NodeInfo {
 	}
 
 	p2pListener := n.sw.Listeners()[0]
-	p2pHost := p2pListener.ExternalAddress().IP.String()
+	p2pHost := p2pListener.ExternalAddressHost()
 	p2pPort := p2pListener.ExternalAddress().Port
 	nodeInfo.ListenAddr = cmn.Fmt("%v:%v", p2pHost, p2pPort)
 
@@ -641,7 +730,7 @@ func loadGenesisDoc(db dbm.DB) (*types.GenesisDoc, error) {
 		return nil, errors.New("Genesis doc not found")
 	}
 	var genDoc *types.GenesisDoc
-	err := json.Unmarshal(bytes, &genDoc)
+	err := cdc.UnmarshalJSON(bytes, &genDoc)
 	if err != nil {
 		cmn.PanicCrisis(fmt.Sprintf("Failed to load genesis doc due to unmarshaling error: %v (bytes: %X)", err, bytes))
 	}
@@ -650,7 +739,7 @@ func loadGenesisDoc(db dbm.DB) (*types.GenesisDoc, error) {
 
 // panics if failed to marshal the given genesis document
 func saveGenesisDoc(db dbm.DB, genDoc *types.GenesisDoc) {
-	bytes, err := json.Marshal(genDoc)
+	bytes, err := cdc.MarshalJSON(genDoc)
 	if err != nil {
 		cmn.PanicCrisis(fmt.Sprintf("Failed to save genesis doc due to marshaling error: %v", err))
 	}

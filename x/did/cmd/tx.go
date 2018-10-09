@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/pkg/errors"
@@ -31,8 +32,10 @@ func AddDidDocCmd(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
 
-			ctx := context.NewCoreContextFromViper()
 			// create the message
 			msg := did.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey)
 
@@ -41,10 +44,15 @@ func AddDidDocCmd(cdc *wire.Codec) *cobra.Command {
 			copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 			copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
-			//Create the Signature
-			signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+			msgBytes, err := json.Marshal(msg)
+			if err != nil {
+				panic(err)
+			}
 
-			tx := ixo.NewIxoTx(msg, signature)
+			//Create the Signature
+			signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
+
+			tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
 			fmt.Println("*******Transaction*******")
 			fmt.Println(tx.String())
@@ -53,6 +61,7 @@ func AddDidDocCmd(cdc *wire.Codec) *cobra.Command {
 			if err != nil {
 				panic(err)
 			}
+			fmt.Println("Sending Msg:", string(bz))
 			// Broadcast to Tendermint
 			res, err := ctx.BroadcastTx(bz)
 			if err != nil {
@@ -79,9 +88,11 @@ func GetDidDocCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecoder) 
 			didAddr := args[0]
 			key := ixo.Did(didAddr)
 
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
 
-			res, err := ctx.Query([]byte(key), storeName)
+			res, err := ctx.QueryStore([]byte(key), storeName)
 			if err != nil {
 				return err
 			}
@@ -116,9 +127,11 @@ func AddCredentialCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecod
 			// find the key to look up the account
 			didAddr := args[0]
 
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
 
-			_, err := ctx.Query([]byte(didAddr), storeName)
+			_, err := ctx.QueryStore([]byte(didAddr), storeName)
 			if err != nil {
 				return errors.New("The did is not on the blockchain")
 			}
@@ -142,10 +155,14 @@ func AddCredentialCmd(storeName string, cdc *wire.Codec, decoder did.DidDocDecod
 			copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 			copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
-			//Create the Signature
-			signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+			msgBytes, err := json.Marshal(msg)
+			if err != nil {
+				panic(err)
+			}
 
-			tx := ixo.NewIxoTx(msg, signature)
+			//Create the Signature
+			signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
+			tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
 			fmt.Println("*******Transaction*******")
 			fmt.Println(tx.String())

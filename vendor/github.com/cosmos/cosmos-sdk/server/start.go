@@ -5,111 +5,115 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/tendermint/abci/server"
-	abci "github.com/tendermint/abci/types"
+	"github.com/tendermint/tendermint/abci/server"
 
 	tcmd "github.com/tendermint/tendermint/cmd/tendermint/commands"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/node"
+	pvm "github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
-	"github.com/tendermint/tendermint/types"
-	cmn "github.com/tendermint/tmlibs/common"
-	"github.com/tendermint/tmlibs/log"
 )
 
 const (
 	flagWithTendermint = "with-tendermint"
 	flagAddress        = "address"
+	flagTraceStore     = "trace-store"
+	flagPruning        = "pruning"
 )
 
-// AppCreator lets us lazily initialize app, using home dir
-// and other flags (?) to start
-type AppCreator func(string, log.Logger) (abci.Application, error)
-
-// StartCmd runs the service passed in, either
-// stand-alone, or in-process with tendermint
-func StartCmd(app AppCreator, ctx *Context) *cobra.Command {
-	start := startCmd{
-		appCreator: app,
-		context:    ctx,
-	}
+// StartCmd runs the service passed in, either stand-alone or in-process with
+// Tendermint.
+func StartCmd(ctx *Context, appCreator AppCreator) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "Run the full node",
-		RunE:  start.run,
-	}
-	// basic flags for abci app
-	cmd.Flags().Bool(flagWithTendermint, true, "run abci app embedded in-process with tendermint")
-	cmd.Flags().String(flagAddress, "tcp://0.0.0.0:46658", "Listen address")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if !viper.GetBool(flagWithTendermint) {
+				ctx.Logger.Info("Starting ABCI without Tendermint")
+				return startStandAlone(ctx, appCreator)
+			}
 
-	// AddNodeFlags adds support for all
-	// tendermint-specific command line options
+			ctx.Logger.Info("Starting ABCI with Tendermint")
+
+			_, err := startInProcess(ctx, appCreator)
+			return err
+		},
+	}
+
+	// core flags for the ABCI application
+	cmd.Flags().Bool(flagWithTendermint, true, "Run abci app embedded in-process with tendermint")
+	cmd.Flags().String(flagAddress, "tcp://0.0.0.0:26658", "Listen address")
+	cmd.Flags().String(flagTraceStore, "", "Enable KVStore tracing to an output file")
+	cmd.Flags().String(flagPruning, "syncable", "Pruning strategy: syncable, nothing, everything")
+
+	// add support for all Tendermint-specific command line options
 	tcmd.AddNodeFlags(cmd)
 	return cmd
 }
 
-type startCmd struct {
-	appCreator AppCreator
-	context    *Context
-}
-
-func (s startCmd) run(cmd *cobra.Command, args []string) error {
-	if !viper.GetBool(flagWithTendermint) {
-		s.context.Logger.Info("Starting ABCI without Tendermint")
-		return s.startStandAlone()
-	}
-	s.context.Logger.Info("Starting ABCI with Tendermint")
-	return s.startInProcess()
-}
-
-func (s startCmd) startStandAlone() error {
-	// Generate the app in the proper dir
+func startStandAlone(ctx *Context, appCreator AppCreator) error {
 	addr := viper.GetString(flagAddress)
 	home := viper.GetString("home")
-	app, err := s.appCreator(home, s.context.Logger)
+	traceStore := viper.GetString(flagTraceStore)
+
+	app, err := appCreator(home, ctx.Logger, traceStore)
 	if err != nil {
 		return err
 	}
 
 	svr, err := server.NewServer(addr, "socket", app)
 	if err != nil {
-		return errors.Errorf("Error creating listener: %v\n", err)
+		return errors.Errorf("error creating listener: %v\n", err)
 	}
-	svr.SetLogger(s.context.Logger.With("module", "abci-server"))
-	svr.Start()
 
-	// Wait forever
+	svr.SetLogger(ctx.Logger.With("module", "abci-server"))
+
+	err = svr.Start()
+	if err != nil {
+		cmn.Exit(err.Error())
+	}
+
+	// wait forever
 	cmn.TrapSignal(func() {
-		// Cleanup
-		svr.Stop()
+		// cleanup
+		err = svr.Stop()
+		if err != nil {
+			cmn.Exit(err.Error())
+		}
 	})
 	return nil
 }
 
-func (s startCmd) startInProcess() error {
-	cfg := s.context.Config
+func startInProcess(ctx *Context, appCreator AppCreator) (*node.Node, error) {
+	cfg := ctx.Config
 	home := cfg.RootDir
-	app, err := s.appCreator(home, s.context.Logger)
+	traceStore := viper.GetString(flagTraceStore)
+
+	app, err := appCreator(home, ctx.Logger, traceStore)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// Create & start tendermint node
-	n, err := node.NewNode(cfg,
-		types.LoadOrGenPrivValidatorFS(cfg.PrivValidatorFile()),
+	// create & start tendermint node
+	tmNode, err := node.NewNode(
+		cfg,
+		pvm.LoadOrGenFilePV(cfg.PrivValidatorFile()),
 		proxy.NewLocalClientCreator(app),
 		node.DefaultGenesisDocProviderFunc(cfg),
 		node.DefaultDBProvider,
-		s.context.Logger.With("module", "node"))
+		node.DefaultMetricsProvider(cfg.Instrumentation),
+		ctx.Logger.With("module", "node"),
+	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = n.Start()
+	err = tmNode.Start()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// Trap signal, run forever.
-	n.RunForever()
-	return nil
+	// trap signal (run forever)
+	tmNode.RunForever()
+	return tmNode, nil
 }

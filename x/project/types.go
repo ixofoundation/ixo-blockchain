@@ -12,6 +12,23 @@ import (
 const COIN_DENOM = "ixo"
 
 //DOC SETUP
+type ProjectStatus string
+
+const (
+	NullStatus     ProjectStatus = ""
+	CreatedProject ProjectStatus = "CREATED"
+	PendingStatus  ProjectStatus = "PENDING"
+	FundedStatus   ProjectStatus = "FUNDED"
+	StartedStatus  ProjectStatus = "STARTED"
+	StoppedStatus  ProjectStatus = "STOPPED"
+	PaidoutStatus  ProjectStatus = "PAIDOUT"
+)
+
+//Define UpdateProjectStatusDoc
+type UpdateProjectStatusDoc struct {
+	Status          ProjectStatus `json:"status"`
+	EthFundingTxnID string        `json:"ethFundingTxnID"`
+}
 
 //Define ProjectDoc
 type ProjectDoc struct {
@@ -56,19 +73,19 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 }
 
 //DECODERS
-type ProjectDocDecoder func(projectEntryBytes []byte) (ixo.StoredProjectDoc, error)
+type ProjectDocDecoder func(projectEntryBytes []byte) (StoredProjectDoc, error)
 
 func GetProjectDocDecoder(cdc *wire.Codec) ProjectDocDecoder {
-	return func(projectDocBytes []byte) (res ixo.StoredProjectDoc, err error) {
+	return func(projectDocBytes []byte) (res StoredProjectDoc, err error) {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := StoredProjectDoc{}
+		projectDoc := CreateProjectMsg{}
 		err = cdc.UnmarshalBinary(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)
 		}
-		return projectDoc, err
+		return &projectDoc, err
 	}
 }
 
@@ -162,8 +179,8 @@ func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateProjectMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateProjectMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateProjectMsg) String() string {
 	b, err := json.Marshal(msg)
@@ -172,8 +189,12 @@ func (msg CreateProjectMsg) String() string {
 	}
 	return string(b)
 }
-func (msg CreateProjectMsg) GetPubKey() string      { return msg.PubKey }
-func (msg CreateProjectMsg) GetEvaluatorPay() int64 { return msg.Data.GetEvaluatorPay() }
+func (msg CreateProjectMsg) GetPubKey() string        { return msg.PubKey }
+func (msg CreateProjectMsg) GetEvaluatorPay() int64   { return msg.Data.GetEvaluatorPay() }
+func (msg CreateProjectMsg) GetStatus() ProjectStatus { return msg.Data.Status }
+func (msg *CreateProjectMsg) SetStatus(status ProjectStatus) {
+	msg.Data.Status = status
+}
 func (msg CreateProjectMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
@@ -182,9 +203,33 @@ func (pd *CreateProjectMsg) SetStatus(status ProjectStatus) {
 	pd.Data.Status = status
 }
 
-type StoredProjectDoc = CreateProjectMsg
+var _ StoredProjectDoc = (*CreateProjectMsg)(nil)
 
-var _ ixo.StoredProjectDoc = (*StoredProjectDoc)(nil)
+//UpdateProjectStatusMsg
+type UpdateProjectStatusMsg struct {
+	SignBytes  string                 `json:"signBytes"`
+	TxHash     string                 `json:"txHash"`
+	SenderDid  ixo.Did                `json:"senderDid"`
+	ProjectDid ixo.Did                `json:"projectDid"`
+	Data       UpdateProjectStatusDoc `json:"data"`
+}
+
+func (msg UpdateProjectStatusMsg) Type() string                            { return "project" }
+func (msg UpdateProjectStatusMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg UpdateProjectStatusMsg) ValidateBasic() sdk.Error                { return nil }
+func (msg UpdateProjectStatusMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+func (msg UpdateProjectStatusMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+}
+func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
+	return ups.ProjectDid
+}
+func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
+	return ups.Data.Status
+}
+func (msg UpdateProjectStatusMsg) IsNewDid() bool { return false }
 
 //UpdateProjectStatusMsg
 type UpdateProjectStatusMsg struct {
@@ -229,8 +274,8 @@ func (msg CreateAgentMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateAgentMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateAgentMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateAgentMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -263,8 +308,8 @@ func (msg UpdateAgentMsg) ValidateBasic() sdk.Error {
 }
 func (msg UpdateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg UpdateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg UpdateAgentMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg UpdateAgentMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg UpdateAgentMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -296,8 +341,8 @@ func (msg CreateClaimMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateClaimMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateClaimMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateClaimMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateClaimMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateClaimMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -329,8 +374,8 @@ func (msg CreateEvaluationMsg) ValidateBasic() sdk.Error {
 }
 func (msg CreateEvaluationMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg CreateEvaluationMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateEvaluationMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg CreateEvaluationMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg CreateEvaluationMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -362,8 +407,8 @@ func (msg FundProjectMsg) ValidateBasic() sdk.Error {
 }
 func (msg FundProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg FundProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg FundProjectMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg FundProjectMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg FundProjectMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -395,8 +440,8 @@ func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
 }
 func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg WithdrawFundsMsg) GetSigners() []sdk.Address {
-	return []sdk.Address{[]byte(msg.GetProjectDid())}
+func (msg WithdrawFundsMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 func (msg WithdrawFundsMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)

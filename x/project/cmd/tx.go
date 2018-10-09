@@ -5,12 +5,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/core"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 
@@ -21,17 +21,21 @@ import (
 	base58 "github.com/btcsuite/btcutil/base58"
 )
 
-func ixoSignAndBroadcast(cdc *wire.Codec, ctx core.CoreContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+func ixoSignAndBroadcast(cdc *wire.Codec, ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
 	// Force the length to 64
 	privKey := [64]byte{}
 	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
 	//Create the Signature
-	signature := ixo.SignIxoMessage(msg, sovrinDid.Did, privKey)
+	signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
 	fmt.Println(signature)
 
-	tx := ixo.NewIxoTx(msg, signature)
+	tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
 	fmt.Println("*******TRANSACTION******* \n", tx.String())
 
@@ -91,7 +95,10 @@ func CreateProjectCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "createProject projectJson sovrinDiD",
 		Short: "Create a new ProjectDoc signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
+
 			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
 				return errors.New("You must provide the project data and the projects private key")
 			}
@@ -153,7 +160,10 @@ func CreateAgentCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "createAgent txHash senderDid agentDid role projectDid",
 		Short: "Create a new agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
+
 			if len(args) != 5 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 {
 				return errors.New("You must provide the agentDid, role and the projects private key")
 			}
@@ -188,7 +198,10 @@ func UpdateAgentCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "updateAgent txHash senderDid agentDid status sovrinDid",
 		Short: "Update the status of an agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
+
 			if len(args) != 6 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 || len(args[5]) == 0 {
 				return errors.New("You must provide the agentDid, status and the projects private key")
 			}
@@ -225,7 +238,10 @@ func CreateClaimCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "createClaim txHash senderDid claimId sovrinDid",
 		Short: "Create a new claim on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
+
 			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
 				return errors.New("You must provide the claimId and the projects private key")
 			}
@@ -254,7 +270,10 @@ func CreateEvaluationCmd(cdc *wire.Codec) *cobra.Command {
 		Use:   "createEvaluation txHash senderDid claimId status sovrinDid",
 		Short: "Create a new claim evaluation on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
+
 			if len(args) != 5 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 || len(args[2]) == 0 {
 				return errors.New("You must provide the claimId, status and the projects private key")
 			}
@@ -293,7 +312,9 @@ func FundProjectTxCmd(cdc *wire.Codec) *cobra.Command {
 				return errors.New("You must provide a valid projectDid, ethereum transaction hash, amount of ixo and sovrinDid")
 			}
 
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
 
 			// create the message
 			fundProjectDoc := project.FundProjectDoc{
@@ -317,7 +338,9 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 		Use:   "getProjectDoc did",
 		Short: "Get a new ProjectDoc for a Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
 
 			if len(args) != 1 || len(args[0]) == 0 {
 				return errors.New("You must provide an did")
@@ -327,7 +350,7 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 			didAddr := args[0]
 			key := ixo.Did(didAddr)
 
-			res, err := ctx.Query([]byte(key), storeName)
+			res, err := ctx.QueryStore([]byte(key), storeName)
 			if err != nil {
 				return err
 			}
@@ -350,12 +373,14 @@ func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.Project
 	}
 }
 
-func GetProjectAccountsCmd(storeName string) *cobra.Command {
+func GetProjectAccountsCmd(storeName string, cdc *wire.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getProjectAccounts did",
 		Short: "Get a Project accounts for a Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCoreContextFromViper()
+			ctx := context.NewCLIContext().
+				WithCodec(cdc).
+				WithLogger(os.Stdout)
 
 			if len(args) != 1 || len(args[0]) == 0 {
 				return errors.New("You must provide a project did")
@@ -368,7 +393,7 @@ func GetProjectAccountsCmd(storeName string) *cobra.Command {
 			buffer.WriteString(projectDid)
 			key := buffer.Bytes()
 
-			res, err := ctx.Query(key, storeName)
+			res, err := ctx.QueryStore(key, storeName)
 			if err != nil {
 				return err
 			}
