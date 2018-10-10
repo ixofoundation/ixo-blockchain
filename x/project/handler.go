@@ -67,21 +67,21 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 		} else {
 			// Check that the Project wallet is funded and mint equivalent tokens on project
 
-			ethTx, err := ethClient.Eth_getTransactionByHash(msg.GetEthFundingTxnID())
+			ethTx, err := ethClient.GetTransactionByHash(msg.GetEthFundingTxnID())
 			if err != nil {
 				return sdk.Result{
 					Code: sdk.ABCICodeType(sdk.CodeInternal),
 					Data: []byte("ETH tx not valid"),
 				}
 			}
-			fundingTx := ethClient.IsProjectFundingTx(existingProjectDoc.GetProjectDid(), ethTx.Input)
+			fundingTx := ethClient.IsProjectFundingTx(existingProjectDoc.GetProjectDid(), ethTx.Data())
 			if !fundingTx {
 				return sdk.Result{
 					Code: sdk.ABCICodeType(sdk.CodeInternal),
 					Data: []byte("ETH tx not valid"),
 				}
 			}
-			amt := ethClient.GetFundingAmt(ethTx.Input)
+			amt := ethClient.GetFundingAmt(ethTx.Data())
 			coin := sdk.NewInt64Coin(COIN_DENOM, amt)
 			return fundProject(ctx, k, ck, existingProjectDoc, coin)
 		}

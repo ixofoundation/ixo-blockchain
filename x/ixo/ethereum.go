@@ -1,9 +1,12 @@
 package ixo
 
 import (
+	"context"
 	"errors"
+	"fmt"
 
-	"github.com/INFURA/go-libs/jsonrpc_client"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -12,7 +15,7 @@ const ETH_REGISTRY_CONTRACT = "ETH_REGISTRY_CONTRACT"
 const ETH_IXO_ERC20_TOKEN = "ETH_IXO_ERC20_TOKEN"
 
 type EthClient struct {
-	ethClient        jsonrpc_client.EthereumClient
+	ethClient        *ethclient.Client
 	registryContract string
 	ercContract      string
 }
@@ -21,7 +24,7 @@ func NewEthClient() (EthClient, error) {
 	url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	ethClient, err := ethclient.Dial(url)
 
-	if err {
+	if err != nil {
 		return EthClient{}, err
 	}
 	registryContract := LookupEnv(ETH_REGISTRY_CONTRACT, "")
@@ -40,14 +43,17 @@ func NewEthClient() (EthClient, error) {
 	}, nil
 }
 
-func (c EthClient) Eth_getTransactionByHash(txHash string) (*jsonrpc_client.Transaction, error) {
-	return c.ethClient.Eth_getTransactionByHash(txHash)
+func (c EthClient) GetTransactionByHash(txHash string) (*types.Transaction, error) {
+	hash := common.HexToHash(txHash)
+	tx, _, err := c.ethClient.TransactionByHash(context.Background(), hash)
+	fmt.Println(tx)
+	return tx, err
 }
 
-func (c EthClient) IsProjectFundingTx(project Did, input string) bool {
+func (c EthClient) IsProjectFundingTx(project Did, input []byte) bool {
 	return false
 }
 
-func (c EthClient) GetFundingAmt(input string) int64 {
+func (c EthClient) GetFundingAmt(input []byte) int64 {
 	return 0
 }

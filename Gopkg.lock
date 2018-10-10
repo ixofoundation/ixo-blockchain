@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/INFURA/go-libs"
+  packages = ["jsonrpc_client"]
+  revision = "3bad60147babf93ee9a7c565e6bb42b9629cbcec"
+
+[[projects]]
   name = "github.com/bartekn/go-bip39"
   packages = ["."]
   revision = "a05967ea095d81c8fe4833776774cfaff8e5036c"
@@ -53,6 +59,7 @@
     "crypto/keys/bcrypt",
     "crypto/keys/bip39",
     "crypto/keys/hd",
+    "examples/democoin/mock",
     "server",
     "server/config",
     "store",
@@ -66,12 +73,7 @@
     "x/bank/client",
     "x/bank/client/cli",
     "x/ibc",
-    "x/ibc/client/cli",
-    "x/stake",
-    "x/stake/client/cli",
-    "x/stake/keeper",
-    "x/stake/tags",
-    "x/stake/types"
+    "x/ibc/client/cli"
   ]
   revision = "2c6ed0fefc499410a7734ac93005f32a99b47b5b"
   version = "v0.24.1"
@@ -83,9 +85,40 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/deckarep/golang-set"
+  packages = ["."]
+  revision = "cbaa98ba5575e67703b32b4b19f73c91f3c4159e"
+  version = "v1.7.1"
+
+[[projects]]
   name = "github.com/ebuchman/fail-test"
   packages = ["."]
   revision = "95f809107225be108efcf10a3509e4ea6ceef3c4"
+
+[[projects]]
+  name = "github.com/ethereum/go-ethereum"
+  packages = [
+    ".",
+    "common",
+    "common/hexutil",
+    "common/math",
+    "common/prque",
+    "core/types",
+    "crypto",
+    "crypto/secp256k1",
+    "crypto/sha3",
+    "ethclient",
+    "ethdb",
+    "log",
+    "metrics",
+    "p2p/netutil",
+    "params",
+    "rlp",
+    "rpc",
+    "trie"
+  ]
+  revision = "8bbe72075e4e16442c4e28d999edee12e294329e"
+  version = "v1.8.17"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -175,7 +208,6 @@
     ".",
     "hcl/ast",
     "hcl/parser",
-    "hcl/printer",
     "hcl/scanner",
     "hcl/strconv",
     "hcl/token",
@@ -184,12 +216,6 @@
     "json/token"
   ]
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/howeyc/crc16"
-  packages = ["."]
-  revision = "2b2a61e366a66d3efb279e46176e7291001e0354"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -292,6 +318,12 @@
   revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
 
 [[projects]]
+  name = "github.com/rs/cors"
+  packages = ["."]
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
+
+[[projects]]
   name = "github.com/spf13/afero"
   packages = [
     ".",
@@ -375,27 +407,6 @@
   version = "v0.12.0-rc0"
 
 [[projects]]
-  name = "github.com/tendermint/go-crypto"
-  packages = [
-    ".",
-    "keys",
-    "keys/bcrypt",
-    "keys/words",
-    "keys/words/wordlist"
-  ]
-  revision = "c3e19f3ea26f5c3357e0bcbb799b0761ef923755"
-  version = "v0.5.0"
-
-[[projects]]
-  name = "github.com/tendermint/go-wire"
-  packages = [
-    ".",
-    "data"
-  ]
-  revision = "fa721242b042ecd4c6ed1a934ee740db4f74e45c"
-  version = "v0.7.3"
-
-[[projects]]
   name = "github.com/tendermint/iavl"
   packages = ["."]
   revision = "35f66e53d9b01e83b30de68b931f54b2477a94c9"
@@ -468,12 +479,7 @@
 
 [[projects]]
   name = "github.com/tendermint/tmlibs"
-  packages = [
-    "cli",
-    "common",
-    "db",
-    "log"
-  ]
+  packages = ["cli"]
   revision = "2e24b64fc121dcdf1cabceab8dc2f7257675483c"
   version = "v0.8.1"
 
@@ -514,7 +520,8 @@
     "idna",
     "internal/timeseries",
     "netutil",
-    "trace"
+    "trace",
+    "websocket"
   ]
   revision = "292b43bbf7cb8d35ddf40f8d5100ef3837cced3f"
 
@@ -584,6 +591,12 @@
   version = "v1.13.0"
 
 [[projects]]
+  branch = "v2"
+  name = "gopkg.in/natefinch/npipe.v2"
+  packages = ["."]
+  revision = "c1b8fa8bdccecb0b8db834ee0b92fdbcfa606dd6"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
@@ -592,6 +605,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "06c095772a1902171df17814ba9f96a347d2623c01d9644b269f5f19dd358352"
+  inputs-digest = "2d579f87db4c9d0b664162d9711c746d4b581625b6d34247c150d08d04865731"
   solver-name = "gps-cdcl"
   solver-version = 1
