@@ -82,6 +82,9 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 		//		panic(cErr)
 	}
 
+	//	ethClient.GetTransactionByHash("0xa1d98950a9d4eece809bf330dee23ca37edcb8403dcca03e42ad04bee8dab065")
+	//ethClient.GetTransactionByHash("0xd15bc34d513af12b75330d38cd1cdc785cd60361cf9af7cfcc6d73586cccf548")
+
 	// create your application object
 	var app = &IxoApp{
 		cdc:        cdc,
