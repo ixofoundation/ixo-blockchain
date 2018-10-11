@@ -2,7 +2,7 @@ package ixo
 
 import (
 	"context"
-	"errors"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -21,20 +21,22 @@ type EthClient struct {
 }
 
 func NewEthClient() (EthClient, error) {
-	url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
+	//url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
+	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
+	url := LookupEnv(ETH_URL, "http://127.0.0.1:7545")
 	ethClient, err := ethclient.Dial(url)
 
 	if err != nil {
 		return EthClient{}, err
 	}
 	registryContract := LookupEnv(ETH_REGISTRY_CONTRACT, "")
-	if len(registryContract) == 0 {
-		return EthClient{}, errors.New("Ethereum Registry contract now set on env. ETH_REGISTRY_CONTRACT=")
-	}
+	// if len(registryContract) == 0 {
+	// 	return EthClient{}, errors.New("Ethereum Registry contract not set on env. ETH_REGISTRY_CONTRACT=")
+	// }
 	erc20Token := LookupEnv(ETH_IXO_ERC20_TOKEN, "")
-	if len(erc20Token) == 0 {
-		return EthClient{}, errors.New("Ethereum IXO ERC20 token contract now set on env. ETH_IXO_ERC20_TOKEN=")
-	}
+	// if len(erc20Token) == 0 {
+	// 	return EthClient{}, errors.New("Ethereum IXO ERC20 token contract not set on env. ETH_IXO_ERC20_TOKEN=")
+	// }
 
 	return EthClient{
 		ethClient,
@@ -44,9 +46,17 @@ func NewEthClient() (EthClient, error) {
 }
 
 func (c EthClient) GetTransactionByHash(txHash string) (*types.Transaction, error) {
+	fmt.Println("tx -2")
 	hash := common.HexToHash(txHash)
+	fmt.Println("tx -1")
 	tx, _, err := c.ethClient.TransactionByHash(context.Background(), hash)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("tx 1")
 	fmt.Println(tx)
+	fmt.Println(hex.EncodeToString(tx.Data()))
+	fmt.Println("tx 2")
 	return tx, err
 }
 
