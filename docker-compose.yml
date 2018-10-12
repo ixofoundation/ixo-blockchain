@@ -2,11 +2,11 @@ version: "2"
 services:
   blockchain:
     container_name: blockchain
-    image: trustlab/ixo-blockchain:master
+    image: trustlab/ixo-blockchain:dev
     restart: always
     ports:
-      - "46656:46656"
-      - "46657:46657"
+      - "46656:26656"
+      - "46657:26657"
     logging:
       options:
         max-size: 30m
@@ -16,11 +16,11 @@ services:
 
   block-sync:
     container_name: block-sync
-    image: trustlab/ixo-block-sync:master
+    image: trustlab/ixo-block-sync:dev
     environment:
       - PORT=8080
       - MONGODB_URI=mongodb://block-sync-db:27017/block-sync
-      - CHAIN_URI=blockchain:46657
+      - CHAIN_URI=blockchain:26657
     restart: always
     ports:
       - "80:8080"
