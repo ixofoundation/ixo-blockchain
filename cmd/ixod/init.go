@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 
 	clkeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
@@ -11,6 +13,7 @@ import (
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -18,6 +21,35 @@ import (
 // simple genesis tx
 type IxoGenTx struct {
 	Addr sdk.AccAddress `json:"addr"`
+}
+
+type EthWallet struct {
+	Address    string `json:"address"`
+	PrivateKey string `json:"privateKey"`
+}
+
+func IxoAppGenEthWallet() {
+	// Create an account
+	key, err := ethCrypto.GenerateKey()
+	if err != nil {
+		return
+	}
+
+	// Get the address
+	address := ethCrypto.PubkeyToAddress(key.PublicKey).Hex()
+	// Get the private key
+	privateKey := hex.EncodeToString(key.D.Bytes())
+
+	ethWallet := &EthWallet{Address: address, PrivateKey: privateKey}
+	json, err := json.Marshal(ethWallet)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = ioutil.WriteFile("ethWallet.json", json, 0644)
+	
+	return
 }
 
 // Generate a genesis transaction
@@ -66,7 +98,7 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
 	if err != nil {
 		return
 	}
-
+	IxoAppGenEthWallet()
 	appState = json.RawMessage(fmt.Sprintf(`{
   "accounts": [{
     "address": "%s",

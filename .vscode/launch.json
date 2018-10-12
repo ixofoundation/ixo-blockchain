@@ -10,7 +10,7 @@
             "mode": "debug",
             "program": "${workspaceRoot}/cmd/ixod",
             "args": [
-                "start"
+                "init"
             ]
         },
 		// {
