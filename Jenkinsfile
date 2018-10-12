@@ -4,7 +4,7 @@ node {
         ws("${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}/") {
             withEnv(["GOPATH=${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"]) {
                 env.PATH="${GOPATH}/bin:$PATH"
-                
+
                 def app
                 def branch
 
@@ -18,13 +18,12 @@ node {
                     echo 'Pulling Dependencies'
                     sh 'go version'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
-                    sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
                 }
 
                 stage('Building') {
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
                          sh 'git checkout ' + branch
-                         sh 'make build && make install'
+                         sh make install'
                     }
                 }
 
