@@ -8,6 +8,11 @@ node {
                 def app
                 def branch
 
+                stage('Environment Variables') {
+                    sh 'echo $GOROOT'
+                    sh 'echo $GOPATH'
+                }
+
                 stage('Get Branch Name') {
                     echo 'Getting branch name from Jenkins settings'
                     branch = scm.branches[0].name.drop(2)
@@ -19,6 +24,8 @@ node {
                     sh 'go version'
                     sh 'go get -u github.com/btcsuite/btcutil/base58'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
+                    sh 'pwd'
+                    sh 'ls -l'
                 }
 
                 stage('Building') {
