@@ -8,6 +8,11 @@ node {
                 def app
                 def branch
 
+                stage('Checkout') {
+                    echo 'Checking out SCM'
+                    checkout scm
+                }
+
                 stage('Get Branch Name') {
                     echo 'Getting branch name from Jenkins settings'
                     branch = scm.branches[0].name.drop(2)
