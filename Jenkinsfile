@@ -22,7 +22,6 @@ node {
 
                 stage('Building') {
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
-                         sh 'git checkout ' + branch
                          sh 'make install'
                     }
                 }
