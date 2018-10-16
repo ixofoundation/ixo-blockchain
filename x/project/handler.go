@@ -74,14 +74,14 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 					Data: []byte("ETH tx not valid"),
 				}
 			}
-			fundingTx := ethClient.IsProjectFundingTx(existingProjectDoc.GetProjectDid(), ethTx.Data())
+			fundingTx := ethClient.IsProjectFundingTx(existingProjectDoc.GetProjectDid(), ethTx)
 			if !fundingTx {
 				return sdk.Result{
 					Code: sdk.ABCICodeType(sdk.CodeInternal),
 					Data: []byte("ETH tx not valid"),
 				}
 			}
-			amt := ethClient.GetFundingAmt(ethTx.Data())
+			amt := ethClient.GetFundingAmt(ethTx)
 			coin := sdk.NewInt64Coin(COIN_DENOM, amt)
 			return fundProject(ctx, k, ck, existingProjectDoc, coin)
 		}

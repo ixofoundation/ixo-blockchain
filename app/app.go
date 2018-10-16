@@ -25,9 +25,9 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/pool"
-
+	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
+
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
@@ -45,6 +45,7 @@ type IxoApp struct {
 	keyAccount *sdk.KVStoreKey
 	keyIBC     *sdk.KVStoreKey
 	keyStake   *sdk.KVStoreKey
+	keyParams  *sdk.KVStoreKey
 	keyDID     *sdk.KVStoreKey
 	keyProject *sdk.KVStoreKey
 
@@ -55,9 +56,9 @@ type IxoApp struct {
 	coinKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	ibcMapper           ibc.Mapper
-	poolKeeper          pool.Keeper
 	didKeeper           did.Keeper
 	projectKeeper       project.Keeper
+	paramsKeeper        params.Keeper
 
 	// Eth client
 	ethClient ixo.EthClient
@@ -82,8 +83,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 		//		panic(cErr)
 	}
 
-	//	ethClient.GetTransactionByHash("0xa1d98950a9d4eece809bf330dee23ca37edcb8403dcca03e42ad04bee8dab065")
-	//ethClient.GetTransactionByHash("0xd15bc34d513af12b75330d38cd1cdc785cd60361cf9af7cfcc6d73586cccf548")
+	// t, _ := ethClient.GetTransactionByHash("0xfd5e66b11abfdaa0a1bee7048a9da0b14ffeaee36c5cc897e007a00f23f23b95")
+	// fmt.Println(t.Result.Input)
+	// ethClient.IsProjectFundingTx("", t)
+	// ethClient.GetEthProjectWallet("123")
 
 	// create your application object
 	var app = &IxoApp{
@@ -93,6 +96,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 		keyAccount: sdk.NewKVStoreKey("acc"),
 		keyIBC:     sdk.NewKVStoreKey("ibc"),
 		keyStake:   sdk.NewKVStoreKey("stake"),
+		keyParams:  sdk.NewKVStoreKey("params"),
 		keyDID:     sdk.NewKVStoreKey("did"),
 		keyProject: sdk.NewKVStoreKey("project"),
 
@@ -111,9 +115,9 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	// add handlers
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
-	app.poolKeeper = pool.NewKeeper(app.cdc, app.keyStake)
+	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
-	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper)
+	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.paramsKeeper.Getter())
 
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
@@ -128,7 +132,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetTxDecoder(app.txDecoder)
 	app.SetAnteHandler(NewIxoAnteHandler(app, app.feeCollectionKeeper))
-	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keyDID, app.keyProject)
+	app.MountStoresIAVL(app.keyMain, app.keyAccount, app.keyIBC, app.keyStake, app.keyParams, app.keyDID, app.keyProject)
 	err := app.LoadLatestVersion(app.keyMain)
 	if err != nil {
 		cmn.Exit(err.Error())
@@ -266,15 +270,7 @@ func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Kee
 			app.accountMapper.SetAccount(ctx, acc)
 		}
 		app.Logger.Info("******InitPool Genesis")
-		// load the initial stake information
-		validators, err := pool.InitGenesis(ctx, app.poolKeeper, genesisState.PoolData)
-		if err != nil {
-			panic(err)
-		}
 
-		for val := range validators {
-			fmt.Println(val)
-		}
 		return abci.ResponseInitChain{}
 	}
 }

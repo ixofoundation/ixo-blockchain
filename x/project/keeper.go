@@ -10,8 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/params"
 )
 
 // module users must specify coin denomination and reward (constant) per PoW solution
@@ -32,15 +32,17 @@ type Keeper struct {
 	key    sdk.StoreKey
 	cdc    *wire.Codec
 	am     auth.AccountMapper
+	params params.Getter
 	config Config
 }
 
 // NewKeeper returns a new Keeper
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper, params params.Getter) Keeper {
 	return Keeper{
 		key,
 		cdc,
 		am,
+		params,
 		Config{"ACC-"},
 	}
 }
