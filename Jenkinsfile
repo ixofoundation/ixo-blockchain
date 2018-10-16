@@ -14,11 +14,12 @@ node {
                     echo 'Branch Name: ' + branch
                 }
 
-                stage('Install Dependencies') {
-                    echo 'Pulling Dependencies'
+                stage('Manage global dependencies') {
+                    echo 'Global Dependencies'
                     sh 'go version'
-                    sh 'go get -u github.com/btcsuite/btcutil/base58'
-                    sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
+                    sh 'go get github.com/golang/dep/cmd/dep'
+                    sh 'go get github.com/btcsuite/btcutil/base58'
+                    sh 'go get github.com/ethereum/go-ethereum'
                     sh 'pwd'
                 }
 
