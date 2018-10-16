@@ -1,23 +1,35 @@
 FROM iron/go:dev
-ENV SRC_DIR=/go/src/github.com/ixofoundation/ixo-cosmos
 
 ARG COMMIT_HASH=''
 
-COPY ./app $SRC_DIR/app
-COPY ./client $SRC_DIR/client
-COPY ./cmd $SRC_DIR/cmd
-COPY ./types $SRC_DIR/types
-COPY ./vendor $SRC_DIR/vendor
-COPY ./x $SRC_DIR/x
-COPY ./Makefile $SRC_DIR
-COPY ./bin/startBlockchain.sh $SRC_DIR/bin/
+ENV FOUNDATION_PATH=/go/src/github.com/ixofoundation
+ENV COSMOS_HOME=$FOUNDATION_PATH/ixo-cosmos
 
+# Copy the local package files to the container's workspace.
+#ADD . $COSMOS_HOME
+COPY ./app $COSMOS_HOME/app
+COPY ./client $COSMOS_HOME/client
+COPY ./cmd $COSMOS_HOME/cmd
+COPY ./types $COSMOS_HOME/types
+COPY ./vendor $COSMOS_HOME/vendor
+COPY ./x $COSMOS_HOME/x
+COPY ./Makefile $COSMOS_HOME
+COPY ./bin/startBlockchain.sh $COSMOS_HOME/bin/
+
+# Manage global dependencies.
+RUN cd $FOUNDATION_PATH
+RUN go get github.com/golang/dep/cmd/dep
 RUN go get github.com/btcsuite/btcutil/base58
-RUN ls -alh $SRC_DIR
-# COMMIT_HASH is an argument passed from the build-docker-image.sh utility script executed from within the Git repository
-RUN cd $SRC_DIR; make COMMIT_HASH=$COMMIT_HASH install
+RUN go get github.com/ethereum/go-ethereum
 
-EXPOSE 46656
-EXPOSE 46657
+# Manage vendor dependencies.
+# RUN cd $COSMOS_HOME; make get_vendor_deps
+
+# Build, Install
+# COMMIT_HASH is an optional argument passed from the build-docker-image.sh utility script executed from within the Git repository
+RUN cd $COSMOS_HOME; make COMMIT_HASH=$COMMIT_HASH build
+RUN cd $COSMOS_HOME; make COMMIT_HASH=$COMMIT_HASH install
+
+EXPOSE 26656
+EXPOSE 26657
 EXPOSE 1317
-# CMD is configured in the docker-compose.yml
