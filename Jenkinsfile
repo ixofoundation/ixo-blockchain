@@ -20,19 +20,14 @@ node {
                     sh 'go get github.com/golang/dep/cmd/dep'
                     sh 'go get github.com/btcsuite/btcutil/base58'
                     sh 'go get github.com/ethereum/go-ethereum'
+                    sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
                     sh 'pwd'
-                }
-
-                stage('Checkout') {
-                    dir('src/github.com/ixofoundation/') {
-                        sh 'go get github.com/ixofoundation/ixo-cosmos'
-                    }
                 }
 
                 stage('Building') {
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
                         sh 'git checkout ' + branch
-                        sh 'make install'
+                        sh 'make build && make install'
                     }
                 }
 
