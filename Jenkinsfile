@@ -23,8 +23,13 @@ node {
                     sh 'pwd'
                 }
 
+                stage('Checkout') {
+                    dir('src/github.com/ixofoundation/') {
+                        sh 'go get github.com/ixofoundation/ixo-cosmos'
+                    }
+                }
+
                 stage('Building') {
-                    sh 'go get github.com/ixofoundation/ixo-cosmos'
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
                         sh 'git checkout ' + branch
                         sh 'make install'
