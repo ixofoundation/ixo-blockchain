@@ -3,14 +3,17 @@ package sovrin
 import (
 	"bytes"
 	crypto_rand "crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	naclbox "golang.org/x/crypto/nacl/box"
 
 	base58 "github.com/btcsuite/btcutil/base58"
+	bip39 "github.com/cosmos/cosmos-sdk/crypto/keys/bip39"
 	ed25519 "golang.org/x/crypto/ed25519"
 )
 
@@ -41,6 +44,22 @@ func (sd SovrinDid) String() string {
 		panic(err)
 	}
 	return fmt.Sprintf("%v", string(output))
+}
+
+func GenerateMnemonic() string {
+	mnemonicWords, _ := bip39.NewMnemonic(bip39.ValidSentenceLen(12))
+	return strings.Join(mnemonicWords, " ")
+}
+
+func FromMnemonic(mnemonic string) SovrinDid {
+	seed := sha256.New()
+	seed.Write([]byte(mnemonic))
+
+	var seed32 [32]byte
+	copy(seed32[:], seed.Sum(nil)[:32])
+
+	return FromSeed(seed32)
+
 }
 
 func FromSeed(seed [32]byte) SovrinDid {
