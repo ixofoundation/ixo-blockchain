@@ -93,3 +93,51 @@ type EthWallet struct {
 	Address    string `json:"address"`
 	PrivateKey string `json:"privateKey"`
 }
+
+// MESSAGES ************************
+
+//Define AddEthWalletDoc
+type AddEthWalletDoc struct {
+	Id            string `json:"id"`
+	WalletAddress string `json:"walletAddress"`
+}
+
+type AddEthWalletMsg struct {
+	SignBytes string          `json:"signBytes"`
+	SignerDid Did             `json:"signerDid"`
+	Data      AddEthWalletDoc `json:"data"`
+}
+
+// New Ixo message
+func NewAddEthWalletMsg(id string, wallet string) AddEthWalletMsg {
+	addEthWalletDoc := AddEthWalletDoc{
+		Id:            id,
+		WalletAddress: wallet,
+	}
+	return AddEthWalletMsg{
+		Data: addEthWalletDoc,
+	}
+}
+
+// enforce the msg type at compile time
+var _ sdk.Msg = AddEthWalletMsg{}
+
+// nolint
+func (msg AddEthWalletMsg) Type() string                            { return "ixo" }
+func (msg AddEthWalletMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg AddEthWalletMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.SignerDid)}
+}
+func (msg AddEthWalletMsg) String() string {
+	return fmt.Sprintf("AddEthWalletMsg{Wallet: %v}", string(msg.Data.WalletAddress))
+}
+
+// Validate Basic is used to quickly disqualify obviously invalid messages quickly
+func (msg AddEthWalletMsg) ValidateBasic() sdk.Error {
+	return nil
+}
+
+// Get the bytes for the message signer to sign on
+func (msg AddEthWalletMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
