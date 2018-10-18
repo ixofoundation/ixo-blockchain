@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
@@ -144,4 +146,20 @@ func GetKeccak(tx string) string {
 	buf = hash.Sum(buf)
 
 	return hex.EncodeToString(buf)
+}
+
+func CreateEthWallet() (ethWallet *EthWallet, err error) {
+	// Create an account
+	key, err := ethCrypto.GenerateKey()
+	if err != nil {
+		return
+	}
+
+	// Get the address
+	address := ethCrypto.PubkeyToAddress(key.PublicKey).Hex()
+	// Get the private key
+	privateKey := hex.EncodeToString(key.D.Bytes())
+
+	ethWallet = &EthWallet{Address: address, PrivateKey: privateKey}
+	return
 }

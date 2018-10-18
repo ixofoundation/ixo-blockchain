@@ -87,3 +87,9 @@ type DidDoc interface {
 
 // Define Project
 type Project = string
+
+// Ethereum
+type EthWallet struct {
+	Address    string `json:"address"`
+	PrivateKey string `json:"privateKey"`
+}

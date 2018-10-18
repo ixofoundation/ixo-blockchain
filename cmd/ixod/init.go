@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,34 +12,28 @@ import (
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/fees"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	sovrin "github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
+
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // simple genesis tx
 type IxoGenTx struct {
-	Addr sdk.AccAddress `json:"addr"`
-}
-
-type EthWallet struct {
-	Address    string `json:"address"`
-	PrivateKey string `json:"privateKey"`
+	Addr      sdk.AccAddress `json:"addr"`
+	ConfigDid did.BaseDidDoc `json:"configDid"`
 }
 
 func IxoAppGenEthWallet() {
 	// Create an account
-	key, err := ethCrypto.GenerateKey()
+	ethWallet, err := ixo.CreateEthWallet()
 	if err != nil {
 		return
 	}
 
-	// Get the address
-	address := ethCrypto.PubkeyToAddress(key.PublicKey).Hex()
-	// Get the private key
-	privateKey := hex.EncodeToString(key.D.Bytes())
-
-	ethWallet := &EthWallet{Address: address, PrivateKey: privateKey}
 	json, err := json.Marshal(ethWallet)
 	if err != nil {
 		fmt.Println(err)
@@ -48,13 +41,18 @@ func IxoAppGenEthWallet() {
 	}
 
 	err = ioutil.WriteFile("ethWallet.json", json, 0644)
-	
+
 	return
 }
 
 // Generate a genesis transaction
 func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.GenTx) (
 	appGenTx, cliPrint json.RawMessage, validator tmtypes.GenesisValidator, err error) {
+
+	mnemonic := sovrin.GenerateMnemonic()
+	sov := sovrin.FromMnemonic(mnemonic)
+
+	didDoc := did.InitDidDoc(did.PrefixDid(sov.Did), sov.VerifyKey)
 
 	var addr sdk.AccAddress
 	var secret string
@@ -64,19 +62,23 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 	}
 
 	var bz []byte
-	ixoGenTx := IxoGenTx{addr}
+	ixoGenTx := IxoGenTx{
+		addr,
+		didDoc,
+	}
 	bz, err = cdc.MarshalJSON(ixoGenTx)
 	if err != nil {
 		return
 	}
 	appGenTx = json.RawMessage(bz)
 
-	mm := map[string]string{"secret": secret}
-	bz, err = cdc.MarshalJSON(mm)
-	if err != nil {
-		return
-	}
-	cliPrint = json.RawMessage(bz)
+	cliPrint = json.RawMessage(fmt.Sprintf(`{
+		"secret": "%s",
+		"config_did": {
+			"did": "%s",
+			"mnemonic": "%s"
+		}
+	}`, secret, didDoc.Did, mnemonic))
 
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
@@ -98,7 +100,10 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
 	if err != nil {
 		return
 	}
-	IxoAppGenEthWallet()
+
+	feesState := fees.DefaultGenesis()
+	feesJson, err := json.MarshalIndent(feesState, "", "  ")
+
 	appState = json.RawMessage(fmt.Sprintf(`{
   "accounts": [{
     "address": "%s",
@@ -108,8 +113,9 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
         "amount": "0"
       }
     ]
-  }]
-}`, genTx.Addr))
+	}],
+	"fees": %s
+}`, genTx.Addr, feesJson))
 	return
 }
 

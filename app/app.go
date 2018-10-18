@@ -24,6 +24,7 @@ import (
 
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
@@ -59,6 +60,7 @@ type IxoApp struct {
 	didKeeper           did.Keeper
 	projectKeeper       project.Keeper
 	paramsKeeper        params.Keeper
+	feeKeeper           fees.Keeper
 
 	// Eth client
 	ethClient ixo.EthClient
@@ -116,8 +118,9 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.coinKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
+	app.feeKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
-	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.paramsKeeper.Getter())
+	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.feeKeeper)
 
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
@@ -251,12 +254,12 @@ func (app *IxoApp) EndBlocker(_ sdk.Context, req abci.RequestEndBlock) abci.Resp
 // should contain all the genesis accounts. These accounts will be added to the
 // application's account mapper.
 func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper) sdk.InitChainer {
-	app.Logger.Info("******InitChainer")
+
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-		app.Logger.Info("******InitChainer called")
+		app.Logger.Info("******Init Chain called")
 		stateJSON := req.AppStateBytes
 
-		genesisState := new(types.GenesisState)
+		genesisState := new(GenesisState)
 		err := app.cdc.UnmarshalJSON(stateJSON, genesisState)
 		if err != nil {
 			panic(err)
@@ -269,7 +272,13 @@ func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Kee
 			}
 			app.accountMapper.SetAccount(ctx, acc)
 		}
-		app.Logger.Info("******InitPool Genesis")
+		app.Logger.Info("******Init Fees")
+
+		// load the initial fee information
+		err = fees.InitGenesis(ctx, app.feeKeeper, genesisState.FeeData)
+		if err != nil {
+			panic(err)
+		}
 
 		return abci.ResponseInitChain{}
 	}
@@ -291,8 +300,9 @@ func (app *IxoApp) ExportAppStateAndValidators() (appState json.RawMessage, vali
 	}
 	app.accountMapper.IterateAccounts(ctx, appendAccount)
 
-	genState := types.GenesisState{
+	genState := GenesisState{
 		Accounts: accounts,
+		FeeData:  fees.WriteGenesis(ctx, app.feeKeeper),
 	}
 
 	appState, err = wire.MarshalJSONIndent(app.cdc, genState)

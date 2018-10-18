@@ -41,11 +41,12 @@ func (dd BaseDidDoc) GetPubKey() string               { return dd.PubKey }
 func (dd BaseDidDoc) GetCredentials() []DidCredential { return dd.Credentials }
 
 //SETTERS
-func (dd *BaseDidDoc) Init(did ixo.Did, pubKey string) *BaseDidDoc {
-	dd.SetDid(did)
-	dd.SetPubKey(pubKey)
-	dd.Credentials = make([]DidCredential, 0)
-	return dd
+func InitDidDoc(did ixo.Did, pubKey string) BaseDidDoc {
+	return BaseDidDoc{
+		did,
+		pubKey,
+		make([]DidCredential, 0),
+	}
 }
 
 func (dd BaseDidDoc) SetDid(did ixo.Did) error {

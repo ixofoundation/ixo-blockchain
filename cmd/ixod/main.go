@@ -24,7 +24,7 @@ import (
 // init parameters
 var IxoAppInit = server.AppInit{
 	AppGenState: IxoAppGenState,
-	AppGenTx:    server.SimpleAppGenTx,
+	AppGenTx:    IxoAppGenTx,
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
