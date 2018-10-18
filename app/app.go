@@ -61,6 +61,7 @@ type IxoApp struct {
 	projectKeeper       project.Keeper
 	paramsKeeper        params.Keeper
 	feeKeeper           fees.Keeper
+	ixoKeeper           ixo.Keeper
 
 	// Eth client
 	ethClient ixo.EthClient
@@ -120,6 +121,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.feeKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
+	app.ixoKeeper = ixo.NewKeeper(app.cdc, app.paramsKeeper)
 	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.feeKeeper)
 
 	app.Router().
