@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-
+	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -32,15 +32,17 @@ type Keeper struct {
 	key    sdk.StoreKey
 	cdc    *wire.Codec
 	am     auth.AccountMapper
+	fk     fees.Keeper
 	config Config
 }
 
 // NewKeeper returns a new Keeper
-func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper) Keeper {
+func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper, fk fees.Keeper) Keeper {
 	return Keeper{
 		key,
 		cdc,
 		am,
+		fk,
 		Config{"ACC-"},
 	}
 }

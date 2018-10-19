@@ -11,6 +11,23 @@ import (
 //_______________________________________________________________________
 // Define the IxoTx
 
+type GenesisState struct {
+	FoundationWallet               string `json:"foundationWallet"`
+	AuthContractAddress            string `json:"authContractAddress"`
+	IxoTokenContractAddress        string `json:"ixoTokenContractAddress"`
+	ProjectRegistryContractAddress string `json:"projectRegistryContractAddress"`
+}
+
+func DefaultGenesisState() GenesisState {
+
+	return GenesisState{
+		FoundationWallet:               "Enter ETH wallet address to accumulate foundations tokens",
+		AuthContractAddress:            "Enter ETH auth contract address",
+		IxoTokenContractAddress:        "Enter ETH Ixo Token contract address",
+		ProjectRegistryContractAddress: "Enter ETH project registry contract address",
+	}
+}
+
 type IxoTx struct {
 	Msgs       []sdk.Msg      `json:"payload"`
 	Signatures []IxoSignature `json:"signatures"`
@@ -87,3 +104,57 @@ type DidDoc interface {
 
 // Define Project
 type Project = string
+
+// Ethereum
+type EthWallet struct {
+	Address    string `json:"address"`
+	PrivateKey string `json:"privateKey"`
+}
+
+// MESSAGES ************************
+
+//Define AddEthWalletDoc
+type AddEthWalletDoc struct {
+	Id            string `json:"id"`
+	WalletAddress string `json:"walletAddress"`
+}
+
+type AddEthWalletMsg struct {
+	SignBytes string          `json:"signBytes"`
+	SignerDid Did             `json:"signerDid"`
+	Data      AddEthWalletDoc `json:"data"`
+}
+
+// New Ixo message
+func NewAddEthWalletMsg(id string, wallet string) AddEthWalletMsg {
+	addEthWalletDoc := AddEthWalletDoc{
+		Id:            id,
+		WalletAddress: wallet,
+	}
+	return AddEthWalletMsg{
+		Data: addEthWalletDoc,
+	}
+}
+
+// enforce the msg type at compile time
+var _ sdk.Msg = AddEthWalletMsg{}
+
+// nolint
+func (msg AddEthWalletMsg) Type() string                            { return "ixo" }
+func (msg AddEthWalletMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg AddEthWalletMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.SignerDid)}
+}
+func (msg AddEthWalletMsg) String() string {
+	return fmt.Sprintf("AddEthWalletMsg{Wallet: %v}", string(msg.Data.WalletAddress))
+}
+
+// Validate Basic is used to quickly disqualify obviously invalid messages quickly
+func (msg AddEthWalletMsg) ValidateBasic() sdk.Error {
+	return nil
+}
+
+// Get the bytes for the message signer to sign on
+func (msg AddEthWalletMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}

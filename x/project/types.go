@@ -30,6 +30,10 @@ type UpdateProjectStatusDoc struct {
 	EthFundingTxnID string        `json:"ethFundingTxnID"`
 }
 
+func (ps UpdateProjectStatusDoc) GetEthFundingTxnID() string {
+	return ps.EthFundingTxnID
+}
+
 //Define ProjectDoc
 type ProjectDoc struct {
 	RequiredClaims       string        `json:"requiredClaims"`
@@ -209,6 +213,9 @@ func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
 	return ups.Data.Status
 }
 func (msg UpdateProjectStatusMsg) IsNewDid() bool { return false }
+func (msg UpdateProjectStatusMsg) GetEthFundingTxnID() string {
+	return msg.Data.EthFundingTxnID
+}
 
 //CreateAgentMsg
 type CreateAgentMsg struct {

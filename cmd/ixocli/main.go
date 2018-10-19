@@ -46,7 +46,6 @@ func main() {
 	// TODO: setup keybase, viper object, etc. to be passed into
 	// the below functions and eliminate global vars, like we do
 	// with the cdc
-
 	// add standard rpc, and tx commands
 	rpc.AddCommands(rootCmd)
 	rootCmd.AddCommand(client.LineBreak)

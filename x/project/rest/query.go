@@ -2,7 +2,6 @@ package rest
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -83,7 +82,8 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.NewCLIContext().
 			WithCodec(cdc).
-			WithLogger(os.Stdout)
+			WithLogger(os.Stdout).
+			WithAccountDecoder(authcmd.GetAccountDecoder(cdc))
 
 		vars := mux.Vars(r)
 		projectDid := vars["projectDid"]
@@ -121,10 +121,19 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 		for k, v := range accMap {
 			addr := v.(string)
 
-			balance, err := getAccountBalance(ctx, addr, types.GetAccountDecoder(cdc))
+			accAddr, err := sdk.AccAddressFromHex(addr)
 			if err != nil {
-				panic(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(fmt.Sprintf("Could't create Account Address. Error: %s", err.Error())))
 			}
+
+			account, err := ctx.GetAccount(accAddr)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(fmt.Sprintf("Could't find account. Error: %s", err.Error())))
+			}
+			baseAcc := account.(*types.AppAccount)
+			balance := baseAcc.Coins.AmountOf("ixo-native")
 			accDetails[i] = AccDetails{Did: k, Account: addr, Balance: balance}
 			i = i + 1
 		}
@@ -139,28 +148,5 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 
 		w.Write(output)
 	}
-
-}
-
-func getAccountBalance(ctx context.CLIContext, addr string, decoder auth.AccountDecoder) (sdk.Int, error) {
-	bz, err := hex.DecodeString(addr)
-	if err != nil {
-		return sdk.NewInt(0), err
-	}
-
-	res, err := ctx.QueryStore(bz, "main")
-	if err != nil {
-		return sdk.NewInt(0), err
-	}
-
-	// decode the value
-	account, err := decoder(res)
-	if err != nil {
-		return sdk.NewInt(0), err
-	}
-
-	baseAcc := account.(*types.AppAccount)
-
-	return baseAcc.Coins.AmountOf(project.COIN_DENOM), nil
 
 }
