@@ -80,12 +80,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	bApp := bam.NewBaseApp(APP_NAME, newLogger, db, nil, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
-	ethClient, cErr := ixo.NewEthClient()
-	if cErr != nil {
-		logger.Error(cErr.Error())
-		//		panic(cErr)
-	}
-
 	// t, _ := ethClient.GetTransactionByHash("0xfd5e66b11abfdaa0a1bee7048a9da0b14ffeaee36c5cc897e007a00f23f23b95")
 	// fmt.Println(t.Result.Input)
 	// ethClient.IsProjectFundingTx("", t)
@@ -102,8 +96,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 		keyParams:  sdk.NewKVStoreKey("params"),
 		keyDID:     sdk.NewKVStoreKey("did"),
 		keyProject: sdk.NewKVStoreKey("project"),
-
-		ethClient: ethClient,
 	}
 
 	// define and attach the mappers and keepers
@@ -124,6 +116,13 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.ixoKeeper = ixo.NewKeeper(app.cdc, app.paramsKeeper)
 	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.feeKeeper)
 
+	newEthClient, cErr := ixo.NewEthClient(app.ixoKeeper)
+	if cErr != nil {
+		logger.Error(cErr.Error())
+		//		panic(cErr)
+	}
+	app.ethClient = newEthClient
+
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
 		//		AddRoute("pool", pool.NewHandler(app.poolKeeper)).
@@ -132,7 +131,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 		AddRoute("project", project.NewHandler(app.projectKeeper, app.coinKeeper, app.ethClient))
 
 	// initialize BaseApp
-	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper))
+	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper, app.ixoKeeper))
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetTxDecoder(app.txDecoder)
@@ -255,7 +254,7 @@ func (app *IxoApp) EndBlocker(_ sdk.Context, req abci.RequestEndBlock) abci.Resp
 // state provided by 'req' and attempt to deserialize said state. The state
 // should contain all the genesis accounts. These accounts will be added to the
 // application's account mapper.
-func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper) sdk.InitChainer {
+func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper, ixoKeeper ixo.Keeper) sdk.InitChainer {
 
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 		app.Logger.Info("******Init Chain called")
@@ -274,10 +273,16 @@ func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Kee
 			}
 			app.accountMapper.SetAccount(ctx, acc)
 		}
-		app.Logger.Info("******Init Fees")
+		app.Logger.Info("****** Initialize Genesis Fees")
 
 		// load the initial fee information
 		err = fees.InitGenesis(ctx, app.feeKeeper, genesisState.FeeData)
+		if err != nil {
+			panic(err)
+		}
+
+		// load the initial config information
+		err = ixo.InitGenesis(ctx, ixoKeeper, genesisState.Config)
 		if err != nil {
 			panic(err)
 		}

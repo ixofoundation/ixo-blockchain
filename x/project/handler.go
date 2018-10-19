@@ -56,7 +56,6 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 	}
 
 	newStatus := msg.GetStatus()
-	existingProjectDoc.SetStatus(newStatus)
 
 	if newStatus == FundedStatus {
 		if existingProjectDoc.GetStatus() != CreatedProject {
@@ -74,7 +73,7 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 					Data: []byte("ETH tx not valid"),
 				}
 			}
-			fundingTx := ethClient.IsProjectFundingTx(existingProjectDoc.GetProjectDid(), ethTx)
+			fundingTx := ethClient.IsProjectFundingTx(ctx, existingProjectDoc.GetProjectDid(), ethTx)
 			if !fundingTx {
 				return sdk.Result{
 					Code: sdk.ABCICodeType(sdk.CodeInternal),
@@ -85,6 +84,8 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 			coin := sdk.NewInt64Coin(COIN_DENOM, amt)
 			return fundProject(ctx, k, ck, existingProjectDoc, coin)
 		}
+		existingProjectDoc.SetStatus(newStatus)
+
 	}
 
 	storedProjectDoc, updated := k.UpdateProjectDoc(ctx, existingProjectDoc)
@@ -176,6 +177,7 @@ func fundProject(ctx sdk.Context, k Keeper, ck bank.Keeper, projectDoc StoredPro
 		Data: []byte("Project Funded"),
 	}
 }
+
 func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg WithdrawFundsMsg) sdk.Result {
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
