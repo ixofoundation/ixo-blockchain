@@ -4,23 +4,26 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+
+	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
 const ETH_URL = "ETH_URL"
-const ETH_REGISTRY_CONTRACT = "ETH_REGISTRY_CONTRACT"
-const ETH_IXO_ERC20_TOKEN = "ETH_IXO_ERC20_TOKEN"
 
 var FUNDING_METHOD_HASH = GetKeccak("transfer(address,uint256)")[0:8]
-var REGISTRY_WALLET_OF = GetKeccak("walletOf(bytes32)")[0:8]
 
 type EthTransaction struct {
 	Jsonrpc string `json:"jsonrpc"`
@@ -44,34 +47,38 @@ func (tx *EthTransaction) UnmarshalJSON(msg []byte) error {
 }
 
 type EthClient struct {
-	client           *rpc.Client
-	registryContract common.Address
-	ercContract      common.Address
+	rpcClient *rpc.Client
+	client    *ethclient.Client
+	k         Keeper
+	callOpts  bind.CallOpts
 }
 
-func NewEthClient() (EthClient, error) {
+func NewEthClient(k Keeper) (EthClient, error) {
 	//url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
+
 	url := LookupEnv(ETH_URL, "http://localhost:7545")
-	client, err := rpc.DialContext(context.Background(), url)
+	rpcClient, err := rpc.DialContext(context.Background(), url)
 
 	if err != nil {
 		return EthClient{}, err
 	}
-	registryContractStr := LookupEnv(ETH_REGISTRY_CONTRACT, "0x1d7d616c01c63c662e676e63008a30845cbcfe1e")
-	if len(registryContractStr) == 0 {
-		return EthClient{}, errors.New("Ethereum Registry contract not set on env. ETH_REGISTRY_CONTRACT=")
+	client, err := ethclient.Dial(url)
+	if err != nil {
+		return EthClient{}, err
 	}
-	registryContract := common.HexToAddress(registryContractStr)
-	erc20TokenStr := LookupEnv(ETH_IXO_ERC20_TOKEN, "0x026aFf3ab0DaE74d5d85537f78B4dDEcC101C6D6")
-	if len(erc20TokenStr) == 0 {
-		return EthClient{}, errors.New("Ethereum IXO ERC20 token contract not set on env. ETH_IXO_ERC20_TOKEN=")
+	validatorWallet := getValidationEthWallet()
+	callOpts := bind.CallOpts{
+		Pending: false,
+		From:    common.HexToAddress(validatorWallet.Address),
+		Context: context.Background(),
 	}
-	erc20Token := common.HexToAddress(erc20TokenStr)
+
 	return EthClient{
+		rpcClient,
 		client,
-		registryContract,
-		erc20Token,
+		k,
+		callOpts,
 	}, nil
 }
 
@@ -87,48 +94,60 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 	// return &types.Transaction{}, nil
 	//	var res interface{}
 	var tx *EthTransaction
-	err := c.client.CallContext(context.Background(), &tx, "eth_getTransactionByHash", hash)
+	err := c.rpcClient.CallContext(context.Background(), &tx, "eth_getTransactionByHash", hash)
 
 	return tx, err
 }
 
-func (c EthClient) IsProjectFundingTx(project Did, tx *EthTransaction) bool {
+// checks whether this is a funding transaction on this project
+func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
 
-	fmt.Println(FUNDING_METHOD_HASH)
-	fmt.Println("To:", common.HexToAddress(tx.Result.To).String())
-	txMethod := tx.Result.Input[2:10]
-	fmt.Println("Method Hash", txMethod)
+	ercContractStr := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+
+	// Check To is the ERC20 Token
+	if common.HexToAddress(tx.Result.To).String() != ercContractStr {
+		return false
+	}
+
+	// Check it is the transfer method
+	if tx.Result.Input[2:10] != FUNDING_METHOD_HASH {
+		return false
+	}
+
+	// Check the project wallet on the registry matches the wallet in the transaction
 	txProjWallet := common.HexToAddress(tx.Result.Input[10:74]).String()
-	fmt.Println("Proj Wallet:", txProjWallet)
-	amt := c.GetFundingAmt(tx)
-	fmt.Println("Amount:", amt)
+	// Check it is the transfer method
+	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
+	if err != nil {
+		return false
+	}
+	if txProjWallet != projWallet {
+		return false
+	}
 
-	return false
+	return true
 }
 
-func (c EthClient) GetEthProjectWallet(project Did) (string, error) {
-	var hex hexutil.Bytes
-	fmt.Println("Reg_Wallet_of:", REGISTRY_WALLET_OF)
-	dataBytes := make([]byte, 0)
-	dataBytes = append(dataBytes, []byte("0x")...)
-	dataBytes = append(dataBytes, []byte(REGISTRY_WALLET_OF)...)
-	dataBytes = append(dataBytes, []byte("00000000000000000000000078a706edcd907a5e897340724b3b530a5c8dcd9a")...)
-	fmt.Println(string(dataBytes))
-	//	data := common.FromHex("0xfca3b5aa00000000000000000000000078a706edcd907a5e897340724b3b530a5c8dcd9a")
-	arg := map[string]interface{}{
-		"from": c.registryContract,
-		"to":   c.registryContract,
-		"data": dataBytes,
-	}
-	err := c.client.CallContext(context.Background(), &hex, "eth_call", arg, "latest")
+// Retrieves the Project wallet address from the Ethereum registry project conteact
+func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
+
+	registryContractStr := c.k.GetEthAddress(ctx, KeyProjectRegistryContractAddress)
+	registryContract := common.HexToAddress(registryContractStr)
+
+	hexEncodedProjectDid := hex.EncodeToString([]byte(removeDidPrefix(projectDid)))
+	var projectDidParam [32]byte
+	copy(projectDidParam[:], []byte("0x"+hexEncodedProjectDid))
+
+	projectRegistryContact, err := ethProject.NewProjectWalletRegistry(registryContract, c.client)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
-	fmt.Println(string(hex))
-	return string(hex), nil
+
+	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDidParam)
+	return projectWalletAddress.String(), err
 }
 
+// Gets the Funding amount out of the transcation data
 func (c EthClient) GetFundingAmt(tx *EthTransaction) int64 {
 	return c.GetInt64FromHexString(tx.Result.Input[74:])
 }
@@ -148,6 +167,39 @@ func GetKeccak(tx string) string {
 	return hex.EncodeToString(buf)
 }
 
+func IxoAppGenEthWallet() {
+	// Create an account
+	ethWallet, err := CreateEthWallet()
+	if err != nil {
+		return
+	}
+
+	json, err := json.Marshal(ethWallet)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = ioutil.WriteFile(getEthWalletFilename(), json, 0644)
+
+	return
+}
+
+func getValidationEthWallet() EthWallet {
+	data, err := ioutil.ReadFile(getEthWalletFilename())
+	var ethWallet EthWallet
+	err = json.Unmarshal(data, &ethWallet)
+	if err != nil {
+		panic(err)
+	}
+	return ethWallet
+}
+
+func getEthWalletFilename() string {
+	rootDir := os.ExpandEnv("$HOME/.ixo-node/config")
+	return rootDir + "/ethWallet.json"
+}
+
 func CreateEthWallet() (ethWallet *EthWallet, err error) {
 	// Create an account
 	key, err := ethCrypto.GenerateKey()
@@ -162,4 +214,13 @@ func CreateEthWallet() (ethWallet *EthWallet, err error) {
 
 	ethWallet = &EthWallet{Address: address, PrivateKey: privateKey}
 	return
+}
+
+func removeDidPrefix(did Did) string {
+	const prefix = "did:ixo:"
+	didStr := string(did)
+	if strings.HasPrefix(didStr, prefix) {
+		return didStr[8:]
+	}
+	return didStr
 }
