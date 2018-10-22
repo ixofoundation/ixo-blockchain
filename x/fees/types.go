@@ -34,6 +34,19 @@ const KeyEvaluationPayFeePercentage = "EvaluationPayFeePercentage"
 // EvaluationPayNodeFeePercentage The percentage of the evaluation payment fee that the initiating node will receive the remainder goes to ixo
 const KeyEvaluationPayNodeFeePercentage = "EvaluationPayNodeFeePercentage"
 
+var AllFees = []string{
+	KeyIxoFactor,
+	KeyInitiationFeeAmount,
+	KeyInitiationNodeFeePercentage,
+	KeyClaimFeeAmount,
+	KeyEvaluationFeeAmount,
+	KeyServiceAgentRegistrationFeeAmount,
+	KeyEvaluationAgentRegistrationFeeAmount,
+	KeyNodeFeePercentage,
+	KeyEvaluationPayFeePercentage,
+	KeyEvaluationPayNodeFeePercentage,
+}
+
 // GenesisAccount doesn't need pubkey or sequence
 type GenesisState struct {
 	IxoFactor sdk.Rat `json:"ixoFactor"`

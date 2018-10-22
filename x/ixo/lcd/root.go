@@ -26,6 +26,7 @@ import (
 	tmserver "github.com/tendermint/tendermint/rpc/lib/server"
 
 	did "github.com/ixofoundation/ixo-cosmos/x/did/rest"
+	fees "github.com/ixofoundation/ixo-cosmos/x/fees/rest"
 	project "github.com/ixofoundation/ixo-cosmos/x/project/rest"
 )
 
@@ -101,6 +102,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 
 	did.RegisterRoutes(cliCtx, r, cdc, kb)
 	project.RegisterRoutes(cliCtx, r, cdc, kb)
+	fees.RegisterRoutes(cliCtx, r, cdc, kb)
 	return r
 }
 
