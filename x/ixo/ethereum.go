@@ -4,21 +4,18 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-
-	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
-
 	"github.com/ethereum/go-ethereum/common"
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
 )
 
 const ETH_URL = "ETH_URL"
@@ -167,22 +164,21 @@ func GetKeccak(tx string) string {
 	return hex.EncodeToString(buf)
 }
 
-func IxoAppGenEthWallet() {
+func IxoAppGenEthWallet() (string, error) {
 	// Create an account
 	ethWallet, err := CreateEthWallet()
 	if err != nil {
-		return
+		return "", err
 	}
 
 	json, err := json.Marshal(ethWallet)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return "", err
 	}
 
 	err = ioutil.WriteFile(getEthWalletFilename(), json, 0644)
 
-	return
+	return ethWallet.Address, nil
 }
 
 func getValidationEthWallet() EthWallet {

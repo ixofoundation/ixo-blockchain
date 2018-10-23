@@ -14,9 +14,10 @@ import (
 
 // GenesisValidator is an initial validator.
 type GenesisValidator struct {
-	PubKey crypto.PubKey `json:"pub_key"`
-	Power  int64         `json:"power"`
-	Name   string        `json:"name"`
+	PubKey    crypto.PubKey `json:"pub_key"`
+	Power     int64         `json:"power"`
+	Name      string        `json:"name"`
+	EthWallet string        `json:"ethWallet"`
 }
 
 // GenesisDoc defines the initial conditions for a tendermint blockchain, in particular its validator set.

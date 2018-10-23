@@ -34,7 +34,11 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 		return
 	}
 
-	ixo.IxoAppGenEthWallet()
+	ethAddress, err :=ixo.IxoAppGenEthWallet()
+
+	if err != nil {
+		return
+	}
 
 	var bz []byte
 	ixoGenTx := IxoGenTx{
@@ -53,6 +57,7 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
 		Power:  10,
+		EthWallet: ethAddress,
 	}
 	return
 }
