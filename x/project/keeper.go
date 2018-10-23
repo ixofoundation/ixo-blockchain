@@ -100,9 +100,9 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]in
 	}
 }
 
-func (k Keeper) AddAccountToAccountProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did, account auth.Account) {
+func (k Keeper) AddAccountToAccountProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
 	accMap := k.GetAccountMap(ctx, projectDid)
-	_, found := accMap[accountDid]
+	_, found := accMap[accountId]
 	if found {
 		return
 	}
@@ -110,12 +110,12 @@ func (k Keeper) AddAccountToAccountProjectAccounts(ctx sdk.Context, projectDid i
 	store := ctx.KVStore(k.key)
 	key := generateAccountsKey(k, projectDid)
 	accountAddrString := hex.EncodeToString(account.GetAddress())
-	accMap[string(accountDid)] = accountAddrString
+	accMap[accountId] = accountAddrString
 	bz := k.encodeAccountMap(accMap)
 	store.Set(key, bz)
 }
 
-func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountDid ixo.Did) auth.Account {
+func (k Keeper) CreateNewAccount(ctx sdk.Context) auth.Account {
 	// generate secret and address
 	addr, _, err := server.GenerateCoinKey()
 	if err != nil {

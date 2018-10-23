@@ -6,6 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+var decimals = sdk.NewRat(100000000, 1)
+
 // InitGenesis sets the fees onto the chain
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) error {
 	keeper.SetRat(ctx, KeyIxoFactor, data.IxoFactor)
@@ -56,11 +58,11 @@ func WriteGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 func DefaultGenesis() GenesisState {
 	ixoFactor := sdk.OneRat() // 1
 
-	initiationFeeAmount := sdk.NewRat(500, 1)    //500
-	initiationNodeFeePercentage := sdk.ZeroRat() // 0
+	initiationFeeAmount := sdk.NewRat(500, 1).Mul(decimals) //500
+	initiationNodeFeePercentage := sdk.ZeroRat()            // 0
 
-	claimFeeAmount := sdk.NewRat(6, 10)      // 0.6
-	evaluationFeeAmount := sdk.NewRat(4, 10) //0.4
+	claimFeeAmount := sdk.NewRat(6, 10).Mul(decimals)      // 0.6
+	evaluationFeeAmount := sdk.NewRat(4, 10).Mul(decimals) //0.4
 
 	serviceAgentRegistrationFeeAmount := sdk.ZeroRat()    // 0
 	evaluationAgentRegistrationFeeAmount := sdk.ZeroRat() // 0
