@@ -29,17 +29,17 @@ func InitKeeper(cdc *wire.Codec, paramsKeeper params.Keeper) Keeper {
 
 // set the percentage value
 func (k Keeper) SetRat(ctx sdk.Context, key string, value sdk.Rat) {
-	k.paramsKeeper.Setter().SetRat(ctx, key, value)
+	k.paramsKeeper.Setter().SetRat(ctx, MakeFeeKey(key), value)
 }
 
 // set the amount value
 func (k Keeper) SetInt64(ctx sdk.Context, key string, value int64) {
-	k.paramsKeeper.Setter().SetInt64(ctx, key, value)
+	k.paramsKeeper.Setter().SetInt64(ctx, MakeFeeKey(key), value)
 }
 
 // set the percentage value
 func (k Keeper) GetRat(ctx sdk.Context, key string) sdk.Rat {
-	r, err := k.paramsKeeper.Getter().GetRat(ctx, key)
+	r, err := k.paramsKeeper.Getter().GetRat(ctx, MakeFeeKey(key))
 	if err != nil {
 		panic(err)
 	}
@@ -48,9 +48,13 @@ func (k Keeper) GetRat(ctx sdk.Context, key string) sdk.Rat {
 
 // set the amount value
 func (k Keeper) GetInt64(ctx sdk.Context, key string) int64 {
-	i, err := k.paramsKeeper.Getter().GetInt64(ctx, key)
+	i, err := k.paramsKeeper.Getter().GetInt64(ctx, MakeFeeKey(key))
 	if err != nil {
 		panic(err)
 	}
 	return i
+}
+
+func MakeFeeKey(key string) string {
+	return "fee/" + key
 }
