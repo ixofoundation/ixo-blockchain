@@ -82,14 +82,14 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
     "address": "%s",
     "coins": [
       {
-        "denom": "ixo-native",
+        "denom": "%s",
         "amount": "0"
       }
     ]
 	}],
 	"fees": %s,
 	"config": %s
-}`, genTx.Addr, feesJson, ixoConfigJson))
+}`, genTx.Addr, ixo.IxoNativeToken, feesJson, ixoConfigJson))
 	return
 }
 
