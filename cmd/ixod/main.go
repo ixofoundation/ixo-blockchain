@@ -6,19 +6,15 @@ import (
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-
-	"github.com/cosmos/cosmos-sdk/server"
-	//	"github.com/cosmos/cosmos-sdk/wire"
-	"github.com/ixofoundation/ixo-cosmos/app"
 )
 
 // init parameters

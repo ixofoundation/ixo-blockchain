@@ -25,6 +25,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/types"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
+	"github.com/ixofoundation/ixo-cosmos/x/node"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
@@ -61,6 +62,7 @@ type IxoApp struct {
 	projectKeeper       project.Keeper
 	paramsKeeper        params.Keeper
 	feeKeeper           fees.Keeper
+	nodeKeeper			node.Keeper
 	ixoKeeper           ixo.Keeper
 
 	// Eth client
@@ -112,6 +114,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.feeKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
+	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeeper)
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
 	app.ixoKeeper = ixo.NewKeeper(app.cdc, app.paramsKeeper)
 	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.feeKeeper)
@@ -281,6 +284,14 @@ func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Kee
 			panic(err)
 		}
 
+		app.Logger.Info("****** Initialize Genesis Eth Wallet")
+
+		// load the initial fee information
+		err = node.InitGenesis(ctx, app.nodeKeeper, genesisState.NodeData)
+		if err != nil {
+			panic(err)
+		}
+
 		// load the initial config information
 		err = ixo.InitGenesis(ctx, ixoKeeper, genesisState.Config)
 		if err != nil {
@@ -310,6 +321,7 @@ func (app *IxoApp) ExportAppStateAndValidators() (appState json.RawMessage, vali
 	genState := GenesisState{
 		Accounts: accounts,
 		FeeData:  fees.WriteGenesis(ctx, app.feeKeeper),
+		NodeData: node.WriteGenesis(ctx, app.nodeKeeper),
 	}
 
 	appState, err = wire.MarshalJSONIndent(app.cdc, genState)

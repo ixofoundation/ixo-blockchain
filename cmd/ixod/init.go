@@ -13,9 +13,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-cosmos/x/node"
 	crypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
+)
+
+var (
+	ethWallet string
+	did       string
 )
 
 // simple genesis tx
@@ -34,7 +40,13 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 		return
 	}
 
-	ixo.IxoAppGenEthWallet()
+	ethereumAddr, err := ixo.IxoAppGenEthWallet()
+
+	ethWallet = ethereumAddr
+
+	if err != nil {
+		return
+	}
 
 	var bz []byte
 	ixoGenTx := IxoGenTx{
@@ -45,14 +57,22 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 		return
 	}
 	appGenTx = json.RawMessage(bz)
+	sovrinDid := sovrin.FromMnemonic(secret)
+
+	did = sovrinDid.Did
 
 	cliPrint = json.RawMessage(fmt.Sprintf(`{
-		"secret": "%s"
-	}`, secret))
+		"secret": "%s",
+		"node": {
+			"did": "%s",
+			"ethWallet": "%s"
+		}
+	}`, secret, did, ethWallet))
 
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
 		Power:  10,
+		Name: did,
 	}
 	return
 }
@@ -72,10 +92,13 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
 	}
 
 	feesState := fees.DefaultGenesis()
-	feesJson, err := json.MarshalIndent(feesState, "", "  ")
+	feesJSON, err := json.MarshalIndent(feesState, "", "  ")
+
+	nodeState := node.DefaultGenesis(did, ethWallet)
+	nodeJSON, err := json.MarshalIndent(nodeState, "", "  ")
 
 	ixoConfig := ixo.DefaultGenesisState()
-	ixoConfigJson, err := json.MarshalIndent(ixoConfig, "", "  ")
+	ixoConfigJSON, err := json.MarshalIndent(ixoConfig, "", "  ")
 
 	appState = json.RawMessage(fmt.Sprintf(`{
   "accounts": [{
@@ -88,8 +111,9 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
     ]
 	}],
 	"fees": %s,
+	"nodes": [%s],
 	"config": %s
-}`, genTx.Addr, ixo.IxoNativeToken, feesJson, ixoConfigJson))
+}`, genTx.Addr, ixo.IxoNativeToken, feesJSON, nodeJSON, ixoConfigJSON))
 	return
 }
 
