@@ -100,7 +100,7 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]in
 	}
 }
 
-func (k Keeper) AddAccountToAccountProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
+func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
 	accMap := k.GetAccountMap(ctx, projectDid)
 	_, found := accMap[accountId]
 	if found {

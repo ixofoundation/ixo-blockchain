@@ -38,11 +38,11 @@ func NewHandler(k Keeper, fk fees.Keeper, ck bank.Keeper, ethClient ixo.EthClien
 
 func handleCreateProjectMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateProjectMsg) sdk.Result {
 	// Create Project Account for Project
-	getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 	// Create IXO Account for Project
-	getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountId)
+	getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountId)
 	// Create Initiating Node Account for Project
-	getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountId)
+	getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountId)
 
 	projectDoc, err := k.AddProjectDoc(ctx, &msg)
 	if err != nil {
@@ -96,7 +96,7 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 }
 
 func handleCreateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateAgentMsg) sdk.Result {
-	getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
+	getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
@@ -134,10 +134,10 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, ck ban
 
 	// If there is an EvaluatorPay configured than we make the payment and deduct and pay those fees
 	if projectDoc.GetEvaluatorPay() != 0 {
-		projectAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
-		nodeAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountId)
-		ixoAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountId)
-		evaluatorAccAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetSenderDid())
+		projectAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+		nodeAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountId)
+		ixoAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountId)
+		evaluatorAccAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetSenderDid())
 
 		// Get percentage of the Evaluator pay to pay in fees
 		feePercentage := fk.GetRat(ctx, fees.KeyEvaluationPayFeePercentage)
@@ -206,7 +206,7 @@ func checkFunded(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient ixo.EthCli
 }
 
 func fundProject(ctx sdk.Context, k Keeper, ck bank.Keeper, projectDoc StoredProjectDoc, coin sdk.Coin) sdk.Result {
-	projectAddr := getAccountInAccountProjectAccounts(ctx, k, projectDoc.GetProjectDid(), projectDoc.GetProjectDid())
+	projectAddr := getAccountInProjectAccounts(ctx, k, projectDoc.GetProjectDid(), projectDoc.GetProjectDid())
 
 	_, _, err := ck.AddCoins(ctx, projectAddr, sdk.Coins{coin})
 	if err != nil {
@@ -228,13 +228,13 @@ func getProjectAccountMap(ctx sdk.Context, k Keeper, projectDid ixo.Did) map[str
 	return k.GetAccountMap(ctx, projectDid)
 }
 
-func getAccountInAccountProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountID string) sdk.AccAddress {
+func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountID string) sdk.AccAddress {
 	accMap := getProjectAccountMap(ctx, k, projectDid)
 	var accountIDAccAddr string
 	accountIDAddrInterface, found := accMap[accountID]
 	if !found {
 		newAcc := k.CreateNewAccount(ctx)
-		k.AddAccountToAccountProjectAccounts(ctx, projectDid, accountID, newAcc)
+		k.AddAccountToProjectAccounts(ctx, projectDid, accountID, newAcc)
 		accountIDAccAddr = hex.EncodeToString(newAcc.GetAddress())
 	} else {
 		accountIDAccAddr = accountIDAddrInterface.(string)
@@ -243,9 +243,9 @@ func getAccountInAccountProjectAccounts(ctx sdk.Context, k Keeper, projectDid ix
 }
 
 func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
-	projectAddr := getAccountInAccountProjectAccounts(ctx, k, projectDid, projectDid)
-	nodeAddr := getAccountInAccountProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountId)
-	ixoAddr := getAccountInAccountProjectAccounts(ctx, k, projectDid, IxoAccountId)
+	projectAddr := getAccountInProjectAccounts(ctx, k, projectDid, projectDid)
+	nodeAddr := getAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountId)
+	ixoAddr := getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountId)
 
 	ixoFactor := fk.GetRat(ctx, fees.KeyIxoFactor)
 	nodePercentage := fk.GetRat(ctx, fees.KeyNodeFeePercentage)
