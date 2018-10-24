@@ -418,7 +418,6 @@ func SimpleAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
 		Power:  10,
-		EthWallet: "",
 	}
 	return
 }
