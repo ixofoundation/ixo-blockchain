@@ -27,7 +27,7 @@ func NewHandler(k Keeper, fk fees.Keeper, ck bank.Keeper, ethClient ixo.EthClien
 		case CreateClaimMsg:
 			return handleCreateClaimMsg(ctx, k, fk, ck, msg)
 		case CreateEvaluationMsg:
-			return handleCreateEvaluationMsg(ctx, k, ck, msg)
+			return handleCreateEvaluationMsg(ctx, k, fk, ck, msg)
 		case WithdrawFundsMsg:
 			return handleWithdrawFundsMsg(ctx, k, ck, msg)
 		default:
@@ -95,6 +95,58 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 
 }
 
+func handleCreateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateAgentMsg) sdk.Result {
+	getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: []byte("Action complete"),
+	}
+}
+
+func handleUpdateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg UpdateAgentMsg) sdk.Result {
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: []byte("Action complete"),
+	}
+}
+func handleCreateClaimMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, msg CreateClaimMsg) sdk.Result {
+
+	return processFees(ctx, k, fk, ck, fees.FeeClaimTransaction, msg.GetProjectDid())
+
+}
+
+func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, msg CreateEvaluationMsg) sdk.Result {
+	res := processFees(ctx, k, fk, ck, fees.FeeEvaluationTransaction, msg.GetProjectDid())
+	// Return error if there was an error processing the fees
+	if res.Code != sdk.ABCICodeOK {
+		return res
+	}
+
+	projectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
+	if !found {
+		return sdk.ErrUnknownRequest("Could not find Project").Result()
+	}
+	projectAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	evaluatorAccAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetSenderDid())
+
+	_, err := ck.SendCoins(ctx, projectAddr, evaluatorAccAddr, sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, projectDoc.GetEvaluatorPay())})
+	if err != nil {
+		return err.Result()
+	}
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: []byte("Action complete"),
+	}
+}
+
+// TODO: This function is not completed
+func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg WithdrawFundsMsg) sdk.Result {
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: []byte("Action complete"),
+	}
+}
+
 func checkFunded(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient ixo.EthClient, msg UpdateProjectStatusMsg, existingProjectDoc StoredProjectDoc) sdk.Result {
 	if existingProjectDoc.GetStatus() != CreatedProject {
 		return sdk.ErrUnknownRequest("Invalid Status").Result()
@@ -115,65 +167,6 @@ func checkFunded(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient ixo.EthCli
 	}
 }
 
-func handleCreateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateAgentMsg) sdk.Result {
-	getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
-	}
-}
-func handleUpdateAgentMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg UpdateAgentMsg) sdk.Result {
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
-	}
-}
-func handleCreateClaimMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, msg CreateClaimMsg) sdk.Result {
-
-	projectAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
-	nodeAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountId)
-	ixoAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountId)
-
-	ixoFactor := fk.GetRat(ctx, fees.KeyIxoFactor)
-	adjustedClaimFeeAmount := fk.GetRat(ctx, fees.KeyClaimFeeAmount).Mul(ixoFactor)
-	nodePercentage := fk.GetRat(ctx, fees.KeyNodeFeePercentage)
-
-	nodeAmount := adjustedClaimFeeAmount.Mul(nodePercentage).RoundInt64()
-	ixoAmount := adjustedClaimFeeAmount.RoundInt64() - nodeAmount
-
-	_, err := ck.SendCoins(ctx, projectAddr, nodeAddr, sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, nodeAmount)})
-	if err != nil {
-		return err.Result()
-	}
-
-	_, err = ck.SendCoins(ctx, projectAddr, ixoAddr, sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, ixoAmount)})
-	if err != nil {
-		return err.Result()
-	}
-
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
-	}
-}
-func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg CreateEvaluationMsg) sdk.Result {
-	projectDoc, found := getProjectDoc(ctx, k, msg.GetProjectDid())
-	if !found {
-		return sdk.ErrUnknownRequest("Could not find Project").Result()
-	}
-	projectAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
-	evaluatorAccAddr := getAccountInAccountProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetSenderDid())
-
-	_, err := ck.SendCoins(ctx, projectAddr, evaluatorAccAddr, sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, projectDoc.GetEvaluatorPay())})
-	if err != nil {
-		return err.Result()
-	}
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
-	}
-}
-
 func fundProject(ctx sdk.Context, k Keeper, ck bank.Keeper, projectDoc StoredProjectDoc, coin sdk.Coin) sdk.Result {
 	projectAddr := getAccountInAccountProjectAccounts(ctx, k, projectDoc.GetProjectDid(), projectDoc.GetProjectDid())
 
@@ -185,14 +178,6 @@ func fundProject(ctx sdk.Context, k Keeper, ck bank.Keeper, projectDoc StoredPro
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
 		Data: []byte("Project Funded"),
-	}
-}
-
-// TODO: This function is not completed
-func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg WithdrawFundsMsg) sdk.Result {
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
 	}
 }
 
@@ -217,4 +202,42 @@ func getAccountInAccountProjectAccounts(ctx sdk.Context, k Keeper, projectDid ix
 		accountIDAccAddr = accountIDAddrInterface.(string)
 	}
 	return sdk.AccAddress(accountIDAccAddr)
+}
+
+func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) sdk.Result {
+	projectAddr := getAccountInAccountProjectAccounts(ctx, k, projectDid, projectDid)
+	nodeAddr := getAccountInAccountProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountId)
+	ixoAddr := getAccountInAccountProjectAccounts(ctx, k, projectDid, IxoAccountId)
+
+	ixoFactor := fk.GetRat(ctx, fees.KeyIxoFactor)
+	nodePercentage := fk.GetRat(ctx, fees.KeyNodeFeePercentage)
+	var adjustedFeeAmount sdk.Rat
+	switch feeType {
+	case fees.FeeClaimTransaction:
+		adjustedFeeAmount = fk.GetRat(ctx, fees.KeyClaimFeeAmount).Mul(ixoFactor)
+	case fees.FeeEvaluationTransaction:
+		adjustedFeeAmount = fk.GetRat(ctx, fees.KeyEvaluationFeeAmount).Mul(ixoFactor)
+	default:
+		return sdk.ErrUnknownRequest("Invalid Fee type.").Result()
+	}
+
+	// Get the adjusted fee amount and round to an int64
+	nodeAmount := adjustedFeeAmount.Mul(nodePercentage).RoundInt64()
+	// now subtract the nodeAmount from the adjustedAmount as the foundation gets the other part of the fee
+	ixoAmount := adjustedFeeAmount.RoundInt64() - nodeAmount
+
+	_, err := ck.SendCoins(ctx, projectAddr, nodeAddr, sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, nodeAmount)})
+	if err != nil {
+		return err.Result()
+	}
+
+	_, err = ck.SendCoins(ctx, projectAddr, ixoAddr, sdk.Coins{sdk.NewInt64Coin(COIN_DENOM, ixoAmount)})
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: []byte("Action complete"),
+	}
 }
