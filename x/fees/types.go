@@ -2,6 +2,18 @@ package fees
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
+//DOC SETUP
+type FeeType string
+
+const (
+	FeeProjectInitiation           FeeType = "ProjectInitiationFee"
+	FeeClaimTransaction            FeeType = "ClaimTransactionnFee"
+	FeeEvaluationTransaction       FeeType = "FeeEvaluationTransaction"
+	FeeServiceAgentRegistration    FeeType = "ServiceAgentRegistrationFee"
+	FeeEvaluationAgentRegistration FeeType = "EvaluationAgentRegistrationFee"
+	FeeEvaluationPay               FeeType = "EvaluationPayFee"
+)
+
 // IxoFactor The factor used to adjust fees across the board if the value of the IXO token varies against Fiat 1 = 100%
 const KeyIxoFactor = "ixoFactor"
 

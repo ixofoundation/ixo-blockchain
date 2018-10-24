@@ -21,7 +21,7 @@ import (
 
 var (
 	ethWallet string
-	did string
+	did       string
 )
 
 // simple genesis tx
@@ -72,6 +72,7 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 	validator = tmtypes.GenesisValidator{
 		PubKey: pk,
 		Power:  10,
+		Name: did,
 	}
 	return
 }
@@ -104,7 +105,7 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
     "address": "%s",
     "coins": [
       {
-        "denom": "ixo-native",
+        "denom": "%s",
         "amount": "0"
       }
     ]
@@ -112,7 +113,7 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
 	"fees": %s,
 	"nodes": [%s],
 	"config": %s
-}`, genTx.Addr, feesJSON, nodeJSON, ixoConfigJSON))
+}`, genTx.Addr, ixo.IxoNativeToken, feesJSON, nodeJSON, ixoConfigJSON))
 	return
 }
 
