@@ -4,6 +4,7 @@ import (
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 // InitGenesis sets the fees onto the chain
@@ -56,14 +57,14 @@ func WriteGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 func DefaultGenesis() GenesisState {
 	ixoFactor := sdk.OneRat() // 1
 
-	initiationFeeAmount := sdk.NewRat(500, 1)    //500
-	initiationNodeFeePercentage := sdk.ZeroRat() // 0
+	initiationFeeAmount := sdk.NewRat(500, 1).Mul(ixo.IxoDecimals) //500
+	initiationNodeFeePercentage := sdk.ZeroRat()                   // 0
 
-	claimFeeAmount := sdk.NewRat(6, 10)      // 0.6
-	evaluationFeeAmount := sdk.NewRat(4, 10) //0.4
+	claimFeeAmount := sdk.NewRat(6, 10).Mul(ixo.IxoDecimals)      // 0.6
+	evaluationFeeAmount := sdk.NewRat(4, 10).Mul(ixo.IxoDecimals) //0.4
 
-	serviceAgentRegistrationFeeAmount := sdk.ZeroRat()    // 0
-	evaluationAgentRegistrationFeeAmount := sdk.ZeroRat() // 0
+	serviceAgentRegistrationFeeAmount := sdk.ZeroRat().Mul(ixo.IxoDecimals)    // 0
+	evaluationAgentRegistrationFeeAmount := sdk.ZeroRat().Mul(ixo.IxoDecimals) // 0
 
 	nodeFeePercentage := sdk.NewRat(5, 10) // 0.5
 

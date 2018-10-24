@@ -8,6 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+var IxoDecimals = sdk.NewRat(100000000, 1)
+
+const IxoNativeToken = "IXO"
+
 //_______________________________________________________________________
 // Define the IxoTx
 

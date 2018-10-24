@@ -9,8 +9,6 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-const COIN_DENOM = "ixo"
-
 //DOC SETUP
 type ProjectStatus string
 
