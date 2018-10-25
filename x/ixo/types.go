@@ -20,6 +20,7 @@ type GenesisState struct {
 	AuthContractAddress            string `json:"authContractAddress"`
 	IxoTokenContractAddress        string `json:"ixoTokenContractAddress"`
 	ProjectRegistryContractAddress string `json:"projectRegistryContractAddress"`
+	ProjectWalletAuthoriserAddress string `json:"projectWalletAuthoriserAddress"`
 }
 
 func DefaultGenesisState() GenesisState {
@@ -29,6 +30,7 @@ func DefaultGenesisState() GenesisState {
 		AuthContractAddress:            "Enter ETH auth contract address",
 		IxoTokenContractAddress:        "Enter ETH Ixo Token contract address",
 		ProjectRegistryContractAddress: "Enter ETH project registry contract address",
+		ProjectWalletAuthoriserAddress: "Enter ETH project wallet authoriser contract address",
 	}
 }
 

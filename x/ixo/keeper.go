@@ -10,6 +10,7 @@ const KeyFoundationWalletID = "Foundation"
 const KeyAuthContractAddress = "AuthContract"
 const KeyIxoTokenContractAddress = "IxoTokenContract"
 const KeyProjectRegistryContractAddress = "ProjectRegistryContract"
+const KeyProjectWalletAuthoriserContractAddress = "ProjectWalletAuthoriserContract"
 
 // IXO Keeper manages ixo params
 type Keeper struct {
