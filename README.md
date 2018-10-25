@@ -5,7 +5,7 @@
 ### Prerequisites:
 * Ensure docker and docker compose are installed
 * Expose the following ports: 
-`46656`, `46657`,`1317`
+`26656`, `26657`,`1317`
 
 
 ### Setup
@@ -29,3 +29,18 @@ mkdir data\blockchain
 
 ### Purge all images (The next start will pull the latest images)
 * Run `./purge.sh`
+
+
+## Initial Configuration
+
+### Steps
+- run `ixod init` (This should be run on each node)
+  - this creates a *genesis.json* file in the *ixo-node/config* folder
+  - It also generates a nodeDid and Ethereum wallet
+- Edit the *genesis.json* file from one of the nodes and setup the chainID, validators, nodes, fees and Ethereum wallets in that file. Copy the file to the other nodes.  It should be the same.
+- The PDS needs to be configured with one of the nodeDID's. This will be used to identify the initiating node for project creation and fees. The Ethereum network also needs to correspond to the network is configured on the blockchain (see PDS config for more info)
+- Fund the node's Ethereum wallet with ETH so that gas costs can be paid for authorising transactions
+- Setup the environment variable on the blockchain server/container with the RPC value for the Ethereum connection. e.g. (mainnet, ropsten and localhost respectively)
+  - ETH_URL=https://api.infura.io/v1/jsonrpc/mainnet
+  - ETH_URL=https://api.infura.io/v1/jsonrpc/ropsten
+  - ETH_URL=http://localhost:7545
