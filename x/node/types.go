@@ -13,6 +13,6 @@ var AllNodes = []string{
 
 // GenesisState of the node
 type GenesisState struct {
-	Did string `json:"did"`
+	Did       string `json:"did"`
 	EthWallet string `json:"ethWallet"`
 }
