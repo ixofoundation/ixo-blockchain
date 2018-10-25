@@ -34,6 +34,7 @@ func (ps UpdateProjectStatusDoc) GetEthFundingTxnID() string {
 
 //Define ProjectDoc
 type ProjectDoc struct {
+	NodeDid              string        `json:"nodeDid"`
 	RequiredClaims       string        `json:"requiredClaims"`
 	EvaluatorPayPerClaim string        `json:"evaluatorPayPerClaim"`
 	ServiceEndpoint      string        `json:"serviceEndpoint"`
@@ -159,6 +160,26 @@ var _ sdk.Msg = CreateProjectMsg{}
 func (msg CreateProjectMsg) Type() string                            { return "project" }
 func (msg CreateProjectMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
+	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.ProjectDid, "ProjectDid")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.Data.NodeDid, "NodeDid")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.Data.RequiredClaims, "RequiredClaims")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy")
+	if !valid {
+		return err
+	}
 	return nil
 }
 func (msg CreateProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
