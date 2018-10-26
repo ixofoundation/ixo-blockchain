@@ -143,6 +143,7 @@ func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }
 type ProjectMsg interface {
 	sdk.Msg
 	IsNewDid() bool
+	IsWithdrawal() bool
 }
 
 //CreateProjectMsg
@@ -203,7 +204,8 @@ func (msg *CreateProjectMsg) SetStatus(status ProjectStatus) {
 func (msg CreateProjectMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
-func (msg CreateProjectMsg) IsNewDid() bool { return true }
+func (msg CreateProjectMsg) IsNewDid() bool     { return true }
+func (msg CreateProjectMsg) IsWithdrawal() bool { return false }
 
 var _ StoredProjectDoc = (*CreateProjectMsg)(nil)
 
@@ -231,7 +233,8 @@ func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
 func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
 	return ups.Data.Status
 }
-func (msg UpdateProjectStatusMsg) IsNewDid() bool { return false }
+func (msg UpdateProjectStatusMsg) IsNewDid() bool     { return false }
+func (msg UpdateProjectStatusMsg) IsWithdrawal() bool { return false }
 func (msg UpdateProjectStatusMsg) GetEthFundingTxnID() string {
 	return msg.Data.EthFundingTxnID
 }
@@ -246,6 +249,7 @@ type CreateAgentMsg struct {
 }
 
 func (msg CreateAgentMsg) IsNewDid() bool                          { return false }
+func (msg CreateAgentMsg) IsWithdrawal() bool                      { return false }
 func (msg CreateAgentMsg) Type() string                            { return "project" }
 func (msg CreateAgentMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateAgentMsg) ValidateBasic() sdk.Error {
@@ -280,6 +284,7 @@ type UpdateAgentMsg struct {
 }
 
 func (msg UpdateAgentMsg) IsNewDid() bool                          { return false }
+func (msg UpdateAgentMsg) IsWithdrawal() bool                      { return false }
 func (msg UpdateAgentMsg) Type() string                            { return "project" }
 func (msg UpdateAgentMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg UpdateAgentMsg) ValidateBasic() sdk.Error {
@@ -313,6 +318,7 @@ type CreateClaimMsg struct {
 }
 
 func (msg CreateClaimMsg) IsNewDid() bool                          { return false }
+func (msg CreateClaimMsg) IsWithdrawal() bool                      { return false }
 func (msg CreateClaimMsg) Type() string                            { return "project" }
 func (msg CreateClaimMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateClaimMsg) ValidateBasic() sdk.Error {
@@ -346,6 +352,7 @@ type CreateEvaluationMsg struct {
 }
 
 func (msg CreateEvaluationMsg) IsNewDid() bool                          { return false }
+func (msg CreateEvaluationMsg) IsWithdrawal() bool                      { return false }
 func (msg CreateEvaluationMsg) Type() string                            { return "project" }
 func (msg CreateEvaluationMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg CreateEvaluationMsg) ValidateBasic() sdk.Error {
@@ -379,6 +386,7 @@ type FundProjectMsg struct {
 }
 
 func (msg FundProjectMsg) IsNewDid() bool                          { return false }
+func (msg FundProjectMsg) IsWithdrawal() bool                      { return false }
 func (msg FundProjectMsg) Type() string                            { return "project" }
 func (msg FundProjectMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg FundProjectMsg) ValidateBasic() sdk.Error {
@@ -404,23 +412,21 @@ var _ sdk.Msg = FundProjectMsg{}
 
 //WithdrawFundsMsg
 type WithdrawFundsMsg struct {
-	SignBytes  string           `json:"signBytes"`
-	TxHash     string           `json:"txHash"`
-	SenderDid  ixo.Did          `json:"senderDid"`
-	ProjectDid ixo.Did          `json:"projectDid"`
-	Data       WithdrawFundsDoc `json:"data"`
+	SignBytes string           `json:"signBytes"`
+	SenderDid ixo.Did          `json:"senderDid"`
+	Data      WithdrawFundsDoc `json:"data"`
 }
 
 func (msg WithdrawFundsMsg) IsNewDid() bool                          { return false }
+func (msg WithdrawFundsMsg) IsWithdrawal() bool                      { return true }
 func (msg WithdrawFundsMsg) Type() string                            { return "project" }
 func (msg WithdrawFundsMsg) Get(key interface{}) (value interface{}) { return nil }
 func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
 	return nil
 }
-func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did { return msg.SenderDid }
 func (msg WithdrawFundsMsg) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
 func (msg WithdrawFundsMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
