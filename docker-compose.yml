@@ -13,6 +13,19 @@ services:
     volumes:
       - ./data/blockchain:/root/.ixo-node
     command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/startBlockchain.sh
+  
+  rest:
+        container_name: rest
+        image: trustlab/ixo-blockchain:dev
+        restart: always
+        ports:
+        - "1317:1317"
+        links:
+        - blockchain
+        volumes:
+        - ./data/blockchain:/root/.ixo-node
+        command: ixocli rest-server --node tcp://blockchain:26657 --laddr tcp://0.0.0.0:1317 --cors *
+
   block-sync:
     container_name: block-sync
     image: trustlab/ixo-block-sync:dev
@@ -20,12 +33,14 @@ services:
       - PORT=8080
       - MONGODB_URI=mongodb://block-sync-db:27017/block-sync
       - CHAIN_URI=blockchain:26657
+      - BC_REST=http://rest:1317
     restart: always
     ports:
       - "80:8080"
     links:
       - block-sync-db
       - blockchain
+      - rest
     logging:
       driver: "json-file"
       options:

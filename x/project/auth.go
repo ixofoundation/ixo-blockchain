@@ -28,13 +28,24 @@ func NewAnteHandler(projectKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler 
 			copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
 
 		} else {
-			projectDid := ixo.Did(msg.GetSigners()[0])
-			// Get Project Doc
-			projectDoc, found := projectKeeper.GetProjectDoc(ctx, projectDid)
-			if !found {
-				return ctx, sdk.ErrInternal("project did not found").Result(), true
+			if projectMsg.IsWithdrawal() {
+				did := ixo.Did(msg.GetSigners()[0])
+				didDoc := didKeeper.GetDidDoc(ctx, did)
+				if didDoc == nil {
+					return ctx,
+						sdk.ErrUnauthorized("Issuer did not found").Result(),
+						true
+				}
+				copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
+			} else {
+				projectDid := ixo.Did(msg.GetSigners()[0])
+				// Get Project Doc
+				projectDoc, found := projectKeeper.GetProjectDoc(ctx, projectDid)
+				if !found {
+					return ctx, sdk.ErrInternal("project did not found").Result(), true
+				}
+				copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
 			}
-			copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
 		}
 
 		// Assert that there are signatures.

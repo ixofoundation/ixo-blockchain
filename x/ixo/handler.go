@@ -51,6 +51,13 @@ func InitGenesis(ctx sdk.Context, ixoKeeper Keeper, genesisState GenesisState) e
 		panic("Project Registry Contract Address is not set in genesis file")
 	}
 	ixoKeeper.SetEthAddress(ctx, KeyProjectRegistryContractAddress, address)
+
+	address = genesisState.ProjectWalletAuthoriserAddress
+	if isEthAddress(address) {
+		panic("Project Wallet Authoriser Contract Address is not set in genesis file")
+	}
+	ixoKeeper.SetEthAddress(ctx, KeyProjectWalletAuthoriserContractAddress, address)
+	
 	return nil
 }
 
