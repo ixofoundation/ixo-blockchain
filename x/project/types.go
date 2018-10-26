@@ -136,6 +136,7 @@ type WithdrawFundsDoc struct {
 }
 
 func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }
+func (wd WithdrawFundsDoc) GetEthWallet() string   { return wd.EthWallet }
 
 //**************************************************************************************
 // Message
@@ -396,8 +397,9 @@ func (msg WithdrawFundsMsg) Get(key interface{}) (value interface{}) { return ni
 func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
 	return nil
 }
-func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did                { return msg.ProjectDid }
+func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did                 { return msg.SenderDid }
+func (msg WithdrawFundsMsg) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
 func (msg WithdrawFundsMsg) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }

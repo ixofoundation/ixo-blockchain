@@ -177,8 +177,28 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, ck ban
 	}
 }
 
-// TODO: This function is not completed
-func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, msg WithdrawFundsMsg) sdk.Result {
+func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient ixo.EthClient, msg WithdrawFundsMsg) sdk.Result {
+
+	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
+	projectDoc, found := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
+	if !found {
+		return sdk.ErrUnknownRequest("Could not find Project").Result()
+	}
+
+	// projectAccountAddress := getAccountInProjectAccounts(ctx, k, projectDoc.GetProjectDid(), projectDoc.GetProjectDid())
+	evaluatorAccountAddress := getAccountInProjectAccounts(ctx, k, withdrawFundsDoc.GetProjectDid(), msg.GetSenderDid())
+	evaluatorCoins := ck.GetCoins(ctx, evaluatorAccountAddress)
+	evaluatorIxoNativeTokensDue := evaluatorCoins.AmountOf(ixo.IxoNativeToken).Int64()
+
+	// initiate auth contract based ixo ERC20 token transfer on Ethereum
+	projectEthWallet, err := ethClient.GetEthProjectWallet(ctx, withdrawFundsDoc.GetProjectDid())
+	// defensivenly code around returned err / project wallet ?
+
+	ethClient.InitiateTokenTransfer(ctx, projectEthWallet, msg.Data.GetEthWallet(), evaluatorIxoNativeTokensDue)
+
+	// burn coins
+	ck.SubtractCoins(ctx, evaluatorAccountAddress, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, evaluatorIxoNativeTokensDue)})
+
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),

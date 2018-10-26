@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
 )
 
@@ -142,6 +143,48 @@ func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string,
 
 	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDidParam)
 	return projectWalletAddress.String(), err
+}
+
+// GetEthAuthContract retrieves the Authcontract from Ethereum
+func (c EthClient) GetEthAuthContract(ctx sdk.Context) (*ethAuth.AuthContract, error) {
+	authContractAddressStr := c.k.GetEthAddress(ctx, KeyAuthContractAddress)
+	authContractAddress := common.HexToAddress(authContractAddressStr)
+
+	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
+	return authContract, err
+}
+
+// InitiateTokenTransfer initiates the transfer of tokens from a source wallet to a destination wallet
+func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, sourceEthWallet string, destinationEthWallet string, amount Int) bool {
+	authContractAddressStr := c.k.GetEthAddress(ctx, KeyAuthContractAddress)
+	authContractAddress := common.HexToAddress(authContractAddressStr)
+
+	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
+
+	ercContractStr := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+
+	// Check To is the ERC20 Token
+	if common.HexToAddress(tx.Result.To).String() != ercContractStr {
+		return false
+	}
+
+	// Check it is the transfer method
+	if tx.Result.Input[2:10] != FUNDING_METHOD_HASH {
+		return false
+	}
+
+	// Check the project wallet on the registry matches the wallet in the transaction
+	txProjWallet := common.HexToAddress(tx.Result.Input[10:74]).String()
+	// Check it is the transfer method
+	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
+	if err != nil {
+		return false
+	}
+	if txProjWallet != projWallet {
+		return false
+	}
+
+	return true
 }
 
 // Gets the Funding amount out of the transcation data
