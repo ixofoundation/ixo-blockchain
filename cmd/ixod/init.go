@@ -59,7 +59,7 @@ func IxoAppGenTx(cdc *wire.Codec, pk crypto.PubKey, genTxConfig serverconfig.Gen
 	appGenTx = json.RawMessage(bz)
 	sovrinDid := sovrin.FromMnemonic(secret)
 
-	did = sovrinDid.Did
+	did = "did:ixo:" + sovrinDid.Did
 
 	cliPrint = json.RawMessage(fmt.Sprintf(`{
 		"secret": "%s",
