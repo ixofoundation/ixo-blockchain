@@ -425,7 +425,6 @@ func (msg WithdrawFundsMsg) Get(key interface{}) (value interface{}) { return ni
 func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
 	return nil
 }
-func (msg WithdrawFundsMsg) GetProjectDid() ixo.Did                { return msg.ProjectDid }
 func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did                 { return msg.SenderDid }
 func (msg WithdrawFundsMsg) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
 func (msg WithdrawFundsMsg) GetSigners() []sdk.AccAddress {

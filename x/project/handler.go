@@ -29,7 +29,7 @@ func NewHandler(k Keeper, fk fees.Keeper, ck bank.Keeper, ethClient ixo.EthClien
 		case CreateEvaluationMsg:
 			return handleCreateEvaluationMsg(ctx, k, fk, ck, msg)
 		case WithdrawFundsMsg:
-			return handleWithdrawFundsMsg(ctx, k, ck, msg)
+			return handleWithdrawFundsMsg(ctx, k, ck, ethClient, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -180,24 +180,26 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, ck ban
 func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient ixo.EthClient, msg WithdrawFundsMsg) sdk.Result {
 
 	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
-	projectDoc, found := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
+	_, found := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
 	if !found {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
 	// projectAccountAddress := getAccountInProjectAccounts(ctx, k, projectDoc.GetProjectDid(), projectDoc.GetProjectDid())
-	evaluatorAccountAddress := getAccountInProjectAccounts(ctx, k, withdrawFundsDoc.GetProjectDid(), msg.GetSenderDid())
-	evaluatorCoins := ck.GetCoins(ctx, evaluatorAccountAddress)
-	evaluatorIxoNativeTokensDue := evaluatorCoins.AmountOf(ixo.IxoNativeToken).Int64()
+	beneficiaryAccount := getAccountInProjectAccounts(ctx, k, withdrawFundsDoc.GetProjectDid(), msg.GetSenderDid())
+	beneficiaryCoinTypes := ck.GetCoins(ctx, beneficiaryAccount)
+	beneficiaryIxoTokensDue := beneficiaryCoinTypes.AmountOf(ixo.IxoNativeToken).Int64()
 
 	// initiate auth contract based ixo ERC20 token transfer on Ethereum
 	projectEthWallet, err := ethClient.GetEthProjectWallet(ctx, withdrawFundsDoc.GetProjectDid())
-	// defensivenly code around returned err / project wallet ?
+	if err != nil {
+		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
+	}
 
-	ethClient.InitiateTokenTransfer(ctx, projectEthWallet, msg.Data.GetEthWallet(), evaluatorIxoNativeTokensDue)
+	ethClient.InitiateTokenTransfer(ctx, projectEthWallet, withdrawFundsDoc.GetEthWallet(), beneficiaryIxoTokensDue)
 
 	// burn coins
-	ck.SubtractCoins(ctx, evaluatorAccountAddress, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, evaluatorIxoNativeTokensDue)})
+	// ck.SubtractCoins(ctx, beneficiaryAccount, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, beneficiaryIxoTokensDue.Int64())})
 
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,

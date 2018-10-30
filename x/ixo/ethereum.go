@@ -5,12 +5,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
+	"log"
+	"math/big"
 	"os"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -145,44 +148,25 @@ func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string,
 	return projectWalletAddress.String(), err
 }
 
-// GetEthAuthContract retrieves the Authcontract from Ethereum
-func (c EthClient) GetEthAuthContract(ctx sdk.Context) (*ethAuth.AuthContract, error) {
-	authContractAddressStr := c.k.GetEthAddress(ctx, KeyAuthContractAddress)
-	authContractAddress := common.HexToAddress(authContractAddressStr)
-
-	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
-	return authContract, err
-}
-
 // InitiateTokenTransfer initiates the transfer of tokens from a source wallet to a destination wallet
-func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, sourceEthWallet string, destinationEthWallet string, amount Int) bool {
-	authContractAddressStr := c.k.GetEthAddress(ctx, KeyAuthContractAddress)
-	authContractAddress := common.HexToAddress(authContractAddressStr)
-
+func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, senderAddr string, receiverAddr string, amount int64) bool {
+	authContractAddress := common.HexToAddress(c.k.GetEthAddress(ctx, KeyAuthContractAddress))
 	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
-
-	ercContractStr := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
-
-	// Check To is the ERC20 Token
-	if common.HexToAddress(tx.Result.To).String() != ercContractStr {
-		return false
-	}
-
-	// Check it is the transfer method
-	if tx.Result.Input[2:10] != FUNDING_METHOD_HASH {
-		return false
-	}
-
-	// Check the project wallet on the registry matches the wallet in the transaction
-	txProjWallet := common.HexToAddress(tx.Result.Input[10:74]).String()
-	// Check it is the transfer method
-	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
 	if err != nil {
 		return false
 	}
-	if txProjWallet != projWallet {
-		return false
+
+	validationEthWallet := getValidationEthWallet()
+	privateKey, err := crypto.HexToECDSA(validationEthWallet.PrivateKey)
+	if err != nil {
+		log.Fatal(err)
 	}
+	transOpts := bind.NewKeyedTransactor(privateKey)
+
+	var txBytes [32]byte
+	projectWalletAuthoriserAddress := c.k.GetEthAddress(ctx, KeyProjectWalletAuthoriserContractAddress)
+
+	authContract.Validate(transOpts, txBytes, common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
 
 	return true
 }

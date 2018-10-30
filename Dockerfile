@@ -23,7 +23,7 @@ RUN go get github.com/btcsuite/btcutil/base58
 RUN go get github.com/ethereum/go-ethereum
 
 # Manage vendor dependencies.
-# RUN cd $COSMOS_HOME; make get_vendor_deps
+#RUN cd $COSMOS_HOME; make get_vendor_deps
 
 # Build, Install
 # COMMIT_HASH is an optional argument passed from the build-docker-image.sh utility script executed from within the Git repository
