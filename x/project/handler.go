@@ -209,6 +209,7 @@ func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, ck bank.Keeper, ethCl
 	if !isFundingTx {
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
+	//TODO: (not urgent) Add an additional check here to check the balance on the wallet account matches the Funding amount
 	amt := ethClient.GetFundingAmt(ethTx)
 	coin := sdk.NewInt64Coin(ixo.IxoNativeToken, amt)
 	return fundProject(ctx, k, ck, existingProjectDoc, coin)
