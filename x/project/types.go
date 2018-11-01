@@ -22,7 +22,22 @@ const (
 	PaidoutStatus  ProjectStatus = "PAIDOUT"
 )
 
-//Define UpdateProjectStatusDoc
+//IsValidProgressionFrom encapsulates legal ProjectStatus prpgression
+func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectStatus ProjectStatus) bool {
+	statusProgression := map[ProjectStatus]int{NullStatus: 0, CreatedProject: 1, PendingStatus: 2, FundedStatus: 3, StartedStatus: 4, StoppedStatus: 5, PaidoutStatus: 6}
+	// prevent the setting of a NullStatus completely & do not allow the setting of a ProjectStatus if previously in PaidoutStatus
+	if nextProjectStatus == NullStatus || previousProjectStatus == PaidoutStatus {
+		return false
+	}
+
+	nextI := statusProgression[nextProjectStatus]
+	previousI := statusProgression[previousProjectStatus]
+
+	// allow single increment forward and unlimited backwards progression
+	return nextI-1 == previousI || nextI <= previousI
+}
+
+//UpdateProjectStatusDoc defined
 type UpdateProjectStatusDoc struct {
 	Status          ProjectStatus `json:"status"`
 	EthFundingTxnID string        `json:"ethFundingTxnID"`
