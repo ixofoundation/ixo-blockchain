@@ -65,12 +65,14 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, eth
 		return sdk.ErrUnknownRequest("Invalid Status").Result()
 	}
 
-	ethFundingTxnID := msg.GetEthFundingTxnID()
-	if ethFundingTxnID == "" {
-		return sdk.ErrUnknownRequest("Invalid EthFundingTxnID provided").Result()
-	}
-
 	if newStatus == FundedStatus {
+		ethFundingTxnID := msg.GetEthFundingTxnID()
+		ctx.Logger().Info("Provided ethFundingTxnID: ", ethFundingTxnID)
+		if ethFundingTxnID == "" {
+			ctx.Logger().Error("ETH tx not valid isFundingTx")
+			return sdk.ErrUnknownRequest("Invalid EthFundingTxnID provided").Result()
+		}
+
 		res := fundIfLegitimateEthereumTx(ctx, k, ck, ethClient, ethFundingTxnID, existingProjectDoc)
 		if res.Code != sdk.ABCICodeOK {
 			return res
@@ -203,10 +205,12 @@ func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, ck bank.Keeper, ethCl
 
 	ethTx, err := ethClient.GetTransactionByHash(ethFundingTxnID)
 	if err != nil {
+		ctx.Logger().Error("ETH tx not valid", "error", err)
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
 	isFundingTx := ethClient.IsProjectFundingTx(ctx, existingProjectDoc.GetProjectDid(), ethTx)
 	if !isFundingTx {
+		ctx.Logger().Error("ETH tx not valid isFundingTx: false")
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
 	//TODO: (not urgent) Add an additional check here to check the balance on the wallet account matches the Funding amount
