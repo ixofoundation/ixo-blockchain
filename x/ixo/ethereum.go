@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/big"
@@ -100,29 +101,45 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 	return tx, err
 }
 
+// func (c EthClient) DebugEthAddress(ctx sdk.Context) {
+// 	ixoTokenContractAddress := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+// 	fmt.Printf("xxxxxxxxxxxxxxxxxxxxx | ixoTokenContractAddress: %s\n", ixoTokenContractAddress)
+// }
+
 // checks whether this is a funding transaction on this project
 func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
+	fmt.Printf("PROJECT_FUNDING | func IsProjectFundingTx.\n")
 
-	ercContractStr := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+	ixoTokenContractAddress := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+	fmt.Printf("PROJECT_FUNDING | ercContractStr: %s\n", ixoTokenContractAddress)
 
 	// Check To is the ERC20 Token
-	if common.HexToAddress(tx.Result.To).String() != ercContractStr {
+	fmt.Printf("PROJECT_FUNDING | tx.To: %s\n", common.HexToAddress(tx.Result.To).String())
+	if common.HexToAddress(tx.Result.To).String() != ixoTokenContractAddress {
+		fmt.Printf("PROJECT_FUNDING | debug: fail 1\n")
 		return false
 	}
 
 	// Check it is the transfer method
+	fmt.Printf("PROJECT_FUNDING | FUNDING_METHOD_HASH: %s\n", FUNDING_METHOD_HASH)
+	fmt.Printf("PROJECT_FUNDING | tx.Result.Input[2:10]: %s\n", tx.Result.Input[2:10])
 	if tx.Result.Input[2:10] != FUNDING_METHOD_HASH {
+		fmt.Printf("PROJECT_FUNDING | debug fail 2\n")
 		return false
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
 	txProjWallet := common.HexToAddress(tx.Result.Input[10:74]).String()
+	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
 	// Check it is the transfer method
 	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
+	fmt.Printf("PROJECT_FUNDING | projWallet: %s\n", projWallet)
 	if err != nil {
+		fmt.Printf("PROJECT_FUNDING | debug fail 3\n")
 		return false
 	}
 	if txProjWallet != projWallet {
+		fmt.Printf("PROJECT_FUNDING | debug fail 4\n")
 		return false
 	}
 
