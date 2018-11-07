@@ -19,9 +19,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
-	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 )
 
 const ETH_URL = "ETH_URL"
@@ -61,6 +61,7 @@ func NewEthClient(k contracts.Keeper) (EthClient, error) {
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
 
 	url := LookupEnv(ETH_URL, "http://localhost:7545")
+	fmt.Printf("PROJECT_FUNDING | url: %s \n", url)
 	rpcClient, err := rpc.DialContext(context.Background(), url)
 
 	if err != nil {
@@ -97,7 +98,9 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 	// return &types.Transaction{}, nil
 	//	var res interface{}
 	var tx *EthTransaction
+	fmt.Printf("PROJECT_FUNDING | Just before call to \n")
 	err := c.rpcClient.CallContext(context.Background(), &tx, "eth_getTransactionByHash", hash)
+	fmt.Printf("PROJECT_FUNDING | err: %s \n", err)
 
 	return tx, err
 }
@@ -115,8 +118,8 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 	fmt.Printf("PROJECT_FUNDING | ercContractStr: %s\n", ixoTokenContractAddress)
 
 	// Check To is the ERC20 Token
-	fmt.Printf("PROJECT_FUNDING | tx.To: %s\n", common.HexToAddress(tx.Result.To).String())
-	if common.HexToAddress(tx.Result.To).String() != ixoTokenContractAddress {
+	fmt.Printf("PROJECT_FUNDING | tx.To: %s\n", tx.Result.To)
+	if tx.Result.To != ixoTokenContractAddress {
 		fmt.Printf("PROJECT_FUNDING | debug: fail 1\n")
 		return false
 	}

@@ -2,6 +2,7 @@ package project
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -205,12 +206,12 @@ func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, ck bank.Keeper, ethCl
 
 	ethTx, err := ethClient.GetTransactionByHash(ethFundingTxnID)
 	if err != nil {
-		ctx.Logger().Error("ETH tx not valid", "error", err)
+		fmt.Printf("PROJECT_FUNDING | ETH tx not valid err: %s\n", err)
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
 	isFundingTx := ethClient.IsProjectFundingTx(ctx, existingProjectDoc.GetProjectDid(), ethTx)
 	if !isFundingTx {
-		ctx.Logger().Error("ETH tx not valid isFundingTx: false")
+		fmt.Printf("PROJECT_FUNDING | ETH tx not valid isFundingTx: false\n")
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
 	//TODO: (not urgent) Add an additional check here to check the balance on the wallet account matches the Funding amount
