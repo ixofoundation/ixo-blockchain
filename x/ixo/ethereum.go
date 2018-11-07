@@ -130,7 +130,7 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
-	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1).String()
+	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
 	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
 	// Check it is the transfer method
 	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
@@ -153,11 +153,10 @@ func getMethodHashFromInput(input string) string {
 
 // paramPos position so first param has paramPos = 1
 func getParamFromInput(input string, paramPos int) string {
-	start := 10 + 64 * (paramPos -1)
-	end := 10 + 64 * (paramPos)
-	return input[start, end]
+	start := 10 + 64*(paramPos-1)
+	end := 10 + 64*paramPos
+	return input[start:end]
 }
-
 
 // Retrieves the Project wallet address from the Ethereum registry project conteact
 func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
