@@ -129,22 +129,6 @@ type CreateEvaluationDoc struct {
 	Status  ClaimStatus `json:"status"`
 }
 
-type FundProjectDoc struct {
-	Signer     ixo.Did `json:"signer"`
-	EthTxHash  string  `json:"ethTxHash"`
-	ProjectDid ixo.Did `json:"projectDid"`
-	Amount     string  `json:"amount"`
-}
-
-func (fd FundProjectDoc) GetSigner() ixo.Did { return fd.Signer }
-func (fd FundProjectDoc) GetAmount() int64 {
-	i, err := strconv.ParseInt(fd.Amount, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return i
-}
-
 type WithdrawFundsDoc struct {
 	ProjectDid ixo.Did `json:"projectDid"`
 	EthWallet  string  `json:"ethWallet"`
@@ -391,40 +375,6 @@ func (msg CreateEvaluationMsg) String() string {
 }
 
 var _ sdk.Msg = CreateEvaluationMsg{}
-
-//FundProjectMsg
-type FundProjectMsg struct {
-	SignBytes  string         `json:"signBytes"`
-	TxHash     string         `json:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid"`
-	Data       FundProjectDoc `json:"data"`
-}
-
-func (msg FundProjectMsg) IsNewDid() bool                          { return false }
-func (msg FundProjectMsg) IsWithdrawal() bool                      { return false }
-func (msg FundProjectMsg) Type() string                            { return "project" }
-func (msg FundProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg FundProjectMsg) ValidateBasic() sdk.Error {
-	return nil
-}
-func (msg FundProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg FundProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg FundProjectMsg) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
-}
-func (msg FundProjectMsg) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
-}
-func (msg FundProjectMsg) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
-
-var _ sdk.Msg = FundProjectMsg{}
 
 //WithdrawFundsMsg
 type WithdrawFundsMsg struct {
