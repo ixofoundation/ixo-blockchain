@@ -14,7 +14,7 @@ ADD . $COSMOS_HOME
 #COPY ./vendor $COSMOS_HOME/vendor
 #COPY ./x $COSMOS_HOME/x
 #COPY ./Makefile $COSMOS_HOME
-#COPY ./bin/startBlockchain.sh $COSMOS_HOME/bin/
+#COPY ./bin/initiatize-or-start-bc.sh $COSMOS_HOME/bin/
 
 # Manage global dependencies.
 RUN cd $FOUNDATION_PATH
