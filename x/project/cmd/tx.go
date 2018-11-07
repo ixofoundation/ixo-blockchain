@@ -284,36 +284,6 @@ func CreateEvaluationCmd(cdc *wire.Codec) *cobra.Command {
 	}
 }
 
-// take the coolness quiz transaction
-func FundProjectTxCmd(cdc *wire.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "fundProject projectDid ethTx amount sovrinDid",
-		Short: "Create tokens to fund project",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
-				return errors.New("You must provide a valid projectDid, ethereum transaction hash, amount of ixo and sovrinDid")
-			}
-
-			ctx := context.NewCLIContext().
-				WithCodec(cdc).
-				WithLogger(os.Stdout)
-
-			// create the message
-			fundProjectDoc := project.FundProjectDoc{
-				ProjectDid: args[0],
-				EthTxHash:  args[1],
-				Amount:     args[2],
-			}
-			sovrinDid := unmarshalSovrinDID(args[3])
-
-			// create the message
-			msg := project.NewFundProjectMsg(args[1], "", fundProjectDoc, sovrinDid)
-
-			return ixoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
-		},
-	}
-}
-
 // Get a project doc from the ledger
 func GetProjectDocCmd(storeName string, cdc *wire.Codec, decoder project.ProjectDocDecoder) *cobra.Command {
 	return &cobra.Command{
