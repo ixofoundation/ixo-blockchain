@@ -19,9 +19,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
-	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 )
 
 const ETH_URL = "ETH_URL"
@@ -123,14 +123,14 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 
 	// Check it is the transfer method
 	fmt.Printf("PROJECT_FUNDING | FUNDING_METHOD_HASH: %s\n", FUNDING_METHOD_HASH)
-	fmt.Printf("PROJECT_FUNDING | tx.Result.Input[2:10]: %s\n", tx.Result.Input[2:10])
-	if tx.Result.Input[2:10] != FUNDING_METHOD_HASH {
+	fmt.Printf("PROJECT_FUNDING | tx.Result.Input[2:10]: %s\n", getMethodHashFromInput(tx.Result.Input))
+	if getMethodHashFromInput(tx.Result.Input) != FUNDING_METHOD_HASH {
 		fmt.Printf("PROJECT_FUNDING | debug fail 2\n")
 		return false
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
-	txProjWallet := common.HexToAddress(tx.Result.Input[10:74]).String()
+	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1).String()
 	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
 	// Check it is the transfer method
 	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
@@ -146,6 +146,18 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 
 	return true
 }
+
+func getMethodHashFromInput(input string) string {
+	return input[2:10]
+}
+
+// paramPos position so first param has paramPos = 1
+func getParamFromInput(input string, paramPos int) string {
+	start := 10 + 64 * (paramPos -1)
+	end := 10 + 64 * (paramPos)
+	return input[start, end]
+}
+
 
 // Retrieves the Project wallet address from the Ethereum registry project conteact
 func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
