@@ -32,7 +32,7 @@ func queryContractsRequestHandler(cdc *wire.Codec) http.HandlerFunc {
 		for _, k := range contracts.AllContracts {
 			bz, err := ctx.QueryStore([]byte(contracts.MakeContractKey(k)), storeName)
 			if err == nil {
-				m[k], _ = string(bz[:]), res
+				m[k], _ = string(bz[2:]), res
 			}
 		}
 
