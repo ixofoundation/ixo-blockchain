@@ -12,28 +12,6 @@ var IxoDecimals = sdk.NewRat(100000000, 1)
 
 const IxoNativeToken = "IXO"
 
-//_______________________________________________________________________
-// Define the IxoTx
-
-type GenesisState struct {
-	FoundationWallet               string `json:"foundationWallet"`
-	AuthContractAddress            string `json:"authContractAddress"`
-	IxoTokenContractAddress        string `json:"ixoTokenContractAddress"`
-	ProjectRegistryContractAddress string `json:"projectRegistryContractAddress"`
-	ProjectWalletAuthoriserAddress string `json:"projectWalletAuthoriserAddress"`
-}
-
-func DefaultGenesisState() GenesisState {
-
-	return GenesisState{
-		FoundationWallet:               "Enter ETH wallet address to accumulate foundations tokens",
-		AuthContractAddress:            "Enter ETH auth contract address",
-		IxoTokenContractAddress:        "Enter ETH Ixo Token contract address",
-		ProjectRegistryContractAddress: "Enter ETH project registry contract address",
-		ProjectWalletAuthoriserAddress: "Enter ETH project wallet authoriser contract address",
-	}
-}
-
 type IxoTx struct {
 	Msgs       []sdk.Msg      `json:"payload"`
 	Signatures []IxoSignature `json:"signatures"`

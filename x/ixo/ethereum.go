@@ -21,6 +21,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
+	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 )
 
 const ETH_URL = "ETH_URL"
@@ -51,11 +52,11 @@ func (tx *EthTransaction) UnmarshalJSON(msg []byte) error {
 type EthClient struct {
 	rpcClient *rpc.Client
 	client    *ethclient.Client
-	k         Keeper
+	k         contracts.Keeper
 	callOpts  bind.CallOpts
 }
 
-func NewEthClient(k Keeper) (EthClient, error) {
+func NewEthClient(k contracts.Keeper) (EthClient, error) {
 	//url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
 
@@ -110,7 +111,7 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
 	fmt.Printf("PROJECT_FUNDING | func IsProjectFundingTx.\n")
 
-	ixoTokenContractAddress := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+	ixoTokenContractAddress := c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
 	fmt.Printf("PROJECT_FUNDING | ercContractStr: %s\n", ixoTokenContractAddress)
 
 	// Check To is the ERC20 Token
@@ -149,7 +150,7 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 // Retrieves the Project wallet address from the Ethereum registry project conteact
 func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
 
-	registryContractStr := c.k.GetEthAddress(ctx, KeyProjectRegistryContractAddress)
+	registryContractStr := c.k.GetContract(ctx, contracts.KeyProjectRegistryContractAddress)
 	registryContract := common.HexToAddress(registryContractStr)
 
 	hexEncodedProjectDid := hex.EncodeToString([]byte(removeDidPrefix(projectDid)))
@@ -167,7 +168,7 @@ func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string,
 
 // InitiateTokenTransfer initiates the transfer of tokens from a source wallet to a destination wallet
 func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, senderAddr string, receiverAddr string, amount int64) bool {
-	authContractAddress := common.HexToAddress(c.k.GetEthAddress(ctx, KeyAuthContractAddress))
+	authContractAddress := common.HexToAddress(c.k.GetContract(ctx, contracts.KeyAuthContractAddress))
 	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
 	if err != nil {
 		return false
@@ -181,7 +182,7 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, senderAddr string, rec
 	transOpts := bind.NewKeyedTransactor(privateKey)
 
 	var txBytes [32]byte
-	projectWalletAuthoriserAddress := c.k.GetEthAddress(ctx, KeyProjectWalletAuthoriserContractAddress)
+	projectWalletAuthoriserAddress := c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
 
 	authContract.Validate(transOpts, txBytes, common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
 

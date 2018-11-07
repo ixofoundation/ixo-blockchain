@@ -28,6 +28,7 @@ import (
 	did "github.com/ixofoundation/ixo-cosmos/x/did/rest"
 	fees "github.com/ixofoundation/ixo-cosmos/x/fees/rest"
 	project "github.com/ixofoundation/ixo-cosmos/x/project/rest"
+	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts/rest"
 )
 
 // ServeCommand will generate a long-running rest server
@@ -103,6 +104,7 @@ func createHandler(cdc *wire.Codec) http.Handler {
 	did.RegisterRoutes(cliCtx, r, cdc, kb)
 	project.RegisterRoutes(cliCtx, r, cdc, kb)
 	fees.RegisterRoutes(cliCtx, r, cdc, kb)
+	contracts.RegisterRoutes(cliCtx, r, cdc, kb)
 	return r
 }
 
