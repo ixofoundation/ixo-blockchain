@@ -133,10 +133,12 @@ type WithdrawFundsDoc struct {
 	ProjectDid ixo.Did `json:"projectDid"`
 	EthWallet  string  `json:"ethWallet"`
 	Amount     string  `json:"amount"`
+	IsRefund   bool    `json:"isRefund"`
 }
 
 func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }
 func (wd WithdrawFundsDoc) GetEthWallet() string   { return wd.EthWallet }
+func (wd WithdrawFundsDoc) GetIsRefund() bool      { return wd.IsRefund }
 
 //**************************************************************************************
 // Message
