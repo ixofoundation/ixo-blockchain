@@ -22,19 +22,30 @@ const (
 	PaidoutStatus  ProjectStatus = "PAIDOUT"
 )
 
-//IsValidProgressionFrom encapsulates legal ProjectStatus prpgression
-func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectStatus ProjectStatus) bool {
-	statusProgression := map[ProjectStatus]int{NullStatus: 0, CreatedProject: 1, PendingStatus: 2, FundedStatus: 3, StartedStatus: 4, StoppedStatus: 5, PaidoutStatus: 6}
-	// prevent the setting of a NullStatus completely & do not allow the setting of a ProjectStatus if previously in PaidoutStatus
-	if nextProjectStatus == NullStatus || previousProjectStatus == PaidoutStatus {
-		return false
+var StateTransitions = initStateTransitions()
+
+func initStateTransitions() map[ProjectStatus][]ProjectStatus {
+	return map[ProjectStatus][]ProjectStatus{
+		NullStatus:     []ProjectStatus{CreatedProject},
+		CreatedProject: []ProjectStatus{PendingStatus},
+		PendingStatus:  []ProjectStatus{CreatedProject, FundedStatus},
+		FundedStatus:   []ProjectStatus{StartedStatus},
+		StartedStatus:  []ProjectStatus{StoppedStatus},
+		StoppedStatus:  []ProjectStatus{PaidoutStatus},
 	}
 
-	nextI := statusProgression[nextProjectStatus]
-	previousI := statusProgression[previousProjectStatus]
+}
 
-	// allow single increment forward and unlimited backwards progression
-	return nextI-1 == previousI || nextI <= previousI
+//IsValidProgressionFrom encapsulates legal ProjectStatus prpgression
+func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectStatus ProjectStatus) bool {
+	validStatuses := StateTransitions[previousProjectStatus]
+	for _, v := range validStatuses {
+		if v == nextProjectStatus {
+			return true
+		}
+	}
+	return false
+
 }
 
 //UpdateProjectStatusDoc defined
