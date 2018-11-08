@@ -51,7 +51,7 @@ type IxoApp struct {
 	accountMapper auth.AccountMapper
 
 	// Manage keeper
-	coinKeeper          bank.Keeper
+	bankKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	ibcMapper           ibc.Mapper
 	didKeeper           did.Keeper
@@ -106,7 +106,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	)
 
 	// add handlers
-	app.coinKeeper = bank.NewKeeper(app.accountMapper)
+	app.bankKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.feeKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
@@ -123,11 +123,11 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.ethClient = newEthClient
 
 	app.Router().
-		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
+		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
 		//		AddRoute("pool", pool.NewHandler(app.poolKeeper)).
-		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("did", did.NewHandler(app.didKeeper)).
-		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.coinKeeper, app.ethClient))
+		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.contractKeeper, app.bankKeeper, app.ethClient))
 
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper, app.contractKeeper))
