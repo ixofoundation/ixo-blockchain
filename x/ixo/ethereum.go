@@ -19,9 +19,10 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
+	params "github.com/ixofoundation/ixo-cosmos/x/params"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
-	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 )
 
 const ETH_URL = "ETH_URL"
@@ -264,4 +265,13 @@ func removeDidPrefix(did Did) string {
 		return didStr[8:]
 	}
 	return didStr
+}
+
+func setTxID(ctx sdk.Context, keeper params.Keeper) {
+	actionID, err := keeper.Getter().GetInt(ctx, "actionID")
+	if err == nil {
+		keeper.Setter().SetInt(ctx, "actionID", actionID.Add(sdk.NewInt(1)))
+	} else {
+		keeper.Setter().SetInt(ctx, "actionID", sdk.NewInt(1))
+	}
 }
