@@ -62,7 +62,6 @@ func NewEthClient(k contracts.Keeper) (EthClient, error) {
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
 
 	url := LookupEnv(ETH_URL, "http://localhost:7545")
-	fmt.Printf("PROJECT_FUNDING | url: %s \n", url)
 	rpcClient, err := rpc.DialContext(context.Background(), url)
 
 	if err != nil {
@@ -99,9 +98,7 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 	// return &types.Transaction{}, nil
 	//	var res interface{}
 	var tx *EthTransaction
-	fmt.Printf("PROJECT_FUNDING | Just before call to \n")
 	err := c.rpcClient.CallContext(context.Background(), &tx, "eth_getTransactionByHash", hash)
-	fmt.Printf("PROJECT_FUNDING | err: %s \n", err)
 
 	return tx, err
 }
@@ -113,39 +110,28 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 
 // checks whether this is a funding transaction on this project
 func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
-	fmt.Printf("PROJECT_FUNDING | func IsProjectFundingTx.\n")
 
 	ixoTokenContractAddress := c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
-	fmt.Printf("PROJECT_FUNDING | ercContractStr: %s\n", ixoTokenContractAddress)
 
 	// Check To is the ERC20 Token
-	fmt.Printf("PROJECT_FUNDING | tx.To: %s\n", tx.Result.To)
 	if tx.Result.To != ixoTokenContractAddress {
-		fmt.Printf("PROJECT_FUNDING | debug: fail 1\n")
 		return false
 	}
 
 	// Check it is the transfer method
-	fmt.Printf("PROJECT_FUNDING | FUNDING_METHOD_HASH: %s\n", FUNDING_METHOD_HASH)
-	fmt.Printf("PROJECT_FUNDING | tx.Result.Input[2:10]: %s\n", getMethodHashFromInput(tx.Result.Input))
 	if getMethodHashFromInput(tx.Result.Input) != FUNDING_METHOD_HASH {
-		fmt.Printf("PROJECT_FUNDING | debug fail 2\n")
 		return false
 	}
 
 	// Check it is the transfer method
 	registryProjWallet, err := c.ProjectWalletFromProjectRegistry(ctx, projectDid)
-	fmt.Printf("PROJECT_FUNDING | registryProjWallet: %s\n", registryProjWallet)
 	if err != nil {
-		fmt.Printf("PROJECT_FUNDING | debug fail 3\n")
 		return false
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
 	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
-	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
 	if txProjWallet != registryProjWallet {
-		fmt.Printf("PROJECT_FUNDING | debug fail 4\n")
 		return false
 	}
 
@@ -158,12 +144,10 @@ func getMethodHashFromInput(input string) string {
 
 // paramPos position so first param has paramPos = 1
 func getParamFromInput(input string, paramPos int) string {
-	fmt.Printf("PROJECT_FUNDING | func getParamFromInput(input: [%s], paramPos: [%d]).\n", input, paramPos)
 
 	start := 10 + 64*(paramPos-1)
 	end := 10 + 64*paramPos
 	param := input[start:end]
-	fmt.Printf("PROJECT_FUNDING | param: [%s]\n", param)
 
 	return param
 }
