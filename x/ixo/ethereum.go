@@ -23,6 +23,7 @@ import (
 	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
+	params "github.com/ixofoundation/ixo-cosmos/x/params"
 )
 
 const ETH_URL = "ETH_URL"
@@ -273,4 +274,13 @@ func removeDidPrefix(did Did) string {
 		return didStr[8:]
 	}
 	return didStr
+}
+
+func setTxID(ctx sdk.Context, keeper params.Keeper) {
+	actionID, err := keeper.Getter().GetInt(ctx, "actionID")
+	if err == nil {
+		keeper.Setter().SetInt(ctx, "actionID", actionID.Add(sdk.NewInt(1)))
+	} else {
+		keeper.Setter().SetInt(ctx, "actionID", sdk.NewInt(1))
+	}
 }
