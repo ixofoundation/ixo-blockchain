@@ -101,7 +101,7 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper
 func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, ethClient ixo.EthClient, projectDid ixo.Did) sdk.Result {
 
 	// initiate auth contract based ixo ERC20 token transfer on Ethereum
-	projectEthWallet, err := ethClient.GetEthProjectWallet(ctx, projectDid)
+	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
 	}
@@ -115,7 +115,9 @@ func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, 
 
 	// for now all fees go to the ixoWallet
 	amt := ixoFees + ixoPayFees + initNodePayFees + valNodeFeesPayFees
-	ethClient.InitiateTokenTransfer(ctx, projectEthWallet, ixoEthWallet, amt)
+	if amt >= 0 {
+		ethClient.InitiateTokenTransfer(ctx, projectEthWallet, ixoEthWallet, amt)
+	}
 
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
