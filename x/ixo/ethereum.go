@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"regexp"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -132,17 +133,18 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 		return false
 	}
 
-	// Check the project wallet on the registry matches the wallet in the transaction
-	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
-	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
 	// Check it is the transfer method
-	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
-	fmt.Printf("PROJECT_FUNDING | projWallet: %s\n", projWallet)
+	registryProjWallet, err := c.ProjectWalletFromProjectRegistry(ctx, projectDid)
+	fmt.Printf("PROJECT_FUNDING | registryProjWallet: %s\n", registryProjWallet)
 	if err != nil {
 		fmt.Printf("PROJECT_FUNDING | debug fail 3\n")
 		return false
 	}
-	if txProjWallet != projWallet {
+
+	// Check the project wallet on the registry matches the wallet in the transaction
+	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
+	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
+	if txProjWallet != registryProjWallet {
 		fmt.Printf("PROJECT_FUNDING | debug fail 4\n")
 		return false
 	}
@@ -156,27 +158,36 @@ func getMethodHashFromInput(input string) string {
 
 // paramPos position so first param has paramPos = 1
 func getParamFromInput(input string, paramPos int) string {
+	fmt.Printf("PROJECT_FUNDING | func getParamFromInput(input: [%s], paramPos: [%d]).\n", input, paramPos)
+
 	start := 10 + 64*(paramPos-1)
 	end := 10 + 64*paramPos
-	return input[start:end]
+	param := input[start:end]
+	fmt.Printf("PROJECT_FUNDING | param: [%s]\n", param)
+
+	return param
 }
 
-// Retrieves the Project wallet address from the Ethereum registry project conteact
-func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
+// ProjectWalletFromProjectRegistry retrieves the Project wallet address from the Ethereum registry project conteact
+func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (string, error) {
+
+	regex := regexp.MustCompile("[^:]+$")
+
+	var projectDid [32]byte
+	copy(projectDid[:], regex.FindString(did))
+	fmt.Printf("ProjectDid Byte Array: %v", projectDid)
+	fmt.Printf("ProjectDid Byte Array: %v", string(projectDid[:]))
 
 	registryContractStr := c.k.GetContract(ctx, contracts.KeyProjectRegistryContractAddress)
 	registryContract := common.HexToAddress(registryContractStr)
-
-	hexEncodedProjectDid := hex.EncodeToString([]byte(removeDidPrefix(projectDid)))
-	var projectDidParam [32]byte
-	copy(projectDidParam[:], []byte("0x"+hexEncodedProjectDid))
 
 	projectRegistryContact, err := ethProject.NewProjectWalletRegistry(registryContract, c.client)
 	if err != nil {
 		return "", err
 	}
 
-	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDidParam)
+	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDid)
+	fmt.Printf("projectWalletAddress: %s", projectWalletAddress.String())
 	return projectWalletAddress.String(), err
 }
 

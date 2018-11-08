@@ -190,7 +190,7 @@ func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, ck bank.Keeper, ethClient
 	beneficiaryIxoTokensDue := beneficiaryCoinTypes.AmountOf(ixo.IxoNativeToken).Int64()
 
 	// initiate auth contract based ixo ERC20 token transfer on Ethereum
-	projectEthWallet, err := ethClient.GetEthProjectWallet(ctx, withdrawFundsDoc.GetProjectDid())
+	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, withdrawFundsDoc.GetProjectDid())
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
 	}
