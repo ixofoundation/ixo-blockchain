@@ -225,7 +225,7 @@ func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, ethClient
 	beneficiaryIxoTokensDue := beneficiaryCoinTypes.AmountOf(ixo.IxoNativeToken).Int64()
 
 	// initiate auth contract based ixo ERC20 token transfer on Ethereum
-	projectEthWallet, err := ethClient.GetEthProjectWallet(ctx, withdrawFundsDoc.GetProjectDid())
+	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, withdrawFundsDoc.GetProjectDid())
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
 	}
@@ -246,12 +246,10 @@ func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, bk bank.Keeper, ethCl
 
 	ethTx, err := ethClient.GetTransactionByHash(ethFundingTxnID)
 	if err != nil {
-		ctx.Logger().Error("ETH tx not valid", "error", err)
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
 	isFundingTx := ethClient.IsProjectFundingTx(ctx, existingProjectDoc.GetProjectDid(), ethTx)
 	if !isFundingTx {
-		ctx.Logger().Error("ETH tx not valid isFundingTx: false")
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
 	//TODO: (not urgent) Add an additional check here to check the balance on the wallet account matches the Funding amount

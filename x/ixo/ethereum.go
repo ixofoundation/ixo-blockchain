@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"regexp"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,6 +23,7 @@ import (
 	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
+	params "github.com/ixofoundation/ixo-cosmos/x/params"
 )
 
 const ETH_URL = "ETH_URL"
@@ -109,38 +111,28 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 
 // checks whether this is a funding transaction on this project
 func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
-	fmt.Printf("PROJECT_FUNDING | func IsProjectFundingTx.\n")
 
 	ixoTokenContractAddress := c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
-	fmt.Printf("PROJECT_FUNDING | ercContractStr: %s\n", ixoTokenContractAddress)
 
 	// Check To is the ERC20 Token
-	fmt.Printf("PROJECT_FUNDING | tx.To: %s\n", common.HexToAddress(tx.Result.To).String())
-	if common.HexToAddress(tx.Result.To).String() != ixoTokenContractAddress {
-		fmt.Printf("PROJECT_FUNDING | debug: fail 1\n")
+	if tx.Result.To != ixoTokenContractAddress {
 		return false
 	}
 
 	// Check it is the transfer method
-	fmt.Printf("PROJECT_FUNDING | FUNDING_METHOD_HASH: %s\n", FUNDING_METHOD_HASH)
-	fmt.Printf("PROJECT_FUNDING | tx.Result.Input[2:10]: %s\n", getMethodHashFromInput(tx.Result.Input))
 	if getMethodHashFromInput(tx.Result.Input) != FUNDING_METHOD_HASH {
-		fmt.Printf("PROJECT_FUNDING | debug fail 2\n")
+		return false
+	}
+
+	// Check it is the transfer method
+	registryProjWallet, err := c.ProjectWalletFromProjectRegistry(ctx, projectDid)
+	if err != nil {
 		return false
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
 	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
-	fmt.Printf("PROJECT_FUNDING | txProjWallet: %s\n", txProjWallet)
-	// Check it is the transfer method
-	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
-	fmt.Printf("PROJECT_FUNDING | projWallet: %s\n", projWallet)
-	if err != nil {
-		fmt.Printf("PROJECT_FUNDING | debug fail 3\n")
-		return false
-	}
-	if txProjWallet != projWallet {
-		fmt.Printf("PROJECT_FUNDING | debug fail 4\n")
+	if txProjWallet != registryProjWallet {
 		return false
 	}
 
@@ -153,27 +145,34 @@ func getMethodHashFromInput(input string) string {
 
 // paramPos position so first param has paramPos = 1
 func getParamFromInput(input string, paramPos int) string {
+
 	start := 10 + 64*(paramPos-1)
 	end := 10 + 64*paramPos
-	return input[start:end]
+	param := input[start:end]
+
+	return param
 }
 
-// Retrieves the Project wallet address from the Ethereum registry project conteact
-func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
+// ProjectWalletFromProjectRegistry retrieves the Project wallet address from the Ethereum registry project conteact
+func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (string, error) {
+
+	regex := regexp.MustCompile("[^:]+$")
+
+	var projectDid [32]byte
+	copy(projectDid[:], regex.FindString(did))
+	fmt.Printf("ProjectDid Byte Array: %v", projectDid)
+	fmt.Printf("ProjectDid Byte Array: %v", string(projectDid[:]))
 
 	registryContractStr := c.k.GetContract(ctx, contracts.KeyProjectRegistryContractAddress)
 	registryContract := common.HexToAddress(registryContractStr)
-
-	hexEncodedProjectDid := hex.EncodeToString([]byte(removeDidPrefix(projectDid)))
-	var projectDidParam [32]byte
-	copy(projectDidParam[:], []byte("0x"+hexEncodedProjectDid))
 
 	projectRegistryContact, err := ethProject.NewProjectWalletRegistry(registryContract, c.client)
 	if err != nil {
 		return "", err
 	}
 
-	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDidParam)
+	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDid)
+	fmt.Printf("projectWalletAddress: %s", projectWalletAddress.String())
 	return projectWalletAddress.String(), err
 }
 
@@ -275,4 +274,13 @@ func removeDidPrefix(did Did) string {
 		return didStr[8:]
 	}
 	return didStr
+}
+
+func setTxID(ctx sdk.Context, keeper params.Keeper) {
+	actionID, err := keeper.Getter().GetInt(ctx, "actionID")
+	if err == nil {
+		keeper.Setter().SetInt(ctx, "actionID", actionID.Add(sdk.NewInt(1)))
+	} else {
+		keeper.Setter().SetInt(ctx, "actionID", sdk.NewInt(1))
+	}
 }
