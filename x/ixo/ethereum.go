@@ -21,9 +21,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
+	params "github.com/ixofoundation/ixo-cosmos/x/params"
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
-	params "github.com/ixofoundation/ixo-cosmos/x/params"
 )
 
 const ETH_URL = "ETH_URL"
@@ -177,7 +177,7 @@ func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (s
 }
 
 // InitiateTokenTransfer initiates the transfer of tokens from a source wallet to a destination wallet
-func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, senderAddr string, receiverAddr string, amount int64) bool {
+func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, senderAddr string, receiverAddr string, amount int64) bool {
 	authContractAddress := common.HexToAddress(c.k.GetContract(ctx, contracts.KeyAuthContractAddress))
 	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
 	if err != nil {
@@ -191,10 +191,9 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, senderAddr string, rec
 	}
 	transOpts := bind.NewKeyedTransactor(privateKey)
 
-	var txBytes [32]byte
 	projectWalletAuthoriserAddress := c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
 
-	authContract.Validate(transOpts, txBytes, common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
+	authContract.Validate(transOpts, getNextTxID(ctx, pk), common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
 
 	return true
 }
@@ -276,11 +275,18 @@ func removeDidPrefix(did Did) string {
 	return didStr
 }
 
-func setTxID(ctx sdk.Context, keeper params.Keeper) {
+func getNextTxID(ctx sdk.Context, keeper params.Keeper) [32]byte {
+	var nextTxID sdk.Int
 	actionID, err := keeper.Getter().GetInt(ctx, "actionID")
 	if err == nil {
-		keeper.Setter().SetInt(ctx, "actionID", actionID.Add(sdk.NewInt(1)))
+		nextTxID = actionID.Add(sdk.NewInt(1))
 	} else {
-		keeper.Setter().SetInt(ctx, "actionID", sdk.NewInt(1))
+		nextTxID = sdk.NewInt(1)
 	}
+	keeper.Setter().SetInt(ctx, "actionID", nextTxID)
+
+	var result [32]byte
+	copy(result[:], nextTxID.BigInt().Bytes())
+
+	return result
 }

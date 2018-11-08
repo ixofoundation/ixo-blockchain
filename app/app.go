@@ -127,8 +127,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 		//		AddRoute("pool", pool.NewHandler(app.poolKeeper)).
 		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("did", did.NewHandler(app.didKeeper)).
-		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.contractKeeper, app.bankKeeper, app.ethClient))
-
+		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.contractKeeper, app.bankKeeper, app.paramsKeeper, app.ethClient))
 	// initialize BaseApp
 	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper, app.contractKeeper))
 	app.SetBeginBlocker(app.BeginBlocker)

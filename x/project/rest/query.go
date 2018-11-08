@@ -133,7 +133,8 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 				w.Write([]byte(fmt.Sprintf("Could't find account. Error: %s", err.Error())))
 			}
 			baseAcc := account.(*types.AppAccount)
-			balance := baseAcc.Coins.AmountOf("ixo-native")
+			fmt.Println("Coins", baseAcc.Coins.String())
+			balance := baseAcc.Coins.AmountOf(ixo.IxoNativeToken)
 			accDetails[i] = AccDetails{Did: k, Account: addr, Balance: balance}
 			i = i + 1
 		}
