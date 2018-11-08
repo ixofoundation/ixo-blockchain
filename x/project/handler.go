@@ -10,8 +10,13 @@ import (
 	ixo "github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-const IxoAccountId = "IXO Foundation"
-const InitiatingNodeAccountId = "InitatingNode"
+type InternalAccountID = string
+
+const (
+	IxoAccountId               InternalAccountID = "IXO Foundation"
+	InitiatingNodeAccountId    InternalAccountID = "InitatingNode"
+	ValidatingNodeSetAccountId InternalAccountID = "ValidatingNodeSet"
+)
 
 func NewHandler(k Keeper, fk fees.Keeper, ck bank.Keeper, ethClient ixo.EthClient) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
@@ -258,7 +263,7 @@ func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, 
 
 func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
 	projectAddr := getAccountInProjectAccounts(ctx, k, projectDid, projectDid)
-	nodeAddr := getAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountId)
+	validatingNodeSetAddr := getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountId)
 	ixoAddr := getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountId)
 
 	ixoFactor := fk.GetRat(ctx, fees.KeyIxoFactor)
@@ -278,7 +283,7 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, ck bank.Keeper, feeT
 	// now subtract the nodeAmount from the adjustedAmount as the foundation gets the other part of the fee
 	ixoAmount := adjustedFeeAmount.RoundInt64() - nodeAmount
 
-	_, err := ck.SendCoins(ctx, projectAddr, nodeAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodeAmount)})
+	_, err := ck.SendCoins(ctx, projectAddr, validatingNodeSetAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodeAmount)})
 	if err != nil {
 		return sdk.Result{}, err
 	}
