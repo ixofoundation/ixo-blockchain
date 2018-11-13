@@ -2,7 +2,6 @@ package project
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 
@@ -109,7 +108,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 
 	store := ctx.KVStore(k.key)
 	key := generateAccountsKey(k, projectDid)
-	accountAddrString := hex.EncodeToString(account.GetAddress())
+	accountAddrString := account.GetAddress().String()
 	accMap[accountId] = accountAddrString
 	bz := k.encodeAccountMap(accMap)
 	store.Set(key, bz)

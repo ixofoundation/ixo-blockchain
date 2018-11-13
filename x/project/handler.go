@@ -1,7 +1,6 @@
 package project
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -46,8 +45,11 @@ func NewHandler(k Keeper, fk fees.Keeper, ck contracts.Keeper, bk bank.Keeper, p
 }
 
 func handleCreateProjectMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg CreateProjectMsg) sdk.Result {
+
 	// Create Project Account for Project
-	getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
+	projAddr := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	bk.AddCoins(ctx, projAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, 50000000000)})
 
 	projectDoc, err := k.AddProjectDoc(ctx, &msg)
 	if err != nil {
@@ -128,13 +130,18 @@ func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, 
 }
 
 func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did, accountId string) int64 {
-	accAddr := getAccountInProjectAccounts(ctx, k, projectDid, accountId)
-	coins := bk.GetCoins(ctx, accAddr)
-	return coins.AmountOf(ixo.IxoNativeToken).Int64()
+	found := checkAccountInProjectAccounts(ctx, k, projectDid, accountId)
+	if found {
+		accAddr := getAccountInProjectAccounts(ctx, k, projectDid, accountId)
+		coins := bk.GetCoins(ctx, accAddr)
+		return coins.AmountOf(ixo.IxoNativeToken).Int64()
+	} else {
+		return 0
+	}
 }
 
 func handleCreateAgentMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg CreateAgentMsg) sdk.Result {
-	getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
+	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
@@ -148,12 +155,15 @@ func handleUpdateAgentMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg UpdateA
 	}
 }
 func handleCreateClaimMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg CreateClaimMsg) sdk.Result {
-
-	res, err := processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
+	_, err := processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
 	if err != nil {
+		fmt.Println("Error:", err)
 		return err.Result()
 	} else {
-		return res
+		return sdk.Result{
+			Code: sdk.ABCICodeOK,
+			Data: []byte("Action complete"),
+		}
 	}
 
 }
@@ -172,10 +182,25 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 
 	// If there is an EvaluatorPay configured than we make the payment and deduct and pay those fees
 	if projectDoc.GetEvaluatorPay() != 0 {
-		projectAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
-		nodeAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountPayFeesId)
-		ixoAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountPayFeesId)
-		evaluatorAccAddr := getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetSenderDid())
+		projectDid := msg.GetProjectDid()
+		projectAddr := getAccountInProjectAccounts(ctx, k, projectDid, msg.GetProjectDid())
+		evaluatorAccAddr := getAccountInProjectAccounts(ctx, k, projectDid, msg.GetSenderDid())
+
+		found := checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+		var nodeAddr sdk.AccAddress
+		if !found {
+			nodeAddr = createAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+		} else {
+			nodeAddr = getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountPayFeesId)
+		}
+
+		found = checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+		var ixoAddr sdk.AccAddress
+		if !found {
+			ixoAddr = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountPayFeesId)
+		} else {
+			ixoAddr = getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountPayFeesId)
+		}
 
 		// Get percentage of the Evaluator pay to pay in fees
 		feePercentage := fk.GetRat(ctx, fees.KeyEvaluationPayFeePercentage)
@@ -293,28 +318,23 @@ func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProject
 	return ixoProjectDoc.(StoredProjectDoc), found
 }
 
-func getProjectAccountMap(ctx sdk.Context, k Keeper, projectDid ixo.Did) map[string]interface{} {
-	return k.GetAccountMap(ctx, projectDid)
-}
-
-func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountID string) sdk.AccAddress {
-	accMap := getProjectAccountMap(ctx, k, projectDid)
-	var accountIDAccAddr string
-	accountIDAddrInterface, found := accMap[accountID]
-	if !found {
-		newAcc := k.CreateNewAccount(ctx)
-		k.AddAccountToProjectAccounts(ctx, projectDid, accountID, newAcc)
-		accountIDAccAddr = hex.EncodeToString(newAcc.GetAddress())
-	} else {
-		accountIDAccAddr = accountIDAddrInterface.(string)
-	}
-	return sdk.AccAddress(accountIDAccAddr)
-}
-
 func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
 	projectAddr := getAccountInProjectAccounts(ctx, k, projectDid, projectDid)
-	validatingNodeSetAddr := getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
-	ixoAddr := getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	var validatingNodeSetAddr sdk.AccAddress
+	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
+	if !found {
+		validatingNodeSetAddr = createAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
+	} else {
+		validatingNodeSetAddr = getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
+	}
+
+	var ixoAddr sdk.AccAddress
+	found = checkAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	if !found {
+		ixoAddr = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	} else {
+		ixoAddr = getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	}
 
 	ixoFactor := fk.GetRat(ctx, fees.KeyIxoFactor)
 	nodePercentage := fk.GetRat(ctx, fees.KeyNodeFeePercentage)
@@ -347,4 +367,34 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 		Code: sdk.ABCICodeOK,
 		Data: []byte("Action complete"),
 	}, nil
+}
+
+func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) bool {
+	accMap := k.GetAccountMap(ctx, projectDid)
+	_, found := accMap[accountId]
+	return found
+}
+
+func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) sdk.AccAddress {
+	acc := k.CreateNewAccount(ctx)
+	k.AddAccountToProjectAccounts(ctx, projectDid, accountId, acc)
+	return acc.GetAddress()
+}
+
+func getProjectAccountMap(ctx sdk.Context, k Keeper, projectDid ixo.Did) map[string]interface{} {
+	return k.GetAccountMap(ctx, projectDid)
+}
+
+func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) sdk.AccAddress {
+	accMap := getProjectAccountMap(ctx, k, projectDid)
+	var accountIDAccAddr string
+	accountIDAddrInterface, found := accMap[accountId]
+	if found {
+		accountIDAccAddr = accountIDAddrInterface.(string)
+		addr, _ := sdk.AccAddressFromBech32(accountIDAccAddr)
+		return addr
+	} else {
+		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
+	}
+
 }
