@@ -48,8 +48,7 @@ func handleCreateProjectMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg Creat
 
 	// Create Project Account for Project
 	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
-	projAddr := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
-	bk.AddCoins(ctx, projAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, 50000000000)})
+	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
 	projectDoc, err := k.AddProjectDoc(ctx, &msg)
 	if err != nil {
