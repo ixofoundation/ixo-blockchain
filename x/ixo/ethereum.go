@@ -59,10 +59,12 @@ type EthClient struct {
 }
 
 func NewEthClient(k contracts.Keeper) (EthClient, error) {
+	// TODO: REMEMBER TO GET THE TARGET RPC ENDPOINT FROM THE ENVIRONMENT !!!
 	//url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
 
-	url := LookupEnv(ETH_URL, "http://localhost:7545")
+	// url := LookupEnv(ETH_URL, "http://localhost:7545")
+	url := "http://localhost:7545"
 	rpcClient, err := rpc.DialContext(context.Background(), url)
 
 	if err != nil {
@@ -192,11 +194,16 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, send
 		log.Fatal(err)
 	}
 	transOpts := bind.NewKeyedTransactor(privateKey)
-	transOpts.GasLimit = 200000
+	transOpts.GasLimit = 300000
 
 	projectWalletAuthoriserAddress := c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
 
-	txResult, err := authContract.Validate(transOpts, getNextTxID(ctx, pk), common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
+	nextTxID := getNextTxID(ctx, pk)
+	var debugTxID []byte
+	debugTxID = nextTxID[:]
+	fmt.Println("-------------------\n\n", common.ToHex(debugTxID))
+
+	txResult, err := authContract.Validate(transOpts, nextTxID, common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
 	fmt.Println("authContract.Validate: ", txResult, err)
 	if err != nil {
 		return false

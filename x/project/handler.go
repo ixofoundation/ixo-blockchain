@@ -251,32 +251,51 @@ func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params
 	// 	return sdk.ErrUnknownRequest("Project not in PAIDOUT Status").Result()
 	// }
 
-	var projectParticipantIxoTokensBalance int64
+	var payoutResult sdk.Result
 	if withdrawFundsDoc.IsRefund {
-		projectParticipantIxoTokensBalance = getIxoAmount(ctx, k, bk, withdrawFundsDoc.GetProjectDid(), withdrawFundsDoc.GetProjectDid())
+		ethWalletAddress := withdrawFundsDoc.GetEthWallet()
+		projectDid := withdrawFundsDoc.GetProjectDid()
+
+		payoutResult = payout(ctx, k, bk, pk, ethClient, projectDid, projectDid, ethWalletAddress)
 	} else {
-		projectParticipantIxoTokensBalance = getIxoAmount(ctx, k, bk, withdrawFundsDoc.GetProjectDid(), msg.GetSenderDid())
+		ethWalletAddress := withdrawFundsDoc.GetEthWallet()
+		projectDid := withdrawFundsDoc.GetProjectDid()
+		senderDid := msg.GetSenderDid()
+
+		payoutResult = payout(ctx, k, bk, pk, ethClient, projectDid, senderDid, ethWalletAddress)
 	}
 
-	if projectParticipantIxoTokensBalance <= 0 {
+	return payoutResult
+}
+
+func payout(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient, projectDid ixo.Did, accountID string, recipientEthAddress string) sdk.Result {
+	balanceToPay := getIxoAmount(ctx, k, bk, projectDid, accountID)
+	if balanceToPay <= 0 {
 		return sdk.ErrUnknownRequest("No balance to pay out on Project").Result()
 	}
 
 	// initiate auth contract based ixo ERC20 token transfer on Ethereum
-	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, withdrawFundsDoc.GetProjectDid())
+	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
 	}
 
-	ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, withdrawFundsDoc.GetEthWallet(), projectParticipantIxoTokensBalance)
+	success := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
+	if success {
+		account := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
+		// burn coins
+		_, _, err := bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
+		if err != nil {
+			return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
+		}
 
-	// burn coins
-	// ck.SubtractCoins(ctx, beneficiaryAccount, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, beneficiaryIxoTokensDue.Int64())})
-
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Action complete"),
+		return sdk.Result{
+			Code: sdk.ABCICodeOK,
+			Data: []byte("Action complete"),
+		}
 	}
+
+	return sdk.ErrUnknownRequest("Could not initiate ERC20 token transfer").Result()
 }
 
 func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, bk bank.Keeper, ethClient ixo.EthClient, ethFundingTxnID string, existingProjectDoc StoredProjectDoc) sdk.Result {
