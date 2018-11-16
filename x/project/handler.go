@@ -15,8 +15,8 @@ import (
 type InternalAccountID = string
 
 const (
-	IxoAccountPayFeesId            InternalAccountID = "IxoPayFees"
 	IxoAccountFeesId               InternalAccountID = "IxoFees"
+	IxoAccountPayFeesId            InternalAccountID = "IxoPayFees"
 	InitiatingNodeAccountPayFeesId InternalAccountID = "InitiatingNodePayFees"
 	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
@@ -67,9 +67,9 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper
 	}
 
 	newStatus := msg.GetStatus()
-	// if !newStatus.IsValidProgressionFrom(existingProjectDoc.GetStatus()) {
-	// 	return sdk.ErrUnknownRequest("Invalid Status").Result()
-	// }
+	if !newStatus.IsValidProgressionFrom(existingProjectDoc.GetStatus()) {
+		return sdk.ErrUnknownRequest("Invalid Status Progression requested").Result()
+	}
 
 	if newStatus == FundedStatus {
 		ethFundingTxnID := msg.GetEthFundingTxnID()
@@ -104,39 +104,49 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper
 func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient, projectDid ixo.Did) sdk.Result {
 
 	// initiate auth contract based ixo ERC20 token transfer on Ethereum
-	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
+	_, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
 	}
 
-	ixoEthWallet := ck.GetContract(ctx, contracts.KeyFoundationWallet)
-
-	ixoFees := getIxoAmount(ctx, k, bk, projectDid, IxoAccountFeesId)
-	ixoPayFees := getIxoAmount(ctx, k, bk, projectDid, IxoAccountPayFeesId)
-	initNodePayFees := getIxoAmount(ctx, k, bk, projectDid, InitiatingNodeAccountPayFeesId)
-	valNodeFeesPayFees := getIxoAmount(ctx, k, bk, projectDid, ValidatingNodeSetAccountFeesId)
-
 	// for now all fees go to the ixoWallet
-	amt := ixoFees + ixoPayFees + initNodePayFees + valNodeFeesPayFees
-	if amt >= 0 {
-		ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, ixoEthWallet, amt)
+	_, err = payAllFeesToAddress(ctx, k, bk, projectDid, IxoAccountPayFeesId, IxoAccountFeesId)
+	if err != nil {
+		return sdk.ErrInternal("Failed to send coins").Result()
+	}
+	_, err = payAllFeesToAddress(ctx, k, bk, projectDid, InitiatingNodeAccountPayFeesId, IxoAccountFeesId)
+	if err != nil {
+		return sdk.ErrInternal("Failed to send coins").Result()
+	}
+	_, err = payAllFeesToAddress(ctx, k, bk, projectDid, ValidatingNodeSetAccountFeesId, IxoAccountFeesId)
+	if err != nil {
+		return sdk.ErrInternal("Failed to send coins").Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: []byte("Project Paidout Initiated"),
-	}
+	ixoEthWallet := ck.GetContract(ctx, contracts.KeyFoundationWallet)
+	return payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, IxoAccountFeesId, ixoEthWallet)
 }
 
-func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did, accountId string) int64 {
-	found := checkAccountInProjectAccounts(ctx, k, projectDid, accountId)
+func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did, sendingAddress InternalAccountID, receivingAddress InternalAccountID) (sdk.Tags, sdk.Error) {
+	feesToPay := getIxoAmount(ctx, k, bk, projectDid, sendingAddress)
+
+	if feesToPay <= 0 {
+		return nil, sdk.ErrInternal("Zero fees to pay")
+	}
+
+	receivingAccount := getAccountInProjectAccounts(ctx, k, projectDid, receivingAddress)
+	sendingAccount := getAccountInProjectAccounts(ctx, k, projectDid, sendingAddress)
+	return bk.SendCoins(ctx, sendingAccount, receivingAccount, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, feesToPay)})
+}
+
+func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did, accountID string) int64 {
+	found := checkAccountInProjectAccounts(ctx, k, projectDid, accountID)
 	if found {
-		accAddr := getAccountInProjectAccounts(ctx, k, projectDid, accountId)
+		accAddr := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
 		coins := bk.GetCoins(ctx, accAddr)
 		return coins.AmountOf(ixo.IxoNativeToken).Int64()
-	} else {
-		return 0
 	}
+	return 0
 }
 
 func handleCreateAgentMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg CreateAgentMsg) sdk.Result {
@@ -241,34 +251,33 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 
 func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient, msg WithdrawFundsMsg) sdk.Result {
 	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
-	_, found := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
+	projectDoc, found := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
 	if !found {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	// TODO: put this back!!!
-	// if projectDoc.GetStatus() != PaidoutStatus {
-	// 	return sdk.ErrUnknownRequest("Project not in PAIDOUT Status").Result()
-	// }
+	if projectDoc.GetStatus() != PaidoutStatus {
+		return sdk.ErrUnknownRequest("Project not in PAIDOUT Status").Result()
+	}
 
 	var payoutResult sdk.Result
 	if withdrawFundsDoc.IsRefund {
 		ethWalletAddress := withdrawFundsDoc.GetEthWallet()
 		projectDid := withdrawFundsDoc.GetProjectDid()
 
-		payoutResult = payout(ctx, k, bk, pk, ethClient, projectDid, projectDid, ethWalletAddress)
+		payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, projectDid, ethWalletAddress)
 	} else {
 		ethWalletAddress := withdrawFundsDoc.GetEthWallet()
 		projectDid := withdrawFundsDoc.GetProjectDid()
 		senderDid := msg.GetSenderDid()
 
-		payoutResult = payout(ctx, k, bk, pk, ethClient, projectDid, senderDid, ethWalletAddress)
+		payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, senderDid, ethWalletAddress)
 	}
 
 	return payoutResult
 }
 
-func payout(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient, projectDid ixo.Did, accountID string, recipientEthAddress string) sdk.Result {
+func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient, projectDid ixo.Did, accountID string, recipientEthAddress string) sdk.Result {
 	balanceToPay := getIxoAmount(ctx, k, bk, projectDid, accountID)
 	if balanceToPay <= 0 {
 		return sdk.ErrUnknownRequest("No balance to pay out on Project").Result()
@@ -309,7 +318,7 @@ func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, bk bank.Keeper, ethCl
 	if !isFundingTx {
 		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
 	}
-	//TODO: (not urgent) Add an additional check here to check the balance on the wallet account matches the Funding amount
+
 	amt := ethClient.GetFundingAmt(ethTx)
 	fmt.Println("PROJECT_FUNDING", "amt: ", amt)
 	coin := sdk.NewInt64Coin(ixo.IxoNativeToken, amt)
