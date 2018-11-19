@@ -9,8 +9,11 @@ echo ""
 
 echo "Check IXO Block is initialized"
 config="/root/.ixo-node/config"
-if [ -f "$config" ]
+echo "Does config"
+echo "Does $config exist? "
+if [ -d "$config" ]
 then
+  echo "YES"
   echo "**************************************************************"
 	echo "Blockchain already initialized"
   echo "**************************************************************"
@@ -19,6 +22,7 @@ then
   echo "Blockchain started!"
   echo "**************************************************************"
 else
+  echo "NO"
   echo "**************************************************************"
 	echo "Initializing blockchain....."
   echo "**************************************************************"
