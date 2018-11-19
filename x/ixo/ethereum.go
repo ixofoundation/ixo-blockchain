@@ -63,8 +63,7 @@ func NewEthClient(k contracts.Keeper) (EthClient, error) {
 	//url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
 
-	// url := LookupEnv(ETH_URL, "http://localhost:7545")
-	url := "http://localhost:7545"
+	url := LookupEnv(ETH_URL, "http://localhost:7545")
 	rpcClient, err := rpc.DialContext(context.Background(), url)
 
 	if err != nil {

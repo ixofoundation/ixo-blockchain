@@ -260,17 +260,13 @@ func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params
 		return sdk.ErrUnknownRequest("Project not in PAIDOUT Status").Result()
 	}
 
+	ethWalletAddress := withdrawFundsDoc.GetEthWallet()
+	projectDid := withdrawFundsDoc.GetProjectDid()
 	var payoutResult sdk.Result
 	if withdrawFundsDoc.IsRefund {
-		ethWalletAddress := withdrawFundsDoc.GetEthWallet()
-		projectDid := withdrawFundsDoc.GetProjectDid()
-
 		payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, projectDid, ethWalletAddress)
 	} else {
-		ethWalletAddress := withdrawFundsDoc.GetEthWallet()
-		projectDid := withdrawFundsDoc.GetProjectDid()
 		senderDid := msg.GetSenderDid()
-
 		payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, senderDid, ethWalletAddress)
 	}
 
