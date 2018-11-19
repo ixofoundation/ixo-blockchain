@@ -8,8 +8,8 @@ echo "***********************************"
 echo ""
 
 echo "Check IXO Block is initialized"
-config="/root/.ixo-node/config"
-echo "Does config"
+# config="/root/.ixo-node/config"
+config="/Users/hermansmith/go/src/github.com/ixofoundation/ixo-cosmos/config"
 echo "Does $config exist? "
 if [ -d "$config" ]
 then
@@ -17,20 +17,31 @@ then
   echo "**************************************************************"
 	echo "Blockchain already initialized"
   echo "**************************************************************"
-  ixod start
-  echo "**************************************************************"
-  echo "Blockchain started!"
-  echo "**************************************************************"
+  
+  if [ -f "$config/init.lock" ]; then
+    echo "**************************************************************"
+    echo "Blockchain initialized but currently locked!"
+    echo "**************************************************************"
+
+    echo "**************************************************************"
+    echo "* NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB!*"
+    echo "* EDIT genesis.json FILE WITH LEGITIMATE ETHEREUM ADDRESSES!!*"
+    echo "* AFTER PROVIDING ALL RELEVANT CONFIG DATA, DELETE init.lock *"
+    echo "**************************************************************"
+  else
+    echo "**************************************************************"
+    echo "Starting blockchain....."
+    echo "**************************************************************"
+    ixod start
+    echo "**************************************************************"
+    echo "Blockchain started!"
+    echo "**************************************************************"
+  fi
 else
   echo "NO"
   echo "**************************************************************"
 	echo "Initializing blockchain....."
   echo "**************************************************************"
   ixod init
-  echo "**************************************************************"
-  echo "Blockchain initialized!"
-  echo "**************************************************************"
-  echo "* NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB!*"
-  echo "* EDIT THE genesis.json FILE BEFORE STARTING IXOD SERVICE !! *"
-  echo "* CONTENTS OF genesis.json IS ONLY USED ON FIRST RUN     !!! *"
+  touch "$config/init.lock"
 fi
