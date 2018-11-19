@@ -14,7 +14,7 @@ ADD . $COSMOS_HOME
 #COPY ./vendor $COSMOS_HOME/vendor
 #COPY ./x $COSMOS_HOME/x
 #COPY ./Makefile $COSMOS_HOME
-#COPY ./bin/startBlockchain.sh $COSMOS_HOME/bin/
+#COPY ./bin/initiatize-or-start-bc.sh $COSMOS_HOME/bin/
 
 # Manage global dependencies.
 RUN cd $FOUNDATION_PATH
@@ -23,7 +23,7 @@ RUN go get github.com/btcsuite/btcutil/base58
 RUN go get github.com/ethereum/go-ethereum
 
 # Manage vendor dependencies.
-# RUN cd $COSMOS_HOME; make get_vendor_deps
+#RUN cd $COSMOS_HOME; make get_vendor_deps
 
 # Build, Install
 # COMMIT_HASH is an optional argument passed from the build-docker-image.sh utility script executed from within the Git repository

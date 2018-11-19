@@ -12,7 +12,6 @@ func RegisterWire(cdc *wire.Codec) {
 	cdc.RegisterConcrete(UpdateAgentMsg{}, "project/UpdateAgent", nil)
 	cdc.RegisterConcrete(CreateClaimMsg{}, "project/CreateClaim", nil)
 	cdc.RegisterConcrete(CreateEvaluationMsg{}, "project/CreateEvaluation", nil)
-	cdc.RegisterConcrete(FundProjectMsg{}, "project/FundProject", nil)
 	cdc.RegisterConcrete(WithdrawFundsMsg{}, "project/WithdrawFunds", nil)
 }
 

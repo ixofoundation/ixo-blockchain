@@ -11,7 +11,13 @@ echo "Check IXO Block is initialized"
 config="/root/.ixo-node/config"
 if [ -f "$config" ]
 then
+  echo "**************************************************************"
 	echo "Blockchain already initialized"
+  echo "**************************************************************"
+  ixod start
+  echo "**************************************************************"
+  echo "Blockchain started!"
+  echo "**************************************************************"
 else
   echo "**************************************************************"
 	echo "Initializing blockchain....."
@@ -20,10 +26,7 @@ else
   echo "**************************************************************"
   echo "Blockchain initialized!"
   echo "**************************************************************"
+  echo "* NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB!*"
+  echo "* EDIT THE genesis.json FILE BEFORE STARTING IXOD SERVICE !! *"
+  echo "* CONTENTS OF genesis.json IS ONLY USED ON FIRST RUN     !!! *"
 fi
-
-echo ""
-echo "**************************************************************"
-echo "Starting Blockchain......"
-echo "**************************************************************"
-ixod start

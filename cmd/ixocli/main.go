@@ -93,11 +93,6 @@ func main() {
 			projectcmd.CreateEvaluationCmd(cdc),
 		)...)
 
-	rootCmd.AddCommand(
-		client.PostCommands(
-			projectcmd.FundProjectTxCmd(cdc),
-		)...)
-
 	// add proxy, version and key info
 	rootCmd.AddCommand(
 		client.LineBreak,

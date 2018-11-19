@@ -4,17 +4,25 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
+	"math/big"
 	"os"
+	"regexp"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	contracts "github.com/ixofoundation/ixo-cosmos/x/contracts"
+	params "github.com/ixofoundation/ixo-cosmos/x/params"
+	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
 )
 
@@ -46,11 +54,12 @@ func (tx *EthTransaction) UnmarshalJSON(msg []byte) error {
 type EthClient struct {
 	rpcClient *rpc.Client
 	client    *ethclient.Client
-	k         Keeper
+	k         contracts.Keeper
 	callOpts  bind.CallOpts
 }
 
-func NewEthClient(k Keeper) (EthClient, error) {
+func NewEthClient(k contracts.Keeper) (EthClient, error) {
+	// TODO: REMEMBER TO GET THE TARGET RPC ENDPOINT FROM THE ENVIRONMENT !!!
 	//url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
 
@@ -96,52 +105,110 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 	return tx, err
 }
 
+// func (c EthClient) DebugEthAddress(ctx sdk.Context) {
+// 	ixoTokenContractAddress := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+// 	fmt.Printf("xxxxxxxxxxxxxxxxxxxxx | ixoTokenContractAddress: %s\n", ixoTokenContractAddress)
+// }
+
 // checks whether this is a funding transaction on this project
 func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
 
-	ercContractStr := c.k.GetEthAddress(ctx, KeyIxoTokenContractAddress)
+	ixoTokenContractAddress := c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
 
 	// Check To is the ERC20 Token
-	if common.HexToAddress(tx.Result.To).String() != ercContractStr {
+	if tx.Result.To != ixoTokenContractAddress {
 		return false
 	}
 
 	// Check it is the transfer method
-	if tx.Result.Input[2:10] != FUNDING_METHOD_HASH {
+	if getMethodHashFromInput(tx.Result.Input) != FUNDING_METHOD_HASH {
+		return false
+	}
+
+	// Check it is the transfer method
+	registryProjWallet, err := c.ProjectWalletFromProjectRegistry(ctx, projectDid)
+	if err != nil {
 		return false
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
-	txProjWallet := common.HexToAddress(tx.Result.Input[10:74]).String()
-	// Check it is the transfer method
-	projWallet, err := c.GetEthProjectWallet(ctx, projectDid)
-	if err != nil {
-		return false
-	}
-	if txProjWallet != projWallet {
+	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
+	if txProjWallet != registryProjWallet {
 		return false
 	}
 
 	return true
 }
 
-// Retrieves the Project wallet address from the Ethereum registry project conteact
-func (c EthClient) GetEthProjectWallet(ctx sdk.Context, projectDid Did) (string, error) {
+func getMethodHashFromInput(input string) string {
+	return input[2:10]
+}
 
-	registryContractStr := c.k.GetEthAddress(ctx, KeyProjectRegistryContractAddress)
+// paramPos position so first param has paramPos = 1
+func getParamFromInput(input string, paramPos int) string {
+
+	start := 10 + 64*(paramPos-1)
+	end := 10 + 64*paramPos
+	param := input[start:end]
+
+	return param
+}
+
+// ProjectWalletFromProjectRegistry retrieves the Project wallet address from the Ethereum registry project conteact
+func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (string, error) {
+
+	regex := regexp.MustCompile("[^:]+$")
+
+	var projectDid [32]byte
+	copy(projectDid[:], regex.FindString(did))
+	fmt.Printf("ProjectDid Byte Array: %v", projectDid)
+	fmt.Printf("ProjectDid Byte Array: %v", string(projectDid[:]))
+
+	registryContractStr := c.k.GetContract(ctx, contracts.KeyProjectRegistryContractAddress)
 	registryContract := common.HexToAddress(registryContractStr)
-
-	hexEncodedProjectDid := hex.EncodeToString([]byte(removeDidPrefix(projectDid)))
-	var projectDidParam [32]byte
-	copy(projectDidParam[:], []byte("0x"+hexEncodedProjectDid))
 
 	projectRegistryContact, err := ethProject.NewProjectWalletRegistry(registryContract, c.client)
 	if err != nil {
 		return "", err
 	}
 
-	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDidParam)
+	projectWalletAddress, err := projectRegistryContact.WalletOf(&c.callOpts, projectDid)
+	fmt.Printf("projectWalletAddress: %s", projectWalletAddress.String())
 	return projectWalletAddress.String(), err
+}
+
+// InitiateTokenTransfer initiates the transfer of tokens from a source wallet to a destination wallet
+func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, senderAddr string, receiverAddr string, amount int64) bool {
+	authContractAddress := common.HexToAddress(c.k.GetContract(ctx, contracts.KeyAuthContractAddress))
+	// acas := authContractAddress.String()
+	// fmt.Println("AuthContractAddress", acas)
+	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
+	if err != nil {
+		return false
+	}
+
+	validationEthWallet := getValidationEthWallet()
+	privateKey, err := crypto.HexToECDSA(validationEthWallet.PrivateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	transOpts := bind.NewKeyedTransactor(privateKey)
+	transOpts.GasLimit = 300000
+
+	projectWalletAuthoriserAddress := c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
+
+	nextTxID := getNextTxID(ctx, pk)
+	var debugTxID []byte
+	debugTxID = nextTxID[:]
+	fmt.Println("-------------------\n\n", common.ToHex(debugTxID))
+
+	txResult, err := authContract.Validate(transOpts, nextTxID, common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
+	fmt.Println("authContract.Validate: ", txResult, err)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 // Gets the Funding amount out of the transcation data
@@ -219,4 +286,20 @@ func removeDidPrefix(did Did) string {
 		return didStr[8:]
 	}
 	return didStr
+}
+
+func getNextTxID(ctx sdk.Context, keeper params.Keeper) [32]byte {
+	var nextTxID sdk.Int
+	actionID, err := keeper.Getter().GetInt(ctx, "actionID")
+	if err == nil {
+		nextTxID = actionID.Add(sdk.NewInt(1))
+	} else {
+		nextTxID = sdk.NewInt(1)
+	}
+	keeper.Setter().SetInt(ctx, "actionID", nextTxID)
+
+	var result [32]byte
+	copy(result[:], nextTxID.BigInt().Bytes())
+
+	return result
 }

@@ -66,18 +66,6 @@ func NewCreateEvaluationMsg(txHash string, senderDid string, createEvaluationDoc
 	}
 }
 
-func NewFundProjectMsg(txHash string, senderDid string, fundProjectDoc FundProjectDoc, projectDid sovrin.SovrinDid) FundProjectMsg {
-	// This did is initialized when the node is initialized
-	fundProjectDoc.Signer = "ETH_PEG"
-	return FundProjectMsg{
-		SignBytes:  "",
-		ProjectDid: projectDid.Did,
-		TxHash:     txHash,
-		SenderDid:  senderDid,
-		Data:       fundProjectDoc,
-	}
-}
-
 func CheckNotEmpty(value string, name string) (valid bool, err sdk.Error) {
 	if len(value) == 0 {
 		return false, sdk.ErrUnknownRequest(name + " is empty.")

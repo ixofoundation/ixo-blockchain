@@ -2,34 +2,30 @@ package app
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
-	"os"
+	"os" //	"cosmos-test/types"
 
-	//	"cosmos-test/types"
-	"encoding/json"
-
+	bam "github.com/cosmos/cosmos-sdk/baseapp"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/ibc"
 	"github.com/go-kit/kit/log/term"
+	"github.com/ixofoundation/ixo-cosmos/types"
+	"github.com/ixofoundation/ixo-cosmos/x/contracts"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/fees"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/node"
+	"github.com/ixofoundation/ixo-cosmos/x/params"
+	"github.com/ixofoundation/ixo-cosmos/x/project"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
-
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/ibc"
-
-	"github.com/ixofoundation/ixo-cosmos/types"
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/node"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/params"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
-
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
@@ -55,15 +51,15 @@ type IxoApp struct {
 	accountMapper auth.AccountMapper
 
 	// Manage keeper
-	coinKeeper          bank.Keeper
+	bankKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	ibcMapper           ibc.Mapper
 	didKeeper           did.Keeper
 	projectKeeper       project.Keeper
 	paramsKeeper        params.Keeper
 	feeKeeper           fees.Keeper
-	nodeKeeper			node.Keeper
-	ixoKeeper           ixo.Keeper
+	nodeKeeper          node.Keeper
+	contractKeeper      contracts.Keeper
 
 	// Eth client
 	ethClient ixo.EthClient
@@ -110,16 +106,16 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	)
 
 	// add handlers
-	app.coinKeeper = bank.NewKeeper(app.accountMapper)
+	app.bankKeeper = bank.NewKeeper(app.accountMapper)
 	app.ibcMapper = ibc.NewMapper(app.cdc, app.keyIBC, app.RegisterCodespace(ibc.DefaultCodespace))
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams)
 	app.feeKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
 	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeeper)
 	app.didKeeper = did.NewKeeper(app.cdc, app.keyDID)
-	app.ixoKeeper = ixo.NewKeeper(app.cdc, app.paramsKeeper)
+	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeeper)
 	app.projectKeeper = project.NewKeeper(app.cdc, app.keyProject, app.accountMapper, app.feeKeeper)
 
-	newEthClient, cErr := ixo.NewEthClient(app.ixoKeeper)
+	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
 	if cErr != nil {
 		logger.Error(cErr.Error())
 		//		panic(cErr)
@@ -127,14 +123,13 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 	app.ethClient = newEthClient
 
 	app.Router().
-		AddRoute("bank", bank.NewHandler(app.coinKeeper)).
+		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
 		//		AddRoute("pool", pool.NewHandler(app.poolKeeper)).
-		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.coinKeeper)).
+		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("did", did.NewHandler(app.didKeeper)).
-		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.coinKeeper, app.ethClient))
-
+		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.contractKeeper, app.bankKeeper, app.paramsKeeper, app.ethClient))
 	// initialize BaseApp
-	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper, app.ixoKeeper))
+	app.SetInitChainer(app.initChainerFn(app.didKeeper, app.projectKeeper, app.contractKeeper))
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetTxDecoder(app.txDecoder)
@@ -257,7 +252,7 @@ func (app *IxoApp) EndBlocker(_ sdk.Context, req abci.RequestEndBlock) abci.Resp
 // state provided by 'req' and attempt to deserialize said state. The state
 // should contain all the genesis accounts. These accounts will be added to the
 // application's account mapper.
-func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper, ixoKeeper ixo.Keeper) sdk.InitChainer {
+func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Keeper, contractKeeper contracts.Keeper) sdk.InitChainer {
 
 	return func(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 		app.Logger.Info("******Init Chain called")
@@ -293,7 +288,7 @@ func (app *IxoApp) initChainerFn(didKeeper did.Keeper, projectKeeper project.Kee
 		}
 
 		// load the initial config information
-		err = ixo.InitGenesis(ctx, ixoKeeper, genesisState.Config)
+		err = contracts.InitGenesis(ctx, contractKeeper, genesisState.Config)
 		if err != nil {
 			panic(err)
 		}

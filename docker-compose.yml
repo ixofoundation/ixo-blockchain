@@ -12,7 +12,7 @@ services:
         max-size: 30m
     volumes:
       - ./data/blockchain:/root/.ixo-node
-    command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/startBlockchain.sh
+    command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/initiatize-or-start-bc.sh
   
   rest:
         container_name: rest

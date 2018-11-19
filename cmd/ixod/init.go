@@ -12,6 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
+	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-cosmos/x/node"
@@ -97,7 +98,7 @@ func IxoAppGenState(cdc *wire.Codec, appGenTxs []json.RawMessage) (appState json
 	nodeState := node.DefaultGenesis(did, ethWallet)
 	nodeJSON, err := json.MarshalIndent(nodeState, "", "  ")
 
-	ixoConfig := ixo.DefaultGenesisState()
+	ixoConfig := contracts.DefaultGenesis()
 	ixoConfigJSON, err := json.MarshalIndent(ixoConfig, "", "  ")
 
 	appState = json.RawMessage(fmt.Sprintf(`{

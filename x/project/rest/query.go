@@ -121,7 +121,7 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 		for k, v := range accMap {
 			addr := v.(string)
 
-			accAddr, err := sdk.AccAddressFromHex(addr)
+			accAddr, err := sdk.AccAddressFromBech32(addr)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(fmt.Sprintf("Could't create Account Address. Error: %s", err.Error())))
@@ -133,7 +133,7 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 				w.Write([]byte(fmt.Sprintf("Could't find account. Error: %s", err.Error())))
 			}
 			baseAcc := account.(*types.AppAccount)
-			balance := baseAcc.Coins.AmountOf("ixo-native")
+			balance := baseAcc.Coins.AmountOf(ixo.IxoNativeToken)
 			accDetails[i] = AccDetails{Did: k, Account: addr, Balance: balance}
 			i = i + 1
 		}
