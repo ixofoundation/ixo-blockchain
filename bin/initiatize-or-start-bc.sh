@@ -8,8 +8,7 @@ echo "***********************************"
 echo ""
 
 echo "Check IXO Block is initialized"
-# config="/root/.ixo-node/config"
-config="/Users/hermansmith/go/src/github.com/ixofoundation/ixo-cosmos/config"
+config="/root/.ixo-node/config"
 echo "Does $config exist? "
 if [ -d "$config" ]
 then
