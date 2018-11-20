@@ -308,11 +308,11 @@ func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, bk bank.Keeper, ethCl
 
 	ethTx, err := ethClient.GetTransactionByHash(ethFundingTxnID)
 	if err != nil {
-		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
+		return sdk.ErrUnknownRequest("ETH tx not valid: Could not get transaction: " + ethFundingTxnID).Result()
 	}
 	isFundingTx := ethClient.IsProjectFundingTx(ctx, existingProjectDoc.GetProjectDid(), ethTx)
 	if !isFundingTx {
-		return sdk.ErrUnknownRequest("ETH tx not valid").Result()
+		return sdk.ErrUnknownRequest("ETH tx not valid. Not a valid project funding transaction").Result()
 	}
 
 	amt := ethClient.GetFundingAmt(ethTx)

@@ -117,23 +117,27 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 
 	// Check To is the ERC20 Token
 	if tx.Result.To != ixoTokenContractAddress {
+		ctx.Logger().Error("Token contract mismatch. Got " + tx.Result.To + " should be " + ixoTokenContractAddress)
 		return false
 	}
 
 	// Check it is the transfer method
 	if getMethodHashFromInput(tx.Result.Input) != FUNDING_METHOD_HASH {
+		ctx.Logger().Error("Method hash mismatch. Got " + getMethodHashFromInput(tx.Result.Input) + " should be " + FUNDING_METHOD_HASH)
 		return false
 	}
 
-	// Check it is the transfer method
+	// Check project wallet is correct for project did
 	registryProjWallet, err := c.ProjectWalletFromProjectRegistry(ctx, projectDid)
 	if err != nil {
+		ctx.Logger().Error("Could not get Project Wallet for DID " + projectDid)
 		return false
 	}
 
 	// Check the project wallet on the registry matches the wallet in the transaction
 	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
 	if txProjWallet != registryProjWallet {
+		ctx.Logger().Error("Project Wallet mismatch. Got " + txProjWallet + " should be " + registryProjWallet)
 		return false
 	}
 
