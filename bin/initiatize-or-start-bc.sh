@@ -24,7 +24,7 @@ then
 
     echo "**************************************************************"
     echo "* NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB! NB!*"
-    echo "* EDIT genesis.json FILE WITH LEGITIMATE ETHEREUM ADDRESSES!!*"
+    echo "* EDIT genesis.json WITH LEGITIMATE SMART CONTRACT ADDRESSES!*"
     echo "* AFTER PROVIDING ALL RELEVANT CONFIG DATA, DELETE init.lock *"
     echo "**************************************************************"
   else
