@@ -1,50 +1,53 @@
 version: "2"
 services:
+
   blockchain:
     container_name: blockchain
     image: trustlab/ixo-blockchain:master
     restart: always
     ports:
-      - "46656:46656"
-      - "46657:46657"
+      - "46656:26656"
+      - "46657:26657"
     logging:
       options:
         max-size: 30m
     volumes:
       - ./data/blockchain:/root/.ixo-node
-    command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/startBlockchain.sh
+    command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/initiatize-or-start-bc.sh
     
   rest:
-    container_name: rest
-    image: trustlab/ixo-blockchain:master
-    restart: always
-    ports:
-      - "1317:1317"
-    links:
-      - blockchain
-    volumes:
-      - ./data/blockchain:/root/.ixo-node
-    command: ixocli rest-server -n tcp://blockchain:46657 -a tcp://0.0.0.0:1317
-  
+        container_name: rest
+        image: trustlab/ixo-blockchain:master
+        restart: always
+        ports:
+        - "1317:1317"
+        links:
+        - blockchain
+        volumes:
+        - ./data/blockchain:/root/.ixo-node
+        command: ixocli rest-server --node tcp://blockchain:26657 --laddr tcp://0.0.0.0:1317 --cors *
+
   block-sync:
     container_name: block-sync
     image: trustlab/ixo-block-sync:master
     environment:
       - PORT=8080
       - MONGODB_URI=mongodb://block-sync-db:27017/block-sync
-      - CHAIN_URI=blockchain:46657
+      - CHAIN_URI=blockchain:26657
+      - BC_REST=http://rest:1317
     restart: always
     ports:
       - "80:8080"
     links:
       - block-sync-db
       - blockchain
+      - rest
     logging:
       driver: "json-file"
       options:
         max-size: "1m"
         max-file: "1"
-      
+
   block-sync-db:
     container_name: block-sync-db
     image: mongo
