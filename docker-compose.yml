@@ -1,5 +1,6 @@
 version: "2"
 services:
+
   blockchain:
     container_name: blockchain
     image: trustlab/ixo-blockchain:master
@@ -13,7 +14,6 @@ services:
     volumes:
       - ./data/blockchain:/root/.ixo-node
     command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/initiatize-or-start-bc.sh
-  
   rest:
         container_name: rest
         image: trustlab/ixo-blockchain:master
