@@ -13,6 +13,8 @@ services:
         max-size: 30m
     volumes:
       - ./data/blockchain:/root/.ixo-node
+    environment:
+        - ETH_URL=https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk
     command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/initiatize-or-start-bc.sh
   rest:
         container_name: rest
@@ -24,6 +26,8 @@ services:
         - blockchain
         volumes:
         - ./data/blockchain:/root/.ixo-node
+        environment:
+            - ETH_URL=https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk
         command: ixocli rest-server --node tcp://blockchain:26657 --laddr tcp://0.0.0.0:1317 --cors *
 
   block-sync:
