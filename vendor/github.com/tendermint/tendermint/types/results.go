@@ -1,10 +1,9 @@
 package types
 
 import (
-	abci "github.com/tendermint/abci/types"
-	wire "github.com/tendermint/tendermint/wire"
-	cmn "github.com/tendermint/tmlibs/common"
-	"github.com/tendermint/tmlibs/merkle"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/merkle"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 //-----------------------------------------------------------------------------
@@ -18,21 +17,23 @@ type ABCIResult struct {
 
 // Hash returns the canonical hash of the ABCIResult
 func (a ABCIResult) Hash() []byte {
-	return tmHash(a)
+	bz := aminoHash(a)
+	return bz
 }
 
 // ABCIResults wraps the deliver tx results to return a proof
 type ABCIResults []ABCIResult
 
-// NewResults creates ABCIResults from ResponseDeliverTx
-func NewResults(del []*abci.ResponseDeliverTx) ABCIResults {
-	res := make(ABCIResults, len(del))
-	for i, d := range del {
+// NewResults creates ABCIResults from the list of ResponseDeliverTx.
+func NewResults(responses []*abci.ResponseDeliverTx) ABCIResults {
+	res := make(ABCIResults, len(responses))
+	for i, d := range responses {
 		res[i] = NewResultFromResponse(d)
 	}
 	return res
 }
 
+// NewResultFromResponse creates ABCIResult from ResponseDeliverTx.
 func NewResultFromResponse(response *abci.ResponseDeliverTx) ABCIResult {
 	return ABCIResult{
 		Code: response.Code,
@@ -42,7 +43,7 @@ func NewResultFromResponse(response *abci.ResponseDeliverTx) ABCIResult {
 
 // Bytes serializes the ABCIResponse using wire
 func (a ABCIResults) Bytes() []byte {
-	bz, err := wire.MarshalBinary(a)
+	bz, err := cdc.MarshalBinary(a)
 	if err != nil {
 		panic(err)
 	}
@@ -51,6 +52,8 @@ func (a ABCIResults) Bytes() []byte {
 
 // Hash returns a merkle hash of all results
 func (a ABCIResults) Hash() []byte {
+	// NOTE: we copy the impl of the merkle tree for txs -
+	// we should be consistent and either do it for both or not.
 	return merkle.SimpleHashFromHashers(a.toHashers())
 }
 

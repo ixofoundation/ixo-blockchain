@@ -3,7 +3,7 @@ package node
 import (
 	"time"
 
-	"github.com/tendermint/go-crypto"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 type NodeID struct {
@@ -26,7 +26,7 @@ type NodeGreeting struct {
 
 type SignedNodeGreeting struct {
 	NodeGreeting
-	Signature crypto.Signature
+	Signature []byte
 }
 
 func (pnid *PrivNodeID) SignGreeting() *SignedNodeGreeting {

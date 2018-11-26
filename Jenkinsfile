@@ -4,35 +4,39 @@ node {
         ws("${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}/") {
             withEnv(["GOPATH=${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"]) {
                 env.PATH="${GOPATH}/bin:$PATH"
-                
+
                 def app
                 def branch
 
-                stage('Checkout') {
-                    echo 'Checking out SCM'
-                    checkout scm
+                stage('Get Branch Name') {
+                    echo 'Getting branch name from Jenkins settings'
                     branch = scm.branches[0].name.drop(2)
                     echo 'Branch Name: ' + branch
                 }
-                
-                stage('Install Dependencies') {
-                    echo 'Pulling Dependencies'
-            
+
+                stage('Manage global dependencies') {
+                    echo 'Global Dependencies'
                     sh 'go version'
-                    sh 'go get -u github.com/btcsuite/btcutil/base58'
+                    sh 'go get github.com/golang/dep/cmd/dep'
+                    sh 'go get github.com/btcsuite/btcutil/base58'
+                    sh 'go get github.com/ethereum/go-ethereum'
                     sh 'go get -u github.com/ixofoundation/ixo-cosmos/app'
+                    sh 'pwd'
                 }
 
                 stage('Building') {
-                    sh 'cd ${GOPATH}/src/github.com/ixofoundation/ixo-cosmos/ && make build && make install' 
-                } 
+                    dir('src/github.com/ixofoundation/ixo-cosmos/') {
+                        sh 'git checkout ' + branch
+                        sh 'make build && make install'
+                    }
+                }
 
                 stage('Building Docker Image') {
                     sh 'pwd'
                     dir('src/github.com/ixofoundation/ixo-cosmos/') {
                         app = docker.build('trustlab/ixo-blockchain:' + branch)
                     }
-                } 
+                }
 
                 stage('Test Image') {
                     app.inside {
@@ -57,7 +61,7 @@ node {
     } catch (e) {
         // If there was an exception thrown, the build failed
         currentBuild.result = "FAILED"
-        
+
     } finally {
         // Success or failure, always send notifications
         notifyBuild(currentBuild.result)

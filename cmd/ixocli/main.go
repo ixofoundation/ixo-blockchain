@@ -16,13 +16,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 
 	"github.com/cosmos/cosmos-sdk/version"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/commands"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/commands"
-	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/commands"
-	simplestakingcmd "github.com/cosmos/cosmos-sdk/x/simplestake/commands"
+	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
 
 	"github.com/ixofoundation/ixo-cosmos/app"
 	"github.com/ixofoundation/ixo-cosmos/types"
+
 	didcmd "github.com/ixofoundation/ixo-cosmos/x/did/cmd"
 	ixolcd "github.com/ixofoundation/ixo-cosmos/x/ixo/lcd"
 	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/cmd"
@@ -46,7 +46,6 @@ func main() {
 	// TODO: setup keybase, viper object, etc. to be passed into
 	// the below functions and eliminate global vars, like we do
 	// with the cdc
-
 	// add standard rpc, and tx commands
 	rpc.AddCommands(rootCmd)
 	rootCmd.AddCommand(client.LineBreak)
@@ -69,12 +68,9 @@ func main() {
 	rootCmd.AddCommand(
 		client.PostCommands(
 			ibccmd.IBCRelayCmd(cdc),
-			simplestakingcmd.BondTxCmd(cdc),
 		)...)
 	rootCmd.AddCommand(
-		client.PostCommands(
-			simplestakingcmd.UnbondTxCmd(cdc),
-		)...)
+		client.PostCommands()...)
 
 	// and now ixo specific commands
 	rootCmd.AddCommand(
@@ -89,16 +85,12 @@ func main() {
 		client.PostCommands(
 			projectcmd.CreateProjectCmd(cdc),
 			projectcmd.GetProjectDocCmd("project", cdc, project.GetProjectDocDecoder(cdc)),
-			projectcmd.GetProjectAccountsCmd("project"),
+			projectcmd.UpdateProjectStatusCmd(cdc),
+			projectcmd.GetProjectAccountsCmd("project", cdc),
 			projectcmd.CreateAgentCmd(cdc),
 			projectcmd.UpdateAgentCmd(cdc),
 			projectcmd.CreateClaimCmd(cdc),
 			projectcmd.CreateEvaluationCmd(cdc),
-		)...)
-
-	rootCmd.AddCommand(
-		client.PostCommands(
-			projectcmd.FundProjectTxCmd(cdc),
 		)...)
 
 	// add proxy, version and key info

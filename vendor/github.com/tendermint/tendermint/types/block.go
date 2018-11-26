@@ -5,49 +5,52 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
-	wire "github.com/tendermint/tendermint/wire"
-	cmn "github.com/tendermint/tmlibs/common"
-	"github.com/tendermint/tmlibs/merkle"
-	"golang.org/x/crypto/ripemd160"
+	"github.com/tendermint/tendermint/crypto/merkle"
+	"github.com/tendermint/tendermint/crypto/tmhash"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 // Block defines the atomic unit of a Tendermint blockchain.
 // TODO: add Version byte
 type Block struct {
-	*Header    `json:"header"`
-	*Data      `json:"data"`
+	mtx        sync.Mutex
+	Header     `json:"header"`
+	Data       `json:"data"`
 	Evidence   EvidenceData `json:"evidence"`
 	LastCommit *Commit      `json:"last_commit"`
 }
 
 // MakeBlock returns a new block with an empty header, except what can be computed from itself.
 // It populates the same set of fields validated by ValidateBasic
-func MakeBlock(height int64, txs []Tx, commit *Commit) *Block {
+func MakeBlock(height int64, txs []Tx, commit *Commit, evidence []Evidence) *Block {
 	block := &Block{
-		Header: &Header{
+		Header: Header{
 			Height: height,
 			Time:   time.Now(),
 			NumTxs: int64(len(txs)),
 		},
-		LastCommit: commit,
-		Data: &Data{
+		Data: Data{
 			Txs: txs,
 		},
+		Evidence:   EvidenceData{Evidence: evidence},
+		LastCommit: commit,
 	}
-	block.FillHeader()
+	block.fillHeader()
 	return block
-}
-
-// AddEvidence appends the given evidence to the block
-func (b *Block) AddEvidence(evidence []Evidence) {
-	b.Evidence.Evidence = append(b.Evidence.Evidence, evidence...)
 }
 
 // ValidateBasic performs basic validation that doesn't involve state data.
 // It checks the internal consistency of the block.
 func (b *Block) ValidateBasic() error {
+	if b == nil {
+		return errors.New("Nil blocks are invalid")
+	}
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
 	newTxs := int64(len(b.Data.Txs))
 	if b.NumTxs != newTxs {
 		return fmt.Errorf("Wrong Block.Header.NumTxs. Expected %v, got %v", newTxs, b.NumTxs)
@@ -69,8 +72,8 @@ func (b *Block) ValidateBasic() error {
 	return nil
 }
 
-// FillHeader fills in any remaining header fields that are a function of the block data
-func (b *Block) FillHeader() {
+// fillHeader fills in any remaining header fields that are a function of the block data
+func (b *Block) fillHeader() {
 	if b.LastCommitHash == nil {
 		b.LastCommitHash = b.LastCommit.Hash()
 	}
@@ -85,17 +88,32 @@ func (b *Block) FillHeader() {
 // Hash computes and returns the block hash.
 // If the block is incomplete, block hash is nil for safety.
 func (b *Block) Hash() cmn.HexBytes {
-	if b == nil || b.Header == nil || b.Data == nil || b.LastCommit == nil {
+	if b == nil {
 		return nil
 	}
-	b.FillHeader()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b == nil || b.LastCommit == nil {
+		return nil
+	}
+	b.fillHeader()
 	return b.Header.Hash()
 }
 
 // MakePartSet returns a PartSet containing parts of a serialized block.
 // This is the form in which the block is gossipped to peers.
+// CONTRACT: partSize is greater than zero.
 func (b *Block) MakePartSet(partSize int) *PartSet {
-	bz, err := wire.MarshalBinary(b)
+	if b == nil {
+		return nil
+	}
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	// We prefix the byte length, so that unmarshaling
+	// can easily happen via a reader.
+	bz, err := cdc.MarshalBinary(b)
 	if err != nil {
 		panic(err)
 	}
@@ -103,7 +121,7 @@ func (b *Block) MakePartSet(partSize int) *PartSet {
 }
 
 // HashesTo is a convenience function that checks if a block hashes to the given argument.
-// A nil block never hashes to anything, and nothing hashes to a nil hash.
+// Returns false if the block is nil or the hash is empty.
 func (b *Block) HashesTo(hash []byte) bool {
 	if len(hash) == 0 {
 		return false
@@ -112,6 +130,15 @@ func (b *Block) HashesTo(hash []byte) bool {
 		return false
 	}
 	return bytes.Equal(b.Hash(), hash)
+}
+
+// Size returns size of the block in bytes.
+func (b *Block) Size() int {
+	bz, err := cdc.MarshalBinaryBare(b)
+	if err != nil {
+		return 0
+	}
+	return len(bz)
 }
 
 // String returns a string representation of the block
@@ -178,25 +205,25 @@ type Header struct {
 // Hash returns the hash of the header.
 // Returns nil if ValidatorHash is missing,
 // since a Header is not valid unless there is
-// a ValidaotrsHash (corresponding to the validator set).
+// a ValidatorsHash (corresponding to the validator set).
 func (h *Header) Hash() cmn.HexBytes {
 	if h == nil || len(h.ValidatorsHash) == 0 {
 		return nil
 	}
 	return merkle.SimpleHashFromMap(map[string]merkle.Hasher{
-		"ChainID":     wireHasher(h.ChainID),
-		"Height":      wireHasher(h.Height),
-		"Time":        wireHasher(h.Time),
-		"NumTxs":      wireHasher(h.NumTxs),
-		"TotalTxs":    wireHasher(h.TotalTxs),
-		"LastBlockID": wireHasher(h.LastBlockID),
-		"LastCommit":  wireHasher(h.LastCommitHash),
-		"Data":        wireHasher(h.DataHash),
-		"Validators":  wireHasher(h.ValidatorsHash),
-		"App":         wireHasher(h.AppHash),
-		"Consensus":   wireHasher(h.ConsensusHash),
-		"Results":     wireHasher(h.LastResultsHash),
-		"Evidence":    wireHasher(h.EvidenceHash),
+		"ChainID":     aminoHasher(h.ChainID),
+		"Height":      aminoHasher(h.Height),
+		"Time":        aminoHasher(h.Time),
+		"NumTxs":      aminoHasher(h.NumTxs),
+		"TotalTxs":    aminoHasher(h.TotalTxs),
+		"LastBlockID": aminoHasher(h.LastBlockID),
+		"LastCommit":  aminoHasher(h.LastCommitHash),
+		"Data":        aminoHasher(h.DataHash),
+		"Validators":  aminoHasher(h.ValidatorsHash),
+		"App":         aminoHasher(h.AppHash),
+		"Consensus":   aminoHasher(h.ConsensusHash),
+		"Results":     aminoHasher(h.LastResultsHash),
+		"Evidence":    aminoHasher(h.EvidenceHash),
 	})
 }
 
@@ -244,7 +271,7 @@ type Commit struct {
 	// NOTE: The Precommits are in order of address to preserve the bonded ValidatorSet order.
 	// Any peer with a block can gossip precommits by index with a peer without recalculating the
 	// active ValidatorSet.
-	BlockID    BlockID `json:"blockID"`
+	BlockID    BlockID `json:"block_id"`
 	Precommits []*Vote `json:"precommits"`
 
 	// Volatile
@@ -362,10 +389,13 @@ func (commit *Commit) ValidateBasic() error {
 
 // Hash returns the hash of the commit
 func (commit *Commit) Hash() cmn.HexBytes {
+	if commit == nil {
+		return nil
+	}
 	if commit.hash == nil {
 		bs := make([]merkle.Hasher, len(commit.Precommits))
 		for i, precommit := range commit.Precommits {
-			bs[i] = wireHasher(precommit)
+			bs[i] = aminoHasher(precommit)
 		}
 		commit.hash = merkle.SimpleHashFromHashers(bs)
 	}
@@ -434,7 +464,7 @@ func (data *Data) StringIndented(indent string) string {
 			txStrings[i] = fmt.Sprintf("... (%v total)", len(data.Txs))
 			break
 		}
-		txStrings[i] = fmt.Sprintf("Tx:%v", tx)
+		txStrings[i] = fmt.Sprintf("%X (%d bytes)", tx.Hash(), len(tx))
 	}
 	return fmt.Sprintf(`Data{
 %s  %v
@@ -474,7 +504,7 @@ func (data *EvidenceData) StringIndented(indent string) string {
 		}
 		evStrings[i] = fmt.Sprintf("Evidence:%v", ev)
 	}
-	return fmt.Sprintf(`Data{
+	return fmt.Sprintf(`EvidenceData{
 %s  %v
 %s}#%v`,
 		indent, strings.Join(evStrings, "\n"+indent+"  "),
@@ -503,7 +533,7 @@ func (blockID BlockID) Equals(other BlockID) bool {
 
 // Key returns a machine-readable string representation of the BlockID
 func (blockID BlockID) Key() string {
-	bz, err := wire.MarshalBinary(blockID.PartsHeader)
+	bz, err := cdc.MarshalBinaryBare(blockID.PartsHeader)
 	if err != nil {
 		panic(err)
 	}
@@ -522,24 +552,26 @@ type hasher struct {
 }
 
 func (h hasher) Hash() []byte {
-	hasher := ripemd160.New()
-	bz, err := wire.MarshalBinary(h.item)
-	if err != nil {
-		panic(err)
-	}
-	_, err = hasher.Write(bz)
-	if err != nil {
-		panic(err)
+	hasher := tmhash.New()
+	if h.item != nil && !cmn.IsTypedNil(h.item) && !cmn.IsEmpty(h.item) {
+		bz, err := cdc.MarshalBinaryBare(h.item)
+		if err != nil {
+			panic(err)
+		}
+		_, err = hasher.Write(bz)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return hasher.Sum(nil)
 
 }
 
-func tmHash(item interface{}) []byte {
+func aminoHash(item interface{}) []byte {
 	h := hasher{item}
 	return h.Hash()
 }
 
-func wireHasher(item interface{}) merkle.Hasher {
+func aminoHasher(item interface{}) merkle.Hasher {
 	return hasher{item}
 }

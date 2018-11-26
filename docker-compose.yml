@@ -14,7 +14,6 @@ services:
     volumes:
       - ./data/blockchain:/root/.ixo-node
     command: /go/src/github.com/ixofoundation/ixo-cosmos/bin/initiatize-or-start-bc.sh
-    
   rest:
         container_name: rest
         image: trustlab/ixo-blockchain:master
@@ -47,7 +46,6 @@ services:
       options:
         max-size: "1m"
         max-file: "1"
-
   block-sync-db:
     container_name: block-sync-db
     image: mongo

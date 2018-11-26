@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net"
 	"net/http"
 	"sync"
@@ -14,8 +13,9 @@ import (
 	"github.com/pkg/errors"
 	metrics "github.com/rcrowley/go-metrics"
 
+	"github.com/tendermint/go-amino"
 	types "github.com/tendermint/tendermint/rpc/lib/types"
-	cmn "github.com/tendermint/tmlibs/common"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 const (
@@ -31,6 +31,7 @@ type WSClient struct {
 	cmn.BaseService
 
 	conn *websocket.Conn
+	cdc  *amino.Codec
 
 	Address  string // IP:PORT or /path/to/socket
 	Endpoint string // /websocket/url/endpoint
@@ -69,14 +70,23 @@ type WSClient struct {
 
 	// Send pings to server with this period. Must be less than readWait. If 0, no pings will be sent.
 	pingPeriod time.Duration
+
+	// Support both ws and wss protocols
+	protocol string
 }
 
 // NewWSClient returns a new client. See the commentary on the func(*WSClient)
 // functions for a detailed description of how to configure ping period and
 // pong wait time. The endpoint argument must begin with a `/`.
 func NewWSClient(remoteAddr, endpoint string, options ...func(*WSClient)) *WSClient {
-	addr, dialer := makeHTTPDialer(remoteAddr)
+	protocol, addr, dialer := makeHTTPDialer(remoteAddr)
+	// default to ws protocol, unless wss is explicitly specified
+	if protocol != "wss" {
+		protocol = "ws"
+	}
+
 	c := &WSClient{
+		cdc:                  amino.NewCodec(),
 		Address:              addr,
 		Dialer:               dialer,
 		Endpoint:             endpoint,
@@ -86,6 +96,7 @@ func NewWSClient(remoteAddr, endpoint string, options ...func(*WSClient)) *WSCli
 		readWait:             defaultReadWait,
 		writeWait:            defaultWriteWait,
 		pingPeriod:           defaultPingPeriod,
+		protocol:             protocol,
 	}
 	c.BaseService = *cmn.NewBaseService(nil, "WSClient", c)
 	for _, option := range options {
@@ -206,7 +217,7 @@ func (c *WSClient) Send(ctx context.Context, request types.RPCRequest) error {
 
 // Call the given method. See Send description.
 func (c *WSClient) Call(ctx context.Context, method string, params map[string]interface{}) error {
-	request, err := types.MapToRequest("ws-client", method, params)
+	request, err := types.MapToRequest(c.cdc, "ws-client", method, params)
 	if err != nil {
 		return err
 	}
@@ -216,11 +227,19 @@ func (c *WSClient) Call(ctx context.Context, method string, params map[string]in
 // CallWithArrayParams the given method with params in a form of array. See
 // Send description.
 func (c *WSClient) CallWithArrayParams(ctx context.Context, method string, params []interface{}) error {
-	request, err := types.ArrayToRequest("ws-client", method, params)
+	request, err := types.ArrayToRequest(c.cdc, "ws-client", method, params)
 	if err != nil {
 		return err
 	}
 	return c.Send(ctx, request)
+}
+
+func (c *WSClient) Codec() *amino.Codec {
+	return c.cdc
+}
+
+func (c *WSClient) SetCodec(cdc *amino.Codec) {
+	c.cdc = cdc
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -232,7 +251,7 @@ func (c *WSClient) dial() error {
 		Proxy:   http.ProxyFromEnvironment,
 	}
 	rHeader := http.Header{}
-	conn, _, err := dialer.Dial("ws://"+c.Address+c.Endpoint, rHeader)
+	conn, _, err := dialer.Dial(c.protocol+"://"+c.Address+c.Endpoint, rHeader)
 	if err != nil {
 		return err
 	}
@@ -255,7 +274,7 @@ func (c *WSClient) reconnect() error {
 	}()
 
 	for {
-		jitterSeconds := time.Duration(rand.Float64() * float64(time.Second)) // 1s == (1e9 ns)
+		jitterSeconds := time.Duration(cmn.RandFloat64() * float64(time.Second)) // 1s == (1e9 ns)
 		backoffDuration := jitterSeconds + ((1 << uint(attempt)) * time.Second)
 
 		c.Logger.Info("reconnecting", "attempt", attempt+1, "backoff_duration", backoffDuration)

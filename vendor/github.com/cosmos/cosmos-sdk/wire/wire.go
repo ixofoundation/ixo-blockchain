@@ -2,54 +2,47 @@ package wire
 
 import (
 	"bytes"
-	"reflect"
+	"encoding/json"
 
-	"github.com/tendermint/go-wire"
+	amino "github.com/tendermint/go-amino"
+	"github.com/tendermint/tendermint/crypto/encoding/amino"
 )
 
-type Codec struct{}
+// amino codec to marshal/unmarshal
+type Codec = amino.Codec
 
 func NewCodec() *Codec {
-	return &Codec{}
+	cdc := amino.NewCodec()
+	return cdc
 }
 
-func (cdc *Codec) MarshalBinary(o interface{}) ([]byte, error) {
-	w, n, err := new(bytes.Buffer), new(int), new(error)
-	wire.WriteBinary(o, w, n, err)
-	return w.Bytes(), *err
-}
-
-func (cdc *Codec) UnmarshalBinary(bz []byte, o interface{}) error {
-	r, n, err := bytes.NewBuffer(bz), new(int), new(error)
-
-	rv := reflect.ValueOf(o)
-	if rv.Kind() == reflect.Ptr {
-		wire.ReadBinaryPtr(o, r, len(bz), n, err)
-	} else {
-		wire.ReadBinary(o, r, len(bz), n, err)
-	}
-	return *err
-}
-
-func (cdc *Codec) MarshalJSON(o interface{}) ([]byte, error) {
-	w, n, err := new(bytes.Buffer), new(int), new(error)
-	wire.WriteJSON(o, w, n, err)
-	return w.Bytes(), *err
-}
-
-func (cdc *Codec) UnmarshalJSON(bz []byte, o interface{}) (err error) {
-
-	rv := reflect.ValueOf(o)
-	if rv.Kind() == reflect.Ptr {
-		wire.ReadJSONPtr(o, bz, &err)
-	} else {
-		wire.ReadJSON(o, bz, &err)
-	}
-	return err
-}
-
-//----------------------------------------------
-
+// Register the go-crypto to the codec
 func RegisterCrypto(cdc *Codec) {
-	// TODO
+	cryptoAmino.RegisterAmino(cdc)
+}
+
+// attempt to make some pretty json
+func MarshalJSONIndent(cdc *Codec, obj interface{}) ([]byte, error) {
+	bz, err := cdc.MarshalJSON(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	var out bytes.Buffer
+	err = json.Indent(&out, bz, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	return out.Bytes(), nil
+}
+
+//__________________________________________________________________
+
+// generic sealed codec to be used throughout sdk
+var Cdc *Codec
+
+func init() {
+	cdc := NewCodec()
+	RegisterCrypto(cdc)
+	Cdc = cdc.Seal()
 }

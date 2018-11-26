@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+const (
+	// FuzzModeDrop is a mode in which we randomly drop reads/writes, connections or sleep
+	FuzzModeDrop = iota
+	// FuzzModeDelay is a mode in which we randomly sleep
+	FuzzModeDelay
+)
+
 // NOTE: Most of the structs & relevant comments + the
 // default configuration options were used to manually
 // generate the config.toml. Please reflect any changes
@@ -38,34 +45,37 @@ type Config struct {
 	BaseConfig `mapstructure:",squash"`
 
 	// Options for services
-	RPC       *RPCConfig       `mapstructure:"rpc"`
-	P2P       *P2PConfig       `mapstructure:"p2p"`
-	Mempool   *MempoolConfig   `mapstructure:"mempool"`
-	Consensus *ConsensusConfig `mapstructure:"consensus"`
-	TxIndex   *TxIndexConfig   `mapstructure:"tx_index"`
+	RPC             *RPCConfig             `mapstructure:"rpc"`
+	P2P             *P2PConfig             `mapstructure:"p2p"`
+	Mempool         *MempoolConfig         `mapstructure:"mempool"`
+	Consensus       *ConsensusConfig       `mapstructure:"consensus"`
+	TxIndex         *TxIndexConfig         `mapstructure:"tx_index"`
+	Instrumentation *InstrumentationConfig `mapstructure:"instrumentation"`
 }
 
 // DefaultConfig returns a default configuration for a Tendermint node
 func DefaultConfig() *Config {
 	return &Config{
-		BaseConfig: DefaultBaseConfig(),
-		RPC:        DefaultRPCConfig(),
-		P2P:        DefaultP2PConfig(),
-		Mempool:    DefaultMempoolConfig(),
-		Consensus:  DefaultConsensusConfig(),
-		TxIndex:    DefaultTxIndexConfig(),
+		BaseConfig:      DefaultBaseConfig(),
+		RPC:             DefaultRPCConfig(),
+		P2P:             DefaultP2PConfig(),
+		Mempool:         DefaultMempoolConfig(),
+		Consensus:       DefaultConsensusConfig(),
+		TxIndex:         DefaultTxIndexConfig(),
+		Instrumentation: DefaultInstrumentationConfig(),
 	}
 }
 
 // TestConfig returns a configuration that can be used for testing
 func TestConfig() *Config {
 	return &Config{
-		BaseConfig: TestBaseConfig(),
-		RPC:        TestRPCConfig(),
-		P2P:        TestP2PConfig(),
-		Mempool:    TestMempoolConfig(),
-		Consensus:  TestConsensusConfig(),
-		TxIndex:    TestTxIndexConfig(),
+		BaseConfig:      TestBaseConfig(),
+		RPC:             TestRPCConfig(),
+		P2P:             TestP2PConfig(),
+		Mempool:         TestMempoolConfig(),
+		Consensus:       TestConsensusConfig(),
+		TxIndex:         TestTxIndexConfig(),
+		Instrumentation: TestInstrumentationConfig(),
 	}
 }
 
@@ -144,7 +154,7 @@ func DefaultBaseConfig() BaseConfig {
 		PrivValidator:     defaultPrivValPath,
 		NodeKey:           defaultNodeKeyPath,
 		Moniker:           defaultMoniker,
-		ProxyApp:          "tcp://127.0.0.1:46658",
+		ProxyApp:          "tcp://127.0.0.1:26658",
 		ABCI:              "socket",
 		LogLevel:          DefaultPackageLogLevels(),
 		ProfListenAddress: "",
@@ -214,16 +224,36 @@ type RPCConfig struct {
 	// NOTE: This server only supports /broadcast_tx_commit
 	GRPCListenAddress string `mapstructure:"grpc_laddr"`
 
+	// Maximum number of simultaneous connections.
+	// Does not include RPC (HTTP&WebSocket) connections. See max_open_connections
+	// If you want to accept more significant number than the default, make sure
+	// you increase your OS limits.
+	// 0 - unlimited.
+	GRPCMaxOpenConnections int `mapstructure:"grpc_max_open_connections"`
+
 	// Activate unsafe RPC commands like /dial_persistent_peers and /unsafe_flush_mempool
 	Unsafe bool `mapstructure:"unsafe"`
+
+	// Maximum number of simultaneous connections (including WebSocket).
+	// Does not include gRPC connections. See grpc_max_open_connections
+	// If you want to accept more significant number than the default, make sure
+	// you increase your OS limits.
+	// 0 - unlimited.
+	MaxOpenConnections int `mapstructure:"max_open_connections"`
 }
 
 // DefaultRPCConfig returns a default configuration for the RPC server
 func DefaultRPCConfig() *RPCConfig {
 	return &RPCConfig{
-		ListenAddress:     "tcp://0.0.0.0:46657",
-		GRPCListenAddress: "",
-		Unsafe:            false,
+		ListenAddress: "tcp://0.0.0.0:26657",
+
+		GRPCListenAddress:      "",
+		GRPCMaxOpenConnections: 900, // no ipv4
+
+		Unsafe: false,
+		// should be < {ulimit -Sn} - {MaxNumPeers} - {N of wal, db and other open files}
+		// 1024 - 50 - 50 = 924 = ~900
+		MaxOpenConnections: 900,
 	}
 }
 
@@ -246,16 +276,18 @@ type P2PConfig struct {
 	// Address to listen for incoming connections
 	ListenAddress string `mapstructure:"laddr"`
 
+	// Address to advertise to peers for them to dial
+	ExternalAddress string `mapstructure:"external_address"`
+
 	// Comma separated list of seed nodes to connect to
 	// We only use these if we can’t connect to peers in the addrbook
 	Seeds string `mapstructure:"seeds"`
 
 	// Comma separated list of nodes to keep persistent connections to
-	// Do not add private peers to this list if you don't want them advertised
 	PersistentPeers string `mapstructure:"persistent_peers"`
 
-	// Skip UPNP port forwarding
-	SkipUPNP bool `mapstructure:"skip_upnp"`
+	// UPNP port forwarding
+	UPNP bool `mapstructure:"upnp"`
 
 	// Path to address book
 	AddrBook string `mapstructure:"addr_book_file"`
@@ -270,7 +302,7 @@ type P2PConfig struct {
 	FlushThrottleTimeout int `mapstructure:"flush_throttle_timeout"`
 
 	// Maximum size of a message packet payload, in bytes
-	MaxMsgPacketPayloadSize int `mapstructure:"max_msg_packet_payload_size"`
+	MaxPacketMsgPayloadSize int `mapstructure:"max_packet_msg_payload_size"`
 
 	// Rate at which packets can be sent, in bytes/second
 	SendRate int64 `mapstructure:"send_rate"`
@@ -287,27 +319,46 @@ type P2PConfig struct {
 	// Does not work if the peer-exchange reactor is disabled.
 	SeedMode bool `mapstructure:"seed_mode"`
 
-	// Authenticated encryption
-	AuthEnc bool `mapstructure:"auth_enc"`
-
-	// Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
+	// Comma separated list of peer IDs to keep private (will not be gossiped to
+	// other peers)
 	PrivatePeerIDs string `mapstructure:"private_peer_ids"`
+
+	// Toggle to disable guard against peers connecting from the same ip.
+	AllowDuplicateIP bool `mapstructure:"allow_duplicate_ip"`
+
+	// Peer connection configuration.
+	HandshakeTimeout time.Duration `mapstructure:"handshake_timeout"`
+	DialTimeout      time.Duration `mapstructure:"dial_timeout"`
+
+	// Testing params.
+	// Force dial to fail
+	TestDialFail bool `mapstructure:"test_dial_fail"`
+	// FUzz connection
+	TestFuzz       bool            `mapstructure:"test_fuzz"`
+	TestFuzzConfig *FuzzConnConfig `mapstructure:"test_fuzz_config"`
 }
 
 // DefaultP2PConfig returns a default configuration for the peer-to-peer layer
 func DefaultP2PConfig() *P2PConfig {
 	return &P2PConfig{
-		ListenAddress:           "tcp://0.0.0.0:46656",
+		ListenAddress:           "tcp://0.0.0.0:26656",
+		ExternalAddress:         "",
+		UPNP:                    false,
 		AddrBook:                defaultAddrBookPath,
 		AddrBookStrict:          true,
 		MaxNumPeers:             50,
 		FlushThrottleTimeout:    100,
-		MaxMsgPacketPayloadSize: 1024,   // 1 kB
-		SendRate:                512000, // 500 kB/s
-		RecvRate:                512000, // 500 kB/s
+		MaxPacketMsgPayloadSize: 1024,    // 1 kB
+		SendRate:                5120000, // 5 mB/s
+		RecvRate:                5120000, // 5 mB/s
 		PexReactor:              true,
 		SeedMode:                false,
-		AuthEnc:                 true,
+		AllowDuplicateIP:        true, // so non-breaking yet
+		HandshakeTimeout:        20 * time.Second,
+		DialTimeout:             3 * time.Second,
+		TestDialFail:            false,
+		TestFuzz:                false,
+		TestFuzzConfig:          DefaultFuzzConnConfig(),
 	}
 }
 
@@ -315,14 +366,34 @@ func DefaultP2PConfig() *P2PConfig {
 func TestP2PConfig() *P2PConfig {
 	cfg := DefaultP2PConfig()
 	cfg.ListenAddress = "tcp://0.0.0.0:36656"
-	cfg.SkipUPNP = true
 	cfg.FlushThrottleTimeout = 10
+	cfg.AllowDuplicateIP = true
 	return cfg
 }
 
 // AddrBookFile returns the full path to the address book
 func (cfg *P2PConfig) AddrBookFile() string {
 	return rootify(cfg.AddrBook, cfg.RootDir)
+}
+
+// FuzzConnConfig is a FuzzedConnection configuration.
+type FuzzConnConfig struct {
+	Mode         int
+	MaxDelay     time.Duration
+	ProbDropRW   float64
+	ProbDropConn float64
+	ProbSleep    float64
+}
+
+// DefaultFuzzConnConfig returns the default config.
+func DefaultFuzzConnConfig() *FuzzConnConfig {
+	return &FuzzConnConfig{
+		Mode:         FuzzModeDrop,
+		MaxDelay:     3 * time.Second,
+		ProbDropRW:   0.2,
+		ProbDropConn: 0.00,
+		ProbSleep:    0.00,
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -335,6 +406,7 @@ type MempoolConfig struct {
 	RecheckEmpty bool   `mapstructure:"recheck_empty"`
 	Broadcast    bool   `mapstructure:"broadcast"`
 	WalPath      string `mapstructure:"wal_dir"`
+	Size         int    `mapstructure:"size"`
 	CacheSize    int    `mapstructure:"cache_size"`
 }
 
@@ -345,6 +417,7 @@ func DefaultMempoolConfig() *MempoolConfig {
 		RecheckEmpty: true,
 		Broadcast:    true,
 		WalPath:      filepath.Join(defaultDataDir, "mempool.wal"),
+		Size:         100000,
 		CacheSize:    100000,
 	}
 }
@@ -364,13 +437,12 @@ func (cfg *MempoolConfig) WalDir() string {
 //-----------------------------------------------------------------------------
 // ConsensusConfig
 
-// ConsensusConfig defines the confuguration for the Tendermint consensus service,
+// ConsensusConfig defines the configuration for the Tendermint consensus service,
 // including timeouts and details about the WAL and the block structure.
 type ConsensusConfig struct {
-	RootDir  string `mapstructure:"home"`
-	WalPath  string `mapstructure:"wal_file"`
-	WalLight bool   `mapstructure:"wal_light"`
-	walFile  string // overrides WalPath if set
+	RootDir string `mapstructure:"home"`
+	WalPath string `mapstructure:"wal_file"`
+	walFile string // overrides WalPath if set
 
 	// All timeouts are in milliseconds
 	TimeoutPropose        int `mapstructure:"timeout_propose"`
@@ -383,10 +455,6 @@ type ConsensusConfig struct {
 
 	// Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
 	SkipTimeoutCommit bool `mapstructure:"skip_timeout_commit"`
-
-	// BlockSize
-	MaxBlockSizeTxs   int `mapstructure:"max_block_size_txs"`
-	MaxBlockSizeBytes int `mapstructure:"max_block_size_bytes"`
 
 	// EmptyBlocks mode and possible interval between empty blocks in seconds
 	CreateEmptyBlocks         bool `mapstructure:"create_empty_blocks"`
@@ -401,7 +469,6 @@ type ConsensusConfig struct {
 func DefaultConsensusConfig() *ConsensusConfig {
 	return &ConsensusConfig{
 		WalPath:                     filepath.Join(defaultDataDir, "cs.wal", "wal"),
-		WalLight:                    false,
 		TimeoutPropose:              3000,
 		TimeoutProposeDelta:         500,
 		TimeoutPrevote:              1000,
@@ -410,8 +477,6 @@ func DefaultConsensusConfig() *ConsensusConfig {
 		TimeoutPrecommitDelta:       500,
 		TimeoutCommit:               1000,
 		SkipTimeoutCommit:           false,
-		MaxBlockSizeTxs:             10000,
-		MaxBlockSizeBytes:           1, // TODO
 		CreateEmptyBlocks:           true,
 		CreateEmptyBlocksInterval:   0,
 		PeerGossipSleepDuration:     100,
@@ -491,14 +556,14 @@ func (cfg *ConsensusConfig) SetWalFile(walFile string) {
 //-----------------------------------------------------------------------------
 // TxIndexConfig
 
-// TxIndexConfig defines the confuguration for the transaction
+// TxIndexConfig defines the configuration for the transaction
 // indexer, including tags to index.
 type TxIndexConfig struct {
 	// What indexer to use for transactions
 	//
 	// Options:
-	//   1) "null" (default)
-	//   2) "kv" - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
+	//   1) "null"
+	//   2) "kv" (default) - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
 	Indexer string `mapstructure:"indexer"`
 
 	// Comma-separated list of tags to index (by default the only tag is tx hash)
@@ -526,6 +591,42 @@ func DefaultTxIndexConfig() *TxIndexConfig {
 // TestTxIndexConfig returns a default configuration for the transaction indexer.
 func TestTxIndexConfig() *TxIndexConfig {
 	return DefaultTxIndexConfig()
+}
+
+//-----------------------------------------------------------------------------
+// InstrumentationConfig
+
+// InstrumentationConfig defines the configuration for metrics reporting.
+type InstrumentationConfig struct {
+	// When true, Prometheus metrics are served under /metrics on
+	// PrometheusListenAddr.
+	// Check out the documentation for the list of available metrics.
+	Prometheus bool `mapstructure:"prometheus"`
+
+	// Address to listen for Prometheus collector(s) connections.
+	PrometheusListenAddr string `mapstructure:"prometheus_listen_addr"`
+
+	// Maximum number of simultaneous connections.
+	// If you want to accept more significant number than the default, make sure
+	// you increase your OS limits.
+	// 0 - unlimited.
+	MaxOpenConnections int `mapstructure:"max_open_connections"`
+}
+
+// DefaultInstrumentationConfig returns a default configuration for metrics
+// reporting.
+func DefaultInstrumentationConfig() *InstrumentationConfig {
+	return &InstrumentationConfig{
+		Prometheus:           false,
+		PrometheusListenAddr: ":26660",
+		MaxOpenConnections:   3,
+	}
+}
+
+// TestInstrumentationConfig returns a default configuration for metrics
+// reporting.
+func TestInstrumentationConfig() *InstrumentationConfig {
+	return DefaultInstrumentationConfig()
 }
 
 //-----------------------------------------------------------------------------

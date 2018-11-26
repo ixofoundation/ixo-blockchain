@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	cmn "github.com/tendermint/tmlibs/common"
+	cmn "github.com/tendermint/tendermint/libs/common"
 )
 
 var configTemplate *template.Template
@@ -37,16 +37,21 @@ func EnsureRoot(rootDir string) {
 
 	// Write default config file if missing.
 	if !cmn.FileExists(configFilePath) {
-		writeConfigFile(configFilePath)
+		writeDefaultConfigFile(configFilePath)
 	}
 }
 
 // XXX: this func should probably be called by cmd/tendermint/commands/init.go
 // alongside the writing of the genesis.json and priv_validator.json
-func writeConfigFile(configFilePath string) {
+func writeDefaultConfigFile(configFilePath string) {
+	WriteConfigFile(configFilePath, DefaultConfig())
+}
+
+// WriteConfigFile renders config using the template and writes it to configFilePath.
+func WriteConfigFile(configFilePath string, config *Config) {
 	var buffer bytes.Buffer
 
-	if err := configTemplate.Execute(&buffer, DefaultConfig()); err != nil {
+	if err := configTemplate.Execute(&buffer, config); err != nil {
 		panic(err)
 	}
 
@@ -76,7 +81,7 @@ fast_sync = {{ .BaseConfig.FastSync }}
 db_backend = "{{ .BaseConfig.DBBackend }}"
 
 # Database directory
-db_path = "{{ .BaseConfig.DBPath }}"
+db_path = "{{ js .BaseConfig.DBPath }}"
 
 # Output level for logging, including package level options
 log_level = "{{ .BaseConfig.LogLevel }}"
@@ -84,13 +89,13 @@ log_level = "{{ .BaseConfig.LogLevel }}"
 ##### additional base config options #####
 
 # Path to the JSON file containing the initial validator set and other meta data
-genesis_file = "{{ .BaseConfig.Genesis }}"
+genesis_file = "{{ js .BaseConfig.Genesis }}"
 
 # Path to the JSON file containing the private key to use as a validator in the consensus protocol
-priv_validator_file = "{{ .BaseConfig.PrivValidator }}"
+priv_validator_file = "{{ js .BaseConfig.PrivValidator }}"
 
 # Path to the JSON file containing the private key to use for node authentication in the p2p protocol
-node_key_file = "{{ .BaseConfig.NodeKey}}"
+node_key_file = "{{ js .BaseConfig.NodeKey}}"
 
 # Mechanism to connect to the ABCI application: socket | grpc
 abci = "{{ .BaseConfig.ABCI }}"
@@ -114,8 +119,22 @@ laddr = "{{ .RPC.ListenAddress }}"
 # NOTE: This server only supports /broadcast_tx_commit
 grpc_laddr = "{{ .RPC.GRPCListenAddress }}"
 
+# Maximum number of simultaneous connections.
+# Does not include RPC (HTTP&WebSocket) connections. See max_open_connections
+# If you want to accept more significant number than the default, make sure
+# you increase your OS limits.
+# 0 - unlimited.
+grpc_max_open_connections = {{ .RPC.GRPCMaxOpenConnections }}
+
 # Activate unsafe RPC commands like /dial_seeds and /unsafe_flush_mempool
 unsafe = {{ .RPC.Unsafe }}
+
+# Maximum number of simultaneous connections (including WebSocket).
+# Does not include gRPC connections. See grpc_max_open_connections
+# If you want to accept more significant number than the default, make sure
+# you increase your OS limits.
+# 0 - unlimited.
+max_open_connections = {{ .RPC.MaxOpenConnections }}
 
 ##### peer to peer configuration options #####
 [p2p]
@@ -123,15 +142,23 @@ unsafe = {{ .RPC.Unsafe }}
 # Address to listen for incoming connections
 laddr = "{{ .P2P.ListenAddress }}"
 
+# Address to advertise to peers for them to dial
+# If empty, will use the same port as the laddr,
+# and will introspect on the listener or use UPnP
+# to figure out the address.
+external_address = "{{ .P2P.ExternalAddress }}"
+
 # Comma separated list of seed nodes to connect to
-seeds = ""
+seeds = "{{ .P2P.Seeds }}"
 
 # Comma separated list of nodes to keep persistent connections to
-# Do not add private peers to this list if you don't want them advertised
-persistent_peers = ""
+persistent_peers = "{{ .P2P.PersistentPeers }}"
+
+# UPNP port forwarding
+upnp = {{ .P2P.UPNP }}
 
 # Path to address book
-addr_book_file = "{{ .P2P.AddrBook }}"
+addr_book_file = "{{ js .P2P.AddrBook }}"
 
 # Set true for strict address routability rules
 addr_book_strict = {{ .P2P.AddrBookStrict }}
@@ -143,7 +170,7 @@ flush_throttle_timeout = {{ .P2P.FlushThrottleTimeout }}
 max_num_peers = {{ .P2P.MaxNumPeers }}
 
 # Maximum size of a message packet payload, in bytes
-max_msg_packet_payload_size = {{ .P2P.MaxMsgPacketPayloadSize }}
+max_packet_msg_payload_size = {{ .P2P.MaxPacketMsgPayloadSize }}
 
 # Rate at which packets can be sent, in bytes/second
 send_rate = {{ .P2P.SendRate }}
@@ -160,9 +187,6 @@ pex = {{ .P2P.PexReactor }}
 # Does not work if the peer-exchange reactor is disabled.
 seed_mode = {{ .P2P.SeedMode }}
 
-# Authenticated encryption
-auth_enc = {{ .P2P.AuthEnc }}
-
 # Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
 private_peer_ids = "{{ .P2P.PrivatePeerIDs }}"
 
@@ -172,13 +196,18 @@ private_peer_ids = "{{ .P2P.PrivatePeerIDs }}"
 recheck = {{ .Mempool.Recheck }}
 recheck_empty = {{ .Mempool.RecheckEmpty }}
 broadcast = {{ .Mempool.Broadcast }}
-wal_dir = "{{ .Mempool.WalPath }}"
+wal_dir = "{{ js .Mempool.WalPath }}"
+
+# size of the mempool
+size = {{ .Mempool.Size }}
+
+# size of the cache (used to filter transactions we saw earlier)
+cache_size = {{ .Mempool.CacheSize }}
 
 ##### consensus configuration options #####
 [consensus]
 
-wal_file = "{{ .Consensus.WalPath }}"
-wal_light = {{ .Consensus.WalLight }}
+wal_file = "{{ js .Consensus.WalPath }}"
 
 # All timeouts are in milliseconds
 timeout_propose = {{ .Consensus.TimeoutPropose }}
@@ -191,10 +220,6 @@ timeout_commit = {{ .Consensus.TimeoutCommit }}
 
 # Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
 skip_timeout_commit = {{ .Consensus.SkipTimeoutCommit }}
-
-# BlockSize
-max_block_size_txs = {{ .Consensus.MaxBlockSizeTxs }}
-max_block_size_bytes = {{ .Consensus.MaxBlockSizeBytes }}
 
 # EmptyBlocks mode and possible interval between empty blocks in seconds
 create_empty_blocks = {{ .Consensus.CreateEmptyBlocks }}
@@ -225,6 +250,23 @@ index_tags = "{{ .TxIndex.IndexTags }}"
 # desirable (see the comment above). IndexTags has a precedence over
 # IndexAllTags (i.e. when given both, IndexTags will be indexed).
 index_all_tags = {{ .TxIndex.IndexAllTags }}
+
+##### instrumentation configuration options #####
+[instrumentation]
+
+# When true, Prometheus metrics are served under /metrics on
+# PrometheusListenAddr.
+# Check out the documentation for the list of available metrics.
+prometheus = {{ .Instrumentation.Prometheus }}
+
+# Address to listen for Prometheus collector(s) connections
+prometheus_listen_addr = "{{ .Instrumentation.PrometheusListenAddr }}"
+
+# Maximum number of simultaneous connections.
+# If you want to accept more significant number than the default, make sure
+# you increase your OS limits.
+# 0 - unlimited.
+max_open_connections = {{ .Instrumentation.MaxOpenConnections }}
 `
 
 /****** these are for test settings ***********/
@@ -262,7 +304,7 @@ func ResetTestRoot(testName string) *Config {
 
 	// Write default config file if missing.
 	if !cmn.FileExists(configFilePath) {
-		writeConfigFile(configFilePath)
+		writeDefaultConfigFile(configFilePath)
 	}
 	if !cmn.FileExists(genesisFilePath) {
 		cmn.MustWriteFile(genesisFilePath, []byte(testGenesis), 0644)
@@ -280,10 +322,10 @@ var testGenesis = `{
   "validators": [
     {
       "pub_key": {
-        "type": "ed25519",
-        "data":"3B3069C422E19688B45CBFAE7BB009FC0FA1B1EA86593519318B7214853803C8"
+        "type": "tendermint/PubKeyEd25519",
+        "value":"AT/+aaL1eB0477Mud9JMm8Sh8BIvOYlPGC9KkIUmFaE="
       },
-      "power": 10,
+      "power": "10",
       "name": ""
     }
   ],
@@ -291,16 +333,16 @@ var testGenesis = `{
 }`
 
 var testPrivValidator = `{
-  "address": "D028C9981F7A87F3093672BF0D5B0E2A1B3ED456",
+  "address": "A3258DCBF45DCA0DF052981870F2D1441A36D145",
   "pub_key": {
-    "type": "ed25519",
-    "data": "3B3069C422E19688B45CBFAE7BB009FC0FA1B1EA86593519318B7214853803C8"
+    "type": "tendermint/PubKeyEd25519",
+    "value": "AT/+aaL1eB0477Mud9JMm8Sh8BIvOYlPGC9KkIUmFaE="
   },
   "priv_key": {
-    "type": "ed25519",
-    "data": "27F82582AEFAE7AB151CFB01C48BB6C1A0DA78F9BDDA979A9F70A84D074EB07D3B3069C422E19688B45CBFAE7BB009FC0FA1B1EA86593519318B7214853803C8"
+    "type": "tendermint/PrivKeyEd25519",
+    "value": "EVkqJO/jIXp3rkASXfh9YnyToYXRXhBr6g9cQVxPFnQBP/5povV4HTjvsy530kybxKHwEi85iU8YL0qQhSYVoQ=="
   },
-  "last_height": 0,
-  "last_round": 0,
+  "last_height": "0",
+  "last_round": "0",
   "last_step": 0
 }`
