@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 
-	server "github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/wire"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -114,12 +113,10 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 	store.Set(key, bz)
 }
 
-func (k Keeper) CreateNewAccount(ctx sdk.Context) auth.Account {
+func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) auth.Account {
 	// generate secret and address
-	addr, _, err := server.GenerateCoinKey()
-	if err != nil {
-		panic(err)
-	}
+	addr := sdk.AccAddress([]byte(projectDid + "/" + accountId))
+
 	//create account with random address
 	acc := k.am.NewAccountWithAddress(ctx, addr)
 	if k.am.GetAccount(ctx, addr) != nil {
