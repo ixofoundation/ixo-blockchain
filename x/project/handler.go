@@ -399,7 +399,7 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did
 }
 
 func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) sdk.AccAddress {
-	acc := k.CreateNewAccount(ctx)
+	acc := k.CreateNewAccount(ctx, projectDid, accountId)
 	k.AddAccountToProjectAccounts(ctx, projectDid, accountId, acc)
 	return acc.GetAddress()
 }
