@@ -32,6 +32,10 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Cod
 		"/projectAccounts/{projectDid}",
 		queryProjectAccountsRequestHandler(cdc, project.GetProjectDocDecoder(cdc)),
 	).Methods("GET")
+	r.HandleFunc(
+		"/projectTxs/{projectDid}",
+		queryProjectTxsRequestHandler(cdc),
+	).Methods("GET")
 }
 
 func queryProjectDocRequestHandler(cdc *wire.Codec, decoder project.ProjectDocDecoder) http.HandlerFunc {
@@ -140,6 +144,55 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 
 		// print out whole didDoc
 		output, err := json.MarshalIndent(accDetails, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
+			return
+		}
+
+		w.Write(output)
+	}
+
+}
+
+func queryProjectTxsRequestHandler(cdc *wire.Codec) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.NewCLIContext().
+			WithCodec(cdc).
+			WithLogger(os.Stdout)
+
+		vars := mux.Vars(r)
+		projectDid := vars["projectDid"]
+
+		var buffer bytes.Buffer
+		buffer.WriteString("TX-")
+		buffer.WriteString(projectDid)
+		key := buffer.Bytes()
+
+		res, err := ctx.QueryStore(key, storeName)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
+			return
+		}
+
+		// the query will return empty if there is no data for this did
+		if len(res) == 0 {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		// decode the value
+		txs := []project.WithdrawalInfo{}
+		err = json.Unmarshal(res, &txs)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
+			return
+		}
+
+		// print out whole didDoc
+		output, err := json.MarshalIndent(txs, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))

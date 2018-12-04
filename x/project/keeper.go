@@ -14,7 +14,8 @@ import (
 
 // module users must specify coin denomination and reward (constant) per PoW solution
 type Config struct {
-	accountMapPrefix string
+	accountMapPrefix  string
+	withdrawalsPrefix string
 }
 
 type StoredProjectDoc interface {
@@ -41,7 +42,10 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper, fk fees
 		cdc,
 		am,
 		fk,
-		Config{"ACC-"},
+		Config{
+			"ACC-",
+			"TX-",
+		},
 	}
 }
 
@@ -96,6 +100,36 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]in
 		didMap := k.decodeAccountMap(bz)
 		return didMap
 	}
+}
+
+// GetAllDids returns all the dids.
+func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo.Did) []WithdrawalInfo {
+	store := ctx.KVStore(k.key)
+	key := generateWithdrawalsKey(k, projectDid)
+	bz := store.Get(key)
+	if bz == nil {
+		return []WithdrawalInfo{}
+	} else {
+		txs := []WithdrawalInfo{}
+		err := json.Unmarshal(bz, &txs)
+		if err != nil {
+			panic(err)
+		}
+		return txs
+	}
+}
+
+func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid ixo.Did, withdrawalInfo WithdrawalInfo) {
+	store := ctx.KVStore(k.key)
+	key := generateWithdrawalsKey(k, projectDid)
+	txs := k.GetProjectWithdrawalTransactions(ctx, projectDid)
+
+	newTxs := append(txs, withdrawalInfo)
+	bz, err := json.Marshal(newTxs)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(key, bz)
 }
 
 func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
@@ -167,6 +201,13 @@ func (k Keeper) decodeAccountMap(accMapBytes []byte) map[string]interface{} {
 func generateAccountsKey(k Keeper, did ixo.Did) []byte {
 	var buffer bytes.Buffer
 	buffer.WriteString(k.config.accountMapPrefix)
+	buffer.WriteString(did)
+	return buffer.Bytes()
+}
+
+func generateWithdrawalsKey(k Keeper, did ixo.Did) []byte {
+	var buffer bytes.Buffer
+	buffer.WriteString(k.config.withdrawalsPrefix)
 	buffer.WriteString(did)
 	return buffer.Bytes()
 }
