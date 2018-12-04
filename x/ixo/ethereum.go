@@ -197,7 +197,7 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, send
 		log.Fatal(err)
 	}
 	transOpts := bind.NewKeyedTransactor(privateKey)
-	transOpts.GasLimit = 300000
+	transOpts.GasLimit = uint64(2782100)
 
 	projectWalletAuthoriserAddress := c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
 
