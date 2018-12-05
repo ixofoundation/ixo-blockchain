@@ -2,6 +2,7 @@ package project
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 
@@ -102,7 +103,7 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]in
 	}
 }
 
-// GetAllDids returns all the dids.
+// GetProjectWithdrawalTransactions returns all the transactions on this project.
 func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo.Did) []WithdrawalInfo {
 	store := ctx.KVStore(k.key)
 	key := generateWithdrawalsKey(k, projectDid)
@@ -122,8 +123,8 @@ func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo
 func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid ixo.Did, withdrawalInfo WithdrawalInfo) {
 	store := ctx.KVStore(k.key)
 	key := generateWithdrawalsKey(k, projectDid)
-	txs := k.GetProjectWithdrawalTransactions(ctx, projectDid)
 
+	txs := k.GetProjectWithdrawalTransactions(ctx, projectDid)
 	newTxs := append(txs, withdrawalInfo)
 	bz, err := json.Marshal(newTxs)
 	if err != nil {
@@ -141,15 +142,16 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 
 	store := ctx.KVStore(k.key)
 	key := generateAccountsKey(k, projectDid)
-	accountAddrString := account.GetAddress().String()
-	accMap[accountId] = accountAddrString
+	accMap[accountId] = string(account.GetAddress().Bytes())
 	bz := k.encodeAccountMap(accMap)
 	store.Set(key, bz)
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) auth.Account {
-	// generate secret and address
-	addr := sdk.AccAddress([]byte(projectDid + "/" + accountId))
+
+	src := []byte(projectDid + "/" + accountId)
+	hexAddr := hex.EncodeToString(src)
+	addr := sdk.AccAddress(hexAddr)
 
 	//create account with random address
 	acc := k.am.NewAccountWithAddress(ctx, addr)

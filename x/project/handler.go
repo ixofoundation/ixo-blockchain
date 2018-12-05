@@ -292,11 +292,9 @@ func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Ke
 		return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
 	}
 
-	success, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
+	_, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
 
-	if success {
-		addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
-	}
+	addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
 
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
@@ -401,7 +399,7 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did
 
 func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper, projectDid ixo.Did, actionID [32]byte, projectEthWallet string, recipientEthAddress string, amount int64) {
 	withdrawalInfo := WithdrawalInfo{
-		actionID,
+		string(actionID[:]),
 		projectEthWallet,
 		recipientEthAddress,
 		amount,
@@ -425,7 +423,7 @@ func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, 
 	accountIDAddrInterface, found := accMap[accountId]
 	if found {
 		accountIDAccAddr = accountIDAddrInterface.(string)
-		addr, _ := sdk.AccAddressFromBech32(accountIDAccAddr)
+		addr := sdk.AccAddress([]byte(accountIDAccAddr))
 		return addr
 	} else {
 		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
