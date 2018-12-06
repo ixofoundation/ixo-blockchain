@@ -85,12 +85,12 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper
 		}
 	}
 
-	// if newStatus == PaidoutStatus {
-	// 	res := payoutFees(ctx, k, ck, bk, pk, ethClient, existingProjectDoc.GetProjectDid())
-	// 	if res.Code != sdk.ABCICodeOK {
-	// 		return res
-	// 	}
-	// }
+	if newStatus == PaidoutStatus {
+		res := payoutFees(ctx, k, ck, bk, pk, ethClient, existingProjectDoc.GetProjectDid())
+		if res.Code != sdk.ABCICodeOK {
+			return res
+		}
+	}
 
 	existingProjectDoc.SetStatus(newStatus)
 	storedProjectDoc, _ := k.UpdateProjectDoc(ctx, existingProjectDoc)
