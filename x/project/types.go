@@ -48,6 +48,13 @@ func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectSta
 
 }
 
+type WithdrawalInfo struct {
+	ActionID            string `json:"actionID"`
+	ProjectEthWallet    string `json:"projectEthWallet"`
+	RecipientEthAddress string `json:"recipientEthAddress"`
+	Amount              int64  `json:"amount"`
+}
+
 //UpdateProjectStatusDoc defined
 type UpdateProjectStatusDoc struct {
 	Status          ProjectStatus `json:"status"`

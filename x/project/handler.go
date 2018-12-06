@@ -285,22 +285,21 @@ func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Ke
 		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
 	}
 
-	success := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
-	if success {
-		account := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
-		// burn coins
-		_, _, err := bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
-		if err != nil {
-			return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
-		}
-
-		return sdk.Result{
-			Code: sdk.ABCICodeOK,
-			Data: []byte("Action complete"),
-		}
+	account := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
+	// burn coins
+	_, _, err = bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
+	if err != nil {
+		return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
 	}
 
-	return sdk.ErrUnknownRequest("Could not initiate ERC20 token transfer").Result()
+	_, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
+
+	addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
+
+	return sdk.Result{
+		Code: sdk.ABCICodeOK,
+		Data: []byte("Action complete"),
+	}
 }
 
 func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, bk bank.Keeper, ethClient ixo.EthClient, ethFundingTxnID string, existingProjectDoc StoredProjectDoc) sdk.Result {
@@ -398,6 +397,16 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did
 	return found
 }
 
+func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper, projectDid ixo.Did, actionID [32]byte, projectEthWallet string, recipientEthAddress string, amount int64) {
+	withdrawalInfo := WithdrawalInfo{
+		string(actionID[:]),
+		projectEthWallet,
+		recipientEthAddress,
+		amount,
+	}
+	k.AddProjectWithdrawalTransaction(ctx, projectDid, withdrawalInfo)
+}
+
 func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) sdk.AccAddress {
 	acc := k.CreateNewAccount(ctx, projectDid, accountId)
 	k.AddAccountToProjectAccounts(ctx, projectDid, accountId, acc)
@@ -414,7 +423,7 @@ func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, 
 	accountIDAddrInterface, found := accMap[accountId]
 	if found {
 		accountIDAccAddr = accountIDAddrInterface.(string)
-		addr, _ := sdk.AccAddressFromBech32(accountIDAccAddr)
+		addr := sdk.AccAddress([]byte(accountIDAccAddr))
 		return addr
 	} else {
 		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
