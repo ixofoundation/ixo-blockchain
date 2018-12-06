@@ -1,6 +1,7 @@
 package project
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -398,8 +399,9 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did
 }
 
 func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper, projectDid ixo.Did, actionID [32]byte, projectEthWallet string, recipientEthAddress string, amount int64) {
+	actionIDStr := "0x" + hex.EncodeToString(actionID[:])
 	withdrawalInfo := WithdrawalInfo{
-		string(actionID[:]),
+		actionIDStr,
 		projectEthWallet,
 		recipientEthAddress,
 		amount,

@@ -212,7 +212,7 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, send
 		return false, nextTxID
 	}
 
-	return false, nextTxID
+	return true, nextTxID
 }
 
 // Gets the Funding amount out of the transcation data
