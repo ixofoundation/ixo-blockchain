@@ -32,6 +32,10 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Cod
 		"/projectAccounts/{projectDid}",
 		queryProjectAccountsRequestHandler(cdc, project.GetProjectDocDecoder(cdc)),
 	).Methods("GET")
+	r.HandleFunc(
+		"/projectTxs/{projectDid}",
+		queryProjectTxsRequestHandler(cdc),
+	).Methods("GET")
 }
 
 func queryProjectDocRequestHandler(cdc *wire.Codec, decoder project.ProjectDocDecoder) http.HandlerFunc {
@@ -54,7 +58,7 @@ func queryProjectDocRequestHandler(cdc *wire.Codec, decoder project.ProjectDocDe
 
 		// the query will return empty if there is no data for this did
 		if len(res) == 0 {
-			w.WriteHeader(http.StatusNoContent)
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
@@ -102,7 +106,7 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 
 		// the query will return empty if there is no data for this did
 		if len(res) == 0 {
-			w.WriteHeader(http.StatusNoContent)
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
@@ -120,17 +124,14 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 		i := 0
 		for k, v := range accMap {
 			addr := v.(string)
-
-			accAddr, err := sdk.AccAddressFromBech32(addr)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(fmt.Sprintf("Could't create Account Address. Error: %s", err.Error())))
-			}
+			fmt.Println("Address:", addr)
+			accAddr := sdk.AccAddress([]byte(addr))
 
 			account, err := ctx.GetAccount(accAddr)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(fmt.Sprintf("Could't find account. Error: %s", err.Error())))
+				return
 			}
 			baseAcc := account.(*types.AppAccount)
 			balance := baseAcc.Coins.AmountOf(ixo.IxoNativeToken)
@@ -145,6 +146,61 @@ func queryProjectAccountsRequestHandler(cdc *wire.Codec, decoder project.Project
 			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
 			return
 		}
+
+		w.Write(output)
+	}
+
+}
+
+func queryProjectTxsRequestHandler(cdc *wire.Codec) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.NewCLIContext().
+			WithCodec(cdc).
+			WithLogger(os.Stdout)
+
+		vars := mux.Vars(r)
+		projectDid := vars["projectDid"]
+
+		var buffer bytes.Buffer
+		buffer.WriteString("TX-")
+		buffer.WriteString(projectDid)
+		key := buffer.Bytes()
+
+		fmt.Println("Lookup key:", string(key))
+
+		res, err := ctx.QueryStore(key, storeName)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
+			return
+		}
+
+		fmt.Println("Len(res):", len(res))
+		txs := []project.WithdrawalInfo{}
+		// the query will return empty if there is no data for this did
+		if len(res) == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		} else {
+			err = json.Unmarshal(res, &txs)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
+				return
+			}
+		}
+
+		// decode the value
+		fmt.Println("Txs:", txs)
+		// print out whole didDoc
+		output, err := json.MarshalIndent(txs, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't marshal query result. Error: %s", err.Error())))
+			return
+		}
+
+		fmt.Println("Output:", output)
 
 		w.Write(output)
 	}

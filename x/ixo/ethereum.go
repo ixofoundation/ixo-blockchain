@@ -182,13 +182,13 @@ func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (s
 }
 
 // InitiateTokenTransfer initiates the transfer of tokens from a source wallet to a destination wallet
-func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, senderAddr string, receiverAddr string, amount int64) bool {
+func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, senderAddr string, receiverAddr string, amount int64) (bool, [32]byte) {
 	authContractAddress := common.HexToAddress(c.k.GetContract(ctx, contracts.KeyAuthContractAddress))
 	// acas := authContractAddress.String()
 	// fmt.Println("AuthContractAddress", acas)
 	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
 	if err != nil {
-		return false
+		return false, [32]byte{}
 	}
 
 	validationEthWallet := getValidationEthWallet()
@@ -209,10 +209,10 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, send
 	txResult, err := authContract.Validate(transOpts, nextTxID, common.HexToAddress(projectWalletAuthoriserAddress), common.HexToAddress(senderAddr), common.HexToAddress(receiverAddr), big.NewInt(amount))
 	fmt.Println("authContract.Validate: ", txResult, err)
 	if err != nil {
-		return false
+		return false, nextTxID
 	}
 
-	return true
+	return false, nextTxID
 }
 
 // Gets the Funding amount out of the transcation data

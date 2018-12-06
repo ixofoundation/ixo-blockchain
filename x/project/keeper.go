@@ -2,6 +2,7 @@ package project
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 
@@ -14,7 +15,8 @@ import (
 
 // module users must specify coin denomination and reward (constant) per PoW solution
 type Config struct {
-	accountMapPrefix string
+	accountMapPrefix  string
+	withdrawalsPrefix string
 }
 
 type StoredProjectDoc interface {
@@ -41,7 +43,10 @@ func NewKeeper(cdc *wire.Codec, key sdk.StoreKey, am auth.AccountMapper, fk fees
 		cdc,
 		am,
 		fk,
-		Config{"ACC-"},
+		Config{
+			"ACC-",
+			"TX-",
+		},
 	}
 }
 
@@ -98,6 +103,36 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]in
 	}
 }
 
+// GetProjectWithdrawalTransactions returns all the transactions on this project.
+func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo.Did) []WithdrawalInfo {
+	store := ctx.KVStore(k.key)
+	key := generateWithdrawalsKey(k, projectDid)
+	bz := store.Get(key)
+	if bz == nil {
+		return []WithdrawalInfo{}
+	} else {
+		txs := []WithdrawalInfo{}
+		err := json.Unmarshal(bz, &txs)
+		if err != nil {
+			panic(err)
+		}
+		return txs
+	}
+}
+
+func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid ixo.Did, withdrawalInfo WithdrawalInfo) {
+	store := ctx.KVStore(k.key)
+	key := generateWithdrawalsKey(k, projectDid)
+
+	txs := k.GetProjectWithdrawalTransactions(ctx, projectDid)
+	newTxs := append(txs, withdrawalInfo)
+	bz, err := json.Marshal(newTxs)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(key, bz)
+}
+
 func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
 	accMap := k.GetAccountMap(ctx, projectDid)
 	_, found := accMap[accountId]
@@ -107,15 +142,16 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 
 	store := ctx.KVStore(k.key)
 	key := generateAccountsKey(k, projectDid)
-	accountAddrString := account.GetAddress().String()
-	accMap[accountId] = accountAddrString
+	accMap[accountId] = string(account.GetAddress().Bytes())
 	bz := k.encodeAccountMap(accMap)
 	store.Set(key, bz)
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) auth.Account {
-	// generate secret and address
-	addr := sdk.AccAddress([]byte(projectDid + "/" + accountId))
+
+	src := []byte(projectDid + "/" + accountId)
+	hexAddr := hex.EncodeToString(src)
+	addr := sdk.AccAddress(hexAddr)
 
 	//create account with random address
 	acc := k.am.NewAccountWithAddress(ctx, addr)
@@ -167,6 +203,13 @@ func (k Keeper) decodeAccountMap(accMapBytes []byte) map[string]interface{} {
 func generateAccountsKey(k Keeper, did ixo.Did) []byte {
 	var buffer bytes.Buffer
 	buffer.WriteString(k.config.accountMapPrefix)
+	buffer.WriteString(did)
+	return buffer.Bytes()
+}
+
+func generateWithdrawalsKey(k Keeper, did ixo.Did) []byte {
+	var buffer bytes.Buffer
+	buffer.WriteString(k.config.withdrawalsPrefix)
 	buffer.WriteString(did)
 	return buffer.Bytes()
 }
