@@ -280,26 +280,24 @@ func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params
 
 func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient, projectDid ixo.Did, accountID string, recipientEthAddress string) sdk.Result {
 	balanceToPay := getIxoAmount(ctx, k, bk, projectDid, accountID)
-	if balanceToPay <= 0 {
-		return sdk.ErrUnknownRequest("No balance to pay out on Project").Result()
+	if balanceToPay > 0 {
+		// initiate auth contract based ixo ERC20 token transfer on Ethereum
+		projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
+		if err != nil {
+			return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
+		}
+
+		account := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
+		// burn coins
+		_, _, err = bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
+		if err != nil {
+			return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
+		}
+
+		_, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
+
+		addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
 	}
-
-	// initiate auth contract based ixo ERC20 token transfer on Ethereum
-	projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
-	if err != nil {
-		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
-	}
-
-	account := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
-	// burn coins
-	_, _, err = bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
-	if err != nil {
-		return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
-	}
-
-	_, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
-
-	addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
 
 	return sdk.Result{
 		Code: sdk.ABCICodeOK,
