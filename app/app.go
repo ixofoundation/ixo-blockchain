@@ -124,8 +124,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, baseAppOption
 
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
-		//		AddRoute("pool", pool.NewHandler(app.poolKeeper)).
-		AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
+		//	AddRoute("pool", pool.NewHandler(app.poolKeeper)).
+		//  AddRoute("ibc", ibc.NewHandler(app.ibcMapper, app.bankKeeper)).
 		AddRoute("did", did.NewHandler(app.didKeeper)).
 		AddRoute("project", project.NewHandler(app.projectKeeper, app.feeKeeper, app.contractKeeper, app.bankKeeper, app.paramsKeeper, app.ethClient))
 	// initialize BaseApp
@@ -150,7 +150,7 @@ func MakeCodec() *wire.Codec {
 	wire.RegisterCrypto(cdc)
 	sdk.RegisterWire(cdc)
 	bank.RegisterWire(cdc)
-	ibc.RegisterWire(cdc)
+	// ibc.RegisterWire(cdc)
 	auth.RegisterWire(cdc)
 	did.RegisterWire(cdc)
 	project.RegisterWire(cdc)
