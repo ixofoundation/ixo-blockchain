@@ -130,8 +130,12 @@ func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, 
 func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did, sendingAddress InternalAccountID, receivingAddress InternalAccountID) (sdk.Tags, sdk.Error) {
 	feesToPay := getIxoAmount(ctx, k, bk, projectDid, sendingAddress)
 
-	if feesToPay <= 0 {
-		return nil, sdk.ErrInternal("Zero fees to pay")
+	if feesToPay < 0 {
+		return nil, sdk.ErrInternal("Negative fee to pay")
+	}
+
+	if feesToPay == 0 {
+		return nil, nil
 	}
 
 	receivingAccount := getAccountInProjectAccounts(ctx, k, projectDid, receivingAddress)
@@ -216,7 +220,7 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 		// Get percentage of the Evaluator Pay fees that goes to the node
 		nodeFeePercentage := fk.GetRat(ctx, fees.KeyEvaluationPayNodeFeePercentage)
 
-		totalEvaluatorPayAmount := sdk.NewRat(projectDoc.GetEvaluatorPay(), 1) // This is in IXO * 10^8
+		totalEvaluatorPayAmount := sdk.NewRat(projectDoc.GetEvaluatorPay(), 1).Mul(ixo.IxoDecimals) // This is in IXO * 10^8
 		// Calculate the fee due
 		evaluatorPayFeeAmount := totalEvaluatorPayAmount.Mul(feePercentage).RoundInt64()
 		// Calculate what the evaluator gets less the fees
