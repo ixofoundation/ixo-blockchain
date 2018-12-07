@@ -28,7 +28,7 @@ import (
 
 const ETH_URL = "ETH_URL"
 
-var FUNDING_METHOD_HASH = GetKeccak("transfer(address,uint256)")[0:8]
+var FUNDING_METHOD_HASH = strings.ToLower(GetKeccak("transfer(address,uint256)")[0:8])
 
 type EthTransaction struct {
 	Jsonrpc string `json:"jsonrpc"`
@@ -116,13 +116,13 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 	ixoTokenContractAddress := c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
 
 	// Check To is the ERC20 Token
-	if tx.Result.To != ixoTokenContractAddress {
+	if strings.ToLower(tx.Result.To) != strings.ToLower(ixoTokenContractAddress) {
 		ctx.Logger().Error("Token contract mismatch. Got " + tx.Result.To + " should be " + ixoTokenContractAddress)
 		return false
 	}
 
 	// Check it is the transfer method
-	if getMethodHashFromInput(tx.Result.Input) != FUNDING_METHOD_HASH {
+	if strings.ToLower(getMethodHashFromInput(tx.Result.Input)) != FUNDING_METHOD_HASH {
 		ctx.Logger().Error("Method hash mismatch. Got " + getMethodHashFromInput(tx.Result.Input) + " should be " + FUNDING_METHOD_HASH)
 		return false
 	}
@@ -136,7 +136,7 @@ func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTr
 
 	// Check the project wallet on the registry matches the wallet in the transaction
 	txProjWallet := common.HexToAddress(getParamFromInput(tx.Result.Input, 1)).String()
-	if txProjWallet != registryProjWallet {
+	if strings.ToLower(txProjWallet) != strings.ToLower(registryProjWallet) {
 		ctx.Logger().Error("Project Wallet mismatch. Got " + txProjWallet + " should be " + registryProjWallet)
 		return false
 	}
