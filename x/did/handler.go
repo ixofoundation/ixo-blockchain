@@ -24,6 +24,11 @@ func NewHandler(k Keeper) sdk.Handler {
 
 func handleAddDidDocMsg(ctx sdk.Context, k Keeper, msg AddDidMsg) sdk.Result {
 	newDidDoc := msg.DidDoc
+
+	if len(newDidDoc.Credentials) > 0 {
+		return sdk.ErrUnknownRequest("Cannot add a new DID with existing Credentials").Result()
+	}
+
 	didDoc, err := k.AddDidDoc(ctx, newDidDoc)
 	if err != nil {
 		return err.Result()
