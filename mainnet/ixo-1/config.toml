@@ -90,7 +90,7 @@ external_address = ""
 seeds = ""
 
 # Comma separated list of nodes to keep persistent connections to
-persistent_peers = ""
+persistent_peers = "1d0762f56c967a6b47e8c57c5dad15572857cb3f@blockchain_sydney_mainnet.ixo.world:46656,949d682084ba65a5fef50ff918192a5340fe1e2b@blockchain_singapore_mainnet.ixo.world:46656,979eeb57eb20cf884743e9fcb98bc0bb88783c00@blockchain_paris_mainnet.ixo.world:46656,296662d7e8786c9d595ed3a358bf07085c544160@blockchain_ohio_mainnet.ixo.world:46656,c7eb36ac091d865ac2362d6f79a84939ac89c735@blockchain_mumbai_mainnet.ixo.world:46656,33f56872b5a03edfd75eaa1f39945da173cb5bbb@blockchain_california_mainnet.ixo.world:46656,9c2e89ad0bdb1e777d73942275de83c7db064b96@blockchain_brazil_mainnet.ixo.world:46656"
 
 # UPNP port forwarding
 upnp = false
