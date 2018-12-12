@@ -1,6 +1,6 @@
 {
 	"genesis_time": "2018-12-04T11:07:11.577695161Z",
-	"chain_id": "test-chain-26p3Oj",
+	"chain_id": "main-chain-ixo",
 	"consensus_params": {
 	  "block_size_params": {
 		"max_bytes": "22020096",
@@ -186,8 +186,7 @@
 		}
 	  ],
 	  "config": {
-		"foundationWallet": "0x7b880d79cFC454e45ee055258be4da4B9B4f67d7",
-		
+		"foundationWallet": "0x7CE50f2D836906a5b04B7Ca6414C38E58fe7e9a6",
 		"authContractAddress": "0x47039367fcf7a5b93ce839743367ff3a370dce88",
 		"ixoTokenContractAddress": "0x519D822F0832b8e8C8DfC594E718f8dfdAE74B47",
 		"projectRegistryContractAddress": "0x54580e28912c407c6645dab9d5c971d28e5d8090",
