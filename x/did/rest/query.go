@@ -18,10 +18,17 @@ const storeName = "did"
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *wire.Codec) {
 	r.HandleFunc(
 		"/did/{did}",
-		queryDidDocRequestHandler(cdc, did.GetDidDocDecoder(cdc))).Methods("GET")
+		queryDidDocRequestHandler(cdc, did.GetDidDocDecoder(cdc)),
+	).Methods("GET")
+
 	r.HandleFunc(
 		"/did",
 		queryAllDidsRequestHandler(cdc, did.GetDidDocDecoder(cdc)),
+	).Methods("GET")
+
+	r.HandleFunc(
+		"/allDidDocs",
+		queryAllDidDocsRequestHandler(cdc, did.GetDidDocDecoder(cdc)),
 	).Methods("GET")
 }
 
@@ -101,6 +108,67 @@ func queryAllDidsRequestHandler(cdc *wire.Codec, decoder did.DidDocDecoder) http
 
 		// print out whole didDoc
 		output, err := json.MarshalIndent(dids, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
+			return
+		}
+
+		w.Write(output)
+	}
+
+}
+
+func queryAllDidDocsRequestHandler(cdc *wire.Codec, decoder did.DidDocDecoder) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.NewCLIContext().
+			WithCodec(cdc).
+			WithLogger(os.Stdout)
+
+		allKey := "ALL"
+
+		res, err := ctx.QueryStore([]byte(allKey), storeName)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
+			return
+		}
+
+		// the query will return empty if there is no data for this did
+		if len(res) == 0 {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		// decode the value
+		dids := []ixo.Did{}
+		err = cdc.UnmarshalBinary(res, &dids)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
+			return
+		}
+
+		didDocs := make([]ixo.DidDoc, len(dids))
+
+		for i, did := range dids {
+			res, err := ctx.QueryStore([]byte(did), storeName)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
+				return
+			}
+			didDoc, err := decoder(res)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
+				return
+			}
+			didDocs[i] = didDoc
+		}
+
+		// print out whole didDoc
+		output, err := json.MarshalIndent(didDocs, "", "  ")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(fmt.Sprintf("Could't marshall query result. Error: %s", err.Error())))
