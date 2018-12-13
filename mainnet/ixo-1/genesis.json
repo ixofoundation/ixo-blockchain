@@ -1,0 +1,196 @@
+{
+	"genesis_time": "2018-12-04T11:07:11.577695161Z",
+	"chain_id": "main-chain-ixo",
+	"consensus_params": {
+	  "block_size_params": {
+		"max_bytes": "22020096",
+		"max_txs": "10000",
+		"max_gas": "-1"
+	  },
+	  "tx_size_params": {
+		"max_bytes": "10240",
+		"max_gas": "-1"
+	  },
+	  "block_gossip_params": {
+		"block_part_size_bytes": "65536"
+	  },
+	  "evidence_params": {
+		"max_age": "100000"
+	  }
+	},
+	"validators": [
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "D8vlYGFuDpEJ8+WAh6KjB0Ps8Ymz1xfyqvnF4NESzSI="
+		},
+		"power": "10",
+		"name": "did:ixo:GadDajASmHWyragB85ruNA"
+	  },
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "g0ckPO8jRkPfphDXJkKXwMsluM+ELKVhr2/Ew+AGF5A="
+		},
+		"power": "10",
+		"name": "did:ixo:Ufqvv8pYN5jVM8xWMufsjH"
+	  },
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "qN3rzHnssajE6cMbXSAKdo+7uh1GiyRkXAOxi1Y07eU="
+		},
+		"power": "10",
+		"name": "did:ixo:P1BVa2nBCVfywVRKLXmcKA"
+	  },
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "iUTkD72/3F/bwLVCkDstrZYgYN/zp8z7da4uROAZNFQ="
+		},
+		"power": "10",
+		"name": "did:ixo:CnUyN9PPwPhSJbveq4dDWg"
+	  },
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "YGM2ZtOYu9RYnUJ7RxvoRhsBz8zokmsJjaN79vO9Ino="
+		},
+		"power": "10",
+		"name": "did:ixo:JPWHTRSqSffPT6mhCtz8S3"
+	  },
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "NDj2UsZ7WqYqO3aM+eRx/1gz8RoggMlj/181c/KHK84="
+		},
+		"power": "10",
+		"name": "did:ixo:EyLzv6nLAubgVwXfu3XiXn"
+	  },
+	  {
+		"pub_key": {
+		  "type": "tendermint/PubKeyEd25519",
+		  "value": "fVONrVH+V1NzAqLHtfDGQmzf8KV/MulG1Of1U0rKy7w="
+		},
+		"power": "10",
+		"name": "did:ixo:9zKieMH7xHKupDEqmudaib"
+	  }
+	],
+	"app_hash": "",
+	"app_state": {
+	  "accounts": [
+		{
+		  "address": "cosmosaccaddr1dadjh8fkcduujhg4pyq5a3d25drhq2xrwm4u4m",
+		  "coins": [
+			{
+			  "denom": "IXO",
+			  "amount": "0"
+			}
+		  ]
+		},
+		{
+			"address": "cosmosaccaddr1lpa35c8j23keapthqcw0svse948xsqllrar28l",
+			"coins": [
+			  {
+				"denom": "IXO",
+				"amount": "0"
+			  }
+			]
+		},
+		{
+			"address": "cosmosaccaddr1ymktxwk20dvh5vkxaet98edvcvckt3x5tgp4pq",
+			"coins": [
+			  {
+				"denom": "IXO",
+				"amount": "0"
+			  }
+			]
+		},
+		{
+			"address": "cosmosaccaddr1y5myw6gn6ltv2k90yjd4jjdpwlatfg957k79x3",
+			"coins": [
+			  {
+				"denom": "IXO",
+				"amount": "0"
+			  }
+			]
+		},
+		{
+			"address": "cosmosaccaddr1mhqlxmnspdu58sy8z6p2npcq7r4930tjvschgj",
+			"coins": [
+			  {
+				"denom": "IXO",
+				"amount": "0"
+			  }
+			]
+		},
+		{
+			"address": "cosmosaccaddr1cvkf0zm7z8jhjqmqwck0ulfgqqtkgk2x6lklqq",
+			"coins": [
+			  {
+				"denom": "IXO",
+				"amount": "0"
+			  }
+			]
+		},
+		{
+			"address": "cosmosaccaddr1amrzdzueyprp2yyzukql5s8pwlqxm0a24pg5tt",
+			"coins": [
+			  {
+				"denom": "IXO",
+				"amount": "0"
+			  }
+			]
+		}		  
+	  ],
+	  "fees": {
+		"ixoFactor": "1",
+		"initiationFeeAmount": "50000000000",
+		"initiationNodeFeePercentage": "0",
+		"claimFeeAmount": "60000000",
+		"evaluationFeeAmount": "40000000",
+		"serviceAgentRegistrationFeeAmount": "0",
+		"evaluationAgentRegistrationFeeAmount": "0",
+		"nodeFeePercentage": "1/2",
+		"evaluationPayFeePercentage": "0",
+		"evaluationPayNodeFeePercentage": "0"
+	  },
+	  "nodes": [
+		{
+		  "did": "did:ixo:GadDajASmHWyragB85ruNA",
+		  "ethWallet": "0x0750EBf6D90194DFF331605f582c616E35763074"
+		},
+		{
+			"did": "did:ixo:Ufqvv8pYN5jVM8xWMufsjH",
+			"ethWallet": "0xF5252A6876ee3AF09174F969218102B0e3fb28Ee"
+		},
+		{
+			"did": "did:ixo:P1BVa2nBCVfywVRKLXmcKA",
+			"ethWallet": "0xa03Ee9A73E62Bf8b5947E2Ab6bC26D4e1Eda8134"
+		},
+		{
+			"did": "did:ixo:CnUyN9PPwPhSJbveq4dDWg",
+			"ethWallet": "0xB3b180f0Bb43c3999820E8F1553f93986C1DF6F6"
+		},
+		{
+			"did": "did:ixo:JPWHTRSqSffPT6mhCtz8S3",
+			"ethWallet": "0x24799CA1dA22c5903896AF6d2D74D0E8550A0d22"
+		},
+		{
+			"did": "did:ixo:EyLzv6nLAubgVwXfu3XiXn",
+			"ethWallet": "0x6a317B0F25CBc2B01fD3cef3E8Bf129D7E842e8a"
+		},
+		{
+			"did": "did:ixo:9zKieMH7xHKupDEqmudaib",
+			"ethWallet": "0x738F91E6cddEE730b7F3cb5dc5454b6f38b2F2D2"
+		}
+	  ],
+	  "config": {
+		"foundationWallet": "0x7CE50f2D836906a5b04B7Ca6414C38E58fe7e9a6",
+		"authContractAddress": "0x47039367fcf7a5b93ce839743367ff3a370dce88",
+		"ixoTokenContractAddress": "0x519D822F0832b8e8C8DfC594E718f8dfdAE74B47",
+		"projectRegistryContractAddress": "0x54580e28912c407c6645dab9d5c971d28e5d8090",
+		"projectWalletAuthoriserAddress": "0x3649a11cb4e61da1340ee7fa09c3120b5d2e0731"
+	  }
+	}
+}
