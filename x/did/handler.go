@@ -1,20 +1,18 @@
 package did
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	
+	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
+	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
 )
 
-const didPrefix = "did:sov:"
-
-func NewHandler(k Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case AddDidMsg:
+		case types.AddDidMsg:
 			return handleAddDidDocMsg(ctx, k, msg)
-		case AddCredentialMsg:
+		case types.AddCredentialMsg:
 			return handleAddCredentialMsg(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
@@ -22,42 +20,30 @@ func NewHandler(k Keeper) sdk.Handler {
 	}
 }
 
-func handleAddDidDocMsg(ctx sdk.Context, k Keeper, msg AddDidMsg) sdk.Result {
+func handleAddDidDocMsg(ctx sdk.Context, k keeper.Keeper, msg types.AddDidMsg) sdk.Result {
 	newDidDoc := msg.DidDoc
-
+	
 	if len(newDidDoc.Credentials) > 0 {
 		return sdk.ErrUnknownRequest("Cannot add a new DID with existing Credentials").Result()
 	}
-
-	didDoc, err := k.AddDidDoc(ctx, newDidDoc)
+	
+	err := k.SetDidDoc(ctx, newDidDoc)
 	if err != nil {
 		return err.Result()
 	}
-
+	
 	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: k.encodeDid(didDoc),
+		Code: sdk.CodeOK,
 	}
 }
 
-func handleAddCredentialMsg(ctx sdk.Context, k Keeper, msg AddCredentialMsg) sdk.Result {
-	didDoc, err := k.AddCredential(ctx, msg.DidCredential.Claim.Id, msg.DidCredential)
+func handleAddCredentialMsg(ctx sdk.Context, k keeper.Keeper, msg types.AddCredentialMsg) sdk.Result {
+	err := k.AddCredentials(ctx, msg.DidCredential.Claim.Id, msg.DidCredential)
 	if err != nil {
 		return err.Result()
 	}
-
+	
 	return sdk.Result{
-		Code: sdk.ABCICodeOK,
-		Data: k.encodeDid(didDoc),
-	}
-}
-
-func PrefixDid(did ixo.Did) ixo.Did {
-	didString := string(did)
-	if strings.HasPrefix(didString, didPrefix) {
-		return did
-	} else {
-		newDid := didPrefix + didString
-		return ixo.Did(newDid)
+		Code: sdk.CodeOK,
 	}
 }
