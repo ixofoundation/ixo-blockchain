@@ -1,9 +1,7 @@
 package node
 
-// KeyNodeID The node id on the network
 const KeyNodeID = "nodeId"
 
-// KeyEthWallet The ethereum wallet address for the node
 const KeyEthWallet = "ethWallet"
 
 var AllNodes = []string{
@@ -11,8 +9,11 @@ var AllNodes = []string{
 	KeyEthWallet,
 }
 
-// GenesisState of the node
-type GenesisState struct {
+type ETHGenesisState struct {
 	Did       string `json:"did"`
 	EthWallet string `json:"ethWallet"`
+}
+
+type GenesisState struct {
+	ETHGenesisStates []ETHGenesisState
 }

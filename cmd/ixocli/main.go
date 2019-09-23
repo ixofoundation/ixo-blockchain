@@ -2,107 +2,135 @@ package main
 
 import (
 	"os"
-
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
-
-	"github.com/spf13/cobra"
-
-	"github.com/tendermint/tmlibs/cli"
-
+	"path"
+	
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/lcd"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	ibccmd "github.com/cosmos/cosmos-sdk/x/ibc/client/cli"
-
+	authCli "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	bankCli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/tendermint/go-amino"
+	"github.com/tendermint/tmlibs/cli"
+	
 	"github.com/ixofoundation/ixo-cosmos/app"
-	"github.com/ixofoundation/ixo-cosmos/types"
-
-	didcmd "github.com/ixofoundation/ixo-cosmos/x/did/cmd"
-	ixolcd "github.com/ixofoundation/ixo-cosmos/x/ixo/lcd"
-	projectcmd "github.com/ixofoundation/ixo-cosmos/x/project/cmd"
-)
-
-// rootCmd is the entry point for this binary
-var (
-	rootCmd = &cobra.Command{
-		Use:   "ixocli",
-		Short: "Ixo light-client",
-	}
+	ixoClient "github.com/ixofoundation/ixo-cosmos/client"
 )
 
 func main() {
-	// disable sorting
-	cobra.EnableCommandSorting = false
-
-	// get the codec
 	cdc := app.MakeCodec()
-
-	// TODO: setup keybase, viper object, etc. to be passed into
-	// the below functions and eliminate global vars, like we do
-	// with the cdc
-	// add standard rpc, and tx commands
-	rpc.AddCommands(rootCmd)
-	rootCmd.AddCommand(client.LineBreak)
-	tx.AddCommands(rootCmd, cdc)
-	rootCmd.AddCommand(client.LineBreak)
-
-	// add query/post commands (custom to binary)
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
+	config.Seal()
+	
+	rootCmd := &cobra.Command{
+		Use:   "ixocli",
+		Short: "ixo Light-Client",
+	}
+	
+	rootCmd.PersistentFlags().String(client.FlagChainID, "", "Chain ID of tendermint node")
+	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
+		return initConfig(rootCmd)
+	}
+	
 	rootCmd.AddCommand(
-		client.GetCommands(
-			authcmd.GetAccountCmd("main", cdc, types.GetAccountDecoder(cdc)),
-		)...)
-	rootCmd.AddCommand(
-		client.PostCommands(
-			bankcmd.SendTxCmd(cdc),
-		)...)
-	rootCmd.AddCommand(
-		client.PostCommands(
-			ibccmd.IBCTransferCmd(cdc),
-		)...)
-	rootCmd.AddCommand(
-		client.PostCommands(
-			ibccmd.IBCRelayCmd(cdc),
-		)...)
-	rootCmd.AddCommand(
-		client.PostCommands()...)
-
-	// and now ixo specific commands
-	rootCmd.AddCommand(
-		client.PostCommands(
-			didcmd.AddDidDocCmd(cdc),
-			didcmd.GetDidDocCmd("did", cdc, did.GetDidDocDecoder(cdc)),
-			didcmd.AddCredentialCmd("did", cdc, did.GetDidDocDecoder(cdc)),
-			client.LineBreak,
-		)...)
-
-	rootCmd.AddCommand(
-		client.PostCommands(
-			projectcmd.CreateProjectCmd(cdc),
-			projectcmd.GetProjectDocCmd("project", cdc, project.GetProjectDocDecoder(cdc)),
-			projectcmd.UpdateProjectStatusCmd(cdc),
-			projectcmd.GetProjectAccountsCmd("project", cdc),
-			projectcmd.CreateAgentCmd(cdc),
-			projectcmd.UpdateAgentCmd(cdc),
-			projectcmd.CreateClaimCmd(cdc),
-			projectcmd.CreateEvaluationCmd(cdc),
-		)...)
-
-	// add proxy, version and key info
-	rootCmd.AddCommand(
+		rpc.StatusCommand(),
+		client.ConfigCmd(app.DefaultCLIHome),
+		queryCmd(cdc),
+		txCmd(cdc),
+		version.Cmd,
 		client.LineBreak,
-		ixolcd.ServeCommand(cdc),
+		lcd.ServeCommand(cdc, registerRoutes),
+		client.LineBreak,
 		keys.Commands(),
 		client.LineBreak,
-		version.VersionCmd,
 	)
+	
+	executor := cli.PrepareMainCmd(rootCmd, "NS", app.DefaultCLIHome)
+	err := executor.Execute()
+	if err != nil {
+		panic(err)
+	}
+}
 
-	// prepare and add flags
-	executor := cli.PrepareMainCmd(rootCmd, "BC", os.ExpandEnv("$HOME/.ixo-node"))
-	executor.Execute()
+func queryCmd(cdc *amino.Codec) *cobra.Command {
+	queryCmd := &cobra.Command{
+		Use:     "query",
+		Aliases: []string{"q"},
+		Short:   "Querying subcommands",
+	}
+	
+	queryCmd.AddCommand(
+		authCli.GetAccountCmd(cdc),
+		client.LineBreak,
+		rpc.ValidatorCommand(cdc),
+		rpc.BlockCommand(),
+		authCli.QueryTxsByEventsCmd(cdc),
+		ixoClient.QueryTxCmd(cdc),
+		client.LineBreak,
+	)
+	
+	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
+	
+	return queryCmd
+}
+
+func txCmd(cdc *amino.Codec) *cobra.Command {
+	txCmd := &cobra.Command{
+		Use:   "tx",
+		Short: "Transactions subcommands",
+	}
+	
+	txCmd.AddCommand(
+		bankCli.SendTxCmd(cdc),
+		client.LineBreak,
+		authCli.GetSignCommand(cdc),
+		authCli.GetMultiSignCommand(cdc),
+		client.LineBreak,
+		authCli.GetBroadcastCommand(cdc),
+		authCli.GetEncodeCommand(cdc),
+		client.LineBreak,
+	)
+	
+	app.ModuleBasics.AddTxCommands(txCmd, cdc)
+	
+	return txCmd
+}
+
+func initConfig(cmd *cobra.Command) error {
+	home, err := cmd.PersistentFlags().GetString(cli.HomeFlag)
+	if err != nil {
+		return err
+	}
+	
+	cfgFile := path.Join(home, "config", "config.toml")
+	if _, err := os.Stat(cfgFile); err == nil {
+		viper.SetConfigFile(cfgFile)
+		
+		if err := viper.ReadInConfig(); err != nil {
+			return err
+		}
+	}
+	
+	if err := viper.BindPFlag(client.FlagChainID, cmd.PersistentFlags().Lookup(client.FlagChainID)); err != nil {
+		return err
+	}
+	
+	if err := viper.BindPFlag(cli.EncodingFlag, cmd.PersistentFlags().Lookup(cli.EncodingFlag)); err != nil {
+		return err
+	}
+	
+	return viper.BindPFlag(cli.OutputFlag, cmd.PersistentFlags().Lookup(cli.OutputFlag))
+}
+
+func registerRoutes(rs *lcd.RestServer) {
+	client.RegisterRoutes(rs.CliCtx, rs.Mux)
+	ixoClient.RegisterQueryTxRoutes(rs.CliCtx, rs.Mux)
+	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }
