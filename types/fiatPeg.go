@@ -24,7 +24,7 @@ type FiatPeg interface {
 	GetTransactionAmount() int64
 	SetTransactionAmount(int64) error
 
-	GetRedeemedAmount(sdk.AccAddress) int64
+	GetRedeemedAmount() int64
 	SetRedeemedAmount(int64)
 
 	GetOwners() []Owner
@@ -77,14 +77,13 @@ func (baseFiatPeg *BaseFiatPeg) SetTransactionAmount(transactionAmount int64) er
 }
 
 // GetRedeemedAmount : getter
-func (baseFiatPeg BaseFiatPeg) GetRedeemedAmount(ownerAddress sdk.AccAddress) int64 {
+func (baseFiatPeg BaseFiatPeg) GetRedeemedAmount() int64 {
 	return baseFiatPeg.RedeemedAmount
 }
 
 // SetRedeemedAmount : setter
-func (baseFiatPeg *BaseFiatPeg) SetRedeemedAmount(ownerAddress sdk.AccAddress, redeemedAmount int64) error {
+func (baseFiatPeg *BaseFiatPeg) SetRedeemedAmount(redeemedAmount int64) {
 	baseFiatPeg.RedeemedAmount = redeemedAmount
-	return nil
 }
 
 // GetOwners : getter
@@ -129,4 +128,22 @@ func NewBaseFiatPegWithPegHash(pegHash PegHash) BaseFiatPeg {
 	return BaseFiatPeg{
 		PegHash: pegHash,
 	}
+}
+
+// GetAssetPegHashHex : convert string to hex peg hash
+func GetPegHashHex(pegHashStr string) (pegHash PegHash, err error) {
+	bz, err := hex.DecodeString(pegHashStr)
+	if err != nil {
+		return nil, err
+	}
+	return PegHash(bz), nil
+}
+
+// GetPegHashHex : convert PegHash string to PegHash hex
+func GetPegHashFromString(pegHashStr string) (pegHash PegHash, err error) {
+	bz, err := hex.DecodeString(pegHashStr)
+	if err != nil {
+		return nil, err
+	}
+	return PegHash(bz), nil
 }
