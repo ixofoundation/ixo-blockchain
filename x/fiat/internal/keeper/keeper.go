@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strconv"
 
 	"github.com/ixofoundation/ixo-cosmos/codec"
 	"github.com/ixofoundation/ixo-cosmos/types"
@@ -68,7 +69,33 @@ func (k Keeper) GetFiatAccounts(ctx sdk.Context) (fiatAccounts []types.FiatAccou
 	return
 }
 
+// GetNextFiatPegHash : Returns and increments the fiatPeg counter
+func (k Keeper) getNextFiatPegHash(ctx sdk.Context) int {
+	var fiatNumber int
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(fiatTypes.FiatPegHashKey)
+	if bz == nil {
+		fiatNumber = 0
+	} else {
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fiatNumber)
+	}
+
+	bz = k.cdc.MustMarshalBinaryLengthPrefixed(fiatNumber + 1)
+	store.Set(fiatTypes.FiatPegHashKey, bz)
+
+	return fiatNumber
+}
+
 func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.Error {
+	fiatAccount, err := k.GetFiatAccount(ctx, issueFiat.ToAddress)
+	if err != nil {
+		fiatAccount = types.NewFiatAccountWithAddress(issueFiat.ToAddress)
+	}
+	pegHash, _ := types.GetFiatPegHashHex(strconv.Itoa(k.getNextFiatPegHash(ctx)))
+	fiatPeg := types.NewFiatPegWithPegHash(pegHash)
+	oldFiatPegWallet := fiatAccount.GetFiatPegWallet()
+	fiatAccount.SetFiatPegWallet(append(oldFiatPegWallet, fiatPeg))
+	k.SetFiatAccount(ctx, fiatAccount)
 	return nil
 }
 

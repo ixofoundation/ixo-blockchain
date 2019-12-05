@@ -121,8 +121,8 @@ func GetFiatPegHashHex(pegHashStr string) (pegHash PegHash, err error) {
 }
 
 // NewBaseFiatPegWithPegHash a base fiat peg with peg hash
-func NewBaseFiatPegWithPegHash(pegHash PegHash) BaseFiatPeg {
-	return BaseFiatPeg{
+func NewFiatPegWithPegHash(pegHash PegHash) FiatPeg {
+	return &BaseFiatPeg{
 		PegHash: pegHash,
 	}
 }
@@ -162,8 +162,8 @@ func (baseFiatAccount *BaseFiatAccount) SetFiatPegWallet(fiatPegWallet []FiatPeg
 	baseFiatAccount.FiatPegWallet = fiatPegWallet
 }
 
-func NewBaseFiatAccountWithAddress(address sdk.AccAddress) BaseFiatAccount {
-	return BaseFiatAccount{
+func NewFiatAccountWithAddress(address sdk.AccAddress) FiatAccount {
+	return &BaseFiatAccount{
 		Address: address,
 	}
 }
