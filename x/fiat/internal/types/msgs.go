@@ -12,26 +12,29 @@ import (
 
 // IssueFiat - transaction input
 type IssueFiat struct {
-	IssuerAddress sdk.AccAddress `json:"issuerAddress"`
-	ToAddress     sdk.AccAddress `json:"toAddress"`
-	FiatPeg       types.FiatPeg  `json:"fiatPeg"`
+	IssuerAddress     sdk.AccAddress `json:"issuerAddress"`
+	ToAddress         sdk.AccAddress `json:"toAddress"`
+	TransactionID     string         `json:"transactionID" valid:"required~TxID is mandatory,matches(^[A-Z0-9]+$)~Invalid TransactionId,length(2|40)~TransactionId length between 2-40"`
+	TransactionAmount int            `json:"transactionAmount" valid:"required~TransactionAmount is mandatory,matches(^[1-9]{1}[0-9]*$)~Invalid TransactionAmount"`
 }
 
 // NewIssueFiat : initializer
-func NewIssueFiat(issuerAddress sdk.AccAddress, toAddress sdk.AccAddress, fiatPeg types.FiatPeg) IssueFiat {
-	return IssueFiat{issuerAddress, toAddress, fiatPeg}
+func NewIssueFiat(issuerAddress sdk.AccAddress, toAddress sdk.AccAddress, transactionID string, transactionAmount int) IssueFiat {
+	return IssueFiat{issuerAddress, toAddress, transactionID, transactionAmount}
 }
 
 // GetSignBytes : get bytes to sign
 func (in IssueFiat) GetSignBytes() []byte {
 	bin, err := ModuleCdc.MarshalJSON(struct {
-		IssuerAddress string        `json:"issuerAddress"`
-		ToAddress     string        `json:"toAddress"`
-		FiatPeg       types.FiatPeg `json:"fiatPeg"`
+		IssuerAddress     string `json:"issuerAddress"`
+		ToAddress         string `json:"toAddress"`
+		TransactionID     string `json:"transactionID"`
+		TransactionAmount string `json:"transactionAmount"`
 	}{
-		IssuerAddress: in.IssuerAddress.String(),
-		ToAddress:     in.ToAddress.String(),
-		FiatPeg:       in.FiatPeg,
+		IssuerAddress:     in.IssuerAddress.String(),
+		ToAddress:         in.ToAddress.String(),
+		TransactionID:     in.TransactionID,
+		TransactionAmount: string(in.TransactionAmount),
 	})
 	if err != nil {
 		panic(err)
@@ -44,9 +47,9 @@ func (in IssueFiat) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress(in.IssuerAddress.String())
 	} else if len(in.ToAddress) == 0 {
 		return sdk.ErrInvalidAddress(in.ToAddress.String())
-	} else if in.FiatPeg.GetTransactionAmount() < 0 {
+	} else if in.TransactionAmount < 0 {
 		return ErrNegativeAmount(DefaultCodeSpace, "Transaction amount should be grater than 0.")
-	} else if in.FiatPeg.GetTransactionID() == "" {
+	} else if in.TransactionID == "" {
 		return sdk.ErrUnknownRequest("Transaction should not be empty")
 	}
 	return nil

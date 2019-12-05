@@ -20,61 +20,62 @@ func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
 	}
 }
 
-// SetFiatPeg:
-func (k Keeper) SetFiatPeg(ctx sdk.Context, fiatPeg types.FiatPeg) {
+// SetFiatAccount:
+func (k Keeper) SetFiatAccount(ctx sdk.Context, fiatAccount types.FiatAccount) {
 	store := ctx.KVStore(k.storeKey)
 
-	fiatPegHash := fiatTypes.FiatPegHashStoreKey(fiatPeg.GetPegHash())
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fiatPeg)
-	store.Set(fiatPegHash, bz)
+	fiatAccountKey := fiatTypes.FiatAccountStoreKey(fiatAccount.GetAddress())
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(fiatAccount)
+	store.Set(fiatAccountKey, bz)
 }
 
-// returns fiatPeg by pegHash
-func (k Keeper) GetFiatPeg(ctx sdk.Context, pegHash types.PegHash) (fiatPeg types.FiatPeg, err sdk.Error) {
+// returns fiat account by address
+func (k Keeper) GetFiatAccount(ctx sdk.Context, address sdk.AccAddress) (fiatAccount types.FiatAccount, err sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 
-	fiatPegKey := fiatTypes.FiatPegHashStoreKey(pegHash)
-	bz := store.Get(fiatPegKey)
+	fiatAccountKey := fiatTypes.FiatAccountStoreKey(address)
+	bz := store.Get(fiatAccountKey)
 	if bz == nil {
 		return nil, fiatTypes.ErrInvalidPegHash(fiatTypes.DefaultCodeSpace)
 	}
 
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fiatPeg)
-	return fiatPeg, nil
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fiatAccount)
+	return fiatAccount, nil
 }
 
-// get all fiatPegs => []FiatPeg from store
-func (k Keeper) GetFiatPegs(ctx sdk.Context) (fiatPegs []types.FiatPeg) {
-	k.IterateFiatPegs(ctx, func(fiatPeg types.FiatPeg) (stop bool) {
-		fiatPegs = append(fiatPegs, fiatPeg)
+func (k Keeper) IterateFiatAccounts(ctx sdk.Context, handler func(fiatAccount types.FiatAccount) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+
+	iterator := sdk.KVStorePrefixIterator(store, fiatTypes.FiatAccountKey)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var fiatAccount types.FiatAccount
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &fiatAccount)
+		if handler(fiatAccount) {
+			break
+		}
+	}
+}
+
+// get all fiat accounts => []FiatAccounts from store
+func (k Keeper) GetFiatAccounts(ctx sdk.Context) (fiatAccounts []types.FiatAccount) {
+	k.IterateFiatAccounts(ctx, func(fiatAccount types.FiatAccount) (stop bool) {
+		fiatAccounts = append(fiatAccounts, fiatAccount)
 		return false
 	},
 	)
 	return
 }
 
-func (k Keeper) IterateFiatPegs(ctx sdk.Context, handler func(fiatPeg types.FiatPeg) (stop bool)) {
-	store := ctx.KVStore(k.storeKey)
-
-	iterator := sdk.KVStorePrefixIterator(store, fiatTypes.PegHashKey)
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var fiatPeg types.FiatPeg
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &fiatPeg)
-		if handler(fiatPeg) {
-			break
-		}
-	}
+func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.Error {
+	return nil
 }
 
-func (k Keeper) GetFiatPegDetails(ctx sdk.Context, buyerAddress sdk.AccAddress, sellerAddress sdk.AccAddress,
-	hash types.PegHash) (types.FiatPeg, sdk.Error) {
+func (k Keeper) RedeemFiats(ctx sdk.Context, redeemFiat fiatTypes.RedeemFiat) sdk.Error {
+	return nil
+}
 
-	pegHash := types.PegHash(append(append(buyerAddress.Bytes(), sellerAddress.Bytes()...), hash.Bytes()...))
-	_fiatPeg, err := k.GetFiatPeg(ctx, pegHash)
-	if err != nil {
-		return nil, err
-	}
-	return _fiatPeg, nil
+func (k Keeper) SendFiats(ctx sdk.Context, sendFiat fiatTypes.SendFiat) sdk.Error {
+	return nil
 }

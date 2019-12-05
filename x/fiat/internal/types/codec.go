@@ -6,6 +6,8 @@ import (
 )
 
 func RegisterCodec(cdc *codec.Codec) {
+	cdc.RegisterInterface((*types.FiatAccount)(nil), nil)
+	cdc.RegisterConcrete(&types.BaseFiatAccount{}, "ixo-cosmos/FiatAccount", nil)
 	cdc.RegisterInterface((*types.FiatPeg)(nil), nil)
 	cdc.RegisterConcrete(&types.BaseFiatPeg{}, "ixo-cosmos/FiatPeg", nil)
 	cdc.RegisterConcrete(MsgIssueFiats{}, "ixo-cosmos/MsgIssueFiats", nil)

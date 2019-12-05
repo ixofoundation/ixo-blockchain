@@ -108,9 +108,6 @@ func (baseFiatPeg *BaseFiatPeg) SearchOwner(ownerAddress sdk.AccAddress) (Owner,
 	return owners[index], nil
 }
 
-// FiatPegDecoder : decoder function for fiat peg
-type FiatPegDecoder func(fiatPegBytes []byte) (FiatPeg, error)
-
 // GetFiatPegHashHex : convert string to hex peg hash
 func GetFiatPegHashHex(pegHashStr string) (pegHash PegHash, err error) {
 	if len(pegHashStr) == 0 {
@@ -130,20 +127,43 @@ func NewBaseFiatPegWithPegHash(pegHash PegHash) BaseFiatPeg {
 	}
 }
 
-// GetAssetPegHashHex : convert string to hex peg hash
-func GetPegHashHex(pegHashStr string) (pegHash PegHash, err error) {
-	bz, err := hex.DecodeString(pegHashStr)
-	if err != nil {
-		return nil, err
-	}
-	return PegHash(bz), nil
+type FiatAccount interface {
+	GetAddress() sdk.AccAddress
+	SetAddress(sdk.AccAddress)
+
+	GetFiatPegWallet() []FiatPeg
+	SetFiatPegWallet([]FiatPeg)
 }
 
-// GetPegHashHex : convert PegHash string to PegHash hex
-func GetPegHashFromString(pegHashStr string) (pegHash PegHash, err error) {
-	bz, err := hex.DecodeString(pegHashStr)
-	if err != nil {
-		return nil, err
+type BaseFiatAccount struct {
+	Address       sdk.AccAddress `json:"address"`
+	FiatPegWallet []FiatPeg      `json:"fiatPegWallet"`
+}
+
+var _ FiatAccount = (*BaseFiatAccount)(nil)
+
+// GetAddress : getter
+func (baseFiatAccount BaseFiatAccount) GetAddress() sdk.AccAddress {
+	return baseFiatAccount.Address
+}
+
+// SetAddress : setter
+func (baseFiatAccount *BaseFiatAccount) SetAddress(address sdk.AccAddress) {
+	baseFiatAccount.Address = address
+}
+
+// GetFiatPegWallet : getter
+func (baseFiatAccount BaseFiatAccount) GetFiatPegWallet() []FiatPeg {
+	return baseFiatAccount.FiatPegWallet
+}
+
+// SetFiatPegWallet : setter
+func (baseFiatAccount *BaseFiatAccount) SetFiatPegWallet(fiatPegWallet []FiatPeg) {
+	baseFiatAccount.FiatPegWallet = fiatPegWallet
+}
+
+func NewBaseFiatAccountWithAddress(address sdk.AccAddress) BaseFiatAccount {
+	return BaseFiatAccount{
+		Address: address,
 	}
-	return PegHash(bz), nil
 }

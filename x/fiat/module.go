@@ -75,7 +75,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	fiatQueryCmd.AddCommand(client.GetCommands(
-		cli.GetFiatPegCmd(cdc),
+		cli.GetFiatAccountCmd(cdc),
 	)...)
 
 	return fiatQueryCmd

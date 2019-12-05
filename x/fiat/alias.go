@@ -36,5 +36,7 @@ type (
 	MsgRedeemFiats = types.MsgRedeemFiats
 	MsgSendFiats   = types.MsgSendFiats
 
-	IssueFiat = types.IssueFiat
+	IssueFiat  = types.IssueFiat
+	RedeemFiat = types.RedeemFiat
+	SendFiat   = types.SendFiat
 )

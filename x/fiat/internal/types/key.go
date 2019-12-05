@@ -1,8 +1,6 @@
 package types
 
-import (
-	"github.com/ixofoundation/ixo-cosmos/types"
-)
+import sdk "github.com/cosmos/cosmos-sdk/types"
 
 const (
 	ModuleName   = "fiat"
@@ -12,9 +10,10 @@ const (
 )
 
 var (
-	PegHashKey = []byte{0x01}
+	FiatAccountKey = []byte{0x04}
+	FiatPegHashKey = []byte("fiatPegHash")
 )
 
-func FiatPegHashStoreKey(fiatPegHash types.PegHash) []byte {
-	return append(PegHashKey, fiatPegHash.Bytes()...)
+func FiatAccountStoreKey(address sdk.AccAddress) []byte {
+	return append(FiatAccountKey, address...)
 }

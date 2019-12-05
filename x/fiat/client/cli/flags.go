@@ -6,19 +6,19 @@ import (
 
 // noLint
 const (
-	FlagTo                 = "to"
-	FlagFrom               = "from"
-	FlagPegHash            = "pegHash"
+	FlagTo      = "to"
+	FlagFrom    = "from"
+	FlagAddress = "address"
 )
 
 var (
-	fsTo                 = flag.NewFlagSet("", flag.ContinueOnError)
-	fsPegHash            = flag.NewFlagSet("", flag.ContinueOnError)
-	fsFrom               = flag.NewFlagSet("", flag.ContinueOnError)
+	fsTo      = flag.NewFlagSet("", flag.ContinueOnError)
+	fsAddress = flag.NewFlagSet("", flag.ContinueOnError)
+	fsFrom    = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
 	fsTo.String(FlagTo, "", "Address to send coins")
-	fsPegHash.String(FlagPegHash, "", "Peg Hash to be negotiated ")
+	fsAddress.String(FlagAddress, "", "Address to query")
 	fsFrom.String(FlagFrom, "", "address of buyer account")
 }

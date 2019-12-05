@@ -5,7 +5,7 @@ import (
 )
 
 type GenesisState struct {
-	FiatPegWallet []types.FiatPeg `json:"fiatPegWallet"`
+	FiatAccount []types.FiatAccount `json:"fiatAccount"`
 }
 
 func DefaultGenesisState() GenesisState {

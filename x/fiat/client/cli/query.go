@@ -12,36 +12,38 @@ import (
 	fiatTypes "github.com/ixofoundation/ixo-cosmos/x/fiat/internal/types"
 )
 
-func GetFiatPegCmd(cdc *codec.Codec) *cobra.Command {
+func GetFiatAccountCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "[fiatPeg-id]",
-		Short: "Query fiatPeg details",
+		Use:   "fiatAccount",
+		Short: "Query fiat account details",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			cliCtx := context.NewCLIContext()
 
-			pegHash, err := types.GetPegHashFromString(args[0])
+			bech32addr := args[0]
+
+			addr, err := sdk.AccAddressFromBech32(bech32addr)
 			if err != nil {
 				return err
 			}
 
-			res, _, err := cliCtx.QueryStore(pegHash, fiatTypes.ModuleName)
+			res, _, err := cliCtx.QueryStore(addr.Bytes(), fiatTypes.ModuleName)
 			if err != nil {
 				return err
 			}
 
 			if res == nil {
-				return sdk.ErrUnknownAddress("No fiatPeg with pegHash " + args[0] +
+				return sdk.ErrUnknownAddress("No fiatAccount with address " + bech32addr +
 					" was found in the state.\nAre you sure there has been a transaction involving it?")
 			}
 
-			var _fiatPeg types.FiatPeg
-			err = cdc.UnmarshalBinaryBare(res, &_fiatPeg)
+			var fiatAccount types.FiatAccount
+			err = cdc.UnmarshalBinaryBare(res, &fiatAccount)
 			if err != nil {
 				return err
 			}
 
-			output, err := cdc.MarshalJSON(_fiatPeg)
+			output, err := cdc.MarshalJSON(fiatAccount)
 			if err != nil {
 				return err
 			}
@@ -51,6 +53,6 @@ func GetFiatPegCmd(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsPegHash)
+	cmd.Flags().AddFlagSet(fsAddress)
 	return cmd
 }
