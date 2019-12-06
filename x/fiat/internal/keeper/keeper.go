@@ -1,8 +1,10 @@
 package keeper
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"fmt"
 	"strconv"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-cosmos/codec"
 	"github.com/ixofoundation/ixo-cosmos/types"
@@ -82,8 +84,8 @@ func (k Keeper) getNextFiatPegHash(ctx sdk.Context) int {
 
 	bz = k.cdc.MustMarshalBinaryLengthPrefixed(fiatNumber + 1)
 	store.Set(fiatTypes.FiatPegHashKey, bz)
-
-	return fiatNumber
+	//TODO
+	return 11
 }
 
 func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.Error {
@@ -91,18 +93,64 @@ func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.E
 	if err != nil {
 		fiatAccount = types.NewFiatAccountWithAddress(issueFiat.ToAddress)
 	}
-	pegHash, _ := types.GetFiatPegHashHex(strconv.Itoa(k.getNextFiatPegHash(ctx)))
+	pegHash, err2 := types.GetFiatPegHashHex(strconv.Itoa(k.getNextFiatPegHash(ctx)))
+	if err2 != nil {
+		return sdk.ErrInternal(fmt.Sprintf("%s", err.Error()))
+	}
 	fiatPeg := types.NewFiatPegWithPegHash(pegHash)
+	fiatPeg.SetTransactionAmount(issueFiat.TransactionAmount)
+	fiatPeg.SetTransactionID(issueFiat.TransactionID)
 	oldFiatPegWallet := fiatAccount.GetFiatPegWallet()
-	fiatAccount.SetFiatPegWallet(append(oldFiatPegWallet, fiatPeg))
+	newFiatPegWallet := types.AddFiatPegToWallet(oldFiatPegWallet, []types.BaseFiatPeg{types.ToBaseFiatPeg(fiatPeg)})
+	fiatAccount.SetFiatPegWallet(newFiatPegWallet)
 	k.SetFiatAccount(ctx, fiatAccount)
 	return nil
 }
 
 func (k Keeper) RedeemFiats(ctx sdk.Context, redeemFiat fiatTypes.RedeemFiat) sdk.Error {
+	fiatAccount, err := k.GetFiatAccount(ctx, redeemFiat.RedeemerAddress)
+	if err != nil {
+		return err
+	}
+	emptiedFiatPegWallet, redeemerFiatPegWallet := types.RedeemAmountFromWallet(redeemFiat.Amount, fiatAccount.GetFiatPegWallet())
+	if len(redeemerFiatPegWallet) == 0 && len(emptiedFiatPegWallet) == 0 {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("Redeemed amount higher than the account balance"))
+	}
+	fiatAccount.SetFiatPegWallet(redeemerFiatPegWallet)
+	k.SetFiatAccount(ctx, fiatAccount)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		fiatTypes.EventTypeRedeemFiat,
+		sdk.NewAttribute("redeemer", redeemFiat.RedeemerAddress.String()),
+	))
 	return nil
 }
 
 func (k Keeper) SendFiats(ctx sdk.Context, sendFiat fiatTypes.SendFiat) sdk.Error {
+	fromFiatAccount, err := k.GetFiatAccount(ctx, sendFiat.FromAddress)
+	if err != nil {
+		return err
+	}
+	sentFiatPegWallet, oldFiatPegWallet := types.SubtractAmountFromWallet(sendFiat.Amount, fromFiatAccount.GetFiatPegWallet())
+	if len(sentFiatPegWallet) == 0 && len(oldFiatPegWallet) == 0 {
+		return sdk.ErrInsufficientCoins(fmt.Sprintf("Insufficient funds"))
+	}
+
+	toFiatAccount, err := k.GetFiatAccount(ctx, sendFiat.ToAddress)
+	if err != nil {
+		toFiatAccount = types.NewFiatAccountWithAddress(sendFiat.ToAddress)
+	}
+	toFiatAccount.SetFiatPegWallet(sentFiatPegWallet)
+	k.SetFiatAccount(ctx, toFiatAccount)
+
+	fromFiatAccount.SetFiatPegWallet(oldFiatPegWallet)
+	k.SetFiatAccount(ctx, fromFiatAccount)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		fiatTypes.EventTypeSendFiat,
+		sdk.NewAttribute("recipient", sendFiat.ToAddress.String()),
+		sdk.NewAttribute("sender", sendFiat.FromAddress.String()),
+	))
+
 	return nil
 }

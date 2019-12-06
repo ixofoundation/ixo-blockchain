@@ -11,7 +11,7 @@ const (
 
 var (
 	FiatAccountKey = []byte{0x04}
-	FiatPegHashKey = []byte("fiatPegHash")
+	FiatPegHashKey = []byte{0x05}
 )
 
 func FiatAccountStoreKey(address sdk.AccAddress) []byte {

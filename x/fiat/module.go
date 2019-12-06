@@ -56,10 +56,9 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	fiatTxCmd.AddCommand(client.PostCommands(
-	// cli.ChangeBuyerBidCmd(cdc),
-	// cli.ChangeSellerBidCmd(cdc),
-	// cli.ConfirmBuyerBidCmd(cdc),
-	// cli.ConfirmSellerBidCmd(cdc),
+		cli.IssueFiatCmd(cdc),
+		cli.RedeemFiatCmd(cdc),
+		cli.SendFiatCmd(cdc),
 	)...)
 
 	return fiatTxCmd
@@ -76,6 +75,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 	fiatQueryCmd.AddCommand(client.GetCommands(
 		cli.GetFiatAccountCmd(cdc),
+		cli.GetAllFiatAccountsCmd(cdc),
 	)...)
 
 	return fiatQueryCmd

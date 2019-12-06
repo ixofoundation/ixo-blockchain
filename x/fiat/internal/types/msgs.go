@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/ixofoundation/ixo-cosmos/types"
 )
 
 // *****IssueFiat
@@ -15,11 +13,11 @@ type IssueFiat struct {
 	IssuerAddress     sdk.AccAddress `json:"issuerAddress"`
 	ToAddress         sdk.AccAddress `json:"toAddress"`
 	TransactionID     string         `json:"transactionID" valid:"required~TxID is mandatory,matches(^[A-Z0-9]+$)~Invalid TransactionId,length(2|40)~TransactionId length between 2-40"`
-	TransactionAmount int            `json:"transactionAmount" valid:"required~TransactionAmount is mandatory,matches(^[1-9]{1}[0-9]*$)~Invalid TransactionAmount"`
+	TransactionAmount int64          `json:"transactionAmount" valid:"required~TransactionAmount is mandatory,matches(^[1-9]{1}[0-9]*$)~Invalid TransactionAmount"`
 }
 
 // NewIssueFiat : initializer
-func NewIssueFiat(issuerAddress sdk.AccAddress, toAddress sdk.AccAddress, transactionID string, transactionAmount int) IssueFiat {
+func NewIssueFiat(issuerAddress sdk.AccAddress, toAddress sdk.AccAddress, transactionID string, transactionAmount int64) IssueFiat {
 	return IssueFiat{issuerAddress, toAddress, transactionID, transactionAmount}
 }
 
@@ -236,13 +234,12 @@ func (msg MsgRedeemFiats) GetSigners() []sdk.AccAddress {
 type SendFiat struct {
 	FromAddress sdk.AccAddress `json:"fromAddress"`
 	ToAddress   sdk.AccAddress `json:"toAddress"`
-	PegHash     types.PegHash  `json:"pegHash"`
 	Amount      int64          `json:"amount"`
 }
 
 // NewSendFiat : initializer
-func NewSendFiat(fromAddress sdk.AccAddress, toAddress sdk.AccAddress, pegHash types.PegHash, amount int64) SendFiat {
-	return SendFiat{fromAddress, toAddress, pegHash, amount}
+func NewSendFiat(fromAddress sdk.AccAddress, toAddress sdk.AccAddress, amount int64) SendFiat {
+	return SendFiat{fromAddress, toAddress, amount}
 }
 
 // GetSignBytes : get bytes to sign
@@ -250,12 +247,10 @@ func (in SendFiat) GetSignBytes() []byte {
 	bin, err := ModuleCdc.MarshalJSON(struct {
 		FromAddress string `json:"fromAddress"`
 		ToAddress   string `json:"toAddress"`
-		PegHash     string `json:"pegHash"`
 		Amount      int64  `json:"amount"`
 	}{
 		FromAddress: in.FromAddress.String(),
 		ToAddress:   in.ToAddress.String(),
-		PegHash:     in.PegHash.String(),
 		Amount:      in.Amount,
 	})
 	if err != nil {
@@ -269,8 +264,6 @@ func (in SendFiat) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidAddress(in.FromAddress.String())
 	} else if len(in.ToAddress) == 0 {
 		return sdk.ErrInvalidAddress(in.ToAddress.String())
-	} else if len(in.PegHash) == 0 {
-		return sdk.ErrUnknownRequest("PegHash is Empty")
 	} else if in.Amount <= 0 {
 		return ErrNegativeAmount(DefaultCodeSpace, "Amount should be positive")
 	}

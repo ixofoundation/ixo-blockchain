@@ -7,6 +7,7 @@ require (
 	github.com/aristanetworks/goarista v0.0.0-20181002214814-33151c4543a7 // indirect
 	github.com/btcsuite/btcutil v0.0.0-20180706230648-ab6388e0c60a
 	github.com/cespare/cp v1.1.1 // indirect
+	github.com/commitHub/commitBlockchain v0.0.0-20191204065042-7dcca6638138 // indirect
 	github.com/cosmos/cosmos-sdk v0.37.0 // latest
 	github.com/cosmos/go-bip39 v0.0.0-20180618194314-52158e4697b8
 	github.com/deckarep/golang-set v1.7.1 // indirect
@@ -35,6 +36,6 @@ require (
 	github.com/tendermint/tendermint v0.32.2 //latest
 	github.com/tendermint/tm-db v0.1.1
 	github.com/tendermint/tmlibs v0.8.1
-	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a
+	golang.org/x/crypto v0.0.0-20190404164418-38d8ce5564a5
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )
