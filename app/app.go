@@ -178,7 +178,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
 	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
 	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeepr)
-	app.fiatKeeper = fiat.NewKeeper(app.cdc, keys[fiat.StoreKey])
+	app.fiatKeeper = fiat.NewKeeper(app.cdc, keys[fiat.StoreKey], app.accountKeeper)
 
 	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
 	if cErr != nil {
@@ -286,7 +286,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 	didAnteHandler := did.NewAnteHandler(app.didKeeper)
 	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
-	fiatAnteHandler := fiat.NewAnteHandler(app.fiatKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
@@ -295,8 +294,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			return didAnteHandler(ctx, tx, false)
 		case "project":
 			return projectAnteHandler(ctx, tx, false)
-		case "fiat":
-			return fiatAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, true)
 		}

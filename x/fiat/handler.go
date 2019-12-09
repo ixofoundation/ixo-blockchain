@@ -13,11 +13,11 @@ func NewHandler(fiatKeeper Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case MsgIssueFiats:
-			return _handleMsgIssueFiats(ctx, fiatKeeper, msg.IssueFiats)
+			return handleMsgIssueFiats(ctx, fiatKeeper, msg.IssueFiats)
 		case MsgRedeemFiats:
-			return _handleMsgRedeemFiats(ctx, fiatKeeper, msg.RedeemFiats)
+			return handleMsgRedeemFiats(ctx, fiatKeeper, msg.RedeemFiats)
 		case MsgSendFiats:
-			return _handleMsgSendFiats(ctx, fiatKeeper, msg.SendFiats)
+			return handleMsgSendFiats(ctx, fiatKeeper, msg.SendFiats)
 		default:
 			return sdk.ErrInternal(fmt.Sprintf("unrecognized %s message type: %T", ModuleName, msg)).Result()
 		}
@@ -25,7 +25,7 @@ func NewHandler(fiatKeeper Keeper) sdk.Handler {
 	}
 }
 
-func _handleMsgIssueFiats(ctx sdk.Context, fiatKeeper Keeper, issueFiats []IssueFiat) sdk.Result {
+func handleMsgIssueFiats(ctx sdk.Context, fiatKeeper Keeper, issueFiats []IssueFiat) sdk.Result {
 
 	for _, issueFiat := range issueFiats {
 
@@ -40,7 +40,7 @@ func _handleMsgIssueFiats(ctx sdk.Context, fiatKeeper Keeper, issueFiats []Issue
 	}
 }
 
-func _handleMsgRedeemFiats(ctx sdk.Context, fiatKeeper Keeper, redeemFiats []RedeemFiat) sdk.Result {
+func handleMsgRedeemFiats(ctx sdk.Context, fiatKeeper Keeper, redeemFiats []RedeemFiat) sdk.Result {
 	for _, redeemFiat := range redeemFiats {
 		err := fiatKeeper.RedeemFiats(ctx, redeemFiat)
 		if err != nil {
@@ -54,7 +54,7 @@ func _handleMsgRedeemFiats(ctx sdk.Context, fiatKeeper Keeper, redeemFiats []Red
 
 }
 
-func _handleMsgSendFiats(ctx sdk.Context, fiatKeeper Keeper, sendFiats []SendFiat) sdk.Result {
+func handleMsgSendFiats(ctx sdk.Context, fiatKeeper Keeper, sendFiats []SendFiat) sdk.Result {
 	for _, sendFiat := range sendFiats {
 		err := fiatKeeper.SendFiats(ctx, sendFiat)
 		if err != nil {

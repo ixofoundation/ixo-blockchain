@@ -8,7 +8,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/btcsuite/btcutil v0.0.0-20180706230648-ab6388e0c60a
 	github.com/cespare/cp v1.1.1 // indirect
-	github.com/commitHub/commitBlockchain v0.0.0-20191204065042-7dcca6638138 // indirect
 	github.com/cosmos/cosmos-sdk v0.37.0 // latest
 	github.com/cosmos/go-bip39 v0.0.0-20180618194314-52158e4697b8
 	github.com/deckarep/golang-set v1.7.1 // indirect

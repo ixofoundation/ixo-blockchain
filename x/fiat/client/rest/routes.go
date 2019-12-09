@@ -8,8 +8,7 @@ import (
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/fiatAccount/{address}", QueryFiatAccountHandlerFn(cliCtx)).Methods("GET")
 
-	// r.HandleFunc("/changeBuyerBid", ChangeBuyerBidRequestHandlerFn(cliCtx, kafkaBool, kafkaState)).Methods("POST")
-	// r.HandleFunc("/changeSellerBid", ChangeSellerBidRequestHandlerFn(cliCtx, kafkaBool, kafkaState)).Methods("POST")
-	// r.HandleFunc("/confirmBuyerBid", ConfirmBuyerBidRequestHandlerFn(cliCtx, kafkaBool, kafkaState)).Methods("POST")
-	// r.HandleFunc("/confirmSellerBid", ConfirmSellerBidRequestHandlerFn(cliCtx, kafkaBool, kafkaState)).Methods("POST")
+	r.HandleFunc("/issueFiat", IssueFiatHandlerFunction(cliCtx)).Methods("POST")
+	r.HandleFunc("/redeemFiat", RedeemiatHandlerFunction(cliCtx)).Methods("POST")
+	r.HandleFunc("/sendFiat", SendiatHandlerFunction(cliCtx)).Methods("POST")
 }

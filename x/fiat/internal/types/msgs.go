@@ -72,7 +72,7 @@ func NewMsgIssueFiats(issueFiats []IssueFiat) MsgIssueFiats {
 var _ sdk.Msg = MsgIssueFiats{}
 
 // Type : implements msg
-func (msg MsgIssueFiats) Type() string { return "bank" }
+func (msg MsgIssueFiats) Type() string { return "fiat" }
 
 func (msg MsgIssueFiats) Route() string { return RouterKey }
 
@@ -180,7 +180,7 @@ func NewMsgRedeemFiats(redeemFiats []RedeemFiat) MsgRedeemFiats {
 var _ sdk.Msg = MsgRedeemFiats{}
 
 // Type : implements msg
-func (msg MsgRedeemFiats) Type() string { return "bank" }
+func (msg MsgRedeemFiats) Type() string { return "fiat" }
 
 func (msg MsgRedeemFiats) Route() string { return RouterKey }
 
@@ -289,7 +289,7 @@ func NewMsgSendFiats(sendFiats []SendFiat) MsgSendFiats {
 var _ sdk.Msg = MsgSendFiats{}
 
 // Type : implements msg
-func (msg MsgSendFiats) Type() string { return "bank" }
+func (msg MsgSendFiats) Type() string { return "fiat" }
 
 func (msg MsgSendFiats) Route() string { return RouterKey }
 

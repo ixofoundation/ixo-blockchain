@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 
 	"github.com/ixofoundation/ixo-cosmos/codec"
 	"github.com/ixofoundation/ixo-cosmos/types"
@@ -12,14 +13,16 @@ import (
 )
 
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      *codec.Codec
+	storeKey      sdk.StoreKey
+	cdc           *codec.Codec
+	accountKeeper auth.AccountKeeper
 }
 
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey) Keeper {
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, ak auth.AccountKeeper) Keeper {
 	return Keeper{
-		storeKey: storeKey,
-		cdc:      cdc,
+		storeKey:      storeKey,
+		cdc:           cdc,
+		accountKeeper: ak,
 	}
 }
 
@@ -87,14 +90,17 @@ func (k Keeper) getNextFiatPegHash(ctx sdk.Context) int {
 }
 
 func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.Error {
+	toAccount := k.accountKeeper.GetAccount(ctx, issueFiat.ToAddress)
+	if toAccount == nil {
+		return sdk.ErrInvalidAddress("Auth account for given address does not exist")
+	}
 	fiatAccount, err := k.GetFiatAccount(ctx, issueFiat.ToAddress)
 	if err != nil {
 		fiatAccount = types.NewFiatAccountWithAddress(issueFiat.ToAddress)
 	}
-	pegHashNumber := k.getNextFiatPegHash(ctx)
-	pegHash, err2 := types.GetFiatPegHashHex(fmt.Sprintf("%x", strconv.Itoa(pegHashNumber)))
+	pegHash, err2 := types.GetFiatPegHashHex(fmt.Sprintf("%x", strconv.Itoa(k.getNextFiatPegHash(ctx))))
 	if err2 != nil {
-		return sdk.ErrInternal("Peghash could not be created due to " + err.Error())
+		return sdk.ErrInternal("Peghash could not be created: " + err.Error())
 	}
 
 	fiatPeg := types.NewFiatPegWithPegHash(pegHash)
@@ -104,6 +110,12 @@ func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.E
 	newFiatPegWallet := types.AddFiatPegToWallet(oldFiatPegWallet, []types.BaseFiatPeg{types.ToBaseFiatPeg(fiatPeg)})
 	fiatAccount.SetFiatPegWallet(newFiatPegWallet)
 	k.SetFiatAccount(ctx, fiatAccount)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		fiatTypes.EventTypeIssueFiat,
+		sdk.NewAttribute("issuer", issueFiat.IssuerAddress.String()),
+		sdk.NewAttribute("toAddress", issueFiat.ToAddress.String()),
+	))
 	return nil
 }
 
@@ -127,6 +139,10 @@ func (k Keeper) RedeemFiats(ctx sdk.Context, redeemFiat fiatTypes.RedeemFiat) sd
 }
 
 func (k Keeper) SendFiats(ctx sdk.Context, sendFiat fiatTypes.SendFiat) sdk.Error {
+	toAccount := k.accountKeeper.GetAccount(ctx, sendFiat.ToAddress)
+	if toAccount == nil {
+		return sdk.ErrInvalidAddress("Auth account for given address does not exist")
+	}
 	fromFiatAccount, err := k.GetFiatAccount(ctx, sendFiat.FromAddress)
 	if err != nil {
 		return err
@@ -140,7 +156,8 @@ func (k Keeper) SendFiats(ctx sdk.Context, sendFiat fiatTypes.SendFiat) sdk.Erro
 	if err != nil {
 		toFiatAccount = types.NewFiatAccountWithAddress(sendFiat.ToAddress)
 	}
-	toFiatAccount.SetFiatPegWallet(sentFiatPegWallet)
+	toFiatPegWallet := types.AddFiatPegToWallet(toFiatAccount.GetFiatPegWallet(), sentFiatPegWallet)
+	toFiatAccount.SetFiatPegWallet(toFiatPegWallet)
 	k.SetFiatAccount(ctx, toFiatAccount)
 
 	fromFiatAccount.SetFiatPegWallet(oldFiatPegWallet)

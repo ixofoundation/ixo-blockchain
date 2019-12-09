@@ -22,27 +22,26 @@ func RedeemFiatCmd(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			redeemerAddressStr := viper.GetString(FlagRedeemerAddress)
-			if redeemerAddressStr == "" {
-				return sdk.ErrInvalidAddress("Redeemer address empty.")
+			toAddrStr := viper.GetString(FlagTo)
+			if toAddrStr == "" {
+				return sdk.ErrInvalidAddress("To address empty.")
 			}
-			redeemerAddress, err := sdk.AccAddressFromBech32(redeemerAddressStr)
+			toAddress, err := sdk.AccAddressFromBech32(toAddrStr)
 			if err != nil {
 				return err
 			}
 
-			amount := viper.GetInt64(FlagTransactionAmount)
+			amount := viper.GetInt64(FlagAmount)
 			if amount <= 0 {
 				return sdk.ErrInvalidCoins("Invalid amount.")
 			}
 
-			msg := client.BuildRedeemFiatMsg(redeemerAddress, cliCtx.GetFromAddress(), amount)
+			msg := client.BuildRedeemFiatMsg(cliCtx.GetFromAddress(), toAddress, amount)
 			return cUtils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsRedeemerAddress)
-	cmd.Flags().AddFlagSet(fsTransactionAmount)
-	cmd.Flags().AddFlagSet(fsTransactionID)
+	cmd.Flags().AddFlagSet(fsTo)
+	cmd.Flags().AddFlagSet(fsAmount)
 	return cmd
 }
