@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
 	github.com/aristanetworks/goarista v0.0.0-20181002214814-33151c4543a7 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/btcsuite/btcutil v0.0.0-20180706230648-ab6388e0c60a
 	github.com/cespare/cp v1.1.1 // indirect
 	github.com/commitHub/commitBlockchain v0.0.0-20191204065042-7dcca6638138 // indirect

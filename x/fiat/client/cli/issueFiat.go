@@ -20,16 +20,7 @@ func IssueFiatCmd(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			issuerAddressStr := viper.GetString(FlagIssuerAddress)
-			if issuerAddressStr == "" {
-				return sdk.ErrInvalidAddress("Issuer address empty.")
-			}
-			issuerAddress, err := sdk.AccAddressFromBech32(issuerAddressStr)
-			if err != nil {
-				return err
-			}
-
-			cliCtx := context.NewCLIContextWithFrom(issuerAddressStr).WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			toStr := viper.GetString(FlagTo)
 			if toStr == "" {
@@ -50,12 +41,11 @@ func IssueFiatCmd(cdc *codec.Codec) *cobra.Command {
 				return sdk.ErrInvalidAddress("Invalid Transaction ID.")
 			}
 
-			msg := client.BuildIssueFiatMsg(issuerAddress, to, tranasctionID, transactionAmount)
+			msg := client.BuildIssueFiatMsg(cliCtx.GetFromAddress(), to, tranasctionID, transactionAmount)
 			return cUtils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsIssuerAddress)
 	cmd.Flags().AddFlagSet(fsTo)
 	cmd.Flags().AddFlagSet(fsTransactionAmount)
 	cmd.Flags().AddFlagSet(fsTransactionID)

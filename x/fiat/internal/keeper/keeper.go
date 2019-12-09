@@ -39,7 +39,7 @@ func (k Keeper) GetFiatAccount(ctx sdk.Context, address sdk.AccAddress) (fiatAcc
 	fiatAccountKey := fiatTypes.FiatAccountStoreKey(address)
 	bz := store.Get(fiatAccountKey)
 	if bz == nil {
-		return nil, fiatTypes.ErrInvalidPegHash(fiatTypes.DefaultCodeSpace)
+		return nil, sdk.ErrInvalidAddress("Fiat account for given address does not exists.")
 	}
 
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fiatAccount)
@@ -81,11 +81,9 @@ func (k Keeper) getNextFiatPegHash(ctx sdk.Context) int {
 	} else {
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &fiatNumber)
 	}
-
 	bz = k.cdc.MustMarshalBinaryLengthPrefixed(fiatNumber + 1)
 	store.Set(fiatTypes.FiatPegHashKey, bz)
-	//TODO
-	return 11
+	return fiatNumber
 }
 
 func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.Error {
@@ -93,10 +91,12 @@ func (k Keeper) IssueFiats(ctx sdk.Context, issueFiat fiatTypes.IssueFiat) sdk.E
 	if err != nil {
 		fiatAccount = types.NewFiatAccountWithAddress(issueFiat.ToAddress)
 	}
-	pegHash, err2 := types.GetFiatPegHashHex(strconv.Itoa(k.getNextFiatPegHash(ctx)))
+	pegHashNumber := k.getNextFiatPegHash(ctx)
+	pegHash, err2 := types.GetFiatPegHashHex(fmt.Sprintf("%x", strconv.Itoa(pegHashNumber)))
 	if err2 != nil {
-		return sdk.ErrInternal(fmt.Sprintf("%s", err.Error()))
+		return sdk.ErrInternal("Peghash could not be created due to " + err.Error())
 	}
+
 	fiatPeg := types.NewFiatPegWithPegHash(pegHash)
 	fiatPeg.SetTransactionAmount(issueFiat.TransactionAmount)
 	fiatPeg.SetTransactionID(issueFiat.TransactionID)

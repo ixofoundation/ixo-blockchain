@@ -21,22 +21,13 @@ func SendFiatCmd(cdc *codec.Codec) *cobra.Command {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			fromStr := viper.GetString(FlagFrom)
-			if fromStr == "" {
-				return sdk.ErrInvalidAddress("From address empty.")
-			}
-			from, err := sdk.AccAddressFromBech32(fromStr)
-			if err != nil {
-				return nil
-			}
-
 			toStr := viper.GetString(FlagTo)
 			if toStr == "" {
 				return sdk.ErrInvalidAddress("To address empty.")
 			}
 			to, err := sdk.AccAddressFromBech32(toStr)
 			if err != nil {
-				return nil
+				return err
 			}
 
 			amount := viper.GetInt64(FlagAmount)
@@ -44,12 +35,11 @@ func SendFiatCmd(cdc *codec.Codec) *cobra.Command {
 				return sdk.ErrInvalidCoins("Invalid amount.")
 			}
 
-			msg := client.BuildSendFiatMsg(from, to, amount)
+			msg := client.BuildSendFiatMsg(cliCtx.GetFromAddress(), to, amount)
 			return cUtils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsFrom)
 	cmd.Flags().AddFlagSet(fsTo)
 	cmd.Flags().AddFlagSet(fsAmount)
 	return cmd

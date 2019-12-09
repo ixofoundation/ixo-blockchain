@@ -50,9 +50,9 @@ func queryFiatAccount(ctx sdk.Context, path []string, keeper Keeper) ([]byte, sd
 func queryAllFiatAccounts(ctx sdk.Context, keeper Keeper) ([]byte, sdk.Error) {
 
 	fiatAccounts := keeper.GetFiatAccounts(ctx)
-	if len(fiatAccounts) == 0 {
-		return nil, sdk.ErrInternal("No Fiat Accounts created.")
-	}
+	// if len(fiatAccounts) == 0 {
+	// 	return []byte("No Fiat Accounts created."), nil
+	// }
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, fiatAccounts)
 	if err != nil {

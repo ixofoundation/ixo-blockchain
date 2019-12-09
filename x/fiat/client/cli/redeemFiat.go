@@ -20,16 +20,7 @@ func RedeemFiatCmd(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			issuerAddressStr := viper.GetString(FlagIssuerAddress)
-			if issuerAddressStr == "" {
-				return sdk.ErrInvalidAddress("Issuer address empty.")
-			}
-			issuerAddress, err := sdk.AccAddressFromBech32(issuerAddressStr)
-			if err != nil {
-				return nil
-			}
-
-			cliCtx := context.NewCLIContextWithFrom(issuerAddressStr).WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			redeemerAddressStr := viper.GetString(FlagRedeemerAddress)
 			if redeemerAddressStr == "" {
@@ -37,7 +28,7 @@ func RedeemFiatCmd(cdc *codec.Codec) *cobra.Command {
 			}
 			redeemerAddress, err := sdk.AccAddressFromBech32(redeemerAddressStr)
 			if err != nil {
-				return nil
+				return err
 			}
 
 			amount := viper.GetInt64(FlagTransactionAmount)
@@ -45,12 +36,11 @@ func RedeemFiatCmd(cdc *codec.Codec) *cobra.Command {
 				return sdk.ErrInvalidCoins("Invalid amount.")
 			}
 
-			msg := client.BuildRedeemFiatMsg(redeemerAddress, issuerAddress, amount)
+			msg := client.BuildRedeemFiatMsg(redeemerAddress, cliCtx.GetFromAddress(), amount)
 			return cUtils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsIssuerAddress)
 	cmd.Flags().AddFlagSet(fsRedeemerAddress)
 	cmd.Flags().AddFlagSet(fsTransactionAmount)
 	cmd.Flags().AddFlagSet(fsTransactionID)
