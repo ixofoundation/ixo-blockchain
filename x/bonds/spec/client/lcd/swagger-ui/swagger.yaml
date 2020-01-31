@@ -1,0 +1,659 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Bonds Module Extension of Gaia-Lite for Cosmos
+  description: An extension of Gaia-Lite for Bonds Module related state queries, transaction generation and broadcasting.
+tags:
+  - name: Bonds Module
+    description: A module for universal token bonding curves
+schemes:
+  - http
+host: localhost:1317
+paths:
+  /bonds:
+    get:
+      description: List of all currently active bonds
+      summary: List of all active bonds
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of bonds by token name
+          schema:
+            type: array
+            items:
+              type: string
+              example: abc
+  /bonds/{bond_token}:
+    get:
+      description: Information about the bond
+      summary: The properties of the bond
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+      responses:
+        200:
+          description: Bond details
+          schema:
+            $ref: "#/definitions/BondQueryResult"
+  /bonds/{bond_token}/batch:
+    get:
+      description: Bond's current batch with current list of buy and sell orders
+      summary: Current orders batch of the bond
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+      responses:
+        200:
+          description: Current batch
+          schema:
+            $ref: "#/definitions/BatchQueryResult"
+  /bonds/{bond_token}/last_batch:
+    get:
+      description: Bond's last batch with last list of buy and sell orders
+      summary: Last orders batch of the bond
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+      responses:
+        200:
+          description: Last batch
+          schema:
+            $ref: "#/definitions/BatchQueryResult"
+  /bonds/{bond_token}/current_price:
+    get:
+      description: Computes the current price(s) of the bond
+      summary: Current price(s) of the bond
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+      responses:
+        200:
+          description: Current price(s) of the bond
+          schema:
+            $ref: "#/definitions/ResCoins"
+  /bonds/{bond_token}/current_reserve:
+    get:
+      description: Obtains the reserve pool balance(s) of the bond
+      summary: Current balance(s) of the reserve pool
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+      responses:
+        200:
+          description: Current balance(s) of the reserve pool
+          schema:
+            $ref: "#/definitions/ResCoins"
+  /bonds/{bond_token}/price/{bond_amount}:
+    get:
+      description: Computes the price(s) of the bond at a specific amount of supply
+      summary: Price(s) of the bond at a specific supply
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+        - in: path
+          name: bond_amount
+          description: Number of bond tokens
+          required: true
+          type: number
+          x-example: 100
+      responses:
+        200:
+          description: Price(s) to buy the tokens
+          schema:
+            $ref: "#/definitions/ResCoins"
+  /bonds/{bond_token}/buy_price/{bond_amount}:
+    get:
+      description: Computes the price(s) to buy an amount of tokens of the bond
+      summary: Price(s) of buying an amount of tokens of the bond
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+        - in: path
+          name: bond_amount
+          description: Number of bond tokens
+          required: true
+          type: number
+          x-example: 100
+      responses:
+        200:
+          description: Price(s) to buy the tokens
+          schema:
+            $ref: "#/definitions/BuyPriceQueryResult"
+  /bonds/{bond_token}/sell_return/{bond_amount}:
+    get:
+      description: Computes the return on selling an amount of tokens of the bond
+      summary: Return on selling an amount of tokens of the bond
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+        - in: path
+          name: bond_amount
+          description: Number of bond tokens
+          required: true
+          type: number
+          x-example: 100
+      responses:
+        200:
+          description: Return when selling the tokens
+          schema:
+            $ref: "#/definitions/SellReturnQueryResult"
+  /bonds/{bond_token}/swap_return/{from_token_with_amount}/{to_token}:
+    get:
+      description: Computes the return on an amount of tokens by swapping
+      summary: Return on an amount of tokens by swapping
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: bond_token
+          description: Bond token
+          required: true
+          type: string
+          x-example: abc
+        - in: path
+          name: from_token_with_amount
+          description: Number of reserve tokens
+          required: true
+          type: number
+          x-example: 100res1
+        - in: path
+          name: to_token
+          description: Reserve token
+          required: true
+          type: string
+          x-example: res2
+      responses:
+        200:
+          description: Return on an amount of tokens by swapping
+          schema:
+            $ref: "#/definitions/SwapReturnQueryResult"
+  /bonds/create_bond:
+    post:
+      description: Create a bond
+      summary: Create a bond
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: create_bond_body
+          description: The parameters of the bond and corresponding bonding curve
+          schema:
+            $ref: "#/definitions/BondCreation"
+  /bonds/edit_bond:
+    post:
+      description: Edit a bond
+      summary: Edit a bond
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: edit_bond_body
+          description: The fields to be edited and the list of the bond's signers
+          schema:
+            $ref: "#/definitions/BondEdit"
+  /bonds/buy:
+    post:
+      description: Buy tokens from a bond
+      summary: Buy from a bond. In the case of a swapper bond, this adds liquidity.
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: buy_from_bond_body
+          description: Number of tokens to buy and max price
+          schema:
+            type: object
+            properties:
+              bond_token:
+                type: string
+                example: abc
+              bond_amount:
+                type: string
+                example: 100
+              max_prices:
+                type: string
+                example: 1000res1,1000res2,...
+  /bonds/sell:
+    post:
+      description: Sell tokens from a bond
+      summary: Sell from a bond. In the case of a swapper bond, this adds liquidity.
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: sell_from_bond_body
+          description: Number of tokens to sell
+          schema:
+            type: object
+            properties:
+              bond_token:
+                type: string
+                example: abc
+              bond_amount:
+                type: string
+                example: 100
+  /bonds/swap:
+    post:
+      description: Perform a swap between two tokens using a swapper bond
+      summary: Swap two tokens
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: swap_tokens_body
+          description: The number of tokens to swap to another token
+          schema:
+            type: object
+            properties:
+              from_amount:
+                type: string
+                example: 100
+              from_token:
+                type: string
+                example: res1
+              to_token:
+                type: string
+                example: res2
+definitions:
+  AnyCoin:
+    type: object
+    properties:
+      denom:
+        type: string
+        example: abc
+      amount:
+        type: string
+        example: 50
+  AnyCoins:
+    type: array
+    items:
+      $ref: "#/definitions/AnyCoin"
+  ResCoin:
+    type: object
+    properties:
+      denom:
+        type: string
+        example: res
+      amount:
+        type: string
+        example: 50
+  ResCoins:
+    type: array
+    items:
+      $ref: "#/definitions/ResCoin"
+  BondCoin:
+    type: object
+    properties:
+      denom:
+        type: string
+        example: bond
+      amount:
+        type: string
+        example: 50
+  BondCoins:
+    type: array
+    items:
+      $ref: "#/definitions/BondCoin"
+  Address:
+    type: string
+    description: bech32 encoded address
+  BaseOrder:
+    type: object
+    properties:
+      buyer:
+        $ref: "#/definitions/Address"
+      amount:
+        $ref: "#/definitions/BondCoin"
+      cancelled:
+        type: string
+        example: "false"
+      cancel_reason:
+        type: string
+        example: "reason for cancellation"
+  BaseOrderSwap:
+    type: object
+    properties:
+      buyer:
+        $ref: "#/definitions/Address"
+      amount:
+        $ref: "#/definitions/ResCoin"
+      cancelled:
+        type: string
+        example: "false"
+      cancel_reason:
+        type: string
+        example: "reason for cancellation"
+  BuyOrder:
+    type: object
+    properties:
+      base_order:
+        $ref: "#/definitions/BaseOrder"
+      max_prices:
+        $ref: "#/definitions/ResCoins"
+  SellOrder:
+    type: object
+    properties:
+      base_order:
+        $ref: "#/definitions/BaseOrder"
+  SwapOrder:
+    type: object
+    properties:
+      base_order:
+        $ref: "#/definitions/BaseOrderSwap"
+      to_token:
+        type: string
+        example: res2
+  Batch:
+    type: object
+    properties:
+      blocks_remaining:
+        type: number
+        example: 2
+      total_buy_amount:
+        type: number
+        example: 1000
+      total_sell_amount:
+        type: number
+        example: 1000
+      buy_price:
+        type: number
+        example: 2.5
+      sell_price:
+        type: number
+        example: 2.5
+      buys:
+        type: array
+        items:
+          $ref: "#/definitions/BuyOrder"
+      sells:
+        type: array
+        items:
+          $ref: "#/definitions/SellOrder"
+      swaps:
+        type: array
+        items:
+          $ref: "#/definitions/SwapOrder"
+  BondQueryResult:
+    type: object
+    properties:
+      type:
+        type: string
+        example: cosmos-sdk/Bond
+      value:
+        type: object
+        properties:
+          token:
+            type: string
+            example: abc
+          name:
+            type: string
+            example: Some bond
+          description:
+            type: string
+            example: Description about bond.
+          creator:
+            $ref: "#/definitions/Address"
+          function_type:
+            type: string
+            example: power_function
+          function_parameters:
+            $ref: "#/definitions/FunctionParameters"
+          reserve_tokens:
+            type: array
+            items:
+              type: string
+              example: res1
+          reserve_address:
+            $ref: "#/definitions/Address"
+          tx_fee_percentage:
+            type: number
+            example: 0.5
+          exit_fee_percentage:
+            type: number
+            example: 1.5
+          fee_address:
+            $ref: "#/definitions/Address"
+          max_supply:
+            $ref: "#/definitions/BondCoin"
+          order_quantity_limits:
+            $ref: "#/definitions/AnyCoins"
+          sanity_rate:
+            type: number
+            example: 12.34
+          sanity_margin_percentage:
+            type: number
+            example: 56.78
+          current_supply:
+            $ref: "#/definitions/BondCoin"
+          allow_sells:
+            type: string
+            example: "true"
+          signers:
+            type: array
+            items:
+              $ref: "#/definitions/Address"
+          batch_blocks:
+            type: number
+            example: 5
+  BatchQueryResult:
+    type: object
+    properties:
+      type:
+        type: string
+        example: cosmos-sdk/Batch
+      value:
+        $ref: "#/definitions/Batch"
+  BuyPriceQueryResult:
+    type: object
+    properties:
+      adjusted_supply:
+        $ref: "#/definitions/ResCoins"
+      prices:
+        $ref: "#/definitions/ResCoins"
+      tx_fees:
+        $ref: "#/definitions/ResCoins"
+      total_prices:
+        $ref: "#/definitions/ResCoins"
+      total_fees:
+        $ref: "#/definitions/ResCoins"
+  SellReturnQueryResult:
+    type: object
+    properties:
+      adjusted_supply:
+        $ref: "#/definitions/ResCoins"
+      returns:
+        $ref: "#/definitions/ResCoins"
+      tx_fees:
+        $ref: "#/definitions/ResCoins"
+      exit_fees:
+        $ref: "#/definitions/ResCoins"
+      total_returns:
+        $ref: "#/definitions/ResCoins"
+      total_fees:
+        $ref: "#/definitions/ResCoins"
+  SwapReturnQueryResult:
+    type: object
+    properties:
+      total_returns:
+        $ref: "#/definitions/ResCoins"
+      total_fees:
+        $ref: "#/definitions/ResCoins"
+  BondCreation:
+    type: object
+    properties:
+      token:
+        type: string
+        example: abc
+      name:
+        type: string
+        example: Bond Name
+      description:
+        type: string
+        example: Description about bond.
+      function_type:
+        type: string
+        example: power_function
+      function_parameters:
+        type: string
+        example: "m:12,n:2,c:100"
+      reserve_tokens:
+        type: string
+        example: res1,res2,...
+      reserve_address:
+        $ref: "#/definitions/Address"
+      tx_fee_percentage:
+        type: string
+        example: "0.5"
+      exit_fee_percentage:
+        type: string
+        example: "1.5"
+      fee_address:
+        $ref: "#/definitions/Address"
+      max_supply:
+        type: string
+        example: "1000abc"
+      order_quantity_limits:
+        type: string
+        example: 100abc,200xyz,...
+      sanity_rate:
+        type: string
+        example: "12.34"
+      sanity_margin_percentage:
+        type: string
+        example: "56.78"
+      allow_sells:
+        type: string
+        example: "true"
+      signers:
+        type: string
+        example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
+      batch_blocks:
+        type: string
+        example: "5"
+  BondEdit:
+    type: object
+    properties:
+      token:
+        type: string
+        example: abc
+      name:
+        type: string
+        example: New Bond Name
+      description:
+        type: string
+        example: New description about bond.
+      order_quantity_limits:
+        type: string
+        example: 100abc,200xyz,...
+      sanity_rate:
+        type: string
+        example: "12.34"
+      sanity_margin_percentage:
+        type: string
+        example: "56.78"
+      signers:
+        type: string
+        example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
+  FunctionParameter:
+    type: object
+    properties:
+      param:
+        type: string
+        example: "a"
+      value:
+        type: string
+        example: "1"
+  FunctionParameters:
+    type: array
+    items:
+      $ref: "#/definitions/FunctionParameter"
