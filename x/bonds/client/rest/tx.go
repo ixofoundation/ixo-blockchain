@@ -46,7 +46,6 @@ type createBondReq struct {
 	FunctionType           string       `json:"function_type" yaml:"function_type"`
 	FunctionParameters     string       `json:"function_parameters" yaml:"function_parameters"`
 	ReserveTokens          string       `json:"reserve_tokens" yaml:"reserve_tokens"`
-	ReserveAddress         string       `json:"reserve_address" yaml:"reserve_address"`
 	TxFeePercentage        string       `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
 	ExitFeePercentage      string       `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
 	FeeAddress             string       `json:"fee_address" yaml:"fee_address"`
@@ -88,12 +87,6 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// Parse reserve tokens
 		reserveTokens, err := client.ParseReserveTokens(req.ReserveTokens, req.FunctionType, req.Token)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		reserveAddress, err := sdk.AccAddressFromBech32(req.ReserveAddress)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -160,9 +153,9 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
 			creator, req.FunctionType, functionParams, reserveTokens,
-			reserveAddress, txFeePercentageDec, exitFeePercentageDec,
-			feeAddress, maxSupply, orderQuantityLimits, sanityRate,
-			sanityMarginPercentage, req.AllowSells, signers, batchBlocks)
+			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
+			orderQuantityLimits, sanityRate, sanityMarginPercentage,
+			req.AllowSells, signers, batchBlocks)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

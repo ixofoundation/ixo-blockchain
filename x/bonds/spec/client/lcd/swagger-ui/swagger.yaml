@@ -589,8 +589,6 @@ definitions:
       reserve_tokens:
         type: string
         example: res1,res2,...
-      reserve_address:
-        $ref: "#/definitions/Address"
       tx_fee_percentage:
         type: string
         example: "0.5"

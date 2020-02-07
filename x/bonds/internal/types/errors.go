@@ -127,11 +127,6 @@ func ErrDuplicateReserveToken(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidBond, errMsg)
 }
 
-func ErrReserveAddrCannotBeFeeAddr(codespace sdk.CodespaceType) sdk.Error {
-	errMsg := "Reserve address cannot be the fee address"
-	return sdk.NewError(codespace, CodeInvalidBond, errMsg)
-}
-
 func ErrUnrecognizedFunctionType(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Unrecognized function type"
 	return sdk.NewError(codespace, CodeUnrecognizedFunctionType, errMsg)

@@ -13,7 +13,6 @@ type MsgCreateBond struct {
 	FunctionParameters     FunctionParams   `json:"function_parameters" yaml:"function_parameters"`
 	Creator                sdk.AccAddress   `json:"creator" yaml:"creator"`
 	ReserveTokens          []string         `json:"reserve_tokens" yaml:"reserve_tokens"`
-	ReserveAddress         sdk.AccAddress   `json:"reserve_address" yaml:"reserve_address"`
 	TxFeePercentage        sdk.Dec          `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
 	ExitFeePercentage      sdk.Dec          `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
 	FeeAddress             sdk.AccAddress   `json:"fee_address" yaml:"fee_address"`
@@ -27,9 +26,8 @@ type MsgCreateBond struct {
 }
 
 func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
-	functionType string, functionParameters FunctionParams,
-	reserveTokens []string, reserveAddress sdk.AccAddress, txFeePercentage,
-	exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
+	functionType string, functionParameters FunctionParams, reserveTokens []string,
+	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
 	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint) MsgCreateBond {
 	return MsgCreateBond{
@@ -40,7 +38,6 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 		FunctionType:           functionType,
 		FunctionParameters:     functionParameters,
 		ReserveTokens:          reserveTokens,
-		ReserveAddress:         reserveAddress,
 		TxFeePercentage:        txFeePercentage,
 		ExitFeePercentage:      exitFeePercentage,
 		FeeAddress:             feeAddress,
@@ -66,8 +63,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Creator")
 	} else if len(msg.ReserveTokens) == 0 {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Reserve token")
-	} else if msg.ReserveAddress.Empty() {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Reserve address")
 	} else if msg.FeeAddress.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Fee address")
 	} else if strings.TrimSpace(msg.FunctionType) == "" {
@@ -101,13 +96,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 				return ErrArgumentMustBePositive(DefaultCodespace, "FunctionParams:"+fp.Param)
 			}
 		}
-	}
-
-	// Check that reserve address is not the fee address
-	// (This is allowed for the swapper function)
-	if msg.ReserveAddress.Equals(msg.FeeAddress) &&
-		msg.FunctionType != SwapperFunction {
-		return ErrReserveAddrCannotBeFeeAddr(DefaultCodespace)
 	}
 
 	// Note: uniqueness of reserve tokens checked when parsing
