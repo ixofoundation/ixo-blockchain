@@ -75,7 +75,6 @@ var (
 	ErrBondAlreadyExists                    = types.ErrBondAlreadyExists
 	ErrBondDoesNotAllowSelling              = types.ErrBondDoesNotAllowSelling
 	ErrDidNotEditAnything                   = types.ErrDidNotEditAnything
-	ErrReserveAddrCannotBeFeeAddr           = types.ErrReserveAddrCannotBeFeeAddr
 	ErrUnrecognizedFunctionType             = types.ErrUnrecognizedFunctionType
 	ErrInvalidFunctionParameter             = types.ErrInvalidFunctionParameter
 	ErrFunctionNotAvailableForFunctionType  = types.ErrFunctionNotAvailableForFunctionType

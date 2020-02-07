@@ -6,6 +6,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
 	"strings"
 )
 
@@ -66,9 +67,11 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
 	}
 
+	reserveAddress := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+
 	bond := NewBond(msg.Token, msg.Name, msg.Description, msg.Creator,
 		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
-		msg.ReserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
+		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
 		msg.SanityMarginPercentage, msg.AllowSells, msg.Signers, msg.BatchBlocks)
 
@@ -88,7 +91,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			sdk.NewAttribute(types.AttributeKeyFunctionType, msg.FunctionType),
 			sdk.NewAttribute(types.AttributeKeyFunctionParameters, msg.FunctionParameters.String()),
 			sdk.NewAttribute(types.AttributeKeyReserveTokens, types.StringsToString(msg.ReserveTokens)),
-			sdk.NewAttribute(types.AttributeKeyReserveAddress, msg.ReserveAddress.String()),
+			sdk.NewAttribute(types.AttributeKeyReserveAddress, reserveAddress.String()),
 			sdk.NewAttribute(types.AttributeKeyTxFeePercentage, msg.TxFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyExitFeePercentage, msg.ExitFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyFeeAddress, msg.FeeAddress.String()),

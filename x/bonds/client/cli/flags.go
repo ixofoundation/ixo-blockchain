@@ -12,7 +12,6 @@ const (
 	FlagFunctionType           = "function-type"
 	FlagFunctionParameters     = "function-parameters"
 	FlagReserveTokens          = "reserve-tokens"
-	FlagReserveAddress         = "reserve-address"
 	FlagTxFeePercentage        = "tx-fee-percentage"
 	FlagExitFeePercentage      = "exit-fee-percentage"
 	FlagFeeAddress             = "fee-address"
@@ -41,7 +40,6 @@ func init() {
 	fsBondCreate.String(FlagFunctionType, "", "The type of function that the bond will be")
 	fsBondCreate.String(FlagFunctionParameters, "", "The parameters that will define the function")
 	fsBondCreate.String(FlagReserveTokens, "", "The token(s) that will serve as the reserve token(s)")
-	fsBondCreate.String(FlagReserveAddress, "", "The address that will serve as the reserve")
 	fsBondCreate.String(FlagTxFeePercentage, "", "The percentage fee charged on buys and sells")
 	fsBondCreate.String(FlagExitFeePercentage, "", "The percentage fee charged on sells")
 	fsBondCreate.String(FlagFeeAddress, "", "The address that will hold any charged fees")
