@@ -46,7 +46,7 @@ func (in IssueFiat) ValidateBasic() sdk.Error {
 	} else if len(in.ToAddress) == 0 {
 		return sdk.ErrInvalidAddress(in.ToAddress.String())
 	} else if in.TransactionAmount < 0 {
-		return ErrNegativeAmount(DefaultCodeSpace, "Transaction amount should be grater than 0.")
+		return ErrNegativeAmount(DefaultCodeSpace, "Transaction amount should be greater than 0.")
 	} else if in.TransactionID == "" {
 		return sdk.ErrUnknownRequest("Transaction should not be empty")
 	}
