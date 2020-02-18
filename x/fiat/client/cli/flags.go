@@ -22,9 +22,9 @@ var (
 )
 
 func init() {
-	fsTo.String(FlagTo, "", "Address to send or issue fiats")
-	fsTransactionAmount.String(FlagTransactionAmount, "", "Amount to be issued.")
-	fsTransactionID.String(FlagTransactionID, "", "Transaction ID from the bank.")
-	fsAmount.String(FlagAmount, "", "Amount to send or issue fiats")
+	fsTo.String(FlagTo, "", "Address to send or issue fiats to")
+	fsTransactionAmount.String(FlagTransactionAmount, "", "Amount to be issued")
+	fsTransactionID.String(FlagTransactionID, "", "Transaction ID from the bank")
+	fsAmount.String(FlagAmount, "", "Amount of fiat to send or issue")
 	fsAddress.String(FlagAddress, "", "Address to query")
 }
