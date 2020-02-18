@@ -28,6 +28,7 @@ import (
 	tmTypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/ixofoundation/ixo-cosmos/x/bonds"
 	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
@@ -66,16 +67,19 @@ var (
 		node.AppModuleBasic{},
 		params.AppModuleBasic{},
 		project.AppModuleBasic{},
+		bonds.AppModuleBasic{},
 		fiat.AppModuleBasic{},
 	)
 
 	maccPerms = map[string][]string{
-		auth.FeeCollectorName:     nil,
-		distribution.ModuleName:   nil,
-		mint.ModuleName:           {supply.Minter},
-		staking.BondedPoolName:    {supply.Burner, supply.Staking},
-		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
-		gov.ModuleName:            {supply.Burner},
+		auth.FeeCollectorName:            nil,
+		distribution.ModuleName:          nil,
+		mint.ModuleName:                  {supply.Minter},
+		staking.BondedPoolName:           {supply.Burner, supply.Staking},
+		staking.NotBondedPoolName:        {supply.Burner, supply.Staking},
+		gov.ModuleName:                   {supply.Burner},
+		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
+		bonds.BatchesIntermediaryAccount: nil,
 	}
 )
 
@@ -112,6 +116,7 @@ type ixoApp struct {
 	nodeKeeper     node.Keeper
 	paramsKeepr    params.Keeper
 	projectKeeper  project.Keeper
+	bondsKeeper    bonds.Keeper
 	fiatKeeper     fiat.Keeper
 
 	mm        *module.Manager
@@ -126,9 +131,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	bApp := bam.NewBaseApp(appName, logger, db, ixo.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
-	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey, supply.StoreKey,
-		mint.StoreKey, distribution.StoreKey, slashing.StoreKey, gov.StoreKey, cParams.StoreKey,
-		contracts.StoreKey, did.StoreKey, fees.StoreKey, node.StoreKey, params.StoreKey, project.StoreKey, fiat.StoreKey)
+	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
+		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
+		gov.StoreKey, cParams.StoreKey, contracts.StoreKey, did.StoreKey, fees.StoreKey,
+		node.StoreKey, params.StoreKey, project.StoreKey, bonds.StoreKey, fiat.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, cParams.TStoreKey)
 
@@ -178,6 +184,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
 	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
 	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeepr)
+	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 	app.fiatKeeper = fiat.NewKeeper(app.cdc, keys[fiat.StoreKey], app.accountKeeper)
 
 	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
@@ -208,15 +215,18 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		fiat.NewAppModule(app.fiatKeeper),
 		project.NewAppModule(app.projectKeeper, app.feesKeeper,
 			app.contractKeeper, app.bankKeeper, app.paramsKeepr, app.ethClient),
+		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName)
+	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName, bonds.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, bonds.ModuleName)
 
 	app.mm.SetOrderInitGenesis(genaccounts.ModuleName, distribution.ModuleName,
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
-		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
-		did.ModuleName, project.ModuleName, fees.ModuleName, contracts.ModuleName, node.ModuleName, params.ModuleName, fiat.ModuleName)
+		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
+		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
+		contracts.ModuleName, node.ModuleName, params.ModuleName, bonds.ModuleName,
+		fiat.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
