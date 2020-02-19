@@ -61,7 +61,6 @@ func (msg CreateBondMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg CreateBondMsg) IsNewDid() bool     { return true }
-func (msg CreateBondMsg) IsWithdrawal() bool { return false }
+func (msg CreateBondMsg) IsNewDid() bool { return true }
 
 var _ StoredBondDoc = (*CreateBondMsg)(nil)

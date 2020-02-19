@@ -21,5 +21,4 @@ type BondDocDecoder func(bondEntryBytes []byte) (StoredBondDoc, error)
 type BondMsg interface {
 	sdk.Msg
 	IsNewDid() bool
-	IsWithdrawal() bool
 }
