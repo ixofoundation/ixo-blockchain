@@ -28,6 +28,7 @@ import (
 	tmTypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/ixofoundation/ixo-cosmos/x/bonddoc"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds"
 	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
@@ -66,6 +67,7 @@ var (
 		node.AppModuleBasic{},
 		params.AppModuleBasic{},
 		project.AppModuleBasic{},
+		bonddoc.AppModuleBasic{},
 		bonds.AppModuleBasic{},
 	)
 
@@ -114,6 +116,7 @@ type ixoApp struct {
 	nodeKeeper     node.Keeper
 	paramsKeepr    params.Keeper
 	projectKeeper  project.Keeper
+	bonddocKeeper  bonddoc.Keeper
 	bondsKeeper    bonds.Keeper
 
 	mm        *module.Manager
@@ -131,7 +134,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
 		gov.StoreKey, cParams.StoreKey, contracts.StoreKey, did.StoreKey, fees.StoreKey,
-		node.StoreKey, params.StoreKey, project.StoreKey, bonds.StoreKey)
+		node.StoreKey, params.StoreKey, project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, cParams.TStoreKey)
 
@@ -181,6 +184,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
 	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
 	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeepr)
+	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[project.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 
 	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
@@ -210,6 +214,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		params.NewAppModule(app.paramsKeepr),
 		project.NewAppModule(app.projectKeeper, app.feesKeeper,
 			app.contractKeeper, app.bankKeeper, app.paramsKeepr, app.ethClient),
+		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 	)
 
@@ -220,7 +225,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
-		contracts.ModuleName, node.ModuleName, params.ModuleName, bonds.ModuleName)
+		contracts.ModuleName, node.ModuleName, params.ModuleName, bonddoc.ModuleName,
+		bonds.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
@@ -290,6 +296,8 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 	didAnteHandler := did.NewAnteHandler(app.didKeeper)
 	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
+	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper, app.didKeeper)
+	// TODO bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
@@ -298,6 +306,10 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			return didAnteHandler(ctx, tx, false)
 		case "project":
 			return projectAnteHandler(ctx, tx, false)
+		case "bonddoc":
+			return bonddocAnteHandler(ctx, tx, false)
+		// TODO case "bonds":
+		// TODO 	return bondsAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, true)
 		}
