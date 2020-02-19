@@ -5,11 +5,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-func NewAnteHandler(bonddocKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
+func NewAnteHandler(bonddocKeeper Keeper) sdk.AnteHandler {
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 
 		ixoTx, ok := tx.(ixo.IxoTx)
@@ -26,25 +25,13 @@ func NewAnteHandler(bonddocKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler 
 			copy(pubKey[:], base58.Decode(createBondMsg.GetPubKey()))
 
 		} else {
-			if bondMsg.IsWithdrawal() {
-				did := ixo.Did(msg.GetSigners()[0])
-				didDoc, _ := didKeeper.GetDidDoc(ctx, did)
-				if didDoc == nil {
-					return ctx,
-						sdk.ErrUnauthorized("Issuer did not found").Result(),
-						true
-				}
-
-				copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
-			} else {
-				bondDid := ixo.Did(msg.GetSigners()[0])
-				bondDoc, err := bonddocKeeper.GetBondDoc(ctx, bondDid)
-				if err != nil {
-					return ctx, sdk.ErrInternal("bond did not found").Result(), false
-				}
-
-				copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
+			bondDid := ixo.Did(msg.GetSigners()[0])
+			bondDoc, err := bonddocKeeper.GetBondDoc(ctx, bondDid)
+			if err != nil {
+				return ctx, sdk.ErrInternal("bond did not found").Result(), false
 			}
+
+			copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
 		}
 
 		var sigs = ixoTx.GetSignatures()

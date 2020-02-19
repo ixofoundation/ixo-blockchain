@@ -296,7 +296,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 	didAnteHandler := did.NewAnteHandler(app.didKeeper)
 	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
-	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper, app.didKeeper)
+	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
 	// TODO bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
