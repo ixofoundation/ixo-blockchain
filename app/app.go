@@ -184,7 +184,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
 	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
 	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeepr)
-	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[project.StoreKey])
+	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 
 	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
