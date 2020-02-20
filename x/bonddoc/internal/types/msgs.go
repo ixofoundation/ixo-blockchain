@@ -55,7 +55,11 @@ func (msg CreateBondMsg) String() string {
 	return string(b)
 }
 
-func (msg CreateBondMsg) GetPubKey() string { return msg.PubKey }
+func (msg CreateBondMsg) GetPubKey() string     { return msg.PubKey }
+func (msg CreateBondMsg) GetStatus() BondStatus { return msg.Data.Status }
+func (msg *CreateBondMsg) SetStatus(status BondStatus) {
+	msg.Data.Status = status
+}
 
 func (msg CreateBondMsg) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
@@ -64,3 +68,34 @@ func (msg CreateBondMsg) GetSignBytes() []byte {
 func (msg CreateBondMsg) IsNewDid() bool { return true }
 
 var _ StoredBondDoc = (*CreateBondMsg)(nil)
+
+type UpdateBondStatusMsg struct {
+	SignBytes string              `json:"signBytes"`
+	TxHash    string              `json:"txHash"`
+	SenderDid ixo.Did             `json:"senderDid"`
+	BondDid   ixo.Did             `json:"bondDid"`
+	Data      UpdateBondStatusDoc `json:"data"`
+}
+
+func (msg UpdateBondStatusMsg) Type() string                            { return ModuleName }
+func (msg UpdateBondStatusMsg) Route() string                           { return RouterKey }
+func (msg UpdateBondStatusMsg) Get(key interface{}) (value interface{}) { return nil }
+func (msg UpdateBondStatusMsg) ValidateBasic() sdk.Error                { return nil }
+func (msg UpdateBondStatusMsg) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+
+func (msg UpdateBondStatusMsg) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetBondDid())}
+}
+
+func (ups UpdateBondStatusMsg) GetBondDid() ixo.Did {
+	return ups.BondDid
+}
+
+func (ups UpdateBondStatusMsg) GetStatus() BondStatus {
+	return ups.Data.Status
+}
+
+func (msg UpdateBondStatusMsg) IsNewDid() bool     { return false }
+func (msg UpdateBondStatusMsg) IsWithdrawal() bool { return false }

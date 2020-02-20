@@ -53,3 +53,17 @@ func (k Keeper) AddBondDoc(ctx sdk.Context, bondDoc types.StoredBondDoc) {
 	key := types.GetBondPrefixKey(bondDoc.GetBondDid())
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(bondDoc))
 }
+
+func (k Keeper) UpdateBondDoc(ctx sdk.Context, newBondDoc types.StoredBondDoc) (types.StoredBondDoc, sdk.Error) {
+	existedDoc, _ := k.GetBondDoc(ctx, newBondDoc.GetBondDid())
+	if existedDoc == nil {
+
+		return nil, didTypes.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc details are not exist")
+	} else {
+
+		existedDoc.SetStatus(newBondDoc.GetStatus())
+		k.AddBondDoc(ctx, newBondDoc)
+
+		return newBondDoc, nil
+	}
+}

@@ -55,6 +55,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	bondTxCmd.AddCommand(client.PostCommands(
 		cli.CreateBondCmd(cdc),
+		cli.UpdateBondStatusCmd(cdc),
 	)...)
 
 	return bondTxCmd

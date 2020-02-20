@@ -15,9 +15,10 @@ const (
 )
 
 type (
-	Keeper        = keeper.Keeper
-	CreateBondMsg = types.CreateBondMsg
-	StoredBondDoc = types.StoredBondDoc
+	Keeper              = keeper.Keeper
+	CreateBondMsg       = types.CreateBondMsg
+	UpdateBondStatusMsg = types.UpdateBondStatusMsg
+	StoredBondDoc       = types.StoredBondDoc
 )
 
 var (
