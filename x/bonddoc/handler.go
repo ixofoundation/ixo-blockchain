@@ -46,6 +46,8 @@ func handleUpdateBondStatusMsg(ctx sdk.Context, k Keeper, msg UpdateBondStatusMs
 		return sdk.ErrUnknownRequest("Invalid Status Progression requested").Result()
 	}
 
+	// TODO: actions depending on new status (refer to how projects module does this)
+
 	ExistingBondDoc.SetStatus(newStatus)
 	_, _ = k.UpdateBondDoc(ctx, ExistingBondDoc)
 
