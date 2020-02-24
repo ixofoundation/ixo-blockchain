@@ -22,6 +22,7 @@ const (
 	FlagAllowSells             = "allow-sells"
 	FlagSigners                = "signers"
 	FlagBatchBlocks            = "batch-blocks"
+	FlagBondDid                = "bond-did"
 )
 
 var (
@@ -49,6 +50,7 @@ func init() {
 	fsBondCreate.String(FlagSanityMarginPercentage, "", "For swappers, this is the acceptable deviation from the sanity rate")
 	fsBondCreate.String(FlagAllowSells, "", "Whether or not sells will be allowed")
 	fsBondCreate.String(FlagBatchBlocks, "", "The duration in terms of blocks of each orders batch")
+	fsBondCreate.String(FlagBondDid, "", "Bond's Sovrin DID")
 
 	fsBondEdit.String(FlagName, types.DoNotModifyField, "The bond's name")
 	fsBondEdit.String(FlagDescription, types.DoNotModifyField, "The bond's description")

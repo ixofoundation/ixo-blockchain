@@ -2,10 +2,15 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"strings"
 )
 
 type MsgCreateBond struct {
+	SignBytes              string           `json:"signBytes"`
+	BondDid                ixo.Did          `json:"bondDid"`
+	PubKey                 string           `json:"pubKey"`
 	Token                  string           `json:"token" yaml:"token"`
 	Name                   string           `json:"name" yaml:"name"`
 	Description            string           `json:"description" yaml:"description"`
@@ -29,8 +34,12 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint) MsgCreateBond {
+	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint,
+	bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
+		SignBytes:              "",
+		BondDid:                bondDid.Did,
+		PubKey:                 bondDid.VerifyKey,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
@@ -104,16 +113,18 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return []byte(msg.SignBytes)
 }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return msg.Signers
+	return msg.Signers // TODO: what to do with this?
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
 func (msg MsgCreateBond) Type() string { return "create_bond" }
+
+func (msg MsgCreateBond) IsNewDid() bool { return true }
 
 type MsgEditBond struct {
 	Token                  string           `json:"token" yaml:"token"`
@@ -188,6 +199,8 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return "edit_bond" }
 
+func (msg MsgEditBond) IsNewDid() bool { return false }
+
 type MsgBuy struct {
 	Buyer     sdk.AccAddress `json:"buyer" yaml:"buyer"`
 	Amount    sdk.Coin       `json:"amount" yaml:"amount"`
@@ -228,6 +241,8 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return "buy" }
 
+func (msg MsgBuy) IsNewDid() bool { return false }
+
 type MsgSell struct {
 	Seller sdk.AccAddress `json:"seller" yaml:"seller"`
 	Amount sdk.Coin       `json:"amount" yaml:"amount"`
@@ -265,6 +280,8 @@ func (msg MsgSell) GetSigners() []sdk.AccAddress {
 func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return "sell" }
+
+func (msg MsgSell) IsNewDid() bool { return false }
 
 type MsgSwap struct {
 	Swapper   sdk.AccAddress `json:"swapper" yaml:"swapper"`
@@ -317,3 +334,5 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return "swap" }
+
+func (msg MsgSwap) IsNewDid() bool { return false }

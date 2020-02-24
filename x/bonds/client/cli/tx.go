@@ -55,8 +55,8 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_allowSells := viper.GetString(FlagAllowSells)
 			_signers := viper.GetString(FlagSigners)
 			_batchBlocks := viper.GetString(FlagBatchBlocks)
+			_bondDid := viper.GetString(FlagBondDid)
 
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// Parse function parameters
@@ -118,12 +118,16 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf(err.Error())
 			}
 
+			// Parse bond's sovrin DID
+			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				cliCtx.GetFromAddress(), _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
-				maxSupply, orderQuantityLimits, sanityRate,
-				sanityMarginPercentage, _allowSells, signers, batchBlocks)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
+				_allowSells, signers, batchBlocks, bondDid)
+
+			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
 		},
 	}
 

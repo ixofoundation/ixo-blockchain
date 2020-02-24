@@ -1,6 +1,9 @@
 package rest
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -8,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/client"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"net/http"
 )
 
@@ -56,6 +60,7 @@ type createBondReq struct {
 	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
 	Signers                string       `json:"signers" yaml:"signers"`
 	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
+	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 }
 
 func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -151,18 +156,53 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Parse bond's sovrin DID
+		bondDid := client.UnmarshalSovrinDID(req.BondDid)
+
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
 			creator, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			req.AllowSells, signers, batchBlocks)
-		err = msg.ValidateBasic()
+			req.AllowSells, signers, batchBlocks, bondDid)
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
