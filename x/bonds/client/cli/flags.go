@@ -57,4 +57,5 @@ func init() {
 	fsBondEdit.String(FlagOrderQuantityLimits, types.DoNotModifyField, "The max number of tokens bought/sold/swapped per order")
 	fsBondEdit.String(FlagSanityRate, types.DoNotModifyField, "For swappers, this is the typical t1 per t2 rate")
 	fsBondEdit.String(FlagSanityMarginPercentage, types.DoNotModifyField, "For swappers, this is the acceptable deviation from the sanity rate")
+	fsBondEdit.String(FlagBondDid, "", "Bond's Sovrin DID")
 }

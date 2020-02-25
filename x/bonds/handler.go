@@ -35,11 +35,11 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		bond := keeper.MustGetBondByKey(ctx, iterator.Key())
-		batch := keeper.MustGetBatch(ctx, bond.Token)
+		batch := keeper.MustGetBatch(ctx, bond.BondDid)
 
 		// Subtract one block
 		batch.BlocksRemaining = batch.BlocksRemaining.SubUint64(1)
-		keeper.SetBatch(ctx, bond.Token, batch)
+		keeper.SetBatch(ctx, bond.BondDid, batch)
 
 		// If blocks remaining > 0 do not perform orders
 		if !batch.BlocksRemaining.IsZero() {
@@ -47,14 +47,14 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		}
 
 		// Perform orders
-		keeper.PerformOrders(ctx, bond.Token)
+		keeper.PerformOrders(ctx, bond.BondDid)
 
 		// Get batch again just in case orders were cancelled
-		batch = keeper.MustGetBatch(ctx, bond.Token)
+		batch = keeper.MustGetBatch(ctx, bond.BondDid)
 
 		// Save current as last and reset current
-		keeper.SetLastBatch(ctx, bond.Token, batch)
-		keeper.SetBatch(ctx, bond.Token, types.NewBatch(bond.Token, bond.BatchBlocks))
+		keeper.SetLastBatch(ctx, bond.BondDid, batch)
+		keeper.SetBatch(ctx, bond.BondDid, types.NewBatch(bond.BondDid, bond.Token, bond.BatchBlocks))
 	}
 	return []abci.ValidatorUpdate{}
 }
@@ -62,7 +62,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
 
 	if keeper.BondExists(ctx, msg.Token) {
-		return types.ErrBondAlreadyExists(DefaultCodeSpace, msg.Token).Result()
+		return types.ErrBondAlreadyExists(DefaultCodeSpace, msg.BondDid).Result()
 	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
 		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
 	}
@@ -73,19 +73,20 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
 		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.Signers, msg.BatchBlocks)
+		msg.SanityMarginPercentage, msg.AllowSells, msg.Signers, msg.BatchBlocks,
+		msg.BondDid, msg.PubKey)
 
-	keeper.SetBond(ctx, msg.Token, bond)
-	keeper.SetBatch(ctx, msg.Token, types.NewBatch(bond.Token, msg.BatchBlocks))
+	keeper.SetBond(ctx, bond.BondDid, bond)
+	keeper.SetBatch(ctx, bond.BondDid, types.NewBatch(bond.BondDid, bond.Token, msg.BatchBlocks))
 
 	logger := keeper.Logger(ctx)
 	logger.Info(fmt.Sprintf("bond %s with reserve(s) [%s] created by %s",
-		msg.Token, strings.Join(bond.ReserveTokens, ","), msg.Creator.String()))
+		msg.BondDid, strings.Join(bond.ReserveTokens, ","), msg.Creator.String()))
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreateBond,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.Token),
+			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
 			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyFunctionType, msg.FunctionType),
@@ -115,9 +116,9 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditBond) sdk.Result {
 
-	bond, found := keeper.GetBond(ctx, msg.Token)
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.Token).Result()
+		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
 	if !bond.SignersEqualTo(msg.Signers) {
@@ -167,14 +168,14 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 
 	logger := keeper.Logger(ctx)
 	logger.Info(fmt.Sprintf("bond %s edited by %s",
-		msg.Token, msg.Editor.String()))
+		msg.BondDid, msg.Editor.String()))
 
-	keeper.SetBond(ctx, msg.Token, bond)
+	keeper.SetBond(ctx, bond.BondDid, bond)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeEditBond,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.Token),
+			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
 			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits),
@@ -193,10 +194,9 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 
 func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
 
-	token := msg.Amount.Denom
-	bond, found := keeper.GetBond(ctx, token)
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return types.ErrBondDoesNotExist(types.DefaultCodespace, token).Result()
+		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
 	// Check max prices
@@ -227,21 +227,21 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 	order := types.NewBuyOrder(msg.Buyer, msg.Amount, msg.MaxPrices)
 
 	// Get buy price and check if can add buy order to batch
-	buyPrices, sellPrices, err := keeper.GetUpdatedBatchPricesAfterBuy(ctx, token, order)
+	buyPrices, sellPrices, err := keeper.GetUpdatedBatchPricesAfterBuy(ctx, bond.BondDid, order)
 	if err != nil {
 		return err.Result()
 	}
 
 	// Add buy order to batch
-	keeper.AddBuyOrder(ctx, token, order, buyPrices, sellPrices)
+	keeper.AddBuyOrder(ctx, bond.BondDid, order, buyPrices, sellPrices)
 
 	// Cancel unfulfillable orders
-	keeper.CancelUnfulfillableOrders(ctx, token)
+	keeper.CancelUnfulfillableOrders(ctx, bond.BondDid)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeBuy,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.Amount.Denom),
+			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyMaxPrices, msg.MaxPrices.String()),
 		),
@@ -259,10 +259,9 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
-	token := msg.Amount.Denom
-	bond, found := keeper.GetBond(ctx, token)
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return types.ErrBondDoesNotExist(types.DefaultCodespace, token).Result()
+		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
 	// Check if initial liquidity violates sanity rate
@@ -291,12 +290,12 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 	}
 
 	// Update supply
-	keeper.SetCurrentSupply(ctx, bond.Token, bond.CurrentSupply.Add(msg.Amount))
+	keeper.SetCurrentSupply(ctx, bond.BondDid, bond.CurrentSupply.Add(msg.Amount))
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeInitSwapper,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.Amount.Denom),
+			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyChargedPrices, msg.MaxPrices.String()),
 		),
@@ -312,10 +311,9 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 
 func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk.Result {
 
-	token := msg.Amount.Denom
-	bond, found := keeper.GetBond(ctx, token)
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return types.ErrBondDoesNotExist(types.DefaultCodespace, token).Result()
+		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
 	if strings.ToLower(bond.AllowSells) == types.FALSE {
@@ -345,21 +343,21 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 	order := types.NewSellOrder(msg.Seller, msg.Amount)
 
 	// Get sell price and check if can add sell order to batch
-	buyPrices, sellPrices, err := keeper.GetUpdatedBatchPricesAfterSell(ctx, token, order)
+	buyPrices, sellPrices, err := keeper.GetUpdatedBatchPricesAfterSell(ctx, bond.BondDid, order)
 	if err != nil {
 		return err.Result()
 	}
 
 	// Add sell order to batch
-	keeper.AddSellOrder(ctx, token, order, buyPrices, sellPrices)
+	keeper.AddSellOrder(ctx, bond.BondDid, order, buyPrices, sellPrices)
 
 	//// Cancel unfulfillable orders (Note: no need)
-	//keeper.CancelUnfulfillableOrders(ctx, token)
+	//keeper.CancelUnfulfillableOrders(ctx, bond.BondDid)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeSell,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.Amount.Denom),
+			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
 		),
 		sdk.NewEvent(
@@ -374,9 +372,9 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 
 func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk.Result {
 
-	bond, found := keeper.GetBond(ctx, msg.BondToken)
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondToken).Result()
+		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
 	// Check if order quantity limit exceeded
@@ -395,15 +393,15 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk
 	order := types.NewSwapOrder(msg.Swapper, msg.From, msg.ToToken)
 
 	// Add swap order to batch
-	keeper.AddSwapOrder(ctx, msg.BondToken, order)
+	keeper.AddSwapOrder(ctx, bond.BondDid, order)
 
 	//// Cancel unfulfillable orders (Note: no need)
-	//keeper.CancelUnfulfillableOrders(ctx, token)
+	//keeper.CancelUnfulfillableOrders(ctx, bond.BondDid)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeSwap,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.BondToken),
+			sdk.NewAttribute(types.AttributeKeyBond, bond.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.From.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeySwapFromToken, msg.From.Denom),
 			sdk.NewAttribute(types.AttributeKeySwapToToken, msg.ToToken),

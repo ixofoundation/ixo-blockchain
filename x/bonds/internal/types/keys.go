@@ -1,5 +1,7 @@
 package types
 
+import "github.com/ixofoundation/ixo-cosmos/x/ixo"
+
 const (
 	// ModuleName is the name of this module
 	ModuleName = "bonds"
@@ -31,14 +33,14 @@ var (
 	LastBatchesKeyPrefix = []byte{0x02} // key for last batches
 )
 
-func GetBondKey(token string) []byte {
-	return append(BondsKeyPrefix, []byte(token)...)
+func GetBondKey(bondDid ixo.Did) []byte {
+	return append(BondsKeyPrefix, []byte(bondDid)...)
 }
 
-func GetBatchKey(token string) []byte {
-	return append(BatchesKeyPrefix, []byte(token)...)
+func GetBatchKey(bondDid ixo.Did) []byte {
+	return append(BatchesKeyPrefix, []byte(bondDid)...)
 }
 
-func GetLastBatchKey(token string) []byte {
-	return append(LastBatchesKeyPrefix, []byte(token)...)
+func GetLastBatchKey(bondDid ixo.Did) []byte {
+	return append(LastBatchesKeyPrefix, []byte(bondDid)...)
 }

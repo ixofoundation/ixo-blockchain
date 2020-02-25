@@ -61,16 +61,16 @@ func GetCmdBonds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdBond(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "bond [bond-token]",
+		Use:   "bond [bond-did]",
 		Short: "Query info of a bond",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bondToken := args[0]
+			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/bond/%s",
-					queryRoute, bondToken), nil)
+					queryRoute, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -95,16 +95,16 @@ func GetCmdBond(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdBatch(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "batch [bond-token]",
+		Use:   "batch [bond-did]",
 		Short: "Query info of a bond's current batch",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bondToken := args[0]
+			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/batch/%s",
-					queryRoute, bondToken), nil)
+					queryRoute, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -129,16 +129,16 @@ func GetCmdBatch(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdLastBatch(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "last-batch [bond-token]",
+		Use:   "last-batch [bond-did]",
 		Short: "Query info of a bond's last batch",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bondToken := args[0]
+			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/last_batch/%s",
-					queryRoute, bondToken), nil)
+					queryRoute, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -163,16 +163,16 @@ func GetCmdLastBatch(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCurrentPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "current-price [bond-token]",
+		Use:   "current-price [bond-did]",
 		Short: "Query current price(s) of the bond",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bondToken := args[0]
+			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/current_price/%s",
-					queryRoute, bondToken), nil)
+					queryRoute, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -197,17 +197,17 @@ func GetCmdCurrentPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCurrentReserve(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:     "current-reserve [bond-token]",
-		Example: "current-reserve abc",
+		Use:     "current-reserve [bond-did]",
+		Example: "current-reserve U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query current balance(s) of the reserve pool",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bondToken := args[0]
+			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/current_reserve/%s",
-					queryRoute, bondToken), nil)
+					queryRoute, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -232,13 +232,14 @@ func GetCmdCurrentReserve(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCustomPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:     "price [bond-token-with-amount]",
-		Example: "price 10abc",
+		Use:     "price [bond-token-with-amount] [bond-did]",
+		Example: "price 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query price(s) of the bond at a specific supply",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			bondTokenWithAmount := args[0]
+			bondDid := args[1]
 
 			bondCoinWithAmount, err := sdk.ParseCoin(bondTokenWithAmount)
 			if err != nil {
@@ -248,7 +249,7 @@ func GetCmdCustomPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/custom_price/%s/%s",
-					queryRoute, bondCoinWithAmount.Denom,
+					queryRoute, bondDid,
 					bondCoinWithAmount.Amount.String()), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -274,13 +275,14 @@ func GetCmdCustomPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdBuyPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:     "buy-price [bond-token-with-amount]",
-		Example: "buy-price 10abc",
+		Use:     "buy-price [bond-token-with-amount] [bond-did]",
+		Example: "buy-price 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query price(s) of buying an amount of tokens of the bond",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			bondTokenWithAmount := args[0]
+			bondDid := args[1]
 
 			bondCoinWithAmount, err := sdk.ParseCoin(bondTokenWithAmount)
 			if err != nil {
@@ -290,7 +292,7 @@ func GetCmdBuyPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/buy_price/%s/%s",
-					queryRoute, bondCoinWithAmount.Denom,
+					queryRoute, bondDid,
 					bondCoinWithAmount.Amount.String()), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -316,13 +318,14 @@ func GetCmdBuyPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSellReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:     "sell-return [bond-token-with-amount]",
-		Example: "sell-return 10abc",
+		Use:     "sell-return [bond-token-with-amount] [bond-did]",
+		Example: "sell-return 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query return(s) on selling an amount of tokens of the bond",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			bondTokenWithAmount := args[0]
+			bondDid := args[1]
 
 			bondCoinWithAmount, err := sdk.ParseCoin(bondTokenWithAmount)
 			if err != nil {
@@ -332,7 +335,7 @@ func GetCmdSellReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/sell_return/%s/%s",
-					queryRoute, bondCoinWithAmount.Denom,
+					queryRoute, bondDid,
 					bondCoinWithAmount.Amount.String()), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -358,13 +361,13 @@ func GetCmdSellReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSwapReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:     "swap-return [bond-token] [from-token-with-amount] [to-token]",
-		Example: "swap-return abc 10res1 res2",
+		Use:     "swap-return [bond-did] [from-token-with-amount] [to-token]",
+		Example: "swap-return abc 10res1 res2 U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query return(s) on swapping an amount of tokens to another token",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			bondToken := args[0]
+			bondDid := args[0]
 			fromTokenWithAmount := args[1]
 			toToken := args[2]
 
@@ -376,7 +379,7 @@ func GetCmdSwapReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, _, err := cliCtx.QueryWithData(
 				fmt.Sprintf("custom/%s/swap_return/%s/%s/%s/%s",
-					queryRoute, bondToken, fromCoinWithAmount.Denom,
+					queryRoute, bondDid, fromCoinWithAmount.Denom,
 					fromCoinWithAmount.Amount.String(), toToken), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())

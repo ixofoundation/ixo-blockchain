@@ -7,12 +7,12 @@ import (
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	// Initialise bonds
 	for _, b := range data.Bonds {
-		keeper.SetBond(ctx, b.Token, b)
+		keeper.SetBond(ctx, b.BondDid, b)
 	}
 
 	// Initialise batches
 	for _, b := range data.Batches {
-		keeper.SetBatch(ctx, b.Token, b)
+		keeper.SetBatch(ctx, b.BondDid, b)
 	}
 }
 
@@ -23,7 +23,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		bond := k.MustGetBondByKey(ctx, iterator.Key())
-		batch := k.MustGetBatch(ctx, bond.Token)
+		batch := k.MustGetBatch(ctx, bond.BondDid)
 		bonds = append(bonds, bond)
 		batches = append(batches, batch)
 	}

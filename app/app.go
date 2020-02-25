@@ -309,6 +309,8 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		case "bonddoc":
 			return bonddocAnteHandler(ctx, tx, false)
 		case "create_bond":
+			fallthrough
+		case "edit_bond":
 			return bondsAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, true)

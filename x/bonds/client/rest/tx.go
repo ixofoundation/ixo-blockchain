@@ -215,6 +215,7 @@ type editBondReq struct {
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	Signers                string       `json:"signers" yaml:"signers"`
+	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 }
 
 func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -244,9 +245,12 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Parse bond's sovrin DID
+		bondDid := client.UnmarshalSovrinDID(req.BondDid)
+
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage,
-			editor, signers)
+			editor, signers, bondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -262,6 +266,7 @@ type buyReq struct {
 	BondToken  string       `json:"bond_token" yaml:"bond_token"`
 	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
 	MaxPrices  string       `json:"max_prices" yaml:"max_prices"`
+	BondDid    string       `json:"bond_did" yaml:"bond_did"`
 }
 
 func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -296,7 +301,7 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBuy(buyer, bondCoin, maxPrices)
+		msg := types.NewMsgBuy(buyer, bondCoin, maxPrices, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -311,6 +316,7 @@ type sellReq struct {
 	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
 	BondToken  string       `json:"bond_token" yaml:"bond_token"`
 	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
+	BondDid    string       `json:"bond_did" yaml:"bond_did"`
 }
 
 func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -339,7 +345,7 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSell(seller, bondCoin)
+		msg := types.NewMsgSell(seller, bondCoin, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -352,10 +358,10 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 type swapReq struct {
 	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondToken  string       `json:"bond_token" yaml:"bond_token"`
 	FromAmount string       `json:"from_amount" yaml:"from_amount"`
 	FromToken  string       `json:"from_token" yaml:"from_token"`
 	ToToken    string       `json:"to_token" yaml:"to_token"`
+	BondDid    string       `json:"bond_did" yaml:"bond_did"`
 }
 
 func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -378,14 +384,6 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Check that BondToken is a valid token name
-		_, err = sdk.ParseCoin("0" + req.BondToken)
-		if err != nil {
-			err = types.ErrInvalidCoinDenomination(types.DefaultCodespace, req.BondToken)
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// Check that from amount and token can be parsed to a coin
 		fromCoin, err := sdk.ParseCoin(req.FromAmount + req.FromToken)
 		if err != nil {
@@ -401,7 +399,7 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSwap(swapper, req.BondToken, fromCoin, req.ToToken)
+		msg := types.NewMsgSwap(swapper, fromCoin, req.ToToken, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

@@ -10,7 +10,7 @@ import (
 // REST variable names
 //noinspection GoNameStartsWithPackageName
 const (
-	RestBondToken           = "bond_token"
+	RestBondDid             = "bond_did"
 	RestBondAmount          = "bond_amount"
 	RestFromTokenWithAmount = "from_token_with_amount"
 	RestToToken             = "to_token"

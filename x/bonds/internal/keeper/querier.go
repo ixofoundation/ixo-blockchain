@@ -58,7 +58,7 @@ func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err sdk.Error) {
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
-		bondsList = append(bondsList, bond.Token)
+		bondsList = append(bondsList, bond.BondDid)
 	}
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, bondsList)
@@ -70,11 +70,11 @@ func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err sdk.Error) {
 }
 
 func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 
-	bond, found := keeper.GetBond(ctx, bondToken)
+	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondToken))
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, bond)
@@ -86,13 +86,13 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err s
 }
 
 func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 
-	if !keeper.BatchExists(ctx, bondToken) {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("batch for '%s' does not exist", bondToken))
+	if !keeper.BatchExists(ctx, bondDid) {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("batch for '%s' does not exist", bondDid))
 	}
 
-	batch := keeper.MustGetBatch(ctx, bondToken)
+	batch := keeper.MustGetBatch(ctx, bondDid)
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, batch)
 	if err2 != nil {
@@ -103,13 +103,13 @@ func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err 
 }
 
 func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 
-	if !keeper.LastBatchExists(ctx, bondToken) {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("last batch for '%s' does not exist", bondToken))
+	if !keeper.LastBatchExists(ctx, bondDid) {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("last batch for '%s' does not exist", bondDid))
 	}
 
-	batch := keeper.MustGetLastBatch(ctx, bondToken)
+	batch := keeper.MustGetLastBatch(ctx, bondDid)
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, batch)
 	if err2 != nil {
@@ -120,14 +120,14 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 }
 
 func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 
-	bond, found := keeper.GetBond(ctx, bondToken)
+	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondToken))
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
-	reserveBalances := keeper.GetReserveBalances(ctx, bondToken)
+	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
 	reservePrices, err := bond.GetCurrentPricesPT(reserveBalances)
 	if err != nil {
 		return nil, err
@@ -143,11 +143,11 @@ func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byt
 }
 
 func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 
-	bond, found := keeper.GetBond(ctx, bondToken)
+	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondToken))
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
 	reserveBalances := keeper.CoinKeeper.GetCoins(ctx, bond.ReserveAddress)
@@ -160,18 +160,19 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []b
 }
 
 func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 	bondAmount := path[1]
 
-	bondCoin, err2 := sdk.ParseCoin(bondAmount + bondToken)
+	bond, found := keeper.GetBond(ctx, bondDid)
+	if !found {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
+	}
+
+	bondCoin, err2 := sdk.ParseCoin(bondAmount + bond.Token)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(err2.Error())
 	}
 
-	bond, found := keeper.GetBond(ctx, bondToken)
-	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondToken))
-	}
 	reservePrices, err := bond.GetPricesAtSupply(bondCoin.Amount)
 	if err != nil {
 		return nil, err
@@ -187,26 +188,26 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 }
 
 func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 	bondAmount := path[1]
 
-	bondCoin, err2 := sdk.ParseCoin(bondAmount + bondToken)
+	bond, found := keeper.GetBond(ctx, bondDid)
+	if !found {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
+	}
+
+	bondCoin, err2 := sdk.ParseCoin(bondAmount + bond.Token)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(err2.Error())
 	}
 
-	bond, found := keeper.GetBond(ctx, bondToken)
-	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondToken))
-	}
-
 	// Max supply cannot be less than supply (max supply >= supply)
-	adjustedSupply := keeper.GetSupplyAdjustedForBuy(ctx, bondToken)
+	adjustedSupply := keeper.GetSupplyAdjustedForBuy(ctx, bondDid)
 	if bond.MaxSupply.IsLT(adjustedSupply.Add(bondCoin)) {
 		return nil, types.ErrCannotMintMoreThanMaxSupply(types.DefaultCodespace)
 	}
 
-	reserveBalances := keeper.GetReserveBalances(ctx, bondToken)
+	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
 	reservePrices, err := bond.GetPricesToMint(bondCoin.Amount, reserveBalances)
 	if err != nil {
 		return nil, err
@@ -230,17 +231,17 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 }
 
 func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 	bondAmount := path[1]
 
-	bondCoin, err2 := sdk.ParseCoin(bondAmount + bondToken)
-	if err2 != nil {
-		return nil, sdk.ErrInternal(err2.Error())
+	bond, found := keeper.GetBond(ctx, bondDid)
+	if !found {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
-	bond, found := keeper.GetBond(ctx, bondToken)
-	if !found {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondToken))
+	bondCoin, err2 := sdk.ParseCoin(bondAmount + bond.Token)
+	if err2 != nil {
+		return nil, sdk.ErrInternal(err2.Error())
 	}
 
 	if strings.ToLower(bond.AllowSells) == types.FALSE {
@@ -248,12 +249,12 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	// Cannot burn more tokens than what exists
-	adjustedSupply := keeper.GetSupplyAdjustedForSell(ctx, bondToken)
+	adjustedSupply := keeper.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(bondCoin) {
 		return nil, types.ErrCannotBurnMoreThanSupply(types.DefaultCodespace)
 	}
 
-	reserveBalances := keeper.GetReserveBalances(ctx, bondToken)
+	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
 	reserveReturns := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
 	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
 
@@ -278,7 +279,7 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 }
 
 func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err sdk.Error) {
-	bondToken := path[0]
+	bondDid := path[0]
 	fromToken := path[1]
 	fromAmount := path[2]
 	toToken := path[3]
@@ -288,12 +289,12 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 		return nil, sdk.ErrInternal(err2.Error())
 	}
 
-	bond, found := keeper.GetBond(ctx, bondToken)
+	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, types.ErrBondDoesNotExist(types.DefaultCodespace, bondToken)
+		return nil, types.ErrBondDoesNotExist(types.DefaultCodespace, bondDid)
 	}
 
-	reserveBalances := keeper.GetReserveBalances(ctx, bondToken)
+	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
 	reserveReturns, txFee, err := bond.GetReturnsForSwap(fromCoin, toToken, reserveBalances)
 	if err != nil {
 		return nil, err
