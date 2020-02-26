@@ -62,7 +62,11 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 
 func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.Token) == "" {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Name")
@@ -160,7 +164,11 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 
 func (msg MsgEditBond) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.Token) == "" {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Name")
