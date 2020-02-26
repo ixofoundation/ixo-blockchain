@@ -60,6 +60,8 @@ type Bond struct {
 	AllowSells             string
 	Signers                []sdk.AccAddress
 	BatchBlocks            sdk.Uint
+	BondDid                ixo.Did
+	PubKey                 string
 }
 ```
 
@@ -73,7 +75,7 @@ The primary task of the batching mechanism is to find a common price for all of 
 
 ```go
 type Batch struct {
-	Token           string
+	BondDid         ixo.Did
 	BlocksRemaining sdk.Uint
 	TotalBuyAmount  sdk.Coin
 	TotalSellAmount sdk.Coin
