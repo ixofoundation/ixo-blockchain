@@ -10,7 +10,7 @@ import (
 	abciTypes "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmDB "github.com/tendermint/tm-db"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
@@ -22,7 +22,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	keyParam := sdk.NewKVStoreKey(params.StoreKey)
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 	keyFee := sdk.NewKVStoreKey(fees.StoreKey)
-	
+
 	db := tmDB.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
@@ -31,12 +31,12 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(keyFee, sdk.StoreTypeIAVL, nil)
 	_ = ms.LoadLatestVersion()
-	
+
 	ctx := sdk.NewContext(ms, abciTypes.Header{}, true, log.NewNopLogger())
 	cdc := MakeTestCodec()
-	
+
 	paramsKeeper := params.NewKeeper(cdc, keyParam)
-	
+
 	pk1 := cParams.NewKeeper(cdc, keyParam, tkeyParams, cParams.DefaultCodespace)
 	accountKeeper := auth.NewAccountKeeper(
 		cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount,
@@ -44,7 +44,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
 	feeKeeper := fees.NewKeeper(cdc, paramsKeeper)
 	keeper := NewKeeper(cdc, storeKey, accountKeeper, feeKeeper)
-	
+
 	return ctx, keeper, cdc, feeKeeper, bankKeeper, paramsKeeper
 }
 

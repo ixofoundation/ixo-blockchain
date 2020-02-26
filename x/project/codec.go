@@ -2,7 +2,7 @@ package project
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 )
 

@@ -36,5 +36,5 @@ yes $PASSWORD | ixod gentx --name miguel
 ixod collect-gentxs
 ixod validate-genesis
 
-ixod start --pruning "syncable" &
-ixocli rest-server --chain-id pandora-test-1 --trust-node && fg
+#ixod start --pruning "syncable" &
+#ixocli rest-server --chain-id pandora-test-1 --trust-node && fg

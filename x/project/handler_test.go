@@ -3,13 +3,13 @@ package project
 import (
 	"encoding/json"
 	"testing"
-	
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -18,7 +18,7 @@ import (
 )
 
 func TestHandler_CreateClaim(t *testing.T) {
-	
+
 	ctx, keeper, cdc, feesKeeper, bankKeeper, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.CreateProjectMsg{}, "ixo/createProjectMsg", nil)
@@ -34,7 +34,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 		SenderDid:  "senderDid",
 		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
 	}
-	
+
 	res := handleCreateClaimMsg(ctx, keeper, feesKeeper, bankKeeper, projectMsg)
 	require.NotNil(t, res)
 }
@@ -45,32 +45,32 @@ func TestHandler_ProjectMsg(t *testing.T) {
 	cdc.RegisterConcrete(types.CreateProjectMsg{}, "ixo/createProjectMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	
+
 	res := handleCreateProjectMsg(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
-	
+
 	var projectDoc CreateProjectMsg
 	json.Unmarshal(res.Data, &projectDoc)
 	require.True(t, res.IsOK())
-	
+
 	res = handleCreateProjectMsg(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
 	require.False(t, res.IsOK())
-	
+
 }
 func Test_CreateEvaluation(t *testing.T) {
 	ctx, k, cdc, fk, bk, _ := keeper.CreateTestInput()
-	
+
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.CreateEvaluationMsg{}, "ixo/createEvaluationMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	
+
 	fk.SetDec(ctx, fees.KeyIxoFactor, sdk.OneDec())
 	fk.SetDec(ctx, fees.KeyNodeFeePercentage, sdk.NewDec(5).Quo(sdk.NewDec(10)))
 	fk.SetDec(ctx, fees.KeyClaimFeeAmount, sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals))
 	fk.SetDec(ctx, fees.KeyEvaluationFeeAmount, sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)) // 0.4
 	fk.SetDec(ctx, fees.KeyEvaluationPayFeePercentage, sdk.ZeroDec())
 	fk.SetDec(ctx, fees.KeyEvaluationPayNodeFeePercentage, sdk.NewDec(5).Quo(sdk.NewDec(10)))
-	
+
 	evaluationMsg := types.CreateEvaluationMsg{
 		SignBytes:  "",
 		TxHash:     "txHash",
@@ -81,7 +81,7 @@ func Test_CreateEvaluation(t *testing.T) {
 			Status:  types.PendingClaim,
 		},
 	}
-	
+
 	msg := types.CreateProjectMsg{
 		SignBytes:  "",
 		TxHash:     "",
@@ -98,13 +98,13 @@ func Test_CreateEvaluation(t *testing.T) {
 			Status:               "CREATED",
 		},
 	}
-	
+
 	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
 	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
-	
+
 	err := k.SetProjectDoc(ctx, &msg)
 	require.Nil(t, err)
-	
+
 	res := handleCreateEvaluationMsg(ctx, k, fk, bk, evaluationMsg)
 	require.NotNil(t, res)
 }
@@ -115,7 +115,7 @@ func Test_WithdrawFunds(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 	cdc.RegisterConcrete(types.WithdrawFundsMsg{}, "ixo-cosmos/withdrawFundsMsg", nil)
-	
+
 	msg := types.WithdrawFundsMsg{
 		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
@@ -126,7 +126,7 @@ func Test_WithdrawFunds(t *testing.T) {
 			IsRefund:   true,
 		},
 	}
-	
+
 	msg1 := types.CreateProjectMsg{
 		SignBytes:  "",
 		TxHash:     "",
@@ -145,18 +145,18 @@ func Test_WithdrawFunds(t *testing.T) {
 	}
 	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
 	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), msg1.GetProjectDid())
-	
+
 	ck := contracts.NewKeeper(cdc, pk)
 	ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
-	
+
 	err := k.SetProjectDoc(ctx, &msg1)
 	require.Nil(t, err)
-	
+
 	cK := contracts.NewKeeper(cdc, pk)
 	ethClient, err1 := ixo.NewEthClient(cK)
 	require.Nil(t, err1)
 	require.NotNil(t, ethClient)
-	
+
 	res := handleWithdrawFundsMsg(ctx, k, bk, pk, ethClient, msg)
 	require.NotNil(t, res)
 }

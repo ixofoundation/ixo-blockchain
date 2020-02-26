@@ -2,10 +2,10 @@ package types
 
 import (
 	"strconv"
-	
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -47,7 +47,7 @@ func initStateTransitions() map[ProjectStatus][]ProjectStatus {
 		StartedStatus:  {StoppedStatus},
 		StoppedStatus:  {PaidoutStatus},
 	}
-	
+
 }
 
 func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectStatus ProjectStatus) bool {
@@ -57,7 +57,7 @@ func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectSta
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -95,7 +95,7 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		return i
 	}
 }
@@ -112,7 +112,7 @@ func GetProjectDocDecoder(cdc *codec.Codec) ProjectDocDecoder {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		return &projectDoc, err
 	}
 }
