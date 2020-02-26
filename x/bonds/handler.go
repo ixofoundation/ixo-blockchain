@@ -201,9 +201,14 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
+	// Check that bond token used belongs to this bond
+	if msg.Amount.Denom != bond.Token {
+		return types.ErrBondTokenDoesNotMatchBond(types.DefaultCodespace).Result()
+	}
+
 	// Check max prices
 	if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
-		return types.ErrReserveDenomsMismatch(types.DefaultCodespace, msg.MaxPrices, bond.ReserveTokens).Result()
+		return types.ErrReserveDenomsMismatch(types.DefaultCodespace, msg.MaxPrices.String(), bond.ReserveTokens).Result()
 	}
 
 	// Check if order quantity limit exceeded
@@ -266,6 +271,11 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
 	}
 
+	// Check that bond token used belongs to this bond
+	if msg.Amount.Denom != bond.Token {
+		return types.ErrBondTokenDoesNotMatchBond(types.DefaultCodespace).Result()
+	}
+
 	// Check if initial liquidity violates sanity rate
 	if bond.ReservesViolateSanityRate(msg.MaxPrices) {
 		return types.ErrValuesViolateSanityRate(types.DefaultCodespace).Result()
@@ -320,6 +330,11 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 
 	if strings.ToLower(bond.AllowSells) == types.FALSE {
 		return types.ErrBondDoesNotAllowSelling(types.DefaultCodespace).Result()
+	}
+
+	// Check that bond token used belongs to this bond
+	if msg.Amount.Denom != bond.Token {
+		return types.ErrBondTokenDoesNotMatchBond(types.DefaultCodespace).Result()
 	}
 
 	// Check if order quantity limit exceeded
@@ -377,6 +392,13 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
+	}
+
+	// Check that from and to use reserve token names
+	fromAndTo := sdk.NewCoins(msg.From, sdk.NewCoin(msg.ToToken, sdk.OneInt()))
+	fromAndToDenoms := msg.From.Denom + "," + msg.ToToken
+	if !bond.ReserveDenomsEqualTo(fromAndTo) {
+		return types.ErrReserveDenomsMismatch(types.DefaultCodespace, fromAndToDenoms, bond.ReserveTokens).Result()
 	}
 
 	// Check if order quantity limit exceeded

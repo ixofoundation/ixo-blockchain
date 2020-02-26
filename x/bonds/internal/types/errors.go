@@ -168,8 +168,13 @@ func ErrBondTokenCannotBeStakingToken(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeBondTokenInvalid, errMsg)
 }
 
-func ErrReserveDenomsMismatch(codespace sdk.CodespaceType, coins sdk.Coins, actualDenoms []string) sdk.Error {
-	errMsg := fmt.Sprintf("Denoms in %s do not match reserve denoms; expected: %s", coins.String(), strings.Join(actualDenoms, ","))
+func ErrBondTokenDoesNotMatchBond(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := "Bond token does not match bond"
+	return sdk.NewError(codespace, CodeBondTokenInvalid, errMsg)
+}
+
+func ErrReserveDenomsMismatch(codespace sdk.CodespaceType, inputDenoms string, actualDenoms []string) sdk.Error {
+	errMsg := fmt.Sprintf("Denoms in %s do not match reserve denoms; expected: %s", inputDenoms, strings.Join(actualDenoms, ","))
 	return sdk.NewError(codespace, CodeReserveDenomsMismatch, errMsg)
 }
 
