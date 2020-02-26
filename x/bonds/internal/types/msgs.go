@@ -121,7 +121,7 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return msg.Signers // TODO: what to do with this?
+	return []sdk.AccAddress{[]byte(msg.BondDid)}
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
@@ -206,7 +206,7 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 }
 
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
-	return msg.Signers // TODO: what to do with this?
+	return []sdk.AccAddress{[]byte(msg.BondDid)}
 }
 
 func (msg MsgEditBond) Route() string { return RouterKey }
