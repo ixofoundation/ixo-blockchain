@@ -234,7 +234,9 @@ func NewMsgBuy(buyer sdk.AccAddress, amount sdk.Coin, maxPrices sdk.Coins,
 
 func (msg MsgBuy) ValidateBasic() sdk.Error {
 	// Check if empty
-	if msg.Buyer.Empty() {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if msg.Buyer.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Buyer")
 	}
 
@@ -276,7 +278,9 @@ func NewMsgSell(seller sdk.AccAddress, amount sdk.Coin, bondDid ixo.Did) MsgSell
 
 func (msg MsgSell) ValidateBasic() sdk.Error {
 	// Check if empty
-	if msg.Seller.Empty() {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if msg.Seller.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Seller")
 	}
 
@@ -321,7 +325,9 @@ func NewMsgSwap(swapper sdk.AccAddress, from sdk.Coin, toToken string,
 
 func (msg MsgSwap) ValidateBasic() sdk.Error {
 	// Check if empty
-	if msg.Swapper.Empty() {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if msg.Swapper.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Swapper")
 	} else if strings.TrimSpace(msg.ToToken) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "ToToken")
