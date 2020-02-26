@@ -24,9 +24,9 @@ const (
 
 // Bonds and batches are stored as follow:
 //
-// - Bonds: 0x00<bond_token_bytes>
-// - Batches: 0x01<bond_token_bytes>
-// - Last batches: 0x01<bond_token_bytes>
+// - Bonds: 0x00<bond_did_bytes>
+// - Batches: 0x01<bond_did_bytes>
+// - Last batches: 0x01<bond_did_bytes>
 var (
 	BondsKeyPrefix       = []byte{0x00} // key for bonds
 	BatchesKeyPrefix     = []byte{0x01} // key for batches
