@@ -86,7 +86,8 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreateBond,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyFunctionType, msg.FunctionType),
@@ -175,7 +176,8 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeEditBond,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits),
@@ -241,7 +243,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeBuy,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyMaxPrices, msg.MaxPrices.String()),
 		),
@@ -295,7 +297,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeInitSwapper,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyChargedPrices, msg.MaxPrices.String()),
 		),
@@ -357,7 +359,7 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeSell,
-			sdk.NewAttribute(types.AttributeKeyBond, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
 		),
 		sdk.NewEvent(
@@ -401,7 +403,7 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeSwap,
-			sdk.NewAttribute(types.AttributeKeyBond, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.From.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeySwapFromToken, msg.From.Denom),
 			sdk.NewAttribute(types.AttributeKeySwapToToken, msg.ToToken),

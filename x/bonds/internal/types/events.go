@@ -10,7 +10,8 @@ const (
 	EventTypeOrderCancel  = "order_cancel"
 	EventTypeOrderFulfill = "order_fulfill"
 
-	AttributeKeyBond                   = "bond"
+	AttributeKeyBondDid                = "bond_did"
+	AttributeKeyToken                  = "token"
 	AttributeKeyName                   = "name"
 	AttributeKeyDescription            = "description"
 	AttributeKeyFunctionType           = "function_type"

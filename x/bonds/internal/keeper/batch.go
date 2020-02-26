@@ -238,7 +238,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
-		sdk.NewAttribute(types.AttributeKeyBond, bond.BondDid),
+		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
 		sdk.NewAttribute(types.AttributeKeyAddress, bo.Address.String()),
 		sdk.NewAttribute(types.AttributeKeyTokensMinted, bo.Amount.Amount.String()),
@@ -284,7 +284,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
-		sdk.NewAttribute(types.AttributeKeyBond, bond.BondDid),
+		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSellOrder),
 		sdk.NewAttribute(types.AttributeKeyAddress, so.Address.String()),
 		sdk.NewAttribute(types.AttributeKeyTokensBurned, so.Amount.Amount.String()),
@@ -342,7 +342,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrder
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
-		sdk.NewAttribute(types.AttributeKeyBond, bond.BondDid),
+		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSwapOrder),
 		sdk.NewAttribute(types.AttributeKeyAddress, so.Address.String()),
 		sdk.NewAttribute(types.AttributeKeyTokensSwapped, adjustedInput.String()),
@@ -469,7 +469,7 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid ixo.Did) (cance
 
 				ctx.EventManager().EmitEvent(sdk.NewEvent(
 					types.EventTypeOrderCancel,
-					sdk.NewAttribute(types.AttributeKeyBond, bondDid),
+					sdk.NewAttribute(types.AttributeKeyBondDid, bondDid),
 					sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
 					sdk.NewAttribute(types.AttributeKeyAddress, bo.Address.String()),
 					sdk.NewAttribute(types.AttributeKeyCancelReason, bo.CancelReason),
