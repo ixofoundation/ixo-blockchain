@@ -12,6 +12,17 @@ func (k Keeper) GetBondIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.BondsKeyPrefix)
 }
 
+func (k Keeper) GetNumberOfBonds(ctx sdk.Context) sdk.Int {
+	var count sdk.Int
+	iterator := k.GetBondIterator(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		var bond types.Bond
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		count = count.AddRaw(1)
+	}
+	return count
+}
+
 func (k Keeper) GetBond(ctx sdk.Context, bondDid ixo.Did) (bond types.Bond, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if !k.BondExists(ctx, bondDid) {
