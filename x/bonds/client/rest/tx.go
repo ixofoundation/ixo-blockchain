@@ -164,6 +164,12 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
 			req.AllowSells, signers, batchBlocks, bondDid)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
@@ -257,7 +263,45 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
