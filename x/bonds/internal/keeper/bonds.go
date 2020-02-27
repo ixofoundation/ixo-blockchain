@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
@@ -13,7 +14,7 @@ func (k Keeper) GetBondIterator(ctx sdk.Context) sdk.Iterator {
 }
 
 func (k Keeper) GetNumberOfBonds(ctx sdk.Context) sdk.Int {
-	var count sdk.Int
+	count := sdk.ZeroInt()
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
@@ -21,6 +22,26 @@ func (k Keeper) GetNumberOfBonds(ctx sdk.Context) sdk.Int {
 		count = count.AddRaw(1)
 	}
 	return count
+}
+
+func (k Keeper) GetNextUnusedReserveAddress(ctx sdk.Context) sdk.AccAddress {
+	var buffer bytes.Buffer
+
+	// Get number of bonds prefixed with a letter (in this case, A)
+	numString := "A" + k.GetNumberOfBonds(ctx).String()
+
+	// Append numString to a base HEX address
+	buffer.WriteString("A97B2E13A94AF4A1D3EC729DC422C6341BAEEDC9")
+	buffer.WriteString(numString)
+
+	// Truncate from the front to the required length (38) and parse to address
+	truncated := buffer.String()[len(buffer.String())-40:]
+	res, err := sdk.AccAddressFromHex(truncated)
+	if err != nil {
+		panic(err)
+	}
+
+	return res
 }
 
 func (k Keeper) GetBond(ctx sdk.Context, bondDid ixo.Did) (bond types.Bond, found bool) {
