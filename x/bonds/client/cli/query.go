@@ -362,7 +362,7 @@ func GetCmdSellReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 func GetCmdSwapReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:     "swap-return [bond-did] [from-token-with-amount] [to-token]",
-		Example: "swap-return abc 10res1 res2 U7GK8p8rVhJMKhBVRCJJ8c",
+		Example: "swap-return U7GK8p8rVhJMKhBVRCJJ8c 10res1 res2",
 		Short:   "Query return(s) on swapping an amount of tokens to another token",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {

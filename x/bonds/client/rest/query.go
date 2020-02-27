@@ -92,11 +92,11 @@ func queryBondHandler(cliCtx context.CLIContext, queryRoute string) http.Handler
 func queryBatchHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/batch/%s",
-				queryRoute, bondToken), nil)
+				queryRoute, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -109,11 +109,11 @@ func queryBatchHandler(cliCtx context.CLIContext, queryRoute string) http.Handle
 func queryLastBatchHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/last_batch/%s",
-				queryRoute, bondToken), nil)
+				queryRoute, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -126,11 +126,11 @@ func queryLastBatchHandler(cliCtx context.CLIContext, queryRoute string) http.Ha
 func queryCurrentPriceHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/current_price/%s",
-				queryRoute, bondToken), nil)
+				queryRoute, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -143,11 +143,11 @@ func queryCurrentPriceHandler(cliCtx context.CLIContext, queryRoute string) http
 func queryCurrentReserveHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/current_reserve/%s",
-				queryRoute, bondToken), nil)
+				queryRoute, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -160,12 +160,12 @@ func queryCurrentReserveHandler(cliCtx context.CLIContext, queryRoute string) ht
 func queryCustomPriceHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 		bondAmount := vars[RestBondAmount]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/custom_price/%s/%s",
-				queryRoute, bondToken, bondAmount), nil)
+				queryRoute, bondDid, bondAmount), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -178,12 +178,12 @@ func queryCustomPriceHandler(cliCtx context.CLIContext, queryRoute string) http.
 func queryBuyPriceHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 		bondAmount := vars[RestBondAmount]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/buy_price/%s/%s",
-				queryRoute, bondToken, bondAmount), nil)
+				queryRoute, bondDid, bondAmount), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -196,12 +196,12 @@ func queryBuyPriceHandler(cliCtx context.CLIContext, queryRoute string) http.Han
 func querySellReturnHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 		bondAmount := vars[RestBondAmount]
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/sell_return/%s/%s",
-				queryRoute, bondToken, bondAmount), nil)
+				queryRoute, bondDid, bondAmount), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -214,7 +214,7 @@ func querySellReturnHandler(cliCtx context.CLIContext, queryRoute string) http.H
 func querySwapReturnHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		bondToken := vars[RestBondDid]
+		bondDid := vars[RestBondDid]
 		fromTokenWithAmount := vars[RestFromTokenWithAmount]
 		toToken := vars[RestToToken]
 
@@ -226,7 +226,7 @@ func querySwapReturnHandler(cliCtx context.CLIContext, queryRoute string) http.H
 
 		res, _, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/swap_return/%s/%s/%s/%s",
-				queryRoute, bondToken, reserveCoinWithAmount.Denom,
+				queryRoute, bondDid, reserveCoinWithAmount.Denom,
 				reserveCoinWithAmount.Amount.String(), toToken), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())

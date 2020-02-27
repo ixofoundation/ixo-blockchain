@@ -297,7 +297,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	didAnteHandler := did.NewAnteHandler(app.didKeeper)
 	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
 	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
-	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
+	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]

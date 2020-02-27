@@ -2,9 +2,9 @@ package types
 
 import (
 	"encoding/json"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -27,27 +27,27 @@ func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
 	if !valid {
 		return err
 	}
-	
+
 	valid, err = CheckNotEmpty(msg.ProjectDid, "ProjectDid")
 	if !valid {
 		return err
 	}
-	
+
 	valid, err = CheckNotEmpty(msg.Data.NodeDid, "NodeDid")
 	if !valid {
 		return err
 	}
-	
+
 	valid, err = CheckNotEmpty(msg.Data.RequiredClaims, "RequiredClaims")
 	if !valid {
 		return err
 	}
-	
+
 	valid, err = CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy")
 	if !valid {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -184,7 +184,7 @@ func (msg UpdateAgentMsg) String() string {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return string(b)
 }
 
@@ -222,7 +222,7 @@ func (msg CreateClaimMsg) String() string {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return string(b)
 }
 
@@ -260,7 +260,7 @@ func (msg CreateEvaluationMsg) String() string {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return string(b)
 }
 
@@ -296,7 +296,7 @@ func (msg WithdrawFundsMsg) String() string {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return string(b)
 }
 
