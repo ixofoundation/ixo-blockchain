@@ -15,7 +15,6 @@ Bonds can be created by any address using `MsgCreateBond`.
 | FunctionParameters     | `FunctionParams`   | The parameters of the function defining the bonding curve (e.g. `m:12,n:2,c:100`) |
 | Creator                | `sdk.AccAddress`   | The address of the account creating the bond |
 | ReserveTokens          | `[]string`         | The token denominations that will be used as reserve (e.g. `res,rez`) |
-| ReserveAddress         | `sdk.AccAddress`   | The address of the account that will hold reserve tokens |
 | TxFeePercentage        | `sdk.Dec`          | The percentage fee charged for buys/sells/swaps (e.g. `0.3`) |
 | ExitFeePercentage      | `sdk.Dec`          | The percentage fee charged for sells on top of the tx fee (e.g. `0.2`) |
 | FeeAddress             | `sdk.AccAddress`   | The address of the account that will store charged fees |
@@ -36,7 +35,6 @@ type MsgCreateBond struct {
 	FunctionParameters     FunctionParams
 	Creator                sdk.AccAddress
 	ReserveTokens          []string
-	ReserveAddress         sdk.AccAddress
 	TxFeePercentage        sdk.Dec
 	ExitFeePercentage      sdk.Dec
 	FeeAddress             sdk.AccAddress

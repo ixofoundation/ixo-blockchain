@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"sort"
 )
 
@@ -83,6 +84,8 @@ type Bond struct {
 	AllowSells             string           `json:"allow_sells" yaml:"allow_sells"`
 	Signers                []sdk.AccAddress `json:"signers" yaml:"signers"`
 	BatchBlocks            sdk.Uint         `json:"batch_blocks" yaml:"batch_blocks"`
+	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
+	PubKey                 string           `json:"pubKey" yaml:"pubKey"`
 }
 
 func NewBond(token, name, description string, creator sdk.AccAddress,
@@ -91,7 +94,7 @@ func NewBond(token, name, description string, creator sdk.AccAddress,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
 	sanityMarginPercentage sdk.Dec, allowSells string, signers []sdk.AccAddress,
-	batchBlocks sdk.Uint) Bond {
+	batchBlocks sdk.Uint, bondDid ixo.Did, pubKey string) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -117,6 +120,8 @@ func NewBond(token, name, description string, creator sdk.AccAddress,
 		AllowSells:             allowSells,
 		Signers:                signers,
 		BatchBlocks:            batchBlocks,
+		BondDid:                bondDid,
+		PubKey:                 pubKey,
 	}
 }
 

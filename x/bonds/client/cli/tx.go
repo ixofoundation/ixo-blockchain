@@ -55,8 +55,8 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_allowSells := viper.GetString(FlagAllowSells)
 			_signers := viper.GetString(FlagSigners)
 			_batchBlocks := viper.GetString(FlagBatchBlocks)
+			_bondDid := viper.GetString(FlagBondDid)
 
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// Parse function parameters
@@ -118,12 +118,16 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf(err.Error())
 			}
 
+			// Parse bond's sovrin DID
+			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				cliCtx.GetFromAddress(), _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
-				maxSupply, orderQuantityLimits, sanityRate,
-				sanityMarginPercentage, _allowSells, signers, batchBlocks)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
+				_allowSells, signers, batchBlocks, bondDid)
+
+			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
 		},
 	}
 
@@ -147,6 +151,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagAllowSells)
 	_ = cmd.MarkFlagRequired(FlagSigners)
 	_ = cmd.MarkFlagRequired(FlagBatchBlocks)
+	_ = cmd.MarkFlagRequired(FlagBondDid)
 
 	return cmd
 }
@@ -163,8 +168,8 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			_sanityRate := viper.GetString(FlagSanityRate)
 			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
 			_signers := viper.GetString(FlagSigners)
+			_bondDid := viper.GetString(FlagBondDid)
 
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// Parse signers
@@ -173,10 +178,15 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			// Parse bond's sovrin DID
+			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, cliCtx.GetFromAddress(), signers)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+				_sanityMarginPercentage, cliCtx.GetFromAddress(), signers,
+				bondDid)
+
+			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
 		},
 	}
 
@@ -186,18 +196,19 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(client.FlagFrom)
 	_ = cmd.MarkFlagRequired(FlagToken)
 	_ = cmd.MarkFlagRequired(FlagSigners)
+	_ = cmd.MarkFlagRequired(FlagBondDid)
 
 	return cmd
 }
 
 func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "buy [bond-token-with-amount] [max-prices]",
+		Use: "buy [bond-token-with-amount] [max-prices] [bond-did]",
 		Example: "" +
-			"buy 10abc 1000res1\n" +
-			"buy 10abc 1000res1,1000res2",
+			"buy 10abc 1000res1 U7GK8p8rVhJMKhBVRCJJ8c\n" +
+			"buy 10abc 1000res1,1000res2 U7GK8p8rVhJMKhBVRCJJ8c",
 		Short: "Buy from a bond",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
@@ -213,8 +224,7 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgBuy(cliCtx.GetFromAddress(),
-				bondCoinWithAmount, maxPrices)
+			msg := types.NewMsgBuy(cliCtx.GetFromAddress(), bondCoinWithAmount, maxPrices, args[2])
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
@@ -224,10 +234,10 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "sell [bond-token-with-amount]",
-		Example: "sell 10abc",
+		Use:     "sell [bond-token-with-amount] [bond-did]",
+		Example: "sell 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Sell from a bond",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
@@ -238,7 +248,7 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSell(cliCtx.GetFromAddress(), bondCoinWithAmount)
+			msg := types.NewMsgSell(cliCtx.GetFromAddress(), bondCoinWithAmount, args[1])
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
@@ -248,10 +258,10 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "swap [bond_token] [from_amount] [from_token] [to_token]",
+		Use: "swap [from_amount] [from_token] [to_token] [bond-did]",
 		Example: "" +
-			"swap abc 100 res1 res2\n" +
-			"swap abc 100 res2 res1",
+			"swap 100 res1 res2 U7GK8p8rVhJMKhBVRCJJ8c\n" +
+			"swap 100 res2 res1 U7GK8p8rVhJMKhBVRCJJ8c",
 		Short: "Perform a swap between two tokens",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -259,25 +269,19 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			// Check that bond_token is a valid token name
-			_, err := sdk.ParseCoin("0" + args[0])
-			if err != nil {
-				return types.ErrInvalidCoinDenomination(types.DefaultCodespace, args[0])
-			}
-
 			// Check that from amount and token can be parsed to a coin
-			from, err := sdk.ParseCoin(args[1] + args[2])
+			from, err := sdk.ParseCoin(args[0] + args[1])
 			if err != nil {
 				return err
 			}
 
 			// Check that to_token is a valid token name
-			_, err = sdk.ParseCoin("0" + args[3])
+			_, err = sdk.ParseCoin("0" + args[2])
 			if err != nil {
-				return types.ErrInvalidCoinDenomination(types.DefaultCodespace, args[3])
+				return types.ErrInvalidCoinDenomination(types.DefaultCodespace, args[2])
 			}
 
-			msg := types.NewMsgSwap(cliCtx.GetFromAddress(), args[0], from, args[3])
+			msg := types.NewMsgSwap(cliCtx.GetFromAddress(), from, args[2], args[3])
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}

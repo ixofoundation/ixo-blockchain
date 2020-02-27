@@ -10,7 +10,7 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
 	PaidoutStatus    = types.PaidoutStatus
 	FundedStatus     = types.FundedStatus

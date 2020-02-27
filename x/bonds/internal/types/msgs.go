@@ -2,10 +2,15 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 	"strings"
 )
 
 type MsgCreateBond struct {
+	SignBytes              string           `json:"signBytes"`
+	BondDid                ixo.Did          `json:"bondDid"`
+	PubKey                 string           `json:"pubKey"`
 	Token                  string           `json:"token" yaml:"token"`
 	Name                   string           `json:"name" yaml:"name"`
 	Description            string           `json:"description" yaml:"description"`
@@ -29,8 +34,12 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint) MsgCreateBond {
+	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint,
+	bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
+		SignBytes:              "",
+		BondDid:                bondDid.Did,
+		PubKey:                 bondDid.VerifyKey,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
@@ -53,7 +62,11 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 
 func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.Token) == "" {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Name")
@@ -104,18 +117,23 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return []byte(msg.SignBytes)
 }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return msg.Signers
+	return []sdk.AccAddress{[]byte(msg.BondDid)}
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
 func (msg MsgCreateBond) Type() string { return "create_bond" }
 
+func (msg MsgCreateBond) IsNewDid() bool { return true }
+
 type MsgEditBond struct {
+	SignBytes              string           `json:"signBytes"`
+	BondDid                ixo.Did          `json:"bondDid"`
+	PubKey                 string           `json:"pubKey"`
 	Token                  string           `json:"token" yaml:"token"`
 	Name                   string           `json:"name" yaml:"name"`
 	Description            string           `json:"description" yaml:"description"`
@@ -128,8 +146,11 @@ type MsgEditBond struct {
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editor sdk.AccAddress,
-	signers []sdk.AccAddress) MsgEditBond {
+	signers []sdk.AccAddress, bondDid sovrin.SovrinDid) MsgEditBond {
 	return MsgEditBond{
+		SignBytes:              "",
+		BondDid:                bondDid.Did,
+		PubKey:                 bondDid.VerifyKey,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
@@ -143,7 +164,11 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 
 func (msg MsgEditBond) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.Token) == "" {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Name")
@@ -177,34 +202,41 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgEditBond) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return []byte(msg.SignBytes)
 }
 
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
-	return msg.Signers
+	return []sdk.AccAddress{[]byte(msg.BondDid)}
 }
 
 func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return "edit_bond" }
 
+func (msg MsgEditBond) IsNewDid() bool { return false }
+
 type MsgBuy struct {
 	Buyer     sdk.AccAddress `json:"buyer" yaml:"buyer"`
 	Amount    sdk.Coin       `json:"amount" yaml:"amount"`
 	MaxPrices sdk.Coins      `json:"max_prices" yaml:"max_prices"`
+	BondDid   ixo.Did        `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgBuy(buyer sdk.AccAddress, amount sdk.Coin, maxPrices sdk.Coins) MsgBuy {
+func NewMsgBuy(buyer sdk.AccAddress, amount sdk.Coin, maxPrices sdk.Coins,
+	bondDid ixo.Did) MsgBuy {
 	return MsgBuy{
 		Buyer:     buyer,
 		Amount:    amount,
 		MaxPrices: maxPrices,
+		BondDid:   bondDid,
 	}
 }
 
 func (msg MsgBuy) ValidateBasic() sdk.Error {
 	// Check if empty
-	if msg.Buyer.Empty() {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if msg.Buyer.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Buyer")
 	}
 
@@ -228,21 +260,27 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return "buy" }
 
+func (msg MsgBuy) IsNewDid() bool { return false }
+
 type MsgSell struct {
-	Seller sdk.AccAddress `json:"seller" yaml:"seller"`
-	Amount sdk.Coin       `json:"amount" yaml:"amount"`
+	Seller  sdk.AccAddress `json:"seller" yaml:"seller"`
+	Amount  sdk.Coin       `json:"amount" yaml:"amount"`
+	BondDid ixo.Did        `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgSell(seller sdk.AccAddress, amount sdk.Coin) MsgSell {
+func NewMsgSell(seller sdk.AccAddress, amount sdk.Coin, bondDid ixo.Did) MsgSell {
 	return MsgSell{
-		Seller: seller,
-		Amount: amount,
+		Seller:  seller,
+		Amount:  amount,
+		BondDid: bondDid,
 	}
 }
 
 func (msg MsgSell) ValidateBasic() sdk.Error {
 	// Check if empty
-	if msg.Seller.Empty() {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if msg.Seller.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Seller")
 	}
 
@@ -266,28 +304,31 @@ func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return "sell" }
 
+func (msg MsgSell) IsNewDid() bool { return false }
+
 type MsgSwap struct {
-	Swapper   sdk.AccAddress `json:"swapper" yaml:"swapper"`
-	BondToken string         `json:"bond_token" yaml:"bond_token"`
-	From      sdk.Coin       `json:"from" yaml:"from"`
-	ToToken   string         `json:"to_token" yaml:"to_token"`
+	Swapper sdk.AccAddress `json:"swapper" yaml:"swapper"`
+	BondDid ixo.Did        `json:"bond_did" yaml:"bond_did"`
+	From    sdk.Coin       `json:"from" yaml:"from"`
+	ToToken string         `json:"to_token" yaml:"to_token"`
 }
 
-func NewMsgSwap(swapper sdk.AccAddress, bondToken string, from sdk.Coin, toToken string) MsgSwap {
+func NewMsgSwap(swapper sdk.AccAddress, from sdk.Coin, toToken string,
+	bondDid ixo.Did) MsgSwap {
 	return MsgSwap{
-		Swapper:   swapper,
-		BondToken: bondToken,
-		From:      from,
-		ToToken:   toToken,
+		Swapper: swapper,
+		From:    from,
+		ToToken: toToken,
+		BondDid: bondDid,
 	}
 }
 
 func (msg MsgSwap) ValidateBasic() sdk.Error {
 	// Check if empty
-	if msg.Swapper.Empty() {
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if msg.Swapper.Empty() {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Swapper")
-	} else if strings.TrimSpace(msg.BondToken) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondToken")
 	} else if strings.TrimSpace(msg.ToToken) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "ToToken")
 	}
@@ -317,3 +358,5 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return "swap" }
+
+func (msg MsgSwap) IsNewDid() bool { return false }

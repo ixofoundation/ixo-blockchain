@@ -2,7 +2,7 @@ package project
 
 import (
 	"encoding/json"
-	
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -52,12 +52,12 @@ func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router
 func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	projectTxCmd := &cobra.Command{
 		Use:                        ModuleName,
-		Short:                      "project transaction sub commands",
+		Short:                      "Project transaction sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	
+
 	projectTxCmd.AddCommand(client.PostCommands(
 		cli.CreateProjectCmd(cdc),
 		cli.CreateAgentCmd(cdc),
@@ -67,7 +67,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		cli.CreateEvaluationCmd(cdc),
 		cli.WithDrawFundsCmd(cdc),
 	)...)
-	
+
 	return projectTxCmd
 }
 
@@ -79,13 +79,13 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	
+
 	projectQueryCmd.AddCommand(client.GetCommands(
 		cli.GetProjectDocCmd(cdc),
 		cli.GetProjectAccountsCmd(cdc),
 		cli.GetProjectTxsCmd(cdc),
 	)...)
-	
+
 	return projectQueryCmd
 }
 
@@ -101,7 +101,7 @@ type AppModule struct {
 
 func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, contractKeeper contracts.Keeper,
 	bankKeeper bank.Keeper, paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
-	
+
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,

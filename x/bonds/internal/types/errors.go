@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"strings"
 )
 
@@ -97,13 +98,13 @@ func ErrIncorrectNumberOfFunctionParameters(codespace sdk.CodespaceType, expecte
 	return sdk.NewError(codespace, CodeIncorrectNumberOfValues, errMsg)
 }
 
-func ErrBondDoesNotExist(codespace sdk.CodespaceType, token string) sdk.Error {
-	errMsg := fmt.Sprintf("Bond '%s' does not exist", token)
+func ErrBondDoesNotExist(codespace sdk.CodespaceType, bondDid ixo.Did) sdk.Error {
+	errMsg := fmt.Sprintf("Bond '%s' does not exist", bondDid)
 	return sdk.NewError(codespace, CodeBondDoesNotExist, errMsg)
 }
 
-func ErrBondAlreadyExists(codespace sdk.CodespaceType, token string) sdk.Error {
-	errMsg := fmt.Sprintf("Bond '%s' already exists", token)
+func ErrBondAlreadyExists(codespace sdk.CodespaceType, bondDid ixo.Did) sdk.Error {
+	errMsg := fmt.Sprintf("Bond '%s' already exists", bondDid)
 	return sdk.NewError(codespace, CodeBondAlreadyExists, errMsg)
 }
 
@@ -167,8 +168,13 @@ func ErrBondTokenCannotBeStakingToken(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeBondTokenInvalid, errMsg)
 }
 
-func ErrReserveDenomsMismatch(codespace sdk.CodespaceType, coins sdk.Coins, actualDenoms []string) sdk.Error {
-	errMsg := fmt.Sprintf("Denoms in %s do not match reserve denoms; expected: %s", coins.String(), strings.Join(actualDenoms, ","))
+func ErrBondTokenDoesNotMatchBond(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := "Bond token does not match bond"
+	return sdk.NewError(codespace, CodeBondTokenInvalid, errMsg)
+}
+
+func ErrReserveDenomsMismatch(codespace sdk.CodespaceType, inputDenoms string, actualDenoms []string) sdk.Error {
+	errMsg := fmt.Sprintf("Denoms in %s do not match reserve denoms; expected: %s", inputDenoms, strings.Join(actualDenoms, ","))
 	return sdk.NewError(codespace, CodeReserveDenomsMismatch, errMsg)
 }
 

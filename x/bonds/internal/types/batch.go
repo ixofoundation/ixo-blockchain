@@ -2,10 +2,11 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 type Batch struct {
-	Token           string       `json:"token" yaml:"token"`
+	BondDid         ixo.Did      `json:"bond_did" yaml:"bond_did"`
 	BlocksRemaining sdk.Uint     `json:"blocks_remaining" yaml:"blocks_remaining"`
 	TotalBuyAmount  sdk.Coin     `json:"total_buy_amount" yaml:"total_buy_amount"`
 	TotalSellAmount sdk.Coin     `json:"total_sell_amount" yaml:"total_sell_amount"`
@@ -20,9 +21,9 @@ func (b Batch) MoreBuysThanSells() bool { return b.TotalSellAmount.IsLT(b.TotalB
 func (b Batch) MoreSellsThanBuys() bool { return b.TotalBuyAmount.IsLT(b.TotalSellAmount) }
 func (b Batch) EqualBuysAndSells() bool { return b.TotalBuyAmount.IsEqual(b.TotalSellAmount) }
 
-func NewBatch(token string, blocks sdk.Uint) Batch {
+func NewBatch(bondDid ixo.Did, token string, blocks sdk.Uint) Batch {
 	return Batch{
-		Token:           token,
+		BondDid:         bondDid,
 		BlocksRemaining: blocks,
 		TotalBuyAmount:  sdk.NewInt64Coin(token, 0),
 		TotalSellAmount: sdk.NewInt64Coin(token, 0),

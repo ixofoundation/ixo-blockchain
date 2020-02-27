@@ -27,7 +27,7 @@ paths:
             items:
               type: string
               example: abc
-  /bonds/{bond_token}:
+  /bonds/{bond_did}:
     get:
       description: Information about the bond
       summary: The properties of the bond
@@ -37,17 +37,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
       responses:
         200:
           description: Bond details
           schema:
             $ref: "#/definitions/BondQueryResult"
-  /bonds/{bond_token}/batch:
+  /bonds/{bond_did}/batch:
     get:
       description: Bond's current batch with current list of buy and sell orders
       summary: Current orders batch of the bond
@@ -57,17 +57,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
       responses:
         200:
           description: Current batch
           schema:
             $ref: "#/definitions/BatchQueryResult"
-  /bonds/{bond_token}/last_batch:
+  /bonds/{bond_did}/last_batch:
     get:
       description: Bond's last batch with last list of buy and sell orders
       summary: Last orders batch of the bond
@@ -77,17 +77,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
       responses:
         200:
           description: Last batch
           schema:
             $ref: "#/definitions/BatchQueryResult"
-  /bonds/{bond_token}/current_price:
+  /bonds/{bond_did}/current_price:
     get:
       description: Computes the current price(s) of the bond
       summary: Current price(s) of the bond
@@ -97,17 +97,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
       responses:
         200:
           description: Current price(s) of the bond
           schema:
             $ref: "#/definitions/ResCoins"
-  /bonds/{bond_token}/current_reserve:
+  /bonds/{bond_did}/current_reserve:
     get:
       description: Obtains the reserve pool balance(s) of the bond
       summary: Current balance(s) of the reserve pool
@@ -117,17 +117,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
       responses:
         200:
           description: Current balance(s) of the reserve pool
           schema:
             $ref: "#/definitions/ResCoins"
-  /bonds/{bond_token}/price/{bond_amount}:
+  /bonds/{bond_did}/price/{bond_amount}:
     get:
       description: Computes the price(s) of the bond at a specific amount of supply
       summary: Price(s) of the bond at a specific supply
@@ -137,11 +137,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
         - in: path
           name: bond_amount
           description: Number of bond tokens
@@ -153,7 +153,7 @@ paths:
           description: Price(s) to buy the tokens
           schema:
             $ref: "#/definitions/ResCoins"
-  /bonds/{bond_token}/buy_price/{bond_amount}:
+  /bonds/{bond_did}/buy_price/{bond_amount}:
     get:
       description: Computes the price(s) to buy an amount of tokens of the bond
       summary: Price(s) of buying an amount of tokens of the bond
@@ -163,11 +163,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
         - in: path
           name: bond_amount
           description: Number of bond tokens
@@ -179,7 +179,7 @@ paths:
           description: Price(s) to buy the tokens
           schema:
             $ref: "#/definitions/BuyPriceQueryResult"
-  /bonds/{bond_token}/sell_return/{bond_amount}:
+  /bonds/{bond_did}/sell_return/{bond_amount}:
     get:
       description: Computes the return on selling an amount of tokens of the bond
       summary: Return on selling an amount of tokens of the bond
@@ -189,11 +189,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
         - in: path
           name: bond_amount
           description: Number of bond tokens
@@ -205,7 +205,7 @@ paths:
           description: Return when selling the tokens
           schema:
             $ref: "#/definitions/SellReturnQueryResult"
-  /bonds/{bond_token}/swap_return/{from_token_with_amount}/{to_token}:
+  /bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}:
     get:
       description: Computes the return on an amount of tokens by swapping
       summary: Return on an amount of tokens by swapping
@@ -215,11 +215,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: U7GK8p8rVhJMKhBVRCJJ8c
         - in: path
           name: from_token_with_amount
           description: Number of reserve tokens
@@ -295,6 +295,9 @@ paths:
               max_prices:
                 type: string
                 example: 1000res1,1000res2,...
+              bond_did:
+                type: string
+                example: U7GK8p8rVhJMKhBVRCJJ8c
   /bonds/sell:
     post:
       description: Sell tokens from a bond
@@ -318,6 +321,9 @@ paths:
               bond_amount:
                 type: string
                 example: 100
+              bond_did:
+                type: string
+                example: U7GK8p8rVhJMKhBVRCJJ8c
   /bonds/swap:
     post:
       description: Perform a swap between two tokens using a swapper bond
@@ -344,6 +350,9 @@ paths:
               to_token:
                 type: string
                 example: res2
+              bond_did:
+                type: string
+                example: U7GK8p8rVhJMKhBVRCJJ8c
 definitions:
   AnyCoin:
     type: object
@@ -436,6 +445,9 @@ definitions:
   Batch:
     type: object
     properties:
+      bond_did:
+        type: string
+        example: U7GK8p8rVhJMKhBVRCJJ8c
       blocks_remaining:
         type: number
         example: 2
@@ -525,6 +537,12 @@ definitions:
           batch_blocks:
             type: number
             example: 5
+          bond_did:
+            type: string
+            example: U7GK8p8rVhJMKhBVRCJJ8c
+          pubkey:
+            type: string
+            example: FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW
   BatchQueryResult:
     type: object
     properties:
@@ -618,6 +636,9 @@ definitions:
       batch_blocks:
         type: string
         example: "5"
+      bond_did:
+        type: string
+        example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
   BondEdit:
     type: object
     properties:
@@ -642,6 +663,9 @@ definitions:
       signers:
         type: string
         example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
+      bond_did:
+        type: string
+        example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
   FunctionParameter:
     type: object
     properties:

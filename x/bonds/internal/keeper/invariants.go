@@ -44,8 +44,9 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 		iterator := k.GetBondIterator(ctx)
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
+			batch := k.MustGetBatch(ctx, bond.BondDid)
 			denom := bond.Token
-			batch := k.MustGetBatch(ctx, denom)
+			did := bond.BondDid
 
 			// Add bond current supply
 			supplyInBondsAndBatches := bond.CurrentSupply
@@ -66,7 +67,7 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 				msg += fmt.Sprintf("total %s supply invariance:\n"+
 					"\ttotal %s supply: %s\n"+
 					"\tsum of %s in accounts: %s\n",
-					denom, denom, supplyInBondsAndBatches.Amount.String(),
+					did, denom, supplyInBondsAndBatches.Amount.String(),
 					denom, inAccounts.String())
 			}
 		}
@@ -86,6 +87,7 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
 			denom := bond.Token
+			did := bond.BondDid
 
 			if bond.FunctionType == types.SwapperFunction {
 				continue // Check does not apply to swapper function
@@ -93,7 +95,7 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 
 			expectedReserve := bond.CurveIntegral(bond.CurrentSupply.Amount)
 			expectedRounded := expectedReserve.Ceil().TruncateInt()
-			actualReserve := k.GetReserveBalances(ctx, denom)
+			actualReserve := k.GetReserveBalances(ctx, did)
 
 			for _, r := range actualReserve {
 				if r.Amount.LT(expectedRounded) {
@@ -101,7 +103,7 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 					msg += fmt.Sprintf("%s reserve invariance:\n"+
 						"\texpected(ceil-rounded) %s reserve: %s\n"+
 						"\tactual %s reserve: %s\n",
-						denom, denom, expectedReserve.String(),
+						did, denom, expectedReserve.String(),
 						denom, r.String())
 				}
 			}
