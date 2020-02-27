@@ -6,7 +6,6 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/ed25519"
 	"strings"
 )
 
@@ -67,7 +66,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
 	}
 
-	reserveAddress := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
 	bond := NewBond(msg.Token, msg.Name, msg.Description, msg.Creator,
 		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
