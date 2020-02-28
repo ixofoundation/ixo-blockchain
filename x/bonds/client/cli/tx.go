@@ -53,6 +53,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_sanityRate := viper.GetString(FlagSanityRate)
 			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
 			_allowSells := viper.GetString(FlagAllowSells)
+			_signers := viper.GetString(FlagSigners)
 			_batchBlocks := viper.GetString(FlagBatchBlocks)
 			_bondDid := viper.GetString(FlagBondDid)
 
@@ -105,6 +106,12 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf(err.Error())
 			}
 
+			// Parse signers
+			signers, err := client2.ParseSigners(_signers)
+			if err != nil {
+				return err
+			}
+
 			// Parse batch blocks
 			batchBlocks, err := client2.ParseBatchBlocks(_batchBlocks)
 			if err != nil {
@@ -118,7 +125,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				cliCtx.GetFromAddress(), _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
 				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
-				_allowSells, batchBlocks, bondDid)
+				_allowSells, signers, batchBlocks, bondDid)
 
 			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
 		},
@@ -142,6 +149,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagSanityRate)
 	_ = cmd.MarkFlagRequired(FlagSanityMarginPercentage)
 	_ = cmd.MarkFlagRequired(FlagAllowSells)
+	_ = cmd.MarkFlagRequired(FlagSigners)
 	_ = cmd.MarkFlagRequired(FlagBatchBlocks)
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 
@@ -159,16 +167,24 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
 			_sanityRate := viper.GetString(FlagSanityRate)
 			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
+			_signers := viper.GetString(FlagSigners)
 			_bondDid := viper.GetString(FlagBondDid)
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			// Parse signers
+			signers, err := client2.ParseSigners(_signers)
+			if err != nil {
+				return err
+			}
 
 			// Parse bond's sovrin DID
 			bondDid := client2.UnmarshalSovrinDID(_bondDid)
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, cliCtx.GetFromAddress(), bondDid)
+				_sanityMarginPercentage, cliCtx.GetFromAddress(), signers,
+				bondDid)
 
 			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
 		},
@@ -179,6 +195,7 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 
 	_ = cmd.MarkFlagRequired(client.FlagFrom)
 	_ = cmd.MarkFlagRequired(FlagToken)
+	_ = cmd.MarkFlagRequired(FlagSigners)
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 
 	return cmd

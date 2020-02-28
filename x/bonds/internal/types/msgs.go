@@ -8,32 +8,34 @@ import (
 )
 
 type MsgCreateBond struct {
-	SignBytes              string         `json:"signBytes"`
-	BondDid                ixo.Did        `json:"bondDid"`
-	PubKey                 string         `json:"pubKey"`
-	Token                  string         `json:"token" yaml:"token"`
-	Name                   string         `json:"name" yaml:"name"`
-	Description            string         `json:"description" yaml:"description"`
-	FunctionType           string         `json:"function_type" yaml:"function_type"`
-	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
-	Creator                sdk.AccAddress `json:"creator" yaml:"creator"`
-	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
-	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-	FeeAddress             sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
-	MaxSupply              sdk.Coin       `json:"max_supply" yaml:"max_supply"`
-	OrderQuantityLimits    sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
-	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
+	SignBytes              string           `json:"signBytes"`
+	BondDid                ixo.Did          `json:"bondDid"`
+	PubKey                 string           `json:"pubKey"`
+	Token                  string           `json:"token" yaml:"token"`
+	Name                   string           `json:"name" yaml:"name"`
+	Description            string           `json:"description" yaml:"description"`
+	FunctionType           string           `json:"function_type" yaml:"function_type"`
+	FunctionParameters     FunctionParams   `json:"function_parameters" yaml:"function_parameters"`
+	Creator                sdk.AccAddress   `json:"creator" yaml:"creator"`
+	ReserveTokens          []string         `json:"reserve_tokens" yaml:"reserve_tokens"`
+	TxFeePercentage        sdk.Dec          `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
+	ExitFeePercentage      sdk.Dec          `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
+	FeeAddress             sdk.AccAddress   `json:"fee_address" yaml:"fee_address"`
+	MaxSupply              sdk.Coin         `json:"max_supply" yaml:"max_supply"`
+	OrderQuantityLimits    sdk.Coins        `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate             sdk.Dec          `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage sdk.Dec          `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	AllowSells             string           `json:"allow_sells" yaml:"allow_sells"`
+	Signers                []sdk.AccAddress `json:"signers" yaml:"signers"`
+	BatchBlocks            sdk.Uint         `json:"batch_blocks" yaml:"batch_blocks"`
 }
 
 func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, batchBlocks sdk.Uint, bondDid sovrin.SovrinDid) MsgCreateBond {
+	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint,
+	bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
 		SignBytes:              "",
 		BondDid:                bondDid.Did,
@@ -53,6 +55,7 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
 		AllowSells:             strings.ToLower(allowSell),
+		Signers:                signers,
 		BatchBlocks:            batchBlocks,
 	}
 }
@@ -128,21 +131,22 @@ func (msg MsgCreateBond) Type() string { return "create_bond" }
 func (msg MsgCreateBond) IsNewDid() bool { return true }
 
 type MsgEditBond struct {
-	SignBytes              string         `json:"signBytes"`
-	BondDid                ixo.Did        `json:"bondDid"`
-	PubKey                 string         `json:"pubKey"`
-	Token                  string         `json:"token" yaml:"token"`
-	Name                   string         `json:"name" yaml:"name"`
-	Description            string         `json:"description" yaml:"description"`
-	OrderQuantityLimits    string         `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             string         `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage string         `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	Editor                 sdk.AccAddress `json:"editor" yaml:"editor"`
+	SignBytes              string           `json:"signBytes"`
+	BondDid                ixo.Did          `json:"bondDid"`
+	PubKey                 string           `json:"pubKey"`
+	Token                  string           `json:"token" yaml:"token"`
+	Name                   string           `json:"name" yaml:"name"`
+	Description            string           `json:"description" yaml:"description"`
+	OrderQuantityLimits    string           `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate             string           `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage string           `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	Editor                 sdk.AccAddress   `json:"editor" yaml:"editor"`
+	Signers                []sdk.AccAddress `json:"signers" yaml:"signers"`
 }
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editor sdk.AccAddress,
-	bondDid sovrin.SovrinDid) MsgEditBond {
+	signers []sdk.AccAddress, bondDid sovrin.SovrinDid) MsgEditBond {
 	return MsgEditBond{
 		SignBytes:              "",
 		BondDid:                bondDid.Did,
@@ -154,6 +158,7 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
 		Editor:                 editor,
+		Signers:                signers,
 	}
 }
 

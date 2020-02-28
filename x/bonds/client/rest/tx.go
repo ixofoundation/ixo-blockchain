@@ -58,6 +58,7 @@ type createBondReq struct {
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
+	Signers                string       `json:"signers" yaml:"signers"`
 	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 }
@@ -141,6 +142,13 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Parse signers
+		signers, err := client.ParseSigners(req.Signers)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		// Parse batch blocks
 		batchBlocks, err := client.ParseBatchBlocks(req.BatchBlocks)
 		if err != nil {
@@ -155,7 +163,7 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			creator, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			req.AllowSells, batchBlocks, bondDid)
+			req.AllowSells, signers, batchBlocks, bondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -212,6 +220,7 @@ type editBondReq struct {
 	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	Signers                string       `json:"signers" yaml:"signers"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 }
 
@@ -235,12 +244,19 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Parse signers
+		signers, err := client.ParseSigners(req.Signers)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		// Parse bond's sovrin DID
 		bondDid := client.UnmarshalSovrinDID(req.BondDid)
 
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage,
-			editor, bondDid)
+			editor, signers, bondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

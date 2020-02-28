@@ -178,6 +178,22 @@ func ParseSanityValues(sanityRateStr string, sanityMarginPercentageStr string) (
 	return sanityRate, sanityMarginPercentage, nil
 }
 
+func ParseSigners(signersStr string) (signers []sdk.AccAddress, err error) {
+
+	// Split by comma
+	signersSplit := strings.Split(signersStr, ",")
+
+	// Parse into sdk.AccAddresses
+	signers = make([]sdk.AccAddress, len(signersSplit))
+	for i, a := range signersSplit {
+		signers[i], err = sdk.AccAddressFromBech32(a)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return signers, nil
+}
+
 func ParseBatchBlocks(batchBlocksStr string) (batchBlocks sdk.Uint, err error) {
 
 	batchBlocks, err = sdk.ParseUint(batchBlocksStr)
