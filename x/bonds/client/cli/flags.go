@@ -20,7 +20,6 @@ const (
 	FlagSanityRate             = "sanity-rate"
 	FlagSanityMarginPercentage = "sanity-margin-percentage"
 	FlagAllowSells             = "allow-sells"
-	FlagSigners                = "signers"
 	FlagBatchBlocks            = "batch-blocks"
 	FlagBondDid                = "bond-did"
 )
@@ -34,7 +33,6 @@ var (
 func init() {
 
 	fsBondGeneral.String(FlagToken, "", "The bond's token")
-	fsBondGeneral.String(FlagSigners, "", "The list of signers required to create/edit the bond")
 
 	fsBondCreate.String(FlagName, "", "The bond's name")
 	fsBondCreate.String(FlagDescription, "", "The bond's description")

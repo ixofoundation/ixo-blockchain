@@ -65,27 +65,26 @@ func (fps FunctionParams) AsMap() (paramsMap map[string]sdk.Int) {
 }
 
 type Bond struct {
-	Token                  string           `json:"token" yaml:"token"`
-	Name                   string           `json:"name" yaml:"name"`
-	Description            string           `json:"description" yaml:"description"`
-	Creator                sdk.AccAddress   `json:"creator" yaml:"creator"`
-	FunctionType           string           `json:"function_type" yaml:"function_type"`
-	FunctionParameters     FunctionParams   `json:"function_parameters" yaml:"function_parameters"`
-	ReserveTokens          []string         `json:"reserve_tokens" yaml:"reserve_tokens"`
-	ReserveAddress         sdk.AccAddress   `json:"reserve_address" yaml:"reserve_address"`
-	TxFeePercentage        sdk.Dec          `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-	ExitFeePercentage      sdk.Dec          `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-	FeeAddress             sdk.AccAddress   `json:"fee_address" yaml:"fee_address"`
-	MaxSupply              sdk.Coin         `json:"max_supply" yaml:"max_supply"`
-	OrderQuantityLimits    sdk.Coins        `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             sdk.Dec          `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage sdk.Dec          `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	CurrentSupply          sdk.Coin         `json:"current_supply" yaml:"current_supply"`
-	AllowSells             string           `json:"allow_sells" yaml:"allow_sells"`
-	Signers                []sdk.AccAddress `json:"signers" yaml:"signers"`
-	BatchBlocks            sdk.Uint         `json:"batch_blocks" yaml:"batch_blocks"`
-	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string           `json:"pubKey" yaml:"pubKey"`
+	Token                  string         `json:"token" yaml:"token"`
+	Name                   string         `json:"name" yaml:"name"`
+	Description            string         `json:"description" yaml:"description"`
+	Creator                sdk.AccAddress `json:"creator" yaml:"creator"`
+	FunctionType           string         `json:"function_type" yaml:"function_type"`
+	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
+	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
+	ReserveAddress         sdk.AccAddress `json:"reserve_address" yaml:"reserve_address"`
+	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
+	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
+	FeeAddress             sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
+	MaxSupply              sdk.Coin       `json:"max_supply" yaml:"max_supply"`
+	OrderQuantityLimits    sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	CurrentSupply          sdk.Coin       `json:"current_supply" yaml:"current_supply"`
+	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
+	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
+	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
+	PubKey                 string         `json:"pubKey" yaml:"pubKey"`
 }
 
 func NewBond(token, name, description string, creator sdk.AccAddress,
@@ -93,8 +92,8 @@ func NewBond(token, name, description string, creator sdk.AccAddress,
 	reserveTokens []string, reserveAdddress sdk.AccAddress,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
-	sanityMarginPercentage sdk.Dec, allowSells string, signers []sdk.AccAddress,
-	batchBlocks sdk.Uint, bondDid ixo.Did, pubKey string) Bond {
+	sanityMarginPercentage sdk.Dec, allowSells string, batchBlocks sdk.Uint,
+	bondDid ixo.Did, pubKey string) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -118,7 +117,6 @@ func NewBond(token, name, description string, creator sdk.AccAddress,
 		SanityMarginPercentage: sanityMarginPercentage,
 		CurrentSupply:          sdk.NewCoin(token, sdk.ZeroInt()),
 		AllowSells:             allowSells,
-		Signers:                signers,
 		BatchBlocks:            batchBlocks,
 		BondDid:                bondDid,
 		PubKey:                 pubKey,
@@ -414,21 +412,6 @@ func (bond Bond) GetExitFees(reserveAmounts sdk.DecCoins) (fees sdk.Coins) {
 		fees = fees.Add(sdk.Coins{bond.GetExitFee(r)})
 	}
 	return fees
-}
-
-func (bond Bond) SignersEqualTo(signers []sdk.AccAddress) bool {
-	if len(bond.Signers) != len(signers) {
-		return false
-	}
-
-	// Note: this also enforces ORDER of signatures to be the same
-	for i := range signers {
-		if !bond.Signers[i].Equals(signers[i]) {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (bond Bond) ReserveDenomsEqualTo(coins sdk.Coins) bool {

@@ -26,7 +26,6 @@ const (
 	AttributeKeySanityRate             = "sanity_rate"
 	AttributeKeySanityMarginPercentage = "sanity_margin_percentage"
 	AttributeKeyAllowSells             = "allow_sells"
-	AttributeKeySigners                = "signers"
 	AttributeKeyBatchBlocks            = "batch_blocks"
 	AttributeKeyMaxPrices              = "max_prices"
 	AttributeKeySwapFromToken          = "from_token"
