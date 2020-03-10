@@ -61,7 +61,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
 
-	if keeper.BondExists(ctx, msg.Token) {
+	if keeper.BondExists(ctx, msg.BondDid) {
 		return types.ErrBondAlreadyExists(DefaultCodeSpace, msg.BondDid).Result()
 	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
 		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
