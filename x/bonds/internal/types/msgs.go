@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-type MsgCreateBond struct {
-	SignBytes              string           `json:"sign_bytes" yaml:"sign_bytes"`
+type MsgCreateBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+	SignBytes              string           `json:"signBytes" yaml:"signBytes"`
 	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
 	PubKey                 string           `json:"pub_key" yaml:"pub_key"`
 	Token                  string           `json:"token" yaml:"token"`
@@ -130,8 +130,8 @@ func (msg MsgCreateBond) Type() string { return "create_bond" }
 
 func (msg MsgCreateBond) IsNewDid() bool { return true }
 
-type MsgEditBond struct {
-	SignBytes              string           `json:"sign_bytes" yaml:"sign_bytes"`
+type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+	SignBytes              string           `json:"signBytes" yaml:"signBytes"`
 	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
 	PubKey                 string           `json:"pub_key" yaml:"pub_key"`
 	Token                  string           `json:"token" yaml:"token"`
@@ -215,8 +215,8 @@ func (msg MsgEditBond) Type() string { return "edit_bond" }
 
 func (msg MsgEditBond) IsNewDid() bool { return false }
 
-type MsgBuy struct {
-	SignBytes string    `json:"sign_bytes" yaml:"sign_bytes"`
+type MsgBuy struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
 	PubKey    string    `json:"pub_key" yaml:"pub_key"`
 	Amount    sdk.Coin  `json:"amount" yaml:"amount"`
@@ -268,8 +268,8 @@ func (msg MsgBuy) Type() string { return "buy" }
 
 func (msg MsgBuy) IsNewDid() bool { return false }
 
-type MsgSell struct {
-	SignBytes string   `json:"sign_bytes" yaml:"sign_bytes"`
+type MsgSell struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+	SignBytes string   `json:"signBytes" yaml:"signBytes"`
 	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
 	PubKey    string   `json:"pub_key" yaml:"pub_key"`
 	Amount    sdk.Coin `json:"amount" yaml:"amount"`
@@ -318,8 +318,8 @@ func (msg MsgSell) Type() string { return "sell" }
 
 func (msg MsgSell) IsNewDid() bool { return false }
 
-type MsgSwap struct {
-	SignBytes  string   `json:"sign_bytes" yaml:"sign_bytes"`
+type MsgSwap struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+	SignBytes  string   `json:"signBytes" yaml:"signBytes"`
 	SwapperDid ixo.Did  `json:"swapper_did" yaml:"swapper_did"`
 	PubKey     string   `json:"pub_key" yaml:"pub_key"`
 	BondDid    ixo.Did  `json:"bond_did" yaml:"bond_did"`
