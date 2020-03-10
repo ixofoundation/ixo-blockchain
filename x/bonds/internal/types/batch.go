@@ -31,15 +31,15 @@ func NewBatch(bondDid ixo.Did, token string, blocks sdk.Uint) Batch {
 }
 
 type BaseOrder struct {
-	Address      sdk.AccAddress `json:"address" yaml:"address"`
-	Amount       sdk.Coin       `json:"amount" yaml:"amount"`
-	Cancelled    string         `json:"cancelled" yaml:"cancelled"`
-	CancelReason string         `json:"cancel_reason" yaml:"cancel_reason"`
+	AccountDid   ixo.Did  `json:"sender_did" yaml:"sender_did"`
+	Amount       sdk.Coin `json:"amount" yaml:"amount"`
+	Cancelled    string   `json:"cancelled" yaml:"cancelled"`
+	CancelReason string   `json:"cancel_reason" yaml:"cancel_reason"`
 }
 
-func NewBaseOrder(address sdk.AccAddress, amount sdk.Coin) BaseOrder {
+func NewBaseOrder(accountDid ixo.Did, amount sdk.Coin) BaseOrder {
 	return BaseOrder{
-		Address:      address,
+		AccountDid:   accountDid,
 		Amount:       amount,
 		Cancelled:    FALSE,
 		CancelReason: "",
@@ -55,9 +55,9 @@ type BuyOrder struct {
 	MaxPrices sdk.Coins `json:"max_prices" yaml:"max_prices"`
 }
 
-func NewBuyOrder(address sdk.AccAddress, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {
+func NewBuyOrder(buyerDid ixo.Did, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {
 	return BuyOrder{
-		BaseOrder: NewBaseOrder(address, amount),
+		BaseOrder: NewBaseOrder(buyerDid, amount),
 		MaxPrices: maxPrices,
 	}
 }
@@ -66,9 +66,9 @@ type SellOrder struct {
 	BaseOrder
 }
 
-func NewSellOrder(address sdk.AccAddress, amount sdk.Coin) SellOrder {
+func NewSellOrder(sellerDid ixo.Did, amount sdk.Coin) SellOrder {
 	return SellOrder{
-		BaseOrder: NewBaseOrder(address, amount),
+		BaseOrder: NewBaseOrder(sellerDid, amount),
 	}
 }
 
@@ -77,9 +77,9 @@ type SwapOrder struct {
 	ToToken string `json:"to_token" yaml:"to_token"`
 }
 
-func NewSwapOrder(address sdk.AccAddress, from sdk.Coin, toToken string) SwapOrder {
+func NewSwapOrder(swapperDid ixo.Did, from sdk.Coin, toToken string) SwapOrder {
 	return SwapOrder{
-		BaseOrder: NewBaseOrder(address, from),
+		BaseOrder: NewBaseOrder(swapperDid, from),
 		ToToken:   toToken,
 	}
 }

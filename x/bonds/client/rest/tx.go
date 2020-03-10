@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/client"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
@@ -311,6 +310,7 @@ type buyReq struct {
 	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
 	MaxPrices  string       `json:"max_prices" yaml:"max_prices"`
 	BondDid    string       `json:"bond_did" yaml:"bond_did"`
+	BuyerDid   string       `json:"buyer_did" yaml:"buyer_did"`
 }
 
 func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -327,12 +327,6 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		buyer, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		bondCoin, err := sdk.ParseCoin(req.BondAmount + req.BondToken)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -345,14 +339,55 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBuy(buyer, bondCoin, maxPrices, req.BondDid)
+		// Parse buyer's sovrin DID
+		buyerDid := client.UnmarshalSovrinDID(req.BuyerDid)
+
+		msg := types.NewMsgBuy(buyerDid, bondCoin, maxPrices, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(buyerDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(buyerDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, buyerDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
@@ -361,6 +396,7 @@ type sellReq struct {
 	BondToken  string       `json:"bond_token" yaml:"bond_token"`
 	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
 	BondDid    string       `json:"bond_did" yaml:"bond_did"`
+	SellerDid  string       `json:"seller_did" yaml:"seller_did"`
 }
 
 func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -377,26 +413,61 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		seller, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		bondCoin, err := sdk.ParseCoin(req.BondAmount + req.BondToken)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgSell(seller, bondCoin, req.BondDid)
+		// Parse seller's sovrin DID
+		sellerDid := client.UnmarshalSovrinDID(req.SellerDid)
+
+		msg := types.NewMsgSell(sellerDid, bondCoin, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(sellerDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(sellerDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, sellerDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
@@ -406,6 +477,7 @@ type swapReq struct {
 	FromToken  string       `json:"from_token" yaml:"from_token"`
 	ToToken    string       `json:"to_token" yaml:"to_token"`
 	BondDid    string       `json:"bond_did" yaml:"bond_did"`
+	SwapperDid string       `json:"swapper_did" yaml:"swapper_did"`
 }
 
 func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -419,12 +491,6 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		baseReq := req.BaseReq.Sanitize()
 		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		swapper, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -443,13 +509,54 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSwap(swapper, fromCoin, req.ToToken, req.BondDid)
+		// Parse swapper's sovrin DID
+		swapperDid := client.UnmarshalSovrinDID(req.SwapperDid)
+
+		msg := types.NewMsgSwap(swapperDid, fromCoin, req.ToToken, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(swapperDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(swapperDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, swapperDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }

@@ -58,7 +58,7 @@ func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid ixo.Did, bo types.BuyOrder,
 	k.SetBatch(ctx, bondDid, batch)
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("added buy order for %s from %s", bo.Amount.String(), bo.Address.String()))
+	logger.Info(fmt.Sprintf("added buy order for %s from %s", bo.Amount.String(), bo.AccountDid))
 }
 
 func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid ixo.Did, so types.SellOrder, buyPrices, sellPrices sdk.DecCoins) {
@@ -70,7 +70,7 @@ func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid ixo.Did, so types.SellOrde
 	k.SetBatch(ctx, bondDid, batch)
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("added sell order for %s from %s", so.Amount.String(), so.Address.String()))
+	logger.Info(fmt.Sprintf("added sell order for %s from %s", so.Amount.String(), so.AccountDid))
 }
 
 func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrder) {
@@ -79,7 +79,7 @@ func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrde
 	k.SetBatch(ctx, bondDid, batch)
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("added swap order for %s to %s from %s", so.Amount.String(), so.ToToken, so.Address.String()))
+	logger.Info(fmt.Sprintf("added swap order for %s to %s from %s", so.Amount.String(), so.ToToken, so.AccountDid))
 }
 
 func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch types.Batch) (buyPricesPT, sellPricesPT sdk.DecCoins, err sdk.Error) {
@@ -179,6 +179,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid ixo.Did,
 
 func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.BuyOrder, prices sdk.DecCoins) (err sdk.Error) {
 	bond := k.MustGetBond(ctx, bondDid)
+	buyerAddr := didToAddr(bo.AccountDid)
 
 	// Mint bond tokens
 	err = k.SupplyKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
@@ -189,7 +190,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 
 	// Send bond tokens bought to buyer
 	err = k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
-		types.BondsMintBurnAccount, bo.Address, sdk.Coins{bo.Amount})
+		types.BondsMintBurnAccount, buyerAddr, sdk.Coins{bo.Amount})
 	if err != nil {
 		return err
 	}
@@ -224,7 +225,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 	returnToBuyer := bo.MaxPrices.Sub(totalPrices)
 	if !returnToBuyer.IsZero() {
 		err = k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
-			types.BatchesIntermediaryAccount, bo.Address, returnToBuyer)
+			types.BatchesIntermediaryAccount, buyerAddr, returnToBuyer)
 		if err != nil {
 			return err
 		}
@@ -234,13 +235,13 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 	k.SetCurrentSupply(ctx, bondDid, bond.CurrentSupply.Add(bo.Amount))
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.Amount.String(), bo.Address.String()))
+	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.Amount.String(), bo.AccountDid))
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, bo.Address.String()),
+		sdk.NewAttribute(types.AttributeKeyAddress, bo.AccountDid),
 		sdk.NewAttribute(types.AttributeKeyTokensMinted, bo.Amount.Amount.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedPrices, reservePricesRounded.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
@@ -252,6 +253,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 
 func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.SellOrder, prices sdk.DecCoins) (err sdk.Error) {
 	bond := k.MustGetBond(ctx, bondDid)
+	sellerAddr := didToAddr(so.AccountDid)
 
 	reserveReturns := types.MultiplyDecCoinsByInt(prices, so.Amount.Amount)
 	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
@@ -263,7 +265,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 
 	// Send total returns to seller (totalReturns should never be zero)
 	// TODO: investigate possibility of zero totalReturns
-	err = k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, so.Address, totalReturns)
+	err = k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, sellerAddr, totalReturns)
 	if err != nil {
 		return err
 	}
@@ -280,13 +282,13 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 	k.SetCurrentSupply(ctx, bondDid, bond.CurrentSupply.Sub(so.Amount))
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.Amount.String(), so.Address.String()))
+	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.Amount.String(), so.AccountDid))
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSellOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, so.Address.String()),
+		sdk.NewAttribute(types.AttributeKeyAddress, so.AccountDid),
 		sdk.NewAttribute(types.AttributeKeyTokensBurned, so.Amount.Amount.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, totalReturns.String()),
@@ -315,7 +317,8 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrder
 	}
 
 	// Give resultant tokens to swapper (reserveReturns should never be zero)
-	err = k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, so.Address, reserveReturns)
+	swapperAddr := didToAddr(so.AccountDid)
+	err = k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, swapperAddr, reserveReturns)
 	if err != nil {
 		return err, false
 	}
@@ -338,13 +341,13 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrder
 
 	logger := k.Logger(ctx)
 	logger.Info(fmt.Sprintf("performed swap order for %s to %s from %s",
-		so.Amount.String(), reserveReturns, so.Address.String()))
+		so.Amount.String(), reserveReturns, so.AccountDid))
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSwapOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, so.Address.String()),
+		sdk.NewAttribute(types.AttributeKeyAddress, so.AccountDid),
 		sdk.NewAttribute(types.AttributeKeyTokensSwapped, adjustedInput.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFee.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, reserveReturns.String()),
@@ -405,12 +408,13 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid ixo.Did) {
 					batch.Swaps[i].Cancelled = types.TRUE
 					batch.Swaps[i].CancelReason = err.Error()
 
-					logger.Info(fmt.Sprintf("cancelled swap order for %s to %s from %s", so.Amount.String(), so.ToToken, so.Address.String()))
+					logger.Info(fmt.Sprintf("cancelled swap order for %s to %s from %s", so.Amount.String(), so.ToToken, so.AccountDid))
 					logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 					// Return from amount to swapper
+					swapperAddr := didToAddr(so.AccountDid)
 					err := k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
-						types.BatchesIntermediaryAccount, so.Address, sdk.Coins{so.Amount})
+						types.BatchesIntermediaryAccount, swapperAddr, sdk.Coins{so.Amount})
 					if err != nil {
 						panic(err)
 					}
@@ -464,20 +468,21 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid ixo.Did) (cance
 				batch.TotalBuyAmount = batch.TotalBuyAmount.Sub(bo.Amount)
 				cancelledOrders += 1
 
-				logger.Info(fmt.Sprintf("cancelled buy order for %s from %s", bo.Amount.String(), bo.Address.String()))
+				logger.Info(fmt.Sprintf("cancelled buy order for %s from %s", bo.Amount.String(), bo.AccountDid))
 				logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 				ctx.EventManager().EmitEvent(sdk.NewEvent(
 					types.EventTypeOrderCancel,
 					sdk.NewAttribute(types.AttributeKeyBondDid, bondDid),
 					sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
-					sdk.NewAttribute(types.AttributeKeyAddress, bo.Address.String()),
+					sdk.NewAttribute(types.AttributeKeyAddress, bo.AccountDid),
 					sdk.NewAttribute(types.AttributeKeyCancelReason, bo.CancelReason),
 				))
 
 				// Return reserve to buyer
+				buyerAddr := didToAddr(bo.AccountDid)
 				err := k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
-					types.BatchesIntermediaryAccount, bo.Address, bo.MaxPrices)
+					types.BatchesIntermediaryAccount, buyerAddr, bo.MaxPrices)
 				if err != nil {
 					panic(err)
 				}
@@ -512,4 +517,9 @@ func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid ixo.Did) (can
 	// Save batch and return number of cancelled orders
 	k.SetBatch(ctx, bondDid, batch)
 	return cancelledOrders
+}
+
+func didToAddr(did ixo.Did) sdk.AccAddress {
+	// TODO: implement this properly
+	return sdk.AccAddress([]byte(did))
 }

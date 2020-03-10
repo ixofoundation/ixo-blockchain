@@ -8,9 +8,9 @@ import (
 )
 
 type MsgCreateBond struct {
-	SignBytes              string           `json:"signBytes"`
-	BondDid                ixo.Did          `json:"bondDid"`
-	PubKey                 string           `json:"pubKey"`
+	SignBytes              string           `json:"sign_bytes" yaml:"sign_bytes"`
+	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
+	PubKey                 string           `json:"pub_key" yaml:"pub_key"`
 	Token                  string           `json:"token" yaml:"token"`
 	Name                   string           `json:"name" yaml:"name"`
 	Description            string           `json:"description" yaml:"description"`
@@ -131,9 +131,9 @@ func (msg MsgCreateBond) Type() string { return "create_bond" }
 func (msg MsgCreateBond) IsNewDid() bool { return true }
 
 type MsgEditBond struct {
-	SignBytes              string           `json:"signBytes"`
-	BondDid                ixo.Did          `json:"bondDid"`
-	PubKey                 string           `json:"pubKey"`
+	SignBytes              string           `json:"sign_bytes" yaml:"sign_bytes"`
+	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
+	PubKey                 string           `json:"pub_key" yaml:"pub_key"`
 	Token                  string           `json:"token" yaml:"token"`
 	Name                   string           `json:"name" yaml:"name"`
 	Description            string           `json:"description" yaml:"description"`
@@ -216,16 +216,20 @@ func (msg MsgEditBond) Type() string { return "edit_bond" }
 func (msg MsgEditBond) IsNewDid() bool { return false }
 
 type MsgBuy struct {
-	Buyer     sdk.AccAddress `json:"buyer" yaml:"buyer"`
-	Amount    sdk.Coin       `json:"amount" yaml:"amount"`
-	MaxPrices sdk.Coins      `json:"max_prices" yaml:"max_prices"`
-	BondDid   ixo.Did        `json:"bond_did" yaml:"bond_did"`
+	SignBytes string    `json:"sign_bytes" yaml:"sign_bytes"`
+	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	Amount    sdk.Coin  `json:"amount" yaml:"amount"`
+	MaxPrices sdk.Coins `json:"max_prices" yaml:"max_prices"`
+	BondDid   ixo.Did   `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgBuy(buyer sdk.AccAddress, amount sdk.Coin, maxPrices sdk.Coins,
+func NewMsgBuy(buyerDid sovrin.SovrinDid, amount sdk.Coin, maxPrices sdk.Coins,
 	bondDid ixo.Did) MsgBuy {
 	return MsgBuy{
-		Buyer:     buyer,
+		SignBytes: "",
+		BuyerDid:  buyerDid.Did,
+		PubKey:    buyerDid.VerifyKey,
 		Amount:    amount,
 		MaxPrices: maxPrices,
 		BondDid:   bondDid,
@@ -234,10 +238,12 @@ func NewMsgBuy(buyer sdk.AccAddress, amount sdk.Coin, maxPrices sdk.Coins,
 
 func (msg MsgBuy) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.BondDid) == "" {
+	if strings.TrimSpace(msg.BuyerDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BuyerDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
-	} else if msg.Buyer.Empty() {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Buyer")
 	}
 
 	// Check that non zero
@@ -253,7 +259,7 @@ func (msg MsgBuy) GetSignBytes() []byte {
 }
 
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Buyer}
+	return []sdk.AccAddress{[]byte(msg.BuyerDid)}
 }
 
 func (msg MsgBuy) Route() string { return RouterKey }
@@ -263,25 +269,31 @@ func (msg MsgBuy) Type() string { return "buy" }
 func (msg MsgBuy) IsNewDid() bool { return false }
 
 type MsgSell struct {
-	Seller  sdk.AccAddress `json:"seller" yaml:"seller"`
-	Amount  sdk.Coin       `json:"amount" yaml:"amount"`
-	BondDid ixo.Did        `json:"bond_did" yaml:"bond_did"`
+	SignBytes string   `json:"sign_bytes" yaml:"sign_bytes"`
+	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
+	PubKey    string   `json:"pub_key" yaml:"pub_key"`
+	Amount    sdk.Coin `json:"amount" yaml:"amount"`
+	BondDid   ixo.Did  `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgSell(seller sdk.AccAddress, amount sdk.Coin, bondDid ixo.Did) MsgSell {
+func NewMsgSell(sellerDid sovrin.SovrinDid, amount sdk.Coin, bondDid ixo.Did) MsgSell {
 	return MsgSell{
-		Seller:  seller,
-		Amount:  amount,
-		BondDid: bondDid,
+		SignBytes: "",
+		SellerDid: sellerDid.Did,
+		PubKey:    sellerDid.VerifyKey,
+		Amount:    amount,
+		BondDid:   bondDid,
 	}
 }
 
 func (msg MsgSell) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.BondDid) == "" {
+	if strings.TrimSpace(msg.SellerDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SellerDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
-	} else if msg.Seller.Empty() {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Seller")
 	}
 
 	// Check that non zero
@@ -297,7 +309,7 @@ func (msg MsgSell) GetSignBytes() []byte {
 }
 
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Seller}
+	return []sdk.AccAddress{[]byte(msg.SellerDid)}
 }
 
 func (msg MsgSell) Route() string { return RouterKey }
@@ -307,28 +319,34 @@ func (msg MsgSell) Type() string { return "sell" }
 func (msg MsgSell) IsNewDid() bool { return false }
 
 type MsgSwap struct {
-	Swapper sdk.AccAddress `json:"swapper" yaml:"swapper"`
-	BondDid ixo.Did        `json:"bond_did" yaml:"bond_did"`
-	From    sdk.Coin       `json:"from" yaml:"from"`
-	ToToken string         `json:"to_token" yaml:"to_token"`
+	SignBytes  string   `json:"sign_bytes" yaml:"sign_bytes"`
+	SwapperDid ixo.Did  `json:"swapper_did" yaml:"swapper_did"`
+	PubKey     string   `json:"pub_key" yaml:"pub_key"`
+	BondDid    ixo.Did  `json:"bond_did" yaml:"bond_did"`
+	From       sdk.Coin `json:"from" yaml:"from"`
+	ToToken    string   `json:"to_token" yaml:"to_token"`
 }
 
-func NewMsgSwap(swapper sdk.AccAddress, from sdk.Coin, toToken string,
+func NewMsgSwap(swapperDid sovrin.SovrinDid, from sdk.Coin, toToken string,
 	bondDid ixo.Did) MsgSwap {
 	return MsgSwap{
-		Swapper: swapper,
-		From:    from,
-		ToToken: toToken,
-		BondDid: bondDid,
+		SignBytes:  "",
+		SwapperDid: swapperDid.Did,
+		PubKey:     swapperDid.VerifyKey,
+		From:       from,
+		ToToken:    toToken,
+		BondDid:    bondDid,
 	}
 }
 
 func (msg MsgSwap) ValidateBasic() sdk.Error {
 	// Check if empty
-	if strings.TrimSpace(msg.BondDid) == "" {
+	if strings.TrimSpace(msg.SwapperDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SwapperDid")
+	} else if strings.TrimSpace(msg.PubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
+	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
-	} else if msg.Swapper.Empty() {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Swapper")
 	} else if strings.TrimSpace(msg.ToToken) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "ToToken")
 	}
@@ -352,7 +370,7 @@ func (msg MsgSwap) GetSignBytes() []byte {
 }
 
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Swapper}
+	return []sdk.AccAddress{[]byte(msg.SwapperDid)}
 }
 
 func (msg MsgSwap) Route() string { return RouterKey }
