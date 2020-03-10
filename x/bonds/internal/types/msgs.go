@@ -126,7 +126,7 @@ func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
-func (msg MsgCreateBond) Type() string { return "create_bond" }
+func (msg MsgCreateBond) Type() string { return ModuleName }
 
 func (msg MsgCreateBond) IsNewDid() bool { return true }
 
@@ -211,7 +211,7 @@ func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 
 func (msg MsgEditBond) Route() string { return RouterKey }
 
-func (msg MsgEditBond) Type() string { return "edit_bond" }
+func (msg MsgEditBond) Type() string { return ModuleName }
 
 func (msg MsgEditBond) IsNewDid() bool { return false }
 
@@ -264,7 +264,7 @@ func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 
 func (msg MsgBuy) Route() string { return RouterKey }
 
-func (msg MsgBuy) Type() string { return "buy" }
+func (msg MsgBuy) Type() string { return ModuleName }
 
 func (msg MsgBuy) IsNewDid() bool { return false }
 
@@ -314,7 +314,7 @@ func (msg MsgSell) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSell) Route() string { return RouterKey }
 
-func (msg MsgSell) Type() string { return "sell" }
+func (msg MsgSell) Type() string { return ModuleName }
 
 func (msg MsgSell) IsNewDid() bool { return false }
 
@@ -375,6 +375,6 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSwap) Route() string { return RouterKey }
 
-func (msg MsgSwap) Type() string { return "swap" }
+func (msg MsgSwap) Type() string { return ModuleName }
 
 func (msg MsgSwap) IsNewDid() bool { return false }
