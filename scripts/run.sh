@@ -28,12 +28,12 @@ yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 1000
 yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000stake,1000000res,1000000rez
 
 # Add DID-based genesis accounts
-MADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"  # address from 4XJLBfGtWSGKSz4BeRxdun
-FADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5"  # address from UKzkhVSHc3qEFva5EY2XHt
-SADDR="cosmos1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"  # address from U4tSpzzv91HHqWW1YmFkHJ
-yes $PASSWORD | ixod add-genesis-account "$MADDR" 100000000stake,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$FADDR" 100000000stake,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$SADDR" 100000000stake,1000000res,1000000rez
+MIGUEL_ADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"    # address from 4XJLBfGtWSGKSz4BeRxdun
+FRANCESCO_ADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5" # address from UKzkhVSHc3qEFva5EY2XHt
+SHAUN_ADDR="cosmos1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"     # address from U4tSpzzv91HHqWW1YmFkHJ
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000stake,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000stake,1000000res,1000000rez
 
 ixocli config chain-id pandora-1
 ixocli config output json
