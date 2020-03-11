@@ -2,17 +2,14 @@
 
 PASSWORD="12345678"
 MIGUEL=$(yes $PASSWORD | ixocli keys show miguel -a)
-FRANCESCO=$(yes $PASSWORD | ixocli keys show francesco -a)
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
-MADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"
-FADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5"
-SADDR="cosmos1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"
+BOND_DID="{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
 
-BONDDID="{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
-
-MDID="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
-FDID="{\"did\":\"UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
+MIGUEL_ADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"
+FRANCESCO_ADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5"
+MIGUEL_DID="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
+FRANCESCO_DID="{\"did\":\"UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
 
 wait() {
   echo "Waiting for chain to start..."
@@ -64,7 +61,7 @@ ixocli tx bonds create-bond \
   --signers="$MIGUEL" \
   --batch-blocks=1 \
   --from=miguel \
-  --bond-did="$BONDDID"
+  --bond-did="$BOND_DID"
 sleep 6
 echo "Created bond..."
 ixocli query bonds bond U7GK8p8rVhJMKhBVRCJJ8c
@@ -75,27 +72,27 @@ ixocli tx bonds edit-bond \
   --name="New A B C" \
   --signers="$MIGUEL" \
   --from=miguel \
-  --bond-did="$BONDDID"
+  --bond-did="$BOND_DID"
 sleep 6
 echo "Edited bond..."
 ixocli query bonds bond U7GK8p8rVhJMKhBVRCJJ8c
 
 echo "Miguel buys 10abc..."
-tx_from_m buy 10abc 1000000res U7GK8p8rVhJMKhBVRCJJ8c "$MDID"
+tx_from_m buy 10abc 1000000res U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID"
 echo "Miguel's account..."
-ixocli query auth account "$MADDR"
+ixocli query auth account "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
-tx_from_f buy 10abc 1000000res U7GK8p8rVhJMKhBVRCJJ8c "$FDID"
+tx_from_f buy 10abc 1000000res U7GK8p8rVhJMKhBVRCJJ8c "$FRANCESCO_DID"
 echo "Francesco's account..."
-ixocli query auth account "$FADDR"
+ixocli query auth account "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
-tx_from_m sell 10abc U7GK8p8rVhJMKhBVRCJJ8c "$MDID"
+tx_from_m sell 10abc U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID"
 echo "Miguel's account..."
-ixocli query auth account "$MADDR"
+ixocli query auth account "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
-tx_from_f sell 10abc U7GK8p8rVhJMKhBVRCJJ8c "$FDID"
+tx_from_f sell 10abc U7GK8p8rVhJMKhBVRCJJ8c "$FRANCESCO_DID"
 echo "Francesco's account..."
-ixocli query auth account "$FADDR"
+ixocli query auth account "$FRANCESCO_ADDR"
