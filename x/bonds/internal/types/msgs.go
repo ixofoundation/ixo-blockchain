@@ -8,34 +8,32 @@ import (
 )
 
 type MsgCreateBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes              string           `json:"signBytes" yaml:"signBytes"`
-	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string           `json:"pub_key" yaml:"pub_key"`
-	Token                  string           `json:"token" yaml:"token"`
-	Name                   string           `json:"name" yaml:"name"`
-	Description            string           `json:"description" yaml:"description"`
-	FunctionType           string           `json:"function_type" yaml:"function_type"`
-	FunctionParameters     FunctionParams   `json:"function_parameters" yaml:"function_parameters"`
-	Creator                sdk.AccAddress   `json:"creator" yaml:"creator"`
-	ReserveTokens          []string         `json:"reserve_tokens" yaml:"reserve_tokens"`
-	TxFeePercentage        sdk.Dec          `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-	ExitFeePercentage      sdk.Dec          `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-	FeeAddress             sdk.AccAddress   `json:"fee_address" yaml:"fee_address"`
-	MaxSupply              sdk.Coin         `json:"max_supply" yaml:"max_supply"`
-	OrderQuantityLimits    sdk.Coins        `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             sdk.Dec          `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage sdk.Dec          `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	AllowSells             string           `json:"allow_sells" yaml:"allow_sells"`
-	Signers                []sdk.AccAddress `json:"signers" yaml:"signers"`
-	BatchBlocks            sdk.Uint         `json:"batch_blocks" yaml:"batch_blocks"`
+	SignBytes              string         `json:"signBytes" yaml:"signBytes"`
+	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
+	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
+	Token                  string         `json:"token" yaml:"token"`
+	Name                   string         `json:"name" yaml:"name"`
+	Description            string         `json:"description" yaml:"description"`
+	FunctionType           string         `json:"function_type" yaml:"function_type"`
+	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
+	CreatorDid             ixo.Did        `json:"creator_did" yaml:"creator_did"`
+	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
+	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
+	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
+	FeeAddress             sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
+	MaxSupply              sdk.Coin       `json:"max_supply" yaml:"max_supply"`
+	OrderQuantityLimits    sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
+	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 }
 
-func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
+func NewMsgCreateBond(token, name, description string, creatorDid ixo.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, signers []sdk.AccAddress, batchBlocks sdk.Uint,
-	bondDid sovrin.SovrinDid) MsgCreateBond {
+	allowSell string, batchBlocks sdk.Uint, bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
 		SignBytes:              "",
 		BondDid:                bondDid.Did,
@@ -43,7 +41,7 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
-		Creator:                creator,
+		CreatorDid:             creatorDid,
 		FunctionType:           functionType,
 		FunctionParameters:     functionParameters,
 		ReserveTokens:          reserveTokens,
@@ -55,7 +53,6 @@ func NewMsgCreateBond(token, name, description string, creator sdk.AccAddress,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
 		AllowSells:             strings.ToLower(allowSell),
-		Signers:                signers,
 		BatchBlocks:            batchBlocks,
 	}
 }
@@ -72,8 +69,8 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Name")
 	} else if strings.TrimSpace(msg.Description) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Description")
-	} else if msg.Creator.Empty() {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Creator")
+	} else if strings.TrimSpace(msg.CreatorDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "CreatorDid")
 	} else if len(msg.ReserveTokens) == 0 {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Reserve token")
 	} else if msg.FeeAddress.Empty() {
@@ -131,21 +128,19 @@ func (msg MsgCreateBond) Type() string { return ModuleName }
 func (msg MsgCreateBond) IsNewDid() bool { return true }
 
 type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes              string           `json:"signBytes" yaml:"signBytes"`
-	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
-	Token                  string           `json:"token" yaml:"token"`
-	Name                   string           `json:"name" yaml:"name"`
-	Description            string           `json:"description" yaml:"description"`
-	OrderQuantityLimits    string           `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             string           `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage string           `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	Editor                 sdk.AccAddress   `json:"editor" yaml:"editor"`
-	Signers                []sdk.AccAddress `json:"signers" yaml:"signers"`
+	SignBytes              string  `json:"signBytes" yaml:"signBytes"`
+	BondDid                ixo.Did `json:"bond_did" yaml:"bond_did"`
+	Token                  string  `json:"token" yaml:"token"`
+	Name                   string  `json:"name" yaml:"name"`
+	Description            string  `json:"description" yaml:"description"`
+	OrderQuantityLimits    string  `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate             string  `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage string  `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	EditorDid              ixo.Did `json:"editor_did" yaml:"editor_did"`
 }
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editor sdk.AccAddress,
-	signers []sdk.AccAddress, bondDid sovrin.SovrinDid) MsgEditBond {
+	sanityMarginPercentage string, editorDid ixo.Did, bondDid sovrin.SovrinDid) MsgEditBond {
 	return MsgEditBond{
 		SignBytes:              "",
 		BondDid:                bondDid.Did,
@@ -155,8 +150,7 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 		OrderQuantityLimits:    orderQuantityLimits,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
-		Editor:                 editor,
-		Signers:                signers,
+		EditorDid:              editorDid,
 	}
 }
 
@@ -174,6 +168,8 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SanityRate")
 	} else if strings.TrimSpace(msg.SanityMarginPercentage) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SanityMarginPercentage")
+	} else if strings.TrimSpace(msg.EditorDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "EditorDid")
 	}
 	// Note: order quantity limits can be blank
 

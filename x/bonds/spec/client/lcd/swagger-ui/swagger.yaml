@@ -266,7 +266,7 @@ paths:
       parameters:
         - in: body
           name: edit_bond_body
-          description: The fields to be edited and the list of the bond's signers
+          description: The fields to be edited
           schema:
             $ref: "#/definitions/BondEdit"
   /bonds/buy:
@@ -296,11 +296,9 @@ paths:
                 type: string
                 example: 1000res1,1000res2,...
               bond_did:
-                type: string
-                example: U7GK8p8rVhJMKhBVRCJJ8c
+                $ref: "#/definitions/Did"
               buyer_did:
-                type: string
-                example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+                $ref: "#/definitions/SovrinDid"
   /bonds/sell:
     post:
       description: Sell tokens from a bond
@@ -325,11 +323,9 @@ paths:
                 type: string
                 example: 100
               bond_did:
-                type: string
-                example: U7GK8p8rVhJMKhBVRCJJ8c
+                $ref: "#/definitions/Did"
               seller_did:
-                type: string
-                example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+                $ref: "#/definitions/SovrinDid"
   /bonds/swap:
     post:
       description: Perform a swap between two tokens using a swapper bond
@@ -357,11 +353,9 @@ paths:
                 type: string
                 example: res2
               bond_did:
-                type: string
-                example: U7GK8p8rVhJMKhBVRCJJ8c
+                $ref: "#/definitions/Did"
               swapper_did:
-                type: string
-                example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+                $ref: "#/definitions/SovrinDid"
 definitions:
   AnyCoin:
     type: object
@@ -455,8 +449,7 @@ definitions:
     type: object
     properties:
       bond_did:
-        type: string
-        example: U7GK8p8rVhJMKhBVRCJJ8c
+        $ref: "#/definitions/Did"
       blocks_remaining:
         type: number
         example: 2
@@ -502,8 +495,8 @@ definitions:
           description:
             type: string
             example: Description about bond.
-          creator:
-            $ref: "#/definitions/Address"
+          creator_did:
+            $ref: "#/definitions/Did"
           function_type:
             type: string
             example: power_function
@@ -539,16 +532,11 @@ definitions:
           allow_sells:
             type: string
             example: "true"
-          signers:
-            type: array
-            items:
-              $ref: "#/definitions/Address"
           batch_blocks:
             type: number
             example: 5
           bond_did:
-            type: string
-            example: U7GK8p8rVhJMKhBVRCJJ8c
+            $ref: "#/definitions/Did"
           pubkey:
             type: string
             example: FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW
@@ -639,15 +627,13 @@ definitions:
       allow_sells:
         type: string
         example: "true"
-      signers:
-        type: string
-        example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
       batch_blocks:
         type: string
         example: "5"
       bond_did:
-        type: string
-        example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+        $ref: "#/definitions/SovrinDid"
+      creator_did:
+        $ref: "#/definitions/Did"
   BondEdit:
     type: object
     properties:
@@ -669,12 +655,10 @@ definitions:
       sanity_margin_percentage:
         type: string
         example: "56.78"
-      signers:
-        type: string
-        example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
       bond_did:
-        type: string
-        example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+        $ref: "#/definitions/SovrinDid"
+      editor_did:
+        $ref: "#/definitions/Did"
   FunctionParameter:
     type: object
     properties:
@@ -688,3 +672,9 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/FunctionParameter"
+  Did:
+    type: string
+    example: "U7GK8p8rVhJMKhBVRCJJ8c"
+  SovrinDid:
+    type: string
+    example: "{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"

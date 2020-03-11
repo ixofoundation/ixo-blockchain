@@ -57,9 +57,9 @@ type createBondReq struct {
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
-	Signers                string       `json:"signers" yaml:"signers"`
 	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
+	CreatorDid             string       `json:"creator_did" yaml:"creator_did"`
 }
 
 func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -73,12 +73,6 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		baseReq := req.BaseReq.Sanitize()
 		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		creator, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -116,21 +110,21 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		feeAddress, err2 := sdk.AccAddressFromBech32(req.FeeAddress)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
-		maxSupply, err := client.ParseMaxSupply(req.MaxSupply, req.Token)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		maxSupply, err2 := client.ParseMaxSupply(req.MaxSupply, req.Token)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
-		orderQuantityLimits, err := sdk.ParseCoins(req.OrderQuantityLimits)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		orderQuantityLimits, err2 := sdk.ParseCoins(req.OrderQuantityLimits)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
@@ -141,17 +135,10 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse signers
-		signers, err := client.ParseSigners(req.Signers)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// Parse batch blocks
-		batchBlocks, err := client.ParseBatchBlocks(req.BatchBlocks)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		batchBlocks, err2 := client.ParseBatchBlocks(req.BatchBlocks)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
@@ -159,10 +146,10 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		bondDid := client.UnmarshalSovrinDID(req.BondDid)
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			creator, req.FunctionType, functionParams, reserveTokens,
+			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			req.AllowSells, signers, batchBlocks, bondDid)
+			req.AllowSells, batchBlocks, bondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -173,36 +160,36 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
 
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
+		msgBytes, err2 := json.Marshal(msg)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err2.Error())))
 			return
 		}
 
 		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
 		tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
+		bz, err2 := cliCtx.Codec.MarshalJSON(tx)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err2.Error())))
 
 			return
 		}
 
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
+		res, err2 := cliCtx.BroadcastTx(bz)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err2.Error())))
 
 			return
 		}
 
-		output, err := json.MarshalIndent(res, "", "  ")
-		if err != nil {
+		output, err2 := json.MarshalIndent(res, "", "  ")
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err2.Error()))
 
 			return
 		}
@@ -219,8 +206,8 @@ type editBondReq struct {
 	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	Signers                string       `json:"signers" yaml:"signers"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
+	EditorDid              string       `json:"editor_did" yaml:"editor_did"`
 }
 
 func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -237,26 +224,13 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		editor, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		// Parse signers
-		signers, err := client.ParseSigners(req.Signers)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// Parse bond's sovrin DID
 		bondDid := client.UnmarshalSovrinDID(req.BondDid)
 
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
-			req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage,
-			editor, signers, bondDid)
-		err = msg.ValidateBasic()
+			req.OrderQuantityLimits, req.SanityRate,
+			req.SanityMarginPercentage, req.EditorDid, bondDid)
+		err := msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -266,36 +240,36 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
 
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
+		msgBytes, err2 := json.Marshal(msg)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err2.Error())))
 			return
 		}
 
 		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
 		tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
+		bz, err2 := cliCtx.Codec.MarshalJSON(tx)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err2.Error())))
 
 			return
 		}
 
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
+		res, err2 := cliCtx.BroadcastTx(bz)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err2.Error())))
 
 			return
 		}
 
-		output, err := json.MarshalIndent(res, "", "  ")
-		if err != nil {
+		output, err2 := json.MarshalIndent(res, "", "  ")
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err2.Error()))
 
 			return
 		}

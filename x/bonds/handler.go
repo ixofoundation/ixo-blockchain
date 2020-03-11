@@ -68,11 +68,11 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
-	bond := NewBond(msg.Token, msg.Name, msg.Description, msg.Creator,
+	bond := NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
 		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
 		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.Signers, msg.BatchBlocks,
+		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks,
 		msg.BondDid, msg.PubKey)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
@@ -80,7 +80,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	logger := keeper.Logger(ctx)
 	logger.Info(fmt.Sprintf("bond %s with reserve(s) [%s] created by %s",
-		msg.BondDid, strings.Join(bond.ReserveTokens, ","), msg.Creator.String()))
+		msg.BondDid, strings.Join(bond.ReserveTokens, ","), msg.CreatorDid))
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -101,13 +101,12 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate.String()),
 			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyAllowSells, msg.AllowSells),
-			sdk.NewAttribute(types.AttributeKeySigners, types.AccAddressesToString(msg.Signers)),
 			sdk.NewAttribute(types.AttributeKeyBatchBlocks, msg.BatchBlocks.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.CreatorDid),
 		),
 	})
 
@@ -119,11 +118,6 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
-	}
-
-	if !bond.SignersEqualTo(msg.Signers) {
-		errMsg := fmt.Sprintf("List of signers does not match the one in the bond")
-		return sdk.ErrInternal(errMsg).Result()
 	}
 
 	if msg.Name != types.DoNotModifyField {
@@ -168,7 +162,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 
 	logger := keeper.Logger(ctx)
 	logger.Info(fmt.Sprintf("bond %s edited by %s",
-		msg.BondDid, msg.Editor.String()))
+		msg.BondDid, msg.EditorDid))
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
 
@@ -186,7 +180,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Editor.String()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
 		),
 	})
 

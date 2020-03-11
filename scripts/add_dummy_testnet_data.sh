@@ -1,7 +1,5 @@
 PASSWORD="12345678"
 
-MIGUEL=$(yes $PASSWORD | ixocli keys show miguel -a)
-
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
 FEE3=$(yes $PASSWORD | ixocli keys show fee3 -a)
@@ -12,12 +10,10 @@ BOND2_DID="{\"did\":\"JHcN95bkS4aAWk3TKXapA2\",\"verifyKey\":\"ARTUGePyi4rm3ogq3
 BOND3_DID="{\"did\":\"48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
 BOND4_DID="{\"did\":\"RYLHkfNpbA8Losy68jt4yF\",\"verifyKey\":\"ENmMCsfNmjYoTRhNgnwXbQAw6p8JKH9DCJfGTPXNfsxW\",\"encryptionPublicKey\":\"5unQBt6JPW1pq9AqoRNhFJmibv8JqeoyyNvN3gF24EaU\",\"secret\":{\"seed\":\"d2c05b107acc2dfe3e9d67e98c993a9c03d227ed8f4505c43997cf4e7819bee2\",\"signKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\",\"encryptionPrivateKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\"}}"
 
-# MIGUEL_ADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"
-# FRANCESCO_ADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5"
-# SHAN_ADDR="cosmos1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"
-MIGUEL_DID="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
-FRANCESCO_DID="{\"did\":\"UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
-SHAUN_DID="{\"did\":\"U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeDue5it82taeheMprdaPrctfK3DeVV9NnEPYDgwwRG\",\"encryptionPublicKey\":\"DtdGbZB2nSQvwhs6QoN5Cd8JTxWgfVRAGVKfxj8LA15i\",\"secret\":{\"seed\":\"6ef0002659d260a0bbad194d1aa28650ccea6c6862f994dfdbd48648e1a05c5e\",\"signKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\",\"encryptionPrivateKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\"}}"
+MIGUEL_DID="4XJLBfGtWSGKSz4BeRxdun"
+MIGUEL_DID_FULL="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
+FRANCESCO_DID_FULL="{\"did\":\"UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
+SHAUN_DID_FULL="{\"did\":\"U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeDue5it82taeheMprdaPrctfK3DeVV9NnEPYDgwwRG\",\"encryptionPublicKey\":\"DtdGbZB2nSQvwhs6QoN5Cd8JTxWgfVRAGVKfxj8LA15i\",\"secret\":{\"seed\":\"6ef0002659d260a0bbad194d1aa28650ccea6c6862f994dfdbd48648e1a05c5e\",\"signKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\",\"encryptionPrivateKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\"}}"
 
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
 yes $PASSWORD | ixocli tx bonds create-bond \
@@ -35,10 +31,9 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --sanity-rate="" \
   --sanity-margin-percentage="" \
   --allow-sells=true \
-  --signers="$MIGUEL" \
   --batch-blocks=1 \
-  --from miguel -y \
-  --bond-did="$BOND1_DID"
+  --bond-did="$BOND1_DID" \
+  --creator-did="$MIGUEL_DID"
 sleep 6
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
@@ -57,10 +52,9 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --sanity-rate="" \
   --sanity-margin-percentage="" \
   --allow-sells=true \
-  --signers="$MIGUEL" \
   --batch-blocks=3 \
-  --from miguel -y \
-  --bond-did="$BOND2_DID"
+  --bond-did="$BOND2_DID" \
+  --creator-did="$MIGUEL_DID"
 sleep 6
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
@@ -79,10 +73,9 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --sanity-rate="" \
   --sanity-margin-percentage="" \
   --allow-sells=true \
-  --signers="$MIGUEL" \
   --batch-blocks=2 \
-  --from miguel -y \
-  --bond-did="$BOND3_DID"
+  --bond-did="$BOND3_DID" \
+  --creator-did="$MIGUEL_DID"
 sleep 6
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
@@ -101,24 +94,23 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --sanity-rate="" \
   --sanity-margin-percentage="" \
   --allow-sells=true \
-  --signers="$MIGUEL" \
   --batch-blocks=1 \
-  --from miguel -y \
-  --bond-did="$BOND4_DID"
+  --bond-did="$BOND4_DID" \
+  --creator-did="$MIGUEL_DID"
 sleep 6
 
 # Buy 5token1, 5token2 from Miguel
 echo "Buying 5token1 from Miguel"
-yes $PASSWORD | ixocli tx bonds buy 5token1 "100000res" U7GK8p8rVhJMKhBVRCJJ8c --from miguel -y "$MIGUEL_DID" --broadcast-mode block
+yes $PASSWORD | ixocli tx bonds buy 5token1 "100000res" U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Buying 5token2 from Miguel"
-yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 --from miguel -y "$MIGUEL_DID" --broadcast-mode block
+yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$MIGUEL_DID_FULL" --broadcast-mode block
 
 # Buy token2 and token3 from Francesco and Shaun
 echo "Buying 5token2 from Francesco"
-yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 --from francesco -y "$FRANCESCO_DID" --broadcast-mode block
+yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$FRANCESCO_DID_FULL" --broadcast-mode block
 echo "Buying 5token3 from Shaun"
-yes $PASSWORD | ixocli tx bonds buy 5token3 "100res,100rez" 48PVm1uyF6QVDSPdGRWw4T --from shaun -y "$SHAUN_DID" --broadcast-mode block
+yes $PASSWORD | ixocli tx bonds buy 5token3 "100res,100rez" 48PVm1uyF6QVDSPdGRWw4T "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Buy 5token4 from Miguel (using token1 and token2)
 echo "Buying 5token4 from Miguel"
-yes $PASSWORD | ixocli tx bonds buy 5token4 "2token1,2token2" RYLHkfNpbA8Losy68jt4yF --from miguel -y "$MIGUEL_DID" --broadcast-mode block
+yes $PASSWORD | ixocli tx bonds buy 5token4 "2token1,2token2" RYLHkfNpbA8Losy68jt4yF "$MIGUEL_DID_FULL" --broadcast-mode block
