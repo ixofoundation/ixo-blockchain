@@ -2,10 +2,9 @@ package cli
 
 import (
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -13,29 +12,6 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
-
-// GetAccountCmd returns a query account that will display the state of the
-// account at a the address represented by a given DID.
-func GetAccountCmd(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "account [pubkey]",
-		Short: "Query for account by PubKey",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-			accGetter := auth.NewAccountRetriever(ctx)
-
-			key := sdk.AccAddress([]byte(args[0]))
-			acc, err := accGetter.GetAccount(key)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(acc)
-			return nil
-		},
-	}
-}
 
 func GetDidDocCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{

@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/abci/types"
@@ -50,16 +51,6 @@ func queryProjectAccount(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.
 	if err != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err.Error()))
 	}
-
-	accountIDAddrInterface := resp["U7GK8p8rVhJMKhBVRCJJ8c"]
-	accountIDAccAddr := accountIDAddrInterface.(string)
-	addr := sdk.AccAddress([]byte(accountIDAccAddr))
-	fmt.Println(addr.String())
-
-	accountIDAddrInterface = resp["IxoFees"]
-	accountIDAccAddr = accountIDAddrInterface.(string)
-	addr = sdk.AccAddress([]byte(accountIDAccAddr))
-	fmt.Println(addr.String())
 
 	return res, nil
 }
