@@ -253,7 +253,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abciTypes.RequestBeginBlock) abciTypes.ResponseBeginBlock {
 
-	// TODO: remove these
+	// TODO: remove these once fiat minting functionality is added
 	if ctx.BlockHeight() == 1 {
 		genesisAddr1 := sdk.AccAddress(crypto.AddressHash([]byte("4XJLBfGtWSGKSz4BeRxdun")))
 		genesisAddr2 := sdk.AccAddress(crypto.AddressHash([]byte("UKzkhVSHc3qEFva5EY2XHt")))
