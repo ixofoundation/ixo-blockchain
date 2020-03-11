@@ -1,8 +1,9 @@
 package app
 
 import (
-	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"github.com/tendermint/tendermint/crypto"
 	"io"
 	"os"
 
@@ -254,9 +255,12 @@ func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abciTypes.RequestBeginBlock
 
 	// TODO: remove these
 	if ctx.BlockHeight() == 1 {
-		genesisAddr1 := sdk.AccAddress(hex.EncodeToString([]byte("4XJLBfGtWSGKSz4BeRxdun")))
-		genesisAddr2 := sdk.AccAddress(hex.EncodeToString([]byte("UKzkhVSHc3qEFva5EY2XHt")))
-		genesisAddr3 := sdk.AccAddress(hex.EncodeToString([]byte("U4tSpzzv91HHqWW1YmFkHJ")))
+		genesisAddr1 := sdk.AccAddress(crypto.AddressHash([]byte("4XJLBfGtWSGKSz4BeRxdun")))
+		genesisAddr2 := sdk.AccAddress(crypto.AddressHash([]byte("UKzkhVSHc3qEFva5EY2XHt")))
+		genesisAddr3 := sdk.AccAddress(crypto.AddressHash([]byte("U4tSpzzv91HHqWW1YmFkHJ")))
+		fmt.Println("Genesis address for 4XJLBfGtWSGKSz4BeRxdun: " + genesisAddr1.String())
+		fmt.Println("Genesis address for UKzkhVSHc3qEFva5EY2XHt: " + genesisAddr2.String())
+		fmt.Println("Genesis address for U4tSpzzv91HHqWW1YmFkHJ: " + genesisAddr3.String())
 		_ = app.bankKeeper.SetCoins(ctx, genesisAddr1, sdk.NewCoins(sdk.NewCoin("res", sdk.NewInt(1000000)), sdk.NewCoin("rez", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))))
 		_ = app.bankKeeper.SetCoins(ctx, genesisAddr2, sdk.NewCoins(sdk.NewCoin("res", sdk.NewInt(1000000)), sdk.NewCoin("rez", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))))
 		_ = app.bankKeeper.SetCoins(ctx, genesisAddr3, sdk.NewCoins(sdk.NewCoin("res", sdk.NewInt(1000000)), sdk.NewCoin("rez", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))))

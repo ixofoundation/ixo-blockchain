@@ -1,9 +1,9 @@
 package types
 
 import (
-	"encoding/hex"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 const (
@@ -17,5 +17,5 @@ type BondsMsg interface {
 }
 
 func DidToAddr(did ixo.Did) sdk.AccAddress {
-	return sdk.AccAddress(hex.EncodeToString([]byte(did)))
+	return sdk.AccAddress(crypto.AddressHash([]byte(did)))
 }

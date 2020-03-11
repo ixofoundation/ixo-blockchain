@@ -5,6 +5,10 @@ MIGUEL=$(yes $PASSWORD | ixocli keys show miguel -a)
 FRANCESCO=$(yes $PASSWORD | ixocli keys show francesco -a)
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
+MADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"
+FADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5"
+SADDR="cosmos1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"
+
 BONDDID="{\"did\":\"U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
 
 MDID="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
@@ -79,19 +83,19 @@ ixocli query bonds bond U7GK8p8rVhJMKhBVRCJJ8c
 echo "Miguel buys 10abc..."
 tx_from_m buy 10abc 1000000res U7GK8p8rVhJMKhBVRCJJ8c "$MDID"
 echo "Miguel's account..."
-ixocli query auth account "$MIGUEL"
+ixocli query auth account "$MADDR"
 
 echo "Francesco buys 10abc..."
 tx_from_f buy 10abc 1000000res U7GK8p8rVhJMKhBVRCJJ8c "$FDID"
 echo "Francesco's account..."
-ixocli query auth account "$FRANCESCO"
+ixocli query auth account "$FADDR"
 
 echo "Miguel sells 10abc..."
 tx_from_m sell 10abc U7GK8p8rVhJMKhBVRCJJ8c "$MDID"
 echo "Miguel's account..."
-ixocli query auth account "$MIGUEL"
+ixocli query auth account "$MADDR"
 
 echo "Francesco sells 10abc..."
 tx_from_f sell 10abc U7GK8p8rVhJMKhBVRCJJ8c "$FDID"
 echo "Francesco's account..."
-ixocli query auth account "$FRANCESCO"
+ixocli query auth account "$FADDR"
