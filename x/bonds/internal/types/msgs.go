@@ -133,7 +133,6 @@ func (msg MsgCreateBond) IsNewDid() bool { return true }
 type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes              string           `json:"signBytes" yaml:"signBytes"`
 	BondDid                ixo.Did          `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string           `json:"pub_key" yaml:"pub_key"`
 	Token                  string           `json:"token" yaml:"token"`
 	Name                   string           `json:"name" yaml:"name"`
 	Description            string           `json:"description" yaml:"description"`
@@ -150,7 +149,6 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 	return MsgEditBond{
 		SignBytes:              "",
 		BondDid:                bondDid.Did,
-		PubKey:                 bondDid.VerifyKey,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
@@ -166,8 +164,6 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
-	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
 	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {

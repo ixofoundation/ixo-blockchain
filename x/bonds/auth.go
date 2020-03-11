@@ -23,13 +23,21 @@ func NewAnteHandler(bondsKeeper Keeper) sdk.AnteHandler {
 			createBondMsg := msg.(types.MsgCreateBond)
 			copy(pubKey[:], base58.Decode(createBondMsg.PubKey))
 		} else {
-			bondDid := ixo.Did(msg.GetSigners()[0])
-			bond, found := bondsKeeper.GetBond(ctx, bondDid)
-			if !found {
-				return ctx, sdk.ErrInternal("bond not found").Result(), true
+			switch msg := msg.(type) {
+			case types.MsgEditBond:
+				bondDid := ixo.Did(msg.GetSigners()[0])
+				bond, found := bondsKeeper.GetBond(ctx, bondDid)
+				if !found {
+					return ctx, sdk.ErrInternal("bond not found").Result(), true
+				}
+				copy(pubKey[:], base58.Decode(bond.PubKey))
+			case types.MsgBuy:
+				copy(pubKey[:], base58.Decode(msg.PubKey))
+			case types.MsgSell:
+				copy(pubKey[:], base58.Decode(msg.PubKey))
+			case types.MsgSwap:
+				copy(pubKey[:], base58.Decode(msg.PubKey))
 			}
-
-			copy(pubKey[:], base58.Decode(bond.PubKey))
 		}
 
 		var sigs = ixoTx.GetSignatures()
