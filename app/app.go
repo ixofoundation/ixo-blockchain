@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"os"
@@ -250,6 +251,17 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 }
 
 func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abciTypes.RequestBeginBlock) abciTypes.ResponseBeginBlock {
+
+	// TODO: remove these
+	if ctx.BlockHeight() == 1 {
+		genesisAddr1 := sdk.AccAddress(hex.EncodeToString([]byte("4XJLBfGtWSGKSz4BeRxdun")))
+		genesisAddr2 := sdk.AccAddress(hex.EncodeToString([]byte("UKzkhVSHc3qEFva5EY2XHt")))
+		genesisAddr3 := sdk.AccAddress(hex.EncodeToString([]byte("U4tSpzzv91HHqWW1YmFkHJ")))
+		_ = app.bankKeeper.SetCoins(ctx, genesisAddr1, sdk.NewCoins(sdk.NewCoin("res", sdk.NewInt(1000000)), sdk.NewCoin("rez", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))))
+		_ = app.bankKeeper.SetCoins(ctx, genesisAddr2, sdk.NewCoins(sdk.NewCoin("res", sdk.NewInt(1000000)), sdk.NewCoin("rez", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))))
+		_ = app.bankKeeper.SetCoins(ctx, genesisAddr3, sdk.NewCoins(sdk.NewCoin("res", sdk.NewInt(1000000)), sdk.NewCoin("rez", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))))
+	}
+
 	return app.mm.BeginBlock(ctx, req)
 }
 

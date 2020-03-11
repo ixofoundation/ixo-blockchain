@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
 )
@@ -195,7 +194,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 }
 
 func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := didToAddr(msg.BuyerDid)
+	buyerAddr := types.DidToAddr(msg.BuyerDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -264,7 +263,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := didToAddr(msg.BuyerDid)
+	buyerAddr := types.DidToAddr(msg.BuyerDid)
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
@@ -324,7 +323,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 }
 
 func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk.Result {
-	sellerAddr := didToAddr(msg.SellerDid)
+	sellerAddr := types.DidToAddr(msg.SellerDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -391,7 +390,7 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 }
 
 func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk.Result {
-	swapperAddr := didToAddr(msg.SwapperDid)
+	swapperAddr := types.DidToAddr(msg.SwapperDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -442,8 +441,4 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk
 	})
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
-}
-
-func didToAddr(did ixo.Did) sdk.AccAddress {
-	return sdk.AccAddress([]byte(did))
 }

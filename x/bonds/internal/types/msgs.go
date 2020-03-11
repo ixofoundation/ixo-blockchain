@@ -251,7 +251,7 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgBuy) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return []byte(msg.SignBytes)
 }
 
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
@@ -301,7 +301,7 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSell) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return []byte(msg.SignBytes)
 }
 
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
@@ -362,7 +362,7 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSwap) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return []byte(msg.SignBytes)
 }
 
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
