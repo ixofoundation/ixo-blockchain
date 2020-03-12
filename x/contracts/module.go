@@ -2,11 +2,11 @@ package contracts
 
 import (
 	"encoding/json"
-	
+
 	"github.com/cosmos/cosmos-sdk/client"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/contracts/client/cli"
-	
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/contracts/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/contracts/internal/keeper"
 )
@@ -52,16 +52,16 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	contractQueryCmd := &cobra.Command{
 		Use:                        ModuleName,
-		Short:                      "fees query sub module",
+		Short:                      "contracts query sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	
+
 	contractQueryCmd.AddCommand(client.GetCommands(
 		cli.GetContractCmd(cdc),
 	)...)
-	
+
 	return contractQueryCmd
 }
 
@@ -103,7 +103,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abciTyp
 	var genesisState GenesisState
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, genesisState)
-	
+
 	return []abciTypes.ValidatorUpdate{}
 }
 

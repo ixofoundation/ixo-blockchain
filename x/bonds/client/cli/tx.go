@@ -249,7 +249,7 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "swap [from_amount] [from_token] [to_token] [bond-did] [swapper-did]",
+		Use: "swap [from-amount] [from-token] [to-token] [bond-did] [swapper-did]",
 		Example: "" +
 			"swap 100 res1 res2 U7GK8p8rVhJMKhBVRCJJ8c <swapper-sovrin-did>\n" +
 			"swap 100 res2 res1 U7GK8p8rVhJMKhBVRCJJ8c <swapper-sovrin-did>",

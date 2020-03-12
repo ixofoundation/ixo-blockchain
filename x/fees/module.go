@@ -2,11 +2,11 @@ package fees
 
 import (
 	"encoding/json"
-	
+
 	"github.com/cosmos/cosmos-sdk/client"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/fees/client/cli"
-	
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/fees/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
@@ -53,16 +53,16 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	feeQueryCmd := &cobra.Command{
 		Use:                        ModuleName,
-		Short:                      "fees query sub module",
+		Short:                      "fees query sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	
+
 	feeQueryCmd.AddCommand(client.GetCommands(
 		cli.GetFeesRequestHandler(cdc),
 	)...)
-	
+
 	return feeQueryCmd
 }
 
@@ -105,7 +105,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.Va
 	var genesisState GenesisState
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, DefaultGenesisState())
-	
+
 	return []abci.ValidatorUpdate{}
 }
 
