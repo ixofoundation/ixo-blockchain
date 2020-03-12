@@ -11,6 +11,12 @@ MIGUEL_DID="4XJLBfGtWSGKSz4BeRxdun"
 MIGUEL_DID_FULL="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
 FRANCESCO_DID_FULL="{\"did\":\"UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
 
+# Ledger DIDs
+echo "Ledgering DID 1/2..."
+ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
+echo "Ledgering DID 2/2..."
+ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
+
 wait() {
   echo "Waiting for chain to start..."
   while :; do
@@ -54,8 +60,8 @@ ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
-  --creator-did="$MIGUEL_DID"
-sleep 6
+  --creator-did="$MIGUEL_DID" \
+  --broadcast-mode block
 echo "Created bond..."
 ixocli query bonds bond U7GK8p8rVhJMKhBVRCJJ8c
 
@@ -64,8 +70,8 @@ ixocli tx bonds edit-bond \
   --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
-  --editor-did="$MIGUEL_DID"
-sleep 6
+  --editor-did="$MIGUEL_DID" \
+  --broadcast-mode block
 echo "Edited bond..."
 ixocli query bonds bond U7GK8p8rVhJMKhBVRCJJ8c
 

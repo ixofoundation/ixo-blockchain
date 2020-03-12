@@ -11,11 +11,6 @@ const (
 	FALSE = "false"
 )
 
-type BondsMsg interface {
-	sdk.Msg
-	IsNewDid() bool
-}
-
 func DidToAddr(did ixo.Did) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(did)))
 }

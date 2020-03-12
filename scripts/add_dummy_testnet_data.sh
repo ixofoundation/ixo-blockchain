@@ -15,7 +15,16 @@ MIGUEL_DID_FULL="{\"did\":\"4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrB
 FRANCESCO_DID_FULL="{\"did\":\"UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
 SHAUN_DID_FULL="{\"did\":\"U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeDue5it82taeheMprdaPrctfK3DeVV9NnEPYDgwwRG\",\"encryptionPublicKey\":\"DtdGbZB2nSQvwhs6QoN5Cd8JTxWgfVRAGVKfxj8LA15i\",\"secret\":{\"seed\":\"6ef0002659d260a0bbad194d1aa28650ccea6c6862f994dfdbd48648e1a05c5e\",\"signKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\",\"encryptionPrivateKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\"}}"
 
+# Ledger DIDs
+echo "Ledgering DID 1/3..."
+ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
+echo "Ledgering DID 2/3..."
+ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
+echo "Ledgering DID 3/3..."
+ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
+
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
+echo "Creating bond 1/4..."
 yes $PASSWORD | ixocli tx bonds create-bond \
   --token=token1 \
   --name="Test Token 1" \
@@ -33,10 +42,11 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND1_DID" \
-  --creator-did="$MIGUEL_DID"
-sleep 6
+  --creator-did="$MIGUEL_DID" \
+  --broadcast-mode block
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
+echo "Creating bond 2/4..."
 yes $PASSWORD | ixocli tx bonds create-bond \
   --token=token2 \
   --name="Test Token 2" \
@@ -54,10 +64,11 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=3 \
   --bond-did="$BOND2_DID" \
-  --creator-did="$MIGUEL_DID"
-sleep 6
+  --creator-did="$MIGUEL_DID" \
+  --broadcast-mode block
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
+echo "Creating bond 3/4..."
 yes $PASSWORD | ixocli tx bonds create-bond \
   --token=token3 \
   --name="Test Token 3" \
@@ -75,10 +86,11 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID" \
-  --creator-did="$MIGUEL_DID"
-sleep 6
+  --creator-did="$MIGUEL_DID" \
+  --broadcast-mode block
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
+echo "Creating bond 4/4..."
 yes $PASSWORD | ixocli tx bonds create-bond \
   --token=token4 \
   --name="Test Token 4" \
@@ -96,21 +108,21 @@ yes $PASSWORD | ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND4_DID" \
-  --creator-did="$MIGUEL_DID"
-sleep 6
+  --creator-did="$MIGUEL_DID" \
+  --broadcast-mode block
 
 # Buy 5token1, 5token2 from Miguel
-echo "Buying 5token1 from Miguel"
+echo "Buying 5token1 from Miguel..."
 yes $PASSWORD | ixocli tx bonds buy 5token1 "100000res" U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID_FULL" --broadcast-mode block
-echo "Buying 5token2 from Miguel"
+echo "Buying 5token2 from Miguel..."
 yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$MIGUEL_DID_FULL" --broadcast-mode block
 
 # Buy token2 and token3 from Francesco and Shaun
-echo "Buying 5token2 from Francesco"
+echo "Buying 5token2 from Francesco..."
 yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$FRANCESCO_DID_FULL" --broadcast-mode block
-echo "Buying 5token3 from Shaun"
+echo "Buying 5token3 from Shaun..."
 yes $PASSWORD | ixocli tx bonds buy 5token3 "100res,100rez" 48PVm1uyF6QVDSPdGRWw4T "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Buy 5token4 from Miguel (using token1 and token2)
-echo "Buying 5token4 from Miguel"
+echo "Buying 5token4 from Miguel..."
 yes $PASSWORD | ixocli tx bonds buy 5token4 "2token1,2token2" RYLHkfNpbA8Losy68jt4yF "$MIGUEL_DID_FULL" --broadcast-mode block

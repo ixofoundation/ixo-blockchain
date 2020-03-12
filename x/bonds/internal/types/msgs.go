@@ -125,8 +125,6 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 
 func (msg MsgCreateBond) Type() string { return ModuleName }
 
-func (msg MsgCreateBond) IsNewDid() bool { return true }
-
 type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes              string  `json:"signBytes" yaml:"signBytes"`
 	BondDid                ixo.Did `json:"bond_did" yaml:"bond_did"`
@@ -205,8 +203,6 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return ModuleName }
 
-func (msg MsgEditBond) IsNewDid() bool { return false }
-
 type MsgBuy struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
@@ -258,8 +254,6 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return ModuleName }
 
-func (msg MsgBuy) IsNewDid() bool { return false }
-
 type MsgSell struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes string   `json:"signBytes" yaml:"signBytes"`
 	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
@@ -307,8 +301,6 @@ func (msg MsgSell) GetSigners() []sdk.AccAddress {
 func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return ModuleName }
-
-func (msg MsgSell) IsNewDid() bool { return false }
 
 type MsgSwap struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes  string   `json:"signBytes" yaml:"signBytes"`
@@ -368,5 +360,3 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return ModuleName }
-
-func (msg MsgSwap) IsNewDid() bool { return false }
