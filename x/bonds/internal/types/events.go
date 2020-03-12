@@ -39,6 +39,7 @@ const (
 	AttributeKeyChargedPrices          = "charged_prices"
 	AttributeKeyChargedFees            = "charged_fees"
 	AttributeKeyReturnedToAddress      = "returned_to_address"
+	AttributeKeyNewBondTokenBalance    = "new_bond_token_balance"
 
 	AttributeValueBuyOrder  = "buy"
 	AttributeValueSellOrder = "sell"

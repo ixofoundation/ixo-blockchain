@@ -237,6 +237,9 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 	logger := k.Logger(ctx)
 	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.Amount.String(), bo.AccountDid))
 
+	// Get new bond token balance
+	bondTokenBalance := k.CoinKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
+
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
@@ -246,6 +249,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 		sdk.NewAttribute(types.AttributeKeyChargedPrices, reservePricesRounded.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, returnToBuyer.String()),
+		sdk.NewAttribute(types.AttributeKeyNewBondTokenBalance, bondTokenBalance.String()),
 	))
 
 	return nil
@@ -284,6 +288,9 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 	logger := k.Logger(ctx)
 	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.Amount.String(), so.AccountDid))
 
+	// Get new bond token balance
+	bondTokenBalance := k.CoinKeeper.GetCoins(ctx, sellerAddr).AmountOf(bond.Token)
+
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
@@ -292,6 +299,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 		sdk.NewAttribute(types.AttributeKeyTokensBurned, so.Amount.Amount.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, totalReturns.String()),
+		sdk.NewAttribute(types.AttributeKeyNewBondTokenBalance, bondTokenBalance.String()),
 	))
 
 	return nil
