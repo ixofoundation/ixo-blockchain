@@ -17,7 +17,7 @@ wait() {
 tx() {
   cmd=$1
   shift
-  yes $PASSWORD | ixocli tx bonds "$cmd" --broadcast-mode block "$@"
+  ixocli tx bonds "$cmd" --broadcast-mode block "$@"
 }
 
 RET=$(ixocli status 2>&1)

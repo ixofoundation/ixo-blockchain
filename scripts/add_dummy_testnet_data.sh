@@ -1,4 +1,4 @@
-PASSWORD="12345678"
+#!/usr/bin/env bash
 
 wait() {
   echo "Waiting for chain to start..."
@@ -17,13 +17,15 @@ wait() {
 tx() {
   cmd=$1
   shift
-  yes $PASSWORD | ixocli tx bonds "$cmd" --broadcast-mode block "$@"
+  ixocli tx bonds "$cmd" --broadcast-mode block "$@"
 }
 
 RET=$(ixocli status 2>&1)
 if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
   wait
 fi
+
+PASSWORD="12345678"
 
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
@@ -50,7 +52,7 @@ ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
 echo "Creating bond 1/4..."
-yes $PASSWORD | ixocli tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token1 \
   --name="Test Token 1" \
   --description="Power function with non-zero fees and batch_blocks=1" \
@@ -72,7 +74,7 @@ yes $PASSWORD | ixocli tx bonds create-bond \
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
 echo "Creating bond 2/4..."
-yes $PASSWORD | ixocli tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token2 \
   --name="Test Token 2" \
   --description="Power function with zero fees and batch_blocks=4" \
@@ -94,7 +96,7 @@ yes $PASSWORD | ixocli tx bonds create-bond \
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
 echo "Creating bond 3/4..."
-yes $PASSWORD | ixocli tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token3 \
   --name="Test Token 3" \
   --description="Swapper function between res and rez" \
@@ -116,7 +118,7 @@ yes $PASSWORD | ixocli tx bonds create-bond \
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
 echo "Creating bond 4/4..."
-yes $PASSWORD | ixocli tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token4 \
   --name="Test Token 4" \
   --description="Swapper function between res and rez" \
@@ -138,16 +140,16 @@ yes $PASSWORD | ixocli tx bonds create-bond \
 
 # Buy 5token1, 5token2 from Miguel
 echo "Buying 5token1 from Miguel..."
-yes $PASSWORD | ixocli tx bonds buy 5token1 "100000res" U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx bonds buy 5token1 "100000res" U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Buying 5token2 from Miguel..."
-yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$MIGUEL_DID_FULL" --broadcast-mode block
 
 # Buy token2 and token3 from Francesco and Shaun
 echo "Buying 5token2 from Francesco..."
-yes $PASSWORD | ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$FRANCESCO_DID_FULL" --broadcast-mode block
+ixocli tx bonds buy 5token2 "100000res" JHcN95bkS4aAWk3TKXapA2 "$FRANCESCO_DID_FULL" --broadcast-mode block
 echo "Buying 5token3 from Shaun..."
-yes $PASSWORD | ixocli tx bonds buy 5token3 "100res,100rez" 48PVm1uyF6QVDSPdGRWw4T "$SHAUN_DID_FULL" --broadcast-mode block
+ixocli tx bonds buy 5token3 "100res,100rez" 48PVm1uyF6QVDSPdGRWw4T "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Buy 5token4 from Miguel (using token1 and token2)
 echo "Buying 5token4 from Miguel..."
-yes $PASSWORD | ixocli tx bonds buy 5token4 "2token1,2token2" RYLHkfNpbA8Losy68jt4yF "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx bonds buy 5token4 "2token1,2token2" RYLHkfNpbA8Losy68jt4yF "$MIGUEL_DID_FULL" --broadcast-mode block
