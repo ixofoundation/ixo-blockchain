@@ -57,6 +57,12 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
+			// Check that bond token is a valid token name
+			err = client2.CheckCoinDenom(_token)
+			if err != nil {
+				return err
+			}
+
 			// Parse function parameters
 			functionParams, err := client2.ParseFunctionParams(_functionParameters, _functionType)
 			if err != nil {
@@ -253,15 +259,15 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// Check that from amount and token can be parsed to a coin
-			from, err := sdk.ParseCoin(args[0] + args[1])
+			from, err := client2.ParseCoin(args[0], args[1])
 			if err != nil {
 				return err
 			}
 
 			// Check that to_token is a valid token name
-			_, err = sdk.ParseCoin("0" + args[2])
+			err = client2.CheckCoinDenom(args[2])
 			if err != nil {
-				return types.ErrInvalidCoinDenomination(types.DefaultCodespace, args[2])
+				return err
 			}
 
 			// Parse swapper's sovrin DID

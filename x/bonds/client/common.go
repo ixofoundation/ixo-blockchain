@@ -84,7 +84,7 @@ func ParseFunctionParams(fnParamsStr string, fnType string) (fnParams types.Func
 	return functionParams, nil
 }
 
-func checkReserveTokenNames(resTokens []string, token string) sdk.Error {
+func checkReserveTokenNames(resTokens []string, token string) error {
 	// Check that no token is the same as the main token, no token
 	// is duplicate, and that the token is a valid denomination
 	uniqueReserveTokens := make(map[string]string)
@@ -102,9 +102,9 @@ func checkReserveTokenNames(resTokens []string, token string) sdk.Error {
 		}
 
 		// Check if can be parsed as coin
-		_, err := sdk.ParseCoin("0" + r)
+		err := CheckCoinDenom(r)
 		if err != nil {
-			return types.ErrInvalidCoinDenomination(types.DefaultCodespace, r)
+			return err
 		}
 	}
 	return nil
@@ -125,7 +125,7 @@ func checkNoOfReserveTokens(resTokens []string, fnType string) sdk.Error {
 	return nil
 }
 
-func ParseReserveTokens(resTokensStr string, fnType string, token string) (resTokens []string, err sdk.Error) {
+func ParseReserveTokens(resTokensStr string, fnType string, token string) (resTokens []string, err error) {
 	resTokens = strings.Split(resTokensStr, ",")
 	if err = checkReserveTokenNames(resTokens, token); err != nil {
 		return nil, err
@@ -185,6 +185,26 @@ func ParseBatchBlocks(batchBlocksStr string) (batchBlocks sdk.Uint, err error) {
 		return sdk.Uint{}, types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
 	}
 	return batchBlocks, nil
+}
+
+func CheckCoinDenom(denom string) (err error) {
+	coin, err := sdk.ParseCoin("0" + denom)
+	if err != nil {
+		return err
+	} else if denom != coin.Denom {
+		return types.ErrInvalidCoinDenomination(types.DefaultCodespace, denom)
+	}
+	return nil
+}
+
+func ParseCoin(amount, denom string) (coin sdk.Coin, err error) {
+	coin, err = sdk.ParseCoin(amount + denom)
+	if err != nil {
+		return sdk.Coin{}, err
+	} else if denom != coin.Denom {
+		return sdk.Coin{}, types.ErrInvalidCoinDenomination(types.DefaultCodespace, denom)
+	}
+	return coin, nil
 }
 
 func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
