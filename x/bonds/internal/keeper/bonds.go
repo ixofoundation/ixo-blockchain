@@ -28,6 +28,7 @@ func (k Keeper) GetNextUnusedReserveAddress(ctx sdk.Context) sdk.AccAddress {
 	var buffer bytes.Buffer
 
 	// Get number of bonds prefixed with a letter (in this case, A)
+	// Letter is added to separate the number from possible digits
 	numString := "A" + k.GetNumberOfBonds(ctx).String()
 
 	// Append numString to a base HEX address
@@ -54,6 +55,16 @@ func (k Keeper) GetBond(ctx sdk.Context, bondDid ixo.Did) (bond types.Bond, foun
 	return bond, true
 }
 
+func (k Keeper) GetBondDid(ctx sdk.Context, bondToken string) (bondDid ixo.Did, found bool) {
+	store := ctx.KVStore(k.storeKey)
+	if !k.BondDidExists(ctx, bondToken) {
+		return
+	}
+	bz := store.Get(types.GetBondDidsKey(bondToken))
+	k.cdc.MustUnmarshalBinaryBare(bz, &bondDid)
+	return bondDid, true
+}
+
 func (k Keeper) MustGetBond(ctx sdk.Context, bondDid ixo.Did) types.Bond {
 	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
@@ -78,9 +89,19 @@ func (k Keeper) BondExists(ctx sdk.Context, bondDid ixo.Did) bool {
 	return store.Has(types.GetBondKey(bondDid))
 }
 
+func (k Keeper) BondDidExists(ctx sdk.Context, bondToken string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.GetBondDidsKey(bondToken))
+}
+
 func (k Keeper) SetBond(ctx sdk.Context, bondDid ixo.Did, bond types.Bond) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.GetBondKey(bondDid), k.cdc.MustMarshalBinaryBare(bond))
+}
+
+func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid ixo.Did) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.GetBondDidsKey(bondToken), k.cdc.MustMarshalBinaryBare(bondDid))
 }
 
 func (k Keeper) GetReserveBalances(ctx sdk.Context, bondDid ixo.Did) sdk.Coins {

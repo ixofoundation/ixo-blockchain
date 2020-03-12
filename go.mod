@@ -14,8 +14,7 @@ require (
 	github.com/ethereum/go-ethereum v1.8.17
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5 // indirect
 	github.com/google/uuid v1.0.0 // indirect
-	github.com/gorilla/mux v1.7.0
-	github.com/hashicorp/golang-lru v0.5.3 // indirect
+	github.com/gorilla/mux v1.7.3
 	github.com/huin/goupnp v1.0.0 // indirect
 	github.com/ixofoundation/ixo-go-abi v0.0.0-20181018124448-726539e93dee
 	github.com/jackpal/go-nat-pmp v1.0.1 // indirect
@@ -27,14 +26,14 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/spf13/cobra v0.0.5
-	github.com/spf13/pflag v1.0.3
-	github.com/spf13/viper v1.3.2
-	github.com/stretchr/testify v1.3.0
+	github.com/spf13/pflag v1.0.5
+	github.com/spf13/viper v1.6.1
+	github.com/stretchr/testify v1.4.0
 	github.com/tendermint/ed25519 v0.0.0-20171027050219-d8387025d2b9
-	github.com/tendermint/go-amino v0.15.0
-	github.com/tendermint/tendermint v0.32.2 //latest
-	github.com/tendermint/tm-db v0.1.1
+	github.com/tendermint/go-amino v0.15.1
+	github.com/tendermint/tendermint v0.32.8 //latest
+	github.com/tendermint/tm-db v0.2.0
 	github.com/tendermint/tmlibs v0.8.1
-	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a
+	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )

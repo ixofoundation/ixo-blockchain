@@ -62,6 +62,8 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	if keeper.BondExists(ctx, msg.BondDid) {
 		return types.ErrBondAlreadyExists(DefaultCodeSpace, msg.BondDid).Result()
+	} else if keeper.BondDidExists(ctx, msg.Token) {
+		return types.ErrBondTokenIsTaken(DefaultCodeSpace, msg.Token).Result()
 	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
 		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
 	}
@@ -76,6 +78,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		msg.BondDid, msg.PubKey)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
+	keeper.SetBondDid(ctx, bond.Token, bond.BondDid)
 	keeper.SetBatch(ctx, bond.BondDid, types.NewBatch(bond.BondDid, bond.Token, msg.BatchBlocks))
 
 	logger := keeper.Logger(ctx)
