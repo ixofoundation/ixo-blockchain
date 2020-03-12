@@ -1,5 +1,30 @@
 PASSWORD="12345678"
 
+wait() {
+  echo "Waiting for chain to start..."
+  while :; do
+    RET=$(ixocli status 2>&1)
+    if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+      sleep 1
+    else
+      echo "A few more seconds..."
+      sleep 6
+      break
+    fi
+  done
+}
+
+tx() {
+  cmd=$1
+  shift
+  yes $PASSWORD | ixocli tx bonds "$cmd" --broadcast-mode block "$@"
+}
+
+RET=$(ixocli status 2>&1)
+if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+  wait
+fi
+
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
 FEE3=$(yes $PASSWORD | ixocli keys show fee3 -a)
