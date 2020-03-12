@@ -24,12 +24,12 @@ func (k Keeper) GetNumberOfBonds(ctx sdk.Context) sdk.Int {
 	return count
 }
 
-func (k Keeper) GetNextUnusedReserveAddress(ctx sdk.Context) sdk.AccAddress {
+func (k Keeper) GetReserveAddressByBondCount(count sdk.Int) sdk.AccAddress {
 	var buffer bytes.Buffer
 
-	// Get number of bonds prefixed with a letter (in this case, A)
+	// Start with number of bonds prefixed with a letter (in this case, A)
 	// Letter is added to separate the number from possible digits
-	numString := "A" + k.GetNumberOfBonds(ctx).String()
+	numString := "A" + count.String()
 
 	// Append numString to a base HEX address
 	buffer.WriteString("A97B2E13A94AF4A1D3EC729DC422C6341BAEEDC9")
@@ -43,6 +43,10 @@ func (k Keeper) GetNextUnusedReserveAddress(ctx sdk.Context) sdk.AccAddress {
 	}
 
 	return res
+}
+
+func (k Keeper) GetNextUnusedReserveAddress(ctx sdk.Context) sdk.AccAddress {
+	return k.GetReserveAddressByBondCount(k.GetNumberOfBonds(ctx))
 }
 
 func (k Keeper) GetBond(ctx sdk.Context, bondDid ixo.Did) (bond types.Bond, found bool) {
