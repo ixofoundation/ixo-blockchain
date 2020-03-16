@@ -16,8 +16,8 @@ import (
 
 func GetProjectDocCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectDoc did",
-		Short: "Get a new ProjectDoc for a Did",
+		Use:   "getProjectDoc [did]",
+		Short: "Query ProjectDoc for a DID",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
@@ -54,7 +54,7 @@ func GetProjectDocCmd(cdc *codec.Codec) *cobra.Command {
 
 func GetProjectAccountsCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectAccounts did",
+		Use:   "getProjectAccounts [did]",
 		Short: "Get a Project accounts for a Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -96,7 +96,7 @@ func GetProjectAccountsCmd(cdc *codec.Codec) *cobra.Command {
 
 func GetProjectTxsCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectTxs projectDid",
+		Use:   "getProjectTxs [project-did]",
 		Short: "Get a Project txs for a projectDid",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().

@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/client"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
@@ -58,9 +57,9 @@ type createBondReq struct {
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
-	Signers                string       `json:"signers" yaml:"signers"`
 	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
+	CreatorDid             string       `json:"creator_did" yaml:"creator_did"`
 }
 
 func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -77,7 +76,8 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		creator, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		// Check that bond token is a valid token name
+		err := client.CheckCoinDenom(req.Token)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -91,9 +91,9 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse reserve tokens
-		reserveTokens, err := client.ParseReserveTokens(req.ReserveTokens, req.FunctionType, req.Token)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		reserveTokens, err2 := client.ParseReserveTokens(req.ReserveTokens, req.FunctionType, req.Token)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
@@ -117,21 +117,21 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		feeAddress, err2 := sdk.AccAddressFromBech32(req.FeeAddress)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
-		maxSupply, err := client.ParseMaxSupply(req.MaxSupply, req.Token)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		maxSupply, err2 := client.ParseMaxSupply(req.MaxSupply, req.Token)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
-		orderQuantityLimits, err := sdk.ParseCoins(req.OrderQuantityLimits)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		orderQuantityLimits, err2 := sdk.ParseCoins(req.OrderQuantityLimits)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
@@ -142,17 +142,10 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse signers
-		signers, err := client.ParseSigners(req.Signers)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// Parse batch blocks
-		batchBlocks, err := client.ParseBatchBlocks(req.BatchBlocks)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		batchBlocks, err2 := client.ParseBatchBlocks(req.BatchBlocks)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
@@ -160,10 +153,10 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		bondDid := client.UnmarshalSovrinDID(req.BondDid)
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			creator, req.FunctionType, functionParams, reserveTokens,
+			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			req.AllowSells, signers, batchBlocks, bondDid)
+			req.AllowSells, batchBlocks, bondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -174,36 +167,36 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
 
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
+		msgBytes, err2 := json.Marshal(msg)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err2.Error())))
 			return
 		}
 
 		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
 		tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
+		bz, err2 := cliCtx.Codec.MarshalJSON(tx)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err2.Error())))
 
 			return
 		}
 
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
+		res, err2 := cliCtx.BroadcastTx(bz)
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err2.Error())))
 
 			return
 		}
 
-		output, err := json.MarshalIndent(res, "", "  ")
-		if err != nil {
+		output, err2 := json.MarshalIndent(res, "", "  ")
+		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err2.Error()))
 
 			return
 		}
@@ -220,8 +213,8 @@ type editBondReq struct {
 	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	Signers                string       `json:"signers" yaml:"signers"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
+	EditorDid              string       `json:"editor_did" yaml:"editor_did"`
 }
 
 func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -238,26 +231,13 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		editor, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		// Parse signers
-		signers, err := client.ParseSigners(req.Signers)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// Parse bond's sovrin DID
 		bondDid := client.UnmarshalSovrinDID(req.BondDid)
 
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
-			req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage,
-			editor, signers, bondDid)
-		err = msg.ValidateBasic()
+			req.OrderQuantityLimits, req.SanityRate,
+			req.SanityMarginPercentage, req.EditorDid, bondDid)
+		err := msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -267,6 +247,93 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		copy(privKey[:], base58.Decode(bondDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(bondDid.VerifyKey))
 
+		msgBytes, err2 := json.Marshal(msg)
+		if err2 != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err2.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err2 := cliCtx.Codec.MarshalJSON(tx)
+		if err2 != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err2.Error())))
+
+			return
+		}
+
+		res, err2 := cliCtx.BroadcastTx(bz)
+		if err2 != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err2.Error())))
+
+			return
+		}
+
+		output, err2 := json.MarshalIndent(res, "", "  ")
+		if err2 != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err2.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
+	}
+}
+
+type buyReq struct {
+	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondToken  string       `json:"bond_token" yaml:"bond_token"`
+	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
+	MaxPrices  string       `json:"max_prices" yaml:"max_prices"`
+	BondDid    string       `json:"bond_did" yaml:"bond_did"`
+	BuyerDid   string       `json:"buyer_did" yaml:"buyer_did"`
+}
+
+func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req buyReq
+
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		bondCoin, err := client.ParseCoin(req.BondAmount, req.BondToken)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		maxPrices, err := sdk.ParseCoins(req.MaxPrices)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// Parse buyer's sovrin DID
+		buyerDid := client.UnmarshalSovrinDID(req.BuyerDid)
+
+		msg := types.NewMsgBuy(buyerDid, bondCoin, maxPrices, req.BondDid)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(buyerDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(buyerDid.VerifyKey))
+
 		msgBytes, err := json.Marshal(msg)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -274,7 +341,7 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		signature := ixo.SignIxoMessage(msgBytes, bondDid.Did, privKey)
+		signature := ixo.SignIxoMessage(msgBytes, buyerDid.Did, privKey)
 		tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
 		bz, err := cliCtx.Codec.MarshalJSON(tx)
@@ -305,62 +372,12 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-type buyReq struct {
-	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondToken  string       `json:"bond_token" yaml:"bond_token"`
-	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
-	MaxPrices  string       `json:"max_prices" yaml:"max_prices"`
-	BondDid    string       `json:"bond_did" yaml:"bond_did"`
-}
-
-func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req buyReq
-
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
-
-		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
-		buyer, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		bondCoin, err := sdk.ParseCoin(req.BondAmount + req.BondToken)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		maxPrices, err := sdk.ParseCoins(req.MaxPrices)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		msg := types.NewMsgBuy(buyer, bondCoin, maxPrices, req.BondDid)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
-	}
-}
-
 type sellReq struct {
 	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
 	BondToken  string       `json:"bond_token" yaml:"bond_token"`
 	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
 	BondDid    string       `json:"bond_did" yaml:"bond_did"`
+	SellerDid  string       `json:"seller_did" yaml:"seller_did"`
 }
 
 func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -377,26 +394,61 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		seller, err := sdk.AccAddressFromBech32(req.BaseReq.From)
+		bondCoin, err := client.ParseCoin(req.BondAmount, req.BondToken)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		bondCoin, err := sdk.ParseCoin(req.BondAmount + req.BondToken)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		// Parse seller's sovrin DID
+		sellerDid := client.UnmarshalSovrinDID(req.SellerDid)
 
-		msg := types.NewMsgSell(seller, bondCoin, req.BondDid)
+		msg := types.NewMsgSell(sellerDid, bondCoin, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(sellerDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(sellerDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, sellerDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
@@ -406,6 +458,7 @@ type swapReq struct {
 	FromToken  string       `json:"from_token" yaml:"from_token"`
 	ToToken    string       `json:"to_token" yaml:"to_token"`
 	BondDid    string       `json:"bond_did" yaml:"bond_did"`
+	SwapperDid string       `json:"swapper_did" yaml:"swapper_did"`
 }
 
 func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -422,34 +475,68 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		swapper, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		// Check that from amount and token can be parsed to a coin
-		fromCoin, err := sdk.ParseCoin(req.FromAmount + req.FromToken)
+		fromCoin, err := client.ParseCoin(req.FromAmount, req.FromToken)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// Check that ToToken is a valid token name
-		_, err = sdk.ParseCoin("0" + req.ToToken)
+		err = client.CheckCoinDenom(req.ToToken)
 		if err != nil {
-			err = types.ErrInvalidCoinDenomination(types.DefaultCodespace, req.ToToken)
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgSwap(swapper, fromCoin, req.ToToken, req.BondDid)
+		// Parse swapper's sovrin DID
+		swapperDid := client.UnmarshalSovrinDID(req.SwapperDid)
+
+		msg := types.NewMsgSwap(swapperDid, fromCoin, req.ToToken, req.BondDid)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+		privKey := [64]byte{}
+		copy(privKey[:], base58.Decode(swapperDid.Secret.SignKey))
+		copy(privKey[32:], base58.Decode(swapperDid.VerifyKey))
+
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
+			return
+		}
+
+		signature := ixo.SignIxoMessage(msgBytes, swapperDid.Did, privKey)
+		tx := ixo.NewIxoTxSingleMsg(msg, signature)
+
+		bz, err := cliCtx.Codec.MarshalJSON(tx)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
+
+			return
+		}
+
+		res, err := cliCtx.BroadcastTx(bz)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
+
+			return
+		}
+
+		output, err := json.MarshalIndent(res, "", "  ")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }

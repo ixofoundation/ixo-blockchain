@@ -26,11 +26,13 @@ const (
 //
 // - Bonds: 0x00<bond_did_bytes>
 // - Batches: 0x01<bond_did_bytes>
-// - Last batches: 0x01<bond_did_bytes>
+// - Last batches: 0x02<bond_did_bytes>
+// - Bond DIDs: 0x03<bond_token_bytes>
 var (
 	BondsKeyPrefix       = []byte{0x00} // key for bonds
 	BatchesKeyPrefix     = []byte{0x01} // key for batches
 	LastBatchesKeyPrefix = []byte{0x02} // key for last batches
+	BondDidsKeyPrefix    = []byte{0x03} // key for bond DIDs
 )
 
 func GetBondKey(bondDid ixo.Did) []byte {
@@ -43,4 +45,8 @@ func GetBatchKey(bondDid ixo.Did) []byte {
 
 func GetLastBatchKey(bondDid ixo.Did) []byte {
 	return append(LastBatchesKeyPrefix, []byte(bondDid)...)
+}
+
+func GetBondDidsKey(token string) []byte {
+	return append(BondDidsKeyPrefix, []byte(token)...)
 }

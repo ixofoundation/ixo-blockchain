@@ -108,6 +108,11 @@ func ErrBondAlreadyExists(codespace sdk.CodespaceType, bondDid ixo.Did) sdk.Erro
 	return sdk.NewError(codespace, CodeBondAlreadyExists, errMsg)
 }
 
+func ErrBondTokenIsTaken(codespace sdk.CodespaceType, bondToken string) sdk.Error {
+	errMsg := fmt.Sprintf("Bond token '%s' is taken", bondToken)
+	return sdk.NewError(codespace, CodeBondAlreadyExists, errMsg)
+}
+
 func ErrBondDoesNotAllowSelling(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Bond does not allow selling."
 	return sdk.NewError(codespace, CodeBondDoesNotAllowSelling, errMsg)

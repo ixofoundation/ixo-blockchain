@@ -16,8 +16,8 @@ import (
 
 func GetBondDocCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getBondDoc did",
-		Short: "Get a new BondDoc for a Did",
+		Use:   "getBondDoc [did]",
+		Short: "Query BondDoc for a DID",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)

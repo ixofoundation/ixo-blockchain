@@ -57,7 +57,7 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 
 func CreateProjectCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createProject projectJson sovrinDiD",
+		Use:   "createProject [project-json] [sovrin-did]",
 		Short: "Create a new ProjectDoc signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -83,7 +83,7 @@ func CreateProjectCmd(cdc *codec.Codec) *cobra.Command {
 
 func UpdateProjectStatusCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateProjectStatus txHash senderDid status sovrinDid",
+		Use:   "updateProjectStatus [tx-hash] [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -122,7 +122,7 @@ func UpdateProjectStatusCmd(cdc *codec.Codec) *cobra.Command {
 
 func CreateAgentCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createAgent txHash senderDid agentDid role projectDid",
+		Use:   "createAgent [tx-hash] [sender-did] [agent-did] [role] [project-did]",
 		Short: "Create a new agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -156,7 +156,7 @@ func CreateAgentCmd(cdc *codec.Codec) *cobra.Command {
 
 func UpdateAgentCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateAgent txHash senderDid agentDid status sovrinDid",
+		Use:   "updateAgent [tx-hash] [sender-did] [agent-did] [status] [sovrin-did]",
 		Short: "Update the status of an agent on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -192,7 +192,7 @@ func UpdateAgentCmd(cdc *codec.Codec) *cobra.Command {
 
 func CreateClaimCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createClaim txHash senderDid claimId sovrinDid",
+		Use:   "createClaim [tx-hash] [sender-did] [claim-id] [sovrin-did]",
 		Short: "Create a new claim on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -219,7 +219,7 @@ func CreateClaimCmd(cdc *codec.Codec) *cobra.Command {
 
 func CreateEvaluationCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createEvaluation txHash senderDid claimId status sovrinDid",
+		Use:   "createEvaluation [tx-hash] [sender-did] [claim-id] [status] [sovrin-did]",
 		Short: "Create a new claim evaluation on a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -253,7 +253,7 @@ func CreateEvaluationCmd(cdc *codec.Codec) *cobra.Command {
 
 func WithDrawFundsCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "withdrawFunds senderDid data",
+		Use:   "withdrawFunds [sender-did] [data]",
 		Short: "withdraw funds.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().

@@ -5,18 +5,14 @@ PASSWORD="12345678"
 ixod init local --chain-id pandora-1
 
 yes $PASSWORD | ixocli keys delete miguel --force
-yes $PASSWORD | ixocli keys delete francesco --force
-yes $PASSWORD | ixocli keys delete shaun --force
-yes $PASSWORD | ixocli keys delete fee --force
-
 yes $PASSWORD | ixocli keys add miguel
-yes $PASSWORD | ixocli keys add francesco
-yes $PASSWORD | ixocli keys add shaun
-yes $PASSWORD | ixocli keys add fee
 
+# Note: important to add 'miguel' as a genesis-account since this is the chain's validator
 yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000stake,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000stake,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000stake,1000000res,1000000rez
+
+# Add DID-based genesis account
+MIGUEL_ADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"    # address from 4XJLBfGtWSGKSz4BeRxdun
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez
 
 ixocli config chain-id pandora-1
 ixocli config output json

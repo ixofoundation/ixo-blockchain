@@ -20,7 +20,7 @@ import (
 
 func AddDidDocCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "addDidDoc sovrinDid",
+		Use:   "addDidDoc [sovrin-did]",
 		Short: "Add a new SovrinDid",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 || len(args[0]) == 0 {
@@ -69,7 +69,7 @@ func AddDidDocCmd(cdc *codec.Codec) *cobra.Command {
 
 func AddCredentialCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "addKycCredential did signerDidDoc",
+		Use:   "addKycCredential [did] [signer-did-doc]",
 		Short: "Add a new KYC Credential for a Did by the signer",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {

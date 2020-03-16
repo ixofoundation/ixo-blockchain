@@ -2,7 +2,7 @@ package did
 
 import (
 	"encoding/json"
-	
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/did/client/cli"
 	"github.com/ixofoundation/ixo-cosmos/x/did/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
@@ -40,7 +40,7 @@ func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return ValidateGenesis(data)
 }
 
@@ -56,12 +56,12 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	
+
 	didTxCmd.AddCommand(client.PostCommands(
 		cli.AddDidDocCmd(cdc),
 		cli.AddCredentialCmd(cdc),
 	)...)
-	
+
 	return didTxCmd
 }
 
@@ -73,13 +73,14 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	
+
 	didQueryCmd.AddCommand(client.GetCommands(
+		cli.GetAddressFromDidCmd(),
 		cli.GetDidDocCmd(cdc),
 		cli.GetAllDidsCmd(cdc),
 		cli.GetAllDidDocsCmd(cdc),
 	)...)
-	
+
 	return didQueryCmd
 }
 
@@ -114,17 +115,17 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 }
 
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abciTypes.ValidatorUpdate {
-	
+
 	var genesisState GenesisState
 	_ = ModuleCdc.UnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, genesisState)
-	
+
 	return []abciTypes.ValidatorUpdate{}
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
-	
+
 	return ModuleCdc.MustMarshalJSON(gs)
 }
 

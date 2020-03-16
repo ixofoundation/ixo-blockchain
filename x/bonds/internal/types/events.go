@@ -26,7 +26,6 @@ const (
 	AttributeKeySanityRate             = "sanity_rate"
 	AttributeKeySanityMarginPercentage = "sanity_margin_percentage"
 	AttributeKeyAllowSells             = "allow_sells"
-	AttributeKeySigners                = "signers"
 	AttributeKeyBatchBlocks            = "batch_blocks"
 	AttributeKeyMaxPrices              = "max_prices"
 	AttributeKeySwapFromToken          = "from_token"
@@ -40,6 +39,7 @@ const (
 	AttributeKeyChargedPrices          = "charged_prices"
 	AttributeKeyChargedFees            = "charged_fees"
 	AttributeKeyReturnedToAddress      = "returned_to_address"
+	AttributeKeyNewBondTokenBalance    = "new_bond_token_balance"
 
 	AttributeValueBuyOrder  = "buy"
 	AttributeValueSellOrder = "sell"

@@ -8,6 +8,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	// Initialise bonds
 	for _, b := range data.Bonds {
 		keeper.SetBond(ctx, b.BondDid, b)
+		keeper.SetBondDid(ctx, b.Token, b.BondDid)
 	}
 
 	// Initialise batches

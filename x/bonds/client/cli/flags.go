@@ -20,9 +20,10 @@ const (
 	FlagSanityRate             = "sanity-rate"
 	FlagSanityMarginPercentage = "sanity-margin-percentage"
 	FlagAllowSells             = "allow-sells"
-	FlagSigners                = "signers"
 	FlagBatchBlocks            = "batch-blocks"
 	FlagBondDid                = "bond-did"
+	FlagCreatorDid             = "creator-did"
+	FlagEditorDid              = "editor-did"
 )
 
 var (
@@ -34,7 +35,6 @@ var (
 func init() {
 
 	fsBondGeneral.String(FlagToken, "", "The bond's token")
-	fsBondGeneral.String(FlagSigners, "", "The list of signers required to create/edit the bond")
 
 	fsBondCreate.String(FlagName, "", "The bond's name")
 	fsBondCreate.String(FlagDescription, "", "The bond's description")
@@ -51,6 +51,7 @@ func init() {
 	fsBondCreate.String(FlagAllowSells, "", "Whether or not sells will be allowed")
 	fsBondCreate.String(FlagBatchBlocks, "", "The duration in terms of blocks of each orders batch")
 	fsBondCreate.String(FlagBondDid, "", "Bond's Sovrin DID")
+	fsBondCreate.String(FlagCreatorDid, "", "Bond creator's DID")
 
 	fsBondEdit.String(FlagName, types.DoNotModifyField, "The bond's name")
 	fsBondEdit.String(FlagDescription, types.DoNotModifyField, "The bond's description")
@@ -58,4 +59,5 @@ func init() {
 	fsBondEdit.String(FlagSanityRate, types.DoNotModifyField, "For swappers, this is the typical t1 per t2 rate")
 	fsBondEdit.String(FlagSanityMarginPercentage, types.DoNotModifyField, "For swappers, this is the acceptable deviation from the sanity rate")
 	fsBondEdit.String(FlagBondDid, "", "Bond's Sovrin DID")
+	fsBondEdit.String(FlagEditorDid, "", "Bond editor's DID")
 }

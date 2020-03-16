@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-cosmos/x/fees"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,11 +18,11 @@ import (
 type Keeper struct {
 	cdc           *codec.Codec
 	storeKey      sdk.StoreKey
-	accountKeeper types.AccountKeeper
-	feeKeeper     types.FeeKeeper
+	accountKeeper auth.AccountKeeper
+	feeKeeper     fees.Keeper
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, accountKeeper types.AccountKeeper, feeKeeper types.FeeKeeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, accountKeeper auth.AccountKeeper, feeKeeper fees.Keeper) Keeper {
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,

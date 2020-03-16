@@ -57,7 +57,7 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 
 func CreateBondCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createBond bondJson sovrinDiD",
+		Use:   "createBond [bond-json] [sovrin-did]",
 		Short: "Create a new BondDoc signed by the sovrinDID of the bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
@@ -83,7 +83,7 @@ func CreateBondCmd(cdc *codec.Codec) *cobra.Command {
 
 func UpdateBondStatusCmd(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateBondStatus txHash senderDid status sovrinDid",
+		Use:   "updateBondStatus [tx-hash] [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a bond signed by the sovrinDID of the bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().

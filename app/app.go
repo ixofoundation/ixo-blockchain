@@ -297,20 +297,18 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	didAnteHandler := did.NewAnteHandler(app.didKeeper)
 	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
 	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
-	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper)
+	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
 		switch msg.Type() {
-		case "did":
+		case did.ModuleName:
 			return didAnteHandler(ctx, tx, false)
-		case "project":
+		case project.ModuleName:
 			return projectAnteHandler(ctx, tx, false)
-		case "bonddoc":
+		case bonddoc.ModuleName:
 			return bonddocAnteHandler(ctx, tx, false)
-		case "create_bond":
-			fallthrough
-		case "edit_bond":
+		case bonds.ModuleName:
 			return bondsAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, true)

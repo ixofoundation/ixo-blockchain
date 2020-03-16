@@ -52,7 +52,7 @@ func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router
 func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	projectTxCmd := &cobra.Command{
 		Use:                        ModuleName,
-		Short:                      "Project transaction sub commands",
+		Short:                      "project transaction sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
