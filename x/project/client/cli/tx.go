@@ -55,7 +55,7 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 	return sovrinDid
 }
 
-func CreateProjectCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "createProject [project-json] [sovrin-did]",
 		Short: "Create a new ProjectDoc signed by the sovrinDID of the project",
@@ -74,14 +74,14 @@ func CreateProjectCmd(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[1])
-			msg := types.NewCreateProjectMsg(projectDoc, sovrinDid)
+			msg := types.NewMsgCreateProject(projectDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
 	}
 }
 
-func UpdateProjectStatusCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "updateProjectStatus [tx-hash] [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a project signed by the sovrinDID of the project",
@@ -120,7 +120,7 @@ func UpdateProjectStatusCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func CreateAgentCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "createAgent [tx-hash] [sender-did] [agent-did] [role] [project-did]",
 		Short: "Create a new agent on a project signed by the sovrinDID of the project",
@@ -154,7 +154,7 @@ func CreateAgentCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func UpdateAgentCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "updateAgent [tx-hash] [sender-did] [agent-did] [status] [sovrin-did]",
 		Short: "Update the status of an agent on a project signed by the sovrinDID of the project",
@@ -190,7 +190,7 @@ func UpdateAgentCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func CreateClaimCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "createClaim [tx-hash] [sender-did] [claim-id] [sovrin-did]",
 		Short: "Create a new claim on a project signed by the sovrinDID of the project",
@@ -217,7 +217,7 @@ func CreateClaimCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func CreateEvaluationCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "createEvaluation [tx-hash] [sender-did] [claim-id] [status] [sovrin-did]",
 		Short: "Create a new claim evaluation on a project signed by the sovrinDID of the project",
@@ -251,7 +251,7 @@ func CreateEvaluationCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func WithDrawFundsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "withdrawFunds [sender-did] [data]",
 		Short: "withdraw funds.",

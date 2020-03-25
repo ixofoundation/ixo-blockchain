@@ -49,7 +49,7 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
-		msg := types.NewCreateProjectMsg(projectDoc, didDoc)
+		msg := types.NewMsgCreateProject(projectDoc, didDoc)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(didDoc.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(didDoc.VerifyKey))

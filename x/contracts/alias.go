@@ -10,9 +10,9 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
-	
+
 	KeyIxoTokenContractAddress                = types.KeyIxoTokenContractAddress
 	KeyProjectRegistryContractAddress         = types.KeyProjectRegistryContractAddress
 	KeyAuthContractAddress                    = types.KeyAuthContractAddress

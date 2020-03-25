@@ -55,7 +55,7 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 	return sovrinDid
 }
 
-func CreateBondCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "createBond [bond-json] [sovrin-did]",
 		Short: "Create a new BondDoc signed by the sovrinDID of the bond",
@@ -81,7 +81,7 @@ func CreateBondCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func UpdateBondStatusCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "updateBondStatus [tx-hash] [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a bond signed by the sovrinDID of the bond",

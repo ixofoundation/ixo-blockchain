@@ -58,8 +58,8 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	didTxCmd.AddCommand(client.PostCommands(
-		cli.AddDidDocCmd(cdc),
-		cli.AddCredentialCmd(cdc),
+		cli.GetCmdAddDidDoc(cdc),
+		cli.GetCmdAddCredential(cdc),
 	)...)
 
 	return didTxCmd
@@ -75,10 +75,10 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	didQueryCmd.AddCommand(client.GetCommands(
-		cli.GetAddressFromDidCmd(),
-		cli.GetDidDocCmd(cdc),
-		cli.GetAllDidsCmd(cdc),
-		cli.GetAllDidDocsCmd(cdc),
+		cli.GetCmdAddressFromDid(),
+		cli.GetCmdDidDoc(cdc),
+		cli.GetCmdAllDids(cdc),
+		cli.GetCmdAllDidDocs(cdc),
 	)...)
 
 	return didQueryCmd

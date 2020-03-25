@@ -35,7 +35,7 @@ func TestQueryProjectDoc(t *testing.T) {
 	require.Nil(t, emptyRes)
 	require.NotNil(t, err)
 
-	var projectDoc types.CreateProjectMsg
+	var projectDoc types.MsgCreateProject
 	cdc.MustUnmarshalJSON(res, &projectDoc)
 }
 

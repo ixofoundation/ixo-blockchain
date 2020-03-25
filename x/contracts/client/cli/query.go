@@ -12,7 +12,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/contracts/internal/types"
 )
 
-func GetContractCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdContract(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getContracts",
 		Short: "Get all contract details",

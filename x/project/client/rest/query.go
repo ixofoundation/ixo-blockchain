@@ -48,7 +48,7 @@ func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var projectDoc types.CreateProjectMsg
+		var projectDoc types.MsgCreateProject
 		cliCtx.Codec.MustUnmarshalJSON(res, &projectDoc)
 
 		bz, err := json.Marshal(projectDoc)

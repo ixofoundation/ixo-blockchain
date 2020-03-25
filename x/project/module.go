@@ -34,7 +34,7 @@ func (AppModuleBasic) Name() string {
 }
 
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	Registercodec(cdc)
+	RegisterCodec(cdc)
 }
 
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
@@ -59,13 +59,13 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	projectTxCmd.AddCommand(client.PostCommands(
-		cli.CreateProjectCmd(cdc),
-		cli.CreateAgentCmd(cdc),
-		cli.UpdateProjectStatusCmd(cdc),
-		cli.UpdateAgentCmd(cdc),
-		cli.CreateClaimCmd(cdc),
-		cli.CreateEvaluationCmd(cdc),
-		cli.WithDrawFundsCmd(cdc),
+		cli.GetCmdCreateProject(cdc),
+		cli.GetCmdCreateAgent(cdc),
+		cli.GetCmdUpdateProjectStatus(cdc),
+		cli.GetCmdUpdateAgent(cdc),
+		cli.GetCmdCreateClaim(cdc),
+		cli.GetCmdCreateEvaluation(cdc),
+		cli.GetCmdWithdrawFunds(cdc),
 	)...)
 
 	return projectTxCmd
@@ -81,9 +81,9 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	projectQueryCmd.AddCommand(client.GetCommands(
-		cli.GetProjectDocCmd(cdc),
-		cli.GetProjectAccountsCmd(cdc),
-		cli.GetProjectTxsCmd(cdc),
+		cli.GetCmdProjectDoc(cdc),
+		cli.GetCmdProjectAccounts(cdc),
+		cli.GetCmdProjectTxs(cdc),
 	)...)
 
 	return projectQueryCmd

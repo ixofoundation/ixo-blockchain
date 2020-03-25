@@ -59,7 +59,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	contractQueryCmd.AddCommand(client.GetCommands(
-		cli.GetContractCmd(cdc),
+		cli.GetCmdContract(cdc),
 	)...)
 
 	return contractQueryCmd

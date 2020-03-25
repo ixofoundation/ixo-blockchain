@@ -10,17 +10,17 @@ import (
 func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
-		case types.AddDidMsg:
-			return handleAddDidDocMsg(ctx, k, msg)
-		case types.AddCredentialMsg:
-			return handleAddCredentialMsg(ctx, k, msg)
+		case types.MsgAddDid:
+			return handleMsgAddDidDoc(ctx, k, msg)
+		case types.MsgAddCredential:
+			return handleMsgAddCredential(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 	}
 }
 
-func handleAddDidDocMsg(ctx sdk.Context, k keeper.Keeper, msg types.AddDidMsg) sdk.Result {
+func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) sdk.Result {
 	newDidDoc := msg.DidDoc
 
 	if len(newDidDoc.Credentials) > 0 {
@@ -37,7 +37,7 @@ func handleAddDidDocMsg(ctx sdk.Context, k keeper.Keeper, msg types.AddDidMsg) s
 	}
 }
 
-func handleAddCredentialMsg(ctx sdk.Context, k keeper.Keeper, msg types.AddCredentialMsg) sdk.Result {
+func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCredential) sdk.Result {
 	err := k.AddCredentials(ctx, msg.DidCredential.Claim.Id, msg.DidCredential)
 	if err != nil {
 		return err.Result()

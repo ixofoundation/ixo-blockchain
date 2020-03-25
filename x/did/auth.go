@@ -21,7 +21,7 @@ func NewAnteHandler(didKeeper Keeper) sdk.AnteHandler {
 		pubKey := [32]byte{}
 
 		if didMsg.IsNewDid() {
-			addDidMsg := didMsg.(types.AddDidMsg)
+			addDidMsg := didMsg.(types.MsgAddDid)
 			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
 		} else {
 			did := ixo.Did(msg.GetSigners()[0])
@@ -49,6 +49,5 @@ func NewAnteHandler(didKeeper Keeper) sdk.AnteHandler {
 		}
 
 		return ctx, sdk.Result{}, false // continue...
-
 	}
 }

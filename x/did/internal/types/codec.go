@@ -7,8 +7,8 @@ import (
 )
 
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(AddDidMsg{}, "did/AddDid", nil)
-	cdc.RegisterConcrete(AddCredentialMsg{}, "did/AddCredential", nil)
+	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
+	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
 	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
 
 }

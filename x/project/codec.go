@@ -6,18 +6,18 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 )
 
-func Registercodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(types.CreateProjectMsg{}, "project/CreateProject", nil)
-	cdc.RegisterConcrete(types.UpdateProjectStatusMsg{}, "project/UpdateProjectStatus", nil)
-	cdc.RegisterConcrete(types.CreateAgentMsg{}, "project/CreateAgent", nil)
-	cdc.RegisterConcrete(types.UpdateAgentMsg{}, "project/UpdateAgent", nil)
-	cdc.RegisterConcrete(types.CreateClaimMsg{}, "project/CreateClaim", nil)
-	cdc.RegisterConcrete(types.CreateEvaluationMsg{}, "project/CreateEvaluation", nil)
-	cdc.RegisterConcrete(types.WithdrawFundsMsg{}, "project/WithdrawFunds", nil)
+func RegisterCodec(cdc *codec.Codec) {
+	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
+	cdc.RegisterConcrete(types.MsgUpdateProjectStatus{}, "project/UpdateProjectStatus", nil)
+	cdc.RegisterConcrete(types.MsgCreateAgent{}, "project/CreateAgent", nil)
+	cdc.RegisterConcrete(types.MsgUpdateAgent{}, "project/UpdateAgent", nil)
+	cdc.RegisterConcrete(types.MsgCreateClaim{}, "project/CreateClaim", nil)
+	cdc.RegisterConcrete(types.MsgCreateEvaluation{}, "project/CreateEvaluation", nil)
+	cdc.RegisterConcrete(types.MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
 }
 
 var moduleCdc = codec.New()
 
 func init() {
-	Registercodec(moduleCdc)
+	RegisterCodec(moduleCdc)
 }

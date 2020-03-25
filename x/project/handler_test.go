@@ -21,13 +21,13 @@ func TestHandler_CreateClaim(t *testing.T) {
 
 	ctx, keeper, cdc, feesKeeper, bankKeeper, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.CreateProjectMsg{}, "ixo/createProjectMsg", nil)
+	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 	feesKeeper.SetDec(ctx, fees.KeyIxoFactor, sdk.OneDec())
 	feesKeeper.SetDec(ctx, fees.KeyNodeFeePercentage, sdk.ZeroDec())
 	feesKeeper.SetDec(ctx, fees.KeyClaimFeeAmount, sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals))
-	projectMsg := types.CreateClaimMsg{
+	projectMsg := types.MsgCreateClaim{
 		SignBytes:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		TxHash:     "txHash",
@@ -35,24 +35,24 @@ func TestHandler_CreateClaim(t *testing.T) {
 		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
 	}
 
-	res := handleCreateClaimMsg(ctx, keeper, feesKeeper, bankKeeper, projectMsg)
+	res := handleMsgCreateClaim(ctx, keeper, feesKeeper, bankKeeper, projectMsg)
 	require.NotNil(t, res)
 }
 
 func TestHandler_ProjectMsg(t *testing.T) {
 	ctx, keeper, cdc, _, bankKeeper, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.CreateProjectMsg{}, "ixo/createProjectMsg", nil)
+	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	res := handleCreateProjectMsg(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
+	res := handleMsgCreateProject(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
 
-	var projectDoc CreateProjectMsg
+	var projectDoc MsgCreateProject
 	json.Unmarshal(res.Data, &projectDoc)
 	require.True(t, res.IsOK())
 
-	res = handleCreateProjectMsg(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
+	res = handleMsgCreateProject(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
 	require.False(t, res.IsOK())
 
 }
@@ -60,7 +60,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	ctx, k, cdc, fk, bk, _ := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.CreateEvaluationMsg{}, "ixo/createEvaluationMsg", nil)
+	cdc.RegisterConcrete(types.MsgCreateEvaluation{}, "ixo/createEvaluationMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
@@ -71,7 +71,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	fk.SetDec(ctx, fees.KeyEvaluationPayFeePercentage, sdk.ZeroDec())
 	fk.SetDec(ctx, fees.KeyEvaluationPayNodeFeePercentage, sdk.NewDec(5).Quo(sdk.NewDec(10)))
 
-	evaluationMsg := types.CreateEvaluationMsg{
+	evaluationMsg := types.MsgCreateEvaluation{
 		SignBytes:  "",
 		TxHash:     "txHash",
 		SenderDid:  "senderDid",
@@ -82,7 +82,7 @@ func Test_CreateEvaluation(t *testing.T) {
 		},
 	}
 
-	msg := types.CreateProjectMsg{
+	msg := types.MsgCreateProject{
 		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
@@ -105,7 +105,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	err := k.SetProjectDoc(ctx, &msg)
 	require.Nil(t, err)
 
-	res := handleCreateEvaluationMsg(ctx, k, fk, bk, evaluationMsg)
+	res := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
 	require.NotNil(t, res)
 }
 
@@ -114,9 +114,9 @@ func Test_WithdrawFunds(t *testing.T) {
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	cdc.RegisterConcrete(types.WithdrawFundsMsg{}, "ixo-cosmos/withdrawFundsMsg", nil)
+	cdc.RegisterConcrete(types.MsgWithdrawFunds{}, "ixo-cosmos/withdrawFundsMsg", nil)
 
-	msg := types.WithdrawFundsMsg{
+	msg := types.MsgWithdrawFunds{
 		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
 		Data: types.WithdrawFundsDoc{
@@ -127,7 +127,7 @@ func Test_WithdrawFunds(t *testing.T) {
 		},
 	}
 
-	msg1 := types.CreateProjectMsg{
+	msg1 := types.MsgCreateProject{
 		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
@@ -157,6 +157,6 @@ func Test_WithdrawFunds(t *testing.T) {
 	require.Nil(t, err1)
 	require.NotNil(t, ethClient)
 
-	res := handleWithdrawFundsMsg(ctx, k, bk, pk, ethClient, msg)
+	res := handleMsgWithdrawFunds(ctx, k, bk, pk, ethClient, msg)
 	require.NotNil(t, res)
 }

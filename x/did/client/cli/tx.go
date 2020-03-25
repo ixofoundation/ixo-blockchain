@@ -18,7 +18,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 )
 
-func AddDidDocCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "addDidDoc [sovrin-did]",
 		Short: "Add a new SovrinDid",
@@ -67,7 +67,7 @@ func AddDidDocCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func AddCredentialCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "addKycCredential [did] [signer-did-doc]",
 		Short: "Add a new KYC Credential for a Did by the signer",
@@ -97,7 +97,7 @@ func AddCredentialCmd(cdc *codec.Codec) *cobra.Command {
 
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
-			msg := types.NewAddCredentialMsg(didAddr, credTypes, sovrinDid.Did, issued)
+			msg := types.NewMsgAddCredential(didAddr, credTypes, sovrinDid.Did, issued)
 
 			privKey := [64]byte{}
 			copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))

@@ -6,13 +6,13 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
 )
 
-func Registercodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(types.CreateBondMsg{}, "bonddoc/CreateBond", nil)
-	cdc.RegisterConcrete(types.UpdateBondStatusMsg{}, "bonddoc/UpdateBondStatus", nil)
+func RegisterCodec(cdc *codec.Codec) {
+	cdc.RegisterConcrete(types.MsgCreateBond{}, "bonddoc/CreateBond", nil)
+	cdc.RegisterConcrete(types.MsgUpdateBondStatus{}, "bonddoc/UpdateBondStatus", nil)
 }
 
 var moduleCdc = codec.New()
 
 func init() {
-	Registercodec(moduleCdc)
+	RegisterCodec(moduleCdc)
 }

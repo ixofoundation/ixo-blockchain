@@ -22,7 +22,7 @@ func NewAnteHandler(projectKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler 
 		pubKey := [32]byte{}
 
 		if projectMsg.IsNewDid() {
-			createProjectMsg := msg.(types.CreateProjectMsg)
+			createProjectMsg := msg.(types.MsgCreateProject)
 			copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
 
 		} else {

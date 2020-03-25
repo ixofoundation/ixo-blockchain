@@ -110,7 +110,7 @@ func addCredentialRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		credTypes := []string{"Credential", "ProofOfKYC"}
 
-		msg := types.NewAddCredentialMsg(did, credTypes, sovrinDid.Did, issued)
+		msg := types.NewMsgAddCredential(did, credTypes, sovrinDid.Did, issued)
 
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))

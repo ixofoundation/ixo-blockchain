@@ -5,12 +5,12 @@ import (
 )
 
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(CreateProjectMsg{}, "ixo-cosmos/MsgCreateProject", nil)
-	cdc.RegisterConcrete(CreateAgentMsg{}, "ixo-cosmos/MsgCreateAgent", nil)
-	cdc.RegisterConcrete(CreateClaimMsg{}, "ixo-cosmos/CreateClaimMsg", nil)
-	cdc.RegisterConcrete(CreateEvaluationMsg{}, "ixo-cosmos/CreateEvaluationMsg", nil)
-	cdc.RegisterConcrete(UpdateAgentMsg{}, "ixo-cosmos/UpdateAgentMsg", nil)
-	cdc.RegisterConcrete(UpdateProjectStatusMsg{}, "ixo-cosmos/UpdateProjectStatusMsg", nil)
+	cdc.RegisterConcrete(MsgCreateProject{}, "ixo-cosmos/MsgCreateProject", nil)
+	cdc.RegisterConcrete(MsgCreateAgent{}, "ixo-cosmos/MsgCreateAgent", nil)
+	cdc.RegisterConcrete(MsgCreateClaim{}, "ixo-cosmos/CreateClaimMsg", nil)
+	cdc.RegisterConcrete(MsgCreateEvaluation{}, "ixo-cosmos/CreateEvaluationMsg", nil)
+	cdc.RegisterConcrete(MsgUpdateAgent{}, "ixo-cosmos/UpdateAgentMsg", nil)
+	cdc.RegisterConcrete(MsgUpdateProjectStatus{}, "ixo-cosmos/UpdateProjectStatusMsg", nil)
 }
 
 var ModuleCdc *codec.Codec

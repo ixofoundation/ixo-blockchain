@@ -16,8 +16,8 @@ const (
 
 type (
 	Keeper              = keeper.Keeper
-	CreateBondMsg       = types.CreateBondMsg
-	UpdateBondStatusMsg = types.UpdateBondStatusMsg
+	MsgCreateBond       = types.MsgCreateBond
+	MsgUpdateBondStatus = types.MsgUpdateBondStatus
 	StoredBondDoc       = types.StoredBondDoc
 )
 
