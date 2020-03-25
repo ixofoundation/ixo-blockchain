@@ -111,7 +111,7 @@ type ixoApp struct {
 	didKeeper     did.Keeper
 	feesKeeper    fees.Keeper
 	nodeKeeper    node.Keeper
-	paramsKeepr   params.Keeper
+	paramsKeeper  params.Keeper
 	projectKeeper project.Keeper
 	bonddocKeeper bonddoc.Keeper
 	bondsKeeper   bonds.Keeper
@@ -176,10 +176,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		app.slashingKeeper.Hooks()))
 
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paramsKeepr = params.NewKeeper(app.cdc, keys[params.StoreKey])
-	app.feesKeeper = fees.NewKeeper(app.cdc, app.paramsKeepr)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey])
+	app.feesKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
-	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
+	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeeper)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 
@@ -206,8 +206,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		did.NewAppModule(app.didKeeper),
 		fees.NewAppModule(app.feesKeeper),
 		node.NewAppModule(app.nodeKeeper),
-		params.NewAppModule(app.paramsKeepr),
-		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper, app.paramsKeepr, app.ethClient),
+		params.NewAppModule(app.paramsKeeper),
+		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper, app.paramsKeeper, app.ethClient),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 	)
