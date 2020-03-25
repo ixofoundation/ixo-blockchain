@@ -30,7 +30,6 @@ import (
 
 	"github.com/ixofoundation/ixo-cosmos/x/bonddoc"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds"
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -61,7 +60,6 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
-		contracts.AppModuleBasic{},
 		did.AppModuleBasic{},
 		fees.AppModuleBasic{},
 		node.AppModuleBasic{},
@@ -110,14 +108,13 @@ type ixoApp struct {
 	crisisKeeper       crisis.Keeper
 	cParamsKeeper      cParams.Keeper
 
-	contractKeeper contracts.Keeper
-	didKeeper      did.Keeper
-	feesKeeper     fees.Keeper
-	nodeKeeper     node.Keeper
-	paramsKeepr    params.Keeper
-	projectKeeper  project.Keeper
-	bonddocKeeper  bonddoc.Keeper
-	bondsKeeper    bonds.Keeper
+	didKeeper     did.Keeper
+	feesKeeper    fees.Keeper
+	nodeKeeper    node.Keeper
+	paramsKeepr   params.Keeper
+	projectKeeper project.Keeper
+	bonddocKeeper bonddoc.Keeper
+	bondsKeeper   bonds.Keeper
 
 	mm        *module.Manager
 	ethClient ixo.EthClient
@@ -133,8 +130,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
-		gov.StoreKey, cParams.StoreKey, contracts.StoreKey, did.StoreKey, fees.StoreKey,
-		node.StoreKey, params.StoreKey, project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
+		gov.StoreKey, cParams.StoreKey, did.StoreKey, fees.StoreKey, node.StoreKey,
+		params.StoreKey, project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, cParams.TStoreKey)
 
@@ -183,11 +180,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.feesKeeper = fees.NewKeeper(app.cdc, app.paramsKeepr)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
 	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
-	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeepr)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 
-	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
+	newEthClient, cErr := ixo.NewEthClient()
 	if cErr != nil {
 		panic(cErr)
 	}
@@ -207,13 +203,11 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
 
-		contracts.NewAppModule(app.contractKeeper),
 		did.NewAppModule(app.didKeeper),
 		fees.NewAppModule(app.feesKeeper),
 		node.NewAppModule(app.nodeKeeper),
 		params.NewAppModule(app.paramsKeepr),
-		project.NewAppModule(app.projectKeeper, app.feesKeeper,
-			app.contractKeeper, app.bankKeeper, app.paramsKeepr, app.ethClient),
+		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper, app.paramsKeepr, app.ethClient),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 	)
@@ -225,8 +219,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
-		contracts.ModuleName, node.ModuleName, params.ModuleName, bonddoc.ModuleName,
-		bonds.ModuleName)
+		node.ModuleName, params.ModuleName, bonddoc.ModuleName, bonds.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())

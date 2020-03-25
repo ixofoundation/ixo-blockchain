@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
@@ -22,8 +21,8 @@ const (
 	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
 
-func NewHandler(k Keeper, fk fees.Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient) sdk.Handler {
+func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper,
+	pk params.Keeper, ethClient ixo.EthClient) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -31,7 +30,7 @@ func NewHandler(k Keeper, fk fees.Keeper, ck contracts.Keeper, bk bank.Keeper, p
 		case MsgCreateProject:
 			return handleMsgCreateProject(ctx, k, bk, msg)
 		case MsgUpdateProjectStatus:
-			return handleMsgUpdateProjectStatus(ctx, k, ck, bk, pk, ethClient, msg)
+			return handleMsgUpdateProjectStatus(ctx, k, bk, pk, ethClient, msg)
 		case MsgCreateAgent:
 			return handleMsgCreateAgent(ctx, k, bk, msg)
 		case MsgUpdateAgent:
@@ -70,8 +69,8 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCr
 	}
 }
 
-func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient, msg MsgUpdateProjectStatus) sdk.Result {
+func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
+	pk params.Keeper, ethClient ixo.EthClient, msg MsgUpdateProjectStatus) sdk.Result {
 
 	ExistingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
@@ -99,7 +98,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, ck contracts.Keeper
 	}
 
 	if newStatus == PaidoutStatus {
-		res := payoutFees(ctx, k, ck, bk, pk, ethClient, ExistingProjectDoc.GetProjectDid())
+		res := payoutFees(ctx, k, bk, pk, ethClient, ExistingProjectDoc.GetProjectDid())
 		if res.Code != sdk.CodeOK {
 			return res
 		}
@@ -113,7 +112,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, ck contracts.Keeper
 	}
 }
 
-func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper,
+func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
 	ethClient ixo.EthClient, projectDid ixo.Did) sdk.Result {
 
 	_, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
@@ -136,7 +135,7 @@ func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, 
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
 
-	ixoEthWallet := ck.GetContract(ctx, contracts.KeyFoundationWallet)
+	ixoEthWallet := "" // TODO (contracts): ck.GetContract(ctx, contracts.KeyFoundationWallet)
 
 	return payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, IxoAccountFeesId, ixoEthWallet)
 }

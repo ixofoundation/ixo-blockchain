@@ -23,7 +23,6 @@ import (
 	ethAuth "github.com/ixofoundation/ixo-go-abi/abi/auth"
 	ethProject "github.com/ixofoundation/ixo-go-abi/abi/project"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 )
 
@@ -55,11 +54,10 @@ func (tx *EthTransaction) UnmarshalJSON(msg []byte) error {
 type EthClient struct {
 	rpcClient *rpc.Client
 	client    *ethclient.Client
-	k         contracts.Keeper
 	callOpts  bind.CallOpts
 }
 
-func NewEthClient(k contracts.Keeper) (EthClient, error) {
+func NewEthClient() (EthClient, error) {
 	// TODO: REMEMBER TO GET THE TARGET RPC ENDPOINT FROM THE ENVIRONMENT !!!
 	// url := LookupEnv(ETH_URL, "https://api.infura.io/v1/jsonrpc/ropsten")
 	// url := LookupEnv(ETH_URL, "https://ropsten.infura.io/sq19XM5Eu2ANGAzwZ4yk")
@@ -84,7 +82,6 @@ func NewEthClient(k contracts.Keeper) (EthClient, error) {
 	return EthClient{
 		rpcClient,
 		client,
-		k,
 		callOpts,
 	}, nil
 }
@@ -99,7 +96,7 @@ func (c EthClient) GetTransactionByHash(txHash string) (*EthTransaction, error) 
 
 func (c EthClient) IsProjectFundingTx(ctx sdk.Context, projectDid Did, tx *EthTransaction) bool {
 
-	ixoTokenContractAddress := c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
+	ixoTokenContractAddress := "" // TODO (contracts): c.k.GetContract(ctx, contracts.KeyIxoTokenContractAddress)
 
 	if strings.ToLower(tx.Result.To) != strings.ToLower(ixoTokenContractAddress) {
 		ctx.Logger().Error("Token contract mismatch. Got " + tx.Result.To + " should be " + ixoTokenContractAddress)
@@ -140,7 +137,7 @@ func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (s
 	var projectDid [32]byte
 	copy(projectDid[:], regex.FindString(did))
 
-	registryContractStr := c.k.GetContract(ctx, contracts.KeyProjectRegistryContractAddress)
+	registryContractStr := "" // TODO (contracts): c.k.GetContract(ctx, contracts.KeyProjectRegistryContractAddress)
 	registryContract := common.HexToAddress(registryContractStr)
 
 	projectRegistryContact, err := ethProject.NewProjectWalletRegistry(registryContract, c.client)
@@ -157,7 +154,7 @@ func (c EthClient) ProjectWalletFromProjectRegistry(ctx sdk.Context, did Did) (s
 }
 
 func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, senderAddr string, receiverAddr string, amount int64) (bool, [32]byte) {
-	authContractAddress := common.HexToAddress(c.k.GetContract(ctx, contracts.KeyAuthContractAddress))
+	authContractAddress := common.HexToAddress("") // TODO (contracts): c.k.GetContract(ctx, contracts.KeyAuthContractAddress)
 	authContract, err := ethAuth.NewAuthContract(authContractAddress, c.client)
 	if err != nil {
 		return false, [32]byte{}
@@ -171,7 +168,7 @@ func (c EthClient) InitiateTokenTransfer(ctx sdk.Context, pk params.Keeper, send
 	transOpts := bind.NewKeyedTransactor(privateKey)
 	transOpts.GasLimit = uint64(2782100)
 
-	projectWalletAuthoriserAddress := c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
+	projectWalletAuthoriserAddress := "" // TODO (contracts): c.k.GetContract(ctx, contracts.KeyProjectWalletAuthoriserContractAddress)
 
 	nextTxID := getNextTxID(ctx, pk)
 	var debugTxID []byte

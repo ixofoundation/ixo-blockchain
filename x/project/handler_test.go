@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
@@ -146,14 +145,12 @@ func Test_WithdrawFunds(t *testing.T) {
 	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
 	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), msg1.GetProjectDid())
 
-	ck := contracts.NewKeeper(cdc, pk)
-	ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
+	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
 
 	err := k.SetProjectDoc(ctx, &msg1)
 	require.Nil(t, err)
 
-	cK := contracts.NewKeeper(cdc, pk)
-	ethClient, err1 := ixo.NewEthClient(cK)
+	ethClient, err1 := ixo.NewEthClient()
 	require.Nil(t, err1)
 	require.NotNil(t, ethClient)
 

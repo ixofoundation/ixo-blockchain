@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
@@ -91,22 +90,20 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper         keeper.Keeper
-	feesKeeper     fees.Keeper
-	contractKeeper contracts.Keeper
-	bankKeeper     bank.Keeper
-	paramsKeeper   params.Keeper
-	ethClient      ixo.EthClient
+	keeper       keeper.Keeper
+	feesKeeper   fees.Keeper
+	bankKeeper   bank.Keeper
+	paramsKeeper params.Keeper
+	ethClient    ixo.EthClient
 }
 
-func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, contractKeeper contracts.Keeper,
-	bankKeeper bank.Keeper, paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
+func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper,
+	paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 		feesKeeper:     feesKeeper,
-		contractKeeper: contractKeeper,
 		bankKeeper:     bankKeeper,
 		paramsKeeper:   paramsKeeper,
 		ethClient:      ethClient,
@@ -124,7 +121,7 @@ func (AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper, am.feesKeeper, am.contractKeeper, am.bankKeeper, am.paramsKeeper, am.ethClient)
+	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper, am.paramsKeeper, am.ethClient)
 }
 
 func (AppModule) QuerierRoute() string {
