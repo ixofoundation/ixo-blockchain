@@ -19,6 +19,9 @@ type (
 )
 
 var (
+	// function aliases
 	NewKeeper = keeper.NewKeeper
+
+	// variable aliases
 	ModuleCdc = types.ModuleCdc
 )

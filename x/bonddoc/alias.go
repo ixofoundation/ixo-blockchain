@@ -22,6 +22,11 @@ type (
 )
 
 var (
-	NewKeeper = keeper.NewKeeper
+	// function aliases
+	NewKeeper     = keeper.NewKeeper
+	NewQuerier    = keeper.NewQuerier
+	RegisterCodec = types.RegisterCodec
+
+	// variable aliases
 	ModuleCdc = types.ModuleCdc
 )

@@ -8,8 +8,11 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgAddEthWallet{}, "ixo/AddEthWallet", nil)
 }
 
-var msgCdc = codec.New()
+// ModuleCdc is the codec for the module
+var ModuleCdc *codec.Codec
 
 func init() {
-	RegisterCodec(msgCdc)
+	ModuleCdc = codec.New()
+	RegisterCodec(ModuleCdc)
+	ModuleCdc.Seal()
 }

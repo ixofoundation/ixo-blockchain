@@ -21,9 +21,13 @@ type (
 )
 
 var (
-	NewKeeper                               = keeper.NewKeeper
-	ModuleCdc                               = types.ModuleCdc
-	NewQuerier                              = keeper.NewQuerier
+	// function aliases
+	NewKeeper  = keeper.NewKeeper
+	NewQuerier = keeper.NewQuerier
+
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
+
 	KeyIxoFactor                            = types.KeyIxoFactor
 	KeyNodeFeePercentage                    = types.KeyNodeFeePercentage
 	FeeClaimTransaction                     = types.FeeClaimTransaction

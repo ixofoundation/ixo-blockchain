@@ -13,6 +13,7 @@ func RegisterCodec(cdc *codec.Codec) {
 
 }
 
+// ModuleCdc is the codec for the module
 var ModuleCdc *codec.Codec
 
 func init() {

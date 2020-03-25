@@ -20,10 +20,13 @@ type (
 )
 
 var (
+	// function aliases
 	NewKeeper     = keeper.NewKeeper
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
-	ModuleCdc     = types.ModuleCdc
+
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
 
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
