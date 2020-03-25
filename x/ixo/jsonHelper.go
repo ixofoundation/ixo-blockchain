@@ -18,7 +18,7 @@ func (jo *JsonObject) String() string {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return fmt.Sprintf("%v", string(output))
 }
 
@@ -30,7 +30,7 @@ func (js *JsonString) ParseJSON() JsonObject {
 		panic(err)
 	}
 	m := f.(map[string]interface{})
-	
+
 	return JsonObject{m}
-	
+
 }

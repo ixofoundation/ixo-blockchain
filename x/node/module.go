@@ -2,7 +2,7 @@ package node
 
 import (
 	"encoding/json"
-	
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/node/internal/keeper"
 )
 
@@ -83,10 +83,10 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abciTypes.ValidatorUpdate {
 	var genesisState GenesisState
-	
+
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, genesisState)
-	
+
 	return []abciTypes.ValidatorUpdate{}
 }
 

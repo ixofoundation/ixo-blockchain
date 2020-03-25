@@ -10,7 +10,7 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
 )
 
@@ -24,9 +24,9 @@ var (
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
 	ModuleCdc     = types.ModuleCdc
-	
+
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
-	
+
 	ErrorInvalidDid = types.ErrorInvalidDid
 )

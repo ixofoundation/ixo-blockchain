@@ -10,7 +10,7 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
 )
 
@@ -36,6 +36,6 @@ var (
 	KeyEvaluationAgentRegistrationFeeAmount = types.KeyEvaluationAgentRegistrationFeeAmount
 	KeyEvaluationPayFeePercentage           = types.KeyEvaluationPayFeePercentage
 	KeyEvaluationPayNodeFeePercentage       = types.KeyEvaluationPayNodeFeePercentage
-	
+
 	DefaultGenesisState = types.DefaultGenesis
 )

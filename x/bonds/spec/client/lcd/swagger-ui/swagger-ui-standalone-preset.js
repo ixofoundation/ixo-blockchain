@@ -12030,13 +12030,13 @@
                     }
                     if (delete a[i], u === i)
                         for (; !o.call(a, ++u);)
-                },
+                            },
                 delete: e = function (t) {
                     var e = s[t];
                     if (e && (delete a[e], delete s[t], --n, u === e)) {
                         if (!n) return c = 0, void (u = 1);
                         for (; !o.call(a, ++u);)
-                    }
+                            }
                 },
                 clear: function () {
                     n = 0, u = 1, a = i(null), s = i(null), c = 0

@@ -3,10 +3,10 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/contracts/internal/types"
 )
 
@@ -27,16 +27,16 @@ func NewQuerier(k Keeper) sdk.Querier {
 
 func queryAllContracts(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 	contracts := make(map[string]string)
-	
+
 	for _, contract := range types.AllContracts {
 		address := k.GetContract(ctx, contract)
 		contracts[contract] = address
 	}
-	
+
 	res, errRes := json.Marshal(contracts)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", errRes))
 	}
-	
+
 	return res, nil
 }

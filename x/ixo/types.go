@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-	
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -42,10 +42,10 @@ func NewIxoTx(msgs []sdk.Msg, sigs []IxoSignature) IxoTx {
 func NewIxoTxSingleMsg(msg sdk.Msg, signature IxoSignature) IxoTx {
 	sigs := make([]IxoSignature, 0)
 	sigs = append(sigs, signature)
-	
+
 	msgs := make([]sdk.Msg, 0)
 	msgs = append(msgs, msg)
-	
+
 	return IxoTx{
 		Msgs:       msgs,
 		Signatures: sigs,
@@ -136,37 +136,37 @@ func (msg AddEthWalletMsg) GetSignBytes() []byte {
 
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 	return func(txBytes []byte) (sdk.Tx, sdk.Error) {
-		
+
 		if len(txBytes) == 0 {
 			return nil, sdk.ErrTxDecode("txBytes are empty")
 		}
-		
+
 		txByteString := string(txBytes[0:1])
 		if txByteString == "{" {
 			var tx = IxoTx{}
-			
+
 			var upTx map[string]interface{}
 			json.Unmarshal(txBytes, &upTx)
 			payloadArray := upTx["payload"].([]interface{})
 			if len(payloadArray) != 1 {
 				return nil, sdk.ErrTxDecode("Multiple messages not supported")
 			}
-			
+
 			signByteString := getSignBytes(txBytes)
-			
+
 			msgPayload := payloadArray[0].(map[string]interface{})
 			msg := msgPayload["value"].(map[string]interface{})
 			msg["signBytes"] = signByteString
-			
+
 			txBytes, _ = json.Marshal(upTx)
-			
+
 			err := cdc.UnmarshalJSON(txBytes, &tx)
 			if err != nil {
 				return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 			}
-			
+
 			return tx, nil
-			
+
 		} else {
 			var tx = auth.StdTx{}
 			err := cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx)
@@ -174,7 +174,7 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 				return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 			}
 			return tx, nil
-			
+
 		}
 	}
 }
@@ -182,10 +182,10 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 func getSignBytes(txBytes []byte) string {
 	const strtTxt string = "\"value\":"
 	const endTxt string = "}],\"signatures\":"
-	
+
 	strt := bytes.Index(txBytes, []byte(strtTxt)) + len(strtTxt)
 	end := bytes.Index(txBytes, []byte(endTxt))
-	
+
 	signBytes := txBytes[strt:end]
 	return string(signBytes)
 }

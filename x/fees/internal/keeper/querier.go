@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
 )
 
@@ -29,11 +29,11 @@ func queryFees(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
 		resDec := k.GetDec(ctx, feeKey)
 		fees[feeKey] = resDec.RoundInt64()
 	}
-	
+
 	res, err := codec.MarshalJSONIndent(k.cdc, fees)
 	if err != nil {
 		return nil, types.ErrorUnmarshalFees()
 	}
-	
+
 	return res, nil
 }

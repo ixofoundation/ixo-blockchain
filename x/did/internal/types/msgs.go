@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -18,7 +18,7 @@ func NewAddDidMsg(did string, publicKey string) AddDidMsg {
 		PubKey:      publicKey,
 		Credentials: make([]DidCredential, 0),
 	}
-	
+
 	return AddDidMsg{
 		DidDoc: didDoc,
 	}
@@ -40,7 +40,7 @@ func (msg AddDidMsg) ValidateBasic() sdk.Error {
 	} else if msg.DidDoc.PubKey == "" {
 		return ErrorInvalidPubKey(DefaultCodeSpace, "pubKey should not be empty")
 	}
-	
+
 	for _, credential := range msg.DidDoc.Credentials {
 		if credential.Issuer == "" {
 			return ErrorInvalidIssuer(DefaultCodeSpace, "issuer should not be empty")
@@ -48,7 +48,7 @@ func (msg AddDidMsg) ValidateBasic() sdk.Error {
 			return ErrorInvalidDid(DefaultCodeSpace, "claim id should not be empty")
 		}
 	}
-	
+
 	return nil
 }
 
@@ -76,7 +76,7 @@ func NewAddCredentialMsg(did string, credType []string, issuer string, issued st
 			KYCValidated: true,
 		},
 	}
-	
+
 	return AddCredentialMsg{
 		DidCredential: didCredential,
 	}
@@ -101,7 +101,7 @@ func (msg AddCredentialMsg) ValidateBasic() sdk.Error {
 	} else if msg.DidCredential.Issuer == "" {
 		return ErrorInvalidIssuer(DefaultCodeSpace, "Issuer should not be nil")
 	}
-	
+
 	return nil
 }
 
@@ -110,7 +110,7 @@ func (msg AddCredentialMsg) GetSignBytes() []byte {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return b
 }
 
