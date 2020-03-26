@@ -113,7 +113,7 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewUpdateProjectStatusMsg(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
+			msg := types.NewMsgUpdateProjectStatus(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -147,7 +147,7 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[4])
-			msg := types.NewCreateAgentMsg(txHash, senderDid, createAgentDoc, sovrinDid)
+			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -183,7 +183,7 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[5])
-			msg := types.NewUpdateAgentMsg(txHash, senderDid, updateAgentDoc, sovrinDid)
+			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -210,7 +210,7 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewCreateClaimMsg(txHash, senderDid, createClaimDoc, sovrinDid)
+			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -244,7 +244,7 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[4])
-			msg := types.NewCreateEvaluationMsg(txHash, senderDid, createEvaluationDoc, sovrinDid)
+			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -270,7 +270,7 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewWithDrawFundsMsg(senderDid.Did, data)
+			msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, senderDid)
 		},
