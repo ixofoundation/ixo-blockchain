@@ -18,10 +18,10 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/project", createProjectRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/updateProjectStatus", updateProjectStatusRequestHandler(cliCtx)).Methods("PUT")
-	r.HandleFunc("/createAgent", CreateAgentRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/createClaim", CreateClaimRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/createEvaluation", CreateEvaluationRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/withdrawFunds", WithdrawFundsRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/createAgent", createAgentRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/createClaim", createClaimRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/createEvaluation", createEvaluationRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/withdrawFunds", withdrawFundsRequestHandler(cliCtx)).Methods("POST")
 }
 
 func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -172,7 +172,7 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 	}
 }
 
-func CreateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		txHash := r.URL.Query().Get("txHash")
@@ -248,11 +248,7 @@ func CreateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func UpdateAgent() {
-	// TODO
-}
-
-func CreateClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		txHash := r.URL.Query().Get("txHash")
@@ -319,7 +315,7 @@ func CreateClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func CreateEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		txHash := r.URL.Query().Get("txHash")
@@ -395,7 +391,7 @@ func CreateEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 	}
 }
 
-func WithdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		senderDidParams := r.URL.Query().Get("senderDid")
