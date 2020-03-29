@@ -1,6 +1,6 @@
 # ixo Hub
  
-This is the official repository of the ixo Hub
+This is the official repository for the Internet of Impact Relayer Hub (ixo Hub)
 
 > This document will have all details necessary to help getting started with ixo Hub
 
