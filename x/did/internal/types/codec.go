@@ -9,8 +9,11 @@ import (
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
 	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
-	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
 
+	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
+	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
+	cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
+	cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
 }
 
 // ModuleCdc is the codec for the module

@@ -17,7 +17,9 @@ const (
 )
 
 type (
-	Keeper                 = keeper.Keeper
+	Keeper       = keeper.Keeper
+	GenesisState = types.GenesisState
+
 	MsgCreateProject       = types.MsgCreateProject
 	MsgUpdateProjectStatus = types.MsgUpdateProjectStatus
 	MsgCreateAgent         = types.MsgCreateAgent
@@ -25,9 +27,10 @@ type (
 	MsgCreateClaim         = types.MsgCreateClaim
 	MsgCreateEvaluation    = types.MsgCreateEvaluation
 	MsgWithdrawFunds       = types.MsgWithdrawFunds
-	StoredProjectDoc       = types.StoredProjectDoc
-	WithdrawalInfo         = types.WithdrawalInfo
-	AccountMap             = types.AccountMap
+
+	StoredProjectDoc = types.StoredProjectDoc
+	WithdrawalInfo   = types.WithdrawalInfo
+	AccountMap       = types.AccountMap
 )
 
 var (
@@ -35,6 +38,10 @@ var (
 	NewKeeper     = keeper.NewKeeper
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
+
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc

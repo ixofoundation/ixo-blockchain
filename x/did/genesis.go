@@ -1,14 +1,21 @@
 package did
 
 import (
-	"github.com/cosmos/cosmos-sdk/types"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-func InitGenesis(ctx types.Context, keeper Keeper, data GenesisState) []abciTypes.ValidatorUpdate {
-	return []abciTypes.ValidatorUpdate{}
+func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
+	// Initialise did docs
+	for _, d := range data.DidDocs {
+		keeper.AddDidDoc(ctx, d)
+	}
+
+	return []abci.ValidatorUpdate{}
 }
 
-func ExportGenesis(ctx types.Context, keeper Keeper) (data GenesisState) {
-	return GenesisState{}
+func ExportGenesis(ctx sdk.Context, keeper Keeper) (data GenesisState) {
+	return GenesisState{
+		DidDocs: keeper.GetAllDidDocs(ctx),
+	}
 }

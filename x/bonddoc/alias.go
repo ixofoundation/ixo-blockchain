@@ -15,10 +15,13 @@ const (
 )
 
 type (
-	Keeper              = keeper.Keeper
+	Keeper       = keeper.Keeper
+	GenesisState = types.GenesisState
+
 	MsgCreateBond       = types.MsgCreateBond
 	MsgUpdateBondStatus = types.MsgUpdateBondStatus
-	StoredBondDoc       = types.StoredBondDoc
+
+	StoredBondDoc = types.StoredBondDoc
 )
 
 var (
@@ -26,6 +29,10 @@ var (
 	NewKeeper     = keeper.NewKeeper
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
+
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc

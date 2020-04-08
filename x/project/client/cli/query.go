@@ -113,7 +113,7 @@ func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			txs := []types.WithdrawalInfo{}
+			var txs []types.WithdrawalInfo
 			if len(res) == 0 {
 				return errors.New("projectTxs does not exist for a projectDid")
 			} else {

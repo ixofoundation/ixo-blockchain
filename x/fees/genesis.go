@@ -2,12 +2,12 @@ package fees
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/keeper"
 )
 
-func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data GenesisState) []abciTypes.ValidatorUpdate {
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data GenesisState) []abci.ValidatorUpdate {
 	keeper.SetDec(ctx, KeyIxoFactor, data.IxoFactor)
 	keeper.SetDec(ctx, KeyInitiationFeeAmount, data.InitiationFeeAmount)
 	keeper.SetDec(ctx, KeyInitiationNodeFeePercentage, data.InitiationNodeFeePercentage)
@@ -23,7 +23,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data GenesisState) []abc
 	keeper.SetDec(ctx, KeyEvaluationPayFeePercentage, data.EvaluationPayFeePercentage)
 	keeper.SetDec(ctx, KeyEvaluationPayNodeFeePercentage, data.EvaluationPayNodeFeePercentage)
 
-	return []abciTypes.ValidatorUpdate{}
+	return []abci.ValidatorUpdate{}
 }
 
 func WriteGenesis(ctx sdk.Context, keeper keeper.Keeper) GenesisState {

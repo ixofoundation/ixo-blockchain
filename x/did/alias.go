@@ -25,11 +25,12 @@ var (
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
 
-	// variable aliases
-	ModuleCdc = types.ModuleCdc
-
+	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
+
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
 
 	ErrorInvalidDid = types.ErrorInvalidDid
 )

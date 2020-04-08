@@ -39,19 +39,19 @@ func TestHandler_CreateClaim(t *testing.T) {
 }
 
 func TestHandler_ProjectMsg(t *testing.T) {
-	ctx, keeper, cdc, _, bankKeeper, _ := keeper.CreateTestInput()
+	ctx, keeper, cdc, _, _, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	res := handleMsgCreateProject(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
+	res := handleMsgCreateProject(ctx, keeper, types.ValidCreateProjectMsg)
 
 	var projectDoc MsgCreateProject
 	json.Unmarshal(res.Data, &projectDoc)
 	require.True(t, res.IsOK())
 
-	res = handleMsgCreateProject(ctx, keeper, bankKeeper, types.ValidCreateProjectMsg)
+	res = handleMsgCreateProject(ctx, keeper, types.ValidCreateProjectMsg)
 	require.False(t, res.IsOK())
 
 }
@@ -101,8 +101,8 @@ func Test_CreateEvaluation(t *testing.T) {
 	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
 	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
 
-	err := k.SetProjectDoc(ctx, &msg)
-	require.Nil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, msg.GetProjectDid()))
+	k.SetProjectDoc(ctx, &msg)
 
 	res := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
 	require.NotNil(t, res)
@@ -147,8 +147,8 @@ func Test_WithdrawFunds(t *testing.T) {
 
 	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
 
-	err := k.SetProjectDoc(ctx, &msg1)
-	require.Nil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, msg1.GetProjectDid()))
+	k.SetProjectDoc(ctx, &msg1)
 
 	// TODO: implement below code
 

@@ -81,7 +81,7 @@ func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			didDids := []ixo.Did{}
+			var didDids []ixo.Did
 			err = cdc.UnmarshalJSON(res, &didDids)
 			if err != nil {
 				return err

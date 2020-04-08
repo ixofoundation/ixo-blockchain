@@ -21,10 +21,12 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	// Export bonds and batches
 	var bonds []Bond
 	var batches []Batch
+
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		bond := k.MustGetBondByKey(ctx, iterator.Key())
 		batch := k.MustGetBatch(ctx, bond.BondDid)
+
 		bonds = append(bonds, bond)
 		batches = append(batches, batch)
 	}

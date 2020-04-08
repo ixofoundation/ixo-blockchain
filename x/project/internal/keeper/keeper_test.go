@@ -14,11 +14,11 @@ import (
 func TestProjectDoc(t *testing.T) {
 	ctx, k, _, _, _, _ := CreateTestInput()
 
-	err := k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
-	require.Nil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
+	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
 
-	err = k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
-	require.NotNil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
+	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
 
 	doc, err := k.GetProjectDoc(ctx, types.ValidCreateProjectMsg.ProjectDid)
 	require.Nil(t, err)

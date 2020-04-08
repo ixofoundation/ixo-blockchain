@@ -3,6 +3,8 @@ package project
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -27,7 +29,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper, pk params.Keeper) sdk.
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
 		case MsgCreateProject:
-			return handleMsgCreateProject(ctx, k, bk, msg)
+			return handleMsgCreateProject(ctx, k, msg)
 		case MsgUpdateProjectStatus:
 			return handleMsgUpdateProjectStatus(ctx, k, bk, pk, msg)
 		case MsgCreateAgent:
@@ -46,7 +48,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper, pk params.Keeper) sdk.
 	}
 }
 
-func handleMsgCreateProject(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateProject) sdk.Result {
+func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk.Result {
 
 	_, err := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
 	if err != nil {
@@ -58,10 +60,10 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCr
 		err.Result()
 	}
 
-	err = k.SetProjectDoc(ctx, &msg)
-	if err != nil {
-		return err.Result()
+	if k.ProjectDocExists(ctx, msg.GetProjectDid()) {
+		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Project already exists")).Result()
 	}
+	k.SetProjectDoc(ctx, &msg)
 
 	return sdk.Result{
 		Code: sdk.CodeOK,

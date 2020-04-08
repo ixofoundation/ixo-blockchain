@@ -18,7 +18,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	coreTypes "github.com/tendermint/tendermint/rpc/core/types"
+	core "github.com/tendermint/tendermint/rpc/core/types"
 
 	genutilrest "github.com/cosmos/cosmos-sdk/x/genutil/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -166,7 +166,7 @@ func QueryTx(cliCtx context.CLIContext, hashHexStr string) (sdk.TxResponse, erro
 		}
 	}
 
-	resBlocks, err := getBlocksForTxResults(cliCtx, []*coreTypes.ResultTx{resTx})
+	resBlocks, err := getBlocksForTxResults(cliCtx, []*core.ResultTx{resTx})
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
@@ -179,13 +179,13 @@ func QueryTx(cliCtx context.CLIContext, hashHexStr string) (sdk.TxResponse, erro
 	return out, nil
 }
 
-func getBlocksForTxResults(cliCtx context.CLIContext, resTxs []*coreTypes.ResultTx) (map[int64]*coreTypes.ResultBlock, error) {
+func getBlocksForTxResults(cliCtx context.CLIContext, resTxs []*core.ResultTx) (map[int64]*core.ResultBlock, error) {
 	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
 
-	resBlocks := make(map[int64]*coreTypes.ResultBlock)
+	resBlocks := make(map[int64]*core.ResultBlock)
 	for _, resTx := range resTxs {
 		if _, ok := resBlocks[resTx.Height]; !ok {
 			resBlock, err := node.Block(&resTx.Height)
@@ -200,7 +200,7 @@ func getBlocksForTxResults(cliCtx context.CLIContext, resTxs []*coreTypes.Result
 	return resBlocks, nil
 }
 
-func formatTxResult(cdc *codec.Codec, resTx *coreTypes.ResultTx, resBlock *coreTypes.ResultBlock) (sdk.TxResponse, error) {
+func formatTxResult(cdc *codec.Codec, resTx *core.ResultTx, resBlock *core.ResultBlock) (sdk.TxResponse, error) {
 	tx, err := parseTx(cdc, resTx.Tx)
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -213,7 +213,7 @@ func parseTx(cdc *codec.Codec, txBytes []byte) (sdk.Tx, error) {
 	return ixo.DefaultTxDecoder(cdc)(txBytes)
 }
 
-func ValidateTxResult(cliCtx context.CLIContext, resTx *coreTypes.ResultTx) error {
+func ValidateTxResult(cliCtx context.CLIContext, resTx *core.ResultTx) error {
 	if !cliCtx.TrustNode {
 		check, err := cliCtx.Verify(resTx.Height)
 		if err != nil {
