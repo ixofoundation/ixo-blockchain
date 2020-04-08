@@ -152,7 +152,7 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId 
 }
 func (k Keeper) decodeProject(bz []byte) types.StoredProjectDoc {
 
-	storedProjectDoc := types.CreateProjectMsg{}
+	storedProjectDoc := types.MsgCreateProject{}
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(bz, &storedProjectDoc)
 	if err != nil {
 		panic(err)

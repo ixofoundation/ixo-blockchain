@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 	"reflect"
-	
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -24,13 +24,13 @@ func InitKeeper(ctx sdk.Context, cdc *codec.Codec, key sdk.StoreKey, params ...i
 	if len(params)%2 != 0 {
 		panic("Odd params list length for InitKeeper")
 	}
-	
+
 	k := NewKeeper(cdc, key)
-	
+
 	for i := 0; i < len(params); i += 2 {
 		k.Set(ctx, params[i].(string), params[i+1])
 	}
-	
+
 	return k
 }
 
@@ -51,12 +51,12 @@ func (k Keeper) Set(ctx sdk.Context, key string, param interface{}) error {
 	if bz != nil {
 		ptrty := reflect.PtrTo(reflect.TypeOf(param))
 		ptr := reflect.New(ptrty).Interface()
-		
+
 		if k.cdc.UnmarshalBinaryLengthPrefixed(bz, ptr) != nil {
 			return fmt.Errorf("Type mismatch with stored param and provided param")
 		}
 	}
-	
+
 	bz, err := k.cdc.MarshalBinaryLengthPrefixed(param)
 	if err != nil {
 		return err

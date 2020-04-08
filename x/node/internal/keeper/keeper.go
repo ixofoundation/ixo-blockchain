@@ -3,7 +3,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/node/internal/types"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 )
@@ -22,7 +22,7 @@ func NewKeeper(cdc *codec.Codec, paramsKeeper params.Keeper) Keeper {
 
 func InitKeeper(cdc *codec.Codec, paramsKeeper params.Keeper) Keeper {
 	k := NewKeeper(cdc, paramsKeeper)
-	
+
 	return k
 }
 
@@ -35,7 +35,7 @@ func (k Keeper) GetNode(ctx sdk.Context, key string) (string, sdk.Error) {
 	if err != nil {
 		return "", types.ErrorInvalidQueryNode()
 	}
-	
+
 	return r, nil
 }
 

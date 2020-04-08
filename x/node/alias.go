@@ -10,7 +10,7 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
 )
 
@@ -19,6 +19,9 @@ type (
 )
 
 var (
+	// function aliases
 	NewKeeper = keeper.NewKeeper
+
+	// variable aliases
 	ModuleCdc = types.ModuleCdc
 )

@@ -4,12 +4,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-func Registercodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(AddEthWalletMsg{}, "ixo/AddEthWallet", nil)
+func RegisterCodec(cdc *codec.Codec) {
+	cdc.RegisterConcrete(MsgAddEthWallet{}, "ixo/AddEthWallet", nil)
 }
 
-var msgCdc = codec.New()
+// ModuleCdc is the codec for the module
+var ModuleCdc *codec.Codec
 
 func init() {
-	Registercodec(msgCdc)
+	ModuleCdc = codec.New()
+	RegisterCodec(ModuleCdc)
+	ModuleCdc.Seal()
 }

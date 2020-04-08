@@ -7,8 +7,8 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 )
 
-func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) CreateProjectMsg {
-	return CreateProjectMsg{
+func NewMsgCreateProject(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) MsgCreateProject {
+	return MsgCreateProject{
 		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
@@ -18,8 +18,8 @@ func NewCreateProjectMsg(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) Cre
 	}
 }
 
-func NewUpdateProjectStatusMsg(txHash string, senderDid string, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid sovrin.SovrinDid) UpdateProjectStatusMsg {
-	return UpdateProjectStatusMsg{
+func NewMsgUpdateProjectStatus(txHash string, senderDid string, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid sovrin.SovrinDid) MsgUpdateProjectStatus {
+	return MsgUpdateProjectStatus{
 		SignBytes:  "",
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -28,8 +28,8 @@ func NewUpdateProjectStatusMsg(txHash string, senderDid string, updateProjectSta
 	}
 }
 
-func NewCreateAgentMsg(txHash string, senderDid string, createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) CreateAgentMsg {
-	return CreateAgentMsg{
+func NewMsgCreateAgent(txHash string, senderDid string, createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) MsgCreateAgent {
+	return MsgCreateAgent{
 		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
@@ -38,8 +38,8 @@ func NewCreateAgentMsg(txHash string, senderDid string, createAgentDoc CreateAge
 	}
 }
 
-func NewUpdateAgentMsg(txHash string, senderDid string, updateAgentDoc UpdateAgentDoc, projectDid sovrin.SovrinDid) UpdateAgentMsg {
-	return UpdateAgentMsg{
+func NewMsgUpdateAgent(txHash string, senderDid string, updateAgentDoc UpdateAgentDoc, projectDid sovrin.SovrinDid) MsgUpdateAgent {
+	return MsgUpdateAgent{
 		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
@@ -48,8 +48,8 @@ func NewUpdateAgentMsg(txHash string, senderDid string, updateAgentDoc UpdateAge
 	}
 }
 
-func NewCreateClaimMsg(txHash string, senderDid string, createClaimDoc CreateClaimDoc, projectDid sovrin.SovrinDid) CreateClaimMsg {
-	return CreateClaimMsg{
+func NewMsgCreateClaim(txHash string, senderDid string, createClaimDoc CreateClaimDoc, projectDid sovrin.SovrinDid) MsgCreateClaim {
+	return MsgCreateClaim{
 		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
@@ -58,8 +58,8 @@ func NewCreateClaimMsg(txHash string, senderDid string, createClaimDoc CreateCla
 	}
 }
 
-func NewCreateEvaluationMsg(txHash string, senderDid string, createEvaluationDoc CreateEvaluationDoc, projectDid sovrin.SovrinDid) CreateEvaluationMsg {
-	return CreateEvaluationMsg{
+func NewMsgCreateEvaluation(txHash string, senderDid string, createEvaluationDoc CreateEvaluationDoc, projectDid sovrin.SovrinDid) MsgCreateEvaluation {
+	return MsgCreateEvaluation{
 		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
@@ -68,18 +68,18 @@ func NewCreateEvaluationMsg(txHash string, senderDid string, createEvaluationDoc
 	}
 }
 
+func NewMsgWithdrawFunds(senderDid ixo.Did, data WithdrawFundsDoc) MsgWithdrawFunds {
+	return MsgWithdrawFunds{
+		SignBytes: "",
+		SenderDid: senderDid,
+		Data:      data,
+	}
+}
+
 func CheckNotEmpty(value string, name string) (valid bool, err sdk.Error) {
 	if len(value) == 0 {
 		return false, sdk.ErrUnknownRequest(name + " is empty.")
 	} else {
 		return true, nil
-	}
-}
-
-func NewWithDrawFundsMsg(senderDid ixo.Did, data WithdrawFundsDoc) WithdrawFundsMsg {
-	return WithdrawFundsMsg{
-		SignBytes: "",
-		SenderDid: senderDid,
-		Data:      data,
 	}
 }

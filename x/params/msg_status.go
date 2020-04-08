@@ -2,7 +2,7 @@ package params
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -18,6 +18,6 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) []abci.ValidatorU
 	for _, ty := range data.ActivatedTypes {
 		k.Set(ctx, ActivatedParamKey(ty), true)
 	}
-	
+
 	return []abci.ValidatorUpdate{}
 }

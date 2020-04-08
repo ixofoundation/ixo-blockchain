@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
@@ -22,33 +21,33 @@ const (
 	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
 
-func NewHandler(k Keeper, fk fees.Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient) sdk.Handler {
+func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper,
+	pk params.Keeper, ethClient ixo.EthClient) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case CreateProjectMsg:
-			return handleCreateProjectMsg(ctx, k, bk, msg)
-		case UpdateProjectStatusMsg:
-			return handleUpdateProjectStatusMsg(ctx, k, ck, bk, pk, ethClient, msg)
-		case CreateAgentMsg:
-			return handleCreateAgentMsg(ctx, k, bk, msg)
-		case UpdateAgentMsg:
-			return handleUpdateAgentMsg(ctx, k, bk, msg)
-		case CreateClaimMsg:
-			return handleCreateClaimMsg(ctx, k, fk, bk, msg)
-		case CreateEvaluationMsg:
-			return handleCreateEvaluationMsg(ctx, k, fk, bk, msg)
-		case WithdrawFundsMsg:
-			return handleWithdrawFundsMsg(ctx, k, bk, pk, ethClient, msg)
+		case MsgCreateProject:
+			return handleMsgCreateProject(ctx, k, bk, msg)
+		case MsgUpdateProjectStatus:
+			return handleMsgUpdateProjectStatus(ctx, k, bk, pk, ethClient, msg)
+		case MsgCreateAgent:
+			return handleMsgCreateAgent(ctx, k, bk, msg)
+		case MsgUpdateAgent:
+			return handleMsgUpdateAgent(ctx, k, bk, msg)
+		case MsgCreateClaim:
+			return handleMsgCreateClaim(ctx, k, fk, bk, msg)
+		case MsgCreateEvaluation:
+			return handleMsgCreateEvaluation(ctx, k, fk, bk, msg)
+		case MsgWithdrawFunds:
+			return handleMsgWithdrawFunds(ctx, k, bk, pk, ethClient, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 	}
 }
 
-func handleCreateProjectMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg CreateProjectMsg) sdk.Result {
+func handleMsgCreateProject(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateProject) sdk.Result {
 
 	_, err := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
 	if err != nil {
@@ -70,8 +69,8 @@ func handleCreateProjectMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg Creat
 	}
 }
 
-func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient, msg UpdateProjectStatusMsg) sdk.Result {
+func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
+	pk params.Keeper, ethClient ixo.EthClient, msg MsgUpdateProjectStatus) sdk.Result {
 
 	ExistingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
@@ -99,7 +98,7 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper
 	}
 
 	if newStatus == PaidoutStatus {
-		res := payoutFees(ctx, k, ck, bk, pk, ethClient, ExistingProjectDoc.GetProjectDid())
+		res := payoutFees(ctx, k, bk, pk, ethClient, ExistingProjectDoc.GetProjectDid())
 		if res.Code != sdk.CodeOK {
 			return res
 		}
@@ -113,7 +112,7 @@ func handleUpdateProjectStatusMsg(ctx sdk.Context, k Keeper, ck contracts.Keeper
 	}
 }
 
-func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, pk params.Keeper,
+func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
 	ethClient ixo.EthClient, projectDid ixo.Did) sdk.Result {
 
 	_, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
@@ -136,7 +135,7 @@ func payoutFees(ctx sdk.Context, k Keeper, ck contracts.Keeper, bk bank.Keeper, 
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
 
-	ixoEthWallet := ck.GetContract(ctx, contracts.KeyFoundationWallet)
+	ixoEthWallet := "" // TODO (contracts): ck.GetContract(ctx, contracts.KeyFoundationWallet)
 
 	return payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, IxoAccountFeesId, ixoEthWallet)
 }
@@ -175,7 +174,7 @@ func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
 	return 0
 }
 
-func handleCreateAgentMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg CreateAgentMsg) sdk.Result {
+func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateAgent) sdk.Result {
 	_, err := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.Data.AgentDid)
 	if err != nil {
 		err.Result()
@@ -186,14 +185,14 @@ func handleCreateAgentMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg CreateA
 	}
 }
 
-func handleUpdateAgentMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, msg UpdateAgentMsg) sdk.Result {
+func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpdateAgent) sdk.Result {
 
 	return sdk.Result{
 		Code: sdk.CodeOK,
 	}
 }
 
-func handleCreateClaimMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg CreateClaimMsg) sdk.Result {
+func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
 
 	_, err := processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
 	if err != nil {
@@ -207,7 +206,7 @@ func handleCreateClaimMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 	}
 }
 
-func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg CreateEvaluationMsg) sdk.Result {
+func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
 	_, err := processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.GetProjectDid())
 	if err != nil {
 		return err.Result()
@@ -269,8 +268,8 @@ func handleCreateEvaluationMsg(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 	}
 }
 
-func handleWithdrawFundsMsg(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient, msg WithdrawFundsMsg) sdk.Result {
+func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
+	ethClient ixo.EthClient, msg MsgWithdrawFunds) sdk.Result {
 
 	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
 	projectDoc, err := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())

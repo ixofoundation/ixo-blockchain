@@ -2,7 +2,7 @@ package params
 
 import (
 	"encoding/json"
-	
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/params/internal/keeper"
 )
 
@@ -85,7 +85,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.Va
 	var genesisState GenesisState
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
 	InitGenesis(ctx, am.keeper, genesisState)
-	
+
 	return []abci.ValidatorUpdate{}
 }
 

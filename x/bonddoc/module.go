@@ -29,7 +29,7 @@ func (AppModuleBasic) Name() string {
 }
 
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	Registercodec(cdc)
+	RegisterCodec(cdc)
 }
 
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
@@ -54,8 +54,8 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	bondTxCmd.AddCommand(client.PostCommands(
-		cli.CreateBondCmd(cdc),
-		cli.UpdateBondStatusCmd(cdc),
+		cli.GetCmdCreateBond(cdc),
+		cli.GetCmdUpdateBondStatus(cdc),
 	)...)
 
 	return bondTxCmd
@@ -71,7 +71,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	bondQueryCmd.AddCommand(client.GetCommands(
-		cli.GetBondDocCmd(cdc),
+		cli.GetCmdBondDoc(cdc),
 	)...)
 
 	return bondQueryCmd

@@ -3,44 +3,44 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type AddDidMsg struct {
+type MsgAddDid struct {
 	DidDoc    BaseDidDoc `json:"didDoc"`
 	SignBytes string     `json:"signBytes"`
 }
 
-func NewAddDidMsg(did string, publicKey string) AddDidMsg {
+func NewAddDidMsg(did string, publicKey string) MsgAddDid {
 	didDoc := BaseDidDoc{
 		Did:         did,
 		PubKey:      publicKey,
 		Credentials: make([]DidCredential, 0),
 	}
-	
-	return AddDidMsg{
+
+	return MsgAddDid{
 		DidDoc: didDoc,
 	}
 }
 
-var _ sdk.Msg = AddDidMsg{}
+var _ sdk.Msg = MsgAddDid{}
 
-func (msg AddDidMsg) Type() string { return "did" }
+func (msg MsgAddDid) Type() string { return "did" }
 
-func (msg AddDidMsg) Route() string { return RouterKey }
+func (msg MsgAddDid) Route() string { return RouterKey }
 
-func (msg AddDidMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.DidDoc.GetDid())}
 }
 
-func (msg AddDidMsg) ValidateBasic() sdk.Error {
+func (msg MsgAddDid) ValidateBasic() sdk.Error {
 	if msg.DidDoc.Did == "" {
 		return ErrorInvalidDid(DefaultCodeSpace, "did should not be empty")
 	} else if msg.DidDoc.PubKey == "" {
 		return ErrorInvalidPubKey(DefaultCodeSpace, "pubKey should not be empty")
 	}
-	
+
 	for _, credential := range msg.DidDoc.Credentials {
 		if credential.Issuer == "" {
 			return ErrorInvalidIssuer(DefaultCodeSpace, "issuer should not be empty")
@@ -48,25 +48,25 @@ func (msg AddDidMsg) ValidateBasic() sdk.Error {
 			return ErrorInvalidDid(DefaultCodeSpace, "claim id should not be empty")
 		}
 	}
-	
+
 	return nil
 }
 
-func (msg AddDidMsg) GetSignBytes() []byte {
+func (msg MsgAddDid) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg AddDidMsg) String() string {
-	return fmt.Sprintf("AddDidMsg{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
+func (msg MsgAddDid) String() string {
+	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
 }
 
-func (msg AddDidMsg) IsNewDid() bool { return true }
+func (msg MsgAddDid) IsNewDid() bool { return true }
 
-type AddCredentialMsg struct {
+type MsgAddCredential struct {
 	DidCredential DidCredential `json:"credential"`
 }
 
-func NewAddCredentialMsg(did string, credType []string, issuer string, issued string) AddCredentialMsg {
+func NewMsgAddCredential(did string, credType []string, issuer string, issued string) MsgAddCredential {
 	didCredential := DidCredential{
 		CredType: credType,
 		Issuer:   issuer,
@@ -76,42 +76,42 @@ func NewAddCredentialMsg(did string, credType []string, issuer string, issued st
 			KYCValidated: true,
 		},
 	}
-	
-	return AddCredentialMsg{
+
+	return MsgAddCredential{
 		DidCredential: didCredential,
 	}
 }
 
-var _ sdk.Msg = AddCredentialMsg{}
+var _ sdk.Msg = MsgAddCredential{}
 
-func (msg AddCredentialMsg) Type() string  { return "did" }
-func (msg AddCredentialMsg) Route() string { return RouterKey }
-func (msg AddCredentialMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgAddCredential) Type() string  { return "did" }
+func (msg MsgAddCredential) Route() string { return RouterKey }
+func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.DidCredential.Issuer)}
 }
 
-func (msg AddCredentialMsg) String() string {
-	return fmt.Sprintf("AddCredentialMsg{Did: %v, Type: %v, Signer: %v}",
+func (msg MsgAddCredential) String() string {
+	return fmt.Sprintf("MsgAddCredential{Did: %v, Type: %v, Signer: %v}",
 		string(msg.DidCredential.Claim.Id), msg.DidCredential.CredType, string(msg.DidCredential.Issuer))
 }
 
-func (msg AddCredentialMsg) ValidateBasic() sdk.Error {
+func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 	if msg.DidCredential.Claim.Id == "" {
 		return ErrorInvalidDid(DefaultCodeSpace, "claim id should not be nil")
 	} else if msg.DidCredential.Issuer == "" {
 		return ErrorInvalidIssuer(DefaultCodeSpace, "Issuer should not be nil")
 	}
-	
+
 	return nil
 }
 
-func (msg AddCredentialMsg) GetSignBytes() []byte {
+func (msg MsgAddCredential) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return b
 }
 
-func (msg AddCredentialMsg) IsNewDid() bool { return false }
+func (msg MsgAddCredential) IsNewDid() bool { return false }
