@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 
@@ -136,10 +135,8 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) auth.Account {
-
-	src := []byte(projectDid + "/" + accountId)
-	hexAddr := hex.EncodeToString(src)
-	addr := sdk.AccAddress(hexAddr)
+	key := projectDid + "/" + accountId
+	address := sdk.AccAddress(crypto.AddressHash([]byte(key)))
 
 	acc := k.accountKeeper.NewAccountWithAddress(ctx, addr)
 	if k.accountKeeper.GetAccount(ctx, addr) != nil {

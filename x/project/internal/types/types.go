@@ -14,7 +14,7 @@ type Config struct {
 	WithdrawalsPrefix string
 }
 
-type AccountMap map[string]interface{}
+type AccountMap map[string]sdk.AccAddress
 
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64

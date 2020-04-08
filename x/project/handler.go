@@ -462,12 +462,9 @@ func getProjectAccountMap(ctx sdk.Context, k Keeper, projectDid ixo.Did) Account
 
 func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) (sdk.AccAddress, sdk.Error) {
 	accMap := getProjectAccountMap(ctx, k, projectDid)
-	var accountIDAccAddr string
 
-	accountIDAddrInterface, found := accMap[accountId]
+	addr, found := accMap[accountId]
 	if found {
-		accountIDAccAddr = accountIDAddrInterface.(string)
-		addr := sdk.AccAddress([]byte(accountIDAccAddr))
 		return addr, nil
 	} else {
 		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
