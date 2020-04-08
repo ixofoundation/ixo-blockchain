@@ -77,15 +77,15 @@ func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc types.StoredProj
 	}
 }
 
-func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {
+func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) types.AccountMap {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetAccountPrefixKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return make(map[string]interface{})
+		return make(map[string]sdk.AccAddress)
 	} else {
-		var accountMap map[string]interface{}
+		var accountMap map[string]sdk.AccAddress
 		if err := json.Unmarshal(bz, &accountMap); err != nil {
 			panic(err)
 		}
@@ -103,7 +103,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetAccountPrefixKey(projectDid)
-	accountMap[accountId] = string(account.GetAddress().Bytes())
+	accountMap[accountId] = account.GetAddress()
 
 	bz, err := json.Marshal(accountMap)
 	if err != nil {
