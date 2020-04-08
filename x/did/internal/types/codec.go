@@ -2,17 +2,18 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(AddDidMsg{}, "did/AddDid", nil)
-	cdc.RegisterConcrete(AddCredentialMsg{}, "did/AddCredential", nil)
+	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
+	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
 	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
-	
+
 }
 
+// ModuleCdc is the codec for the module
 var ModuleCdc *codec.Codec
 
 func init() {

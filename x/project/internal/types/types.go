@@ -107,7 +107,7 @@ func GetProjectDocDecoder(cdc *codec.Codec) ProjectDocDecoder {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := CreateProjectMsg{}
+		projectDoc := MsgCreateProject{}
 		err = cdc.UnmarshalBinaryLengthPrefixed(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)

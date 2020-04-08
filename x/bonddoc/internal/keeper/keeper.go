@@ -31,7 +31,7 @@ func (k Keeper) GetBondDoc(ctx sdk.Context, bondDid ixo.Did) (types.StoredBondDo
 		return nil, didTypes.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid BondDid Address")
 	}
 
-	var bondDoc types.CreateBondMsg
+	var bondDoc types.MsgCreateBond
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &bondDoc)
 
 	return &bondDoc, nil

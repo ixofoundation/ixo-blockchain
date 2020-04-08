@@ -12,17 +12,17 @@ func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case CreateBondMsg:
-			return handleCreateBondMsg(ctx, k, msg)
-		case UpdateBondStatusMsg:
-			return handleUpdateBondStatusMsg(ctx, k, msg)
+		case MsgCreateBond:
+			return handleMsgCreateBond(ctx, k, msg)
+		case MsgUpdateBondStatus:
+			return handleMsgUpdateBondStatus(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 	}
 }
 
-func handleCreateBondMsg(ctx sdk.Context, k Keeper, msg CreateBondMsg) sdk.Result {
+func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Result {
 
 	err := k.SetBondDoc(ctx, &msg)
 	if err != nil {
@@ -34,7 +34,7 @@ func handleCreateBondMsg(ctx sdk.Context, k Keeper, msg CreateBondMsg) sdk.Resul
 	}
 }
 
-func handleUpdateBondStatusMsg(ctx sdk.Context, k Keeper, msg UpdateBondStatusMsg) sdk.Result {
+func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatus) sdk.Result {
 
 	ExistingBondDoc, err := getBondDoc(ctx, k, msg.GetBondDid())
 	if err != nil {

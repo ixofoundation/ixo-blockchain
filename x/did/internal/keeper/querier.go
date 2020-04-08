@@ -3,10 +3,10 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -36,34 +36,34 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	res, errRes := json.Marshal(didDoc)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", errRes))
 	}
-	
+
 	return res, nil
 }
 
 func queryAllDids(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 	allDids := k.GetAddDids(ctx)
-	
+
 	res, errRes := json.Marshal(allDids)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", errRes.Error()))
 	}
-	
+
 	return res, nil
 }
 
 func queryAllDidDocs(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 	var didDocs []ixo.DidDoc
 	didDocs = k.GetAllDidDocs(ctx)
-	
+
 	res, errRes := json.Marshal(didDocs)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", errRes.Error()))
 	}
-	
+
 	return res, nil
 }

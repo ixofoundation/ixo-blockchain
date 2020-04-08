@@ -10,7 +10,7 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
 )
 
@@ -20,13 +20,16 @@ type (
 )
 
 var (
+	// function aliases
 	NewKeeper     = keeper.NewKeeper
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
-	ModuleCdc     = types.ModuleCdc
-	
+
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
+
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
-	
+
 	ErrorInvalidDid = types.ErrorInvalidDid
 )

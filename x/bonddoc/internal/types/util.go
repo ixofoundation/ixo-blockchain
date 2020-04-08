@@ -6,8 +6,8 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
 )
 
-func NewCreateBondMsg(bondDoc BondDoc, bondDid sovrin.SovrinDid) CreateBondMsg {
-	return CreateBondMsg{
+func NewCreateBondMsg(bondDoc BondDoc, bondDid sovrin.SovrinDid) MsgCreateBond {
+	return MsgCreateBond{
 		SignBytes: "",
 		TxHash:    "",
 		SenderDid: "",
@@ -17,8 +17,8 @@ func NewCreateBondMsg(bondDoc BondDoc, bondDid sovrin.SovrinDid) CreateBondMsg {
 	}
 }
 
-func NewUpdateBondStatusMsg(txHash string, senderDid string, updateBondStatusDoc UpdateBondStatusDoc, projectDid sovrin.SovrinDid) UpdateBondStatusMsg {
-	return UpdateBondStatusMsg{
+func NewUpdateBondStatusMsg(txHash string, senderDid string, updateBondStatusDoc UpdateBondStatusDoc, projectDid sovrin.SovrinDid) MsgUpdateBondStatus {
+	return MsgUpdateBondStatus{
 		SignBytes: "",
 		TxHash:    txHash,
 		SenderDid: senderDid,

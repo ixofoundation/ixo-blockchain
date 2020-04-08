@@ -40,7 +40,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid ixo.Did) (types.Stored
 		return nil, didTypes.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid ProjectDid Address")
 	}
 
-	var projectDoc types.CreateProjectMsg
+	var projectDoc types.MsgCreateProject
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
 	return &projectDoc, nil

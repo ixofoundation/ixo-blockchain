@@ -2,7 +2,7 @@ package types
 
 import (
 	"errors"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -44,9 +44,9 @@ func (dd BaseDidDoc) SetDid(did ixo.Did) error {
 	if len(dd.Did) != 0 {
 		return errors.New("cannot override BaseDidDoc did")
 	}
-	
+
 	dd.Did = did
-	
+
 	return nil
 }
 
@@ -54,9 +54,9 @@ func (dd BaseDidDoc) SetPubKey(pubKey string) error {
 	if len(dd.PubKey) != 0 {
 		return errors.New("cannot override BaseDidDoc pubKey")
 	}
-	
+
 	dd.PubKey = pubKey
-	
+
 	return nil
 }
 
@@ -64,7 +64,7 @@ func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
 	if dd.Credentials == nil {
 		dd.Credentials = make([]DidCredential, 0)
 	}
-	
+
 	dd.Credentials = append(dd.Credentials, cred)
 }
 

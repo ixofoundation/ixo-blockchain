@@ -18,19 +18,24 @@ const (
 
 type (
 	Keeper                 = keeper.Keeper
-	CreateProjectMsg       = types.CreateProjectMsg
-	UpdateProjectStatusMsg = types.UpdateProjectStatusMsg
-	CreateAgentMsg         = types.CreateAgentMsg
-	UpdateAgentMsg         = types.UpdateAgentMsg
-	CreateClaimMsg         = types.CreateClaimMsg
-	CreateEvaluationMsg    = types.CreateEvaluationMsg
-	WithdrawFundsMsg       = types.WithdrawFundsMsg
+	MsgCreateProject       = types.MsgCreateProject
+	MsgUpdateProjectStatus = types.MsgUpdateProjectStatus
+	MsgCreateAgent         = types.MsgCreateAgent
+	MsgUpdateAgent         = types.MsgUpdateAgent
+	MsgCreateClaim         = types.MsgCreateClaim
+	MsgCreateEvaluation    = types.MsgCreateEvaluation
+	MsgWithdrawFunds       = types.MsgWithdrawFunds
 	StoredProjectDoc       = types.StoredProjectDoc
 	WithdrawalInfo         = types.WithdrawalInfo
 	AccountMap             = types.AccountMap
 )
 
 var (
-	NewKeeper = keeper.NewKeeper
+	// function aliases
+	NewKeeper     = keeper.NewKeeper
+	NewQuerier    = keeper.NewQuerier
+	RegisterCodec = types.RegisterCodec
+
+	// variable aliases
 	ModuleCdc = types.ModuleCdc
 )

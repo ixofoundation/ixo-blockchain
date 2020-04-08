@@ -8,7 +8,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-type CreateProjectMsg struct {
+type MsgCreateProject struct {
 	SignBytes  string     `json:"signBytes"`
 	TxHash     string     `json:"txHash"`
 	SenderDid  ixo.Did    `json:"senderDid"`
@@ -17,12 +17,12 @@ type CreateProjectMsg struct {
 	Data       ProjectDoc `json:"data"`
 }
 
-var _ sdk.Msg = CreateProjectMsg{}
+var _ sdk.Msg = MsgCreateProject{}
 
-func (msg CreateProjectMsg) Type() string                            { return ModuleName }
-func (msg CreateProjectMsg) Route() string                           { return RouterKey }
-func (msg CreateProjectMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
+func (msg MsgCreateProject) Type() string                            { return ModuleName }
+func (msg MsgCreateProject) Route() string                           { return RouterKey }
+func (msg MsgCreateProject) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
 	if !valid {
 		return err
@@ -51,13 +51,13 @@ func (msg CreateProjectMsg) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg CreateProjectMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg CreateProjectMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateProjectMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgCreateProject) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (msg CreateProjectMsg) String() string {
+func (msg MsgCreateProject) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -65,23 +65,23 @@ func (msg CreateProjectMsg) String() string {
 	return string(b)
 }
 
-func (msg CreateProjectMsg) GetPubKey() string        { return msg.PubKey }
-func (msg CreateProjectMsg) GetEvaluatorPay() int64   { return msg.Data.GetEvaluatorPay() }
-func (msg CreateProjectMsg) GetStatus() ProjectStatus { return msg.Data.Status }
-func (msg *CreateProjectMsg) SetStatus(status ProjectStatus) {
+func (msg MsgCreateProject) GetPubKey() string        { return msg.PubKey }
+func (msg MsgCreateProject) GetEvaluatorPay() int64   { return msg.Data.GetEvaluatorPay() }
+func (msg MsgCreateProject) GetStatus() ProjectStatus { return msg.Data.Status }
+func (msg *MsgCreateProject) SetStatus(status ProjectStatus) {
 	msg.Data.Status = status
 }
 
-func (msg CreateProjectMsg) GetSignBytes() []byte {
+func (msg MsgCreateProject) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg CreateProjectMsg) IsNewDid() bool     { return true }
-func (msg CreateProjectMsg) IsWithdrawal() bool { return false }
+func (msg MsgCreateProject) IsNewDid() bool     { return true }
+func (msg MsgCreateProject) IsWithdrawal() bool { return false }
 
-var _ StoredProjectDoc = (*CreateProjectMsg)(nil)
+var _ StoredProjectDoc = (*MsgCreateProject)(nil)
 
-type UpdateProjectStatusMsg struct {
+type MsgUpdateProjectStatus struct {
 	SignBytes  string                 `json:"signBytes"`
 	TxHash     string                 `json:"txHash"`
 	SenderDid  ixo.Did                `json:"senderDid"`
@@ -89,33 +89,33 @@ type UpdateProjectStatusMsg struct {
 	Data       UpdateProjectStatusDoc `json:"data"`
 }
 
-func (msg UpdateProjectStatusMsg) Type() string                            { return ModuleName }
-func (msg UpdateProjectStatusMsg) Route() string                           { return RouterKey }
-func (msg UpdateProjectStatusMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg UpdateProjectStatusMsg) ValidateBasic() sdk.Error                { return nil }
-func (msg UpdateProjectStatusMsg) GetSignBytes() []byte {
+func (msg MsgUpdateProjectStatus) Type() string                            { return ModuleName }
+func (msg MsgUpdateProjectStatus) Route() string                           { return RouterKey }
+func (msg MsgUpdateProjectStatus) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error                { return nil }
+func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg UpdateProjectStatusMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (ups UpdateProjectStatusMsg) GetProjectDid() ixo.Did {
+func (ups MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
 	return ups.ProjectDid
 }
 
-func (ups UpdateProjectStatusMsg) GetStatus() ProjectStatus {
+func (ups MsgUpdateProjectStatus) GetStatus() ProjectStatus {
 	return ups.Data.Status
 }
 
-func (msg UpdateProjectStatusMsg) IsNewDid() bool     { return false }
-func (msg UpdateProjectStatusMsg) IsWithdrawal() bool { return false }
-func (msg UpdateProjectStatusMsg) GetEthFundingTxnID() string {
+func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
+func (msg MsgUpdateProjectStatus) IsWithdrawal() bool { return false }
+func (msg MsgUpdateProjectStatus) GetEthFundingTxnID() string {
 	return msg.Data.EthFundingTxnID
 }
 
-type CreateAgentMsg struct {
+type MsgCreateAgent struct {
 	SignBytes  string         `json:"signBytes"`
 	TxHash     string         `json:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid"`
@@ -123,26 +123,26 @@ type CreateAgentMsg struct {
 	Data       CreateAgentDoc `json:"data"`
 }
 
-func (msg CreateAgentMsg) IsNewDid() bool                          { return false }
-func (msg CreateAgentMsg) IsWithdrawal() bool                      { return false }
-func (msg CreateAgentMsg) Type() string                            { return ModuleName }
-func (msg CreateAgentMsg) Route() string                           { return RouterKey }
-func (msg CreateAgentMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg CreateAgentMsg) ValidateBasic() sdk.Error {
+func (msg MsgCreateAgent) IsNewDid() bool                          { return false }
+func (msg MsgCreateAgent) IsWithdrawal() bool                      { return false }
+func (msg MsgCreateAgent) Type() string                            { return ModuleName }
+func (msg MsgCreateAgent) Route() string                           { return RouterKey }
+func (msg MsgCreateAgent) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg CreateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg CreateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateAgentMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgCreateAgent) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateAgent) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (msg CreateAgentMsg) GetSignBytes() []byte {
+func (msg MsgCreateAgent) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg CreateAgentMsg) String() string {
+func (msg MsgCreateAgent) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -150,9 +150,9 @@ func (msg CreateAgentMsg) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = CreateAgentMsg{}
+var _ sdk.Msg = MsgCreateAgent{}
 
-type UpdateAgentMsg struct {
+type MsgUpdateAgent struct {
 	SignBytes  string         `json:"signBytes"`
 	TxHash     string         `json:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid"`
@@ -160,26 +160,26 @@ type UpdateAgentMsg struct {
 	Data       UpdateAgentDoc `json:"data"`
 }
 
-func (msg UpdateAgentMsg) IsNewDid() bool                          { return false }
-func (msg UpdateAgentMsg) IsWithdrawal() bool                      { return false }
-func (msg UpdateAgentMsg) Type() string                            { return ModuleName }
-func (msg UpdateAgentMsg) Route() string                           { return RouterKey }
-func (msg UpdateAgentMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg UpdateAgentMsg) ValidateBasic() sdk.Error {
+func (msg MsgUpdateAgent) IsNewDid() bool                          { return false }
+func (msg MsgUpdateAgent) IsWithdrawal() bool                      { return false }
+func (msg MsgUpdateAgent) Type() string                            { return ModuleName }
+func (msg MsgUpdateAgent) Route() string                           { return RouterKey }
+func (msg MsgUpdateAgent) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg UpdateAgentMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg UpdateAgentMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg UpdateAgentMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgUpdateAgent) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgUpdateAgent) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (msg UpdateAgentMsg) GetSignBytes() []byte {
+func (msg MsgUpdateAgent) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg UpdateAgentMsg) String() string {
+func (msg MsgUpdateAgent) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -188,9 +188,9 @@ func (msg UpdateAgentMsg) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = UpdateAgentMsg{}
+var _ sdk.Msg = MsgUpdateAgent{}
 
-type CreateClaimMsg struct {
+type MsgCreateClaim struct {
 	SignBytes  string         `json:"signBytes"`
 	TxHash     string         `json:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid"`
@@ -198,26 +198,26 @@ type CreateClaimMsg struct {
 	Data       CreateClaimDoc `json:"data"`
 }
 
-func (msg CreateClaimMsg) IsNewDid() bool                          { return false }
-func (msg CreateClaimMsg) IsWithdrawal() bool                      { return false }
-func (msg CreateClaimMsg) Type() string                            { return ModuleName }
-func (msg CreateClaimMsg) Route() string                           { return RouterKey }
-func (msg CreateClaimMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg CreateClaimMsg) ValidateBasic() sdk.Error {
+func (msg MsgCreateClaim) IsNewDid() bool                          { return false }
+func (msg MsgCreateClaim) IsWithdrawal() bool                      { return false }
+func (msg MsgCreateClaim) Type() string                            { return ModuleName }
+func (msg MsgCreateClaim) Route() string                           { return RouterKey }
+func (msg MsgCreateClaim) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg CreateClaimMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg CreateClaimMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateClaimMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgCreateClaim) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateClaim) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (msg CreateClaimMsg) GetSignBytes() []byte {
+func (msg MsgCreateClaim) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg CreateClaimMsg) String() string {
+func (msg MsgCreateClaim) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -226,9 +226,9 @@ func (msg CreateClaimMsg) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = CreateClaimMsg{}
+var _ sdk.Msg = MsgCreateClaim{}
 
-type CreateEvaluationMsg struct {
+type MsgCreateEvaluation struct {
 	SignBytes  string              `json:"signBytes"`
 	TxHash     string              `json:"txHash"`
 	SenderDid  ixo.Did             `json:"senderDid"`
@@ -236,26 +236,26 @@ type CreateEvaluationMsg struct {
 	Data       CreateEvaluationDoc `json:"data"`
 }
 
-func (msg CreateEvaluationMsg) IsNewDid() bool                          { return false }
-func (msg CreateEvaluationMsg) IsWithdrawal() bool                      { return false }
-func (msg CreateEvaluationMsg) Type() string                            { return ModuleName }
-func (msg CreateEvaluationMsg) Route() string                           { return RouterKey }
-func (msg CreateEvaluationMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg CreateEvaluationMsg) ValidateBasic() sdk.Error {
+func (msg MsgCreateEvaluation) IsNewDid() bool                          { return false }
+func (msg MsgCreateEvaluation) IsWithdrawal() bool                      { return false }
+func (msg MsgCreateEvaluation) Type() string                            { return ModuleName }
+func (msg MsgCreateEvaluation) Route() string                           { return RouterKey }
+func (msg MsgCreateEvaluation) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg CreateEvaluationMsg) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg CreateEvaluationMsg) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg CreateEvaluationMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgCreateEvaluation) GetProjectDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateEvaluation) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (msg CreateEvaluationMsg) GetSignBytes() []byte {
+func (msg MsgCreateEvaluation) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg CreateEvaluationMsg) String() string {
+func (msg MsgCreateEvaluation) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -264,34 +264,34 @@ func (msg CreateEvaluationMsg) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = CreateEvaluationMsg{}
+var _ sdk.Msg = MsgCreateEvaluation{}
 
-type WithdrawFundsMsg struct {
+type MsgWithdrawFunds struct {
 	SignBytes string           `json:"signBytes"`
 	SenderDid ixo.Did          `json:"senderDid"`
 	Data      WithdrawFundsDoc `json:"data"`
 }
 
-func (msg WithdrawFundsMsg) IsNewDid() bool                          { return false }
-func (msg WithdrawFundsMsg) IsWithdrawal() bool                      { return true }
-func (msg WithdrawFundsMsg) Type() string                            { return ModuleName }
-func (msg WithdrawFundsMsg) Route() string                           { return RouterKey }
-func (msg WithdrawFundsMsg) Get(key interface{}) (value interface{}) { return nil }
-func (msg WithdrawFundsMsg) ValidateBasic() sdk.Error {
+func (msg MsgWithdrawFunds) IsNewDid() bool                          { return false }
+func (msg MsgWithdrawFunds) IsWithdrawal() bool                      { return true }
+func (msg MsgWithdrawFunds) Type() string                            { return ModuleName }
+func (msg MsgWithdrawFunds) Route() string                           { return RouterKey }
+func (msg MsgWithdrawFunds) Get(key interface{}) (value interface{}) { return nil }
+func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg WithdrawFundsMsg) GetSenderDid() ixo.Did                 { return msg.SenderDid }
-func (msg WithdrawFundsMsg) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
-func (msg WithdrawFundsMsg) GetSigners() []sdk.AccAddress {
+func (msg MsgWithdrawFunds) GetSenderDid() ixo.Did                 { return msg.SenderDid }
+func (msg MsgWithdrawFunds) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
+func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
 
-func (msg WithdrawFundsMsg) GetSignBytes() []byte {
+func (msg MsgWithdrawFunds) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-func (msg WithdrawFundsMsg) String() string {
+func (msg MsgWithdrawFunds) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -300,4 +300,4 @@ func (msg WithdrawFundsMsg) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = WithdrawFundsMsg{}
+var _ sdk.Msg = MsgWithdrawFunds{}

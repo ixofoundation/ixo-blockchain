@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cobra"
 	abciTypes "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
@@ -34,7 +33,7 @@ func (AppModuleBasic) Name() string {
 }
 
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	Registercodec(cdc)
+	RegisterCodec(cdc)
 }
 
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
@@ -59,13 +58,13 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	projectTxCmd.AddCommand(client.PostCommands(
-		cli.CreateProjectCmd(cdc),
-		cli.CreateAgentCmd(cdc),
-		cli.UpdateProjectStatusCmd(cdc),
-		cli.UpdateAgentCmd(cdc),
-		cli.CreateClaimCmd(cdc),
-		cli.CreateEvaluationCmd(cdc),
-		cli.WithDrawFundsCmd(cdc),
+		cli.GetCmdCreateProject(cdc),
+		cli.GetCmdCreateAgent(cdc),
+		cli.GetCmdUpdateProjectStatus(cdc),
+		cli.GetCmdUpdateAgent(cdc),
+		cli.GetCmdCreateClaim(cdc),
+		cli.GetCmdCreateEvaluation(cdc),
+		cli.GetCmdWithdrawFunds(cdc),
 	)...)
 
 	return projectTxCmd
@@ -81,9 +80,9 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	projectQueryCmd.AddCommand(client.GetCommands(
-		cli.GetProjectDocCmd(cdc),
-		cli.GetProjectAccountsCmd(cdc),
-		cli.GetProjectTxsCmd(cdc),
+		cli.GetCmdProjectDoc(cdc),
+		cli.GetCmdProjectAccounts(cdc),
+		cli.GetCmdProjectTxs(cdc),
 	)...)
 
 	return projectQueryCmd
@@ -91,22 +90,20 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper         keeper.Keeper
-	feesKeeper     fees.Keeper
-	contractKeeper contracts.Keeper
-	bankKeeper     bank.Keeper
-	paramsKeeper   params.Keeper
-	ethClient      ixo.EthClient
+	keeper       keeper.Keeper
+	feesKeeper   fees.Keeper
+	bankKeeper   bank.Keeper
+	paramsKeeper params.Keeper
+	ethClient    ixo.EthClient
 }
 
-func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, contractKeeper contracts.Keeper,
-	bankKeeper bank.Keeper, paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
+func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper,
+	paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 		feesKeeper:     feesKeeper,
-		contractKeeper: contractKeeper,
 		bankKeeper:     bankKeeper,
 		paramsKeeper:   paramsKeeper,
 		ethClient:      ethClient,
@@ -124,7 +121,7 @@ func (AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper, am.feesKeeper, am.contractKeeper, am.bankKeeper, am.paramsKeeper, am.ethClient)
+	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper, am.paramsKeeper, am.ethClient)
 }
 
 func (AppModule) QuerierRoute() string {

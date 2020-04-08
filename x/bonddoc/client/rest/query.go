@@ -39,7 +39,7 @@ func queryBondDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var bondDoc types.CreateBondMsg
+		var bondDoc types.MsgCreateBond
 		cliCtx.Codec.MustUnmarshalJSON(res, &bondDoc)
 
 		bz, err := json.Marshal(bondDoc)
