@@ -14,7 +14,6 @@ import (
 	abciTypes "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project/client/cli"
 	"github.com/ixofoundation/ixo-cosmos/x/project/client/rest"
@@ -94,11 +93,10 @@ type AppModule struct {
 	feesKeeper   fees.Keeper
 	bankKeeper   bank.Keeper
 	paramsKeeper params.Keeper
-	ethClient    ixo.EthClient
 }
 
 func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper,
-	paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
+	paramsKeeper params.Keeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
@@ -106,7 +104,6 @@ func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper,
 		feesKeeper:     feesKeeper,
 		bankKeeper:     bankKeeper,
 		paramsKeeper:   paramsKeeper,
-		ethClient:      ethClient,
 	}
 }
 
@@ -121,7 +118,7 @@ func (AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper, am.paramsKeeper, am.ethClient)
+	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper, am.paramsKeeper)
 }
 
 func (AppModule) QuerierRoute() string {

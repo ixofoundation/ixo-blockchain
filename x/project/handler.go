@@ -21,8 +21,7 @@ const (
 	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
 
-func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper,
-	pk params.Keeper, ethClient ixo.EthClient) sdk.Handler {
+func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper, pk params.Keeper) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -30,7 +29,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper,
 		case MsgCreateProject:
 			return handleMsgCreateProject(ctx, k, bk, msg)
 		case MsgUpdateProjectStatus:
-			return handleMsgUpdateProjectStatus(ctx, k, bk, pk, ethClient, msg)
+			return handleMsgUpdateProjectStatus(ctx, k, bk, pk, msg)
 		case MsgCreateAgent:
 			return handleMsgCreateAgent(ctx, k, bk, msg)
 		case MsgUpdateAgent:
@@ -40,7 +39,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper,
 		case MsgCreateEvaluation:
 			return handleMsgCreateEvaluation(ctx, k, fk, bk, msg)
 		case MsgWithdrawFunds:
-			return handleMsgWithdrawFunds(ctx, k, bk, pk, ethClient, msg)
+			return handleMsgWithdrawFunds(ctx, k, bk, pk, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -70,7 +69,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCr
 }
 
 func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
-	pk params.Keeper, ethClient ixo.EthClient, msg MsgUpdateProjectStatus) sdk.Result {
+	pk params.Keeper, msg MsgUpdateProjectStatus) sdk.Result {
 
 	existingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
@@ -84,7 +83,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	if newStatus == FundedStatus {
 		// TODO: get funding amount from MsgUpdateProjectStatus or add a new MsgFundProject
-		funding := sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(100))
+		funding := sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(100000))
 		res := fundProject(ctx, k, bk, existingProjectDoc, funding)
 		if res.Code != sdk.CodeOK {
 			return res
@@ -92,7 +91,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 
 	if newStatus == PaidoutStatus {
-		res := payoutFees(ctx, k, bk, pk, ethClient, existingProjectDoc.GetProjectDid())
+		res := payoutFees(ctx, k, bk, pk, existingProjectDoc.GetProjectDid())
 		if res.Code != sdk.CodeOK {
 			return res
 		}
@@ -107,14 +106,15 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 }
 
 func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient, projectDid ixo.Did) sdk.Result {
+	projectDid ixo.Did) sdk.Result {
 
-	_, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
-	if err != nil {
-		return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
-	}
+	// TODO
+	//_, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
+	//if err != nil {
+	//	return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
+	//}
 
-	_, err = payAllFeesToAddress(ctx, k, bk, projectDid, IxoAccountPayFeesId, IxoAccountFeesId)
+	_, err := payAllFeesToAddress(ctx, k, bk, projectDid, IxoAccountPayFeesId, IxoAccountFeesId)
 	if err != nil {
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
@@ -129,9 +129,10 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
 
-	ixoEthWallet := "" // TODO (contracts): ck.GetContract(ctx, contracts.KeyFoundationWallet)
+	// TODO (contracts): ixoEthWallet := ck.GetContract(ctx, contracts.KeyFoundationWallet)
 
-	return payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, IxoAccountFeesId, ixoEthWallet)
+	// TODO: return payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, IxoAccountFeesId, ixoEthWallet)
+	return sdk.Result{}
 }
 
 func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
@@ -262,8 +263,8 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 	}
 }
 
-func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
-	ethClient ixo.EthClient, msg MsgWithdrawFunds) sdk.Result {
+func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
+	pk params.Keeper, msg MsgWithdrawFunds) sdk.Result {
 
 	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
 	projectDoc, err := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
@@ -275,54 +276,56 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params
 		return sdk.ErrUnknownRequest("Project not in PAIDOUT Status").Result()
 	}
 
-	ethWalletAddress := withdrawFundsDoc.GetEthWallet()
-	projectDid := withdrawFundsDoc.GetProjectDid()
+	// TODO: implement below code
 
-	var payoutResult sdk.Result
-	if withdrawFundsDoc.IsRefund {
-		payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, projectDid, ethWalletAddress)
-	} else {
-		senderDid := msg.GetSenderDid()
-		payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, senderDid, ethWalletAddress)
-	}
+	//ethWalletAddress := withdrawFundsDoc.GetEthWallet()
+	//projectDid := withdrawFundsDoc.GetProjectDid()
 
-	return payoutResult
+	//var payoutResult sdk.Result
+	//if withdrawFundsDoc.IsRefund {
+	//	payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, projectDid, ethWalletAddress)
+	//} else {
+	//	senderDid := msg.GetSenderDid()
+	//	payoutResult = payoutERC20AndRecon(ctx, k, bk, pk, ethClient, projectDid, senderDid, ethWalletAddress)
+	//}
+
+	return sdk.Result{}
 }
 
-func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient,
-	projectDid ixo.Did, accountID string, recipientEthAddress string) sdk.Result {
-
-	balanceToPay := getIxoAmount(ctx, k, bk, projectDid, accountID)
-	if balanceToPay > 0 {
-		projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
-		if err != nil {
-			return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
-		}
-
-		account, errRes := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
-		if errRes != nil {
-			return errRes.Result()
-		}
-
-		// TODO: Why is balanceToPay is added to account and removed right after??
-		_, err = bk.AddCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
-		if err != nil {
-		}
-
-		_, err = bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
-		if err != nil {
-			return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
-		}
-
-		_, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
-
-		addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
-	}
-
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
-}
+//func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper, ethClient ixo.EthClient,
+//	projectDid ixo.Did, accountID string, recipientEthAddress string) sdk.Result {
+//
+//	balanceToPay := getIxoAmount(ctx, k, bk, projectDid, accountID)
+//	if balanceToPay > 0 {
+//		projectEthWallet, err := ethClient.ProjectWalletFromProjectRegistry(ctx, projectDid)
+//		if err != nil {
+//			return sdk.ErrUnknownRequest("Could not find Project Ethereum wallet").Result()
+//		}
+//
+//		account, errRes := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
+//		if errRes != nil {
+//			return errRes.Result()
+//		}
+//
+//		// TODO: Why is balanceToPay is added to account and removed right after??
+//		_, err = bk.AddCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
+//		if err != nil {
+//		}
+//
+//		_, err = bk.SubtractCoins(ctx, account, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, balanceToPay)})
+//		if err != nil {
+//			return sdk.ErrUnknownRequest("Could not burn tokens from " + account.String()).Result()
+//		}
+//
+//		_, actionID := ethClient.InitiateTokenTransfer(ctx, pk, projectEthWallet, recipientEthAddress, balanceToPay)
+//
+//		addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
+//	}
+//
+//	return sdk.Result{
+//		Code: sdk.CodeOK,
+//	}
+//}
 
 func fundProject(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDoc StoredProjectDoc, coin sdk.Coin) sdk.Result {
 	fmt.Printf("PROJECT_FUNDING func fundProject(_, _, _, _, [coin.Amount: %d, coin.Denom: %s])",
