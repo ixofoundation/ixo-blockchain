@@ -87,53 +87,6 @@ type DidDoc interface {
 
 type Project = string
 
-type EthWallet struct {
-	Address    string `json:"address"`
-	PrivateKey string `json:"privateKey"`
-}
-
-type AddEthWalletDoc struct {
-	Id            string `json:"id"`
-	WalletAddress string `json:"walletAddress"`
-}
-
-type MsgAddEthWallet struct {
-	SignBytes string          `json:"signBytes"`
-	SignerDid Did             `json:"signerDid"`
-	Data      AddEthWalletDoc `json:"data"`
-}
-
-func NewAddEthWalletMsg(id string, wallet string) MsgAddEthWallet {
-	addEthWalletDoc := AddEthWalletDoc{
-		Id:            id,
-		WalletAddress: wallet,
-	}
-	return MsgAddEthWallet{
-		Data: addEthWalletDoc,
-	}
-}
-
-var _ sdk.Msg = MsgAddEthWallet{}
-
-// nolint
-func (msg MsgAddEthWallet) Type() string                            { return "ixo" }
-func (msg MsgAddEthWallet) Route() string                           { return "ixo" }
-func (msg MsgAddEthWallet) Get(key interface{}) (value interface{}) { return nil }
-func (msg MsgAddEthWallet) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.SignerDid)}
-}
-func (msg MsgAddEthWallet) String() string {
-	return fmt.Sprintf("MsgAddEthWallet{Wallet: %v}", string(msg.Data.WalletAddress))
-}
-
-func (msg MsgAddEthWallet) ValidateBasic() sdk.Error {
-	return nil
-}
-
-func (msg MsgAddEthWallet) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
-}
-
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 	return func(txBytes []byte) (sdk.Tx, sdk.Error) {
 
