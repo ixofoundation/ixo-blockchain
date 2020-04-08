@@ -82,9 +82,11 @@ func (k Keeper) MustGetBondByKey(ctx sdk.Context, key []byte) types.Bond {
 	if !store.Has(key) {
 		panic("bond not found")
 	}
+
 	bz := store.Get(key)
 	var bond types.Bond
 	k.cdc.MustUnmarshalBinaryBare(bz, &bond)
+
 	return bond
 }
 

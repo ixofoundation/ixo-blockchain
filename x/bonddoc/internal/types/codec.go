@@ -7,6 +7,7 @@ import (
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateBond{}, "bonddoc/CreateBond", nil)
 	cdc.RegisterConcrete(MsgUpdateBondStatus{}, "bonddoc/UpdateBondStatus", nil)
+	cdc.RegisterInterface((*StoredBondDoc)(nil), nil)
 }
 
 // ModuleCdc is the codec for the module

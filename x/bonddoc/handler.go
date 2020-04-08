@@ -1,7 +1,10 @@
 package bonddoc
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -24,10 +27,10 @@ func NewHandler(k Keeper) sdk.Handler {
 
 func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Result {
 
-	err := k.SetBondDoc(ctx, &msg)
-	if err != nil {
-		return err.Result()
+	if k.BondDocExists(ctx, msg.GetBondDid()) {
+		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Bond doc already exists")).Result()
 	}
+	k.SetBondDoc(ctx, &msg)
 
 	return sdk.Result{
 		Code: sdk.CodeOK,

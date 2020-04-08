@@ -108,7 +108,7 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		txs := []types.WithdrawalInfo{}
+		var txs []types.WithdrawalInfo
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 

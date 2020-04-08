@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -16,7 +16,7 @@ func TestQueryDidDocs(t *testing.T) {
 	err := k.SetDidDoc(ctx, &types.ValidDidDoc)
 	require.Nil(t, err)
 
-	query := abciTypes.RequestQuery{
+	query := abci.RequestQuery{
 		Path: "",
 		Data: []byte{},
 	}

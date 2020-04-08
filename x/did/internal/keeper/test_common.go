@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
@@ -18,7 +18,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
 	_ = ms.LoadLatestVersion()
-	ctx := sdk.NewContext(ms, abciTypes.Header{}, true, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
 	cdc := codec.New()
 	keeper := NewKeeper(cdc, storeKey)
 
