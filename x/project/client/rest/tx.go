@@ -95,7 +95,6 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		txHash := r.URL.Query().Get("txHash")
 		senderDid := r.URL.Query().Get("senderDid")
 		status := r.URL.Query().Get("status")
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
@@ -118,17 +117,17 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 			projectStatus != types.StartedStatus &&
 			projectStatus != types.StoppedStatus &&
 			projectStatus != types.PaidoutStatus {
-			_, _ = w.Write([]byte("The status must be one of 'CREATED', 'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'"))
+			_, _ = w.Write([]byte("The status must be one of 'CREATED', " +
+				"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'"))
 
 			return
 		}
 
 		updateProjectStatusDoc := types.UpdateProjectStatusDoc{
-			Status:          projectStatus,
-			EthFundingTxnID: txHash,
+			Status: projectStatus,
 		}
 
-		msg := types.NewMsgUpdateProjectStatus(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
+		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, sovrinDid)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))

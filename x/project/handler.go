@@ -72,40 +72,34 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCr
 func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	pk params.Keeper, ethClient ixo.EthClient, msg MsgUpdateProjectStatus) sdk.Result {
 
-	ExistingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	existingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
 	newStatus := msg.GetStatus()
-	if !newStatus.IsValidProgressionFrom(ExistingProjectDoc.GetStatus()) {
+	if !newStatus.IsValidProgressionFrom(existingProjectDoc.GetStatus()) {
 		return sdk.ErrUnknownRequest("Invalid Status Progression requested").Result()
 	}
 
 	if newStatus == FundedStatus {
-		ethFundingTxnID := msg.GetEthFundingTxnID()
-		ctx.Logger().Info("Provided ethFundingTxnID: ", ethFundingTxnID)
-		if ethFundingTxnID == "" {
-			ctx.Logger().Error("ETH tx not valid isFundingTx")
-
-			return sdk.ErrUnknownRequest("Invalid EthFundingTxnID provided").Result()
-		}
-
-		res := fundIfLegitimateEthereumTx(ctx, k, bk, ethClient, ethFundingTxnID, ExistingProjectDoc)
+		// TODO: get funding amount from MsgUpdateProjectStatus or add a new MsgFundProject
+		funding := sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(100))
+		res := fundProject(ctx, k, bk, existingProjectDoc, funding)
 		if res.Code != sdk.CodeOK {
 			return res
 		}
 	}
 
 	if newStatus == PaidoutStatus {
-		res := payoutFees(ctx, k, bk, pk, ethClient, ExistingProjectDoc.GetProjectDid())
+		res := payoutFees(ctx, k, bk, pk, ethClient, existingProjectDoc.GetProjectDid())
 		if res.Code != sdk.CodeOK {
 			return res
 		}
 	}
 
-	ExistingProjectDoc.SetStatus(newStatus)
-	_, _ = k.UpdateProjectDoc(ctx, ExistingProjectDoc)
+	existingProjectDoc.SetStatus(newStatus)
+	_, _ = k.UpdateProjectDoc(ctx, existingProjectDoc)
 
 	return sdk.Result{
 		Code: sdk.CodeOK,
@@ -328,26 +322,6 @@ func payoutERC20AndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Ke
 	return sdk.Result{
 		Code: sdk.CodeOK,
 	}
-}
-
-func fundIfLegitimateEthereumTx(ctx sdk.Context, k Keeper, bk bank.Keeper, ethClient ixo.EthClient,
-	ethFundingTxnID string, ExistingProjectDoc StoredProjectDoc) sdk.Result {
-
-	ethTx, err := ethClient.GetTransactionByHash(ethFundingTxnID)
-	if err != nil {
-		return sdk.ErrUnknownRequest("ETH tx not valid: Could not get transaction: " + ethFundingTxnID).Result()
-	}
-
-	isFundingTx := ethClient.IsProjectFundingTx(ctx, ExistingProjectDoc.GetProjectDid(), ethTx)
-	if !isFundingTx {
-		return sdk.ErrUnknownRequest("ETH tx not valid. Not a valid project funding transaction").Result()
-	}
-
-	amt := ethClient.GetFundingAmt(ethTx)
-	fmt.Println("PROJECT_FUNDING", "amt: ", amt)
-	coin := sdk.NewInt64Coin(ixo.IxoNativeToken, amt)
-
-	return fundProject(ctx, k, bk, ExistingProjectDoc, coin)
 }
 
 func fundProject(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDoc StoredProjectDoc, coin sdk.Coin) sdk.Result {

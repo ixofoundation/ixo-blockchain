@@ -83,37 +83,36 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateProjectStatus [tx-hash] [sender-did] [status] [sovrin-did]",
+		Use:   "updateProjectStatus [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a project signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
+			if len(args) != 3 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 {
 				return errors.New("You must provide the status and the projects private key")
 			}
 
-			txHash := args[0]
-			senderDid := args[1]
+			senderDid := args[0]
+			status := args[1]
+			sovrinDid := unmarshalSovrinDID(args[2])
 
-			projectStatus := types.ProjectStatus(args[2])
+			projectStatus := types.ProjectStatus(status)
 			if projectStatus != types.CreatedProject &&
 				projectStatus != types.PendingStatus &&
 				projectStatus != types.FundedStatus &&
 				projectStatus != types.StartedStatus &&
 				projectStatus != types.StoppedStatus &&
 				projectStatus != types.PaidoutStatus {
-				return errors.New("The status must be one of 'CREATED', 'PENDING', 'FUNDED', 'STARTED'," +
-					" 'STOPPED' or 'PAIDOUT'")
+				return errors.New("The status must be one of 'CREATED', " +
+					"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
 			}
 
 			updateProjectStatusDoc := types.UpdateProjectStatusDoc{
-				Status:          projectStatus,
-				EthFundingTxnID: txHash,
+				Status: projectStatus,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewMsgUpdateProjectStatus(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
+			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

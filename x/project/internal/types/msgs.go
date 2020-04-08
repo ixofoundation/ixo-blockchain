@@ -83,7 +83,6 @@ var _ StoredProjectDoc = (*MsgCreateProject)(nil)
 
 type MsgUpdateProjectStatus struct {
 	SignBytes  string                 `json:"signBytes"`
-	TxHash     string                 `json:"txHash"`
 	SenderDid  ixo.Did                `json:"senderDid"`
 	ProjectDid ixo.Did                `json:"projectDid"`
 	Data       UpdateProjectStatusDoc `json:"data"`
@@ -111,9 +110,6 @@ func (ups MsgUpdateProjectStatus) GetStatus() ProjectStatus {
 
 func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
 func (msg MsgUpdateProjectStatus) IsWithdrawal() bool { return false }
-func (msg MsgUpdateProjectStatus) GetEthFundingTxnID() string {
-	return msg.Data.EthFundingTxnID
-}
 
 type MsgCreateAgent struct {
 	SignBytes  string         `json:"signBytes"`

@@ -73,10 +73,6 @@ type UpdateProjectStatusDoc struct {
 	EthFundingTxnID string        `json:"ethFundingTxnID"`
 }
 
-func (ps UpdateProjectStatusDoc) GetEthFundingTxnID() string {
-	return ps.EthFundingTxnID
-}
-
 type ProjectDoc struct {
 	NodeDid              string        `json:"nodeDid"`
 	RequiredClaims       string        `json:"requiredClaims"`
