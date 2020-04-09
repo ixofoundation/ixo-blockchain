@@ -46,18 +46,18 @@ var AllFees = []string{
 
 type GenesisState struct {
 	IxoFactor sdk.Dec `json:"ixoFactor"`
-	
+
 	InitiationFeeAmount         sdk.Dec `json:"initiationFeeAmount"`
 	InitiationNodeFeePercentage sdk.Dec `json:"initiationNodeFeePercentage"`
-	
+
 	ClaimFeeAmount      sdk.Dec `json:"claimFeeAmount"`
 	EvaluationFeeAmount sdk.Dec `json:"evaluationFeeAmount"`
-	
+
 	ServiceAgentRegistrationFeeAmount    sdk.Dec `json:"serviceAgentRegistrationFeeAmount"`
 	EvaluationAgentRegistrationFeeAmount sdk.Dec `json:"evaluationAgentRegistrationFeeAmount"`
-	
+
 	NodeFeePercentage sdk.Dec `json:"nodeFeePercentage"`
-	
+
 	EvaluationPayFeePercentage     sdk.Dec `json:"evaluationPayFeePercentage"`
 	EvaluationPayNodeFeePercentage sdk.Dec `json:"evaluationPayNodeFeePercentage"`
 }

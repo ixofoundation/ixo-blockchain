@@ -14,7 +14,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-func GetBondDocCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdBondDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getBondDoc [did]",
 		Short: "Query BondDoc for a DID",
@@ -35,7 +35,7 @@ func GetBondDocCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var bondDoc types.CreateBondMsg
+			var bondDoc types.MsgCreateBond
 			err = cdc.UnmarshalJSON(res, &bondDoc)
 			if err != nil {
 				return err

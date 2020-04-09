@@ -14,7 +14,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-func GetAddressFromDidCmd() *cobra.Command {
+func GetCmdAddressFromDid() *cobra.Command {
 	return &cobra.Command{
 		Use:   "getAddressFromDid [did]",
 		Short: "Query for an account address by DID",
@@ -27,7 +27,7 @@ func GetAddressFromDidCmd() *cobra.Command {
 	}
 }
 
-func GetDidDocCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getDidDoc [did]",
 		Short: "Query DidDoc for a DID",
@@ -68,7 +68,7 @@ func GetDidDocCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetAllDidsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getAllDids",
 		Short: "Query all DIDs",
@@ -81,7 +81,7 @@ func GetAllDidsCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			didDids := []ixo.Did{}
+			var didDids []ixo.Did
 			err = cdc.UnmarshalJSON(res, &didDids)
 			if err != nil {
 				return err
@@ -98,7 +98,7 @@ func GetAllDidsCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetAllDidDocsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdAllDidDocs(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getAllDidDocs",
 		Short: "Query all DID documents",

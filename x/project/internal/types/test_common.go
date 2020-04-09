@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var ValidCreateProjectMsg = CreateProjectMsg{
+var ValidCreateProjectMsg = MsgCreateProject{
 	SignBytes:  "SampleSignBytes",
 	TxHash:     "SampleTxBytes",
 	SenderDid:  "SenderDid",
@@ -21,7 +21,7 @@ var ValidCreateProjectMsg = CreateProjectMsg{
 	},
 }
 
-var ValidUpdateProjectMsg = CreateProjectMsg{
+var ValidUpdateProjectMsg = MsgCreateProject{
 	SignBytes:  "UpdatedSignBytes",
 	TxHash:     "UpdatedTxBytes",
 	SenderDid:  "SenderDid",

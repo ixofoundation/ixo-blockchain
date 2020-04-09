@@ -14,10 +14,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
-	tmTypes "github.com/tendermint/tendermint/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/ixofoundation/ixo-cosmos/app"
@@ -71,7 +71,7 @@ func main() {
 	}
 }
 
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abciTypes.Application {
+func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
 	return app.NewIxoApp(logger, db, traceStore, true, invCheckPeriod,
 		baseapp.SetPruning(store.NewPruningOptionsFromString(viper.GetString("pruning"))),
 		baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
@@ -79,7 +79,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abciTypes.Applic
 }
 
 func exportAppStateAndTMValidators(logger log.Logger, db dbm.DB, traceStore io.Writer, height int64,
-	forZeroHeight bool, jailWhiteList []string) (json.RawMessage, []tmTypes.GenesisValidator, error) {
+	forZeroHeight bool, jailWhiteList []string) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
 		nsApp := app.NewIxoApp(logger, db, traceStore, false, uint(2))

@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	cParams "github.com/cosmos/cosmos-sdk/x/params"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmDB "github.com/tendermint/tm-db"
 
@@ -32,7 +32,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	ms.MountStoreWithDB(keyFee, sdk.StoreTypeIAVL, nil)
 	_ = ms.LoadLatestVersion()
 
-	ctx := sdk.NewContext(ms, abciTypes.Header{}, true, log.NewNopLogger())
+	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
 	cdc := MakeTestCodec()
 
 	paramsKeeper := params.NewKeeper(cdc, keyParam)

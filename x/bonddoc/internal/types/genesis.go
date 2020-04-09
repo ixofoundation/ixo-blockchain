@@ -1,14 +1,12 @@
 package types
 
-import "github.com/ixofoundation/ixo-cosmos/x/ixo"
-
 type GenesisState struct {
-	DidDocs []ixo.DidDoc `json:"did_docs" yaml:"did_docs"`
+	BondDocs []MsgCreateBond `json:"bond_docs" yaml:"bond_docs"`
 }
 
-func NewGenesisState(didDocs []ixo.DidDoc) GenesisState {
+func NewGenesisState(bondDocs []MsgCreateBond) GenesisState {
 	return GenesisState{
-		DidDocs: didDocs,
+		BondDocs: bondDocs,
 	}
 }
 
@@ -19,6 +17,6 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		DidDocs: nil,
+		BondDocs: nil,
 	}
 }

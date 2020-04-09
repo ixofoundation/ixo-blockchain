@@ -67,6 +67,5 @@ func NewAnteHandler(bondsKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
 		}
 
 		return ctx, sdk.Result{}, false // continue...
-
 	}
 }

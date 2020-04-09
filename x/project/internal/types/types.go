@@ -14,7 +14,7 @@ type Config struct {
 	WithdrawalsPrefix string
 }
 
-type AccountMap map[string]interface{}
+type AccountMap map[string]sdk.AccAddress
 
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
@@ -73,10 +73,6 @@ type UpdateProjectStatusDoc struct {
 	EthFundingTxnID string        `json:"ethFundingTxnID"`
 }
 
-func (ps UpdateProjectStatusDoc) GetEthFundingTxnID() string {
-	return ps.EthFundingTxnID
-}
-
 type ProjectDoc struct {
 	NodeDid              string        `json:"nodeDid"`
 	RequiredClaims       string        `json:"requiredClaims"`
@@ -107,7 +103,7 @@ func GetProjectDocDecoder(cdc *codec.Codec) ProjectDocDecoder {
 		if len(projectDocBytes) == 0 {
 			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
 		}
-		projectDoc := CreateProjectMsg{}
+		projectDoc := MsgCreateProject{}
 		err = cdc.UnmarshalBinaryLengthPrefixed(projectDocBytes, &projectDoc)
 		if err != nil {
 			panic(err)

@@ -80,7 +80,7 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		dids := []ixo.Did{}
+		var dids []ixo.Did
 		cliCtx.Codec.MustUnmarshalJSON(res, &dids)
 
 		rest.PostProcessResponse(w, cliCtx.Codec, dids, true)
@@ -107,7 +107,7 @@ func queryAllDidDocsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		didDocs := []types.BaseDidDoc{}
+		var didDocs []types.BaseDidDoc
 		cliCtx.Codec.MustUnmarshalJSON(res, &didDocs)
 
 		rest.PostProcessResponse(w, cliCtx.Codec, didDocs, true)

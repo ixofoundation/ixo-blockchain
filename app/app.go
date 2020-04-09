@@ -22,19 +22,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
-	tmTypes "github.com/tendermint/tendermint/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/ixofoundation/ixo-cosmos/x/bonddoc"
 	"github.com/ixofoundation/ixo-cosmos/x/bonds"
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/node"
 	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
@@ -61,10 +59,8 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
-		contracts.AppModuleBasic{},
 		did.AppModuleBasic{},
 		fees.AppModuleBasic{},
-		node.AppModuleBasic{},
 		params.AppModuleBasic{},
 		project.AppModuleBasic{},
 		bonddoc.AppModuleBasic{},
@@ -110,17 +106,14 @@ type ixoApp struct {
 	crisisKeeper       crisis.Keeper
 	cParamsKeeper      cParams.Keeper
 
-	contractKeeper contracts.Keeper
-	didKeeper      did.Keeper
-	feesKeeper     fees.Keeper
-	nodeKeeper     node.Keeper
-	paramsKeepr    params.Keeper
-	projectKeeper  project.Keeper
-	bonddocKeeper  bonddoc.Keeper
-	bondsKeeper    bonds.Keeper
+	didKeeper     did.Keeper
+	feesKeeper    fees.Keeper
+	paramsKeeper  params.Keeper
+	projectKeeper project.Keeper
+	bonddocKeeper bonddoc.Keeper
+	bondsKeeper   bonds.Keeper
 
-	mm        *module.Manager
-	ethClient ixo.EthClient
+	mm *module.Manager
 }
 
 func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
@@ -133,8 +126,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
-		gov.StoreKey, cParams.StoreKey, contracts.StoreKey, did.StoreKey, fees.StoreKey,
-		node.StoreKey, params.StoreKey, project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
+		gov.StoreKey, cParams.StoreKey, did.StoreKey, fees.StoreKey,
+		params.StoreKey, project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, cParams.TStoreKey)
 
@@ -179,20 +172,11 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		app.slashingKeeper.Hooks()))
 
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paramsKeepr = params.NewKeeper(app.cdc, keys[params.StoreKey])
-	app.feesKeeper = fees.NewKeeper(app.cdc, app.paramsKeepr)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey])
+	app.feesKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
-	app.nodeKeeper = node.NewKeeper(app.cdc, app.paramsKeepr)
-	app.contractKeeper = contracts.NewKeeper(app.cdc, app.paramsKeepr)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
-
-	newEthClient, cErr := ixo.NewEthClient(app.contractKeeper)
-	if cErr != nil {
-		panic(cErr)
-	}
-
-	app.ethClient = newEthClient
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
@@ -207,13 +191,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
 
-		contracts.NewAppModule(app.contractKeeper),
 		did.NewAppModule(app.didKeeper),
 		fees.NewAppModule(app.feesKeeper),
-		node.NewAppModule(app.nodeKeeper),
-		params.NewAppModule(app.paramsKeepr),
-		project.NewAppModule(app.projectKeeper, app.feesKeeper,
-			app.contractKeeper, app.bankKeeper, app.paramsKeepr, app.ethClient),
+		params.NewAppModule(app.paramsKeeper),
+		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper, app.paramsKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 	)
@@ -225,8 +206,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
-		contracts.ModuleName, node.ModuleName, params.ModuleName, bonddoc.ModuleName,
-		bonds.ModuleName)
+		params.ModuleName, bonddoc.ModuleName, bonds.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
@@ -249,15 +229,15 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	return app
 }
 
-func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abciTypes.RequestBeginBlock) abciTypes.ResponseBeginBlock {
+func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
-func (app *ixoApp) EndBlocker(ctx sdk.Context, req abciTypes.RequestEndBlock) abciTypes.ResponseEndBlock {
+func (app *ixoApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
-func (app *ixoApp) InitChainer(ctx sdk.Context, req abciTypes.RequestInitChain) abciTypes.ResponseInitChain {
+func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState map[string]json.RawMessage
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
 
@@ -278,9 +258,9 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 }
 
 func (app *ixoApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string) (appState json.RawMessage,
-	validators []tmTypes.GenesisValidator, err error) {
+	validators []tmtypes.GenesisValidator, err error) {
 
-	ctx := app.NewContext(true, abciTypes.Header{Height: app.LastBlockHeight()})
+	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
 	genState := app.mm.ExportGenesis(ctx)
 	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
 	if err != nil {

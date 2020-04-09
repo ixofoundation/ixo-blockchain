@@ -1,7 +1,10 @@
 package bonddoc
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
@@ -12,29 +15,29 @@ func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
-		case CreateBondMsg:
-			return handleCreateBondMsg(ctx, k, msg)
-		case UpdateBondStatusMsg:
-			return handleUpdateBondStatusMsg(ctx, k, msg)
+		case MsgCreateBond:
+			return handleMsgCreateBond(ctx, k, msg)
+		case MsgUpdateBondStatus:
+			return handleMsgUpdateBondStatus(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 	}
 }
 
-func handleCreateBondMsg(ctx sdk.Context, k Keeper, msg CreateBondMsg) sdk.Result {
+func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Result {
 
-	err := k.SetBondDoc(ctx, &msg)
-	if err != nil {
-		return err.Result()
+	if k.BondDocExists(ctx, msg.GetBondDid()) {
+		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Bond doc already exists")).Result()
 	}
+	k.SetBondDoc(ctx, &msg)
 
 	return sdk.Result{
 		Code: sdk.CodeOK,
 	}
 }
 
-func handleUpdateBondStatusMsg(ctx sdk.Context, k Keeper, msg UpdateBondStatusMsg) sdk.Result {
+func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatus) sdk.Result {
 
 	ExistingBondDoc, err := getBondDoc(ctx, k, msg.GetBondDid())
 	if err != nil {

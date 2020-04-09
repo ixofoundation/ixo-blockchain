@@ -10,7 +10,7 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-	
+
 	DefaultCodeSpace = types.DefaultCodeSpace
 )
 
@@ -21,9 +21,13 @@ type (
 )
 
 var (
-	NewKeeper                               = keeper.NewKeeper
-	ModuleCdc                               = types.ModuleCdc
-	NewQuerier                              = keeper.NewQuerier
+	// function aliases
+	NewKeeper  = keeper.NewKeeper
+	NewQuerier = keeper.NewQuerier
+
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
+
 	KeyIxoFactor                            = types.KeyIxoFactor
 	KeyNodeFeePercentage                    = types.KeyNodeFeePercentage
 	FeeClaimTransaction                     = types.FeeClaimTransaction
@@ -36,6 +40,6 @@ var (
 	KeyEvaluationAgentRegistrationFeeAmount = types.KeyEvaluationAgentRegistrationFeeAmount
 	KeyEvaluationPayFeePercentage           = types.KeyEvaluationPayFeePercentage
 	KeyEvaluationPayNodeFeePercentage       = types.KeyEvaluationPayNodeFeePercentage
-	
+
 	DefaultGenesisState = types.DefaultGenesis
 )

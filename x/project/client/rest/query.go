@@ -48,7 +48,7 @@ func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var projectDoc types.CreateProjectMsg
+		var projectDoc types.MsgCreateProject
 		cliCtx.Codec.MustUnmarshalJSON(res, &projectDoc)
 
 		bz, err := json.Marshal(projectDoc)
@@ -108,7 +108,7 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		txs := []types.WithdrawalInfo{}
+		var txs []types.WithdrawalInfo
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 

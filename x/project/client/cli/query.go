@@ -14,7 +14,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 )
 
-func GetProjectDocCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getProjectDoc [did]",
 		Short: "Query ProjectDoc for a DID",
@@ -35,7 +35,7 @@ func GetProjectDocCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var projectDoc types.CreateProjectMsg
+			var projectDoc types.MsgCreateProject
 			err = cdc.UnmarshalJSON(res, &projectDoc)
 			if err != nil {
 				return err
@@ -52,7 +52,7 @@ func GetProjectDocCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetProjectAccountsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getProjectAccounts [did]",
 		Short: "Get a Project accounts for a Did",
@@ -94,7 +94,7 @@ func GetProjectAccountsCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetProjectTxsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getProjectTxs [project-did]",
 		Short: "Get a Project txs for a projectDid",
@@ -113,7 +113,7 @@ func GetProjectTxsCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			txs := []types.WithdrawalInfo{}
+			var txs []types.WithdrawalInfo
 			if len(res) == 0 {
 				return errors.New("projectTxs does not exist for a projectDid")
 			} else {

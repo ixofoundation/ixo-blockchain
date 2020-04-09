@@ -1,16 +1,15 @@
 package keeper
 
 import (
-	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 
-	didTypes "github.com/ixofoundation/ixo-cosmos/x/did"
+	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 )
@@ -31,33 +30,45 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, accountKeeper auth.AccountKee
 	}
 }
 
+func (k Keeper) GetProjectDocIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.ProjectKey)
+}
+
+func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.StoredProjectDoc {
+	store := ctx.KVStore(k.storeKey)
+	if !store.Has(key) {
+		panic("project doc not found")
+	}
+
+	bz := store.Get(key)
+	var projectDoc types.MsgCreateProject
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
+
+	return &projectDoc
+}
+
+func (k Keeper) ProjectDocExists(ctx sdk.Context, projectDid ixo.Did) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.GetProjectPrefixKey(projectDid))
+}
+
 func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid ixo.Did) (types.StoredProjectDoc, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectPrefixKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, didTypes.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid ProjectDid Address")
+		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid ProjectDid Address")
 	}
 
-	var projectDoc types.CreateProjectMsg
+	var projectDoc types.MsgCreateProject
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
 	return &projectDoc, nil
 }
 
-func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.StoredProjectDoc) sdk.Error {
-	existedDoc, err := k.GetProjectDoc(ctx, projectDoc.GetProjectDid())
-	if existedDoc != nil {
-		return didTypes.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Project already exists %s", err))
-	}
-
-	k.AddProjectDoc(ctx, projectDoc)
-
-	return nil
-}
-
-func (k Keeper) AddProjectDoc(ctx sdk.Context, projectDoc types.StoredProjectDoc) {
+func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.StoredProjectDoc) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectPrefixKey(projectDoc.GetProjectDid())
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(projectDoc))
@@ -67,25 +78,34 @@ func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc types.StoredProj
 	existedDoc, _ := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
 	if existedDoc == nil {
 
-		return nil, didTypes.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc details are not exist")
+		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc details are not exist")
 	} else {
 
 		existedDoc.SetStatus(newProjectDoc.GetStatus())
-		k.AddProjectDoc(ctx, newProjectDoc)
+		k.SetProjectDoc(ctx, newProjectDoc)
 
 		return newProjectDoc, nil
 	}
 }
 
-func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) map[string]interface{} {
+func (k Keeper) SetAccountMap(ctx sdk.Context, projectDid ixo.Did, accountMap types.AccountMap) {
+	store := ctx.KVStore(k.storeKey)
+	bz, err := json.Marshal(accountMap)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(types.GetAccountPrefixKey(projectDid), bz)
+}
+
+func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) types.AccountMap {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetAccountPrefixKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return make(map[string]interface{})
+		return make(map[string]sdk.AccAddress)
 	} else {
-		var accountMap map[string]interface{}
+		var accountMap map[string]sdk.AccAddress
 		if err := json.Unmarshal(bz, &accountMap); err != nil {
 			panic(err)
 		}
@@ -103,7 +123,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetAccountPrefixKey(projectDid)
-	accountMap[accountId] = string(account.GetAddress().Bytes())
+	accountMap[accountId] = account.GetAddress()
 
 	bz, err := json.Marshal(accountMap)
 	if err != nil {
@@ -114,9 +134,8 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) (auth.Account, sdk.Error) {
-	src := []byte(projectDid + "/" + accountId)
-	hexAddress := hex.EncodeToString(src)
-	address := sdk.AccAddress(hexAddress)
+	key := projectDid + "/" + accountId
+	address := sdk.AccAddress(crypto.AddressHash([]byte(key)))
 
 	if k.accountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")
@@ -128,15 +147,21 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId 
 	return account, nil
 }
 
+func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo.Did, txs []types.WithdrawalInfo) {
+	store := ctx.KVStore(k.storeKey)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(txs)
+	store.Set(types.GetWithdrawalPrefixKey(projectDid), bz)
+}
+
 func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo.Did) ([]types.WithdrawalInfo, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetWithdrawalPrefixKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, didTypes.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc doesn't exist")
 	} else {
-		txs := []types.WithdrawalInfo{}
+		var txs []types.WithdrawalInfo
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
 
 		return txs, nil
