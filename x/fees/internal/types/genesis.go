@@ -1,43 +1,26 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+type GenesisState struct {
+	Params Params `json:"params" yaml:"params"` // inflation params
+}
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-)
-
-func DefaultGenesis() GenesisState {
-	ixoFactor := sdk.OneDec() // 1
-
-	initiationFeeAmount := sdk.NewDec(500).Mul(ixo.IxoDecimals) // 500
-	initiationNodeFeePercentage := sdk.ZeroDec()                // 0
-
-	claimFeeAmount := sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)      // 0.6
-	evaluationFeeAmount := sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals) // 0.4
-
-	serviceAgentRegistrationFeeAmount := sdk.ZeroDec().Mul(ixo.IxoDecimals)    // 0
-	evaluationAgentRegistrationFeeAmount := sdk.ZeroDec().Mul(ixo.IxoDecimals) // 0
-
-	nodeFeePercentage := sdk.NewDec(5).Quo(sdk.NewDec(10)) // 0.5
-
-	evaluationPayFeePercentage := sdk.NewDec(1).Quo(sdk.NewDec(10))     // 0.1  TODO : Can change this value
-	evaluationPayNodeFeePercentage := sdk.NewDec(2).Quo(sdk.NewDec(10)) // 0.2  TODO : Can change this value
-
+func NewGenesisState(params Params) GenesisState {
 	return GenesisState{
-		IxoFactor: ixoFactor,
+		Params: params,
+	}
+}
 
-		InitiationFeeAmount:         initiationFeeAmount,
-		InitiationNodeFeePercentage: initiationNodeFeePercentage,
+func ValidateGenesis(data GenesisState) error {
+	err := ValidateParams(data.Params)
+	if err != nil {
+		return err
+	}
 
-		ClaimFeeAmount:      claimFeeAmount,
-		EvaluationFeeAmount: evaluationFeeAmount,
+	return nil
+}
 
-		ServiceAgentRegistrationFeeAmount:    serviceAgentRegistrationFeeAmount,
-		EvaluationAgentRegistrationFeeAmount: evaluationAgentRegistrationFeeAmount,
-
-		NodeFeePercentage: nodeFeePercentage,
-
-		EvaluationPayFeePercentage:     evaluationPayFeePercentage,
-		EvaluationPayNodeFeePercentage: evaluationPayNodeFeePercentage,
+func DefaultGenesisState() GenesisState {
+	return GenesisState{
+		Params: DefaultParams(),
 	}
 }

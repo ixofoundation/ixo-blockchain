@@ -17,7 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/mint"
-	cParams "github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsClient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -33,7 +33,6 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
 )
 
@@ -54,14 +53,13 @@ var (
 		mint.AppModuleBasic{},
 		distribution.AppModuleBasic{},
 		gov.NewAppModuleBasic(paramsClient.ProposalHandler, distribution.ProposalHandler),
-		cParams.AppModuleBasic{},
+		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
 		did.AppModuleBasic{},
 		fees.AppModuleBasic{},
-		params.AppModuleBasic{},
 		project.AppModuleBasic{},
 		bonddoc.AppModuleBasic{},
 		bonds.AppModuleBasic{},
@@ -104,11 +102,10 @@ type ixoApp struct {
 	govKeeper          gov.Keeper
 	mintKeeper         mint.Keeper
 	crisisKeeper       crisis.Keeper
-	cParamsKeeper      cParams.Keeper
+	paramsKeeper       params.Keeper
 
 	didKeeper     did.Keeper
 	feesKeeper    fees.Keeper
-	paramsKeeper  params.Keeper
 	projectKeeper project.Keeper
 	bonddocKeeper bonddoc.Keeper
 	bondsKeeper   bonds.Keeper
@@ -126,10 +123,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
-		gov.StoreKey, cParams.StoreKey, did.StoreKey, fees.StoreKey,
-		params.StoreKey, project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
+		gov.StoreKey, params.StoreKey, did.StoreKey, fees.StoreKey,
+		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
 
-	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, cParams.TStoreKey)
+	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	app := &ixoApp{
 		BaseApp:        bApp,
@@ -139,15 +136,16 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		tKeys:          tKeys,
 	}
 
-	app.cParamsKeeper = cParams.NewKeeper(app.cdc, keys[cParams.StoreKey], tKeys[cParams.TStoreKey], cParams.DefaultCodespace)
-	authSubspace := app.cParamsKeeper.Subspace(auth.DefaultParamspace)
-	bankSubspace := app.cParamsKeeper.Subspace(bank.DefaultParamspace)
-	stakingSubspace := app.cParamsKeeper.Subspace(staking.DefaultParamspace)
-	mintSubspace := app.cParamsKeeper.Subspace(mint.DefaultParamspace)
-	distrSubspace := app.cParamsKeeper.Subspace(distribution.DefaultParamspace)
-	slashingSubspace := app.cParamsKeeper.Subspace(slashing.DefaultParamspace)
-	govSubspace := app.cParamsKeeper.Subspace(gov.DefaultParamspace)
-	crisisSubspace := app.cParamsKeeper.Subspace(crisis.DefaultParamspace)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tKeys[params.TStoreKey], params.DefaultCodespace)
+	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
+	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
+	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
+	mintSubspace := app.paramsKeeper.Subspace(mint.DefaultParamspace)
+	distrSubspace := app.paramsKeeper.Subspace(distribution.DefaultParamspace)
+	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
+	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace)
+	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
+	feesSubspace := app.paramsKeeper.Subspace(fees.DefaultParamspace)
 
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
 	app.bankKeeper = bank.NewBaseKeeper(app.accountKeeper, bankSubspace, bank.DefaultCodespace, app.ModuleAccountAddrs())
@@ -163,17 +161,16 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
-		AddRoute(cParams.RouterKey, cParams.NewParamChangeProposalHandler(app.cParamsKeeper)).
+		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
 		AddRoute(distribution.RouterKey, distribution.NewCommunityPoolSpendProposalHandler(app.distributionKeeper))
-	app.govKeeper = gov.NewKeeper(app.cdc, keys[gov.StoreKey], app.cParamsKeeper, govSubspace,
+	app.govKeeper = gov.NewKeeper(app.cdc, keys[gov.StoreKey], app.paramsKeeper, govSubspace,
 		app.supplyKeeper, &stakingKeeper, gov.DefaultCodespace, govRouter)
 
 	app.stakingKeeper = *stakingKeeper.SetHooks(staking.NewMultiStakingHooks(app.distributionKeeper.Hooks(),
 		app.slashingKeeper.Hooks()))
 
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey])
-	app.feesKeeper = fees.NewKeeper(app.cdc, app.paramsKeeper)
+	app.feesKeeper = fees.NewKeeper(app.cdc, feesSubspace)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.accountKeeper, app.feesKeeper)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
@@ -193,8 +190,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 		did.NewAppModule(app.didKeeper),
 		fees.NewAppModule(app.feesKeeper),
-		params.NewAppModule(app.paramsKeeper),
-		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper, app.paramsKeeper),
+		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 	)
@@ -206,7 +202,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
-		params.ModuleName, bonddoc.ModuleName, bonds.ModuleName)
+		bonddoc.ModuleName, bonds.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())

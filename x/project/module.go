@@ -14,7 +14,6 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project/client/cli"
 	"github.com/ixofoundation/ixo-cosmos/x/project/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
@@ -94,21 +93,18 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper       keeper.Keeper
-	feesKeeper   fees.Keeper
-	bankKeeper   bank.Keeper
-	paramsKeeper params.Keeper
+	keeper     keeper.Keeper
+	feesKeeper fees.Keeper
+	bankKeeper bank.Keeper
 }
 
-func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper,
-	paramsKeeper params.Keeper) AppModule {
+func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 		feesKeeper:     feesKeeper,
 		bankKeeper:     bankKeeper,
-		paramsKeeper:   paramsKeeper,
 	}
 }
 
@@ -123,7 +119,7 @@ func (AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper, am.paramsKeeper)
+	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper)
 }
 
 func (AppModule) QuerierRoute() string {

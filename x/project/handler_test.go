@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
@@ -18,14 +17,16 @@ import (
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, keeper, cdc, feesKeeper, bankKeeper, _ := keeper.CreateTestInput()
+	ctx, keeper, cdc, feesKeeper, bankKeeper := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	feesKeeper.SetDec(ctx, fees.KeyIxoFactor, sdk.OneDec())
-	feesKeeper.SetDec(ctx, fees.KeyNodeFeePercentage, sdk.ZeroDec())
-	feesKeeper.SetDec(ctx, fees.KeyClaimFeeAmount, sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals))
+	params := feesKeeper.GetParams(ctx)
+	params.IxoFactor = sdk.OneDec()
+	params.NodeFeePercentage = sdk.ZeroDec()
+	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
+	feesKeeper.SetParams(ctx, params)
 	projectMsg := types.MsgCreateClaim{
 		SignBytes:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -39,7 +40,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 }
 
 func TestHandler_ProjectMsg(t *testing.T) {
-	ctx, keeper, cdc, _, _, _ := keeper.CreateTestInput()
+	ctx, keeper, cdc, _, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
@@ -56,19 +57,21 @@ func TestHandler_ProjectMsg(t *testing.T) {
 
 }
 func Test_CreateEvaluation(t *testing.T) {
-	ctx, k, cdc, fk, bk, _ := keeper.CreateTestInput()
+	ctx, k, cdc, fk, bk := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateEvaluation{}, "ixo/createEvaluationMsg", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	fk.SetDec(ctx, fees.KeyIxoFactor, sdk.OneDec())
-	fk.SetDec(ctx, fees.KeyNodeFeePercentage, sdk.NewDec(5).Quo(sdk.NewDec(10)))
-	fk.SetDec(ctx, fees.KeyClaimFeeAmount, sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals))
-	fk.SetDec(ctx, fees.KeyEvaluationFeeAmount, sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)) // 0.4
-	fk.SetDec(ctx, fees.KeyEvaluationPayFeePercentage, sdk.ZeroDec())
-	fk.SetDec(ctx, fees.KeyEvaluationPayNodeFeePercentage, sdk.NewDec(5).Quo(sdk.NewDec(10)))
+	params := fk.GetParams(ctx)
+	params.IxoFactor = sdk.OneDec()
+	params.NodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
+	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
+	params.EvaluationFeeAmount = sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals) // 0.4
+	params.EvaluationPayFeePercentage = sdk.ZeroDec()
+	params.EvaluationPayNodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
+	fk.SetParams(ctx, params)
 
 	evaluationMsg := types.MsgCreateEvaluation{
 		SignBytes:  "",
@@ -109,7 +112,7 @@ func Test_CreateEvaluation(t *testing.T) {
 }
 
 func Test_WithdrawFunds(t *testing.T) {
-	ctx, k, cdc, _, bk, pk := keeper.CreateTestInput()
+	ctx, k, cdc, _, bk := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
@@ -154,7 +157,6 @@ func Test_WithdrawFunds(t *testing.T) {
 
 	_ = msg
 	_ = bk
-	_ = pk
 
 	//ethClient, err1 := ixo.NewEthClient()
 	//require.Nil(t, err1)

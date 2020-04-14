@@ -14,7 +14,7 @@ import (
 )
 
 func TestQueryProjectDoc(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
@@ -40,7 +40,7 @@ func TestQueryProjectDoc(t *testing.T) {
 }
 
 func TestQueryProjectAccounts(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
@@ -76,7 +76,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 }
 
 func TestQueryTxs(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
