@@ -12,10 +12,7 @@ import (
 )
 
 func TestProjectDoc(t *testing.T) {
-	ctx, k, _, _, _, _ := CreateTestInput()
-
-	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
-	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
+	ctx, k, _, _, _ := CreateTestInput()
 
 	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
 	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
@@ -35,7 +32,7 @@ func TestProjectDoc(t *testing.T) {
 }
 
 func TestKeeperAccountMap(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
@@ -55,7 +52,7 @@ func TestKeeperAccountMap(t *testing.T) {
 }
 
 func TestKeeperWithdrawalInfo(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 
 	withdrawals, err := k.GetProjectWithdrawalTransactions(ctx, "")

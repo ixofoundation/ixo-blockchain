@@ -15,7 +15,7 @@ func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
-			keeper.QueryFees), nil)
+			keeper.QueryParams), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
@@ -23,15 +23,14 @@ func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		fees := make(map[string]int64)
-		err = cliCtx.Codec.UnmarshalJSON(bz, &fees)
-		if err != nil {
+		var params types.Params
+		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, fees)
+		rest.PostProcessResponse(w, cliCtx, params)
 	}
 }

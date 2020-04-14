@@ -3,41 +3,29 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/ixofoundation/ixo-cosmos/x/params"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
 )
 
 type Keeper struct {
-	cdc          *codec.Codec
-	paramsKeeper params.Keeper
+	cdc        *codec.Codec
+	paramSpace params.Subspace
 }
 
-func NewKeeper(cdc *codec.Codec, paramsKeeper params.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, paramSpace params.Subspace) Keeper {
 	return Keeper{
-		cdc:          cdc,
-		paramsKeeper: paramsKeeper,
+		cdc:        cdc,
+		paramSpace: paramSpace.WithKeyTable(types.ParamKeyTable()),
 	}
 }
 
-func InitKeeper(cdc *codec.Codec, paramsKeeper params.Keeper) Keeper {
-	k := NewKeeper(cdc, paramsKeeper)
-
-	return k
+// GetParams returns the total set of fees parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+	k.paramSpace.GetParamSet(ctx, &params)
+	return params
 }
 
-func (k Keeper) SetDec(ctx sdk.Context, key string, value sdk.Dec) {
-	k.paramsKeeper.Setter().SetDec(ctx, MakeFeeKey(key), value)
-}
-
-func (k Keeper) GetDec(ctx sdk.Context, key string) sdk.Dec {
-	dec, err := k.paramsKeeper.Getter().GetDec(ctx, MakeFeeKey(key))
-	if err != nil {
-		panic(err)
-	}
-
-	return dec
-}
-
-func MakeFeeKey(key string) string {
-	return "fee/" + key
+// SetParams sets the total set of fees parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
+	k.paramSpace.SetParamSet(ctx, &params)
 }

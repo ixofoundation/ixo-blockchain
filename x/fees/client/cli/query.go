@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -21,19 +20,13 @@ func GetFeesRequestHandler(cdc *codec.Codec) *cobra.Command {
 				WithCodec(cdc)
 
 			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
-				keeper.QueryFees), nil)
+				keeper.QueryParams), nil)
 			if err != nil {
 				return err
 			}
 
-			fees := make(map[string]int64)
-			err = cliCtx.Codec.UnmarshalJSON(bz, &fees)
-			if err != nil {
-				return err
-			}
-
-			bz, err = json.MarshalIndent(fees, "", "  ")
-			if err != nil {
+			var params types.Params
+			if err := cdc.UnmarshalJSON(bz, &params); err != nil {
 				return err
 			}
 

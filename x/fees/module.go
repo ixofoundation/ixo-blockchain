@@ -17,7 +17,6 @@ import (
 
 	"github.com/ixofoundation/ixo-cosmos/x/fees/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
 )
 
 var (
@@ -35,7 +34,7 @@ func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
 }
 
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-	return ModuleCdc.MustMarshalJSON(types.DefaultGenesis())
+	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
@@ -104,13 +103,13 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
 	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, DefaultGenesisState())
-
+	InitGenesis(ctx, am.keeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
-	return nil
+	gs := ExportGenesis(ctx, am.keeper)
+	return ModuleCdc.MustMarshalJSON(gs)
 }
 
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {

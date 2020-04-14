@@ -11,7 +11,6 @@ import (
 
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/params"
 )
 
 type InternalAccountID = string
@@ -23,7 +22,7 @@ const (
 	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
 
-func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper, pk params.Keeper) sdk.Handler {
+func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -31,7 +30,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper, pk params.Keeper) sdk.
 		case MsgCreateProject:
 			return handleMsgCreateProject(ctx, k, msg)
 		case MsgUpdateProjectStatus:
-			return handleMsgUpdateProjectStatus(ctx, k, bk, pk, msg)
+			return handleMsgUpdateProjectStatus(ctx, k, bk, msg)
 		case MsgCreateAgent:
 			return handleMsgCreateAgent(ctx, k, bk, msg)
 		case MsgUpdateAgent:
@@ -41,7 +40,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper, pk params.Keeper) sdk.
 		case MsgCreateEvaluation:
 			return handleMsgCreateEvaluation(ctx, k, fk, bk, msg)
 		case MsgWithdrawFunds:
-			return handleMsgWithdrawFunds(ctx, k, bk, pk, msg)
+			return handleMsgWithdrawFunds(ctx, k, bk, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -71,7 +70,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 }
 
 func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
-	pk params.Keeper, msg MsgUpdateProjectStatus) sdk.Result {
+	msg MsgUpdateProjectStatus) sdk.Result {
 
 	existingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
@@ -93,7 +92,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 
 	if newStatus == PaidoutStatus {
-		res := payoutFees(ctx, k, bk, pk, existingProjectDoc.GetProjectDid())
+		res := payoutFees(ctx, k, bk, existingProjectDoc.GetProjectDid())
 		if res.Code != sdk.CodeOK {
 			return res
 		}
@@ -107,7 +106,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 }
 
-func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, pk params.Keeper,
+func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	projectDid ixo.Did) sdk.Result {
 
 	// TODO
@@ -235,8 +234,8 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 			ixoAddr, _ = getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountPayFeesId)
 		}
 
-		feePercentage := fk.GetDec(ctx, fees.KeyEvaluationPayFeePercentage)
-		nodeFeePercentage := fk.GetDec(ctx, fees.KeyEvaluationPayNodeFeePercentage)
+		feePercentage := fk.GetParams(ctx).EvaluationPayFeePercentage
+		nodeFeePercentage := fk.GetParams(ctx).EvaluationPayNodeFeePercentage
 
 		totalEvaluatorPayAmount := sdk.NewDec(projectDoc.GetEvaluatorPay()).Mul(ixo.IxoDecimals) // This is in IXO * 10^8
 		evaluatorPayFeeAmount := totalEvaluatorPayAmount.Mul(feePercentage)
@@ -266,7 +265,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 }
 
 func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
-	pk params.Keeper, msg MsgWithdrawFunds) sdk.Result {
+	msg MsgWithdrawFunds) sdk.Result {
 
 	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
 	projectDoc, err := getProjectDoc(ctx, k, withdrawFundsDoc.GetProjectDid())
@@ -373,15 +372,15 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 		ixoAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
 	}
 
-	ixoFactor := fk.GetDec(ctx, fees.KeyIxoFactor)
-	nodePercentage := fk.GetDec(ctx, fees.KeyNodeFeePercentage)
+	ixoFactor := fk.GetParams(ctx).IxoFactor
+	nodePercentage := fk.GetParams(ctx).NodeFeePercentage
 	var adjustedFeeAmount sdk.Dec
 
 	switch feeType {
 	case fees.FeeClaimTransaction:
-		adjustedFeeAmount = fk.GetDec(ctx, fees.KeyClaimFeeAmount).Mul(ixoFactor)
+		adjustedFeeAmount = fk.GetParams(ctx).ClaimFeeAmount.Mul(ixoFactor)
 	case fees.FeeEvaluationTransaction:
-		adjustedFeeAmount = fk.GetDec(ctx, fees.KeyEvaluationFeeAmount).Mul(ixoFactor)
+		adjustedFeeAmount = fk.GetParams(ctx).EvaluationFeeAmount.Mul(ixoFactor)
 	default:
 		return sdk.Result{}, sdk.ErrUnknownRequest("Invalid Fee type.")
 	}

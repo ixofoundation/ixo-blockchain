@@ -1,8 +1,9 @@
 package types
 
 const (
-	ModuleName   = "fees"
-	StoreKey     = ModuleName
-	RouterKey    = StoreKey
-	QuerierRoute = RouterKey
+	ModuleName        = "fees"
+	DefaultParamspace = ModuleName
+	StoreKey          = ModuleName
+	RouterKey         = StoreKey
+	QuerierRoute      = RouterKey
 )
