@@ -86,6 +86,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		cli.GetCmdProjectDoc(cdc),
 		cli.GetCmdProjectAccounts(cdc),
 		cli.GetCmdProjectTxs(cdc),
+		cli.GetParamsRequestHandler(cdc),
 	)...)
 
 	return projectQueryCmd

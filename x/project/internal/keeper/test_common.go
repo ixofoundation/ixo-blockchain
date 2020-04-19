@@ -38,9 +38,13 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	accountKeeper := auth.NewAccountKeeper(
 		cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount,
 	)
+
+	feesSubspace := pk1.Subspace(fees.DefaultParamspace)
+	projectSubspace := pk1.Subspace(types.DefaultParamspace)
+
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
-	feeKeeper := fees.NewKeeper(cdc, pk1.Subspace(fees.DefaultParamspace))
-	keeper := NewKeeper(cdc, storeKey, accountKeeper, feeKeeper)
+	feeKeeper := fees.NewKeeper(cdc, feesSubspace)
+	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, feeKeeper)
 
 	feeKeeper.SetParams(ctx, fees.DefaultParams())
 
