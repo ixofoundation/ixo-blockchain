@@ -8,8 +8,8 @@ import (
 )
 
 type MsgAddDid struct {
-	DidDoc    BaseDidDoc `json:"didDoc"`
-	SignBytes string     `json:"signBytes"`
+	DidDoc    BaseDidDoc `json:"didDoc" yaml:"didDoc"`
+	SignBytes string     `json:"signBytes" yaml:"signBytes"`
 }
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
@@ -63,7 +63,7 @@ func (msg MsgAddDid) String() string {
 func (msg MsgAddDid) IsNewDid() bool { return true }
 
 type MsgAddCredential struct {
-	DidCredential DidCredential `json:"credential"`
+	DidCredential DidCredential `json:"credential" yaml:"credential"`
 }
 
 func NewMsgAddCredential(did string, credType []string, issuer string, issued string) MsgAddCredential {

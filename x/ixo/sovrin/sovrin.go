@@ -16,9 +16,9 @@ import (
 )
 
 type SovrinSecret struct {
-	Seed                 string `json:"seed"`
-	SignKey              string `json:"signKey"`
-	EncryptionPrivateKey string `json:"encryptionPrivateKey"`
+	Seed                 string `json:"seed" yaml:"seed"`
+	SignKey              string `json:"signKey" yaml:"signKey"`
+	EncryptionPrivateKey string `json:"encryptionPrivateKey" yaml:"encryptionPrivateKey"`
 }
 
 func (ss SovrinSecret) String() string {
@@ -31,10 +31,10 @@ func (ss SovrinSecret) String() string {
 }
 
 type SovrinDid struct {
-	Did                 string       `json:"did"`
-	VerifyKey           string       `json:"verifyKey"`
-	EncryptionPublicKey string       `json:"encryptionPublicKey"`
-	Secret              SovrinSecret `json:"secret"`
+	Did                 string       `json:"did" yaml:"did"`
+	VerifyKey           string       `json:"verifyKey" yaml:"verifyKey"`
+	EncryptionPublicKey string       `json:"encryptionPublicKey" yaml:"encryptionPublicKey"`
+	Secret              SovrinSecret `json:"secret" yaml:"secret"`
 }
 
 func (sd SovrinDid) String() string {

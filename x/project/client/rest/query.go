@@ -16,9 +16,9 @@ import (
 )
 
 type AccDetails struct {
-	Did     string  `json:"did"`
-	Account string  `json:"account"`
-	Balance sdk.Int `json:"balance"`
+	Did     string  `json:"did" yaml:"did"`
+	Account string  `json:"account" yaml:"account"`
+	Balance sdk.Int `json:"balance" yaml:"balance"`
 }
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {

@@ -16,13 +16,13 @@ var IxoDecimals = sdk.NewDec(100000000)
 const IxoNativeToken = "ixo"
 
 type IxoTx struct {
-	Msgs       []sdk.Msg      `json:"payload"`
-	Signatures []IxoSignature `json:"signatures"`
+	Msgs       []sdk.Msg      `json:"payload" yaml:"payload"`
+	Signatures []IxoSignature `json:"signatures" yaml:"signatures"`
 }
 
 type IxoSignature struct {
-	SignatureValue [64]byte  `json:"signatureValue"`
-	Created        time.Time `json:"created"`
+	SignatureValue [64]byte  `json:"signatureValue" yaml:"signatureValue"`
+	Created        time.Time `json:"created" yaml:"created"`
 }
 
 func NewSignature(created time.Time, signature [64]byte) IxoSignature {
