@@ -34,6 +34,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project"
+	"github.com/ixofoundation/ixo-cosmos/x/treasury"
 )
 
 const (
@@ -63,6 +64,7 @@ var (
 		project.AppModuleBasic{},
 		bonddoc.AppModuleBasic{},
 		bonds.AppModuleBasic{},
+		treasury.AppModuleBasic{},
 	)
 
 	maccPerms = map[string][]string{
@@ -124,7 +126,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, did.StoreKey, fees.StoreKey,
-		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey)
+		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey, treasury.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -194,6 +196,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
+		treasury.NewAppModule(app.bankKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName, bonds.ModuleName)
@@ -203,7 +206,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
-		bonddoc.ModuleName, bonds.ModuleName)
+		bonddoc.ModuleName, bonds.ModuleName, treasury.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
@@ -275,6 +278,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
 	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
 	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
+	treasuryAnteHandler := treasury.NewAnteHandler(app.didKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
@@ -287,6 +291,8 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			return bonddocAnteHandler(ctx, tx, false)
 		case bonds.ModuleName:
 			return bondsAnteHandler(ctx, tx, false)
+		case treasury.ModuleName:
+			return treasuryAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, true)
 		}
