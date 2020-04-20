@@ -62,25 +62,25 @@ func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectSta
 }
 
 type WithdrawalInfo struct {
-	ActionID            string `json:"actionID"`
-	ProjectEthWallet    string `json:"projectEthWallet"`
-	RecipientEthAddress string `json:"recipientEthAddress"`
-	Amount              int64  `json:"amount"`
+	ActionID            string `json:"actionID" yaml:"actionID"`
+	ProjectEthWallet    string `json:"projectEthWallet" yaml:"projectEthWallet"`
+	RecipientEthAddress string `json:"recipientEthAddress" yaml:"recipientEthAddress"`
+	Amount              int64  `json:"amount" yaml:"amount"`
 }
 
 type UpdateProjectStatusDoc struct {
-	Status          ProjectStatus `json:"status"`
-	EthFundingTxnID string        `json:"ethFundingTxnID"`
+	Status          ProjectStatus `json:"status" yaml:"status"`
+	EthFundingTxnID string        `json:"ethFundingTxnID" yaml:"ethFundingTxnID"`
 }
 
 type ProjectDoc struct {
-	NodeDid              string        `json:"nodeDid"`
-	RequiredClaims       string        `json:"requiredClaims"`
-	EvaluatorPayPerClaim string        `json:"evaluatorPayPerClaim"`
-	ServiceEndpoint      string        `json:"serviceEndpoint"`
-	CreatedOn            string        `json:"createdOn"`
-	CreatedBy            string        `json:"createdBy"`
-	Status               ProjectStatus `json:"status"`
+	NodeDid              string        `json:"nodeDid" yaml:"nodeDid"`
+	RequiredClaims       string        `json:"requiredClaims" yaml:"requiredClaims"`
+	EvaluatorPayPerClaim string        `json:"evaluatorPayPerClaim" yaml:"evaluatorPayPerClaim"`
+	ServiceEndpoint      string        `json:"serviceEndpoint" yaml:"serviceEndpoint"`
+	CreatedOn            string        `json:"createdOn" yaml:"createdOn"`
+	CreatedBy            string        `json:"createdBy" yaml:"createdBy"`
+	Status               ProjectStatus `json:"status" yaml:"status"`
 }
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
@@ -114,8 +114,8 @@ func GetProjectDocDecoder(cdc *codec.Codec) ProjectDocDecoder {
 }
 
 type CreateAgentDoc struct {
-	AgentDid ixo.Did `json:"did"`
-	Role     string  `json:"role"`
+	AgentDid ixo.Did `json:"did" yaml:"did"`
+	Role     string  `json:"role" yaml:"role"`
 }
 
 type AgentStatus string
@@ -127,13 +127,13 @@ const (
 )
 
 type UpdateAgentDoc struct {
-	Did    ixo.Did     `json:"did"`
-	Status AgentStatus `json:"status"`
-	Role   string      `json:"role"`
+	Did    ixo.Did     `json:"did" yaml:"did"`
+	Status AgentStatus `json:"status" yaml:"status"`
+	Role   string      `json:"role" yaml:"role"`
 }
 
 type CreateClaimDoc struct {
-	ClaimID string `json:"claimID"`
+	ClaimID string `json:"claimID" yaml:"claimIDyaml:"claimID"`
 }
 
 type ClaimStatus string
@@ -145,15 +145,15 @@ const (
 )
 
 type CreateEvaluationDoc struct {
-	ClaimID string      `json:"claimID"`
-	Status  ClaimStatus `json:"status"`
+	ClaimID string      `json:"claimID" yaml:"claimID"`
+	Status  ClaimStatus `json:"status" yaml:"status"`
 }
 
 type WithdrawFundsDoc struct {
-	ProjectDid ixo.Did `json:"projectDid"`
-	EthWallet  string  `json:"ethWallet"`
-	Amount     string  `json:"amount"`
-	IsRefund   bool    `json:"isRefund"`
+	ProjectDid ixo.Did `json:"projectDid" yaml:"projectDid"`
+	EthWallet  string  `json:"ethWallet" yaml:"ethWallet"`
+	Amount     string  `json:"amount" yaml:"amount"`
+	IsRefund   bool    `json:"isRefund" yaml:"isRefund"`
 }
 
 func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }

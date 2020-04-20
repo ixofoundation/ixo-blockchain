@@ -50,13 +50,13 @@ func (nextBondStatus BondStatus) IsValidProgressionFrom(previousBondStatus BondS
 }
 
 type UpdateBondStatusDoc struct {
-	Status BondStatus `json:"status"`
+	Status BondStatus `json:"status" yaml:"status"`
 }
 
 type BondDoc struct {
-	CreatedOn string     `json:"createdOn"`
-	CreatedBy string     `json:"createdBy"`
-	Status    BondStatus `json:"status"`
+	CreatedOn string     `json:"createdOn" yaml:"createdOn"`
+	CreatedBy string     `json:"createdBy" yaml:"createdBy"`
+	Status    BondStatus `json:"status" yaml:"status"`
 }
 
 type BondDocDecoder func(bondEntryBytes []byte) (StoredBondDoc, error)
