@@ -28,9 +28,9 @@ yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 1000
 yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000stake,1000000res,1000000rez,1000000ixo
 
 # Add DID-based genesis accounts
-MIGUEL_ADDR="cosmos1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"    # address from 4XJLBfGtWSGKSz4BeRxdun
-FRANCESCO_ADDR="cosmos16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5" # address from UKzkhVSHc3qEFva5EY2XHt
-SHAUN_ADDR="cosmos1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"     # address from U4tSpzzv91HHqWW1YmFkHJ
+MIGUEL_ADDR="ixo1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"    # address from 4XJLBfGtWSGKSz4BeRxdun
+FRANCESCO_ADDR="ixo16ne06jpdr3eu2a3uv3etwxavw0q03sqscjdcj5" # address from UKzkhVSHc3qEFva5EY2XHt
+SHAUN_ADDR="ixo1vc9v45u8rc946tn3j06c0glhx9q0llx2u3uuan"     # address from U4tSpzzv91HHqWW1YmFkHJ
 yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez,1000000ixo
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000stake,1000000res,1000000rez,1000000ixo
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000stake,1000000res,1000000rez,1000000ixo

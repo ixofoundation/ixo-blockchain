@@ -38,7 +38,14 @@ import (
 )
 
 const (
-	appName = "ixoApp"
+	appName              = "ixoApp"
+	Bech32MainPrefix     = "ixo"
+	Bech32PrefixAccAddr  = Bech32MainPrefix
+	Bech32PrefixAccPub   = Bech32MainPrefix + sdk.PrefixPublic
+	Bech32PrefixValAddr  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator
+	Bech32PrefixValPub   = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
+	Bech32PrefixConsAddr = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus
+	Bech32PrefixConsPub  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
 )
 
 var (
