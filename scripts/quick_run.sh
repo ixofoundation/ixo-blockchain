@@ -11,7 +11,7 @@ yes $PASSWORD | ixocli keys add miguel
 yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000stake,1000000res,1000000rez,1000000ixo
 
 # Add DID-based genesis account
-MIGUEL_ADDR="ixo1yhfwr0u62dpy35hl4e6nxarysuuwrwhxmle95m"    # address from 4XJLBfGtWSGKSz4BeRxdun
+MIGUEL_ADDR="ixo1x2x0thq6x2rx7txl0ujpyg9rr0c8mc8ad904xw" # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun
 yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez,1000000ixo
 
 ixocli config chain-id pandora-1
