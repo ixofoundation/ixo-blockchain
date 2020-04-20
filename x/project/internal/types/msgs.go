@@ -9,12 +9,12 @@ import (
 )
 
 type MsgCreateProject struct {
-	SignBytes  string     `json:"signBytes"`
-	TxHash     string     `json:"txHash"`
-	SenderDid  ixo.Did    `json:"senderDid"`
-	ProjectDid ixo.Did    `json:"projectDid"`
-	PubKey     string     `json:"pubKey"`
-	Data       ProjectDoc `json:"data"`
+	SignBytes  string     `json:"signBytes" yaml:"signBytes"`
+	TxHash     string     `json:"txHash" yaml:"txHash"`
+	SenderDid  ixo.Did    `json:"senderDid" yaml:"senderDid"`
+	ProjectDid ixo.Did    `json:"projectDid" yaml:"projectDid"`
+	PubKey     string     `json:"pubKey" yaml:"pubKey"`
+	Data       ProjectDoc `json:"data" yaml:"data"`
 }
 
 var _ sdk.Msg = MsgCreateProject{}
@@ -82,10 +82,10 @@ func (msg MsgCreateProject) IsWithdrawal() bool { return false }
 var _ StoredProjectDoc = (*MsgCreateProject)(nil)
 
 type MsgUpdateProjectStatus struct {
-	SignBytes  string                 `json:"signBytes"`
-	SenderDid  ixo.Did                `json:"senderDid"`
-	ProjectDid ixo.Did                `json:"projectDid"`
-	Data       UpdateProjectStatusDoc `json:"data"`
+	SignBytes  string                 `json:"signBytes" yaml:"signBytes"`
+	SenderDid  ixo.Did                `json:"senderDid" yaml:"senderDid"`
+	ProjectDid ixo.Did                `json:"projectDid" yaml:"projectDid"`
+	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgUpdateProjectStatus) Type() string                            { return ModuleName }
@@ -112,11 +112,11 @@ func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
 func (msg MsgUpdateProjectStatus) IsWithdrawal() bool { return false }
 
 type MsgCreateAgent struct {
-	SignBytes  string         `json:"signBytes"`
-	TxHash     string         `json:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid"`
-	Data       CreateAgentDoc `json:"data"`
+	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
+	TxHash     string         `json:"txHash" yaml:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	Data       CreateAgentDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgCreateAgent) IsNewDid() bool                          { return false }
@@ -149,11 +149,11 @@ func (msg MsgCreateAgent) String() string {
 var _ sdk.Msg = MsgCreateAgent{}
 
 type MsgUpdateAgent struct {
-	SignBytes  string         `json:"signBytes"`
-	TxHash     string         `json:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid"`
-	Data       UpdateAgentDoc `json:"data"`
+	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
+	TxHash     string         `json:"txHash" yaml:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgUpdateAgent) IsNewDid() bool                          { return false }
@@ -187,11 +187,11 @@ func (msg MsgUpdateAgent) String() string {
 var _ sdk.Msg = MsgUpdateAgent{}
 
 type MsgCreateClaim struct {
-	SignBytes  string         `json:"signBytes"`
-	TxHash     string         `json:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid"`
-	Data       CreateClaimDoc `json:"data"`
+	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
+	TxHash     string         `json:"txHash" yaml:"txHash"`
+	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgCreateClaim) IsNewDid() bool                          { return false }
@@ -225,11 +225,11 @@ func (msg MsgCreateClaim) String() string {
 var _ sdk.Msg = MsgCreateClaim{}
 
 type MsgCreateEvaluation struct {
-	SignBytes  string              `json:"signBytes"`
-	TxHash     string              `json:"txHash"`
-	SenderDid  ixo.Did             `json:"senderDid"`
-	ProjectDid ixo.Did             `json:"projectDid"`
-	Data       CreateEvaluationDoc `json:"data"`
+	SignBytes  string              `json:"signBytes" yaml:"signBytes"`
+	TxHash     string              `json:"txHash" yaml:"txHash"`
+	SenderDid  ixo.Did             `json:"senderDid" yaml:"senderDid"`
+	ProjectDid ixo.Did             `json:"projectDid" yaml:"projectDid"`
+	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgCreateEvaluation) IsNewDid() bool                          { return false }
@@ -263,9 +263,9 @@ func (msg MsgCreateEvaluation) String() string {
 var _ sdk.Msg = MsgCreateEvaluation{}
 
 type MsgWithdrawFunds struct {
-	SignBytes string           `json:"signBytes"`
-	SenderDid ixo.Did          `json:"senderDid"`
-	Data      WithdrawFundsDoc `json:"data"`
+	SignBytes string           `json:"signBytes" yaml:"signBytes"`
+	SenderDid ixo.Did          `json:"senderDid" yaml:"senderDid"`
+	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgWithdrawFunds) IsNewDid() bool                          { return false }

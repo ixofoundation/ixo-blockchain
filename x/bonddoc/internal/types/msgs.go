@@ -9,12 +9,12 @@ import (
 )
 
 type MsgCreateBond struct {
-	SignBytes string  `json:"signBytes"`
-	TxHash    string  `json:"txHash"`
-	SenderDid ixo.Did `json:"senderDid"`
-	BondDid   ixo.Did `json:"bondDid"`
-	PubKey    string  `json:"pubKey"`
-	Data      BondDoc `json:"data"`
+	SignBytes string  `json:"signBytes" yaml:"signBytes"`
+	TxHash    string  `json:"txHash" yaml:"txHash"`
+	SenderDid ixo.Did `json:"senderDid" yaml:"senderDid"`
+	BondDid   ixo.Did `json:"bondDid" yaml:"bondDid"`
+	PubKey    string  `json:"pubKey" yaml:"pubKey"`
+	Data      BondDoc `json:"data" yaml:"data"`
 }
 
 var _ sdk.Msg = MsgCreateBond{}
@@ -70,11 +70,11 @@ func (msg MsgCreateBond) IsNewDid() bool { return true }
 var _ StoredBondDoc = (*MsgCreateBond)(nil)
 
 type MsgUpdateBondStatus struct {
-	SignBytes string              `json:"signBytes"`
-	TxHash    string              `json:"txHash"`
-	SenderDid ixo.Did             `json:"senderDid"`
-	BondDid   ixo.Did             `json:"bondDid"`
-	Data      UpdateBondStatusDoc `json:"data"`
+	SignBytes string              `json:"signBytes" yaml:"signBytes"`
+	TxHash    string              `json:"txHash" yaml:"txHash"`
+	SenderDid ixo.Did             `json:"senderDid" yaml:"senderDid"`
+	BondDid   ixo.Did             `json:"bondDid" yaml:"bondDid"`
+	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`
 }
 
 func (msg MsgUpdateBondStatus) Type() string                            { return ModuleName }

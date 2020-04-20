@@ -9,21 +9,21 @@ import (
 var _ ixo.DidDoc = (*BaseDidDoc)(nil)
 
 type BaseDidDoc struct {
-	Did         ixo.Did         `json:"did"`
-	PubKey      string          `json:"pubKey"`
-	Credentials []DidCredential `json:"credentials"`
+	Did         ixo.Did         `json:"did" yaml:"did"`
+	PubKey      string          `json:"pubKey" yaml:"pubKey"`
+	Credentials []DidCredential `json:"credentials" yaml:"credentials"`
 }
 
 type DidCredential struct {
-	CredType []string `json:"type"`
-	Issuer   ixo.Did  `json:"issuer"`
-	Issued   string   `json:"issued"`
-	Claim    Claim    `json:"claim"`
+	CredType []string `json:"type" yaml:"type"`
+	Issuer   ixo.Did  `json:"issuer" yaml:"issuer"`
+	Issued   string   `json:"issued" yaml:"issued"`
+	Claim    Claim    `json:"claim" yaml:"claim"`
 }
 
 type Claim struct {
-	Id           ixo.Did `json:"id"`
-	KYCValidated bool    `json:"KYCValidated"`
+	Id           ixo.Did `json:"id" yaml:"id"`
+	KYCValidated bool    `json:"KYCValidated" yaml:"KYCValidated"`
 }
 
 type Credential struct{}
