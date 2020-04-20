@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// InitGenesis new mint genesis
+// InitGenesis new fees genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	keeper.SetParams(ctx, data.Params)
 }

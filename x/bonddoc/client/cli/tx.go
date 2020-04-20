@@ -74,7 +74,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[1])
-			msg := types.NewCreateBondMsg(bondDoc, sovrinDid)
+			msg := types.NewMsgCreateBond(bondDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -112,7 +112,7 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewUpdateBondStatusMsg(txHash, senderDid, updateBondStatusDoc, sovrinDid)
+			msg := types.NewMsgUpdateBondStatus(txHash, senderDid, updateBondStatusDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

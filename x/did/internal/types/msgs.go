@@ -12,7 +12,7 @@ type MsgAddDid struct {
 	SignBytes string     `json:"signBytes" yaml:"signBytes"`
 }
 
-func NewAddDidMsg(did string, publicKey string) MsgAddDid {
+func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	didDoc := BaseDidDoc{
 		Did:         did,
 		PubKey:      publicKey,

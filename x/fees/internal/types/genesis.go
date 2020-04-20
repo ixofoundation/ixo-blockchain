@@ -1,7 +1,7 @@
 package types
 
 type GenesisState struct {
-	Params Params `json:"params" yaml:"params"` // inflation params
+	Params Params `json:"params" yaml:"params"`
 }
 
 func NewGenesisState(params Params) GenesisState {

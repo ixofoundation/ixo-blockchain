@@ -5,14 +5,15 @@ import (
 )
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
-	// Initialise project docs, account maps, project withdrawals
-	for i, _ := range data.ProjectDocs {
+	// Initialise project docs, account maps, project withdrawals, params
+	for i := range data.ProjectDocs {
 		keeper.SetProjectDoc(ctx, &data.ProjectDocs[i])
 		keeper.SetAccountMap(ctx,
 			data.ProjectDocs[i].GetProjectDid(), data.AccountMaps[i])
 		keeper.SetProjectWithdrawalTransactions(ctx,
 			data.ProjectDocs[i].GetProjectDid(), data.WithdrawalsInfos[i])
 	}
+	keeper.SetParams(ctx, data.Params)
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
@@ -32,9 +33,12 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		withdrawalInfos = append(withdrawalInfos, withdrawalInfo)
 	}
 
+	params := k.GetParams(ctx)
+
 	return GenesisState{
 		ProjectDocs:      projectDocs,
 		AccountMaps:      accountMaps,
 		WithdrawalsInfos: withdrawalInfos,
+		Params:           params,
 	}
 }

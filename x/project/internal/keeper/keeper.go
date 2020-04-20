@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
 	"github.com/tendermint/tendermint/crypto"
 
@@ -17,17 +18,30 @@ import (
 type Keeper struct {
 	cdc           *codec.Codec
 	storeKey      sdk.StoreKey
-	accountKeeper auth.AccountKeeper
+	paramSpace    params.Subspace
+	AccountKeeper auth.AccountKeeper
 	feeKeeper     fees.Keeper
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, accountKeeper auth.AccountKeeper, feeKeeper fees.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, accountKeeper auth.AccountKeeper, feeKeeper fees.Keeper) Keeper {
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,
-		accountKeeper: accountKeeper,
+		paramSpace:    paramSpace.WithKeyTable(types.ParamKeyTable()),
+		AccountKeeper: accountKeeper,
 		feeKeeper:     feeKeeper,
 	}
+}
+
+// GetParams returns the total set of project parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+	k.paramSpace.GetParamSet(ctx, &params)
+	return params
+}
+
+// SetParams sets the total set of project parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
+	k.paramSpace.SetParamSet(ctx, &params)
 }
 
 func (k Keeper) GetProjectDocIterator(ctx sdk.Context) sdk.Iterator {
@@ -137,12 +151,12 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId 
 	key := projectDid + "/" + accountId
 	address := sdk.AccAddress(crypto.AddressHash([]byte(key)))
 
-	if k.accountKeeper.GetAccount(ctx, address) != nil {
+	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")
 	}
 
-	account := k.accountKeeper.NewAccountWithAddress(ctx, address)
-	k.accountKeeper.SetAccount(ctx, account)
+	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
+	k.AccountKeeper.SetAccount(ctx, account)
 
 	return account, nil
 }

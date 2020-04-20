@@ -73,7 +73,7 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 
 			sovrinDid := unmarshalSovrinDID(args[0])
 
-			msg := types.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey)
+			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
 	}

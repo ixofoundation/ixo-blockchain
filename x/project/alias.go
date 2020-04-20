@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	ModuleName   = types.ModuleName
-	QuerierRoute = types.QuerierRoute
-	RouterKey    = types.RouterKey
-	StoreKey     = types.StoreKey
+	ModuleName        = types.ModuleName
+	DefaultParamspace = types.DefaultParamspace
+	QuerierRoute      = types.QuerierRoute
+	RouterKey         = types.RouterKey
+	StoreKey          = types.StoreKey
 
 	DefaultCodeSpace = types.DefaultCodeSpace
 	PaidoutStatus    = types.PaidoutStatus
@@ -35,9 +36,13 @@ type (
 
 var (
 	// function aliases
-	NewKeeper     = keeper.NewKeeper
-	NewQuerier    = keeper.NewQuerier
-	RegisterCodec = types.RegisterCodec
+	NewKeeper      = keeper.NewKeeper
+	NewQuerier     = keeper.NewQuerier
+	ParamKeyTable  = types.ParamKeyTable
+	NewParams      = types.NewParams
+	DefaultParams  = types.DefaultParams
+	ValidateParams = types.ValidateParams
+	RegisterCodec  = types.RegisterCodec
 
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState

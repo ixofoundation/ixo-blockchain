@@ -83,11 +83,20 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 
 	if newStatus == FundedStatus {
-		// TODO: get funding amount from MsgUpdateProjectStatus or add a new MsgFundProject
-		funding := sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(100000))
-		res := fundProject(ctx, k, bk, existingProjectDoc, funding)
-		if res.Code != sdk.CodeOK {
-			return res
+		projectAddr, err := getProjectAccount(ctx, k, existingProjectDoc.GetProjectDid())
+		if err != nil {
+			return err.Result()
+		}
+
+		projectAcc := k.AccountKeeper.GetAccount(ctx, projectAddr)
+		if projectAcc == nil {
+			return sdk.ErrUnknownRequest("Could not find project account").Result()
+		}
+
+		minimumFunding := k.GetParams(ctx).ProjectMinimumInitialFunding
+		if projectAcc.GetCoins().AmountOf(ixo.IxoNativeToken).LT(minimumFunding) {
+			return sdk.ErrInsufficientFunds(
+				fmt.Sprintf("Project has not reached minimum funding %s", minimumFunding)).Result()
 		}
 	}
 
@@ -328,24 +337,6 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 //	}
 //}
 
-func fundProject(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDoc StoredProjectDoc, coin sdk.Coin) sdk.Result {
-	fmt.Printf("PROJECT_FUNDING func fundProject(_, _, _, _, [coin.Amount: %d, coin.Denom: %s])",
-		coin.Amount.Int64(), coin.Denom)
-	projectAddr, errRes := getAccountInProjectAccounts(ctx, k, projectDoc.GetProjectDid(), projectDoc.GetProjectDid())
-	if errRes != nil {
-		return errRes.Result()
-	}
-
-	_, err := bk.AddCoins(ctx, projectAddr, sdk.Coins{coin})
-	if err != nil {
-		panic(err)
-	}
-
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
-}
-
 func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProjectDoc, sdk.Error) {
 	ixoProjectDoc, err := k.GetProjectDoc(ctx, projectDid)
 
@@ -354,7 +345,7 @@ func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProject
 
 func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
 
-	projectAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, projectDid)
+	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
 	var validatingNodeSetAddr sdk.AccAddress
 
 	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
@@ -434,12 +425,8 @@ func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Di
 	return acc.GetAddress(), nil
 }
 
-func getProjectAccountMap(ctx sdk.Context, k Keeper, projectDid ixo.Did) AccountMap {
-	return k.GetAccountMap(ctx, projectDid)
-}
-
 func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, accountId string) (sdk.AccAddress, sdk.Error) {
-	accMap := getProjectAccountMap(ctx, k, projectDid)
+	accMap := k.GetAccountMap(ctx, projectDid)
 
 	addr, found := accMap[accountId]
 	if found {
@@ -447,4 +434,8 @@ func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did, 
 	} else {
 		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
 	}
+}
+
+func getProjectAccount(ctx sdk.Context, k Keeper, projectDid ixo.Did) (sdk.AccAddress, sdk.Error) {
+	return getAccountInProjectAccounts(ctx, k, projectDid, projectDid)
 }

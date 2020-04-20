@@ -45,7 +45,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
-		msg := types.NewCreateBondMsg(bondDoc, didDoc)
+		msg := types.NewMsgCreateBond(bondDoc, didDoc)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(didDoc.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(didDoc.VerifyKey))
@@ -123,7 +123,7 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 			Status: bondStatus,
 		}
 
-		msg := types.NewUpdateBondStatusMsg(txHash, senderDid, updateBondStatusDoc, sovrinDid)
+		msg := types.NewMsgUpdateBondStatus(txHash, senderDid, updateBondStatusDoc, sovrinDid)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))

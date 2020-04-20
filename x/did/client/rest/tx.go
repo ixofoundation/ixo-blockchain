@@ -37,7 +37,7 @@ func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewAddDidMsg(sovrinDid.Did, sovrinDid.VerifyKey)
+		msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))

@@ -13,6 +13,7 @@ const (
 	QueryProjectDoc     = "queryProjectDoc"
 	QueryProjectAccount = "queryProjectAccount"
 	QueryProjectTx      = "queryProjectTx"
+	QueryParams         = "queryParams"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -24,6 +25,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryProjectAccount(ctx, path[1:], k)
 		case QueryProjectTx:
 			return queryProjectTx(ctx, path[1:], k)
+		case QueryParams:
+			return queryParams(ctx, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("Unknown project query endpoint")
 		}
@@ -64,6 +67,17 @@ func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error
 	res, errRes := codec.MarshalJSONIndent(k.cdc, info)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err.Error()))
+	}
+
+	return res, nil
+}
+
+func queryParams(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+	params := k.GetParams(ctx)
+
+	res, err := codec.MarshalJSONIndent(k.cdc, params)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err.Error()))
 	}
 
 	return res, nil
