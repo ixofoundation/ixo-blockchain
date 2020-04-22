@@ -11,9 +11,11 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
 
 	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
-	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
-	cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
-	cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
+
+	// TODO: https://github.com/ixofoundation/ixo-blockchain/issues/76
+	//cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
+	//cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
+	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
 }
 
 // ModuleCdc is the codec for the module
