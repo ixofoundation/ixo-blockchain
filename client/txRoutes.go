@@ -202,15 +202,16 @@ func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		//txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(req.Tx)
-		//if err != nil {
-		//	rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		//	return
-		//}
+		// The only line in this function different from that in Cosmos SDK
+		// is the one below. Instead of codec (JSON) marshalling, hex is used
+		// so that the DefaultTxDecoder can successfully recognize the IxoTx
+		//
+		// txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(req.Tx)
 
 		txBytes, err := hex.DecodeString(strings.TrimPrefix(req.Tx, "0x"))
 		if err != nil {
-			panic(err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(req.Mode)
