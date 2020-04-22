@@ -131,6 +131,6 @@ func initConfig(cmd *cobra.Command) error {
 
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
-	ixoClient.RegisterQueryTxRoutes(rs.CliCtx, rs.Mux)
+	ixoClient.RegisterTxRoutes(rs.CliCtx, rs.Mux)
 	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }

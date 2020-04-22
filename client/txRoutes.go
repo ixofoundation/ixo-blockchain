@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -54,9 +55,10 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func RegisterQueryTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func RegisterTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/txs/{hash}", QueryTxRequestHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/txs", QueryTxsRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx)).Methods("POST")
 }
 
 func QueryTxRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
@@ -177,6 +179,50 @@ func QueryTx(cliCtx context.CLIContext, hashHexStr string) (sdk.TxResponse, erro
 	}
 
 	return out, nil
+}
+
+type BroadcastReq struct {
+	Tx   string `json:"tx" yaml:"tx"`
+	Mode string `json:"mode" yaml:"mode"`
+}
+
+func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req BroadcastReq
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		err = cliCtx.Codec.UnmarshalJSON(body, &req)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		//txBytes, err := cliCtx.Codec.MarshalBinaryLengthPrefixed(req.Tx)
+		//if err != nil {
+		//	rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		//	return
+		//}
+
+		txBytes, err := hex.DecodeString(strings.TrimPrefix(req.Tx, "0x"))
+		if err != nil {
+			panic(err)
+		}
+
+		cliCtx = cliCtx.WithBroadcastMode(req.Mode)
+
+		res, err := cliCtx.BroadcastTx(txBytes)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		rest.PostProcessResponseBare(w, cliCtx, res)
+	}
 }
 
 func getBlocksForTxResults(cliCtx context.CLIContext, resTxs []*core.ResultTx) (map[int64]*core.ResultBlock, error) {
