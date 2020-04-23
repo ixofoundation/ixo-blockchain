@@ -194,11 +194,18 @@ echo "Updating project 2 to CREATED..."
 ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Updating project 2 to PENDING..."
 ixocli tx project updateProjectStatus "sender_did" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
-echo "Funding project 1..."
-ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 100ixo "$MIGUEL_DID_FULL" --broadcast-mode block
+echo "Funding project 2..."
+ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 10000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
 # The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
+# Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
 echo "Updating project 2 to FUNDED..."
 ixocli tx project updateProjectStatus "sender_did" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
+echo "Creating a claim in project 2..."
+ixocli tx project createClaim "tx_hash" "sender_did" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
+echo "Creating an evaluation in project 2..."
+SENDER_DID="$MIGUEL_DID"
+STATUS="0"
+ixocli tx project createEvaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Adding agents (this creates a project account for the agent in the respective project)
 echo "Adding agent to project 1..."

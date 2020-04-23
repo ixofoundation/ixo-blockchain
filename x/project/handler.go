@@ -63,6 +63,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Project already exists")).Result()
 	}
 	k.SetProjectDoc(ctx, &msg)
+	k.SetProjectWithdrawalTransactions(ctx, msg.GetProjectDid(), nil)
 
 	return sdk.Result{
 		Code: sdk.CodeOK,
@@ -199,6 +200,9 @@ func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpda
 
 func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
 
+	// TODO: check if project exists before calling processFees
+	// Something will still fail but it's better to give a more meaningful error
+
 	_, err := processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
 	if err != nil {
 
@@ -212,6 +216,10 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 }
 
 func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
+
+	// TODO: check if project exists before calling processFees
+	// Something will still fail but it's better to give a more meaningful error
+
 	_, err := processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.GetProjectDid())
 	if err != nil {
 		return err.Result()
@@ -348,7 +356,7 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
 	var validatingNodeSetAddr sdk.AccAddress
 
-	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
+	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId) // not found
 	if !found {
 		validatingNodeSetAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
 	} else {
@@ -356,7 +364,7 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 	}
 
 	var ixoAddr sdk.AccAddress
-	found = checkAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	found = checkAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId) // found
 	if !found {
 		ixoAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
 	} else {
@@ -365,8 +373,8 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 
 	ixoFactor := fk.GetParams(ctx).IxoFactor
 	nodePercentage := fk.GetParams(ctx).NodeFeePercentage
-	var adjustedFeeAmount sdk.Dec
 
+	var adjustedFeeAmount sdk.Dec
 	switch feeType {
 	case fees.FeeClaimTransaction:
 		adjustedFeeAmount = fk.GetParams(ctx).ClaimFeeAmount.Mul(ixoFactor)
