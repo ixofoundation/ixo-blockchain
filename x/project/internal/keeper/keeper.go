@@ -2,13 +2,11 @@ package keeper
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/tendermint/tendermint/crypto"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/ixofoundation/ixo-cosmos/x/fees"
 
 	"github.com/ixofoundation/ixo-cosmos/x/did"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -148,8 +146,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) (auth.Account, sdk.Error) {
-	key := projectDid + "/" + accountId
-	address := sdk.AccAddress(crypto.AddressHash([]byte(key)))
+	address := types.StringToAddr(projectDid + "/" + accountId)
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")

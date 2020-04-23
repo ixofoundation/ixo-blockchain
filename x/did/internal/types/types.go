@@ -2,6 +2,8 @@ package types
 
 import (
 	"errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto"
 
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
@@ -70,4 +72,8 @@ func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
 
 type DidMsg interface {
 	IsNewDid() bool
+}
+
+func DidToAddr(did ixo.Did) sdk.AccAddress {
+	return sdk.AccAddress(crypto.AddressHash([]byte(did)))
 }

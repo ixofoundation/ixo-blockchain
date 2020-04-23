@@ -2,8 +2,6 @@ package rest
 
 import (
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/crypto"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -27,7 +25,7 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
-		accAddress := sdk.AccAddress(crypto.AddressHash([]byte(vars["did"])))
+		accAddress := types.DidToAddr(vars["did"])
 
 		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
 	}

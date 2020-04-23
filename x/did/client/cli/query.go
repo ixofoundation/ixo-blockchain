@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/crypto"
-
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 func GetCmdAddressFromDid() *cobra.Command {
@@ -20,7 +17,7 @@ func GetCmdAddressFromDid() *cobra.Command {
 		Short: "Query for an account address by DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accAddress := sdk.AccAddress(crypto.AddressHash([]byte(args[0])))
+			accAddress := types.DidToAddr(args[0])
 			fmt.Println(accAddress.String())
 			return nil
 		},
