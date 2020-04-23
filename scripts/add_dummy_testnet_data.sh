@@ -195,7 +195,8 @@ ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT2_DID_FULL" 
 echo "Updating project 2 to PENDING..."
 ixocli tx project updateProjectStatus "sender_did" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Funding project 1..."
-ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 10000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 100ixo "$MIGUEL_DID_FULL" --broadcast-mode block
+# This address can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
 echo "Updating project 2 to FUNDED..."
 ixocli tx project updateProjectStatus "sender_did" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
 
