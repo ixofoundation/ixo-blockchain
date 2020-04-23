@@ -62,6 +62,7 @@ MIGUEL_DID_FULL="{\"did\":\"did:ixo:4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vM
 FRANCESCO_DID_FULL="{\"did\":\"did:ixo:UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
 SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeDue5it82taeheMprdaPrctfK3DeVV9NnEPYDgwwRG\",\"encryptionPublicKey\":\"DtdGbZB2nSQvwhs6QoN5Cd8JTxWgfVRAGVKfxj8LA15i\",\"secret\":{\"seed\":\"6ef0002659d260a0bbad194d1aa28650ccea6c6862f994dfdbd48648e1a05c5e\",\"signKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\",\"encryptionPrivateKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\"}}"
 
+# ----------------------------------------------------------------------------------------- dids
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
 ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
@@ -74,6 +75,7 @@ ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
 echo "Adding KYC credential 1/1..."
 ixocli tx did addKycCredential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block
 
+# ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
 echo "Creating bond 1/4..."
 ixocli tx bonds create-bond \
@@ -178,6 +180,7 @@ ixocli tx bonds buy 5token3 "100res,100rez" "$BOND3_DID" "$SHAUN_DID_FULL" --bro
 echo "Buying 5token4 from Miguel..."
 ixocli tx bonds buy 5token4 "2token1,2token2" "$BOND4_DID" "$MIGUEL_DID_FULL" --broadcast-mode block
 
+# ----------------------------------------------------------------------------------------- projects
 # Create projects (this creates a project doc for the respective project)
 echo "Creating project 1/2..."
 ixocli tx project createProject "$PROJECT1_INFO" "$PROJECT1_DID_FULL" --broadcast-mode block
@@ -191,6 +194,10 @@ echo "Updating project 2 to CREATED..."
 ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Updating project 2 to PENDING..."
 ixocli tx project updateProjectStatus "sender_did" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
+echo "Funding project 1..."
+ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 10000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
+echo "Updating project 2 to FUNDED..."
+ixocli tx project updateProjectStatus "sender_did" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Adding agents (this creates a project account for the agent in the respective project)
 echo "Adding agent to project 1..."
@@ -199,6 +206,7 @@ AGENT_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
 ROLE="SA"
 ixocli tx project createAgent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PROJECT1_DID_FULL" --broadcast-mode block
 
+# ----------------------------------------------------------------------------------------- bonddocs
 # Creating bonddoc
 echo "Creating bonddoc 1/2..."
 ixocli tx bonddoc createBond "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL" --broadcast-mode block
