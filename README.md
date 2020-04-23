@@ -8,4 +8,3 @@ This is the official repository for the Internet of Impact Relayer Hub (ixo Hub)
 
 1. **[Installation](./documents/1.install.md)**
 2. **[Setting Up New Node](./documents/2.new-node.md)**
-3. **[TestNets](./documents/3.testnets.md)**
