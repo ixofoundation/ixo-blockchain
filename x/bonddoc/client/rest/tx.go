@@ -91,7 +91,6 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		txHash := r.URL.Query().Get("txHash")
 		senderDid := r.URL.Query().Get("senderDid")
 		status := r.URL.Query().Get("status")
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
@@ -123,7 +122,7 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 			Status: bondStatus,
 		}
 
-		msg := types.NewMsgUpdateBondStatus(txHash, senderDid, updateBondStatusDoc, sovrinDid)
+		msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))

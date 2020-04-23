@@ -71,7 +71,6 @@ var _ StoredBondDoc = (*MsgCreateBond)(nil)
 
 type MsgUpdateBondStatus struct {
 	SignBytes string              `json:"signBytes" yaml:"signBytes"`
-	TxHash    string              `json:"txHash" yaml:"txHash"`
 	SenderDid ixo.Did             `json:"senderDid" yaml:"senderDid"`
 	BondDid   ixo.Did             `json:"bondDid" yaml:"bondDid"`
 	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`

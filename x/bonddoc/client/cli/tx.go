@@ -83,20 +83,21 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateBondStatus [tx-hash] [sender-did] [status] [sovrin-did]",
+		Use:   "updateBondStatus [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a bond signed by the sovrinDID of the bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 || len(args[3]) == 0 {
+			if len(args) != 3 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 {
 				return errors.New("You must provide the status and the bonds private key")
 			}
 
-			txHash := args[0]
-			senderDid := args[1]
+			senderDid := args[0]
+			status := args[1]
+			sovrinDid := unmarshalSovrinDID(args[2])
 
-			bondStatus := types.BondStatus(args[2])
+			bondStatus := types.BondStatus(status)
 			if bondStatus != types.PreIssuanceStatus &&
 				bondStatus != types.OpenStatus &&
 				bondStatus != types.SuspendedStatus &&
@@ -111,8 +112,7 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 				Status: bondStatus,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewMsgUpdateBondStatus(txHash, senderDid, updateBondStatusDoc, sovrinDid)
+			msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
