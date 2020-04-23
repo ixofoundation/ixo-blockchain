@@ -28,7 +28,8 @@ fi
 PASSWORD="12345678"
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
-BOND_DID="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+BOND_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
 
 MIGUEL_ADDR="ixo1x2x0thq6x2rx7txl0ujpyg9rr0c8mc8ad904xw"
 FRANCESCO_ADDR="ixo1nnxvyr6hs0sglppqzw4v5s9r5dwh89423xu5zp"
@@ -59,38 +60,38 @@ ixocli tx bonds create-bond \
   --sanity-margin-percentage="" \
   --allow-sells=true \
   --batch-blocks=1 \
-  --bond-did="$BOND_DID" \
+  --bond-did="$BOND_DID_FULL" \
   --creator-did="$MIGUEL_DID" \
   --broadcast-mode block
 echo "Created bond..."
-ixocli query bonds bond did:ixo:U7GK8p8rVhJMKhBVRCJJ8c
+ixocli query bonds bond "$BOND_DID"
 
 echo "Editing bond..."
 ixocli tx bonds edit-bond \
   --token=abc \
   --name="New A B C" \
-  --bond-did="$BOND_DID" \
+  --bond-did="$BOND_DID_FULL" \
   --editor-did="$MIGUEL_DID" \
   --broadcast-mode block
 echo "Edited bond..."
-ixocli query bonds bond did:ixo:U7GK8p8rVhJMKhBVRCJJ8c
+ixocli query bonds bond "$BOND_DID"
 
 echo "Miguel buys 10abc..."
-tx buy 10abc 1000000res did:ixo:U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID_FULL"
+tx buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixocli query auth account "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
-tx buy 10abc 1000000res did:ixo:U7GK8p8rVhJMKhBVRCJJ8c "$FRANCESCO_DID_FULL"
+tx buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
 ixocli query auth account "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
-tx sell 10abc did:ixo:U7GK8p8rVhJMKhBVRCJJ8c "$MIGUEL_DID_FULL"
+tx sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixocli query auth account "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
-tx sell 10abc did:ixo:U7GK8p8rVhJMKhBVRCJJ8c "$FRANCESCO_DID_FULL"
+tx sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
 ixocli query auth account "$FRANCESCO_ADDR"
