@@ -23,16 +23,16 @@ var (
 
 // fees parameters
 type Params struct {
-	IxoFactor                            sdk.Dec `json:"ixo_factor yaml:"ixo_factor"`
-	InitiationFeeAmount                  sdk.Dec `json:"initiation_fee_amount yaml:"initiation_fee_amount"`
-	InitiationNodeFeePercentage          sdk.Dec `json:"initiation_node_fee_percentage yaml:"initiation_node_fee_percentage"`
-	ClaimFeeAmount                       sdk.Dec `json:"claim_fee_amount yaml:"claim_fee_amount"`
-	EvaluationFeeAmount                  sdk.Dec `json:"evaluation_fee_amount yaml:"evaluation_fee_amount"`
-	ServiceAgentRegistrationFeeAmount    sdk.Dec `json:"service_agent_registration_fee_amount yaml:"service_agent_registration_fee_amount"`
-	EvaluationAgentRegistrationFeeAmount sdk.Dec `json:"evaluation_agent_registration_fee_amount yaml:"evaluation_agent_registration_fee_amount"`
-	NodeFeePercentage                    sdk.Dec `json:"node_fee_percentage yaml:"node_fee_percentage"`
-	EvaluationPayFeePercentage           sdk.Dec `json:"evaluation_pay_fee_percentage yaml:"evaluation_pay_fee_percentage"`
-	EvaluationPayNodeFeePercentage       sdk.Dec `json:"evaluation_pay_node_fee_percentage yaml:"evaluation_pay_node_fee_percentage"`
+	IxoFactor                            sdk.Dec `json:"ixo_factor" yaml:"ixo_factor"`
+	InitiationFeeAmount                  sdk.Dec `json:"initiation_fee_amount" yaml:"initiation_fee_amount"`
+	InitiationNodeFeePercentage          sdk.Dec `json:"initiation_node_fee_percentage" yaml:"initiation_node_fee_percentage"`
+	ClaimFeeAmount                       sdk.Dec `json:"claim_fee_amount" yaml:"claim_fee_amount"`
+	EvaluationFeeAmount                  sdk.Dec `json:"evaluation_fee_amount" yaml:"evaluation_fee_amount"`
+	ServiceAgentRegistrationFeeAmount    sdk.Dec `json:"service_agent_registration_fee_amount" yaml:"service_agent_registration_fee_amount"`
+	EvaluationAgentRegistrationFeeAmount sdk.Dec `json:"evaluation_agent_registration_fee_amount" yaml:"evaluation_agent_registration_fee_amount"`
+	NodeFeePercentage                    sdk.Dec `json:"node_fee_percentage" yaml:"node_fee_percentage"`
+	EvaluationPayFeePercentage           sdk.Dec `json:"evaluation_pay_fee_percentage" yaml:"evaluation_pay_fee_percentage"`
+	EvaluationPayNodeFeePercentage       sdk.Dec `json:"evaluation_pay_node_fee_percentage" yaml:"evaluation_pay_node_fee_percentage"`
 }
 
 // ParamTable for fees module.
