@@ -61,7 +61,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 	require.Nil(t, err)
 	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String(), account)
 
-	res, err := querier(ctx, []string{QueryProjectAccount, types.ValidCreateProjectMsg.ProjectDid}, query)
+	res, err := querier(ctx, []string{QueryProjectAccounts, types.ValidCreateProjectMsg.ProjectDid}, query)
 	require.Nil(t, err)
 
 	var data interface{}

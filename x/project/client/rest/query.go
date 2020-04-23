@@ -65,7 +65,7 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 		projectDid := vars["projectDid"]
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
-			types.QuerierRoute, keeper.QueryProjectAccount, projectDid), nil)
+			types.QuerierRoute, keeper.QueryProjectAccounts, projectDid), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))

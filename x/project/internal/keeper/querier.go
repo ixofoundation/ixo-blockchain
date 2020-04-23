@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	QueryProjectDoc     = "queryProjectDoc"
-	QueryProjectAccount = "queryProjectAccount"
-	QueryProjectTx      = "queryProjectTx"
-	QueryParams         = "queryParams"
+	QueryProjectDoc      = "queryProjectDoc"
+	QueryProjectAccounts = "queryProjectAccounts"
+	QueryProjectTx       = "queryProjectTx"
+	QueryParams          = "queryParams"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -21,8 +21,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case QueryProjectDoc:
 			return queryProjectDoc(ctx, path[1:], k)
-		case QueryProjectAccount:
-			return queryProjectAccount(ctx, path[1:], k)
+		case QueryProjectAccounts:
+			return queryProjectAccounts(ctx, path[1:], k)
 		case QueryProjectTx:
 			return queryProjectTx(ctx, path[1:], k)
 		case QueryParams:
@@ -47,7 +47,7 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Erro
 	return res, nil
 }
 
-func queryProjectAccount(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
 
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)

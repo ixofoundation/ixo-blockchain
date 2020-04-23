@@ -55,7 +55,7 @@ func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getProjectAccounts [did]",
-		Short: "Get a Project accounts for a Did",
+		Short: "Get a Project accounts of a Project by Did",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
@@ -67,7 +67,7 @@ func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 			projectDid := args[0]
 
 			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryProjectAccount, projectDid), nil)
+				keeper.QueryProjectAccounts, projectDid), nil)
 			if err != nil {
 				return err
 			}
