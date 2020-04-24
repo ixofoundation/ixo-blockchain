@@ -85,6 +85,7 @@ var (
 		gov.ModuleName:                   {supply.Burner},
 		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
 		bonds.BatchesIntermediaryAccount: nil,
+		treasury.ModuleName:              {supply.Minter, supply.Burner},
 	}
 )
 
@@ -115,12 +116,13 @@ type ixoApp struct {
 	crisisKeeper       crisis.Keeper
 	paramsKeeper       params.Keeper
 
-	didKeeper     did.Keeper
-	feesKeeper    fees.Keeper
-	projectKeeper project.Keeper
-	bonddocKeeper bonddoc.Keeper
-	bondsKeeper   bonds.Keeper
-	oraclesKeeper oracles.Keeper
+	didKeeper      did.Keeper
+	feesKeeper     fees.Keeper
+	projectKeeper  project.Keeper
+	bonddocKeeper  bonddoc.Keeper
+	bondsKeeper    bonds.Keeper
+	oraclesKeeper  oracles.Keeper
+	treasuryKeeper treasury.Keeper
 
 	mm *module.Manager
 }
@@ -189,6 +191,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
+	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper, app.oraclesKeeper, app.supplyKeeper)
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
@@ -208,7 +211,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
-		treasury.NewAppModule(app.bankKeeper),
+		treasury.NewAppModule(app.treasuryKeeper),
 		oracles.NewAppModule(app.oraclesKeeper),
 	)
 

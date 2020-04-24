@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-cosmos/x/treasury/client/rest"
 	"github.com/spf13/cobra"
@@ -61,6 +60,8 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	treasuryTxCmd.AddCommand(client.PostCommands(
 		cli.GetCmdSend(cdc),
+		cli.GetCmdMint(cdc),
+		cli.GetCmdBurn(cdc),
 	)...)
 
 	return treasuryTxCmd
@@ -72,14 +73,14 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	bankKeeper bank.Keeper
+	keeper Keeper
 }
 
-func NewAppModule(bankKeeper bank.Keeper) AppModule {
+func NewAppModule(keeper Keeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
-		bankKeeper:     bankKeeper,
+		keeper:         keeper,
 	}
 }
 
@@ -94,7 +95,7 @@ func (AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.bankKeeper)
+	return NewHandler(am.keeper)
 }
 
 func (AppModule) QuerierRoute() string {

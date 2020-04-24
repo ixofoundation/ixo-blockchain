@@ -83,3 +83,61 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 }
+
+func GetCmdMint(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "mint [to-did] [amount] [oracle-sovrin-did]",
+		Short: "Create and sign a mint tx using DIDs",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCLIContext().
+				WithCodec(cdc)
+
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the recipient DID, " +
+					"amount, and oracle private key")
+			}
+
+			toDid := args[0]
+
+			coins, err := sdk.ParseCoins(args[1])
+			if err != nil {
+				return err
+			}
+
+			sovrinDid := unmarshalSovrinDID(args[2])
+			msg := types.NewMsgMint(toDid, coins, sovrinDid)
+
+			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+		},
+	}
+}
+
+func GetCmdBurn(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "burn [from-did] [amount] [oracle-sovrin-did]",
+		Short: "Create and sign a burn tx using DIDs",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCLIContext().
+				WithCodec(cdc)
+
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the source DID, " +
+					"amount, and oracle private key")
+			}
+
+			fromDid := args[0]
+
+			coins, err := sdk.ParseCoins(args[1])
+			if err != nil {
+				return err
+			}
+
+			sovrinDid := unmarshalSovrinDID(args[2])
+			msg := types.NewMsgBurn(fromDid, coins, sovrinDid)
+
+			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+		},
+	}
+}
