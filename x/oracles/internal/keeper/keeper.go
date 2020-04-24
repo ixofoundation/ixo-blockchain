@@ -34,7 +34,13 @@ func (k Keeper) GetOracles(ctx sdk.Context) (oracles types.Oracles) {
 	return oracles
 }
 
-// SetParams sets the list of registered oracles
+// OracleExists checks if an oracle exists
+func (k Keeper) OracleExists(ctx sdk.Context, oracle types.Oracle) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.GetOraclePrefixKey(ixo.Did(oracle)))
+}
+
+// SetOracle registers an oracle
 func (k Keeper) SetOracle(ctx sdk.Context, oracle types.Oracle) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetOraclePrefixKey(ixo.Did(oracle))
