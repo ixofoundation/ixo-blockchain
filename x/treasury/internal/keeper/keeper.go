@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -46,8 +47,24 @@ func (k Keeper) Mint(ctx sdk.Context, oracleDid, toDid ixo.Did, amount sdk.Coins
 	toAddress := types.DidToAddr(toDid)
 
 	// Check if oracle exists
-	if !k.oraclesKeeper.OracleExists(ctx, oracles.Oracle(oracleDid)) {
+	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
 		return sdk.ErrInternal("oracle specified is not a registered oracle")
+	}
+
+	// Confirm that oracle has the required capabilities
+	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
+	for _, c := range amount {
+		if !oracle.Capabilities.Includes(c.Denom) {
+			return sdk.ErrInternal(fmt.Sprintf(
+				"oracle does not have capability to mint %s", c.Denom))
+		}
+
+		// Get capability by token name
+		capability := oracle.Capabilities.MustGet(c.Denom)
+		if !capability.Capabilities.Includes(oracles.MintCap) {
+			return sdk.ErrInternal(fmt.Sprintf(
+				"oracle does not have capability to mint %s", c.Denom))
+		}
 	}
 
 	// Mint coins to module account
@@ -70,8 +87,24 @@ func (k Keeper) Burn(ctx sdk.Context, oracleDid, fromDid ixo.Did, amount sdk.Coi
 	fromAddress := types.DidToAddr(fromDid)
 
 	// Check if oracle exists
-	if !k.oraclesKeeper.OracleExists(ctx, oracles.Oracle(oracleDid)) {
+	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
 		return sdk.ErrInternal("oracle specified is not a registered oracle")
+	}
+
+	// Confirm that oracle has the required capabilities
+	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
+	for _, c := range amount {
+		if !oracle.Capabilities.Includes(c.Denom) {
+			return sdk.ErrInternal(fmt.Sprintf(
+				"oracle does not have capability to burn %s", c.Denom))
+		}
+
+		// Get capability by token name
+		capability := oracle.Capabilities.MustGet(c.Denom)
+		if !capability.Capabilities.Includes(oracles.BurnCap) {
+			return sdk.ErrInternal(fmt.Sprintf(
+				"oracle does not have capability to burn %s", c.Denom))
+		}
 	}
 
 	// Take tokens to burn from account

@@ -72,6 +72,13 @@ sleep 6 # to make sure DIDs were ledgered before proceeding
 echo "Adding KYC credential 1/1..."
 ixocli tx did addKycCredential "$MIGUEL_DID" "$FRANCESCO_DID_FULL"
 
+# ----------------------------------------------------------------------------------------- mints/burns
+# Mint ixo tokens
+echo "Minting 1000ixo tokens to Miguel using Miguel oracle..."
+ixocli tx treasury mint "$MIGUEL_DID" 1000ixo "$MIGUEL_DID_FULL"
+echo "Burning 1000ixo tokens from Francesco using Francesco oracle..."
+ixocli tx treasury burn "$FRANCESCO_DID" 1000ixo "$FRANCESCO_DID_FULL"
+
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
 echo "Creating bond 1/4..."

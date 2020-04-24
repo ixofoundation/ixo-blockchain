@@ -5,6 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/oracles/internal/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,17 +19,24 @@ const (
 func AddGenesisOracleCmd(ctx *server.Context, cdc *codec.Codec,
 	defaultNodeHome, defaultClientHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add-genesis-oracle [oracle-did]",
+		Use:   "add-genesis-oracle [oracle-did] [capability][,[capability]]",
 		Short: "Add oracle to genesis.json",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(_ *cobra.Command, args []string) error {
 			config := ctx.Config
 			config.SetRoot(viper.GetString(cli.HomeFlag))
 
-			oracleDid := types.Oracle(args[0])
+			oracleDid := ixo.Did(args[0])
 			if len(oracleDid) == 0 {
-				return fmt.Errorf("did cannot be empty")
+				return fmt.Errorf("oracle did cannot be empty")
 			}
+
+			capabilities, err := types.ParseOracleTokenCaps(args[1])
+			if err != nil {
+				return err
+			}
+
+			oracle := types.NewOracle(oracleDid, capabilities)
 
 			// retrieve the app state
 			genFile := config.GenesisFile()
@@ -42,11 +50,11 @@ func AddGenesisOracleCmd(ctx *server.Context, cdc *codec.Codec,
 
 			cdc.MustUnmarshalJSON(appState[types.ModuleName], &genesisState)
 
-			if genesisState.Oracles.Contains(oracleDid) {
+			if genesisState.Oracles.Includes(oracle) {
 				return fmt.Errorf("cannot add oracle since it already exists")
 			}
 
-			genesisState.Oracles = append(genesisState.Oracles, oracleDid)
+			genesisState.Oracles = append(genesisState.Oracles, oracle)
 
 			genesisStateBz := cdc.MustMarshalJSON(genesisState)
 			appState[types.ModuleName] = genesisStateBz
