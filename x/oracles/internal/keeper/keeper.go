@@ -3,6 +3,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/oracles/internal/types"
 )
 
@@ -21,7 +22,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
 // GetOracles returns the list of registered oracles
 func (k Keeper) GetOracles(ctx sdk.Context) (oracles types.Oracles) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.OraclesKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.OracleKey)
 
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -34,7 +35,8 @@ func (k Keeper) GetOracles(ctx sdk.Context) (oracles types.Oracles) {
 }
 
 // SetParams sets the list of registered oracles
-func (k Keeper) SetOracles(ctx sdk.Context, oracles types.Oracles) {
+func (k Keeper) SetOracle(ctx sdk.Context, oracle types.Oracle) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.OraclesKey, k.cdc.MustMarshalBinaryLengthPrefixed(oracles))
+	key := types.GetOraclePrefixKey(ixo.Did(oracle))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(oracle))
 }

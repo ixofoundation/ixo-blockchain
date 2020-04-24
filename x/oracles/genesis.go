@@ -6,7 +6,10 @@ import (
 
 // InitGenesis new oracles genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
-	keeper.SetOracles(ctx, data.Oracles)
+	// Initialise oracles
+	for _, o := range data.Oracles {
+		keeper.SetOracle(ctx, o)
+	}
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
