@@ -13,7 +13,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
 
 	// TODO: https://github.com/ixofoundation/ixo-blockchain/issues/76
-	//cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
+	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
 	//cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
 	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
 }

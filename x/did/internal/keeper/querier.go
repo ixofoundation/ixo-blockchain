@@ -3,7 +3,7 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -37,7 +37,7 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
 		return nil, err
 	}
 
-	res, errRes := json.Marshal(didDoc)
+	res, errRes := codec.MarshalJSONIndent(k.cdc, didDoc)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", errRes))
 	}
