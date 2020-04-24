@@ -35,6 +35,14 @@ yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000re
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000stake,1000000res,1000000rez,100000000000ixo
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000stake,1000000res,1000000rez,100000000000ixo
 
+# Add genesis oracles
+MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
+SHAN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID"
+yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID"
+yes $PASSWORD | ixod add-genesis-oracle "$SHAN_DID"
+
 ixocli config chain-id pandora-1
 ixocli config output json
 ixocli config indent true

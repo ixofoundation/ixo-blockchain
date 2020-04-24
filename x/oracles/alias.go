@@ -17,6 +17,9 @@ const (
 type (
 	Keeper       = keeper.Keeper
 	GenesisState = types.GenesisState
+
+	Oracles = types.Oracles
+	Oracle  = types.Oracle
 )
 
 var (

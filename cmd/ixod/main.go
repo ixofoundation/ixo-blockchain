@@ -12,6 +12,7 @@ import (
 	genAccsCli "github.com/cosmos/cosmos-sdk/x/genaccounts/client/cli"
 	genUtilCli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	oraclesCli "github.com/ixofoundation/ixo-cosmos/x/oracles/client/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -57,6 +58,7 @@ func main() {
 			app.DefaultNodeHome, app.DefaultCLIHome),
 		genUtilCli.ValidateGenesisCmd(ctx, cdc, app.ModuleBasics),
 		genAccsCli.AddGenesisAccountCmd(ctx, cdc, app.DefaultNodeHome, app.DefaultCLIHome),
+		oraclesCli.AddGenesisOracleCmd(ctx, cdc, app.DefaultNodeHome, app.DefaultCLIHome),
 	)
 
 	rootCmd.PersistentFlags().UintVar(&invCheckPeriod, flagInvCheckPeriod,
