@@ -9,7 +9,6 @@ import (
 func NewMsgSend(toDid string, amount sdk.Coins, senderDid sovrin.SovrinDid) MsgSend {
 	return MsgSend{
 		SignBytes: "",
-		TxHash:    "",
 		PubKey:    senderDid.VerifyKey,
 		FromDid:   senderDid.Did,
 		ToDid:     toDid,

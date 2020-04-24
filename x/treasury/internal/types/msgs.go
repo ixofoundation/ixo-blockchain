@@ -10,7 +10,6 @@ import (
 
 type MsgSend struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	TxHash    string    `json:"txHash" yaml:"txHash"`
 	PubKey    string    `json:"pubKey" yaml:"pubKey"`
 	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
 	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
