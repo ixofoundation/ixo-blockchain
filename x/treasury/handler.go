@@ -13,6 +13,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgSend:
 			return handleMsgSend(ctx, k, msg)
+		case MsgSendOnBehalfOf:
+			return handleMsgSendOnBehalfOf(ctx, k, msg)
 		case MsgMint:
 			return handleMsgMint(ctx, k, msg)
 		case MsgBurn:
@@ -29,6 +31,22 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) sdk.Result {
 
 	if err := k.Send(ctx, msg.FromDid, msg.ToDid, msg.Amount); err != nil {
+		return err.Result()
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	)
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
+}
+
+func handleMsgSendOnBehalfOf(ctx sdk.Context, k keeper.Keeper, msg types.MsgSendOnBehalfOf) sdk.Result {
+
+	if err := k.SendOnBehalfOf(ctx, msg.FromDid, msg.ToDid, msg.OracleDid, msg.Amount); err != nil {
 		return err.Result()
 	}
 

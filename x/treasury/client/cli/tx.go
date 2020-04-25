@@ -84,6 +84,36 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
+func GetCmdSendOnBehalfOf(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "send-on-behalf-of [from-did] [to-did] [amount] [oracle-sovrin-did]",
+		Short: "Create and sign a send-on-behalf-of tx using DIDs",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCLIContext().
+				WithCodec(cdc)
+
+			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 ||
+				len(args[2]) == 0 || len(args[3]) == 0 {
+				return errors.New("You must provide the sender and receiver " +
+					"DID, amount, and sender private key")
+			}
+
+			fromDid := args[0]
+			toDid := args[1]
+
+			coins, err := sdk.ParseCoins(args[2])
+			if err != nil {
+				return err
+			}
+
+			sovrinDid := unmarshalSovrinDID(args[3])
+			msg := types.NewMsgSendOnBehalfOf(fromDid, toDid, coins, sovrinDid)
+
+			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+		},
+	}
+}
+
 func GetCmdMint(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "mint [to-did] [amount] [oracle-sovrin-did]",

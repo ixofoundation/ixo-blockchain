@@ -35,7 +35,6 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 	if !valid {
 		return err
 	}
-
 	valid, err = CheckNotEmpty(msg.ToDid, "ToDid")
 	if !valid {
 		return err
@@ -69,6 +68,65 @@ func (msg MsgSend) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
+type MsgSendOnBehalfOf struct {
+	SignBytes string    `json:"signBytes" yaml:"signBytes"`
+	PubKey    string    `json:"pubKey" yaml:"pubKey"`
+	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
+	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
+	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
+	Amount    sdk.Coins `json:"amount" yaml:"amount"`
+}
+
+var _ TreasuryMessage = MsgSendOnBehalfOf{}
+
+func (msg MsgSendOnBehalfOf) Type() string  { return ModuleName }
+func (msg MsgSendOnBehalfOf) Route() string { return RouterKey }
+func (msg MsgSendOnBehalfOf) ValidateBasic() sdk.Error {
+	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.OracleDid, "OracleDid")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.FromDid, "FromDid")
+	if !valid {
+		return err
+	}
+	valid, err = CheckNotEmpty(msg.ToDid, "ToDid")
+	if !valid {
+		return err
+	}
+	if !msg.Amount.IsValid() {
+		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
+	}
+	if !msg.Amount.IsAllPositive() {
+		return sdk.ErrInsufficientCoins("send amount must be positive")
+	}
+
+	return nil
+}
+
+func (msg MsgSendOnBehalfOf) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgSendOnBehalfOf) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+}
+
+func (msg MsgSendOnBehalfOf) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+func (msg MsgSendOnBehalfOf) GetPubKey() string { return msg.PubKey }
+
+func (msg MsgSendOnBehalfOf) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+
 type MsgMint struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pubKey" yaml:"pubKey"`
@@ -90,7 +148,6 @@ func (msg MsgMint) ValidateBasic() sdk.Error {
 	if !valid {
 		return err
 	}
-
 	valid, err = CheckNotEmpty(msg.ToDid, "ToDid")
 	if !valid {
 		return err
@@ -145,7 +202,6 @@ func (msg MsgBurn) ValidateBasic() sdk.Error {
 	if !valid {
 		return err
 	}
-
 	valid, err = CheckNotEmpty(msg.FromDid, "FromDid")
 	if !valid {
 		return err

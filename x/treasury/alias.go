@@ -14,9 +14,10 @@ const (
 type (
 	Keeper = keeper.Keeper
 
-	MsgSend = types.MsgSend
-	MsgMint = types.MsgMint
-	MsgBurn = types.MsgBurn
+	MsgSend           = types.MsgSend
+	MsgSendOnBehalfOf = types.MsgSendOnBehalfOf
+	MsgMint           = types.MsgMint
+	MsgBurn           = types.MsgBurn
 )
 
 var (

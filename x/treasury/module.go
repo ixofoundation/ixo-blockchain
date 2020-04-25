@@ -60,6 +60,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	treasuryTxCmd.AddCommand(client.PostCommands(
 		cli.GetCmdSend(cdc),
+		cli.GetCmdSendOnBehalfOf(cdc),
 		cli.GetCmdMint(cdc),
 		cli.GetCmdBurn(cdc),
 	)...)

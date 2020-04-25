@@ -17,6 +17,17 @@ func NewMsgSend(toDid ixo.Did, amount sdk.Coins, senderDid sovrin.SovrinDid) Msg
 	}
 }
 
+func NewMsgSendOnBehalfOf(fromDid, toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgSendOnBehalfOf {
+	return MsgSendOnBehalfOf{
+		SignBytes: "",
+		PubKey:    oracleDid.VerifyKey,
+		OracleDid: oracleDid.Did,
+		FromDid:   fromDid,
+		ToDid:     toDid,
+		Amount:    amount,
+	}
+}
+
 func NewMsgMint(toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgMint {
 	return MsgMint{
 		SignBytes: "",

@@ -43,6 +43,33 @@ func (k Keeper) Send(ctx sdk.Context, fromDid, toDid ixo.Did, amount sdk.Coins) 
 	return nil
 }
 
+func (k Keeper) SendOnBehalfOf(ctx sdk.Context, fromDid, toDid, oracleDid ixo.Did, amount sdk.Coins) sdk.Error {
+
+	// Check if oracle exists
+	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
+		return sdk.ErrInternal("oracle specified is not a registered oracle")
+	}
+
+	// Confirm that oracle has the required capabilities
+	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
+	for _, c := range amount {
+		if !oracle.Capabilities.Includes(c.Denom) {
+			return sdk.ErrInternal(fmt.Sprintf(
+				"oracle does not have capability to send %s", c.Denom))
+		}
+
+		// Get capability by token name
+		capability := oracle.Capabilities.MustGet(c.Denom)
+		if !capability.Capabilities.Includes(oracles.SendCap) {
+			return sdk.ErrInternal(fmt.Sprintf(
+				"oracle does not have capability to send %s", c.Denom))
+		}
+	}
+
+	// Perform send
+	return k.Send(ctx, fromDid, toDid, amount)
+}
+
 func (k Keeper) Mint(ctx sdk.Context, oracleDid, toDid ixo.Did, amount sdk.Coins) sdk.Error {
 	toAddress := types.DidToAddr(toDid)
 

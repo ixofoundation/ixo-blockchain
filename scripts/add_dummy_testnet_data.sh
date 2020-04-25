@@ -73,7 +73,7 @@ echo "Adding KYC credential 1/1..."
 ixocli tx did addKycCredential "$MIGUEL_DID" "$FRANCESCO_DID_FULL"
 
 # ----------------------------------------------------------------------------------------- mints/burns
-# Mint ixo tokens
+# Mint and burn ixo tokens
 echo "Minting 1000ixo tokens to Miguel using Miguel oracle..."
 ixocli tx treasury mint "$MIGUEL_DID" 1000ixo "$MIGUEL_DID_FULL"
 echo "Burning 1000ixo tokens from Francesco using Francesco oracle..."
@@ -206,12 +206,18 @@ echo "Updating project 2 to CREATED..."
 ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Updating project 2 to PENDING..."
 ixocli tx project updateProjectStatus "sender_did" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
-echo "Funding project 2..."
-ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 10000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
+
+# Fund project (using treasury 'send' and 'oracle-send')
+echo "Funding project 2 (using treasury 'send' from Miguel)..."
+ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
+echo "Funding project 2 (using treasury 'send-on-behalf-of' from Miguel using Francesco oracle)..."
+ixocli tx treasury send-on-behalf-of "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$FRANCESCO_DID_FULL" --broadcast-mode block
 # The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
 # Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
 echo "Updating project 2 to FUNDED..."
 ixocli tx project updateProjectStatus "sender_did" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
+
+# Adding a claim and evaluation
 echo "Creating a claim in project 2..."
 ixocli tx project createClaim "tx_hash" "sender_did" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Creating an evaluation in project 2..."

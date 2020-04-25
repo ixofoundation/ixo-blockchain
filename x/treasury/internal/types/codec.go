@@ -6,6 +6,7 @@ import (
 
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSend{}, "treasury/MsgSend", nil)
+	cdc.RegisterConcrete(MsgSendOnBehalfOf{}, "treasury/MsgSendOnBehalfOf", nil)
 	cdc.RegisterConcrete(MsgMint{}, "treasury/MsgMint", nil)
 	cdc.RegisterConcrete(MsgBurn{}, "treasury/MsgBurn", nil)
 }
