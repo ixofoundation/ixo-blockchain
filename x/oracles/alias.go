@@ -11,9 +11,9 @@ const (
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
 
-	MintCap = types.MintCap
-	BurnCap = types.BurnCap
-	SendCap = types.SendCap
+	MintCap     = types.MintCap
+	BurnCap     = types.BurnCap
+	TransferCap = types.TransferCap
 
 	DefaultCodeSpace = types.DefaultCodeSpace
 )
@@ -22,12 +22,12 @@ type (
 	Keeper       = keeper.Keeper
 	GenesisState = types.GenesisState
 
-	Oracle                  = types.Oracle
-	Oracles                 = types.Oracles
-	OracleTokenCapability   = types.OracleTokenCap
-	OracleTokenCapabilities = types.OracleTokenCaps
-	TokenCapability         = types.TokenCap
-	TokenCapabilities       = types.TokenCapabilities
+	Oracle          = types.Oracle
+	Oracles         = types.Oracles
+	OracleTokenCap  = types.OracleTokenCap
+	OracleTokenCaps = types.OracleTokenCaps
+	TokenCap        = types.TokenCap
+	TokenCaps       = types.TokenCaps
 )
 
 var (

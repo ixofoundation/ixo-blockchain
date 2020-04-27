@@ -36,13 +36,13 @@ func (os Oracles) Includes(oracle Oracle) bool {
 
 type (
 	OracleTokenCap struct {
-		Denom        string            `json:"denom" yaml:"denom"`
-		Capabilities TokenCapabilities `json:"capabilities" yaml:"capabilities"`
+		Denom        string    `json:"denom" yaml:"denom"`
+		Capabilities TokenCaps `json:"capabilities" yaml:"capabilities"`
 	}
 	OracleTokenCaps []OracleTokenCap
 )
 
-func NewOracleTokenCap(denom string, caps TokenCapabilities) OracleTokenCap {
+func NewOracleTokenCap(denom string, caps TokenCaps) OracleTokenCap {
 	return OracleTokenCap{
 		Denom:        denom,
 		Capabilities: caps,
@@ -67,11 +67,11 @@ func (otcs OracleTokenCaps) MustGet(denom string) OracleTokenCap {
 	panic("capability for specified denom not found")
 }
 
-func ParseTokenCaps(capsStr string) (TokenCapabilities, error) {
+func ParseTokenCaps(capsStr string) (TokenCaps, error) {
 	capsStr = strings.TrimSpace(capsStr)
 
 	capsStrs := strings.Split(capsStr, "/")
-	caps := make(TokenCapabilities, len(capsStrs))
+	caps := make(TokenCaps, len(capsStrs))
 	for i, capStr := range capsStrs {
 		capability := TokenCap(capStr)
 		if !capability.IsValid() {
@@ -131,11 +131,11 @@ func ParseOracleTokenCaps(capsStr string) (OracleTokenCaps, error) {
 // --------------------------------------- TokenCap/s
 
 type (
-	TokenCap          string
-	TokenCapabilities []TokenCap
+	TokenCap  string
+	TokenCaps []TokenCap
 )
 
-func (tcs TokenCapabilities) Includes(cap TokenCap) bool {
+func (tcs TokenCaps) Includes(cap TokenCap) bool {
 	for _, tc := range tcs {
 		if tc == cap {
 			return true
@@ -145,11 +145,11 @@ func (tcs TokenCapabilities) Includes(cap TokenCap) bool {
 }
 
 const (
-	MintCap TokenCap = "mint"
-	BurnCap TokenCap = "burn"
-	SendCap TokenCap = "send"
+	MintCap     TokenCap = "mint"
+	BurnCap     TokenCap = "burn"
+	TransferCap TokenCap = "transfer"
 )
 
 func (tc TokenCap) IsValid() bool {
-	return tc == MintCap || tc == BurnCap || tc == SendCap
+	return tc == MintCap || tc == BurnCap || tc == TransferCap
 }

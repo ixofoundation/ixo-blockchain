@@ -40,8 +40,8 @@ MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
 yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "ixo:mint"
-yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "ixo:mint/burn/send"
-yes $PASSWORD | ixod add-genesis-oracle "$SHAUN_DID" "res:send,rez:send"
+yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "ixo:mint/burn/transfer"
+yes $PASSWORD | ixod add-genesis-oracle "$SHAUN_DID" "res:transfer,rez:transfer"
 
 ixocli config chain-id pandora-1
 ixocli config output json

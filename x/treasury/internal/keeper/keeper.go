@@ -60,7 +60,7 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid ixo.Di
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
-		if !capability.Capabilities.Includes(oracles.SendCap) {
+		if !capability.Capabilities.Includes(oracles.TransferCap) {
 			return sdk.ErrInternal(fmt.Sprintf(
 				"oracle does not have capability to send %s", c.Denom))
 		}
