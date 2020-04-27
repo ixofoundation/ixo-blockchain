@@ -118,7 +118,7 @@ type UpdateAgentDoc struct {
 }
 
 type CreateClaimDoc struct {
-	ClaimID string `json:"claimID" yaml:"claimIDyaml:"claimID"`
+	ClaimID string `json:"claimID" yaml:"claimID"`
 }
 
 type ClaimStatus string
