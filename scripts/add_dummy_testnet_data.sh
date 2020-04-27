@@ -75,9 +75,9 @@ ixocli tx did addKycCredential "$MIGUEL_DID" "$FRANCESCO_DID_FULL"
 # ----------------------------------------------------------------------------------------- mints/burns
 # Mint and burn ixo tokens
 echo "Minting 1000ixo tokens to Miguel using Miguel oracle..."
-ixocli tx treasury mint "$MIGUEL_DID" 1000ixo "$MIGUEL_DID_FULL"
+ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000ixo "$MIGUEL_DID_FULL"
 echo "Burning 1000ixo tokens from Francesco using Francesco oracle..."
-ixocli tx treasury burn "$FRANCESCO_DID" 1000ixo "$FRANCESCO_DID_FULL"
+ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000ixo "$FRANCESCO_DID_FULL"
 
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
@@ -207,11 +207,11 @@ ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT2_DID_FULL" 
 echo "Updating project 2 to PENDING..."
 ixocli tx project updateProjectStatus "sender_did" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
 
-# Fund project (using treasury 'send' and 'oracle-send')
+# Fund project (using treasury 'send' and 'oracle-transfer')
 echo "Funding project 2 (using treasury 'send' from Miguel)..."
 ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
-echo "Funding project 2 (using treasury 'send-on-behalf-of' from Miguel using Francesco oracle)..."
-ixocli tx treasury send-on-behalf-of "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$FRANCESCO_DID_FULL" --broadcast-mode block
+echo "Funding project 2 (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
+ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$FRANCESCO_DID_FULL" --broadcast-mode block
 # The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
 # Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
 echo "Updating project 2 to FUNDED..."

@@ -17,8 +17,8 @@ func NewMsgSend(toDid ixo.Did, amount sdk.Coins, senderDid sovrin.SovrinDid) Msg
 	}
 }
 
-func NewMsgSendOnBehalfOf(fromDid, toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgSendOnBehalfOf {
-	return MsgSendOnBehalfOf{
+func NewMsgSendOnBehalfOf(fromDid, toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgOracleTransfer {
+	return MsgOracleTransfer{
 		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
 		OracleDid: oracleDid.Did,
@@ -28,8 +28,8 @@ func NewMsgSendOnBehalfOf(fromDid, toDid ixo.Did, amount sdk.Coins, oracleDid so
 	}
 }
 
-func NewMsgMint(toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgMint {
-	return MsgMint{
+func NewMsgMint(toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgOracleMint {
+	return MsgOracleMint{
 		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
 		OracleDid: oracleDid.Did,
@@ -38,8 +38,8 @@ func NewMsgMint(toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) Msg
 	}
 }
 
-func NewMsgBurn(fromDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgBurn {
-	return MsgBurn{
+func NewMsgBurn(fromDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgOracleBurn {
+	return MsgOracleBurn{
 		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
 		OracleDid: oracleDid.Did,

@@ -68,7 +68,7 @@ func (msg MsgSend) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-type MsgSendOnBehalfOf struct {
+type MsgOracleTransfer struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pubKey" yaml:"pubKey"`
 	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
@@ -77,11 +77,11 @@ type MsgSendOnBehalfOf struct {
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 }
 
-var _ TreasuryMessage = MsgSendOnBehalfOf{}
+var _ TreasuryMessage = MsgOracleTransfer{}
 
-func (msg MsgSendOnBehalfOf) Type() string  { return ModuleName }
-func (msg MsgSendOnBehalfOf) Route() string { return RouterKey }
-func (msg MsgSendOnBehalfOf) ValidateBasic() sdk.Error {
+func (msg MsgOracleTransfer) Type() string  { return ModuleName }
+func (msg MsgOracleTransfer) Route() string { return RouterKey }
+func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
 	if !valid {
 		return err
@@ -108,12 +108,12 @@ func (msg MsgSendOnBehalfOf) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSendOnBehalfOf) GetSenderDid() ixo.Did { return msg.OracleDid }
-func (msg MsgSendOnBehalfOf) GetSigners() []sdk.AccAddress {
+func (msg MsgOracleTransfer) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
 
-func (msg MsgSendOnBehalfOf) String() string {
+func (msg MsgOracleTransfer) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -121,13 +121,13 @@ func (msg MsgSendOnBehalfOf) String() string {
 	return string(b)
 }
 
-func (msg MsgSendOnBehalfOf) GetPubKey() string { return msg.PubKey }
+func (msg MsgOracleTransfer) GetPubKey() string { return msg.PubKey }
 
-func (msg MsgSendOnBehalfOf) GetSignBytes() []byte {
+func (msg MsgOracleTransfer) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-type MsgMint struct {
+type MsgOracleMint struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pubKey" yaml:"pubKey"`
 	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
@@ -135,11 +135,11 @@ type MsgMint struct {
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 }
 
-var _ TreasuryMessage = MsgMint{}
+var _ TreasuryMessage = MsgOracleMint{}
 
-func (msg MsgMint) Type() string  { return ModuleName }
-func (msg MsgMint) Route() string { return RouterKey }
-func (msg MsgMint) ValidateBasic() sdk.Error {
+func (msg MsgOracleMint) Type() string  { return ModuleName }
+func (msg MsgOracleMint) Route() string { return RouterKey }
+func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
 	if !valid {
 		return err
@@ -162,12 +162,12 @@ func (msg MsgMint) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgMint) GetSenderDid() ixo.Did { return msg.OracleDid }
-func (msg MsgMint) GetSigners() []sdk.AccAddress {
+func (msg MsgOracleMint) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
 
-func (msg MsgMint) String() string {
+func (msg MsgOracleMint) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -175,13 +175,13 @@ func (msg MsgMint) String() string {
 	return string(b)
 }
 
-func (msg MsgMint) GetPubKey() string { return msg.PubKey }
+func (msg MsgOracleMint) GetPubKey() string { return msg.PubKey }
 
-func (msg MsgMint) GetSignBytes() []byte {
+func (msg MsgOracleMint) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
-type MsgBurn struct {
+type MsgOracleBurn struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pubKey" yaml:"pubKey"`
 	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
@@ -189,11 +189,11 @@ type MsgBurn struct {
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 }
 
-var _ TreasuryMessage = MsgBurn{}
+var _ TreasuryMessage = MsgOracleBurn{}
 
-func (msg MsgBurn) Type() string  { return ModuleName }
-func (msg MsgBurn) Route() string { return RouterKey }
-func (msg MsgBurn) ValidateBasic() sdk.Error {
+func (msg MsgOracleBurn) Type() string  { return ModuleName }
+func (msg MsgOracleBurn) Route() string { return RouterKey }
+func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
 	if !valid {
 		return err
@@ -216,12 +216,12 @@ func (msg MsgBurn) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgBurn) GetSenderDid() ixo.Did { return msg.OracleDid }
-func (msg MsgBurn) GetSigners() []sdk.AccAddress {
+func (msg MsgOracleBurn) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
 
-func (msg MsgBurn) String() string {
+func (msg MsgOracleBurn) String() string {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)
@@ -229,8 +229,8 @@ func (msg MsgBurn) String() string {
 	return string(b)
 }
 
-func (msg MsgBurn) GetPubKey() string { return msg.PubKey }
+func (msg MsgOracleBurn) GetPubKey() string { return msg.PubKey }
 
-func (msg MsgBurn) GetSignBytes() []byte {
+func (msg MsgOracleBurn) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }

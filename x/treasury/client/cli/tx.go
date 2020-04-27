@@ -84,10 +84,10 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdSendOnBehalfOf(cdc *codec.Codec) *cobra.Command {
+func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "send-on-behalf-of [from-did] [to-did] [amount] [oracle-sovrin-did]",
-		Short: "Create and sign a send-on-behalf-of tx using DIDs",
+		Use:   "oracle-transfer [from-did] [to-did] [amount] [oracle-sovrin-did]",
+		Short: "Create and sign an oracle-transfer tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
@@ -114,10 +114,10 @@ func GetCmdSendOnBehalfOf(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdMint(cdc *codec.Codec) *cobra.Command {
+func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "mint [to-did] [amount] [oracle-sovrin-did]",
-		Short: "Create and sign a mint tx using DIDs",
+		Use:   "oracle-mint [to-did] [amount] [oracle-sovrin-did]",
+		Short: "Create and sign an oracle-mint tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
@@ -143,10 +143,10 @@ func GetCmdMint(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdBurn(cdc *codec.Codec) *cobra.Command {
+func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "burn [from-did] [amount] [oracle-sovrin-did]",
-		Short: "Create and sign a burn tx using DIDs",
+		Use:   "oracle-burn [from-did] [amount] [oracle-sovrin-did]",
+		Short: "Create and sign an oracle-burn tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)

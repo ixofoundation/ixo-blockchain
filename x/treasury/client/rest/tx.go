@@ -16,9 +16,9 @@ import (
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/treasury/send", sendRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/treasury/sendOnBehalfOf", sendOnBehalfOfRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/treasury/mint", mintRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/treasury/burn", burnRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/treasury/oracleTransfer", oracleTransferRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/treasury/oracleMint", oracleMintRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/treasury/oracleBurn", oracleBurnRequestHandler(cliCtx)).Methods("POST")
 }
 
 func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -92,7 +92,7 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func sendOnBehalfOfRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -164,7 +164,7 @@ func sendOnBehalfOfRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func mintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -235,7 +235,7 @@ func mintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func burnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")

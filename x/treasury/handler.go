@@ -13,12 +13,12 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgSend:
 			return handleMsgSend(ctx, k, msg)
-		case MsgSendOnBehalfOf:
-			return handleMsgSendOnBehalfOf(ctx, k, msg)
-		case MsgMint:
-			return handleMsgMint(ctx, k, msg)
-		case MsgBurn:
-			return handleMsgBurn(ctx, k, msg)
+		case MsgOracleTransfer:
+			return handleMsgOracleTransfer(ctx, k, msg)
+		case MsgOracleMint:
+			return handleMsgOracleMint(ctx, k, msg)
+		case MsgOracleBurn:
+			return handleMsgOracleBurn(ctx, k, msg)
 		default:
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
@@ -44,9 +44,9 @@ func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) sdk.Resu
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
-func handleMsgSendOnBehalfOf(ctx sdk.Context, k keeper.Keeper, msg types.MsgSendOnBehalfOf) sdk.Result {
+func handleMsgOracleTransfer(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleTransfer) sdk.Result {
 
-	if err := k.SendOnBehalfOf(ctx, msg.FromDid, msg.ToDid, msg.OracleDid, msg.Amount); err != nil {
+	if err := k.OracleTransfer(ctx, msg.FromDid, msg.ToDid, msg.OracleDid, msg.Amount); err != nil {
 		return err.Result()
 	}
 
@@ -60,9 +60,9 @@ func handleMsgSendOnBehalfOf(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
-func handleMsgMint(ctx sdk.Context, k keeper.Keeper, msg types.MsgMint) sdk.Result {
+func handleMsgOracleMint(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleMint) sdk.Result {
 
-	if err := k.Mint(ctx, msg.OracleDid, msg.ToDid, msg.Amount); err != nil {
+	if err := k.OracleMint(ctx, msg.OracleDid, msg.ToDid, msg.Amount); err != nil {
 		return err.Result()
 	}
 
@@ -76,9 +76,9 @@ func handleMsgMint(ctx sdk.Context, k keeper.Keeper, msg types.MsgMint) sdk.Resu
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
-func handleMsgBurn(ctx sdk.Context, k keeper.Keeper, msg types.MsgBurn) sdk.Result {
+func handleMsgOracleBurn(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleBurn) sdk.Result {
 
-	if err := k.Burn(ctx, msg.OracleDid, msg.FromDid, msg.Amount); err != nil {
+	if err := k.OracleBurn(ctx, msg.OracleDid, msg.FromDid, msg.Amount); err != nil {
 		return err.Result()
 	}
 

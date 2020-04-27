@@ -15,9 +15,9 @@ type (
 	Keeper = keeper.Keeper
 
 	MsgSend           = types.MsgSend
-	MsgSendOnBehalfOf = types.MsgSendOnBehalfOf
-	MsgMint           = types.MsgMint
-	MsgBurn           = types.MsgBurn
+	MsgOracleTransfer = types.MsgOracleTransfer
+	MsgOracleMint     = types.MsgOracleMint
+	MsgOracleBurn     = types.MsgOracleBurn
 )
 
 var (
