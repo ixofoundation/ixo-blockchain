@@ -4,7 +4,6 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
@@ -98,21 +97,6 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 }
 
 type ProjectDocDecoder func(projectEntryBytes []byte) (StoredProjectDoc, error)
-
-func GetProjectDocDecoder(cdc *codec.Codec) ProjectDocDecoder {
-	return func(projectDocBytes []byte) (res StoredProjectDoc, err error) {
-		if len(projectDocBytes) == 0 {
-			return nil, sdk.ErrTxDecode("projectDocBytes are empty")
-		}
-		projectDoc := MsgCreateProject{}
-		err = cdc.UnmarshalBinaryLengthPrefixed(projectDocBytes, &projectDoc)
-		if err != nil {
-			panic(err)
-		}
-
-		return &projectDoc, err
-	}
-}
 
 type CreateAgentDoc struct {
 	AgentDid ixo.Did `json:"did" yaml:"did"`
