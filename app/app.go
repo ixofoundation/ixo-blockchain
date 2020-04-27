@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/ixofoundation/ixo-cosmos/x/oracles"
 	"io"
 	"os"
 
@@ -72,6 +73,7 @@ var (
 		bonddoc.AppModuleBasic{},
 		bonds.AppModuleBasic{},
 		treasury.AppModuleBasic{},
+		oracles.AppModuleBasic{},
 	)
 
 	maccPerms = map[string][]string{
@@ -83,6 +85,7 @@ var (
 		gov.ModuleName:                   {supply.Burner},
 		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
 		bonds.BatchesIntermediaryAccount: nil,
+		treasury.ModuleName:              {supply.Minter, supply.Burner},
 	}
 )
 
@@ -113,11 +116,13 @@ type ixoApp struct {
 	crisisKeeper       crisis.Keeper
 	paramsKeeper       params.Keeper
 
-	didKeeper     did.Keeper
-	feesKeeper    fees.Keeper
-	projectKeeper project.Keeper
-	bonddocKeeper bonddoc.Keeper
-	bondsKeeper   bonds.Keeper
+	didKeeper      did.Keeper
+	feesKeeper     fees.Keeper
+	projectKeeper  project.Keeper
+	bonddocKeeper  bonddoc.Keeper
+	bondsKeeper    bonds.Keeper
+	oraclesKeeper  oracles.Keeper
+	treasuryKeeper treasury.Keeper
 
 	mm *module.Manager
 }
@@ -133,7 +138,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, did.StoreKey, fees.StoreKey,
-		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey, treasury.StoreKey)
+		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey, treasury.StoreKey,
+		oracles.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -184,6 +190,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace, app.accountKeeper, app.feesKeeper)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
+	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
+	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper, app.oraclesKeeper, app.supplyKeeper)
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
@@ -203,7 +211,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
-		treasury.NewAppModule(app.bankKeeper),
+		treasury.NewAppModule(app.treasuryKeeper),
+		oracles.NewAppModule(app.oraclesKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName, bonds.ModuleName)
@@ -213,7 +222,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, fees.ModuleName,
-		bonddoc.ModuleName, bonds.ModuleName, treasury.ModuleName)
+		bonddoc.ModuleName, bonds.ModuleName, treasury.ModuleName, oracles.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())

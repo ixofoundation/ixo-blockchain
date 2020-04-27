@@ -1,6 +1,7 @@
 package treasury
 
 import (
+	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/types"
 )
 
@@ -11,11 +12,17 @@ const (
 )
 
 type (
-	MsgSend = types.MsgSend
+	Keeper = keeper.Keeper
+
+	MsgSend           = types.MsgSend
+	MsgOracleTransfer = types.MsgOracleTransfer
+	MsgOracleMint     = types.MsgOracleMint
+	MsgOracleBurn     = types.MsgOracleBurn
 )
 
 var (
 	// function aliases
+	NewKeeper     = keeper.NewKeeper
 	RegisterCodec = types.RegisterCodec
 
 	// variable aliases

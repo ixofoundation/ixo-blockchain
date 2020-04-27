@@ -5,6 +5,7 @@ ixod export >genesis.json
 
 echo "Fixing genesis file..."
 sed -i 's/"genutil":null/"genutil":{"gentxs":null}/g' genesis.json
+# https://github.com/cosmos/cosmos-sdk/issues/5086
 
 echo "Backing up existing genesis file..."
 cp "$HOME"/.ixod/config/genesis.json "$HOME"/.ixod/config/genesis.json.backup

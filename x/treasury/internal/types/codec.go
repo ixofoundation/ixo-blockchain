@@ -6,6 +6,9 @@ import (
 
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgSend{}, "treasury/MsgSend", nil)
+	cdc.RegisterConcrete(MsgOracleTransfer{}, "treasury/MsgOracleTransfer", nil)
+	cdc.RegisterConcrete(MsgOracleMint{}, "treasury/MsgOracleMint", nil)
+	cdc.RegisterConcrete(MsgOracleBurn{}, "treasury/MsgOracleBurn", nil)
 }
 
 // ModuleCdc is the codec for the module

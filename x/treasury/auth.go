@@ -18,20 +18,12 @@ func NewAnteHandler(didKeeper did.Keeper) sdk.AnteHandler {
 		}
 
 		msg := ixoTx.GetMsgs()[0]
+		treasuryMsg := msg.(types.TreasuryMessage)
 		pubKey := [32]byte{}
-		var senderDid ixo.Did
-
-		// Get signer PubKey and sender DID
-		switch msg := msg.(type) {
-		case types.MsgSend:
-			senderDid = msg.FromDid
-			copy(pubKey[:], base58.Decode(msg.PubKey))
-		default:
-			panic("Unrecognized message type")
-		}
+		copy(pubKey[:], base58.Decode(treasuryMsg.GetPubKey()))
 
 		// Check that sender's DID is ledgered
-		senderDidDoc, _ := didKeeper.GetDidDoc(ctx, senderDid)
+		senderDidDoc, _ := didKeeper.GetDidDoc(ctx, treasuryMsg.GetSenderDid())
 		if senderDidDoc == nil {
 			return ctx,
 				sdk.ErrUnauthorized("Sender did not found").Result(),
