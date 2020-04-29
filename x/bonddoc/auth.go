@@ -21,7 +21,7 @@ func NewAnteHandler(bonddocKeeper Keeper) sdk.AnteHandler {
 		pubKey := [32]byte{}
 
 		if bondMsg.IsNewDid() {
-			createBondMsg := msg.(types.CreateBondMsg)
+			createBondMsg := msg.(types.MsgCreateBond)
 			copy(pubKey[:], base58.Decode(createBondMsg.GetPubKey()))
 
 		} else {
@@ -47,6 +47,5 @@ func NewAnteHandler(bonddocKeeper Keeper) sdk.AnteHandler {
 		}
 
 		return ctx, sdk.Result{}, false // continue...
-
 	}
 }

@@ -18,10 +18,10 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/project", createProjectRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/updateProjectStatus", updateProjectStatusRequestHandler(cliCtx)).Methods("PUT")
-	r.HandleFunc("/createAgent", CreateAgentRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/createClaim", CreateClaimRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/createEvaluation", CreateEvaluationRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/withdrawFunds", WithDrawFundsRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/createAgent", createAgentRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/createClaim", createClaimRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/createEvaluation", createEvaluationRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/withdrawFunds", withdrawFundsRequestHandler(cliCtx)).Methods("POST")
 }
 
 func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -49,7 +49,7 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
-		msg := types.NewCreateProjectMsg(projectDoc, didDoc)
+		msg := types.NewMsgCreateProject(projectDoc, didDoc)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(didDoc.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(didDoc.VerifyKey))
@@ -95,7 +95,6 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		txHash := r.URL.Query().Get("txHash")
 		senderDid := r.URL.Query().Get("senderDid")
 		status := r.URL.Query().Get("status")
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
@@ -118,17 +117,17 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 			projectStatus != types.StartedStatus &&
 			projectStatus != types.StoppedStatus &&
 			projectStatus != types.PaidoutStatus {
-			_, _ = w.Write([]byte("The status must be one of 'CREATED', 'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'"))
+			_, _ = w.Write([]byte("The status must be one of 'CREATED', " +
+				"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'"))
 
 			return
 		}
 
 		updateProjectStatusDoc := types.UpdateProjectStatusDoc{
-			Status:          projectStatus,
-			EthFundingTxnID: txHash,
+			Status: projectStatus,
 		}
 
-		msg := types.NewUpdateProjectStatusMsg(txHash, senderDid, updateProjectStatusDoc, sovrinDid)
+		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, sovrinDid)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
@@ -172,7 +171,7 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 	}
 }
 
-func CreateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		txHash := r.URL.Query().Get("txHash")
@@ -204,7 +203,7 @@ func CreateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			Role:     role,
 		}
 
-		msg := types.NewCreateAgentMsg(txHash, senderDid, createAgentDoc, projectDid)
+		msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, projectDid)
 
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(projectDid.Secret.SignKey))
@@ -248,11 +247,7 @@ func CreateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func UpdateAgent() {
-	// TODO
-}
-
-func CreateClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		txHash := r.URL.Query().Get("txHash")
@@ -276,7 +271,7 @@ func CreateClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 
-		msg := types.NewCreateClaimMsg(txHash, senderDid, createClaimDoc, sovrinDid)
+		msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, sovrinDid)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
@@ -319,7 +314,7 @@ func CreateClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-func CreateEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		txHash := r.URL.Query().Get("txHash")
@@ -352,7 +347,7 @@ func CreateEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 			Status:  claimStatus,
 		}
 
-		msg := types.NewCreateEvaluationMsg(txHash, senderDid, createEvaluationDoc, sovrinDid)
+		msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, sovrinDid)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
@@ -395,7 +390,7 @@ func CreateEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 	}
 }
 
-func WithDrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		senderDidParams := r.URL.Query().Get("senderDid")
@@ -420,7 +415,7 @@ func WithDrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 
-		msg := types.NewWithDrawFundsMsg(senderDid.Did, data)
+		msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(senderDid.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(senderDid.VerifyKey))

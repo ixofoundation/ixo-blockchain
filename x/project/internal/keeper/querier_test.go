@@ -8,21 +8,21 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 )
 
 func TestQueryProjectDoc(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	err := k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
-	require.Nil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
+	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
 
-	query := abciTypes.RequestQuery{
+	query := abci.RequestQuery{
 		Path: "",
 		Data: []byte{},
 	}
@@ -35,33 +35,33 @@ func TestQueryProjectDoc(t *testing.T) {
 	require.Nil(t, emptyRes)
 	require.NotNil(t, err)
 
-	var projectDoc types.CreateProjectMsg
+	var projectDoc types.MsgCreateProject
 	cdc.MustUnmarshalJSON(res, &projectDoc)
 }
 
 func TestQueryProjectAccounts(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	err := k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
-	require.Nil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
+	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
 
-	query := abciTypes.RequestQuery{
+	query := abci.RequestQuery{
 		Path: "",
 		Data: []byte{},
 	}
 
 	querier := NewQuerier(k)
-	_, err = querier(ctx, []string{QueryProjectDoc, types.ValidCreateProjectMsg.ProjectDid}, query)
+	_, err := querier(ctx, []string{QueryProjectDoc, types.ValidCreateProjectMsg.ProjectDid}, query)
 	require.Nil(t, err)
 
 	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String())
 	require.Nil(t, err)
 	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String(), account)
 
-	res, err := querier(ctx, []string{QueryProjectAccount, types.ValidCreateProjectMsg.ProjectDid}, query)
+	res, err := querier(ctx, []string{QueryProjectAccounts, types.ValidCreateProjectMsg.ProjectDid}, query)
 	require.Nil(t, err)
 
 	var data interface{}
@@ -76,18 +76,18 @@ func TestQueryProjectAccounts(t *testing.T) {
 }
 
 func TestQueryTxs(t *testing.T) {
-	ctx, k, cdc, _, _, _ := CreateTestInput()
+	ctx, k, cdc, _, _ := CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	err := k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
-	require.Nil(t, err)
+	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
+	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
 
 	k.AddProjectWithdrawalTransaction(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidWithdrawalInfo)
 	k.AddProjectWithdrawalTransaction(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidWithdrawalInfo)
 
-	query := abciTypes.RequestQuery{
+	query := abci.RequestQuery{
 		Path: "",
 		Data: []byte{},
 	}

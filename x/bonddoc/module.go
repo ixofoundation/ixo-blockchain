@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/client/cli"
 	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/client/rest"
@@ -29,15 +29,20 @@ func (AppModuleBasic) Name() string {
 }
 
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	Registercodec(cdc)
+	RegisterCodec(cdc)
 }
 
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-	return nil
+	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
-	return nil
+	var data GenesisState
+	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	if err != nil {
+		return err
+	}
+	return ValidateGenesis(data)
 }
 
 func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
@@ -54,8 +59,8 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	bondTxCmd.AddCommand(client.PostCommands(
-		cli.CreateBondCmd(cdc),
-		cli.UpdateBondStatusCmd(cdc),
+		cli.GetCmdCreateBond(cdc),
+		cli.GetCmdUpdateBondStatus(cdc),
 	)...)
 
 	return bondTxCmd
@@ -71,7 +76,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	bondQueryCmd.AddCommand(client.GetCommands(
-		cli.GetBondDocCmd(cdc),
+		cli.GetCmdBondDoc(cdc),
 	)...)
 
 	return bondQueryCmd
@@ -112,17 +117,21 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 	return keeper.NewQuerier(am.keeper)
 }
 
-func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abciTypes.ValidatorUpdate {
-	return []abciTypes.ValidatorUpdate{}
+func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
+	var genesisState GenesisState
+	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
+	InitGenesis(ctx, am.keeper, genesisState)
+	return []abci.ValidatorUpdate{}
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
-	return nil
+	gs := ExportGenesis(ctx, am.keeper)
+	return ModuleCdc.MustMarshalJSON(gs)
 }
 
-func (am AppModule) BeginBlock(ctx sdk.Context, req abciTypes.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 }
 
-func (AppModule) EndBlock(_ sdk.Context, _ abciTypes.RequestEndBlock) []abciTypes.ValidatorUpdate {
-	return []abciTypes.ValidatorUpdate{}
+func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	return []abci.ValidatorUpdate{}
 }

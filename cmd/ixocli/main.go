@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"path"
-	
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/lcd"
@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tmlibs/cli"
-	
+
 	"github.com/ixofoundation/ixo-cosmos/app"
 	ixoClient "github.com/ixofoundation/ixo-cosmos/client"
 )
@@ -24,21 +24,21 @@ import (
 func main() {
 	cdc := app.MakeCodec()
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
+	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
 	config.Seal()
-	
+
 	rootCmd := &cobra.Command{
 		Use:   "ixocli",
 		Short: "ixo Light-Client",
 	}
-	
+
 	rootCmd.PersistentFlags().String(client.FlagChainID, "", "Chain ID of tendermint node")
 	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
 		return initConfig(rootCmd)
 	}
-	
+
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		client.ConfigCmd(app.DefaultCLIHome),
@@ -51,7 +51,7 @@ func main() {
 		keys.Commands(),
 		client.LineBreak,
 	)
-	
+
 	executor := cli.PrepareMainCmd(rootCmd, "NS", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
@@ -65,7 +65,7 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		Aliases: []string{"q"},
 		Short:   "Querying subcommands",
 	}
-	
+
 	queryCmd.AddCommand(
 		authCli.GetAccountCmd(cdc),
 		client.LineBreak,
@@ -75,9 +75,9 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		ixoClient.QueryTxCmd(cdc),
 		client.LineBreak,
 	)
-	
+
 	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
-	
+
 	return queryCmd
 }
 
@@ -86,7 +86,7 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 		Use:   "tx",
 		Short: "Transactions subcommands",
 	}
-	
+
 	txCmd.AddCommand(
 		bankCli.SendTxCmd(cdc),
 		client.LineBreak,
@@ -97,9 +97,9 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 		authCli.GetEncodeCommand(cdc),
 		client.LineBreak,
 	)
-	
+
 	app.ModuleBasics.AddTxCommands(txCmd, cdc)
-	
+
 	return txCmd
 }
 
@@ -108,29 +108,29 @@ func initConfig(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	
+
 	cfgFile := path.Join(home, "config", "config.toml")
 	if _, err := os.Stat(cfgFile); err == nil {
 		viper.SetConfigFile(cfgFile)
-		
+
 		if err := viper.ReadInConfig(); err != nil {
 			return err
 		}
 	}
-	
+
 	if err := viper.BindPFlag(client.FlagChainID, cmd.PersistentFlags().Lookup(client.FlagChainID)); err != nil {
 		return err
 	}
-	
+
 	if err := viper.BindPFlag(cli.EncodingFlag, cmd.PersistentFlags().Lookup(cli.EncodingFlag)); err != nil {
 		return err
 	}
-	
+
 	return viper.BindPFlag(cli.OutputFlag, cmd.PersistentFlags().Lookup(cli.OutputFlag))
 }
 
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
-	ixoClient.RegisterQueryTxRoutes(rs.CliCtx, rs.Mux)
+	ixoClient.RegisterTxRoutes(rs.CliCtx, rs.Mux)
 	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }

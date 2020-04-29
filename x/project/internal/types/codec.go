@@ -5,17 +5,25 @@ import (
 )
 
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(CreateProjectMsg{}, "ixo-cosmos/MsgCreateProject", nil)
-	cdc.RegisterConcrete(CreateAgentMsg{}, "ixo-cosmos/MsgCreateAgent", nil)
-	cdc.RegisterConcrete(CreateClaimMsg{}, "ixo-cosmos/CreateClaimMsg", nil)
-	cdc.RegisterConcrete(CreateEvaluationMsg{}, "ixo-cosmos/CreateEvaluationMsg", nil)
-	cdc.RegisterConcrete(UpdateAgentMsg{}, "ixo-cosmos/UpdateAgentMsg", nil)
-	cdc.RegisterConcrete(UpdateProjectStatusMsg{}, "ixo-cosmos/UpdateProjectStatusMsg", nil)
+	cdc.RegisterConcrete(MsgCreateProject{}, "project/CreateProject", nil)
+	cdc.RegisterConcrete(MsgUpdateProjectStatus{}, "project/UpdateProjectStatus", nil)
+	cdc.RegisterConcrete(MsgCreateAgent{}, "project/CreateAgent", nil)
+	cdc.RegisterConcrete(MsgUpdateAgent{}, "project/UpdateAgent", nil)
+	cdc.RegisterConcrete(MsgCreateClaim{}, "project/CreateClaim", nil)
+	cdc.RegisterConcrete(MsgCreateEvaluation{}, "project/CreateEvaluation", nil)
+	cdc.RegisterConcrete(MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
+
+	// TODO: https://github.com/ixofoundation/ixo-blockchain/issues/76
+	//cdc.RegisterInterface((*StoredProjectDoc)(nil), nil)
+	//cdc.RegisterConcrete(AccountMap{}, "project/AccountMap", nil)
+	//cdc.RegisterConcrete(WithdrawalInfo{}, "project/WithdrawalInfo", nil)
 }
 
+// ModuleCdc is the codec for the module
 var ModuleCdc *codec.Codec
 
 func init() {
 	ModuleCdc = codec.New()
+	RegisterCodec(ModuleCdc)
 	ModuleCdc.Seal()
 }

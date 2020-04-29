@@ -5,10 +5,11 @@ import (
 )
 
 const (
-	ModuleName   = "project"
-	StoreKey     = ModuleName
-	RouterKey    = StoreKey
-	QuerierRoute = RouterKey
+	ModuleName        = "project"
+	DefaultParamspace = ModuleName
+	StoreKey          = ModuleName
+	RouterKey         = StoreKey
+	QuerierRoute      = RouterKey
 )
 
 var (

@@ -6,12 +6,16 @@ import (
 )
 
 const (
-	ModuleName   = types.ModuleName
-	QuerierRoute = types.QuerierRoute
-	RouterKey    = types.RouterKey
-	StoreKey     = types.StoreKey
-	
+	ModuleName        = types.ModuleName
+	DefaultParamspace = types.DefaultParamspace
+	QuerierRoute      = types.QuerierRoute
+	RouterKey         = types.RouterKey
+	StoreKey          = types.StoreKey
+
 	DefaultCodeSpace = types.DefaultCodeSpace
+
+	FeeClaimTransaction      = types.FeeClaimTransaction
+	FeeEvaluationTransaction = types.FeeEvaluationTransaction
 )
 
 type (
@@ -21,13 +25,22 @@ type (
 )
 
 var (
-	NewKeeper                               = keeper.NewKeeper
+	// function aliases
+	NewKeeper      = keeper.NewKeeper
+	NewQuerier     = keeper.NewQuerier
+	ParamKeyTable  = types.ParamKeyTable
+	NewParams      = types.NewParams
+	DefaultParams  = types.DefaultParams
+	ValidateParams = types.ValidateParams
+
+	NewGenesisState     = types.NewGenesisState
+	DefaultGenesisState = types.DefaultGenesisState
+	ValidateGenesis     = types.ValidateGenesis
+
+	// variable aliases
 	ModuleCdc                               = types.ModuleCdc
-	NewQuerier                              = keeper.NewQuerier
 	KeyIxoFactor                            = types.KeyIxoFactor
 	KeyNodeFeePercentage                    = types.KeyNodeFeePercentage
-	FeeClaimTransaction                     = types.FeeClaimTransaction
-	FeeEvaluationTransaction                = types.FeeEvaluationTransaction
 	KeyClaimFeeAmount                       = types.KeyClaimFeeAmount
 	KeyEvaluationFeeAmount                  = types.KeyEvaluationFeeAmount
 	KeyInitiationFeeAmount                  = types.KeyInitiationFeeAmount
@@ -36,6 +49,4 @@ var (
 	KeyEvaluationAgentRegistrationFeeAmount = types.KeyEvaluationAgentRegistrationFeeAmount
 	KeyEvaluationPayFeePercentage           = types.KeyEvaluationPayFeePercentage
 	KeyEvaluationPayNodeFeePercentage       = types.KeyEvaluationPayNodeFeePercentage
-	
-	DefaultGenesisState = types.DefaultGenesis
 )

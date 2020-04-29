@@ -12,9 +12,11 @@ func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid ixo.Did) types.Batch {
 	if !k.BatchExists(ctx, bondDid) {
 		panic(fmt.Sprintf("batch not found for %s\n", bondDid))
 	}
+
 	bz := store.Get(types.GetBatchKey(bondDid))
 	var batch types.Batch
 	k.cdc.MustUnmarshalBinaryBare(bz, &batch)
+
 	return batch
 }
 
@@ -23,9 +25,11 @@ func (k Keeper) MustGetLastBatch(ctx sdk.Context, bondDid ixo.Did) types.Batch {
 	if !k.LastBatchExists(ctx, bondDid) {
 		panic(fmt.Sprintf("last batch not found for %s\n", bondDid))
 	}
+
 	bz := store.Get(types.GetLastBatchKey(bondDid))
 	var batch types.Batch
 	k.cdc.MustUnmarshalBinaryBare(bz, &batch)
+
 	return batch
 }
 

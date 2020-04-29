@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	QueryProjectDoc     = "queryProjectDoc"
-	QueryProjectAccount = "queryProjectAccount"
-	QueryProjectTx      = "queryProjectTx"
+	QueryProjectDoc      = "queryProjectDoc"
+	QueryProjectAccounts = "queryProjectAccounts"
+	QueryProjectTx       = "queryProjectTx"
+	QueryParams          = "queryParams"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -20,10 +21,12 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		case QueryProjectDoc:
 			return queryProjectDoc(ctx, path[1:], k)
-		case QueryProjectAccount:
-			return queryProjectAccount(ctx, path[1:], k)
+		case QueryProjectAccounts:
+			return queryProjectAccounts(ctx, path[1:], k)
 		case QueryProjectTx:
 			return queryProjectTx(ctx, path[1:], k)
+		case QueryParams:
+			return queryParams(ctx, k)
 		default:
 			return nil, sdk.ErrUnknownRequest("Unknown project query endpoint")
 		}
@@ -44,7 +47,7 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Erro
 	return res, nil
 }
 
-func queryProjectAccount(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
 
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)
@@ -64,6 +67,17 @@ func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error
 	res, errRes := codec.MarshalJSONIndent(k.cdc, info)
 	if errRes != nil {
 		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err.Error()))
+	}
+
+	return res, nil
+}
+
+func queryParams(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+	params := k.GetParams(ctx)
+
+	res, err := codec.MarshalJSONIndent(k.cdc, params)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err.Error()))
 	}
 
 	return res, nil

@@ -9,21 +9,23 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gorilla/mux"
 
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
 )
 
 type AccDetails struct {
-	Did     string  `json:"did"`
-	Account string  `json:"account"`
-	Balance sdk.Int `json:"balance"`
+	Did     string  `json:"did" yaml:"did"`
+	Account string  `json:"account" yaml:"account"`
+	Balance sdk.Int `json:"balance" yaml:"balance"`
 }
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/project/{did}", queryProjectDocRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/projectAccounts/{projectDid}", queryProjectAccountsRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/projectTxs/{projectDid}", queryProjectTxsRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/projectParams", queryParamsRequestHandler(cliCtx)).Methods("GET")
 }
 
 func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -48,7 +50,7 @@ func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var projectDoc types.CreateProjectMsg
+		var projectDoc types.MsgCreateProject
 		cliCtx.Codec.MustUnmarshalJSON(res, &projectDoc)
 
 		bz, err := json.Marshal(projectDoc)
@@ -63,7 +65,7 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 		projectDid := vars["projectDid"]
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
-			types.QuerierRoute, keeper.QueryProjectAccount, projectDid), nil)
+			types.QuerierRoute, keeper.QueryProjectAccounts, projectDid), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
@@ -108,7 +110,7 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		txs := []types.WithdrawalInfo{}
+		var txs []types.WithdrawalInfo
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 
@@ -121,4 +123,28 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		_, _ = w.Write(bz)
 	}
 
+}
+
+func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
+			keeper.QueryParams), nil)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+
+			return
+		}
+
+		var params types.Params
+		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, params)
+	}
 }

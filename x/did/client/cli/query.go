@@ -4,30 +4,27 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/crypto"
-
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
-func GetAddressFromDidCmd() *cobra.Command {
+func GetCmdAddressFromDid() *cobra.Command {
 	return &cobra.Command{
 		Use:   "getAddressFromDid [did]",
 		Short: "Query for an account address by DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accAddress := sdk.AccAddress(crypto.AddressHash([]byte(args[0])))
+			accAddress := types.DidToAddr(args[0])
 			fmt.Println(accAddress.String())
 			return nil
 		},
 	}
 }
 
-func GetDidDocCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getDidDoc [did]",
 		Short: "Query DidDoc for a DID",
@@ -68,7 +65,7 @@ func GetDidDocCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetAllDidsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getAllDids",
 		Short: "Query all DIDs",
@@ -81,7 +78,7 @@ func GetAllDidsCmd(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			didDids := []ixo.Did{}
+			var didDids []ixo.Did
 			err = cdc.UnmarshalJSON(res, &didDids)
 			if err != nil {
 				return err
@@ -98,7 +95,7 @@ func GetAllDidsCmd(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetAllDidDocsCmd(cdc *codec.Codec) *cobra.Command {
+func GetCmdAllDidDocs(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "getAllDidDocs",
 		Short: "Query all DID documents",

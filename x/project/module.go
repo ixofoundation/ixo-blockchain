@@ -11,12 +11,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
-	abciTypes "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/contracts"
 	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/params"
 	"github.com/ixofoundation/ixo-cosmos/x/project/client/cli"
 	"github.com/ixofoundation/ixo-cosmos/x/project/client/rest"
 	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
@@ -34,15 +31,20 @@ func (AppModuleBasic) Name() string {
 }
 
 func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	Registercodec(cdc)
+	RegisterCodec(cdc)
 }
 
 func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-	return nil
+	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
 func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
-	return nil
+	var data GenesisState
+	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	if err != nil {
+		return err
+	}
+	return ValidateGenesis(data)
 }
 
 func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
@@ -59,13 +61,13 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	projectTxCmd.AddCommand(client.PostCommands(
-		cli.CreateProjectCmd(cdc),
-		cli.CreateAgentCmd(cdc),
-		cli.UpdateProjectStatusCmd(cdc),
-		cli.UpdateAgentCmd(cdc),
-		cli.CreateClaimCmd(cdc),
-		cli.CreateEvaluationCmd(cdc),
-		cli.WithDrawFundsCmd(cdc),
+		cli.GetCmdCreateProject(cdc),
+		cli.GetCmdCreateAgent(cdc),
+		cli.GetCmdUpdateProjectStatus(cdc),
+		cli.GetCmdUpdateAgent(cdc),
+		cli.GetCmdCreateClaim(cdc),
+		cli.GetCmdCreateEvaluation(cdc),
+		cli.GetCmdWithdrawFunds(cdc),
 	)...)
 
 	return projectTxCmd
@@ -81,9 +83,10 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	projectQueryCmd.AddCommand(client.GetCommands(
-		cli.GetProjectDocCmd(cdc),
-		cli.GetProjectAccountsCmd(cdc),
-		cli.GetProjectTxsCmd(cdc),
+		cli.GetCmdProjectDoc(cdc),
+		cli.GetCmdProjectAccounts(cdc),
+		cli.GetCmdProjectTxs(cdc),
+		cli.GetParamsRequestHandler(cdc),
 	)...)
 
 	return projectQueryCmd
@@ -91,25 +94,18 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper         keeper.Keeper
-	feesKeeper     fees.Keeper
-	contractKeeper contracts.Keeper
-	bankKeeper     bank.Keeper
-	paramsKeeper   params.Keeper
-	ethClient      ixo.EthClient
+	keeper     keeper.Keeper
+	feesKeeper fees.Keeper
+	bankKeeper bank.Keeper
 }
 
-func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, contractKeeper contracts.Keeper,
-	bankKeeper bank.Keeper, paramsKeeper params.Keeper, ethClient ixo.EthClient) AppModule {
+func NewAppModule(keeper Keeper, feesKeeper fees.Keeper, bankKeeper bank.Keeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 		feesKeeper:     feesKeeper,
-		contractKeeper: contractKeeper,
 		bankKeeper:     bankKeeper,
-		paramsKeeper:   paramsKeeper,
-		ethClient:      ethClient,
 	}
 }
 
@@ -124,7 +120,7 @@ func (AppModule) Route() string {
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper, am.feesKeeper, am.contractKeeper, am.bankKeeper, am.paramsKeeper, am.ethClient)
+	return NewHandler(am.keeper, am.feesKeeper, am.bankKeeper)
 }
 
 func (AppModule) QuerierRoute() string {
@@ -135,17 +131,21 @@ func (am AppModule) NewQuerierHandler() sdk.Querier {
 	return keeper.NewQuerier(am.keeper)
 }
 
-func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abciTypes.ValidatorUpdate {
-	return []abciTypes.ValidatorUpdate{}
+func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
+	var genesisState GenesisState
+	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
+	InitGenesis(ctx, am.keeper, genesisState)
+	return []abci.ValidatorUpdate{}
 }
 
 func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
-	return nil
+	gs := ExportGenesis(ctx, am.keeper)
+	return ModuleCdc.MustMarshalJSON(gs)
 }
 
-func (am AppModule) BeginBlock(ctx sdk.Context, req abciTypes.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 }
 
-func (AppModule) EndBlock(_ sdk.Context, _ abciTypes.RequestEndBlock) []abciTypes.ValidatorUpdate {
-	return []abciTypes.ValidatorUpdate{}
+func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	return []abci.ValidatorUpdate{}
 }
