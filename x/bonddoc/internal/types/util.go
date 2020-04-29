@@ -17,11 +17,11 @@ func NewMsgCreateBond(bondDoc BondDoc, bondDid sovrin.SovrinDid) MsgCreateBond {
 	}
 }
 
-func NewMsgUpdateBondStatus(senderDid string, updateBondStatusDoc UpdateBondStatusDoc, projectDid sovrin.SovrinDid) MsgUpdateBondStatus {
+func NewMsgUpdateBondStatus(senderDid string, updateBondStatusDoc UpdateBondStatusDoc, bondDid sovrin.SovrinDid) MsgUpdateBondStatus {
 	return MsgUpdateBondStatus{
 		SignBytes: "",
 		SenderDid: senderDid,
-		BondDid:   projectDid.Did,
+		BondDid:   bondDid.Did,
 		Data:      updateBondStatusDoc,
 	}
 }
