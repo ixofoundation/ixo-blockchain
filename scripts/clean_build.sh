@@ -3,5 +3,5 @@
 rm -rf "$HOME"/.ixod
 rm -rf "$HOME"/.ixocli
 
-cd "$HOME"/go/src/github.com/ixofoundation/ixo-cosmos/ || exit
+cd "$HOME"/go/src/github.com/ixofoundation/ixo-blockchain/ || exit
 make install

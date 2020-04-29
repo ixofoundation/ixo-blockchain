@@ -21,6 +21,7 @@ func NewMsgCreateProject(projectDoc ProjectDoc, projectDid sovrin.SovrinDid) Msg
 func NewMsgUpdateProjectStatus(senderDid string, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid sovrin.SovrinDid) MsgUpdateProjectStatus {
 	return MsgUpdateProjectStatus{
 		SignBytes:  "",
+		TxHash:     "",
 		SenderDid:  senderDid,
 		ProjectDid: projectDid.Did,
 		Data:       updateProjectStatusDoc,

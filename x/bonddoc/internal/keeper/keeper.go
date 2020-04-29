@@ -68,7 +68,7 @@ func (k Keeper) UpdateBondDoc(ctx sdk.Context, newBondDoc types.StoredBondDoc) (
 	existedDoc, _ := k.GetBondDoc(ctx, newBondDoc.GetBondDid())
 	if existedDoc == nil {
 
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc details are not exist")
+		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "BondDoc details are not exist")
 	} else {
 
 		existedDoc.SetStatus(newBondDoc.GetStatus())
