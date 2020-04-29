@@ -82,6 +82,7 @@ var _ StoredProjectDoc = (*MsgCreateProject)(nil)
 
 type MsgUpdateProjectStatus struct {
 	SignBytes  string                 `json:"signBytes" yaml:"signBytes"`
+	TxHash     string                 `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did                `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did                `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
