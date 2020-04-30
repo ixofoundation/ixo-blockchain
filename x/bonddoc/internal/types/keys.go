@@ -7,8 +7,8 @@ import (
 const (
 	ModuleName   = "bonddoc"
 	StoreKey     = ModuleName
-	RouterKey    = StoreKey
-	QuerierRoute = RouterKey
+	RouterKey    = ModuleName
+	QuerierRoute = ModuleName
 )
 
 var (

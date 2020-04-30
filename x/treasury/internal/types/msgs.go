@@ -24,7 +24,7 @@ type MsgSend struct {
 
 var _ TreasuryMessage = MsgSend{}
 
-func (msg MsgSend) Type() string  { return ModuleName }
+func (msg MsgSend) Type() string  { return "send" }
 func (msg MsgSend) Route() string { return RouterKey }
 func (msg MsgSend) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
@@ -79,7 +79,7 @@ type MsgOracleTransfer struct {
 
 var _ TreasuryMessage = MsgOracleTransfer{}
 
-func (msg MsgOracleTransfer) Type() string  { return ModuleName }
+func (msg MsgOracleTransfer) Type() string  { return "oracle-transfer" }
 func (msg MsgOracleTransfer) Route() string { return RouterKey }
 func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
@@ -137,7 +137,7 @@ type MsgOracleMint struct {
 
 var _ TreasuryMessage = MsgOracleMint{}
 
-func (msg MsgOracleMint) Type() string  { return ModuleName }
+func (msg MsgOracleMint) Type() string  { return "oracle-mint" }
 func (msg MsgOracleMint) Route() string { return RouterKey }
 func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
@@ -191,7 +191,7 @@ type MsgOracleBurn struct {
 
 var _ TreasuryMessage = MsgOracleBurn{}
 
-func (msg MsgOracleBurn) Type() string  { return ModuleName }
+func (msg MsgOracleBurn) Type() string  { return "oracle-burn" }
 func (msg MsgOracleBurn) Route() string { return RouterKey }
 func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")

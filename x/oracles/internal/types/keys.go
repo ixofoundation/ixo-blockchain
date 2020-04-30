@@ -5,8 +5,8 @@ import "github.com/ixofoundation/ixo-cosmos/x/ixo"
 const (
 	ModuleName   = "oracles"
 	StoreKey     = ModuleName
-	RouterKey    = StoreKey
-	QuerierRoute = RouterKey
+	RouterKey    = ModuleName
+	QuerierRoute = ModuleName
 )
 
 var (
