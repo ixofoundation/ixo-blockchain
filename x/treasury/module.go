@@ -100,8 +100,7 @@ func (am AppModule) NewHandler() sdk.Handler {
 }
 
 func (AppModule) QuerierRoute() string {
-	// return QuerierRoute
-	return ""
+	return QuerierRoute
 }
 
 func (am AppModule) NewQuerierHandler() sdk.Querier {

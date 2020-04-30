@@ -8,8 +8,8 @@ const (
 	ModuleName        = "project"
 	DefaultParamspace = ModuleName
 	StoreKey          = ModuleName
-	RouterKey         = StoreKey
-	QuerierRoute      = RouterKey
+	RouterKey         = ModuleName
+	QuerierRoute      = ModuleName
 )
 
 var (

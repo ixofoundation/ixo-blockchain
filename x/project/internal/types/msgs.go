@@ -19,7 +19,7 @@ type MsgCreateProject struct {
 
 var _ sdk.Msg = MsgCreateProject{}
 
-func (msg MsgCreateProject) Type() string  { return ModuleName }
+func (msg MsgCreateProject) Type() string  { return "create-project" }
 func (msg MsgCreateProject) Route() string { return RouterKey }
 func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
@@ -88,7 +88,7 @@ type MsgUpdateProjectStatus struct {
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateProjectStatus) Type() string             { return ModuleName }
+func (msg MsgUpdateProjectStatus) Type() string             { return "update-project-status" }
 func (msg MsgUpdateProjectStatus) Route() string            { return RouterKey }
 func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error { return nil }
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
@@ -120,7 +120,7 @@ type MsgCreateAgent struct {
 
 func (msg MsgCreateAgent) IsNewDid() bool     { return false }
 func (msg MsgCreateAgent) IsWithdrawal() bool { return false }
-func (msg MsgCreateAgent) Type() string       { return ModuleName }
+func (msg MsgCreateAgent) Type() string       { return "create-agent" }
 func (msg MsgCreateAgent) Route() string      { return RouterKey }
 func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	return nil
@@ -156,7 +156,7 @@ type MsgUpdateAgent struct {
 
 func (msg MsgUpdateAgent) IsNewDid() bool     { return false }
 func (msg MsgUpdateAgent) IsWithdrawal() bool { return false }
-func (msg MsgUpdateAgent) Type() string       { return ModuleName }
+func (msg MsgUpdateAgent) Type() string       { return "update-agent" }
 func (msg MsgUpdateAgent) Route() string      { return RouterKey }
 func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	return nil
@@ -193,7 +193,7 @@ type MsgCreateClaim struct {
 
 func (msg MsgCreateClaim) IsNewDid() bool     { return false }
 func (msg MsgCreateClaim) IsWithdrawal() bool { return false }
-func (msg MsgCreateClaim) Type() string       { return ModuleName }
+func (msg MsgCreateClaim) Type() string       { return "create-claim" }
 func (msg MsgCreateClaim) Route() string      { return RouterKey }
 func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	return nil
@@ -230,7 +230,7 @@ type MsgCreateEvaluation struct {
 
 func (msg MsgCreateEvaluation) IsNewDid() bool     { return false }
 func (msg MsgCreateEvaluation) IsWithdrawal() bool { return false }
-func (msg MsgCreateEvaluation) Type() string       { return ModuleName }
+func (msg MsgCreateEvaluation) Type() string       { return "create-evaluation" }
 func (msg MsgCreateEvaluation) Route() string      { return RouterKey }
 func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	return nil
@@ -265,7 +265,7 @@ type MsgWithdrawFunds struct {
 
 func (msg MsgWithdrawFunds) IsNewDid() bool     { return false }
 func (msg MsgWithdrawFunds) IsWithdrawal() bool { return true }
-func (msg MsgWithdrawFunds) Type() string       { return ModuleName }
+func (msg MsgWithdrawFunds) Type() string       { return "withdraw-funds" }
 func (msg MsgWithdrawFunds) Route() string      { return RouterKey }
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil

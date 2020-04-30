@@ -19,7 +19,7 @@ type MsgCreateBond struct {
 
 var _ sdk.Msg = MsgCreateBond{}
 
-func (msg MsgCreateBond) Type() string  { return ModuleName }
+func (msg MsgCreateBond) Type() string  { return "create-bond" }
 func (msg MsgCreateBond) Route() string { return RouterKey }
 func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
@@ -75,7 +75,7 @@ type MsgUpdateBondStatus struct {
 	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateBondStatus) Type() string             { return ModuleName }
+func (msg MsgUpdateBondStatus) Type() string             { return "update-bond-status" }
 func (msg MsgUpdateBondStatus) Route() string            { return RouterKey }
 func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error { return nil }
 func (msg MsgUpdateBondStatus) GetSignBytes() []byte {

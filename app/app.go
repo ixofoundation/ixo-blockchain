@@ -298,16 +298,16 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
-		switch msg.Type() {
-		case did.ModuleName:
+		switch msg.Route() {
+		case did.RouterKey:
 			return didAnteHandler(ctx, tx, false)
-		case project.ModuleName:
+		case project.RouterKey:
 			return projectAnteHandler(ctx, tx, false)
-		case bonddoc.ModuleName:
+		case bonddoc.RouterKey:
 			return bonddocAnteHandler(ctx, tx, false)
-		case bonds.ModuleName:
+		case bonds.RouterKey:
 			return bondsAnteHandler(ctx, tx, false)
-		case treasury.ModuleName:
+		case treasury.RouterKey:
 			return treasuryAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, false)
