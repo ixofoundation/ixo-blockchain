@@ -107,7 +107,7 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewMsgSendOnBehalfOf(fromDid, toDid, coins, sovrinDid)
+			msg := types.NewMsgOracleTransfer(fromDid, toDid, coins, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

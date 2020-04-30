@@ -17,7 +17,7 @@ func NewMsgSend(toDid ixo.Did, amount sdk.Coins, senderDid sovrin.SovrinDid) Msg
 	}
 }
 
-func NewMsgSendOnBehalfOf(fromDid, toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgOracleTransfer {
+func NewMsgOracleTransfer(fromDid, toDid ixo.Did, amount sdk.Coins, oracleDid sovrin.SovrinDid) MsgOracleTransfer {
 	return MsgOracleTransfer{
 		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
