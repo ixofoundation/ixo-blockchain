@@ -310,7 +310,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		case treasury.ModuleName:
 			return treasuryAnteHandler(ctx, tx, false)
 		default:
-			return cosmosAnteHandler(ctx, tx, true)
+			return cosmosAnteHandler(ctx, tx, false)
 		}
 	}
 }
