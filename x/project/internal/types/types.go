@@ -9,14 +9,12 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-type InternalAccountID = string
-
-type Config struct {
-	AccountMapPrefix  string
-	WithdrawalsPrefix string
-}
-
-type AccountMap map[string]sdk.AccAddress
+type (
+	InternalAccountID          string
+	AccountMap                 map[string]sdk.AccAddress
+	ProjectStatus              string
+	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
+)
 
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
@@ -25,8 +23,6 @@ type StoredProjectDoc interface {
 	GetStatus() ProjectStatus
 	SetStatus(status ProjectStatus)
 }
-
-type ProjectStatus string
 
 const (
 	NullStatus     ProjectStatus = ""
@@ -40,8 +36,8 @@ const (
 
 var StateTransitions = initStateTransitions()
 
-func initStateTransitions() map[ProjectStatus][]ProjectStatus {
-	return map[ProjectStatus][]ProjectStatus{
+func initStateTransitions() ProjectStatusTransitionMap {
+	return ProjectStatusTransitionMap{
 		NullStatus:     {CreatedProject},
 		CreatedProject: {PendingStatus},
 		PendingStatus:  {CreatedProject, FundedStatus},
@@ -49,17 +45,15 @@ func initStateTransitions() map[ProjectStatus][]ProjectStatus {
 		StartedStatus:  {StoppedStatus},
 		StoppedStatus:  {PaidoutStatus},
 	}
-
 }
 
-func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectStatus ProjectStatus) bool {
-	validStatuses := StateTransitions[previousProjectStatus]
+func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
+	validStatuses := StateTransitions[prev]
 	for _, v := range validStatuses {
-		if v == nextProjectStatus {
+		if v == next {
 			return true
 		}
 	}
-
 	return false
 }
 
