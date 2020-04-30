@@ -13,8 +13,6 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
-type InternalAccountID = string
-
 const (
 	IxoAccountFeesId               InternalAccountID = "IxoFees"
 	IxoAccountPayFeesId            InternalAccountID = "IxoPayFees"

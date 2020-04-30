@@ -29,9 +29,10 @@ type (
 	MsgCreateEvaluation    = types.MsgCreateEvaluation
 	MsgWithdrawFunds       = types.MsgWithdrawFunds
 
-	StoredProjectDoc = types.StoredProjectDoc
-	WithdrawalInfo   = types.WithdrawalInfo
-	AccountMap       = types.AccountMap
+	StoredProjectDoc  = types.StoredProjectDoc
+	WithdrawalInfo    = types.WithdrawalInfo
+	AccountMap        = types.AccountMap
+	InternalAccountID = types.InternalAccountID
 )
 
 var (

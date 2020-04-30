@@ -9,6 +9,8 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/ixo"
 )
 
+type InternalAccountID = string
+
 type Config struct {
 	AccountMapPrefix  string
 	WithdrawalsPrefix string
