@@ -47,4 +47,5 @@ var ValidWithdrawalInfo = WithdrawalInfo{
 
 var (
 	ValidAddress1, _ = sdk.AccAddressFromHex("0F6A8D732716BA24B213D7C28984FBE1248D009D")
+	ValidAccId1      = InternalAccountID(ValidAddress1.String())
 )

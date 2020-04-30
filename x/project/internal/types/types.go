@@ -11,10 +11,14 @@ import (
 
 type (
 	InternalAccountID          string
-	AccountMap                 map[string]sdk.AccAddress
+	AccountMap                 map[InternalAccountID]sdk.AccAddress
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
 )
+
+func (id InternalAccountID) ToAddressKey(projectDid ixo.Did) string {
+	return projectDid + "/" + string(id)
+}
 
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
@@ -99,7 +103,7 @@ type CreateAgentDoc struct {
 	Role     string  `json:"role" yaml:"role"`
 }
 
-type AgentStatus string
+type AgentStatus = string
 
 const (
 	PendingAgent  AgentStatus = "0"

@@ -102,7 +102,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	}
 
 	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
-	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.GetProjectDid()))
 
 	require.False(t, k.ProjectDocExists(ctx, msg.GetProjectDid()))
 	k.SetProjectDoc(ctx, &msg)
@@ -146,7 +146,7 @@ func Test_WithdrawFunds(t *testing.T) {
 		},
 	}
 	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
-	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), msg1.GetProjectDid())
+	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), InternalAccountID(msg1.GetProjectDid()))
 
 	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
 
