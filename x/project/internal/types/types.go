@@ -62,10 +62,10 @@ func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
 }
 
 type WithdrawalInfo struct {
-	ActionID            string `json:"actionID" yaml:"actionID"`
-	ProjectEthWallet    string `json:"projectEthWallet" yaml:"projectEthWallet"`
-	RecipientEthAddress string `json:"recipientEthAddress" yaml:"recipientEthAddress"`
-	Amount              int64  `json:"amount" yaml:"amount"`
+	ActionID     string   `json:"actionID" yaml:"actionID"`
+	ProjectDid   ixo.Did  `json:"projectDid" yaml:"projectDid"`
+	RecipientDid ixo.Did  `json:"recipientDid" yaml:"recipientDid"`
+	Amount       sdk.Coin `json:"amount" yaml:"amount"`
 }
 
 type UpdateProjectStatusDoc struct {
@@ -135,15 +135,11 @@ type CreateEvaluationDoc struct {
 }
 
 type WithdrawFundsDoc struct {
-	ProjectDid ixo.Did `json:"projectDid" yaml:"projectDid"`
-	EthWallet  string  `json:"ethWallet" yaml:"ethWallet"`
-	Amount     string  `json:"amount" yaml:"amount"`
-	IsRefund   bool    `json:"isRefund" yaml:"isRefund"`
+	ProjectDid   ixo.Did `json:"projectDid" yaml:"projectDid"`
+	RecipientDid ixo.Did `json:"recipientDid" yaml:"recipientDid"`
+	Amount       string  `json:"amount" yaml:"amount"`
+	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
 }
-
-func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }
-func (wd WithdrawFundsDoc) GetEthWallet() string   { return wd.EthWallet }
-func (wd WithdrawFundsDoc) GetIsRefund() bool      { return wd.IsRefund }
 
 type ProjectMsg interface {
 	sdk.Msg

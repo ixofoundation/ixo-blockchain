@@ -122,10 +122,10 @@ func Test_WithdrawFunds(t *testing.T) {
 		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
 		Data: types.WithdrawFundsDoc{
-			ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-			EthWallet:  "ethwallet",
-			Amount:     "100",
-			IsRefund:   true,
+			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
+			RecipientDid: "6iftm1hHdaU6LJGKayRMev",
+			Amount:       "100",
+			IsRefund:     true,
 		},
 	}
 
