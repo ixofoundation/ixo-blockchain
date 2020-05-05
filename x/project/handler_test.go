@@ -124,7 +124,7 @@ func Test_WithdrawFunds(t *testing.T) {
 		Data: types.WithdrawFundsDoc{
 			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
 			RecipientDid: "6iftm1hHdaU6LJGKayRMev",
-			Amount:       "100",
+			Amount:       sdk.NewInt(100),
 			IsRefund:     true,
 		},
 	}

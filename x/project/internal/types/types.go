@@ -137,7 +137,7 @@ type CreateEvaluationDoc struct {
 type WithdrawFundsDoc struct {
 	ProjectDid   ixo.Did `json:"projectDid" yaml:"projectDid"`
 	RecipientDid ixo.Did `json:"recipientDid" yaml:"recipientDid"`
-	Amount       string  `json:"amount" yaml:"amount"`
+	Amount       sdk.Int `json:"amount" yaml:"amount"`
 	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
 }
 

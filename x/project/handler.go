@@ -128,7 +128,13 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did) s
 	}
 
 	ixoDid := k.GetParams(ctx).IxoDid
-	return payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid).Result()
+	amount := getIxoAmount(ctx, k, bk, projectDid, IxoAccountFeesId)
+	err = payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid, amount)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{}
 }
 
 func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
@@ -246,6 +252,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	projectDid := withdrawFundsDoc.ProjectDid
 	recipientDid := withdrawFundsDoc.RecipientDid
+	amount := withdrawFundsDoc.Amount
 
 	var fromAccountId InternalAccountID
 	if withdrawFundsDoc.IsRefund {
@@ -254,7 +261,8 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		fromAccountId = InternalAccountID(recipientDid)
 	}
 
-	err = payoutAndRecon(ctx, k, bk, projectDid, fromAccountId, recipientDid)
+	amountCoin := sdk.NewCoin(ixo.IxoNativeToken, amount)
+	err = payoutAndRecon(ctx, k, bk, projectDid, fromAccountId, recipientDid, amountCoin)
 	if err != nil {
 		return err.Result()
 	}
@@ -263,11 +271,11 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 }
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
-	fromAccountId InternalAccountID, recipientDid ixo.Did) sdk.Error {
+	fromAccountId InternalAccountID, recipientDid ixo.Did, amount sdk.Coin) sdk.Error {
 
-	balanceToPay := getIxoAmount(ctx, k, bk, projectDid, fromAccountId)
-	if balanceToPay.Amount.IsZero() {
-		return nil
+	ixoBalance := getIxoAmount(ctx, k, bk, projectDid, fromAccountId)
+	if ixoBalance.IsLT(amount) {
+		return sdk.ErrInternal("insufficient funds in specified account")
 	}
 
 	fromAccount, err := getAccountInProjectAccounts(ctx, k, projectDid, fromAccountId)
@@ -276,7 +284,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Di
 	}
 
 	recipientAddr := types.StringToAddr(recipientDid)
-	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{balanceToPay})
+	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{amount})
 	if err != nil {
 		return err
 	}
@@ -285,7 +293,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Di
 	dec := sdk.OneDec() // TODO: should increment with each withdrawal
 	copy(actionId[:], dec.Bytes())
 
-	addProjectWithdrawalTransaction(ctx, k, projectDid, actionId, recipientDid, balanceToPay)
+	addProjectWithdrawalTransaction(ctx, k, projectDid, actionId, recipientDid, amount)
 	return nil
 }
 
