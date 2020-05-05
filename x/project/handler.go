@@ -127,7 +127,7 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did) s
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
 
-	ixoDid := ixo.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ") // TODO: should not be hardcoded
+	ixoDid := k.GetParams(ctx).IxoDid
 	return payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid).Result()
 }
 
