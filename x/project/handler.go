@@ -280,7 +280,10 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Di
 		return err
 	}
 
-	var actionId [32]byte // TODO
+	var actionId [32]byte
+	dec := sdk.OneDec() // TODO: should increment with each withdrawal
+	copy(actionId[:], dec.Bytes())
+
 	addProjectWithdrawalTransaction(ctx, k, projectDid, actionId, recipientDid, balanceToPay)
 	return nil
 }
