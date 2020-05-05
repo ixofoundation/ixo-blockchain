@@ -127,7 +127,8 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did) s
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
 
-	return sdk.Result{} // TODO: payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, IxoWallet).Result()
+	ixoDid := ixo.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ") // TODO: should not be hardcoded
+	return payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid).Result()
 }
 
 func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
