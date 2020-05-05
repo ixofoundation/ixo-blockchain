@@ -32,9 +32,7 @@ func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) s
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCredential) sdk.Result {
@@ -43,7 +41,5 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }

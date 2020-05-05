@@ -63,9 +63,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 	k.SetProjectDoc(ctx, &msg)
 	k.SetProjectWithdrawalTransactions(ctx, msg.GetProjectDid(), nil)
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
@@ -109,9 +107,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	existingProjectDoc.SetStatus(newStatus)
 	_, _ = k.UpdateProjectDoc(ctx, existingProjectDoc)
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper,
@@ -179,104 +175,72 @@ func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
 }
 
 func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateAgent) sdk.Result {
-	_, err := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.Data.AgentDid))
+
+	// Check if project exists
+	_, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	if err != nil {
+		return sdk.ErrUnknownRequest("Could not find Project").Result()
+	}
+
+	// Create account in project accounts for the agent
+	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.Data.AgentDid))
 	if err != nil {
 		err.Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpdateAgent) sdk.Result {
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
+	// Check if project exists
+	_, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	if err != nil {
+		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
+
+	// TODO: implement agent update (or remove functionality)
+
+	return sdk.Result{}
 }
 
 func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
 
-	// TODO: check if project exists before calling processFees
-	// Something will still fail but it's better to give a more meaningful error
-
-	_, err := processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
+	// Check if project exists
+	_, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
-
-		return err.Result()
-	} else {
-
-		return sdk.Result{
-			Code: sdk.CodeOK,
-		}
+		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
+
+	// Process claim fees
+	_, err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{}
 }
 
 func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
 
-	// TODO: check if project exists before calling processFees
-	// Something will still fail but it's better to give a more meaningful error
-
-	_, err := processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.GetProjectDid())
-	if err != nil {
-		return err.Result()
-	}
-
+	// Check if project exists
 	projectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	if projectDoc.GetEvaluatorPay() != 0 {
-		projectDid := msg.GetProjectDid()
-		projectAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(msg.GetProjectDid()))
-		evaluatorAccAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(msg.GetSenderDid()))
-
-		found := checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
-		var nodeAddr sdk.AccAddress
-		if !found {
-			nodeAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
-		} else {
-			nodeAddr, _ = getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InitiatingNodeAccountPayFeesId)
-		}
-
-		found = checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
-		var ixoAddr sdk.AccAddress
-		if !found {
-			ixoAddr, _ = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountPayFeesId)
-		} else {
-			ixoAddr, _ = getAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountPayFeesId)
-		}
-
-		feePercentage := fk.GetParams(ctx).EvaluationPayFeePercentage
-		nodeFeePercentage := fk.GetParams(ctx).EvaluationPayNodeFeePercentage
-
-		totalEvaluatorPayAmount := sdk.NewDec(projectDoc.GetEvaluatorPay()).Mul(ixo.IxoDecimals) // This is in IXO * 10^8
-		evaluatorPayFeeAmount := totalEvaluatorPayAmount.Mul(feePercentage)
-		evaluatorPayLessFees := totalEvaluatorPayAmount.Sub(evaluatorPayFeeAmount)
-		nodePayFees := evaluatorPayFeeAmount.Mul(nodeFeePercentage)
-		ixoPayFees := evaluatorPayFeeAmount.Sub(nodePayFees)
-
-		err := bk.SendCoins(ctx, projectAddr, evaluatorAccAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, evaluatorPayLessFees.RoundInt64())})
-		if err != nil {
-			return err.Result()
-		}
-
-		err = bk.SendCoins(ctx, projectAddr, nodeAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodePayFees.RoundInt64())})
-		if err != nil {
-			return err.Result()
-		}
-
-		err = bk.SendCoins(ctx, projectAddr, ixoAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, ixoPayFees.RoundInt64())})
-		if err != nil {
-			return err.Result()
-		}
+	_, err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.GetProjectDid())
+	if err != nil {
+		return err.Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
+	err = processEvaluatorPay(ctx, k, fk, bk, msg.GetProjectDid(),
+		msg.GetSenderDid(), projectDoc.GetEvaluatorPay())
+	if err != nil {
+		return err.Result()
 	}
+
+	return sdk.Result{}
 }
 
 func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
@@ -338,9 +302,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 //		addProjectWithdrawalTransaction(ctx, k, projectDid, actionID, projectEthWallet, recipientEthAddress, balanceToPay)
 //	}
 //
-//	return sdk.Result{
-//		Code: sdk.CodeOK,
-//	}
+//	return sdk.Result{}
 //}
 
 func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProjectDoc, sdk.Error) {
@@ -395,9 +357,59 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 		return sdk.Result{}, err
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}, nil
+	return sdk.Result{}, nil
+}
+
+func processEvaluatorPay(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, projectDid, senderDid ixo.Did, evaluatorPay int64) sdk.Error {
+
+	if evaluatorPay == 0 {
+		return nil
+	}
+
+	projectAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(projectDid))
+	evaluatorAccAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(senderDid))
+
+	found := checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+	var nodeAddr sdk.AccAddress
+	if !found {
+		nodeAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+	} else {
+		nodeAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+	}
+
+	found = checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+	var ixoAddr sdk.AccAddress
+	if !found {
+		ixoAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountPayFeesId)
+	} else {
+		ixoAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountPayFeesId)
+	}
+
+	feePercentage := fk.GetParams(ctx).EvaluationPayFeePercentage
+	nodeFeePercentage := fk.GetParams(ctx).EvaluationPayNodeFeePercentage
+
+	totalEvaluatorPayAmount := sdk.NewDec(evaluatorPay).Mul(ixo.IxoDecimals) // This is in IXO * 10^8
+	evaluatorPayFeeAmount := totalEvaluatorPayAmount.Mul(feePercentage)
+	evaluatorPayLessFees := totalEvaluatorPayAmount.Sub(evaluatorPayFeeAmount)
+	nodePayFees := evaluatorPayFeeAmount.Mul(nodeFeePercentage)
+	ixoPayFees := evaluatorPayFeeAmount.Sub(nodePayFees)
+
+	err := bk.SendCoins(ctx, projectAddr, evaluatorAccAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, evaluatorPayLessFees.RoundInt64())})
+	if err != nil {
+		return err
+	}
+
+	err = bk.SendCoins(ctx, projectAddr, nodeAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodePayFees.RoundInt64())})
+	if err != nil {
+		return err
+	}
+
+	err = bk.SendCoins(ctx, projectAddr, ixoAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, ixoPayFees.RoundInt64())})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid ixo.Did,

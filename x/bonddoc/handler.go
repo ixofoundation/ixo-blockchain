@@ -32,9 +32,7 @@ func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Resul
 	}
 	k.SetBondDoc(ctx, &msg)
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatus) sdk.Result {
@@ -54,9 +52,7 @@ func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatu
 	ExistingBondDoc.SetStatus(newStatus)
 	_, _ = k.UpdateBondDoc(ctx, ExistingBondDoc)
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func getBondDoc(ctx sdk.Context, k Keeper, bondDid ixo.Did) (StoredBondDoc, sdk.Error) {
