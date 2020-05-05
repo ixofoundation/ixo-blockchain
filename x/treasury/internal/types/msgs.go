@@ -75,6 +75,7 @@ type MsgOracleTransfer struct {
 	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
 	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
+	Proof     string    `json:"proof" yaml:"proof"`
 }
 
 var _ TreasuryMessage = MsgOracleTransfer{}
@@ -133,6 +134,7 @@ type MsgOracleMint struct {
 	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
 	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
+	Proof     string    `json:"proof" yaml:"proof"`
 }
 
 var _ TreasuryMessage = MsgOracleMint{}
@@ -187,6 +189,7 @@ type MsgOracleBurn struct {
 	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
 	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
+	Proof     string    `json:"proof" yaml:"proof"`
 }
 
 var _ TreasuryMessage = MsgOracleBurn{}
