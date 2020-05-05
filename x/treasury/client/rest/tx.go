@@ -122,7 +122,7 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSendOnBehalfOf(fromDidParam, toDidParam, coins, oracleDid)
+		msg := types.NewMsgOracleTransfer(fromDidParam, toDidParam, coins, oracleDid)
 
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))
