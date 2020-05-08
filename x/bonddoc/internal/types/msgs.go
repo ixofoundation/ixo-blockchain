@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type MsgCreateBond struct {
@@ -86,12 +86,12 @@ func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetBondDid())}
 }
 
-func (ups MsgUpdateBondStatus) GetBondDid() ixo.Did {
-	return ups.BondDid
+func (msg MsgUpdateBondStatus) GetBondDid() ixo.Did {
+	return msg.BondDid
 }
 
-func (ups MsgUpdateBondStatus) GetStatus() BondStatus {
-	return ups.Data.Status
+func (msg MsgUpdateBondStatus) GetStatus() BondStatus {
+	return msg.Data.Status
 }
 
 func (msg MsgUpdateBondStatus) IsNewDid() bool     { return false }

@@ -2,7 +2,7 @@ package sovrin
 
 import (
 	"bytes"
-	crypto_rand "crypto/rand"
+	cryptoRand "crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/go-bip39"
 	"golang.org/x/crypto/ed25519"
-	naclbox "golang.org/x/crypto/nacl/box"
+	naclBox "golang.org/x/crypto/nacl/box"
 )
 
 type SovrinSecret struct {
@@ -73,17 +73,17 @@ func FromSeed(seed [32]byte) SovrinDid {
 	privateKey := []byte(privateKeyBytes)
 
 	signKey := base58.Encode(privateKey[:32])
-	keyPair_publicKey, keyPair_privateKey, err := naclbox.GenerateKey(bytes.NewReader(privateKey[:]))
+	keyPairPublicKey, keyPairPrivateKey, err := naclBox.GenerateKey(bytes.NewReader(privateKey[:]))
 
 	sovDid := SovrinDid{
 		Did:                 base58.Encode(publicKey[:16]),
 		VerifyKey:           base58.Encode(publicKey),
-		EncryptionPublicKey: base58.Encode(keyPair_publicKey[:]),
+		EncryptionPublicKey: base58.Encode(keyPairPublicKey[:]),
 
 		Secret: SovrinSecret{
 			Seed:                 hex.EncodeToString(seed[0:32]),
 			SignKey:              signKey,
-			EncryptionPrivateKey: base58.Encode(keyPair_privateKey[:]),
+			EncryptionPrivateKey: base58.Encode(keyPairPrivateKey[:]),
 		},
 	}
 
@@ -92,7 +92,7 @@ func FromSeed(seed [32]byte) SovrinDid {
 
 func Gen() SovrinDid {
 	var seed [32]byte
-	if _, err := io.ReadFull(crypto_rand.Reader, seed[:]); err != nil {
+	if _, err := io.ReadFull(cryptoRand.Reader, seed[:]); err != nil {
 		panic(err)
 	}
 	return FromSeed(seed)
@@ -118,7 +118,7 @@ func VerifySignedMessage(message []byte, signature []byte, verifyKey string) boo
 
 func GetNonce() [24]byte {
 	var nonce [24]byte
-	if _, err := io.ReadFull(crypto_rand.Reader, nonce[:]); err != nil {
+	if _, err := io.ReadFull(cryptoRand.Reader, nonce[:]); err != nil {
 		panic(err)
 	}
 	return nonce
@@ -129,7 +129,7 @@ func getArrayFromKey(key string) []byte {
 }
 
 func GetKeyPairFromSignKey(signKey string) ([32]byte, [32]byte) {
-	publicKey, privateKey, err := naclbox.GenerateKey(bytes.NewReader(getArrayFromKey(signKey)))
+	publicKey, privateKey, err := naclBox.GenerateKey(bytes.NewReader(getArrayFromKey(signKey)))
 	if err != nil {
 		panic(err)
 	}

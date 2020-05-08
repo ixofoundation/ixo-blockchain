@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type MsgCreateProject struct {
@@ -99,12 +99,12 @@ func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (ups MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
-	return ups.ProjectDid
+func (msg MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
+	return msg.ProjectDid
 }
 
-func (ups MsgUpdateProjectStatus) GetStatus() ProjectStatus {
-	return ups.Data.Status
+func (msg MsgUpdateProjectStatus) GetStatus() ProjectStatus {
+	return msg.Data.Status
 }
 
 func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }

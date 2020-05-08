@@ -3,14 +3,14 @@ package project
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type InternalAccountID = string
@@ -413,10 +413,10 @@ func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper, projectDid ixo.D
 	actionIDStr := "0x" + hex.EncodeToString(actionID[:])
 
 	withdrawalInfo := WithdrawalInfo{
-		actionIDStr,
-		projectEthWallet,
-		recipientEthAddress,
-		amount,
+		ActionID:            actionIDStr,
+		ProjectEthWallet:    projectEthWallet,
+		RecipientEthAddress: recipientEthAddress,
+		Amount:              amount,
 	}
 
 	k.AddProjectWithdrawalTransaction(ctx, projectDid, withdrawalInfo)

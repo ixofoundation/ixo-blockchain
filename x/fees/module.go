@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/ixofoundation/ixo-cosmos/x/fees/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/client/cli"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/fees/client/rest"
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/client/rest"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/keeper"
 )
 
 var (

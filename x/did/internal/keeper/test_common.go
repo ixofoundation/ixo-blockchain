@@ -8,7 +8,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
 func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {

@@ -1,8 +1,8 @@
 package fees
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
 const (
@@ -11,8 +11,6 @@ const (
 	QuerierRoute      = types.QuerierRoute
 	RouterKey         = types.RouterKey
 	StoreKey          = types.StoreKey
-
-	DefaultCodeSpace = types.DefaultCodeSpace
 
 	FeeClaimTransaction      = types.FeeClaimTransaction
 	FeeEvaluationTransaction = types.FeeEvaluationTransaction
