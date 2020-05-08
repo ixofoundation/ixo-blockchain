@@ -222,7 +222,7 @@ echo "Creating a claim in project 2..."
 ixocli tx project createClaim "tx_hash" "sender_did" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Creating an evaluation in project 2..."
 SENDER_DID="$MIGUEL_DID"
-STATUS="1"  # createEvaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
+STATUS="1" # createEvaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
 ixocli tx project createEvaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Adding agents (this creates a project account for the agent in the respective project)

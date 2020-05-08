@@ -1,7 +1,8 @@
-import requests
 from base64 import b64decode
 from typing import List, Dict
 from urllib.parse import quote
+
+import requests
 
 URL = "http://localhost:26657"
 IGNORED_EVENTS = \
