@@ -413,10 +413,10 @@ func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper, projectDid ixo.D
 	actionIDStr := "0x" + hex.EncodeToString(actionID[:])
 
 	withdrawalInfo := WithdrawalInfo{
-		actionIDStr,
-		projectEthWallet,
-		recipientEthAddress,
-		amount,
+		ActionID:            actionIDStr,
+		ProjectEthWallet:    projectEthWallet,
+		RecipientEthAddress: recipientEthAddress,
+		Amount:              amount,
 	}
 
 	k.AddProjectWithdrawalTransaction(ctx, projectDid, withdrawalInfo)

@@ -99,7 +99,12 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 			var tx = IxoTx{}
 
 			var upTx map[string]interface{}
-			json.Unmarshal(txBytes, &upTx)
+
+			err := json.Unmarshal(txBytes, &upTx)
+			if err != nil {
+				return nil, sdk.ErrTxDecode(err.Error())
+			}
+
 			payloadArray := upTx["payload"].([]interface{})
 			if len(payloadArray) != 1 {
 				return nil, sdk.ErrTxDecode("Multiple messages not supported")
@@ -113,7 +118,7 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 
 			txBytes, _ = json.Marshal(upTx)
 
-			err := cdc.UnmarshalJSON(txBytes, &tx)
+			err = cdc.UnmarshalJSON(txBytes, &tx)
 			if err != nil {
 				return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 			}

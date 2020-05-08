@@ -12,8 +12,6 @@ const (
 	RouterKey         = types.RouterKey
 	StoreKey          = types.StoreKey
 
-	DefaultCodeSpace = types.DefaultCodeSpace
-
 	FeeClaimTransaction      = types.FeeClaimTransaction
 	FeeEvaluationTransaction = types.FeeEvaluationTransaction
 )

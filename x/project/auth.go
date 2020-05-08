@@ -27,8 +27,8 @@ func NewAnteHandler(projectKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler 
 
 		} else {
 			if projectMsg.IsWithdrawal() {
-				did := ixo.Did(msg.GetSigners()[0])
-				didDoc, _ := didKeeper.GetDidDoc(ctx, did)
+				signerDid := ixo.Did(msg.GetSigners()[0])
+				didDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
 				if didDoc == nil {
 					return ctx,
 						sdk.ErrUnauthorized("Issuer did not found").Result(),

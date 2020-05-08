@@ -5,7 +5,7 @@ import (
 	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
 )
 
-//noinspection GoUnusedConst
+//noinspection GoUnusedConst,GoNameStartsWithPackageName
 const (
 	QueryBonds          = keeper.QueryBonds
 	QueryBond           = keeper.QueryBond
