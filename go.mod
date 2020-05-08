@@ -1,4 +1,4 @@
-module github.com/ixofoundation/ixo-cosmos
+module github.com/ixofoundation/ixo-blockchain
 
 go 1.12
 

@@ -10,10 +10,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/gorilla/mux"
 
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {

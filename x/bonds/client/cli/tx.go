@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	client2 "github.com/ixofoundation/ixo-cosmos/x/bonds/client"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
+	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

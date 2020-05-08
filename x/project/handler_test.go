@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func TestHandler_CreateClaim(t *testing.T) {
@@ -115,7 +115,7 @@ func Test_WithdrawFunds(t *testing.T) {
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	cdc.RegisterConcrete(types.MsgWithdrawFunds{}, "ixo-cosmos/withdrawFundsMsg", nil)
+	cdc.RegisterConcrete(types.MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
 
 	msg := types.MsgWithdrawFunds{
 		SignBytes: "",

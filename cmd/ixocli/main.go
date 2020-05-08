@@ -17,8 +17,8 @@ import (
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tmlibs/cli"
 
-	"github.com/ixofoundation/ixo-cosmos/app"
-	ixoClient "github.com/ixofoundation/ixo-cosmos/client"
+	"github.com/ixofoundation/ixo-blockchain/app"
+	ixoClient "github.com/ixofoundation/ixo-blockchain/client"
 )
 
 func main() {

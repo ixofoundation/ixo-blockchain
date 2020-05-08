@@ -11,8 +11,8 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmDB "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Keeper) {

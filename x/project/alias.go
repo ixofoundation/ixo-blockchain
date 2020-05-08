@@ -1,8 +1,8 @@
 package project
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 const (

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

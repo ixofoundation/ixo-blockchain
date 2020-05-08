@@ -1,6 +1,6 @@
 package types
 
-import "github.com/ixofoundation/ixo-cosmos/x/ixo"
+import "github.com/ixofoundation/ixo-blockchain/x/ixo"
 
 type GenesisState struct {
 	DidDocs []ixo.DidDoc `json:"did_docs" yaml:"did_docs"`

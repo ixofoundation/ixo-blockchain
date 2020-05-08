@@ -3,8 +3,8 @@ package bonds
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
 )

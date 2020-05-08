@@ -2,7 +2,7 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/ixofoundation/ixo-cosmos/x/oracles"
+	"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"io"
 	"os"
 
@@ -29,13 +29,13 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds"
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/project"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury"
 )
 
 const (
