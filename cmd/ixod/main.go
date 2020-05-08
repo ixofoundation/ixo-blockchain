@@ -12,7 +12,7 @@ import (
 	genAccsCli "github.com/cosmos/cosmos-sdk/x/genaccounts/client/cli"
 	genUtilCli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-	oraclesCli "github.com/ixofoundation/ixo-cosmos/x/oracles/client/cli"
+	oraclesCli "github.com/ixofoundation/ixo-blockchain/x/oracles/client/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -21,7 +21,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-cosmos/app"
+	"github.com/ixofoundation/ixo-blockchain/app"
 )
 
 const (

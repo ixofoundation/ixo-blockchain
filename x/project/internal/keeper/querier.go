@@ -64,9 +64,9 @@ func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error
 		return nil, err
 	}
 
-	res, errRes := codec.MarshalJSONIndent(k.cdc, info)
-	if errRes != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err.Error()))
+	res, err2 := codec.MarshalJSONIndent(k.cdc, info)
+	if err2 != nil {
+		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err2.Error()))
 	}
 
 	return res, nil

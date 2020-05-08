@@ -29,7 +29,7 @@ ldflags = \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=ixocli \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X "github.com/ixofoundation/ixo-cosmos/version.BuildTags=$(build_tags_comma_sep)"
+	-X "github.com/ixofoundation/ixo-blockchain/version.BuildTags=$(build_tags_comma_sep)"
 
 ifeq ($(WITH_CLEVELDB),yes)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb

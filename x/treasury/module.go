@@ -8,11 +8,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/client/rest"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/client/rest"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/client/cli"
 )
 
 var (

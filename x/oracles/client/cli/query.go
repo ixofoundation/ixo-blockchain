@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-cosmos/x/oracles/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/oracles/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/types"
 )
 
 func GetOraclesRequestHandler(cdc *codec.Codec) *cobra.Command {

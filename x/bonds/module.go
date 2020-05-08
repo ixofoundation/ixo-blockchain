@@ -7,9 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/client/cli"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/client/rest"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/rest"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/spf13/cobra"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

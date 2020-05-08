@@ -2,8 +2,8 @@ package treasury
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {

@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
 func GetFeesRequestHandler(cdc *codec.Codec) *cobra.Command {
