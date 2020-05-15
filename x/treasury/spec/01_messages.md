@@ -54,6 +54,7 @@ Sending of tokens between two addresses identified by DIDs and signed by an orac
 | FromDid   | ixo.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | ToDid     | ixo.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | Amount    | sdk.Coins | The tokens being sent (e.g. `100ixo,200stake`) |
+| Proof     | string    | Arbitrary proof backing up this operation (presently unused) |
 
 ```go
 type MsgOracleTransfer struct {
@@ -63,6 +64,7 @@ type MsgOracleTransfer struct {
 	FromDid   ixo.Did
 	ToDid     ixo.Did
 	Amount    sdk.Coins
+    Proof     string
 }
 ``` 
 
@@ -77,6 +79,7 @@ Minting of tokens to an address identified by a DID and signed by an oracle is d
 | OracleDid | ixo.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | ToDid     | ixo.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | Amount    | sdk.Coins | The tokens being sent (e.g. `100ixo,200stake`) |
+| Proof     | string    | Arbitrary proof backing up this operation (presently unused) |
 
 ```go
 type MsgOracleMint struct {
@@ -85,6 +88,7 @@ type MsgOracleMint struct {
 	OracleDid ixo.Did
 	ToDid     ixo.Did
 	Amount    sdk.Coins
+    Proof     string
 }
 ``` 
 
@@ -99,6 +103,7 @@ Burning of tokens from an address identified by a DID and signed by an oracle is
 | OracleDid | ixo.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | FromDid   | ixo.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | Amount    | sdk.Coins | The tokens being sent (e.g. `100ixo,200stake`) |
+| Proof     | string    | Arbitrary proof backing up this operation (presently unused) |
 
 ```go
 type MsgOracleBurn struct {
@@ -107,5 +112,6 @@ type MsgOracleBurn struct {
 	OracleDid ixo.Did
 	FromDid   ixo.Did
 	Amount    sdk.Coins
+    Proof     string
 }
 ``` 
