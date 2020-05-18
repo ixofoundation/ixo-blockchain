@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -22,20 +23,23 @@ var _ sdk.Msg = MsgCreateBond{}
 func (msg MsgCreateBond) Type() string  { return "create-bond" }
 func (msg MsgCreateBond) Route() string { return RouterKey }
 func (msg MsgCreateBond) ValidateBasic() sdk.Error {
-	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
-	if !valid {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.BondDid, "BondDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy"); !valid {
 		return err
 	}
 
-	valid, err = CheckNotEmpty(msg.BondDid, "BondDid")
-	if !valid {
-		return err
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
-	valid, err = CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy")
-	if !valid {
-		return err
-	}
+	// No need for extra checks on Data since a blank status is valid
 
 	return nil
 }
@@ -75,9 +79,30 @@ type MsgUpdateBondStatus struct {
 	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateBondStatus) Type() string             { return "update-bond-status" }
-func (msg MsgUpdateBondStatus) Route() string            { return RouterKey }
-func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error { return nil }
+func (msg MsgUpdateBondStatus) Type() string  { return "update-bond-status" }
+func (msg MsgUpdateBondStatus) Route() string { return RouterKey }
+
+func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.BondDid, "BondDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	}
+
+	// No need for extra checks on Data since a blank status is valid
+	// IsValidProgressionFrom checked by the handler
+
+	return nil
+}
+
 func (msg MsgUpdateBondStatus) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }

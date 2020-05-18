@@ -15,7 +15,7 @@ const (
 	QueryBuyPrice       = keeper.QueryBuyPrice
 	QuerySellReturn     = keeper.QuerySellReturn
 
-	DefaultCodeSpace = types.DefaultCodespace
+	DefaultCodespace = types.DefaultCodespace
 
 	CodeArgumentInvalid                      = types.CodeArgumentInvalid
 	CodeArgumentMissingOrIncorrectType       = types.CodeArgumentMissingOrIncorrectType

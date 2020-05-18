@@ -5,5 +5,5 @@ import (
 )
 
 const (
-	DefaultCodeSpace sdk.CodespaceType = ModuleName
+	DefaultCodespace sdk.CodespaceType = ModuleName
 )

@@ -28,7 +28,7 @@ func NewHandler(k Keeper) sdk.Handler {
 func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Result {
 
 	if k.BondDocExists(ctx, msg.GetBondDid()) {
-		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Bond doc already exists")).Result()
+		return did.ErrorInvalidDid(types.DefaultCodespace, fmt.Sprintf("Bond doc already exists")).Result()
 	}
 	k.SetBondDoc(ctx, &msg)
 
@@ -57,6 +57,9 @@ func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatu
 
 func getBondDoc(ctx sdk.Context, k Keeper, bondDid ixo.Did) (StoredBondDoc, sdk.Error) {
 	ixoBondDoc, err := k.GetBondDoc(ctx, bondDid)
+	if err != nil {
+		return nil, err
+	}
 
-	return ixoBondDoc.(StoredBondDoc), err
+	return ixoBondDoc.(StoredBondDoc), nil
 }

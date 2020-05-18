@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"strings"
@@ -110,6 +111,13 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 
 	// Note: uniqueness of reserve tokens checked when parsing
 
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.CreatorDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+	}
+
 	return nil
 }
 
@@ -188,6 +196,13 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 		return ErrDidNotEditAnything(DefaultCodespace)
 	}
 
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.EditorDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "editor did is invalid")
+	}
+
 	return nil
 }
 
@@ -239,6 +254,13 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
 	}
 
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.BuyerDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "buyer did is invalid")
+	}
+
 	return nil
 }
 
@@ -285,6 +307,13 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 	// Check that non zero
 	if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
+	}
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.SellerDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "seller did is invalid")
 	}
 
 	return nil
@@ -346,6 +375,14 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 	}
 
 	// Note: From denom and amount must be valid since sdk.Coin
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.SwapperDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "swapper did is invalid")
+	}
+
 	return nil
 }
 

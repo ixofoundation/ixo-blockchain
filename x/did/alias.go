@@ -11,7 +11,7 @@ const (
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
 
-	DefaultCodeSpace = types.DefaultCodeSpace
+	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

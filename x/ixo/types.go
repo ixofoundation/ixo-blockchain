@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -11,7 +12,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 )
 
-var IxoDecimals = sdk.NewDec(100000000)
+var (
+	IxoDecimals = sdk.NewDec(100000000)
+	ValidDid    = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
+	IsValidDid  = ValidDid.MatchString
+	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html
+	// IsValidDid adapted from the above link but assumes no sub-namespaces
+	// TODO: ValidDid needs to be updated once we no longer want to be able
+	//   to consider project accounts as DIDs (especially in treasury module),
+	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
+)
 
 const IxoNativeToken = "ixo"
 

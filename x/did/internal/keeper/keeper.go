@@ -25,7 +25,7 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did ixo.Did) (ixo.DidDoc, sdk.Error) 
 	key := types.GetDidPrefixKey(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, types.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid Did Address")
+		return nil, types.ErrorInvalidDid(types.DefaultCodespace, "Invalid Did Address")
 	}
 
 	var didDoc types.BaseDidDoc
@@ -37,7 +37,7 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did ixo.Did) (ixo.DidDoc, sdk.Error) 
 func (k Keeper) SetDidDoc(ctx sdk.Context, did ixo.DidDoc) (err sdk.Error) {
 	existedDidDoc, err := k.GetDidDoc(ctx, did.GetDid())
 	if existedDidDoc != nil {
-		return types.ErrorInvalidDid(types.DefaultCodeSpace, "Did already exists")
+		return types.ErrorInvalidDid(types.DefaultCodespace, "Did already exists")
 	}
 
 	k.AddDidDoc(ctx, did)
@@ -61,7 +61,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did ixo.Did, credential types.Di
 
 	for _, data := range credentials {
 		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] && data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
-			return types.ErrorInvalidCredentials(types.DefaultCodeSpace, "credentials already exist")
+			return types.ErrorInvalidCredentials(types.DefaultCodespace, "credentials already exist")
 		}
 	}
 

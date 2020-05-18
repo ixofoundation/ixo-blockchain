@@ -58,7 +58,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 	}
 
 	if k.ProjectDocExists(ctx, msg.GetProjectDid()) {
-		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Project already exists")).Result()
+		return did.ErrorInvalidDid(types.DefaultCodespace, fmt.Sprintf("Project already exists")).Result()
 	}
 	k.SetProjectDoc(ctx, &msg)
 	k.SetProjectWithdrawalTransactions(ctx, msg.GetProjectDid(), nil)
@@ -299,8 +299,11 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Di
 
 func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProjectDoc, sdk.Error) {
 	ixoProjectDoc, err := k.GetProjectDoc(ctx, projectDid)
+	if err != nil {
+		return nil, err
+	}
 
-	return ixoProjectDoc.(StoredProjectDoc), err
+	return ixoProjectDoc.(StoredProjectDoc), nil
 }
 
 func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {

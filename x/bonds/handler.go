@@ -61,11 +61,11 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
 
 	if keeper.BondExists(ctx, msg.BondDid) {
-		return types.ErrBondAlreadyExists(DefaultCodeSpace, msg.BondDid).Result()
+		return types.ErrBondAlreadyExists(DefaultCodespace, msg.BondDid).Result()
 	} else if keeper.BondDidExists(ctx, msg.Token) {
-		return types.ErrBondTokenIsTaken(DefaultCodeSpace, msg.Token).Result()
+		return types.ErrBondTokenIsTaken(DefaultCodespace, msg.Token).Result()
 	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
-		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
+		return types.ErrBondTokenCannotBeStakingToken(DefaultCodespace).Result()
 	}
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)

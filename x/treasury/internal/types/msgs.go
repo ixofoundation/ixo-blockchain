@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -27,22 +28,26 @@ var _ TreasuryMessage = MsgSend{}
 func (msg MsgSend) Type() string  { return "send" }
 func (msg MsgSend) Route() string { return RouterKey }
 func (msg MsgSend) ValidateBasic() sdk.Error {
-	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
-	if !valid {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err = CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
+		return err
+	} else if valid, err = CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
 	}
-	valid, err = CheckNotEmpty(msg.FromDid, "FromDid")
-	if !valid {
-		return err
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.FromDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
+	} else if !ixo.IsValidDid(msg.ToDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
-	valid, err = CheckNotEmpty(msg.ToDid, "ToDid")
-	if !valid {
-		return err
-	}
+
+	// Check amount
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	}
-	if !msg.Amount.IsAllPositive() {
+	} else if !msg.Amount.IsAllPositive() {
 		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
@@ -83,26 +88,30 @@ var _ TreasuryMessage = MsgOracleTransfer{}
 func (msg MsgOracleTransfer) Type() string  { return "oracle-transfer" }
 func (msg MsgOracleTransfer) Route() string { return RouterKey }
 func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
-	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
-	if !valid {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
 	}
-	valid, err = CheckNotEmpty(msg.OracleDid, "OracleDid")
-	if !valid {
-		return err
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.OracleDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
+	} else if !ixo.IsValidDid(msg.FromDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
+	} else if !ixo.IsValidDid(msg.ToDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
-	valid, err = CheckNotEmpty(msg.FromDid, "FromDid")
-	if !valid {
-		return err
-	}
-	valid, err = CheckNotEmpty(msg.ToDid, "ToDid")
-	if !valid {
-		return err
-	}
+
+	// Check amount
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	}
-	if !msg.Amount.IsAllPositive() {
+	} else if !msg.Amount.IsAllPositive() {
 		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
@@ -142,22 +151,26 @@ var _ TreasuryMessage = MsgOracleMint{}
 func (msg MsgOracleMint) Type() string  { return "oracle-mint" }
 func (msg MsgOracleMint) Route() string { return RouterKey }
 func (msg MsgOracleMint) ValidateBasic() sdk.Error {
-	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
-	if !valid {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
 	}
-	valid, err = CheckNotEmpty(msg.OracleDid, "OracleDid")
-	if !valid {
-		return err
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.OracleDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
+	} else if !ixo.IsValidDid(msg.ToDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
-	valid, err = CheckNotEmpty(msg.ToDid, "ToDid")
-	if !valid {
-		return err
-	}
+
+	// Check amount
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	}
-	if !msg.Amount.IsAllPositive() {
+	} else if !msg.Amount.IsAllPositive() {
 		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
@@ -197,22 +210,26 @@ var _ TreasuryMessage = MsgOracleBurn{}
 func (msg MsgOracleBurn) Type() string  { return "oracle-burn" }
 func (msg MsgOracleBurn) Route() string { return RouterKey }
 func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
-	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
-	if !valid {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
 	}
-	valid, err = CheckNotEmpty(msg.OracleDid, "OracleDid")
-	if !valid {
-		return err
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.OracleDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
+	} else if !ixo.IsValidDid(msg.FromDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
 	}
-	valid, err = CheckNotEmpty(msg.FromDid, "FromDid")
-	if !valid {
-		return err
-	}
+
+	// Check amount
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	}
-	if !msg.Amount.IsAllPositive() {
+	} else if !msg.Amount.IsAllPositive() {
 		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 

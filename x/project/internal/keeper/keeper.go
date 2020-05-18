@@ -71,7 +71,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid ixo.Did) (types.Stored
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid ProjectDid Address")
+		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
 	}
 
 	var projectDoc types.MsgCreateProject
@@ -90,7 +90,7 @@ func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc types.StoredProj
 	existedDoc, _ := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
 	if existedDoc == nil {
 
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc details are not exist")
+		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc details are not exist")
 	} else {
 
 		existedDoc.SetStatus(newProjectDoc.GetStatus())
@@ -172,7 +172,7 @@ func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
 	} else {
 		var txs []types.WithdrawalInfo
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
