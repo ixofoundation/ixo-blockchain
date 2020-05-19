@@ -83,16 +83,55 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	}
 	// Note: FunctionParameters can be empty
 
+	// Check that bond token is a valid token name
+	err := CheckCoinDenom(msg.Token)
+	if err != nil {
+		return ErrInvalidCoinDenomination(DefaultCodespace, msg.Token)
+	}
+
+	// Validate function parameters
+	if err := msg.FunctionParameters.Validate(msg.FunctionType); err != nil {
+		return err
+	}
+
+	// Validate reserve tokens
+	if err = CheckReserveTokenNames(msg.ReserveTokens, msg.Token); err != nil {
+		return err
+	} else if err = CheckNoOfReserveTokens(msg.ReserveTokens, msg.FunctionType); err != nil {
+		return err
+	}
+
+	// Validate coins
+	if !msg.MaxSupply.IsValid() {
+		return sdk.ErrInternal("max supply is invalid")
+	} else if !msg.OrderQuantityLimits.IsValid() {
+		return sdk.ErrInternal("order quantity limits are invalid")
+	}
+
+	// Check that max supply denom matches token denom
+	if msg.MaxSupply.Denom != msg.Token {
+		return ErrMaxSupplyDenomDoesNotMatchTokenDenom(DefaultCodespace)
+	}
+
+	// Check that Sanity values not negative
+	if msg.SanityRate.IsNegative() {
+		return ErrArgumentCannotBeNegative(DefaultCodespace, "SanityRate")
+	} else if msg.SanityMarginPercentage.IsNegative() {
+		return ErrArgumentCannotBeNegative(DefaultCodespace, "SanityMarginPercentage")
+	}
+
 	// Check that true or false
 	if msg.AllowSells != TRUE && msg.AllowSells != FALSE {
 		return ErrArgumentMissingOrNonBoolean(DefaultCodespace, "AllowSells")
 	}
 
-	// Check that not negative
+	// Check FeePercentages not negative and don't add up to 100
 	if msg.TxFeePercentage.IsNegative() {
 		return ErrArgumentCannotBeNegative(DefaultCodespace, "TxFeePercentage")
 	} else if msg.ExitFeePercentage.IsNegative() {
 		return ErrArgumentCannotBeNegative(DefaultCodespace, "ExitFeePercentage")
+	} else if msg.TxFeePercentage.Add(msg.ExitFeePercentage).GTE(sdk.NewDec(100)) {
+		return ErrFeesCannotBeOrExceed100Percent(DefaultCodespace)
 	}
 
 	// Check that not zero
@@ -100,13 +139,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentMustBePositive(DefaultCodespace, "BatchBlocks")
 	} else if msg.MaxSupply.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "MaxSupply")
-	} else {
-		// TODO: consider allowing negative function parameters where possible
-		for _, fp := range msg.FunctionParameters {
-			if fp.Value.IsZero() {
-				return ErrArgumentMustBePositive(DefaultCodespace, "FunctionParams:"+fp.Param)
-			}
-		}
 	}
 
 	// Note: uniqueness of reserve tokens checked when parsing
@@ -249,9 +281,16 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	}
 
-	// Check that non zero
-	if msg.Amount.Amount.IsZero() {
+	// Check that amount valid and non zero
+	if !msg.Amount.IsValid() {
+		return sdk.ErrInternal("amount is invalid")
+	} else if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
+	}
+
+	// Check that maxPrices valid
+	if !msg.MaxPrices.IsValid() {
+		return sdk.ErrInternal("maxprices is invalid")
 	}
 
 	// Check that DIDs valid
@@ -304,8 +343,10 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	}
 
-	// Check that non zero
-	if msg.Amount.Amount.IsZero() {
+	// Check that amount valid and non zero
+	if !msg.Amount.IsValid() {
+		return sdk.ErrInternal("amount is invalid")
+	} else if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
 	}
 
@@ -362,6 +403,17 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	} else if strings.TrimSpace(msg.ToToken) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "ToToken")
+	}
+
+	// Validate from amount
+	if !msg.From.IsValid() {
+		return sdk.ErrInternal("from amount is invalid")
+	}
+
+	// Validate to token
+	err := CheckCoinDenom(msg.ToToken)
+	if err != nil {
+		return err
 	}
 
 	// Check if from and to the same token

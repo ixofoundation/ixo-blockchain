@@ -44,6 +44,32 @@ func NewFunctionParam(param string, value sdk.Int) FunctionParam {
 
 type FunctionParams []FunctionParam
 
+func (fps FunctionParams) Validate(functionType string) sdk.Error {
+	// Come up with list of expected parameters
+	expectedParams, err := GetRequiredParamsForFunctionType(functionType)
+	if err != nil {
+		return err
+	}
+
+	// Check that number of params is as expected
+	if len(fps) != len(expectedParams) {
+		return ErrIncorrectNumberOfFunctionParameters(DefaultCodespace, len(expectedParams))
+	}
+
+	// Check that params match and all values are positive
+	fpsMap := fps.AsMap()
+	for _, p := range expectedParams {
+		val, ok := fpsMap[p]
+		if !ok {
+			return ErrFunctionParameterMissingOrNonInteger(DefaultCodespace, p)
+		} else if !val.IsPositive() {
+			return ErrArgumentMustBePositive(DefaultCodespace, "FunctionParams:"+p)
+		}
+	}
+
+	return nil
+}
+
 func (fps FunctionParams) String() (result string) {
 	result = "{"
 	for _, fp := range fps {

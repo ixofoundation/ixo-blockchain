@@ -94,8 +94,8 @@ ixocli tx bonds create-bond \
   --fee-address="$FEE1" \
   --max-supply=1000000token1 \
   --order-quantity-limits="" \
-  --sanity-rate="" \
-  --sanity-margin-percentage="" \
+  --sanity-rate="0" \
+  --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND1_DID_FULL" \
@@ -115,8 +115,8 @@ ixocli tx bonds create-bond \
   --fee-address="$FEE2" \
   --max-supply=1000000token2 \
   --order-quantity-limits="" \
-  --sanity-rate="" \
-  --sanity-margin-percentage="" \
+  --sanity-rate="0" \
+  --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=3 \
   --bond-did="$BOND2_DID_FULL" \
@@ -136,8 +136,8 @@ ixocli tx bonds create-bond \
   --fee-address="$FEE3" \
   --max-supply=1000000token3 \
   --order-quantity-limits="" \
-  --sanity-rate="" \
-  --sanity-margin-percentage="" \
+  --sanity-rate="0" \
+  --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID_FULL" \
@@ -157,8 +157,8 @@ ixocli tx bonds create-bond \
   --fee-address="$FEE4" \
   --max-supply=1000000token4 \
   --order-quantity-limits="" \
-  --sanity-rate="" \
-  --sanity-margin-percentage="" \
+  --sanity-rate="0" \
+  --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND4_DID_FULL" \
