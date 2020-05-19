@@ -59,6 +59,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
+	if keeper.CoinKeeper.BlacklistedAddr(msg.FeeAddress) {
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress)).Result()
+	}
 
 	if keeper.BondExists(ctx, msg.BondDid) {
 		return types.ErrBondAlreadyExists(DefaultCodespace, msg.BondDid).Result()
