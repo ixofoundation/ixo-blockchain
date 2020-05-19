@@ -14,7 +14,8 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/didToAddr/{did}", queryAddressFromDidRequestHandler(cliCtx)).Methods("GET")
+	// The .* is necessary so that a slash in the did gets included as part of the did
+	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/did/{did}", queryDidDocRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/did", queryAllDidsRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandler(cliCtx)).Methods("GET")
@@ -25,6 +26,14 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
+
+		if !ixo.IsValidDid(vars["did"]) {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Error: input is not a valid did"))
+
+			return
+		}
+
 		accAddress := types.DidToAddr(vars["did"])
 
 		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
