@@ -17,6 +17,10 @@ func GetCmdAddressFromDid() *cobra.Command {
 		Short: "Query for an account address by DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !ixo.IsValidDid(args[0]) {
+				return errors.New("input is not a valid did")
+			}
+
 			accAddress := types.DidToAddr(args[0])
 			fmt.Println(accAddress.String())
 			return nil
