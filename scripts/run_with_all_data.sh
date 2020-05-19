@@ -43,6 +43,12 @@ yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "ixo:mint"
 yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "ixo:mint/burn/transfer"
 yes $PASSWORD | ixod add-genesis-oracle "$SHAUN_DID" "res:transfer,rez:transfer"
 
+# Add ixo did
+IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+FROM="\"ixo_did\": \"\""
+TO="\"ixo_did\": \"$IXO_DID\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 ixocli config chain-id pandora-1
 ixocli config output json
 ixocli config indent true

@@ -115,9 +115,9 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) types.Account
 
 	bz := store.Get(key)
 	if bz == nil {
-		return make(map[string]sdk.AccAddress)
+		return make(types.AccountMap)
 	} else {
-		var accountMap map[string]sdk.AccAddress
+		var accountMap types.AccountMap
 		if err := json.Unmarshal(bz, &accountMap); err != nil {
 			panic(err)
 		}
@@ -126,7 +126,8 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) types.Account
 	}
 }
 
-func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
+func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
+	accountId types.InternalAccountID, account auth.Account) {
 	accountMap := k.GetAccountMap(ctx, projectDid)
 	_, found := accountMap[accountId]
 	if found {
@@ -145,8 +146,9 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 	store.Set(key, bz)
 }
 
-func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) (auth.Account, sdk.Error) {
-	address := types.StringToAddr(projectDid + "/" + accountId)
+func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did,
+	accountId types.InternalAccountID) (auth.Account, sdk.Error) {
+	address := types.StringToAddr(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")

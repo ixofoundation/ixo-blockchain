@@ -9,22 +9,25 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-type Config struct {
-	AccountMapPrefix  string
-	WithdrawalsPrefix string
-}
+type (
+	InternalAccountID          string
+	AccountMap                 map[InternalAccountID]sdk.AccAddress
+	ProjectStatus              string
+	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
+)
 
-type AccountMap map[string]sdk.AccAddress
+func (id InternalAccountID) ToAddressKey(projectDid ixo.Did) string {
+	return projectDid + "/" + string(id)
+}
 
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
 	GetProjectDid() ixo.Did
+	GetSenderDid() ixo.Did
 	GetPubKey() string
 	GetStatus() ProjectStatus
 	SetStatus(status ProjectStatus)
 }
-
-type ProjectStatus string
 
 const (
 	NullStatus     ProjectStatus = ""
@@ -38,8 +41,8 @@ const (
 
 var StateTransitions = initStateTransitions()
 
-func initStateTransitions() map[ProjectStatus][]ProjectStatus {
-	return map[ProjectStatus][]ProjectStatus{
+func initStateTransitions() ProjectStatusTransitionMap {
+	return ProjectStatusTransitionMap{
 		NullStatus:     {CreatedProject},
 		CreatedProject: {PendingStatus},
 		PendingStatus:  {CreatedProject, FundedStatus},
@@ -47,25 +50,23 @@ func initStateTransitions() map[ProjectStatus][]ProjectStatus {
 		StartedStatus:  {StoppedStatus},
 		StoppedStatus:  {PaidoutStatus},
 	}
-
 }
 
-func (nextProjectStatus ProjectStatus) IsValidProgressionFrom(previousProjectStatus ProjectStatus) bool {
-	validStatuses := StateTransitions[previousProjectStatus]
+func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
+	validStatuses := StateTransitions[prev]
 	for _, v := range validStatuses {
-		if v == nextProjectStatus {
+		if v == next {
 			return true
 		}
 	}
-
 	return false
 }
 
 type WithdrawalInfo struct {
-	ActionID            string `json:"actionID" yaml:"actionID"`
-	ProjectEthWallet    string `json:"projectEthWallet" yaml:"projectEthWallet"`
-	RecipientEthAddress string `json:"recipientEthAddress" yaml:"recipientEthAddress"`
-	Amount              int64  `json:"amount" yaml:"amount"`
+	ActionID     string   `json:"actionID" yaml:"actionID"`
+	ProjectDid   ixo.Did  `json:"projectDid" yaml:"projectDid"`
+	RecipientDid ixo.Did  `json:"recipientDid" yaml:"recipientDid"`
+	Amount       sdk.Coin `json:"amount" yaml:"amount"`
 }
 
 type UpdateProjectStatusDoc struct {
@@ -103,7 +104,7 @@ type CreateAgentDoc struct {
 	Role     string  `json:"role" yaml:"role"`
 }
 
-type AgentStatus string
+type AgentStatus = string
 
 const (
 	PendingAgent  AgentStatus = "0"
@@ -135,15 +136,11 @@ type CreateEvaluationDoc struct {
 }
 
 type WithdrawFundsDoc struct {
-	ProjectDid ixo.Did `json:"projectDid" yaml:"projectDid"`
-	EthWallet  string  `json:"ethWallet" yaml:"ethWallet"`
-	Amount     string  `json:"amount" yaml:"amount"`
-	IsRefund   bool    `json:"isRefund" yaml:"isRefund"`
+	ProjectDid   ixo.Did `json:"projectDid" yaml:"projectDid"`
+	RecipientDid ixo.Did `json:"recipientDid" yaml:"recipientDid"`
+	Amount       sdk.Int `json:"amount" yaml:"amount"`
+	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
 }
-
-func (wd WithdrawFundsDoc) GetProjectDid() ixo.Did { return wd.ProjectDid }
-func (wd WithdrawFundsDoc) GetEthWallet() string   { return wd.EthWallet }
-func (wd WithdrawFundsDoc) GetIsRefund() bool      { return wd.IsRefund }
 
 type ProjectMsg interface {
 	sdk.Msg

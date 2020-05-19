@@ -57,9 +57,9 @@ func TestQueryProjectAccounts(t *testing.T) {
 	_, err := querier(ctx, []string{QueryProjectDoc, types.ValidCreateProjectMsg.ProjectDid}, query)
 	require.Nil(t, err)
 
-	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String())
+	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
 	require.Nil(t, err)
-	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String(), account)
+	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1, account)
 
 	res, err := querier(ctx, []string{QueryProjectAccounts, types.ValidCreateProjectMsg.ProjectDid}, query)
 	require.Nil(t, err)
@@ -71,7 +71,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 	_, errRes := json.Marshal(accountMap)
 	require.Nil(t, errRes)
 
-	account, err = k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String())
+	account, err = k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
 	require.NotNil(t, err)
 }
 

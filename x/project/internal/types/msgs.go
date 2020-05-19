@@ -268,13 +268,15 @@ func (msg MsgWithdrawFunds) IsWithdrawal() bool { return true }
 func (msg MsgWithdrawFunds) Type() string       { return "withdraw-funds" }
 func (msg MsgWithdrawFunds) Route() string      { return RouterKey }
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
+	if msg.SenderDid != msg.Data.RecipientDid {
+		return sdk.ErrInternal("sender did must match recipient did")
+	}
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSenderDid() ixo.Did                 { return msg.SenderDid }
 func (msg MsgWithdrawFunds) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{[]byte(msg.Data.RecipientDid)}
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {

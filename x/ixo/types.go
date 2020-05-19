@@ -85,8 +85,6 @@ type DidDoc interface {
 	GetPubKey() string
 }
 
-type Project = string
-
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 	return func(txBytes []byte) (sdk.Tx, sdk.Error) {
 

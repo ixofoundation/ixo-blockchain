@@ -37,16 +37,16 @@ func TestKeeperAccountMap(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String())
+	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
 	require.Nil(t, err)
 
-	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String(), account)
+	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1, account)
 
 	accountMap := k.GetAccountMap(ctx, types.ValidCreateProjectMsg.ProjectDid)
-	_, found := accountMap[types.ValidAddress1.String()]
+	_, found := accountMap[types.ValidAccId1]
 	require.True(t, found)
 
-	account, err = k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAddress1.String())
+	account, err = k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
 	require.NotNil(t, err)
 
 }

@@ -252,8 +252,8 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "withdrawFunds [sender-did] [data]",
-		Short: "withdraw funds.",
+		Use:   "withdraw-funds [sender-did] [data]",
+		Short: "Withdraw funds.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)

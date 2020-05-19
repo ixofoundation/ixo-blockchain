@@ -100,7 +100,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	var err sdk.Error
 	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
 	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.GetProjectDid()))
 	require.Nil(t, err)
 
 	require.False(t, k.ProjectDocExists(ctx, msg.GetProjectDid()))
@@ -121,10 +121,10 @@ func Test_WithdrawFunds(t *testing.T) {
 		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
 		Data: types.WithdrawFundsDoc{
-			ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-			EthWallet:  "ethwallet",
-			Amount:     "100",
-			IsRefund:   true,
+			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
+			RecipientDid: "6iftm1hHdaU6LJGKayRMev",
+			Amount:       sdk.NewInt(100),
+			IsRefund:     true,
 		},
 	}
 
@@ -148,7 +148,7 @@ func Test_WithdrawFunds(t *testing.T) {
 	var err sdk.Error
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
 	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), msg1.GetProjectDid())
+	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), InternalAccountID(msg1.GetProjectDid()))
 	require.Nil(t, err)
 
 	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
