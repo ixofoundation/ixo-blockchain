@@ -254,6 +254,11 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	recipientDid := withdrawFundsDoc.RecipientDid
 	amount := withdrawFundsDoc.Amount
 
+	// If this is a refund, recipient has to be the project creator
+	if withdrawFundsDoc.IsRefund && (recipientDid != projectDoc.GetSenderDid()) {
+		return sdk.ErrUnknownRequest("Only project creator can get a refund").Result()
+	}
+
 	var fromAccountId InternalAccountID
 	if withdrawFundsDoc.IsRefund {
 		fromAccountId = InternalAccountID(projectDid)
