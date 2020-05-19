@@ -24,15 +24,18 @@ PROJECT_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"Fm
 PROJECT_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"500\",\"evaluatorPayPerClaim\":\"50\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-01-01T01:01:01.000Z\",\"createdBy\":\"Miguel\",\"status\":\"\"}"
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
 MIGUEL_DID_FULL="{\"did\":\"did:ixo:4XJLBfGtWSGKSz4BeRxdun\",\"verifyKey\":\"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt\",\"encryptionPublicKey\":\"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS\",\"secret\":{\"seed\":\"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180\",\"signKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\",\"encryptionPrivateKey\":\"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh\"}}"
 FRANCESCO_DID_FULL="{\"did\":\"did:ixo:UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej\",\"encryptionPublicKey\":\"8YScf3mY4eeHoxDT9MRxiuGX5Fw7edWFnwHpgWYSn1si\",\"secret\":{\"seed\":\"94f3c48a9b19b4881e582ba80f5767cd3f3c5d7b7103cb9a50fa018f108d89de\",\"signKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\",\"encryptionPrivateKey\":\"B2Svs8GoQnUJHg8W2Ch7J53Goq36AaF6C6W4PD2MCPrM\"}}"
-SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeDue5it82taeheMprdaPrctfK3DeVV9NnEPYDgwwRG\",\"encryptionPublicKey\":\"DtdGbZB2nSQvwhs6QoN5Cd8JTxWgfVRAGVKfxj8LA15i\",\"secret\":{\"seed\":\"6ef0002659d260a0bbad194d1aa28650ccea6c6862f994dfdbd48648e1a05c5e\",\"signKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\",\"encryptionPrivateKey\":\"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR\"}}"
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
 ixocli tx did addDidDoc "$MIGUEL_DID_FULL"
 echo "Ledgering Francesco DID..."
 ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
+echo "Ledgering Shaun DID..."
+ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
@@ -111,8 +114,16 @@ ixocli q project getProjectTxs $PROJECT_DID
 # Expected project:               4900000000
 
 # Withdraw funds (from main project account, i.e. as refund)
+# --> FAIL since Miguel is not the project owner
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
+echo "Project withdrawals query..."
+ixocli q project getProjectTxs $PROJECT_DID
+
+# Withdraw funds (from main project account, i.e. as refund)
+# --> SUCCESS since Shaun is the project owner
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
+ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
 ixocli q project getProjectTxs $PROJECT_DID
 
