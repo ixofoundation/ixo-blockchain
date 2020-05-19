@@ -49,7 +49,7 @@ func (k Keeper) GetBondDoc(ctx sdk.Context, bondDid ixo.Did) (types.StoredBondDo
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid BondDid Address")
+		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid BondDid Address")
 	}
 
 	var bondDoc types.MsgCreateBond
@@ -68,7 +68,7 @@ func (k Keeper) UpdateBondDoc(ctx sdk.Context, newBondDoc types.StoredBondDoc) (
 	existedDoc, _ := k.GetBondDoc(ctx, newBondDoc.GetBondDid())
 	if existedDoc == nil {
 
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "BondDoc details are not exist")
+		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "BondDoc details are not exist")
 	} else {
 
 		existedDoc.SetStatus(newBondDoc.GetStatus())

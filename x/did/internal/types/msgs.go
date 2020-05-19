@@ -3,6 +3,8 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -35,18 +37,25 @@ func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgAddDid) ValidateBasic() sdk.Error {
-	if msg.DidDoc.Did == "" {
-		return ErrorInvalidDid(DefaultCodeSpace, "did should not be empty")
-	} else if msg.DidDoc.PubKey == "" {
-		return ErrorInvalidPubKey(DefaultCodeSpace, "pubKey should not be empty")
+	// Check that not empty
+	if strings.TrimSpace(msg.DidDoc.Did) == "" {
+		return ErrorInvalidDid(DefaultCodespace, "did should not be empty")
+	} else if strings.TrimSpace(msg.DidDoc.PubKey) == "" {
+		return ErrorInvalidPubKey(DefaultCodespace, "pubKey should not be empty")
 	}
 
-	for _, credential := range msg.DidDoc.Credentials {
-		if credential.Issuer == "" {
-			return ErrorInvalidIssuer(DefaultCodeSpace, "issuer should not be empty")
-		} else if credential.Claim.Id == "" {
-			return ErrorInvalidDid(DefaultCodeSpace, "claim id should not be empty")
+	// Check DidDoc credentials for empty fields
+	for _, cred := range msg.DidDoc.Credentials {
+		if strings.TrimSpace(cred.Issuer) == "" {
+			return ErrorInvalidIssuer(DefaultCodespace, "issuer should not be empty")
+		} else if strings.TrimSpace(cred.Claim.Id) == "" {
+			return ErrorInvalidDid(DefaultCodespace, "claim id should not be empty")
 		}
+	}
+
+	// Check that DID valid
+	if !ixo.IsValidDid(msg.DidDoc.Did) {
+		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
 	}
 
 	return nil
@@ -96,10 +105,16 @@ func (msg MsgAddCredential) String() string {
 }
 
 func (msg MsgAddCredential) ValidateBasic() sdk.Error {
-	if msg.DidCredential.Claim.Id == "" {
-		return ErrorInvalidDid(DefaultCodeSpace, "claim id should not be nil")
-	} else if msg.DidCredential.Issuer == "" {
-		return ErrorInvalidIssuer(DefaultCodeSpace, "Issuer should not be nil")
+	// Check if empty
+	if strings.TrimSpace(msg.DidCredential.Claim.Id) == "" {
+		return ErrorInvalidDid(DefaultCodespace, "claim id should not be empty")
+	} else if strings.TrimSpace(msg.DidCredential.Issuer) == "" {
+		return ErrorInvalidIssuer(DefaultCodespace, "issuer should not be empty")
+	}
+
+	// Check that DID valid
+	if !ixo.IsValidDid(msg.DidCredential.Issuer) {
+		return ErrorInvalidDid(DefaultCodespace, "issuer did is invalid")
 	}
 
 	return nil

@@ -2,22 +2,24 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"strings"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
-func NewMsgCreateBond(bondDoc BondDoc, bondDid sovrin.SovrinDid) MsgCreateBond {
+func NewMsgCreateBond(senderDid ixo.Did, bondDoc BondDoc, bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
 		SignBytes: "",
 		TxHash:    "",
-		SenderDid: "",
+		SenderDid: senderDid,
 		BondDid:   bondDid.Did,
 		PubKey:    bondDid.VerifyKey,
 		Data:      bondDoc,
 	}
 }
 
-func NewMsgUpdateBondStatus(senderDid string, updateBondStatusDoc UpdateBondStatusDoc, bondDid sovrin.SovrinDid) MsgUpdateBondStatus {
+func NewMsgUpdateBondStatus(senderDid ixo.Did, updateBondStatusDoc UpdateBondStatusDoc, bondDid sovrin.SovrinDid) MsgUpdateBondStatus {
 	return MsgUpdateBondStatus{
 		SignBytes: "",
 		SenderDid: senderDid,
@@ -27,7 +29,7 @@ func NewMsgUpdateBondStatus(senderDid string, updateBondStatusDoc UpdateBondStat
 }
 
 func CheckNotEmpty(value string, name string) (valid bool, err sdk.Error) {
-	if len(value) == 0 {
+	if strings.TrimSpace(value) == "" {
 		return false, sdk.ErrUnknownRequest(name + " is empty.")
 	} else {
 		return true, nil

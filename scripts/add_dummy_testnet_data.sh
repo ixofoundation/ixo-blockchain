@@ -191,21 +191,23 @@ ixocli tx bonds buy 5token4 "2token1,2token2" "$BOND4_DID" "$MIGUEL_DID_FULL"
 
 # ----------------------------------------------------------------------------------------- projects
 # Create projects (this creates a project doc for the respective project)
+SENDER_DID="$SHAUN_DID"
 echo "Creating project 1/2..."
-ixocli tx project createProject "$PROJECT1_INFO" "$PROJECT1_DID_FULL"
+ixocli tx project createProject "$SENDER_DID" "$PROJECT1_INFO" "$PROJECT1_DID_FULL"
 echo "Creating project 2/2..."
-ixocli tx project createProject "$PROJECT2_INFO" "$PROJECT2_DID_FULL"
+ixocli tx project createProject "$SENDER_DID" "$PROJECT2_INFO" "$PROJECT2_DID_FULL"
 
 echo "Sleeping for a bit..."
 sleep 6 # to make sure projects were ledgered before proceeding
 
 # Update project status (this updates the status in the project doc for the respective project)
+SENDER_DID="$SHAUN_DID"
 echo "Updating project 1 to CREATED..."
-ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT1_DID_FULL"
+ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT1_DID_FULL"
 echo "Updating project 2 to CREATED..."
-ixocli tx project updateProjectStatus "sender_did" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Updating project 2 to PENDING..."
-ixocli tx project updateProjectStatus "sender_did" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project updateProjectStatus "$SENDER_DID" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Fund project (using treasury 'send' and 'oracle-transfer')
 echo "Funding project 2 (using treasury 'send' from Miguel)..."
@@ -215,11 +217,13 @@ ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5
 # The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
 # Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
 echo "Updating project 2 to FUNDED..."
-ixocli tx project updateProjectStatus "sender_did" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
+SENDER_DID="$SHAUN_DID"
+ixocli tx project updateProjectStatus "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Adding a claim and evaluation
 echo "Creating a claim in project 2..."
-ixocli tx project createClaim "tx_hash" "sender_did" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
+SENDER_DID="$SHAUN_DID"
+ixocli tx project createClaim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Creating an evaluation in project 2..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # createEvaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
@@ -234,18 +238,20 @@ ixocli tx project createAgent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PRO
 
 # ----------------------------------------------------------------------------------------- bonddocs
 # Creating bonddoc
+SENDER_DID="$SHAUN_DID"
 echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc createBond "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL"
+ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL"
 echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc createBond "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL"
+ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL"
 
 echo "Sleeping for a bit..."
 sleep 6 # to make sure bonddocs were ledgered before proceeding
 
 # Updating bonddoc status
+SENDER_DID="$SHAUN_DID"
 echo "Updating bonddoc 1 to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "sender_did" PREISSUANCE "$BONDDOC1_DID_FULL"
+ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC1_DID_FULL"
 echo "Updating bonddoc 2 to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "sender_did" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block
+ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block
 echo "Updating bonddoc 2 to OPEN..."
-ixocli tx bonddoc updateBondStatus "sender_did" OPEN "$BONDDOC2_DID_FULL"
+ixocli tx bonddoc updateBondStatus "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL"

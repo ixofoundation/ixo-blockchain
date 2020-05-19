@@ -31,9 +31,15 @@ func AddGenesisOracleCmd(ctx *server.Context, cdc *codec.Codec,
 				return fmt.Errorf("oracle did cannot be empty")
 			}
 
+			// Check that oracle token capabilities are valid
 			capabilities, err := types.ParseOracleTokenCaps(args[1])
 			if err != nil {
 				return err
+			}
+
+			// Check that oracle DID is valid
+			if !ixo.IsValidDid(oracleDid) {
+				return fmt.Errorf("oracle did is invalid")
 			}
 
 			oracle := types.NewOracle(oracleDid, capabilities)

@@ -57,24 +57,29 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 
 func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createProject [project-json] [sovrin-did]",
+		Use:   "createProject [sender-did] [project-json] [sovrin-did]",
 		Short: "Create a new ProjectDoc signed by the sovrinDID of the project",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
-				return errors.New("You must provide the project data and the projects private key")
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the sender-did, " +
+					"project data, and the project's private key")
 			}
 
+			senderDid := args[0]
+			projectDocStr := args[1]
+			sovrinDid := unmarshalSovrinDID(args[2])
+
 			projectDoc := types.ProjectDoc{}
-			err := json.Unmarshal([]byte(args[0]), &projectDoc)
+			err := json.Unmarshal([]byte(projectDocStr), &projectDoc)
 			if err != nil {
 				panic(err)
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[1])
-			msg := types.NewMsgCreateProject(projectDoc, sovrinDid)
+			msg := types.NewMsgCreateProject(senderDid, projectDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -89,8 +94,10 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 3 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 {
-				return errors.New("You must provide the status and the projects private key")
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the sender-did, " +
+					"status, and the project's private key")
 			}
 
 			senderDid := args[0]
