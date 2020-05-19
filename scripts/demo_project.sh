@@ -92,7 +92,7 @@ ixocli q auth account "ixo1545vwm70g6tws43a3epakzwyhpj7hxcs7qgpcv"
 echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixocli q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 
-# Withdraw funds
+# Withdraw funds (from miguel's project account, i.e. as non-refund)
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":false}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
@@ -105,7 +105,7 @@ ixocli q project getProjectTxs $PROJECT_DID
 # Expected evaluator (Miguel):    4400000000
 # Expected project:               4900000000
 
-# Withdraw funds
+# Withdraw funds (from main project account, i.e. as refund)
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
