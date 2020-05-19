@@ -169,7 +169,7 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
-	bondCoin, err2 := client.ParseCoin(bondAmount, bond.Token)
+	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(err2.Error())
 	}
@@ -197,7 +197,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
-	bondCoin, err2 := client.ParseCoin(bondAmount, bond.Token)
+	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(err2.Error())
 	}
@@ -240,7 +240,7 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
-	bondCoin, err2 := client.ParseCoin(bondAmount, bond.Token)
+	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(err2.Error())
 	}
@@ -285,7 +285,7 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	fromAmount := path[2]
 	toToken := path[3]
 
-	fromCoin, err2 := client.ParseCoin(fromAmount, fromToken)
+	fromCoin, err2 := client.ParseTwoPartCoin(fromAmount, fromToken)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(err2.Error())
 	}

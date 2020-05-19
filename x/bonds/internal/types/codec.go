@@ -7,7 +7,6 @@ import (
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&Bond{}, "cosmos-sdk/Bond", nil)
 	cdc.RegisterConcrete(&FunctionParam{}, "cosmos-sdk/FunctionParam", nil)
-	cdc.RegisterConcrete(&FunctionParams{}, "cosmos-sdk/FunctionParams", nil)
 	cdc.RegisterConcrete(&Batch{}, "cosmos-sdk/Batch", nil)
 	cdc.RegisterConcrete(&BaseOrder{}, "cosmos-sdk/BaseOrder", nil)
 	cdc.RegisterConcrete(&BuyOrder{}, "cosmos-sdk/BuyOrder", nil)

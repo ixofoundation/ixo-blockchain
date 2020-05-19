@@ -56,8 +56,8 @@ ixocli tx bonds create-bond \
   --fee-address="$FEE" \
   --max-supply=1000000abc \
   --order-quantity-limits="" \
-  --sanity-rate="" \
-  --sanity-margin-percentage="" \
+  --sanity-rate="0" \
+  --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND_DID_FULL" \
