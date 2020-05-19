@@ -23,6 +23,7 @@ func (id InternalAccountID) ToAddressKey(projectDid ixo.Did) string {
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
 	GetProjectDid() ixo.Did
+	GetSenderDid() ixo.Did
 	GetPubKey() string
 	GetStatus() ProjectStatus
 	SetStatus(status ProjectStatus)

@@ -66,7 +66,7 @@ func main() {
 
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
-	executor := cli.PrepareBaseCmd(rootCmd, "CM", app.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "IXO", app.DefaultNodeHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
