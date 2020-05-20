@@ -9,6 +9,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(FeeContract{}, "fees/FeeContract", nil)
 	cdc.RegisterConcrete(Distribution{}, "fees/Distribution", nil)
 	cdc.RegisterConcrete(DistributionShare{}, "fees/DistributionShare", nil)
+	cdc.RegisterConcrete(Discounts{}, "fees/Discounts", nil)
+	cdc.RegisterConcrete(Discount{}, "fees/Discount", nil)
 }
 
 // ModuleCdc is the codec for the module

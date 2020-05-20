@@ -15,6 +15,7 @@ func NewGenesisState(params Params, fees []Fee, feeContracts []FeeContract) Gene
 }
 
 func ValidateGenesis(data GenesisState) error {
+	// Validate params
 	err := ValidateParams(data.Params)
 	if err != nil {
 		return err

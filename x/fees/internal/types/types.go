@@ -16,20 +16,18 @@ type Fee struct {
 	ChargeAmount       sdk.Coins    `json:"charge_amount" yaml:"charge_amount"`
 	ChargeMinimum      sdk.Coins    `json:"charge_minimum" yaml:"charge_minimum"`
 	ChargeMaximum      sdk.Coins    `json:"charge_maximum" yaml:"charge_maximum"`
-	DiscountId         string       `json:"discount_id" yaml:"discount_id"`
-	DiscountPercent    sdk.Dec      `json:"discount_percent" yaml:"discount_percent"`
+	Discounts          Discounts    `json:"discounts" yaml:"discounts"`
 	WalletDistribution Distribution `json:"wallet_distribution" yaml:"wallet_distribution"`
 }
 
 func NewFee(id string, chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
-	discountId string, discountPercent sdk.Dec, walletDistribution Distribution) Fee {
+	discounts Discounts, walletDistribution Distribution) Fee {
 	return Fee{
 		Id:                 id,
 		ChargeAmount:       chargeAmount,
 		ChargeMinimum:      chargeMinimum,
 		ChargeMaximum:      chargeMaximum,
-		DiscountId:         discountId,
-		DiscountPercent:    discountPercent,
+		Discounts:          discounts,
 		WalletDistribution: walletDistribution,
 	}
 }
@@ -106,4 +104,22 @@ func (d DistributionShare) Validate() sdk.Error {
 	}
 
 	return nil
+}
+
+type Discounts []Discount
+
+func NewDiscounts(discounts ...Discount) Discounts {
+	return Discounts(discounts)
+}
+
+type Discount struct {
+	Id      string  `json:"id" yaml:"id"`
+	Percent sdk.Dec `json:"percent" yaml:"percent"`
+}
+
+func NewDiscount(id string, percent sdk.Dec) Discount {
+	return Discount{
+		Id:      id,
+		Percent: percent,
+	}
 }
