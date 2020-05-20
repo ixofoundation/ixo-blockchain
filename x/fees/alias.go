@@ -19,7 +19,13 @@ const (
 type (
 	Keeper       = keeper.Keeper
 	GenesisState = types.GenesisState
-	FeeType      = types.FeeType
+
+	FeeType = types.FeeType
+
+	Fee               = types.Fee
+	FeeContract       = types.FeeContract
+	Distribution      = types.Distribution
+	DistributionShare = types.DistributionShare
 )
 
 var (
