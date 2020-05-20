@@ -18,16 +18,16 @@ type Keeper struct {
 	storeKey      sdk.StoreKey
 	paramSpace    params.Subspace
 	AccountKeeper auth.AccountKeeper
-	feeKeeper     fees.Keeper
+	feesKeeper    fees.Keeper
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, accountKeeper auth.AccountKeeper, feeKeeper fees.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, accountKeeper auth.AccountKeeper, feesKeeper fees.Keeper) Keeper {
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,
 		paramSpace:    paramSpace.WithKeyTable(types.ParamKeyTable()),
 		AccountKeeper: accountKeeper,
-		feeKeeper:     feeKeeper,
+		feesKeeper:    feesKeeper,
 	}
 }
 

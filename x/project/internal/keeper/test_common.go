@@ -20,7 +20,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	actStoreKey := sdk.NewKVStoreKey(auth.StoreKey)
 	keyParams := sdk.NewKVStoreKey("subspace")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
-	keyFee := sdk.NewKVStoreKey(fees.StoreKey)
+	keyFees := sdk.NewKVStoreKey(fees.StoreKey)
 
 	db := tmDB.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
@@ -28,7 +28,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	ms.MountStoreWithDB(actStoreKey, sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeIAVL, nil)
-	ms.MountStoreWithDB(keyFee, sdk.StoreTypeIAVL, nil)
+	ms.MountStoreWithDB(keyFees, sdk.StoreTypeIAVL, nil)
 	_ = ms.LoadLatestVersion()
 
 	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
@@ -43,7 +43,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 	projectSubspace := pk1.Subspace(types.DefaultParamspace)
 
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
-	feeKeeper := fees.NewKeeper(cdc, feesSubspace)
+	feeKeeper := fees.NewKeeper(cdc, keyFees, feesSubspace)
 	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, feeKeeper)
 
 	feeKeeper.SetParams(ctx, fees.DefaultParams())
