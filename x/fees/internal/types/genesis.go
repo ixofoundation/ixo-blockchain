@@ -1,16 +1,21 @@
 package types
 
 type GenesisState struct {
-	Params       Params        `json:"params" yaml:"params"`
-	Fees         []Fee         `json:"fees" yaml:"fees"`
-	FeeContracts []FeeContract `json:"fee_contracts" yaml:"fee_contracts"`
+	Params                Params        `json:"params" yaml:"params"`
+	Fees                  []Fee         `json:"fees" yaml:"fees"`
+	FeeContracts          []FeeContract `json:"fee_contracts" yaml:"fee_contracts"`
+	StartingFeeId         uint64        `json:"starting_fee_id" yaml:"starting_fee_id"`
+	StartingFeeContractId uint64        `json:"starting_fee_contract_id" yaml:"starting_fee_contract_id"`
 }
 
-func NewGenesisState(params Params, fees []Fee, feeContracts []FeeContract) GenesisState {
+func NewGenesisState(params Params, fees []Fee, feeContracts []FeeContract,
+	startingFeeID, startingFeeContractID uint64) GenesisState {
 	return GenesisState{
-		Params:       params,
-		Fees:         fees,
-		FeeContracts: feeContracts,
+		Params:                params,
+		Fees:                  fees,
+		FeeContracts:          feeContracts,
+		StartingFeeId:         startingFeeID,
+		StartingFeeContractId: startingFeeContractID,
 	}
 }
 
@@ -33,8 +38,10 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		Params:       DefaultParams(),
-		Fees:         nil,
-		FeeContracts: nil,
+		Params:                DefaultParams(),
+		Fees:                  nil,
+		FeeContracts:          nil,
+		StartingFeeId:         1,
+		StartingFeeContractId: 1,
 	}
 }

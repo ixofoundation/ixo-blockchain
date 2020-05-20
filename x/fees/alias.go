@@ -22,10 +22,12 @@ type (
 
 	FeeType = types.FeeType
 
-	Fee               = types.Fee
-	FeeContract       = types.FeeContract
-	Distribution      = types.Distribution
-	DistributionShare = types.DistributionShare
+	Fee                = types.Fee
+	FeeContent         = types.FeeContent
+	FeeContract        = types.FeeContract
+	FeeContractContent = types.FeeContractContent
+	Distribution       = types.Distribution
+	DistributionShare  = types.DistributionShare
 )
 
 var (
@@ -37,12 +39,22 @@ var (
 	DefaultParams  = types.DefaultParams
 	ValidateParams = types.ValidateParams
 
+	NewFee                = types.NewFee
+	NewFeeContent         = types.NewFeeContent
+	NewFeeContract        = types.NewFeeContract
+	NewFeeContractContent = types.NewFeeContractContent
+
+	ErrNegativeSharePercentage       = types.ErrNegativeSharePercentage
+	ErrDistributionPercentagesNot100 = types.ErrDistributionPercentagesNot100
+	ErrInvalidGenesis                = types.ErrInvalidGenesis
+
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
 	// variable aliases
-	ModuleCdc                               = types.ModuleCdc
+	ModuleCdc = types.ModuleCdc
+
 	KeyIxoFactor                            = types.KeyIxoFactor
 	KeyNodeFeePercentage                    = types.KeyNodeFeePercentage
 	KeyClaimFeeAmount                       = types.KeyClaimFeeAmount
@@ -53,4 +65,9 @@ var (
 	KeyEvaluationAgentRegistrationFeeAmount = types.KeyEvaluationAgentRegistrationFeeAmount
 	KeyEvaluationPayFeePercentage           = types.KeyEvaluationPayFeePercentage
 	KeyEvaluationPayNodeFeePercentage       = types.KeyEvaluationPayNodeFeePercentage
+
+	FeeKeyPrefix         = types.FeeKeyPrefix
+	FeeContractKeyPrefix = types.FeeContractKeyPrefix
+	FeeIdKey             = types.FeeIdKey
+	FeeContractIdKey     = types.FeeContractIdKey
 )

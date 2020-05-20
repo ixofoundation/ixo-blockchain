@@ -11,8 +11,7 @@ const (
 	FeeEvaluationTransaction FeeType = "FeeEvaluationTransaction"
 )
 
-type Fee struct {
-	Id                 string       `json:"id" yaml:"id"`
+type FeeContent struct {
 	ChargeAmount       sdk.Coins    `json:"charge_amount" yaml:"charge_amount"`
 	ChargeMinimum      sdk.Coins    `json:"charge_minimum" yaml:"charge_minimum"`
 	ChargeMaximum      sdk.Coins    `json:"charge_maximum" yaml:"charge_maximum"`
@@ -20,10 +19,9 @@ type Fee struct {
 	WalletDistribution Distribution `json:"wallet_distribution" yaml:"wallet_distribution"`
 }
 
-func NewFee(id string, chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
-	discounts Discounts, walletDistribution Distribution) Fee {
-	return Fee{
-		Id:                 id,
+func NewFeeContent(chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
+	discounts Discounts, walletDistribution Distribution) FeeContent {
+	return FeeContent{
 		ChargeAmount:       chargeAmount,
 		ChargeMinimum:      chargeMinimum,
 		ChargeMaximum:      chargeMaximum,
@@ -32,30 +30,52 @@ func NewFee(id string, chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
 	}
 }
 
+type Fee struct {
+	Id      uint64     `json:"id" yaml:"id"`
+	Content FeeContent `json:"content" yaml:"content"`
+}
+
+func NewFee(id uint64, content FeeContent) Fee {
+	return Fee{
+		Id:      id,
+		Content: content,
+	}
+}
+
 func (f Fee) Validate() sdk.Error {
 	// TODO: Validation of remaining fields
 
-	return f.WalletDistribution.Validate()
+	return f.Content.WalletDistribution.Validate()
 }
 
-type FeeContract struct {
-	Id               string         `json:"id" yaml:""`
-	FeeId            string         `json:"fee_id" yaml:""`
-	Payer            sdk.AccAddress `json:"payer" yaml:""`
+type FeeContractContent struct {
+	FeeId            uint64         `json:"fee_id" yaml:"fee_id"`
+	Payer            sdk.AccAddress `json:"payer" yaml:"payer"`
 	CumulativeCharge sdk.Coins      `json:"cumulative_charge" yaml:"cumulative_charge"`
 	CanDeauthorise   bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	Authorised       bool           `json:"authorised" yaml:"authorised"`
 }
 
-func NewFeeContract(id, feeId string, payer sdk.AccAddress,
-	cumulativeCharge sdk.Coins, canDeauthorise, authorised bool) FeeContract {
-	return FeeContract{
-		Id:               id,
+func NewFeeContractContent(feeId uint64, payer sdk.AccAddress,
+	cumulativeCharge sdk.Coins, canDeauthorise, authorised bool) FeeContractContent {
+	return FeeContractContent{
 		FeeId:            feeId,
 		Payer:            payer,
 		CumulativeCharge: cumulativeCharge,
 		CanDeauthorise:   canDeauthorise,
 		Authorised:       authorised,
+	}
+}
+
+type FeeContract struct {
+	Id      uint64             `json:"id" yaml:"id"`
+	Content FeeContractContent `json:"content" yaml:"content"`
+}
+
+func NewFeeContract(id uint64, content FeeContractContent) FeeContract {
+	return FeeContract{
+		Id:      id,
+		Content: content,
 	}
 }
 
