@@ -11,8 +11,8 @@ const (
 )
 
 type Subscription struct {
-	Id      uint64
-	Content SubscriptionContent
+	Id      uint64              `json:"id" yaml:"id"`
+	Content SubscriptionContent `json:"content" yaml:"content"`
 }
 
 func (s Subscription) Validate() sdk.Error {
@@ -38,13 +38,13 @@ type SubscriptionContent interface {
 var _, _ SubscriptionContent = BlockSubscriptionContent{}, TimeSubscriptionContent{}
 
 type BlockSubscriptionContent struct {
-	FeeContractId      uint64
-	PeriodsSoFar       sdk.Uint
-	MaxPeriods         sdk.Uint
-	PeriodsAccumulated sdk.Uint
-	PeriodLength       int64
-	PeriodStartBlock   int64
-	PeriodEndBlock     int64
+	FeeContractId      uint64   `json:"fee_contract_id" yaml:"fee_contract_id"`
+	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
+	MaxPeriods         sdk.Uint `json:"max_periods" yaml:"max_periods"`
+	PeriodsAccumulated sdk.Uint `json:"periods_accumulated" yaml:"periods_accumulated"`
+	PeriodLength       int64    `json:"period_length" yaml:"period_length"`
+	PeriodStartBlock   int64    `json:"period_start_block" yaml:"period_start_block"`
+	PeriodEndBlock     int64    `json:"period_end_block" yaml:"period_end_block"`
 }
 
 func NewBlockSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
@@ -109,13 +109,13 @@ func (s BlockSubscriptionContent) Validate() sdk.Error {
 }
 
 type TimeSubscriptionContent struct {
-	FeeContractId      uint64
-	PeriodsSoFar       sdk.Uint
-	MaxPeriods         sdk.Uint
-	PeriodsAccumulated sdk.Uint
-	PeriodLength       time.Duration
-	PeriodStartTime    time.Time
-	PeriodEndTime      time.Time
+	FeeContractId      uint64        `json:"fee_contract_id" yaml:"fee_contract_id"`
+	PeriodsSoFar       sdk.Uint      `json:"periods_so_far" yaml:"periods_so_far"`
+	MaxPeriods         sdk.Uint      `json:"max_periods" yaml:"max_periods"`
+	PeriodsAccumulated sdk.Uint      `json:"periods_accumulated" yaml:"periods_accumulated"`
+	PeriodLength       time.Duration `json:"period_length" yaml:"period_length"`
+	PeriodStartTime    time.Time     `json:"period_start_time" yaml:"period_start_time"`
+	PeriodEndTime      time.Time     `json:"period_end_time" yaml:"period_end_time"`
 }
 
 func NewTimeSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,

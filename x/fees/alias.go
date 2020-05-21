@@ -48,45 +48,10 @@ var (
 	DefaultParams  = types.DefaultParams
 	ValidateParams = types.ValidateParams
 
-	NewFee                = types.NewFee
-	NewFeeContent         = types.NewFeeContent
-	NewFeeContract        = types.NewFeeContract
-	NewFeeContractContent = types.NewFeeContractContent
-	NewDistribution       = types.NewDistribution
-	NewDistributionShare  = types.NewDistributionShare
-
-	NewDiscount  = types.NewDiscount
-	NewDiscounts = types.NewDiscounts
-
-	NewSubscription      = types.NewSubscription
-	NewBlockSubscription = types.NewBlockSubscriptionContent
-	NewTimeSubscription  = types.NewTimeSubscriptionContent
-
-	ErrNegativeSharePercentage       = types.ErrNegativeSharePercentage
-	ErrDistributionPercentagesNot100 = types.ErrDistributionPercentagesNot100
-	ErrInvalidGenesis                = types.ErrInvalidGenesis
-	ErrSubscriptionHasNoNextPeriod   = types.ErrSubscriptionHasNoNextPeriod
-
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc
-
-	KeyIxoFactor                            = types.KeyIxoFactor
-	KeyNodeFeePercentage                    = types.KeyNodeFeePercentage
-	KeyClaimFeeAmount                       = types.KeyClaimFeeAmount
-	KeyEvaluationFeeAmount                  = types.KeyEvaluationFeeAmount
-	KeyInitiationFeeAmount                  = types.KeyInitiationFeeAmount
-	KeyInitiationNodeFeePercentage          = types.KeyInitiationNodeFeePercentage
-	KeyServiceAgentRegistrationFeeAmount    = types.KeyServiceAgentRegistrationFeeAmount
-	KeyEvaluationAgentRegistrationFeeAmount = types.KeyEvaluationAgentRegistrationFeeAmount
-	KeyEvaluationPayFeePercentage           = types.KeyEvaluationPayFeePercentage
-	KeyEvaluationPayNodeFeePercentage       = types.KeyEvaluationPayNodeFeePercentage
-
-	FeeKeyPrefix         = types.FeeKeyPrefix
-	FeeContractKeyPrefix = types.FeeContractKeyPrefix
-	FeeIdKey             = types.FeeIdKey
-	FeeContractIdKey     = types.FeeContractIdKey
 )
