@@ -10,6 +10,8 @@ const (
 	TimeSubscriptionUnit  = "time"
 )
 
+// --------------------------------------------- Subscription and SubscriptionContent
+
 type Subscription struct {
 	Id      uint64              `json:"id" yaml:"id"`
 	Content SubscriptionContent `json:"content" yaml:"content"`
@@ -36,6 +38,8 @@ type SubscriptionContent interface {
 }
 
 var _, _ SubscriptionContent = BlockSubscriptionContent{}, TimeSubscriptionContent{}
+
+// --------------------------------------------- BlockSubscriptionContent
 
 type BlockSubscriptionContent struct {
 	FeeContractId      uint64   `json:"fee_contract_id" yaml:"fee_contract_id"`
@@ -107,6 +111,8 @@ func (s BlockSubscriptionContent) Validate() sdk.Error {
 	}
 	return nil
 }
+
+// --------------------------------------------- TimeSubscriptionContent
 
 type TimeSubscriptionContent struct {
 	FeeContractId      uint64        `json:"fee_contract_id" yaml:"fee_contract_id"`
