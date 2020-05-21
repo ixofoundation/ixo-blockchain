@@ -31,9 +31,10 @@ func NewSubscription(id uint64, content SubscriptionContent) Subscription {
 type SubscriptionContent interface {
 	GetFeeContractId() uint64
 	GetPeriodUnit() string
+	Started(ctx sdk.Context) bool
+	Ended() bool
 	ShouldCharge(ctx sdk.Context) bool
-	HasNextPeriod() bool
-	NextPeriod(periodPaid bool) sdk.Error
+	NextPeriod(periodPaid bool)
 	Validate() sdk.Error
 }
 
@@ -72,20 +73,22 @@ func (s BlockSubscriptionContent) GetPeriodUnit() string {
 	return BlockSubscriptionUnit
 }
 
+//Started True if height has passed start block, or if this is not the first period
+func (s BlockSubscriptionContent) Started(ctx sdk.Context) bool {
+	return !s.PeriodsSoFar.IsZero() || ctx.BlockHeight() > s.PeriodStartBlock
+}
+
+//Ended True if max number of periods has been reached
+func (s BlockSubscriptionContent) Ended() bool {
+	return s.PeriodsSoFar.GTE(s.MaxPeriods)
+}
+
+//ShouldCharge True if end of period reached or there's accumulated periods
 func (s BlockSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
-	return ctx.BlockHeight() > s.PeriodEndBlock
+	return !s.PeriodsAccumulated.IsZero() || ctx.BlockHeight() >= s.PeriodEndBlock
 }
 
-//HasNextPeriod True if the current period is not the last period
-func (s BlockSubscriptionContent) HasNextPeriod() bool {
-	return s.PeriodsSoFar.Add(sdk.OneUint()).LT(s.MaxPeriods)
-}
-
-func (s BlockSubscriptionContent) NextPeriod(periodPaid bool) sdk.Error {
-	if s.HasNextPeriod() {
-		return ErrSubscriptionHasNoNextPeriod(DefaultCodespace)
-	}
-
+func (s BlockSubscriptionContent) NextPeriod(periodPaid bool) {
 	// Update periods so far (periodsAccumulated if period not paid)
 	s.PeriodsSoFar = s.PeriodsSoFar.Add(sdk.OneUint())
 	if !periodPaid {
@@ -95,8 +98,6 @@ func (s BlockSubscriptionContent) NextPeriod(periodPaid bool) sdk.Error {
 	// Update period start/end
 	s.PeriodStartBlock = s.PeriodEndBlock
 	s.PeriodEndBlock = s.PeriodStartBlock + s.PeriodLength
-
-	return nil
 }
 
 func (s BlockSubscriptionContent) Validate() sdk.Error {
@@ -145,21 +146,23 @@ func (s TimeSubscriptionContent) GetPeriodUnit() string {
 	return TimeSubscriptionUnit
 }
 
-func (s TimeSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
-	return ctx.BlockTime().After(s.PeriodEndTime)
+//Started True if height has passed start block, or if this is not the first period
+func (s TimeSubscriptionContent) Started(ctx sdk.Context) bool {
+	return !s.PeriodsSoFar.IsZero() || ctx.BlockTime().After(s.PeriodStartTime)
 }
 
-//HasNextPeriod True if the current period is not the last period
-func (s TimeSubscriptionContent) HasNextPeriod() bool {
-	return s.PeriodsSoFar.Add(sdk.OneUint()).LT(s.MaxPeriods)
+//Ended True if max number of periods has been reached
+func (s TimeSubscriptionContent) Ended() bool {
+	return s.PeriodsSoFar.GTE(s.MaxPeriods)
+}
+
+//ShouldCharge True if end of period reached or there's accumulated periods
+func (s TimeSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
+	return !s.PeriodsAccumulated.IsZero() || ctx.BlockTime().After(s.PeriodEndTime)
 }
 
 //NextPeriod Proceed to the next period
-func (s TimeSubscriptionContent) NextPeriod(periodPaid bool) sdk.Error {
-	if s.HasNextPeriod() {
-		return ErrSubscriptionHasNoNextPeriod(DefaultCodespace)
-	}
-
+func (s TimeSubscriptionContent) NextPeriod(periodPaid bool) {
 	// Update periods so far (periodsAccumulated if period not paid)
 	s.PeriodsSoFar = s.PeriodsSoFar.Add(sdk.OneUint())
 	if !periodPaid {
@@ -169,8 +172,6 @@ func (s TimeSubscriptionContent) NextPeriod(periodPaid bool) sdk.Error {
 	// Update period start/end
 	s.PeriodStartTime = s.PeriodEndTime
 	s.PeriodEndTime = s.PeriodStartTime.Add(s.PeriodLength)
-
-	return nil
 }
 
 func (s TimeSubscriptionContent) Validate() sdk.Error {
