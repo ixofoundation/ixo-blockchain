@@ -32,8 +32,9 @@ type (
 
 var (
 	// function aliases
-	NewKeeper  = keeper.NewKeeper
-	NewQuerier = keeper.NewQuerier
+	NewKeeper     = keeper.NewKeeper
+	NewQuerier    = keeper.NewQuerier
+	RegisterCodec = types.RegisterCodec
 
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
