@@ -160,3 +160,22 @@ func (k Keeper) SetFeeContractID(ctx sdk.Context, feeContractId uint64) {
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(feeContractId)
 	store.Set(types.FeeContractIdKey, bz)
 }
+
+func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId uint64,
+	authorised bool) sdk.Error {
+	feeContract, err := k.GetFeeContract(ctx, feeContractId)
+	if err != nil {
+		return err
+	}
+
+	// If de-authorising, check if can be de-authorised
+	if !authorised && !feeContract.Content.CanDeauthorise {
+		return types.ErrFeeContractCannotBeDeauthorised(types.DefaultCodespace)
+	}
+
+	// Set authorised state
+	feeContract.Content.Authorised = authorised
+	k.SetFeeContract(ctx, feeContract)
+
+	return nil
+}

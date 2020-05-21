@@ -12,6 +12,7 @@ const (
 	CodeInvalidGenesis             sdk.CodeType      = 103
 	CodeInvalidSubscriptionAction  sdk.CodeType      = 104
 	CodeInvalidSubscriptionContent sdk.CodeType      = 105
+	CodeInvalidFeeContractAction   sdk.CodeType      = 106
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -36,4 +37,9 @@ func ErrSubscriptionHasNoNextPeriod(codespace sdk.CodespaceType) sdk.Error {
 func ErrInvalidSubscriptionContent(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 	errMsg = fmt.Sprintf("subscription content is invalid: %s", errMsg)
 	return sdk.NewError(codespace, CodeInvalidSubscriptionContent, errMsg)
+}
+
+func ErrFeeContractCannotBeDeauthorised(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := fmt.Sprintf("fee contract cannot be deauthorised")
+	return sdk.NewError(codespace, CodeInvalidFeeContractAction, errMsg)
 }
