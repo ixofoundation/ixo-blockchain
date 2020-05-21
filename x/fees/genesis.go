@@ -9,6 +9,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	keeper.SetParams(ctx, data.Params)
 	keeper.SetFeeID(ctx, data.StartingFeeId)
 	keeper.SetFeeContractID(ctx, data.StartingFeeContractId)
+	keeper.SetSubscriptionID(ctx, data.StartingFeeContractId)
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
@@ -33,10 +34,19 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 		feeContracts = append(feeContracts, feeContract)
 	}
 
+	// Export subscriptions
+	var subscriptions []Subscription
+	iterator = keeper.GetSubscriptionIterator(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		subscription := keeper.MustGetSubscriptionByKey(ctx, iterator.Key())
+		subscriptions = append(subscriptions, subscription)
+	}
+
 	// Export fee ID and fee contract ID
 	startingFeeID, _ := keeper.GetFeeID(ctx)
 	startingFeeContractID, _ := keeper.GetFeeContractID(ctx)
+	startingSubscriptionID, _ := keeper.GetSubscriptionID(ctx)
 
-	return NewGenesisState(params, fees, feeContracts,
-		startingFeeID, startingFeeContractID)
+	return NewGenesisState(params, fees, feeContracts, subscriptions,
+		startingFeeID, startingFeeContractID, startingSubscriptionID)
 }

@@ -28,12 +28,21 @@ type (
 	FeeContractContent = types.FeeContractContent
 	Distribution       = types.Distribution
 	DistributionShare  = types.DistributionShare
+
+	Discount  = types.Discount
+	Discounts = types.Discounts
+
+	Subscription        = types.Subscription
+	SubscriptionContent = types.SubscriptionContent
+	BlockSubscription   = types.BlockSubscriptionContent
+	TimeSubscription    = types.TimeSubscriptionContent
 )
 
 var (
 	// function aliases
 	NewKeeper      = keeper.NewKeeper
 	NewQuerier     = keeper.NewQuerier
+	RegisterCodec  = types.RegisterCodec
 	ParamKeyTable  = types.ParamKeyTable
 	NewParams      = types.NewParams
 	DefaultParams  = types.DefaultParams
@@ -43,10 +52,20 @@ var (
 	NewFeeContent         = types.NewFeeContent
 	NewFeeContract        = types.NewFeeContract
 	NewFeeContractContent = types.NewFeeContractContent
+	NewDistribution       = types.NewDistribution
+	NewDistributionShare  = types.NewDistributionShare
+
+	NewDiscount  = types.NewDiscount
+	NewDiscounts = types.NewDiscounts
+
+	NewSubscription      = types.NewSubscription
+	NewBlockSubscription = types.NewBlockSubscriptionContent
+	NewTimeSubscription  = types.NewTimeSubscriptionContent
 
 	ErrNegativeSharePercentage       = types.ErrNegativeSharePercentage
 	ErrDistributionPercentagesNot100 = types.ErrDistributionPercentagesNot100
 	ErrInvalidGenesis                = types.ErrInvalidGenesis
+	ErrSubscriptionHasNoNextPeriod   = types.ErrSubscriptionHasNoNextPeriod
 
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
