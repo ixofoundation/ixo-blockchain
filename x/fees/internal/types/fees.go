@@ -48,16 +48,18 @@ func (f Fee) Validate() sdk.Error {
 
 type FeeContractContent struct {
 	FeeId            uint64         `json:"fee_id" yaml:"fee_id"`
+	Creator          sdk.AccAddress `json:"creator" yaml:"creator"`
 	Payer            sdk.AccAddress `json:"payer" yaml:"payer"`
 	CumulativeCharge sdk.Coins      `json:"cumulative_charge" yaml:"cumulative_charge"`
 	CanDeauthorise   bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	Authorised       bool           `json:"authorised" yaml:"authorised"`
 }
 
-func NewFeeContractContent(feeId uint64, payer sdk.AccAddress,
+func NewFeeContractContent(feeId uint64, creator, payer sdk.AccAddress,
 	cumulativeCharge sdk.Coins, canDeauthorise, authorised bool) FeeContractContent {
 	return FeeContractContent{
 		FeeId:            feeId,
+		Creator:          creator,
 		Payer:            payer,
 		CumulativeCharge: cumulativeCharge,
 		CanDeauthorise:   canDeauthorise,
