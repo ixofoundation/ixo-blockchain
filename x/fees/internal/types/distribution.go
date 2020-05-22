@@ -28,20 +28,18 @@ func (d Distribution) Validate() sdk.Error {
 }
 
 type DistributionShare struct {
-	Identifier string  `json:"identifier" yaml:"identifier"`
-	Percentage sdk.Dec `json:"percentage" yaml:"percentage"`
+	Address    sdk.AccAddress `json:"address" yaml:"address"`
+	Percentage sdk.Dec        `json:"percentage" yaml:"percentage"`
 }
 
-func NewDistributionShare(identifier string, percentage sdk.Dec) DistributionShare {
+func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) DistributionShare {
 	return DistributionShare{
-		Identifier: identifier,
+		Address:    address,
 		Percentage: percentage,
 	}
 }
 
 func (d DistributionShare) Validate() sdk.Error {
-	// TODO: Identifier distribution
-
 	if !d.Percentage.IsPositive() {
 		return ErrNegativeSharePercentage(DefaultCodespace)
 	}
