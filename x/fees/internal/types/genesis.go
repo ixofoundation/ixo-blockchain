@@ -1,23 +1,25 @@
 package types
 
 type GenesisState struct {
-	Params                 Params         `json:"params" yaml:"params"`
-	Fees                   []Fee          `json:"fees" yaml:"fees"`
-	FeeContracts           []FeeContract  `json:"fee_contracts" yaml:"fee_contracts"`
-	Subscriptions          []Subscription `json:"subscriptions" yaml:"subscriptions"`
-	StartingFeeId          uint64         `json:"starting_fee_id" yaml:"starting_fee_id"`
-	StartingFeeContractId  uint64         `json:"starting_fee_contract_id" yaml:"starting_fee_contract_id"`
-	StartingSubscriptionId uint64         `json:"starting_subscription_id" yaml:"starting_subscription_id"`
+	Params                 Params           `json:"params" yaml:"params"`
+	Fees                   []Fee            `json:"fees" yaml:"fees"`
+	FeeContracts           []FeeContract    `json:"fee_contracts" yaml:"fee_contracts"`
+	Subscriptions          []Subscription   `json:"subscriptions" yaml:"subscriptions"`
+	DiscountHolders        []DiscountHolder `json:"discount_holders" yaml:"discount_holders"`
+	StartingFeeId          uint64           `json:"starting_fee_id" yaml:"starting_fee_id"`
+	StartingFeeContractId  uint64           `json:"starting_fee_contract_id" yaml:"starting_fee_contract_id"`
+	StartingSubscriptionId uint64           `json:"starting_subscription_id" yaml:"starting_subscription_id"`
 }
 
 func NewGenesisState(params Params, fees []Fee, feeContracts []FeeContract,
-	subscriptions []Subscription, startingFeeID, startingFeeContractID,
-	startingSubscriptionID uint64) GenesisState {
+	subscriptions []Subscription, discountHolders []DiscountHolder,
+	startingFeeID, startingFeeContractID, startingSubscriptionID uint64) GenesisState {
 	return GenesisState{
 		Params:                 params,
 		Fees:                   fees,
 		FeeContracts:           feeContracts,
 		Subscriptions:          subscriptions,
+		DiscountHolders:        discountHolders,
 		StartingFeeId:          startingFeeID,
 		StartingFeeContractId:  startingFeeContractID,
 		StartingSubscriptionId: startingSubscriptionID,

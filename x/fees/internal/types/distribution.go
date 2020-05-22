@@ -8,7 +8,7 @@ func NewDistribution(shares ...DistributionShare) Distribution {
 	return Distribution(shares)
 }
 
-//IsValid Checks that shares total up to 100 percent
+// IsValid Checks that shares total up to 100 percent
 func (d Distribution) Validate() sdk.Error {
 	// Validate shares and calculate total
 	total := sdk.ZeroDec()

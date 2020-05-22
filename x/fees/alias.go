@@ -29,8 +29,9 @@ type (
 	Distribution       = types.Distribution
 	DistributionShare  = types.DistributionShare
 
-	Discount  = types.Discount
-	Discounts = types.Discounts
+	Discount       = types.Discount
+	Discounts      = types.Discounts
+	DiscountHolder = types.DiscountHolder
 
 	Subscription        = types.Subscription
 	SubscriptionContent = types.SubscriptionContent

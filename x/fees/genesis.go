@@ -6,7 +6,30 @@ import (
 
 // InitGenesis new fees genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+	// Init params
 	keeper.SetParams(ctx, data.Params)
+
+	// Init fees
+	for _, f := range data.Fees {
+		keeper.SetFee(ctx, f)
+	}
+
+	// Init fee contracts
+	for _, fc := range data.FeeContracts {
+		keeper.SetFeeContract(ctx, fc)
+	}
+
+	// Init subscriptions
+	for _, s := range data.Subscriptions {
+		keeper.SetSubscription(ctx, s)
+	}
+
+	// Init discount holders
+	for _, dh := range data.DiscountHolders {
+		keeper.SetDiscountHolder(ctx, dh)
+	}
+
+	// Init starting IDs
 	keeper.SetFeeID(ctx, data.StartingFeeId)
 	keeper.SetFeeContractID(ctx, data.StartingFeeContractId)
 	keeper.SetSubscriptionID(ctx, data.StartingFeeContractId)
@@ -14,7 +37,6 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
-
 	// Export params
 	params := keeper.GetParams(ctx)
 
@@ -42,11 +64,19 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 		subscriptions = append(subscriptions, subscription)
 	}
 
+	// Export discount holders
+	var discountHolders []DiscountHolder
+	iterator = keeper.GetFeesDiscountsHoldersIterator(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		discountHolder := keeper.MustGetDiscountHolderByKey(ctx, iterator.Key())
+		discountHolders = append(discountHolders, discountHolder)
+	}
+
 	// Export fee ID and fee contract ID
 	startingFeeID, _ := keeper.GetFeeID(ctx)
 	startingFeeContractID, _ := keeper.GetFeeContractID(ctx)
 	startingSubscriptionID, _ := keeper.GetSubscriptionID(ctx)
 
 	return NewGenesisState(params, fees, feeContracts, subscriptions,
-		startingFeeID, startingFeeContractID, startingSubscriptionID)
+		discountHolders, startingFeeID, startingFeeContractID, startingSubscriptionID)
 }

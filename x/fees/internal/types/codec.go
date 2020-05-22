@@ -13,6 +13,7 @@ func RegisterCodec(cdc *codec.Codec) {
 
 	cdc.RegisterConcrete(Discounts{}, "fees/Discounts", nil)
 	cdc.RegisterConcrete(Discount{}, "fees/Discount", nil)
+	cdc.RegisterConcrete(DiscountHolder{}, "fees/DiscountHolder", nil)
 
 	cdc.RegisterConcrete(Subscription{}, "fees/Subscription", nil)
 	cdc.RegisterInterface((*SubscriptionContent)(nil), nil)

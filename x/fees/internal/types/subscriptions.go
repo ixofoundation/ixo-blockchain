@@ -73,17 +73,17 @@ func (s BlockSubscriptionContent) GetPeriodUnit() string {
 	return BlockSubscriptionUnit
 }
 
-//Started True if height has passed start block, or if this is not the first period
+// Started True if height has passed start block, or if this is not the first period
 func (s BlockSubscriptionContent) Started(ctx sdk.Context) bool {
 	return !s.PeriodsSoFar.IsZero() || ctx.BlockHeight() > s.PeriodStartBlock
 }
 
-//Ended True if max number of periods has been reached
+// Ended True if max number of periods has been reached
 func (s BlockSubscriptionContent) Ended() bool {
 	return s.PeriodsSoFar.GTE(s.MaxPeriods)
 }
 
-//ShouldCharge True if end of period reached or there's accumulated periods
+// ShouldCharge True if end of period reached or there's accumulated periods
 func (s BlockSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
 	return !s.PeriodsAccumulated.IsZero() || ctx.BlockHeight() >= s.PeriodEndBlock
 }
@@ -146,22 +146,22 @@ func (s TimeSubscriptionContent) GetPeriodUnit() string {
 	return TimeSubscriptionUnit
 }
 
-//Started True if height has passed start block, or if this is not the first period
+// Started True if height has passed start block, or if this is not the first period
 func (s TimeSubscriptionContent) Started(ctx sdk.Context) bool {
 	return !s.PeriodsSoFar.IsZero() || ctx.BlockTime().After(s.PeriodStartTime)
 }
 
-//Ended True if max number of periods has been reached
+// Ended True if max number of periods has been reached
 func (s TimeSubscriptionContent) Ended() bool {
 	return s.PeriodsSoFar.GTE(s.MaxPeriods)
 }
 
-//ShouldCharge True if end of period reached or there's accumulated periods
+// ShouldCharge True if end of period reached or there's accumulated periods
 func (s TimeSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
 	return !s.PeriodsAccumulated.IsZero() || ctx.BlockTime().After(s.PeriodEndTime)
 }
 
-//NextPeriod Proceed to the next period
+// NextPeriod Proceed to the next period
 func (s TimeSubscriptionContent) NextPeriod(periodPaid bool) {
 	// Update periods so far (periodsAccumulated if period not paid)
 	s.PeriodsSoFar = s.PeriodsSoFar.Add(sdk.OneUint())

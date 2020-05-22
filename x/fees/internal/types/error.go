@@ -10,9 +10,9 @@ const (
 	CodeInvalidDistribution        sdk.CodeType      = 101
 	CodeInvalidShare               sdk.CodeType      = 102
 	CodeInvalidGenesis             sdk.CodeType      = 103
-	CodeInvalidSubscriptionAction  sdk.CodeType      = 104
-	CodeInvalidSubscriptionContent sdk.CodeType      = 105
-	CodeInvalidFeeContractAction   sdk.CodeType      = 106
+	CodeInvalidSubscriptionContent sdk.CodeType      = 104
+	CodeInvalidFeeContractAction   sdk.CodeType      = 105
+	CodeInvalidDiscounts           sdk.CodeType      = 106
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -29,11 +29,6 @@ func ErrInvalidGenesis(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidGenesis, errMsg)
 }
 
-func ErrSubscriptionHasNoNextPeriod(codespace sdk.CodespaceType) sdk.Error {
-	errMsg := fmt.Sprintf("subscription has no next period")
-	return sdk.NewError(codespace, CodeInvalidSubscriptionAction, errMsg)
-}
-
 func ErrInvalidSubscriptionContent(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 	errMsg = fmt.Sprintf("subscription content is invalid: %s", errMsg)
 	return sdk.NewError(codespace, CodeInvalidSubscriptionContent, errMsg)
@@ -42,4 +37,9 @@ func ErrInvalidSubscriptionContent(codespace sdk.CodespaceType, errMsg string) s
 func ErrFeeContractCannotBeDeauthorised(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := fmt.Sprintf("fee contract cannot be deauthorised")
 	return sdk.NewError(codespace, CodeInvalidFeeContractAction, errMsg)
+}
+
+func ErrDiscountIDsBeSequentialFrom1(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := fmt.Sprintf("discount IDs must be sequential starting with 1")
+	return sdk.NewError(codespace, CodeInvalidDiscounts, errMsg)
 }
