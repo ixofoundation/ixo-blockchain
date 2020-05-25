@@ -62,6 +62,10 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	module.NewBasicManager(auth.AppModuleBasic{}).RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	cdc.RegisterInterface((*types.SubscriptionContent)(nil), nil)
+	cdc.RegisterConcrete(types.BlockSubscriptionContent{}, "fees/BlockSubscriptionContent", nil)
+	cdc.RegisterConcrete(types.TimeSubscriptionContent{}, "fees/TimeSubscriptionContent", nil)
+	cdc.RegisterConcrete(types.TestSubscriptionContent{}, "fees/TesSubscriptionContent", nil)
 
 	keyParams := sdk.NewKVStoreKey("subspace")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")

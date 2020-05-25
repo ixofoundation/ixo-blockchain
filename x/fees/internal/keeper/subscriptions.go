@@ -5,7 +5,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
-// -------------------------------------------------------- Subscriptions
+// -------------------------------------------------------- Subscriptions Get/Set
 
 func (k Keeper) GetSubscriptionIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
@@ -81,4 +81,32 @@ func (k Keeper) SetSubscriptionID(ctx sdk.Context, subscriptionId uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(subscriptionId)
 	store.Set(types.SubscriptionIdKey, bz)
+}
+
+// -------------------------------------------------------- Subscriptions Charge
+
+func (k Keeper) ChargeSubscriptionFee(ctx sdk.Context, subscriptionId uint64) sdk.Error {
+
+	subscription, err := k.GetSubscription(ctx, subscriptionId)
+	if err != nil {
+		return err
+	}
+	sData := subscription.Content
+
+	// Check if should charge
+	if !sData.ShouldCharge(ctx) {
+		return types.ErrTriedToChargeSubscriptionFeeWhenShouldnt(types.DefaultCodespace)
+	}
+
+	// Charge fee
+	charged, err := k.ChargeFee(ctx, k.bankKeeper, sData.GetFeeContractId())
+	if err != nil {
+		return err
+	}
+
+	// Update and save subscription
+	sData.NextPeriod(charged)
+	k.SetSubscription(ctx, subscription)
+
+	return nil
 }

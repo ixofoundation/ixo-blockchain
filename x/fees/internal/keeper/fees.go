@@ -183,23 +183,23 @@ func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId uint64,
 
 // -------------------------------------------------------- FeeContracts Charge
 
-func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper, feeContractId uint64) sdk.Error {
+func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper, feeContractId uint64) (charged bool, err sdk.Error) {
 
 	feeContract, err := k.GetFeeContract(ctx, feeContractId)
 	if err != nil {
-		return err
+		return false, err
 	}
 	fcData := &feeContract.Content
 
 	fee, err := k.GetFee(ctx, fcData.FeeId)
 	if err != nil {
-		return err
+		return false, err
 	}
 	feeData := &fee.Content
 
 	// Check if can charge (this is false if e.g. max charge has been reached)
 	if !feeContract.CanCharge(fee) {
-		return nil
+		return false, nil
 	}
 
 	// First assume that address will pay ChargeAmount, and calculate cumulative
@@ -233,15 +233,21 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper, feeContractId
 	// => actualCharge = adjustedCumul - previousCumul
 	charge := cumulative.Sub(fcData.CumulativeCharge)
 
+	// Stop if payer doesn't have enough coins. However, this is not considered
+	// an error but the caller should be looking at the 'charged' bool result
+	if !bankKeeper.HasCoins(ctx, fcData.Payer, charge) {
+		return false, nil
+	}
+
 	// Perform the fee charge
 	err = bankKeeper.SendCoins(ctx, fcData.Payer, fee.Content.WalletDistribution[0].Address, charge)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	// Update fee contract
+	// Update and save fee contract
 	fcData.CumulativeCharge = fcData.CumulativeCharge.Add(charge)
 	k.SetFeeContract(ctx, feeContract)
 
-	return nil
+	return true, nil
 }
