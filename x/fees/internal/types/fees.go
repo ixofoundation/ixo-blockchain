@@ -28,6 +28,34 @@ func NewFeeContent(chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
 	}
 }
 
+func (fc FeeContent) Validate() sdk.Error {
+	// Validate charge amount, minimum, maximum
+	amt := fc.ChargeAmount
+	min := fc.ChargeMinimum
+	max := fc.ChargeMaximum
+	if min.IsValid() && max.IsValid() && amt.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "min, max, or amt coins invalid")
+	} else if min.IsAnyGT(max) {
+		return ErrInvalidFee(DefaultCodespace, "min charge includes value greater than max")
+	} else if !min.DenomsSubsetOf(amt) {
+		return ErrInvalidFee(DefaultCodespace, "min charge includes denom not in fee amount")
+	} else if !max.DenomsSubsetOf(amt) {
+		return ErrInvalidFee(DefaultCodespace, "max charge includes denom not in fee amount")
+	}
+
+	// Validate discounts
+	if err := fc.Discounts.Validate(); err != nil {
+		return err
+	}
+
+	// Validate wallet distribution
+	if err := fc.WalletDistribution.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type Fee struct {
 	Id      uint64     `json:"id" yaml:"id"`
 	Content FeeContent `json:"content" yaml:"content"`
@@ -41,31 +69,7 @@ func NewFee(id uint64, content FeeContent) Fee {
 }
 
 func (f Fee) Validate() sdk.Error {
-	// Validate charge amount, minimum, maximum
-	amt := f.Content.ChargeAmount
-	min := f.Content.ChargeMinimum
-	max := f.Content.ChargeMaximum
-	if min.IsValid() && max.IsValid() && amt.IsValid() {
-		return ErrInvalidFee(DefaultCodespace, "min, max, or amt coins invalid")
-	} else if min.IsAnyGT(max) {
-		return ErrInvalidFee(DefaultCodespace, "min charge includes value greater than max")
-	} else if !min.DenomsSubsetOf(amt) {
-		return ErrInvalidFee(DefaultCodespace, "min charge includes denom not in fee amount")
-	} else if !max.DenomsSubsetOf(amt) {
-		return ErrInvalidFee(DefaultCodespace, "max charge includes denom not in fee amount")
-	}
-
-	// Validate discounts
-	if err := f.Content.Discounts.Validate(); err != nil {
-		return err
-	}
-
-	// Validate wallet distribution
-	if err := f.Content.WalletDistribution.Validate(); err != nil {
-		return err
-	}
-
-	return nil
+	return f.Content.Validate()
 }
 
 type FeeContractContent struct {
