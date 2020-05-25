@@ -13,6 +13,7 @@ func TestKeeper(t *testing.T) {
 	startingFeeId := uint64(1)
 	startingFeeContractId := uint64(1)
 	startingSubscriptionId := uint64(1)
+	startingDiscountHoldersId := uint64(1) // does not increment automatically
 
 	ctx, k, cdc := CreateTestInput()
 	cdc.RegisterInterface((*types.SubscriptionContent)(nil), nil)
@@ -22,13 +23,19 @@ func TestKeeper(t *testing.T) {
 	k.SetFeeContractID(ctx, 1)
 	k.SetSubscriptionID(ctx, 1)
 
-	// Check Fee, FeeContract, Subscription existence
+	// Check Fee, FeeContract, Subscription, DiscountHolders existence
 	feeGet, err := k.GetFee(ctx, startingFeeId)
 	require.NotNil(t, err)
 	feeContractGet, err := k.GetFeeContract(ctx, startingFeeContractId)
 	require.NotNil(t, err)
 	blockSubscriptionGet, err := k.GetSubscription(ctx, startingSubscriptionId)
 	require.NotNil(t, err)
+	discountHoldersIter := k.GetFeeDiscountHoldersIterator(ctx, startingFeeId, startingDiscountHoldersId)
+	require.False(t, discountHoldersIter.Valid())
+	discountHoldersIter = k.GetFeeDiscountsHoldersIterator(ctx, startingFeeId)
+	require.False(t, discountHoldersIter.Valid())
+	discountHoldersIter = k.GetFeesDiscountsHoldersIterator(ctx)
+	require.False(t, discountHoldersIter.Valid())
 
 	// Submitted Fee
 	fee, err := k.SubmitFee(ctx, validFeeContent)
@@ -92,4 +99,32 @@ func TestKeeper(t *testing.T) {
 	k.SetDiscountHolder(ctx, types.NewDiscountHolder(fee.Id, 2, holder2))
 	k.SetDiscountHolder(ctx, types.NewDiscountHolder(fee.Id+1, 3, holder3))
 	k.SetDiscountHolder(ctx, types.NewDiscountHolder(fee.Id+2, 4, holder4))
+
+	// Check that 4 discount holders in general
+	discountHoldersIter = k.GetFeesDiscountsHoldersIterator(ctx)
+	for i := 0; i < 4; i++ {
+		_ = k.MustGetDiscountHolderByKey(ctx, discountHoldersIter.Key())
+		discountHoldersIter.Next()
+	}
+	require.False(t, discountHoldersIter.Valid())
+
+	// Check that 2 discount holders for fee.Id
+	discountHoldersIter = k.GetFeeDiscountsHoldersIterator(ctx, fee.Id)
+	for i := 0; i < 2; i++ {
+		_ = k.MustGetDiscountHolderByKey(ctx, discountHoldersIter.Key())
+		discountHoldersIter.Next()
+	}
+	require.False(t, discountHoldersIter.Valid())
+
+	// Check that 1 discount holder for fee.Id and discount id 2
+	discountId := uint64(2)
+	discountHoldersIter = k.GetFeeDiscountHoldersIterator(ctx, fee.Id, discountId)
+	discountholder := k.MustGetDiscountHolderByKey(ctx, discountHoldersIter.Key())
+	require.Equal(t, discountId, discountholder.DiscountId)
+	discountHoldersIter.Next()
+	require.False(t, discountHoldersIter.Valid())
+
+	// Check that 0 discount holders for fee.Id and discount id 3
+	discountHoldersIter = k.GetFeeDiscountHoldersIterator(ctx, fee.Id, 3)
+	require.False(t, discountHoldersIter.Valid())
 }
