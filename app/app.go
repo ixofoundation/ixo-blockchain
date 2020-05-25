@@ -86,6 +86,7 @@ var (
 		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
 		bonds.BatchesIntermediaryAccount: nil,
 		treasury.ModuleName:              {supply.Minter, supply.Burner},
+		fees.FeeRemainderPool:            nil,
 	}
 )
 

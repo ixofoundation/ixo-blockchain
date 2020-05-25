@@ -2,6 +2,8 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
+var oneHundred = sdk.NewDec(100)
+
 type Distribution []DistributionShare
 
 func NewDistribution(shares ...DistributionShare) Distribution {
@@ -27,6 +29,25 @@ func (d Distribution) Validate() sdk.Error {
 	return nil
 }
 
+func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
+	decAmount := sdk.NewDecCoins(amount)
+	distributions := make([]sdk.DecCoins, len(d))
+
+	// Calculate distribution amount for each share of the distribution
+	var distributed sdk.DecCoins
+	for i, share := range d {
+		distributions[i] = share.GetShareOf(decAmount)
+		distributed = distributed.Add(distributions[i])
+	}
+
+	// Distributed amount should equal original amount
+	if !distributed.IsEqual(decAmount) {
+		panic("distributing more or less than original amount")
+	}
+
+	return distributions
+}
+
 type DistributionShare struct {
 	Address    sdk.AccAddress `json:"address" yaml:"address"`
 	Percentage sdk.Dec        `json:"percentage" yaml:"percentage"`
@@ -45,4 +66,8 @@ func (d DistributionShare) Validate() sdk.Error {
 	}
 
 	return nil
+}
+
+func (d DistributionShare) GetShareOf(amount sdk.DecCoins) sdk.DecCoins {
+	return amount.MulDec(d.Percentage.Quo(oneHundred))
 }

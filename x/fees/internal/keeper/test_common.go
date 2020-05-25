@@ -24,7 +24,6 @@ var (
 	validChargeAmount, _  = sdk.ParseCoins("1ixo,2res")
 	validChargeMinimum, _ = sdk.ParseCoins("3res")
 	validChargeMaximum    = sdk.NewCoins()
-	validCumulativeCharge = sdk.NewCoins()
 
 	validDiscounts = types.NewDiscounts(
 		types.NewDiscount(1, sdk.MustNewDecFromStr("0.5")),
@@ -42,8 +41,7 @@ var (
 		validDistribution)
 
 	validFeeContractContent = types.NewFeeContractContent(
-		1, feeCreatorAddr, feePayerAddr,
-		validCumulativeCharge, false, true)
+		1, feeCreatorAddr, feePayerAddr, false, true)
 )
 
 func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {

@@ -11,6 +11,8 @@ const (
 	StoreKey          = ModuleName
 	RouterKey         = ModuleName
 	QuerierRoute      = ModuleName
+
+	FeeRemainderPool = "fee_remainder_pool"
 )
 
 var (

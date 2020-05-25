@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
@@ -239,14 +240,50 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper, feeContractId
 		return false, nil
 	}
 
-	// Perform the fee charge
-	err = bankKeeper.SendCoins(ctx, fcData.Payer, fee.Content.WalletDistribution[0].Address, charge)
+	// Total input is charge plus current remainder in FeeRemainderPool
+	inputFromFeeRemainderPool := fcData.CurrentRemainder
+	totalInputAmount := charge.Add(inputFromFeeRemainderPool)
+
+	// Calculate list of outputs and calculate the total output to payees based
+	// on the calculated wallet distributions
+	var outputToPayees sdk.Coins
+	var outputs []bank.Output
+	distributions := fee.Content.WalletDistribution.GetDistributionsFor(totalInputAmount)
+	for i, share := range distributions {
+		// Get integer output
+		outputAmt, _ := share.TruncateDecimal()
+
+		// If amount not zero, update total and add as output
+		if !outputAmt.IsZero() {
+			outputToPayees = outputToPayees.Add(outputAmt)
+			address := fee.Content.WalletDistribution[i].Address
+			outputs = append(outputs, bank.NewOutput(address, outputAmt))
+		}
+	}
+
+	// Remainder (not output to payees) goes to FeeRemainderPool if not zero
+	outputToFeeRemainderPool := totalInputAmount.Sub(outputToPayees)
+	if !outputToFeeRemainderPool.IsZero() {
+		feeRemainderPoolAddr := supply.NewModuleAddress(types.FeeRemainderPool)
+		outputs = append(outputs, bank.NewOutput(feeRemainderPoolAddr, outputToFeeRemainderPool))
+	}
+
+	// Construct list of inputs (charge and from FeeRemainderPool if non zero)
+	inputs := []bank.Input{bank.NewInput(fcData.Payer, charge)}
+	if !inputFromFeeRemainderPool.IsZero() {
+		feeRemainderPoolAddr := supply.NewModuleAddress(types.FeeRemainderPool)
+		inputs = append(inputs, bank.NewInput(feeRemainderPoolAddr, inputFromFeeRemainderPool))
+	}
+
+	// Distribute the fee charge according to the outputs
+	err = bankKeeper.InputOutputCoins(ctx, inputs, outputs)
 	if err != nil {
 		return false, err
 	}
 
 	// Update and save fee contract
 	fcData.CumulativeCharge = fcData.CumulativeCharge.Add(charge)
+	fcData.CurrentRemainder = fcData.CurrentRemainder.Add(outputToFeeRemainderPool).Sub(inputFromFeeRemainderPool)
 	k.SetFeeContract(ctx, feeContract)
 
 	return true, nil
