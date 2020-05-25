@@ -24,6 +24,13 @@ func (ds Discounts) Validate() sdk.Error {
 		id += 1
 	}
 
+	// Validate list of discounts
+	for _, d := range ds {
+		if err := d.Validate(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -37,6 +44,14 @@ func NewDiscount(id uint64, percent sdk.Dec) Discount {
 		Id:      id,
 		Percent: percent,
 	}
+}
+
+func (d Discount) Validate() sdk.Error {
+	if !d.Percent.IsPositive() {
+		return ErrNegativeDiscountPercantage(DefaultCodespace)
+	}
+
+	return nil
 }
 
 // --------------------------------------------- DiscountHolders

@@ -41,9 +41,31 @@ func NewFee(id uint64, content FeeContent) Fee {
 }
 
 func (f Fee) Validate() sdk.Error {
-	// TODO: Validation of remaining fields
+	// Validate charge amount, minimum, maximum
+	amt := f.Content.ChargeAmount
+	min := f.Content.ChargeMinimum
+	max := f.Content.ChargeMaximum
+	if min.IsValid() && max.IsValid() && amt.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "min, max, or amt coins invalid")
+	} else if min.IsAnyGT(max) {
+		return ErrInvalidFee(DefaultCodespace, "min charge includes value greater than max")
+	} else if !min.DenomsSubsetOf(amt) {
+		return ErrInvalidFee(DefaultCodespace, "min charge includes denom not in fee amount")
+	} else if !max.DenomsSubsetOf(amt) {
+		return ErrInvalidFee(DefaultCodespace, "max charge includes denom not in fee amount")
+	}
 
-	return f.Content.WalletDistribution.Validate()
+	// Validate discounts
+	if err := f.Content.Discounts.Validate(); err != nil {
+		return err
+	}
+
+	// Validate wallet distribution
+	if err := f.Content.WalletDistribution.Validate(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type FeeContractContent struct {
@@ -77,4 +99,11 @@ func NewFeeContract(id uint64, content FeeContractContent) FeeContract {
 		Id:      id,
 		Content: content,
 	}
+}
+
+func (fc FeeContract) CanCharge(fee Fee) bool {
+	if fee.Id != fc.Content.FeeId {
+		panic("fee ID mismatch in CanCharge")
+	}
+	return fc.Content.CumulativeCharge.IsAllGTE(fee.Content.ChargeMaximum)
 }

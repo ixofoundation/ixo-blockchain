@@ -12,7 +12,8 @@ const (
 	CodeInvalidGenesis             sdk.CodeType      = 103
 	CodeInvalidSubscriptionContent sdk.CodeType      = 104
 	CodeInvalidFeeContractAction   sdk.CodeType      = 105
-	CodeInvalidDiscounts           sdk.CodeType      = 106
+	CodeInvalidDiscount            sdk.CodeType      = 106
+	CodeInvalidFee                 sdk.CodeType      = 107
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -41,5 +42,15 @@ func ErrFeeContractCannotBeDeauthorised(codespace sdk.CodespaceType) sdk.Error {
 
 func ErrDiscountIDsBeSequentialFrom1(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := fmt.Sprintf("discount IDs must be sequential starting with 1")
-	return sdk.NewError(codespace, CodeInvalidDiscounts, errMsg)
+	return sdk.NewError(codespace, CodeInvalidDiscount, errMsg)
+}
+
+func ErrNegativeDiscountPercantage(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := fmt.Sprintf("discount percentage must be positive")
+	return sdk.NewError(codespace, CodeInvalidDiscount, errMsg)
+}
+
+func ErrInvalidFee(codespace sdk.CodespaceType, errMsg string) sdk.Error {
+	errMsg = fmt.Sprintf("fee invalid; %s", errMsg)
+	return sdk.NewError(codespace, CodeInvalidFee, errMsg)
 }
