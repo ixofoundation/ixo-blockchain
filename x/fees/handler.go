@@ -18,9 +18,11 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			continue
 		}
 
-		// Charge fee
-		success := true // TODO: Charge fee
-		subContent.NextPeriod(success)
+		// Charge subscription fee
+		err := keeper.ChargeSubscriptionFee(ctx, subscription.Id)
+		if err != nil {
+			panic(err) // TODO: maybe shouldn't panic?
+		}
 
 		// Note: if fee can be re-charged immediately, this should be done in
 		// the next block to prevent spending too much time charging fees
