@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func TestKeeper(t *testing.T) {
+func TestKeeperSetGet(t *testing.T) {
 	startingFeeId := uint64(1)
 	startingFeeContractId := uint64(1)
 	startingSubscriptionId := uint64(1)
@@ -19,9 +19,9 @@ func TestKeeper(t *testing.T) {
 	cdc.RegisterInterface((*types.SubscriptionContent)(nil), nil)
 	cdc.RegisterConcrete(types.BlockSubscriptionContent{}, "fees/BlockSubscriptionContent", nil)
 	cdc.RegisterConcrete(types.TimeSubscriptionContent{}, "fees/TimeSubscriptionContent", nil)
-	k.SetFeeID(ctx, 1)
-	k.SetFeeContractID(ctx, 1)
-	k.SetSubscriptionID(ctx, 1)
+	k.SetFeeID(ctx, startingFeeId)
+	k.SetFeeContractID(ctx, startingFeeContractId)
+	k.SetSubscriptionID(ctx, startingSubscriptionId)
 
 	// Check Fee, FeeContract, Subscription, DiscountHolders existence
 	feeGet, err := k.GetFee(ctx, startingFeeId)
@@ -127,4 +127,85 @@ func TestKeeper(t *testing.T) {
 	// Check that 0 discount holders for fee.Id and discount id 3
 	discountHoldersIter = k.GetFeeDiscountHoldersIterator(ctx, fee.Id, 3)
 	require.False(t, discountHoldersIter.Valid())
+}
+
+func TestKeeperChargeFee(t *testing.T) {
+	startingFeeId := uint64(1)
+	startingFeeContractId := uint64(1)
+
+	ctx, k, _ := CreateTestInput()
+	k.SetFeeID(ctx, startingFeeId)
+	k.SetFeeContractID(ctx, startingFeeContractId)
+
+	// Submitted Fee
+	_, err := k.SubmitFee(ctx, validFeeContent)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Submitted FeeContract
+	feeContract, err := k.SubmitFeeContract(ctx, validFeeContractContent)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Set payer balance
+	balance, err2 := sdk.ParseCoins("10ixo,10res")
+	require.Nil(t, err2)
+	err = k.bankKeeper.SetCoins(ctx, feeContract.Content.Payer, balance)
+	require.Nil(t, err)
+
+	// At this point, cumulative: /
+	// ChargeAmt:  1ixo, 2res
+	// ChargeMin:  3res
+	// ChargeMax:  /
+	// Next charge expected to be: 1ixo, 3res (3res due to ChargeMin)
+	// Updated balance: 9ixo, 7res
+
+	// Charge fee
+	err = k.ChargeFee(ctx, k.bankKeeper, feeContract.Id)
+	require.Nil(t, err)
+
+	// Check balance
+	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	expected, err2 := sdk.ParseCoins("9ixo,7res")
+	require.Nil(t, err2)
+	require.Equal(t, expected.String(), newBalance.String())
+
+	// At this point, cumulative: 1ixo, 3res
+	// ChargeAmt:  1ixo, 2res
+	// ChargeMin:  3res
+	// ChargeMax:  /
+	// Next charge expected to be: 1ixo, 2res (no effect from ChargeMin)
+	// Updated balance: 8ixo, 5res
+
+	// Charge fee
+	err = k.ChargeFee(ctx, k.bankKeeper, feeContract.Id)
+	require.Nil(t, err)
+
+	// Check balance
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	expected, err2 = sdk.ParseCoins("8ixo,5res")
+	require.Nil(t, err2)
+	require.Equal(t, expected.String(), newBalance.String())
+
+	// At this point, cumulative: 2ixo, 5res
+	// Next charge expected to be: 1ixo, 2res
+	// Updated balance: 7ixo, 3res
+
+	// Charge fee
+	err = k.ChargeFee(ctx, k.bankKeeper, feeContract.Id)
+	require.Nil(t, err)
+
+	// Check balance
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	expected, err2 = sdk.ParseCoins("7ixo,3res")
+	require.Nil(t, err2)
+	require.Equal(t, expected.String(), newBalance.String())
+
+	// Two more charges will cause an error
+	err = k.ChargeFee(ctx, k.bankKeeper, feeContract.Id)
+	require.Nil(t, err)
+	err = k.ChargeFee(ctx, k.bankKeeper, feeContract.Id)
+	require.Error(t, err)
 }

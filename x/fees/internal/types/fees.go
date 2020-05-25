@@ -30,16 +30,16 @@ func NewFeeContent(chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
 
 func (fc FeeContent) Validate() sdk.Error {
 	// Validate charge amount, minimum, maximum
-	amt := fc.ChargeAmount
-	min := fc.ChargeMinimum
-	max := fc.ChargeMaximum
+	amt := &fc.ChargeAmount
+	min := &fc.ChargeMinimum
+	max := &fc.ChargeMaximum
 	if min.IsValid() && max.IsValid() && amt.IsValid() {
 		return ErrInvalidFee(DefaultCodespace, "min, max, or amt coins invalid")
-	} else if min.IsAnyGT(max) {
+	} else if min.IsAnyGT(*max) {
 		return ErrInvalidFee(DefaultCodespace, "min charge includes value greater than max")
-	} else if !min.DenomsSubsetOf(amt) {
+	} else if !min.DenomsSubsetOf(*amt) {
 		return ErrInvalidFee(DefaultCodespace, "min charge includes denom not in fee amount")
-	} else if !max.DenomsSubsetOf(amt) {
+	} else if !max.DenomsSubsetOf(*amt) {
 		return ErrInvalidFee(DefaultCodespace, "max charge includes denom not in fee amount")
 	}
 
@@ -103,6 +103,10 @@ func NewFeeContract(id uint64, content FeeContractContent) FeeContract {
 		Id:      id,
 		Content: content,
 	}
+}
+
+func (fc FeeContract) IsFirstCharge() bool {
+	return fc.Content.CumulativeCharge.IsZero()
 }
 
 // CanCharge False if not authorised or max has been reached
