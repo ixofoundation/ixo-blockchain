@@ -101,9 +101,10 @@ func NewFeeContract(id uint64, content FeeContractContent) FeeContract {
 	}
 }
 
+// CanCharge False if not authorised or max has been reached
 func (fc FeeContract) CanCharge(fee Fee) bool {
 	if fee.Id != fc.Content.FeeId {
 		panic("fee ID mismatch in CanCharge")
 	}
-	return fc.Content.CumulativeCharge.IsAllGTE(fee.Content.ChargeMaximum)
+	return !fc.Content.Authorised || fc.Content.CumulativeCharge.IsAllGTE(fee.Content.ChargeMaximum)
 }
