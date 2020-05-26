@@ -272,7 +272,7 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	// Next charge expected to be: 1ixo, 2res (no effect from ChargeMin)
 	// Updated balance: 8ixo, 5res
 
-	// Charge fee
+	// Charge subscription fee
 	err = k.ChargeSubscriptionFee(ctx, testSubscription.Id)
 	require.Nil(t, err)
 
@@ -286,7 +286,7 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	// Next charge expected to be: 1ixo, 2res
 	// Updated balance: 7ixo, 3res
 
-	// Charge fee
+	// Charge subscription fee
 	err = k.ChargeSubscriptionFee(ctx, testSubscription.Id)
 	require.Nil(t, err)
 
