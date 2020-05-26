@@ -27,6 +27,25 @@ func (k Keeper) DiscountHolderExists(ctx sdk.Context, feeId, discountId uint64, 
 	return store.Has(types.GetDiscountHolderKey(feeId, discountId, holder))
 }
 
+func (k Keeper) GetFirstDiscountHeld(ctx sdk.Context, feeId uint64,
+	holder sdk.AccAddress) (discountId uint64, holdsDiscount bool, err sdk.Error) {
+	// Get specified fee
+	fee, err := k.GetFee(ctx, feeId)
+	if err != nil {
+		return 0, false, err
+	}
+
+	// Find first discount
+	for _, discount := range fee.Content.Discounts {
+		if k.DiscountHolderExists(ctx, feeId, discount.Id, holder) {
+			return discount.Id, true, nil
+		}
+	}
+
+	// Not holding a discount is not considered and error
+	return 0, false, nil
+}
+
 func (k Keeper) MustGetDiscountHolderByKey(ctx sdk.Context, key []byte) types.DiscountHolder {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {

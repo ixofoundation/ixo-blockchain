@@ -48,7 +48,9 @@ func NewDiscount(id uint64, percent sdk.Dec) Discount {
 
 func (d Discount) Validate() sdk.Error {
 	if !d.Percent.IsPositive() {
-		return ErrNegativeDiscountPercantage(DefaultCodespace)
+		return ErrNegativeDiscountPercentage(DefaultCodespace)
+	} else if d.Percent.GT(sdk.NewDec(100)) {
+		return ErrDiscountPercentageGreaterThan100(DefaultCodespace)
 	}
 
 	return nil

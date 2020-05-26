@@ -184,6 +184,57 @@ func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId uint64,
 
 // -------------------------------------------------------- FeeContracts Charge
 
+func applyDiscount(ctx sdk.Context, k Keeper, fee types.Fee, payer sdk.AccAddress, payAmount sdk.Coins) (sdk.Coins, sdk.Error) {
+	// Apply first discount held, if any
+	discountId, holdsDiscount, err := k.GetFirstDiscountHeld(ctx, fee.Id, payer)
+	if err != nil {
+		return nil, err
+	} else if !holdsDiscount {
+		return payAmount, nil
+	}
+
+	// Get discount percentage to calculate discount amount. Any rounding
+	// when multiplying means the payer receives a slightly smaller discount.
+	discountPercent, err := fee.Content.GetDiscountPercent(discountId)
+	if err != nil {
+		return nil, err
+	}
+	discountPercentDec := discountPercent.Quo(sdk.NewDec(100)) // 50 -> 0.5
+	discountAmt, _ := sdk.NewDecCoins(payAmount).MulDec(discountPercentDec).TruncateDecimal()
+
+	// Confirm that discount is not greater than the payAmount
+	if discountAmt.IsAnyGT(payAmount) {
+		return nil, types.ErrDiscountPercentageGreaterThan100(types.DefaultCodespace)
+	}
+
+	// Return payAmount with discount deducted
+	return payAmount.Sub(discountAmt), nil
+}
+
+func adjustForMinimums(fee types.Fee, feeContract types.FeeContract, cumulative sdk.Coins) {
+	// If first charge, increase to the minimum charge if the cumulative charge
+	// is less than the minimum (applied on each denomination independently)
+	if feeContract.IsFirstCharge() {
+		for i, coin := range cumulative {
+			minAmt := fee.Content.ChargeMinimum.AmountOf(coin.Denom)
+			if !minAmt.IsZero() && minAmt.GT(coin.Amount) {
+				cumulative[i] = sdk.NewCoin(coin.Denom, minAmt)
+			}
+		}
+	}
+}
+
+func adjustForMaximums(fee types.Fee, cumulative sdk.Coins) {
+	// Reduce to the maximum charge if the cumulative charge is more than the
+	// maximum (applied on each denomination independently)
+	for i, coin := range cumulative {
+		maxAmt := fee.Content.ChargeMaximum.AmountOf(coin.Denom)
+		if !maxAmt.IsZero() && maxAmt.LT(coin.Amount) {
+			cumulative[i] = sdk.NewCoin(coin.Denom, maxAmt)
+		}
+	}
+}
+
 func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper, feeContractId uint64) (charged bool, err sdk.Error) {
 
 	feeContract, err := k.GetFeeContract(ctx, feeContractId)
@@ -203,31 +254,18 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper, feeContractId
 		return false, nil
 	}
 
-	// First assume that address will pay ChargeAmount, and calculate cumulative
+	// Assume payer will pay ChargeAmount, apply discount (if any),
+	// and calculate initial cumulative (before adjustments)
 	payAmount := feeData.ChargeAmount
+	payAmount, err = applyDiscount(ctx, k, fee, feeContract.Content.Payer, payAmount)
+	if err != nil {
+		return false, err
+	}
 	cumulative := fcData.CumulativeCharge.Add(payAmount)
 
-	// Cumulative adjustment 1:
-	// If first charge, increase to the minimum charge if the cumulative charge
-	// is less than the minimum (applied on each denomination independently)
-	if feeContract.IsFirstCharge() {
-		for i, coin := range cumulative {
-			minAmt := feeData.ChargeMinimum.AmountOf(coin.Denom)
-			if !minAmt.IsZero() && minAmt.GT(coin.Amount) {
-				cumulative[i] = sdk.NewCoin(coin.Denom, minAmt)
-			}
-		}
-	}
-
-	// Cumulative adjustment 2:
-	// Reduce to the maximum charge if the cumulative charge is more than the
-	// maximum (applied on each denomination independently)
-	for i, coin := range cumulative {
-		maxAmt := feeData.ChargeMaximum.AmountOf(coin.Denom)
-		if !maxAmt.IsZero() && maxAmt.LT(coin.Amount) {
-			cumulative[i] = sdk.NewCoin(coin.Denom, maxAmt)
-		}
-	}
+	// In-place cumulative adjustments (i.e. considering minimums and maximums)
+	adjustForMinimums(fee, feeContract, cumulative)
+	adjustForMaximums(fee, cumulative)
 
 	// Find actual charge from adjusted cumulative:
 	//    adjustedCumul = previousCumul + actualCharge

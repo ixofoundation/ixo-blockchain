@@ -13,8 +13,9 @@ const (
 	CodeInvalidSubscriptionContent sdk.CodeType      = 104
 	CodeInvalidFeeContractAction   sdk.CodeType      = 105
 	CodeInvalidDiscount            sdk.CodeType      = 106
-	CodeInvalidFee                 sdk.CodeType      = 107
-	CodeInvalidSubscriptionAction  sdk.CodeType      = 108
+	CodeInvalidDiscountRequest     sdk.CodeType      = 107
+	CodeInvalidFee                 sdk.CodeType      = 108
+	CodeInvalidSubscriptionAction  sdk.CodeType      = 109
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -46,9 +47,19 @@ func ErrDiscountIDsBeSequentialFrom1(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidDiscount, errMsg)
 }
 
-func ErrNegativeDiscountPercantage(codespace sdk.CodespaceType) sdk.Error {
+func ErrNegativeDiscountPercentage(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := fmt.Sprintf("discount percentage must be positive")
 	return sdk.NewError(codespace, CodeInvalidDiscount, errMsg)
+}
+
+func ErrDiscountPercentageGreaterThan100(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := fmt.Sprintf("discount percentage cannot exceed 100%%")
+	return sdk.NewError(codespace, CodeInvalidDiscount, errMsg)
+}
+
+func ErrDiscountIdIsNotInFee(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := fmt.Sprintf("discount ID specified is not one of the fee's discounts")
+	return sdk.NewError(codespace, CodeInvalidDiscountRequest, errMsg)
 }
 
 func ErrInvalidFee(codespace sdk.CodespaceType, errMsg string) sdk.Error {

@@ -25,9 +25,13 @@ var (
 	validChargeMinimum, _ = sdk.ParseCoins("3res")
 	validChargeMaximum    = sdk.NewCoins()
 
+	validDoubledChargeAmount, _ = sdk.ParseCoins("2ixo,4res")
+
 	validDiscounts = types.NewDiscounts(
-		types.NewDiscount(1, sdk.MustNewDecFromStr("0.5")),
-		types.NewDiscount(2, sdk.MustNewDecFromStr("0.5")))
+		types.NewDiscount(1, sdk.MustNewDecFromStr("10")),
+		types.NewDiscount(2, sdk.MustNewDecFromStr("50")))
+	tenPercentOffId   = validDiscounts[0].Id
+	fiftyPercentOffId = validDiscounts[1].Id
 
 	validDistribution = types.NewDistribution(
 		types.NewDistributionShare(shareAddr1, sdk.NewDec(50)),
@@ -35,6 +39,13 @@ var (
 
 	validFeeContent = types.NewFeeContent(
 		validChargeAmount,
+		validChargeMinimum,
+		validChargeMaximum,
+		validDiscounts,
+		validDistribution)
+
+	validDoubleChargeFeeContent = types.NewFeeContent(
+		validDoubledChargeAmount,
 		validChargeMinimum,
 		validChargeMaximum,
 		validDiscounts,

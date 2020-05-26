@@ -60,6 +60,15 @@ func (fc FeeContent) Validate() sdk.Error {
 	return nil
 }
 
+func (fc FeeContent) GetDiscountPercent(discountId uint64) (sdk.Dec, sdk.Error) {
+	for _, discount := range fc.Discounts {
+		if discount.Id == discountId {
+			return discount.Percent, nil
+		}
+	}
+	return sdk.Dec{}, ErrDiscountIdIsNotInFee(DefaultCodespace)
+}
+
 type Fee struct {
 	Id      uint64     `json:"id" yaml:"id"`
 	Content FeeContent `json:"content" yaml:"content"`
