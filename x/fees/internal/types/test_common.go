@@ -7,7 +7,7 @@ import sdk "github.com/cosmos/cosmos-sdk/types"
 var _ SubscriptionContent = TestSubscriptionContent{}
 
 // TestSubscriptionContent Is identical to BlockSubscriptionContent but does
-// not take into consideration the context in ShouldCharge() and Started()
+// not take into consideration the context in ShouldCharge() and started()
 type TestSubscriptionContent struct {
 	FeeContractId      uint64   `json:"fee_contract_id" yaml:"fee_contract_id"`
 	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
@@ -39,9 +39,8 @@ func (s TestSubscriptionContent) GetPeriodUnit() string {
 	return BlockSubscriptionUnit
 }
 
-// Started True if height has passed start block, or if this is not the first period
-func (s TestSubscriptionContent) Started(ctx sdk.Context) bool {
-	return true // !s.PeriodsSoFar.IsZero() || ctx.BlockHeight() > s.PeriodStartBlock
+func (s TestSubscriptionContent) started(ctx sdk.Context) bool {
+	return true
 }
 
 // Ended True if max number of periods has been reached
@@ -49,9 +48,9 @@ func (s TestSubscriptionContent) Ended() bool {
 	return s.PeriodsSoFar.GTE(s.MaxPeriods)
 }
 
-// ShouldCharge True if end of period reached or there's accumulated periods
+// ShouldCharge True if started
 func (s TestSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
-	return true // !s.PeriodsAccumulated.IsZero() || ctx.BlockHeight() >= s.PeriodEndBlock
+	return s.started(ctx)
 }
 
 func (s TestSubscriptionContent) NextPeriod(periodPaid bool) {

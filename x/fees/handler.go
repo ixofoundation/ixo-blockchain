@@ -13,8 +13,8 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		subscription := keeper.MustGetSubscriptionByKey(ctx, iterator.Key())
 		subContent := subscription.Content
 
-		// Skip if hasn't started or no charge necessary
-		if !subContent.Started(ctx) || !subContent.ShouldCharge(ctx) {
+		// Skip if should not charge
+		if !subContent.ShouldCharge(ctx) {
 			continue
 		}
 

@@ -31,7 +31,7 @@ func NewSubscription(id uint64, content SubscriptionContent) Subscription {
 type SubscriptionContent interface {
 	GetFeeContractId() uint64
 	GetPeriodUnit() string
-	Started(ctx sdk.Context) bool
+	started(ctx sdk.Context) bool
 	Ended() bool
 	ShouldCharge(ctx sdk.Context) bool
 	NextPeriod(periodPaid bool)
@@ -73,8 +73,7 @@ func (s BlockSubscriptionContent) GetPeriodUnit() string {
 	return BlockSubscriptionUnit
 }
 
-// Started True if height has passed start block, or if this is not the first period
-func (s BlockSubscriptionContent) Started(ctx sdk.Context) bool {
+func (s BlockSubscriptionContent) started(ctx sdk.Context) bool {
 	return !s.PeriodsSoFar.IsZero() || ctx.BlockHeight() > s.PeriodStartBlock
 }
 
@@ -83,9 +82,10 @@ func (s BlockSubscriptionContent) Ended() bool {
 	return s.PeriodsSoFar.GTE(s.MaxPeriods)
 }
 
-// ShouldCharge True if end of period reached or there's accumulated periods
+// ShouldCharge True if end of period reached or there's accumulated periods.
+// In any case, the subscription must have started.
 func (s BlockSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
-	return !s.PeriodsAccumulated.IsZero() || ctx.BlockHeight() >= s.PeriodEndBlock
+	return s.started(ctx) && (!s.PeriodsAccumulated.IsZero() || ctx.BlockHeight() >= s.PeriodEndBlock)
 }
 
 func (s BlockSubscriptionContent) NextPeriod(periodPaid bool) {
@@ -146,8 +146,7 @@ func (s TimeSubscriptionContent) GetPeriodUnit() string {
 	return TimeSubscriptionUnit
 }
 
-// Started True if height has passed start block, or if this is not the first period
-func (s TimeSubscriptionContent) Started(ctx sdk.Context) bool {
+func (s TimeSubscriptionContent) started(ctx sdk.Context) bool {
 	return !s.PeriodsSoFar.IsZero() || ctx.BlockTime().After(s.PeriodStartTime)
 }
 
@@ -156,9 +155,10 @@ func (s TimeSubscriptionContent) Ended() bool {
 	return s.PeriodsSoFar.GTE(s.MaxPeriods)
 }
 
-// ShouldCharge True if end of period reached or there's accumulated periods
+// ShouldCharge True if end of period reached or there's accumulated periods.
+// In any case, the subscription must have started.
 func (s TimeSubscriptionContent) ShouldCharge(ctx sdk.Context) bool {
-	return !s.PeriodsAccumulated.IsZero() || ctx.BlockTime().After(s.PeriodEndTime)
+	return s.started(ctx) && (!s.PeriodsAccumulated.IsZero() || ctx.BlockTime().After(s.PeriodEndTime))
 }
 
 // NextPeriod Proceed to the next period
