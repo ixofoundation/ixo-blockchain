@@ -44,7 +44,35 @@ var (
 		1, feeCreatorAddr, feePayerAddr, false, true)
 )
 
+func ValidateVariables() sdk.Error {
+	err := validDiscounts.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = validDistribution.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = validFeeContent.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = types.NewFee(1, validFeeContent).Validate()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
+	if err := ValidateVariables(); err != nil {
+		panic(err)
+	}
+
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	actStoreKey := sdk.NewKVStoreKey(auth.StoreKey)
 
@@ -60,9 +88,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	module.NewBasicManager(auth.AppModuleBasic{}).RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterInterface((*types.SubscriptionContent)(nil), nil)
-	cdc.RegisterConcrete(types.BlockSubscriptionContent{}, "fees/BlockSubscriptionContent", nil)
-	cdc.RegisterConcrete(types.TimeSubscriptionContent{}, "fees/TimeSubscriptionContent", nil)
+	types.RegisterCodec(cdc)
 	cdc.RegisterConcrete(types.TestSubscriptionContent{}, "fees/TesSubscriptionContent", nil)
 
 	keyParams := sdk.NewKVStoreKey("subspace")

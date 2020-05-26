@@ -33,8 +33,12 @@ func (fc FeeContent) Validate() sdk.Error {
 	amt := &fc.ChargeAmount
 	min := &fc.ChargeMinimum
 	max := &fc.ChargeMaximum
-	if min.IsValid() && max.IsValid() && amt.IsValid() {
-		return ErrInvalidFee(DefaultCodespace, "min, max, or amt coins invalid")
+	if !amt.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "ChargeAmount coins invalid")
+	} else if !min.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "ChargeMinimum coins invalid")
+	} else if !max.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "ChargeMaximum coins invalid")
 	} else if min.IsAnyGT(*max) {
 		return ErrInvalidFee(DefaultCodespace, "min charge includes value greater than max")
 	} else if !min.DenomsSubsetOf(*amt) {
