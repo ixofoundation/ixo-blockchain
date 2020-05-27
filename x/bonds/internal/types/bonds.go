@@ -110,7 +110,7 @@ type Bond struct {
 	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string         `json:"pubKey" yaml:"pubKey"`
+	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
 }
 
 func NewBond(token, name, description string, creatorDid ixo.Did,

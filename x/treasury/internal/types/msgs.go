@@ -17,9 +17,9 @@ type TreasuryMessage interface {
 
 type MsgSend struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
-	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
+	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 }
 
@@ -75,10 +75,10 @@ func (msg MsgSend) GetSignBytes() []byte {
 
 type MsgOracleTransfer struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
-	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
-	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
+	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -139,9 +139,9 @@ func (msg MsgOracleTransfer) GetSignBytes() []byte {
 
 type MsgOracleMint struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
-	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
+	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -198,9 +198,9 @@ func (msg MsgOracleMint) GetSignBytes() []byte {
 
 type MsgOracleBurn struct {
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
-	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
