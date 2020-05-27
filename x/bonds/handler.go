@@ -121,6 +121,9 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditBond) sdk.Result {
 
+	// Note: since the expected signer is BondDid, it is not a requirement that
+	// the editor of the bond is also the creator.
+
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
