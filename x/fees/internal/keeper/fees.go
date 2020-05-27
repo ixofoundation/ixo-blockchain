@@ -54,6 +54,9 @@ func (k Keeper) SubmitFee(ctx sdk.Context, content types.FeeContent) (types.Fee,
 	}
 
 	fee := types.NewFee(feeId, content)
+	if err := fee.Validate(); err != nil {
+		return types.Fee{}, err
+	}
 
 	k.SetFee(ctx, fee)
 	k.SetFeeID(ctx, feeId+1)
@@ -132,6 +135,9 @@ func (k Keeper) SubmitFeeContract(ctx sdk.Context, content types.FeeContractCont
 	}
 
 	feeContract := types.NewFeeContract(feeContractId, content)
+	if err := feeContract.Validate(); err != nil {
+		return types.FeeContract{}, err
+	}
 
 	k.SetFeeContract(ctx, feeContract)
 	k.SetFeeContractID(ctx, feeContractId+1)

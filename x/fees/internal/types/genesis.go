@@ -40,6 +40,13 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
+	// Validate fee contracts
+	for _, f := range data.FeeContracts {
+		if err := f.Validate(); err != nil {
+			return err
+		}
+	}
+
 	// Validate subscriptions
 	for _, s := range data.Subscriptions {
 		if err := s.Validate(); err != nil {

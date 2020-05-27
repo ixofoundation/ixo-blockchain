@@ -108,6 +108,7 @@ func ValidateParams(params Params) error {
 	if params.EvaluationPayNodeFeePercentage.LT(sdk.ZeroDec()) {
 		return fmt.Errorf("fees parameter EvaluationPayNodeFeePercentage should be positive, is %s ", params.EvaluationPayNodeFeePercentage.String())
 	}
+	// TODO: validate according to param upper limits
 	return nil
 }
 

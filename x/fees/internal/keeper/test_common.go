@@ -71,7 +71,17 @@ func ValidateVariables() sdk.Error {
 		return err
 	}
 
+	err = validFeeContractContent.Validate()
+	if err != nil {
+		return err
+	}
+
 	err = types.NewFee(1, validFeeContent).Validate()
+	if err != nil {
+		return err
+	}
+
+	err = types.NewFeeContract(1, validFeeContractContent).Validate()
 	if err != nil {
 		return err
 	}

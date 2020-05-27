@@ -108,6 +108,24 @@ func NewFeeContractContent(feeId uint64, creator, payer sdk.AccAddress,
 	}
 }
 
+func (fc FeeContractContent) Validate() sdk.Error {
+	// Validate coins
+	if !fc.CumulativeCharge.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "CumulativeCharge coins invalid")
+	} else if !fc.CurrentRemainder.IsValid() {
+		return ErrInvalidFee(DefaultCodespace, "CurrentRemainder coins invalid")
+	}
+
+	// Validate addresses
+	if fc.Creator.Empty() {
+		return sdk.ErrInvalidAddress("empty creator address")
+	} else if fc.Payer.Empty() {
+		return sdk.ErrInvalidAddress("empty payer address")
+	}
+
+	return nil
+}
+
 type FeeContract struct {
 	Id      uint64             `json:"id" yaml:"id"`
 	Content FeeContractContent `json:"content" yaml:"content"`
@@ -120,14 +138,19 @@ func NewFeeContract(id uint64, content FeeContractContent) FeeContract {
 	}
 }
 
+func (f FeeContract) Validate() sdk.Error {
+	return f.Content.Validate()
+}
+
 func (fc FeeContract) IsFirstCharge() bool {
 	return fc.Content.CumulativeCharge.IsZero()
 }
 
-// CanCharge False if not authorised or max has been reached
+// CanCharge False if not authorised or the (non-zero!) max has been reached
 func (fc FeeContract) CanCharge(fee Fee) bool {
 	if fee.Id != fc.Content.FeeId {
 		panic("fee ID mismatch in CanCharge")
 	}
-	return !fc.Content.Authorised || fc.Content.CumulativeCharge.IsAllGTE(fee.Content.ChargeMaximum)
+	max := fee.Content.ChargeMaximum
+	return fc.Content.Authorised && (max.IsZero() || max.IsAllGT(fc.Content.CumulativeCharge))
 }
