@@ -18,7 +18,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 
 	ctx, k, cdc, feesKeeper, bankKeeper := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
+	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 	params := feesKeeper.GetParams(ctx)
@@ -41,7 +41,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 func TestHandler_ProjectMsg(t *testing.T) {
 	ctx, k, cdc, _, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
+	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
@@ -56,7 +56,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	ctx, k, cdc, fk, bk := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateEvaluation{}, "ixo/createEvaluationMsg", nil)
+	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
@@ -113,9 +113,9 @@ func Test_CreateEvaluation(t *testing.T) {
 func Test_WithdrawFunds(t *testing.T) {
 	ctx, k, cdc, _, bk := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
+	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	cdc.RegisterConcrete(types.MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
 
 	msg := types.MsgWithdrawFunds{
 		SignBytes: "",
