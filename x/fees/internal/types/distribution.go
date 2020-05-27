@@ -63,6 +63,8 @@ func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) Distributi
 func (d DistributionShare) Validate() sdk.Error {
 	if !d.Percentage.IsPositive() {
 		return ErrNegativeSharePercentage(DefaultCodespace)
+	} else if d.Address.Empty() {
+		return sdk.ErrInvalidAddress("empty distribution share address")
 	}
 
 	return nil
