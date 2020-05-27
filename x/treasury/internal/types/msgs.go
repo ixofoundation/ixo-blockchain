@@ -44,11 +44,9 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -108,11 +106,9 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -167,11 +163,9 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -226,11 +220,9 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
