@@ -48,9 +48,9 @@ ixocli tx project updateProjectStatus "$SENDER_DID" PENDING "$PROJECT_DID_FULL" 
 
 # Fund project and progress status to FUNDED
 echo "Funding project (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-SENDER_DID="$SHAUN_DID"
 ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_DID/$PROJECT_DID" 10000000000ixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block
 echo "Updating project to FUNDED..."
+SENDER_DID="$SHAUN_DID"
 ixocli tx project updateProjectStatus "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Create claim and evaluation
@@ -101,6 +101,7 @@ echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixocli q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 
 # Withdraw funds (from miguel's project account, i.e. as non-refund)
+echo "Withdraw funds as Miguel..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":false}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
@@ -115,6 +116,7 @@ ixocli q project getProjectTxs $PROJECT_DID
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
+echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
@@ -122,6 +124,7 @@ ixocli q project getProjectTxs $PROJECT_DID
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
+echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
