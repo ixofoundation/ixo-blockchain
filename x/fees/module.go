@@ -84,6 +84,8 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 	feeQueryCmd.AddCommand(client.GetCommands(
 		cli.GetFeesRequestHandler(cdc),
+		cli.GetCmdFee(cdc),
+		cli.GetCmdFeeContract(cdc),
 	)...)
 
 	return feeQueryCmd
