@@ -53,6 +53,19 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
+	NewFeeContent         = types.NewFeeContent
+	NewFeeContractContent = types.NewFeeContractContent
+	NewDistribution       = types.NewDistribution
+	NewDistributionShare  = types.NewDistributionShare
+
+	NewDiscount       = types.NewDiscount
+	NewDiscounts      = types.NewDiscounts
+	NewDiscountHolder = types.NewDiscountHolder
+
+	NewSubscription             = types.NewSubscription
+	NewBlockSubscriptionContent = types.NewBlockSubscriptionContent
+	NewTimeSubscriptionContent  = types.NewTimeSubscriptionContent
+
 	// variable aliases
 	ModuleCdc = types.ModuleCdc
 )
