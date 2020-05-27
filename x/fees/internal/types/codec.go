@@ -19,6 +19,13 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*SubscriptionContent)(nil), nil)
 	cdc.RegisterConcrete(BlockSubscriptionContent{}, "fees/BlockSubscriptionContent", nil)
 	cdc.RegisterConcrete(TimeSubscriptionContent{}, "fees/TimeSubscriptionContent", nil)
+
+	cdc.RegisterConcrete(MsgSetFeeContractAuthorisation{}, "fees/MsgSetFeeContractAuthorisation", nil)
+	cdc.RegisterConcrete(MsgCreateFee{}, "fees/MsgCreateFee", nil)
+	cdc.RegisterConcrete(MsgCreateFeeContract{}, "fees/MsgCreateFeeContract", nil)
+	cdc.RegisterConcrete(MsgGrantFeeDiscount{}, "fees/MsgGrantFeeDiscount", nil)
+	cdc.RegisterConcrete(MsgRevokeFeeDiscount{}, "fees/MsgRevokeFeeDiscount", nil)
+	cdc.RegisterConcrete(MsgChargeFee{}, "fees/MsgChargeFee", nil)
 }
 
 // ModuleCdc is the codec for the module

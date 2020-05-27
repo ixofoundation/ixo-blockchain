@@ -208,7 +208,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
 
 		did.NewAppModule(app.didKeeper),
-		fees.NewAppModule(app.feesKeeper),
+		fees.NewAppModule(app.feesKeeper, app.bankKeeper),
 		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
@@ -296,6 +296,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
 	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
 	treasuryAnteHandler := treasury.NewAnteHandler(app.didKeeper)
+	feesAnteHandler := fees.NewAnteHandler(app.didKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
@@ -310,6 +311,8 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			return bondsAnteHandler(ctx, tx, false)
 		case treasury.RouterKey:
 			return treasuryAnteHandler(ctx, tx, false)
+		case fees.RouterKey:
+			return feesAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, false)
 		}
