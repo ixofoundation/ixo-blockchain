@@ -40,6 +40,13 @@ type (
 	SubscriptionContent = types.SubscriptionContent
 	BlockSubscription   = types.BlockSubscriptionContent
 	TimeSubscription    = types.TimeSubscriptionContent
+
+	MsgSetFeeContractAuthorisation = types.MsgSetFeeContractAuthorisation
+	MsgCreateFee                   = types.MsgCreateFee
+	MsgCreateFeeContract           = types.MsgCreateFeeContract
+	MsgGrantFeeDiscount            = types.MsgGrantFeeDiscount
+	MsgRevokeFeeDiscount           = types.MsgRevokeFeeDiscount
+	MsgChargeFee                   = types.MsgChargeFee
 )
 
 var (
