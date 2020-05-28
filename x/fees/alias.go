@@ -63,12 +63,13 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
-	NewFee                = types.NewFee
-	NewFeeContent         = types.NewFeeContent
-	NewFeeContract        = types.NewFeeContract
-	NewFeeContractContent = types.NewFeeContractContent
-	NewDistribution       = types.NewDistribution
-	NewDistributionShare  = types.NewDistributionShare
+	NewFee                          = types.NewFee
+	NewFeeContent                   = types.NewFeeContent
+	NewFeeContract                  = types.NewFeeContract
+	NewFeeContractContent           = types.NewFeeContractContent
+	NewFeeContractContentNoDiscount = types.NewFeeContractContentNoDiscount
+	NewDistribution                 = types.NewDistribution
+	NewDistributionShare            = types.NewDistributionShare
 
 	NewDiscount  = types.NewDiscount
 	NewDiscounts = types.NewDiscounts

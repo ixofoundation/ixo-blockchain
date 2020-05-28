@@ -110,7 +110,7 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, msg MsgCreateFeeContr
 	// Create fee contract content
 	creatorAddr := types.DidToAddr(msg.CreatorDid)
 	feeContractContent := NewFeeContractContent(
-		msg.FeeId, creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountIds)
+		msg.FeeId, creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
 
 	// Create fee contract and validate
 	feeContract := NewFeeContract(msg.FeeContractId, feeContractContent)
@@ -170,7 +170,7 @@ func handleMsgRevokeFeeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeFeeDisco
 	}
 
 	// Revoke the fee discount
-	err = k.RevokeFeeDiscount(ctx, feeContract.Id, msg.DiscountId)
+	err = k.RevokeFeeDiscount(ctx, feeContract.Id)
 	if err != nil {
 		return err.Result()
 	}

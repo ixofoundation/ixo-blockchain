@@ -60,9 +60,9 @@ func (fc FeeContent) Validate() sdk.Error {
 	return nil
 }
 
-func (fc FeeContent) GetDiscountPercent(discountId uint64) (sdk.Dec, sdk.Error) {
+func (fc FeeContent) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, sdk.Error) {
 	for _, discount := range fc.Discounts {
-		if discount.Id == discountId {
+		if discount.Id.Equal(discountId) {
 			return discount.Percent, nil
 		}
 	}
@@ -96,11 +96,11 @@ type FeeContractContent struct {
 	CurrentRemainder sdk.Coins      `json:"current_charge" yaml:"current_charge"`
 	CanDeauthorise   bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	Authorised       bool           `json:"authorised" yaml:"authorised"`
-	DiscountIds      []uint64       `json:"discount_ids" yaml:"discount_ids"`
+	DiscountId       sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
 func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
-	canDeauthorise, authorised bool, discountIds []uint64) FeeContractContent {
+	canDeauthorise, authorised bool, discountId sdk.Uint) FeeContractContent {
 	return FeeContractContent{
 		FeeId:            feeId,
 		Creator:          creator,
@@ -109,8 +109,14 @@ func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
 		CurrentRemainder: sdk.NewCoins(),
 		CanDeauthorise:   canDeauthorise,
 		Authorised:       authorised,
-		DiscountIds:      discountIds,
+		DiscountId:       discountId,
 	}
+}
+
+func NewFeeContractContentNoDiscount(feeId string, creator, payer sdk.AccAddress,
+	canDeauthorise, authorised bool) FeeContractContent {
+	return NewFeeContractContent(
+		feeId, creator, payer, canDeauthorise, authorised, sdk.ZeroUint())
 }
 
 func (fc FeeContractContent) Validate() sdk.Error {

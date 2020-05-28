@@ -15,13 +15,14 @@ func (ds Discounts) Validate() sdk.Error {
 		return nil
 	}
 
-	// Check that discount IDs are sequential, starting with 1
-	id := uint64(1)
+	// Check that discount IDs are sequential, STRICTLY starting with 1,
+	// since in a fee contract zero indicates the lack of discount
+	id := sdk.OneUint()
 	for _, d := range ds {
-		if d.Id != id {
+		if !d.Id.Equal(id) {
 			return ErrDiscountIDsBeSequentialFrom1(DefaultCodespace)
 		}
-		id += 1
+		id = id.Add(sdk.OneUint())
 	}
 
 	// Validate list of discounts
@@ -35,11 +36,11 @@ func (ds Discounts) Validate() sdk.Error {
 }
 
 type Discount struct {
-	Id      uint64  `json:"id" yaml:"id"`
-	Percent sdk.Dec `json:"percent" yaml:"percent"`
+	Id      sdk.Uint `json:"id" yaml:"id"`
+	Percent sdk.Dec  `json:"percent" yaml:"percent"`
 }
 
-func NewDiscount(id uint64, percent sdk.Dec) Discount {
+func NewDiscount(id sdk.Uint, percent sdk.Dec) Discount {
 	return Discount{
 		Id:      id,
 		Percent: percent,

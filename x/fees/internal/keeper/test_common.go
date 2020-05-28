@@ -35,8 +35,8 @@ var (
 	validDoubledChargeAmount, _ = sdk.ParseCoins("2ixo,4res")
 
 	validDiscounts = types.NewDiscounts(
-		types.NewDiscount(1, sdk.MustNewDecFromStr("10")),
-		types.NewDiscount(2, sdk.MustNewDecFromStr("50")))
+		types.NewDiscount(sdk.NewUint(1), sdk.MustNewDecFromStr("10")),
+		types.NewDiscount(sdk.NewUint(2), sdk.MustNewDecFromStr("50")))
 	tenPercentOffId   = validDiscounts[0].Id
 	fiftyPercentOffId = validDiscounts[1].Id
 
@@ -58,8 +58,8 @@ var (
 		validDiscounts,
 		validDistribution)
 
-	validFeeContractContent = types.NewFeeContractContent(
-		validFeeId1, feeCreatorAddr, feePayerAddr, false, true, nil)
+	validFeeContractContent = types.NewFeeContractContentNoDiscount(
+		validFeeId1, feeCreatorAddr, feePayerAddr, false, true)
 )
 
 func ValidateVariables() sdk.Error {

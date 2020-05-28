@@ -132,7 +132,7 @@ type MsgCreateFeeContract struct {
 	FeeContractId  string         `json:"fee_contract_id" yaml:"fee_contract_id"`
 	Payer          sdk.AccAddress `json:"payer" yaml:"payer"`
 	CanDeauthorise bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
-	DiscountIds    []uint64       `json:"discount_ids" yaml:"discount_ids"`
+	DiscountId     sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
 var _ FeesMessage = MsgCreateFeeContract{}
@@ -188,7 +188,7 @@ type MsgGrantFeeDiscount struct {
 	PubKey        string         `json:"pub_key" yaml:"pub_key"`
 	SenderDid     ixo.Did        `json:"sender_did" yaml:"sender_did"`
 	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
-	DiscountId    uint64         `json:"discount_id" yaml:"discount_id"`
+	DiscountId    sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 	Recipient     sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
 
@@ -243,7 +243,6 @@ type MsgRevokeFeeDiscount struct {
 	PubKey        string         `json:"pub_key" yaml:"pub_key"`
 	SenderDid     ixo.Did        `json:"sender_did" yaml:"sender_did"`
 	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
-	DiscountId    uint64         `json:"discount_id" yaml:"discount_id"`
 	Holder        sdk.AccAddress `json:"holder" yaml:"holder"`
 }
 

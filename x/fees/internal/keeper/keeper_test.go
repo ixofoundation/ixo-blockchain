@@ -62,34 +62,39 @@ func TestKeeperSetGet(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, timeSubscription.Id, timeSubscriptionGet.Id)
 
-	// Grant FeeContract discounts
-	err = k.GrantFeeDiscount(ctx, validFeeContractId1, 1)
-	require.Nil(t, err)
-	err = k.GrantFeeDiscount(ctx, validFeeContractId1, 2)
-	require.Nil(t, err)
-	err = k.GrantFeeDiscount(ctx, validFeeContractId2, 3)
-	require.Error(t, err) // since we used non-existent fee contract ID
-
-	// Check that fee contract has the two discount IDs
+	// Check that currently discount is set as zero
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	require.Len(t, feeContract.Content.DiscountIds, 2)
-	require.Equal(t, feeContract.Content.DiscountIds[0], uint64(1))
-	require.Equal(t, feeContract.Content.DiscountIds[1], uint64(2))
+	require.True(t, feeContract.Content.DiscountId.IsZero())
+
+	// Grant FeeContract discounts
+	err = k.GrantFeeDiscount(ctx, validFeeContractId1, sdk.NewUint(1))
+	require.Nil(t, err)
+	err = k.GrantFeeDiscount(ctx, validFeeContractId2, sdk.NewUint(2))
+	require.Error(t, err) // since we used non-existent fee contract ID
+
+	// Check that fee contract now has the discount ID (=1)
+	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
+	require.Nil(t, err)
+	require.Equal(t, feeContract.Content.DiscountId, sdk.NewUint(1))
+
+	// Overwrite grant with a new discount grant
+	err = k.GrantFeeDiscount(ctx, validFeeContractId1, sdk.NewUint(2))
+	require.Nil(t, err)
+
+	// Check that fee contract has the new discount ID (=2)
+	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
+	require.Nil(t, err)
+	require.Equal(t, feeContract.Content.DiscountId, sdk.NewUint(2))
 
 	// Revoke FeeContract discounts
-	err = k.RevokeFeeDiscount(ctx, validFeeContractId1, 1)
+	err = k.RevokeFeeDiscount(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	err = k.RevokeFeeDiscount(ctx, validFeeContractId1, 4)
-	require.Nil(t, err) // invalid discount ID not considered an error
-	err = k.RevokeFeeDiscount(ctx, validFeeContractId2, 3)
-	require.Error(t, err) // since we used non-existent fee contract ID
 
-	// Check that fee contract has just one discount now
+	// Check that the discount ID is now back to zero
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	require.Len(t, feeContract.Content.DiscountIds, 1)
-	require.Equal(t, feeContract.Content.DiscountIds[0], uint64(2))
+	require.True(t, feeContract.Content.DiscountId.IsZero())
 }
 
 func TestKeeperChargeFee(t *testing.T) {
