@@ -7,12 +7,12 @@ import (
 
 // -------------------------------------------------------- DiscountHolders
 
-func (k Keeper) GetFeeDiscountHoldersIterator(ctx sdk.Context, feeId, discountId uint64) sdk.Iterator {
+func (k Keeper) GetFeeDiscountHoldersIterator(ctx sdk.Context, feeId string, discountId uint64) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetDiscountHoldersKey(feeId, discountId))
 }
 
-func (k Keeper) GetFeeDiscountsHoldersIterator(ctx sdk.Context, feeId uint64) sdk.Iterator {
+func (k Keeper) GetFeeDiscountsHoldersIterator(ctx sdk.Context, feeId string) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.GetDiscountsHoldersKey(feeId))
 }
@@ -22,12 +22,12 @@ func (k Keeper) GetFeesDiscountsHoldersIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.DiscountHolderKeyPrefix)
 }
 
-func (k Keeper) DiscountHolderExists(ctx sdk.Context, feeId, discountId uint64, holder sdk.AccAddress) bool {
+func (k Keeper) DiscountHolderExists(ctx sdk.Context, feeId string, discountId uint64, holder sdk.AccAddress) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetDiscountHolderKey(feeId, discountId, holder))
 }
 
-func (k Keeper) GetFirstDiscountHeld(ctx sdk.Context, feeId uint64,
+func (k Keeper) GetFirstDiscountHeld(ctx sdk.Context, feeId string,
 	holder sdk.AccAddress) (discountId uint64, holdsDiscount bool, err sdk.Error) {
 	// Get specified fee
 	fee, err := k.GetFee(ctx, feeId)

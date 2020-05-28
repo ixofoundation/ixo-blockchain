@@ -9,13 +9,13 @@ const (
 	DefaultCodespace               sdk.CodespaceType = ModuleName
 	CodeInvalidDistribution        sdk.CodeType      = 101
 	CodeInvalidShare               sdk.CodeType      = 102
-	CodeInvalidGenesis             sdk.CodeType      = 103
-	CodeInvalidSubscriptionContent sdk.CodeType      = 104
-	CodeInvalidFeeContractAction   sdk.CodeType      = 105
-	CodeInvalidDiscount            sdk.CodeType      = 106
-	CodeInvalidDiscountRequest     sdk.CodeType      = 107
-	CodeInvalidFee                 sdk.CodeType      = 108
-	CodeInvalidSubscriptionAction  sdk.CodeType      = 109
+	CodeInvalidSubscriptionContent sdk.CodeType      = 103
+	CodeInvalidFeeContractAction   sdk.CodeType      = 104
+	CodeInvalidDiscount            sdk.CodeType      = 105
+	CodeInvalidDiscountRequest     sdk.CodeType      = 106
+	CodeInvalidFee                 sdk.CodeType      = 107
+	CodeInvalidSubscriptionAction  sdk.CodeType      = 108
+	CodeInvalidId                  sdk.CodeType      = 109
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -26,10 +26,6 @@ func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
 func ErrDistributionPercentagesNot100(codespace sdk.CodespaceType, total sdk.Dec) sdk.Error {
 	errMsg := fmt.Sprintf("fee distribution percentages should add up to 100, not %s", total.String())
 	return sdk.NewError(codespace, CodeInvalidDistribution, errMsg)
-}
-
-func ErrInvalidGenesis(codespace sdk.CodespaceType, errMsg string) sdk.Error {
-	return sdk.NewError(codespace, CodeInvalidGenesis, errMsg)
 }
 
 func ErrInvalidSubscriptionContent(codespace sdk.CodespaceType, errMsg string) sdk.Error {
@@ -70,4 +66,8 @@ func ErrInvalidFee(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 func ErrTriedToChargeSubscriptionFeeWhenShouldnt(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := fmt.Sprintf("tried to charge subscription fee when shouldn't")
 	return sdk.NewError(codespace, CodeInvalidSubscriptionAction, errMsg)
+}
+
+func ErrInvalidId(codespace sdk.CodespaceType, errMsg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidId, errMsg)
 }

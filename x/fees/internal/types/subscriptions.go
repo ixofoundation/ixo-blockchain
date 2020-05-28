@@ -13,15 +13,18 @@ const (
 // --------------------------------------------- Subscription and SubscriptionContent
 
 type Subscription struct {
-	Id      uint64              `json:"id" yaml:"id"`
+	Id      string              `json:"id" yaml:"id"`
 	Content SubscriptionContent `json:"content" yaml:"content"`
 }
 
 func (s Subscription) Validate() sdk.Error {
+	if !IsValidSubscriptionId(s.Id) {
+		return ErrInvalidId(DefaultCodespace, "subscription id invalid")
+	}
 	return s.Content.Validate()
 }
 
-func NewSubscription(id uint64, content SubscriptionContent) Subscription {
+func NewSubscription(id string, content SubscriptionContent) Subscription {
 	return Subscription{
 		Id:      id,
 		Content: content,
@@ -29,7 +32,7 @@ func NewSubscription(id uint64, content SubscriptionContent) Subscription {
 }
 
 type SubscriptionContent interface {
-	GetFeeContractId() uint64
+	GetFeeContractId() string
 	GetPeriodUnit() string
 	started(ctx sdk.Context) bool
 	Ended() bool
@@ -43,7 +46,7 @@ var _, _ SubscriptionContent = BlockSubscriptionContent{}, TimeSubscriptionConte
 // --------------------------------------------- BlockSubscriptionContent
 
 type BlockSubscriptionContent struct {
-	FeeContractId      uint64   `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId      string   `json:"fee_contract_id" yaml:"fee_contract_id"`
 	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
 	MaxPeriods         sdk.Uint `json:"max_periods" yaml:"max_periods"`
 	PeriodsAccumulated sdk.Uint `json:"periods_accumulated" yaml:"periods_accumulated"`
@@ -52,7 +55,7 @@ type BlockSubscriptionContent struct {
 	PeriodEndBlock     int64    `json:"period_end_block" yaml:"period_end_block"`
 }
 
-func NewBlockSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
+func NewBlockSubscriptionContent(feeContractId string, maxPeriods sdk.Uint,
 	periodLength, periodStartBlock int64) BlockSubscriptionContent {
 	return BlockSubscriptionContent{
 		FeeContractId:      feeContractId,
@@ -65,7 +68,7 @@ func NewBlockSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
 	}
 }
 
-func (s BlockSubscriptionContent) GetFeeContractId() uint64 {
+func (s BlockSubscriptionContent) GetFeeContractId() string {
 	return s.FeeContractId
 }
 
@@ -101,6 +104,7 @@ func (s BlockSubscriptionContent) NextPeriod(periodPaid bool) {
 }
 
 func (s BlockSubscriptionContent) Validate() sdk.Error {
+	// Validate period-related values
 	if s.PeriodsSoFar.GT(s.MaxPeriods) {
 		return ErrInvalidSubscriptionContent(DefaultCodespace, "periods so far is greater than max periods")
 	} else if s.PeriodStartBlock > s.PeriodEndBlock {
@@ -110,13 +114,19 @@ func (s BlockSubscriptionContent) Validate() sdk.Error {
 	} else if s.PeriodStartBlock+s.PeriodLength != s.PeriodEndBlock {
 		return ErrInvalidSubscriptionContent(DefaultCodespace, "period start + period length != period end")
 	}
+
+	// Validate IDs
+	if !IsValidFeeContractId(s.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
+	}
+
 	return nil
 }
 
 // --------------------------------------------- TimeSubscriptionContent
 
 type TimeSubscriptionContent struct {
-	FeeContractId      uint64        `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId      string        `json:"fee_contract_id" yaml:"fee_contract_id"`
 	PeriodsSoFar       sdk.Uint      `json:"periods_so_far" yaml:"periods_so_far"`
 	MaxPeriods         sdk.Uint      `json:"max_periods" yaml:"max_periods"`
 	PeriodsAccumulated sdk.Uint      `json:"periods_accumulated" yaml:"periods_accumulated"`
@@ -125,7 +135,7 @@ type TimeSubscriptionContent struct {
 	PeriodEndTime      time.Time     `json:"period_end_time" yaml:"period_end_time"`
 }
 
-func NewTimeSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
+func NewTimeSubscriptionContent(feeContractId string, maxPeriods sdk.Uint,
 	periodLength time.Duration, periodStartTime time.Time) TimeSubscriptionContent {
 	return TimeSubscriptionContent{
 		FeeContractId:      feeContractId,
@@ -138,7 +148,7 @@ func NewTimeSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
 	}
 }
 
-func (s TimeSubscriptionContent) GetFeeContractId() uint64 {
+func (s TimeSubscriptionContent) GetFeeContractId() string {
 	return s.FeeContractId
 }
 
@@ -175,6 +185,7 @@ func (s TimeSubscriptionContent) NextPeriod(periodPaid bool) {
 }
 
 func (s TimeSubscriptionContent) Validate() sdk.Error {
+	// Validate period-related values
 	if s.PeriodsSoFar.GT(s.MaxPeriods) {
 		return ErrInvalidSubscriptionContent(DefaultCodespace, "periods so far is greater than max periods")
 	} else if s.PeriodStartTime.After(s.PeriodEndTime) {
@@ -184,5 +195,11 @@ func (s TimeSubscriptionContent) Validate() sdk.Error {
 	} else if !s.PeriodStartTime.Add(s.PeriodLength).Equal(s.PeriodEndTime) {
 		return ErrInvalidSubscriptionContent(DefaultCodespace, "period start + period length != period end")
 	}
+
+	// Validate IDs
+	if !IsValidFeeContractId(s.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
+	}
+
 	return nil
 }

@@ -59,12 +59,12 @@ func (d Discount) Validate() sdk.Error {
 // --------------------------------------------- DiscountHolders
 
 type DiscountHolder struct {
-	FeeId      uint64         `json:"fee_id" yaml:"fee_id"`
+	FeeId      string         `json:"fee_id" yaml:"fee_id"`
 	DiscountId uint64         `json:"discount_id" yaml:"discount_id"`
 	Holder     sdk.AccAddress `json:"holder" yaml:"holder"`
 }
 
-func NewDiscountHolder(feeId, discountId uint64, holder sdk.AccAddress) DiscountHolder {
+func NewDiscountHolder(feeId string, discountId uint64, holder sdk.AccAddress) DiscountHolder {
 	return DiscountHolder{
 		FeeId:      feeId,
 		DiscountId: discountId,

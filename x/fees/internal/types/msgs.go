@@ -19,7 +19,7 @@ type MsgSetFeeContractAuthorisation struct {
 	SignBytes     string  `json:"signBytes" yaml:"signBytes"`
 	PubKey        string  `json:"pub_key" yaml:"pub_key"`
 	PayerDid      ixo.Did `json:"payer_did" yaml:"payer_did"`
-	FeeContractId uint64  `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
 	Authorised    bool    `json:"authorised" yaml:"authorised"`
 }
 
@@ -38,6 +38,11 @@ func (msg MsgSetFeeContractAuthorisation) ValidateBasic() sdk.Error {
 	// Check that DIDs valid
 	if !ixo.IsValidDid(msg.PayerDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "payer did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeContractId(msg.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
 	}
 
 	return nil
@@ -66,6 +71,7 @@ type MsgCreateFee struct {
 	SignBytes  string     `json:"signBytes" yaml:"signBytes"`
 	PubKey     string     `json:"pub_key" yaml:"pub_key"`
 	CreatorDid ixo.Did    `json:"creator_did" yaml:"creator_did"`
+	FeeId      string     `json:"fee_id" yaml:"fee_id"`
 	FeeContent FeeContent `json:"fee_content" yaml:"fee_content"`
 }
 
@@ -84,6 +90,11 @@ func (msg MsgCreateFee) ValidateBasic() sdk.Error {
 	// Check that DIDs valid
 	if !ixo.IsValidDid(msg.CreatorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeId(msg.FeeId) {
+		return ErrInvalidId(DefaultCodespace, "fee id invalid")
 	}
 
 	// Validate FeeContent
@@ -117,7 +128,8 @@ type MsgCreateFeeContract struct {
 	SignBytes      string         `json:"signBytes" yaml:"signBytes"`
 	PubKey         string         `json:"pub_key" yaml:"pub_key"`
 	CreatorDid     ixo.Did        `json:"creator_did" yaml:"creator_did"`
-	FeeId          uint64         `json:"fee_id" yaml:"fee_id"`
+	FeeId          string         `json:"fee_id" yaml:"fee_id"`
+	FeeContractId  string         `json:"fee_contract_id" yaml:"fee_contract_id"`
 	Payer          sdk.AccAddress `json:"payer" yaml:"payer"`
 	CanDeauthorise bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 }
@@ -139,6 +151,13 @@ func (msg MsgCreateFeeContract) ValidateBasic() sdk.Error {
 	// Check that DIDs valid
 	if !ixo.IsValidDid(msg.CreatorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeId(msg.FeeId) {
+		return ErrInvalidId(DefaultCodespace, "fee id invalid")
+	} else if !IsValidFeeContractId(msg.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
 	}
 
 	return nil
@@ -167,7 +186,7 @@ type MsgGrantFeeDiscount struct {
 	SignBytes             string         `json:"signBytes" yaml:"signBytes"`
 	PubKey                string         `json:"pub_key" yaml:"pub_key"`
 	FeeContractCreatorDid ixo.Did        `json:"fee_contract_creator_did" yaml:"fee_contract_creator_did"`
-	FeeContractId         uint64         `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId         string         `json:"fee_contract_id" yaml:"fee_contract_id"`
 	DiscountId            uint64         `json:"discount_id" yaml:"discount_id"`
 	Recipient             sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
@@ -189,6 +208,11 @@ func (msg MsgGrantFeeDiscount) ValidateBasic() sdk.Error {
 	// Check that DIDs valid
 	if !ixo.IsValidDid(msg.FeeContractCreatorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "fee creator did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeContractId(msg.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
 	}
 
 	return nil
@@ -217,7 +241,7 @@ type MsgRevokeFeeDiscount struct {
 	SignBytes             string         `json:"signBytes" yaml:"signBytes"`
 	PubKey                string         `json:"pub_key" yaml:"pub_key"`
 	FeeContractCreatorDid ixo.Did        `json:"fee_contract_creator_did" yaml:"fee_contract_creator_did"`
-	FeeContractId         uint64         `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId         string         `json:"fee_contract_id" yaml:"fee_contract_id"`
 	DiscountId            uint64         `json:"discount_id" yaml:"discount_id"`
 	Holder                sdk.AccAddress `json:"holder" yaml:"holder"`
 }
@@ -239,6 +263,11 @@ func (msg MsgRevokeFeeDiscount) ValidateBasic() sdk.Error {
 	// Check that DIDs valid
 	if !ixo.IsValidDid(msg.FeeContractCreatorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "fee creator did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeContractId(msg.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
 	}
 
 	return nil
@@ -267,7 +296,7 @@ type MsgChargeFee struct {
 	SignBytes             string  `json:"signBytes" yaml:"signBytes"`
 	PubKey                string  `json:"pub_key" yaml:"pub_key"`
 	FeeContractCreatorDid ixo.Did `json:"fee_contract_creator_did" yaml:"fee_contract_creator_did"`
-	FeeContractId         uint64  `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId         string  `json:"fee_contract_id" yaml:"fee_contract_id"`
 }
 
 var _ FeesMessage = MsgChargeFee{}
@@ -285,6 +314,11 @@ func (msg MsgChargeFee) ValidateBasic() sdk.Error {
 	// Check that DIDs valid
 	if !ixo.IsValidDid(msg.FeeContractCreatorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "fee creator did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeContractId(msg.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
 	}
 
 	return nil

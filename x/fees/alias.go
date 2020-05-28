@@ -10,6 +10,10 @@ const (
 
 	FeeRemainderPool = types.FeeRemainderPool
 
+	FeePrefix          = types.FeePrefix
+	FeeContractPrefix  = types.FeeContractPrefix
+	SubscriptionPrefix = types.SubscriptionPrefix
+
 	DefaultParamspace = types.DefaultParamspace
 	QuerierRoute      = types.QuerierRoute
 	RouterKey         = types.RouterKey
@@ -60,7 +64,9 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
+	NewFee                = types.NewFee
 	NewFeeContent         = types.NewFeeContent
+	NewFeeContract        = types.NewFeeContract
 	NewFeeContractContent = types.NewFeeContractContent
 	NewDistribution       = types.NewDistribution
 	NewDistributionShare  = types.NewDistributionShare

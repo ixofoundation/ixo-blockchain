@@ -9,7 +9,7 @@ var _ SubscriptionContent = TestSubscriptionContent{}
 // TestSubscriptionContent Is identical to BlockSubscriptionContent but does
 // not take into consideration the context in ShouldCharge() and started()
 type TestSubscriptionContent struct {
-	FeeContractId      uint64   `json:"fee_contract_id" yaml:"fee_contract_id"`
+	FeeContractId      string   `json:"fee_contract_id" yaml:"fee_contract_id"`
 	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
 	MaxPeriods         sdk.Uint `json:"max_periods" yaml:"max_periods"`
 	PeriodsAccumulated sdk.Uint `json:"periods_accumulated" yaml:"periods_accumulated"`
@@ -18,7 +18,7 @@ type TestSubscriptionContent struct {
 	PeriodEndBlock     int64    `json:"period_end_block" yaml:"period_end_block"`
 }
 
-func NewTestSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
+func NewTestSubscriptionContent(feeContractId string, maxPeriods sdk.Uint,
 	periodLength, periodStartBlock int64) TestSubscriptionContent {
 	return TestSubscriptionContent{
 		FeeContractId:      feeContractId,
@@ -31,7 +31,7 @@ func NewTestSubscriptionContent(feeContractId uint64, maxPeriods sdk.Uint,
 	}
 }
 
-func (s TestSubscriptionContent) GetFeeContractId() uint64 {
+func (s TestSubscriptionContent) GetFeeContractId() string {
 	return s.FeeContractId
 }
 
@@ -66,6 +66,7 @@ func (s TestSubscriptionContent) NextPeriod(periodPaid bool) {
 }
 
 func (s TestSubscriptionContent) Validate() sdk.Error {
+	// Validate period-related values
 	if s.PeriodsSoFar.GT(s.MaxPeriods) {
 		return ErrInvalidSubscriptionContent(DefaultCodespace, "periods so far is greater than max periods")
 	} else if s.PeriodStartBlock > s.PeriodEndBlock {
@@ -75,5 +76,11 @@ func (s TestSubscriptionContent) Validate() sdk.Error {
 	} else if s.PeriodStartBlock+s.PeriodLength != s.PeriodEndBlock {
 		return ErrInvalidSubscriptionContent(DefaultCodespace, "period start + period length != period end")
 	}
+
+	// Validate IDs
+	if !IsValidFeeContractId(s.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
+	}
+
 	return nil
 }

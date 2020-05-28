@@ -25,12 +25,12 @@ func (k Keeper) MustGetSubscriptionByKey(ctx sdk.Context, key []byte) types.Subs
 	return subscription
 }
 
-func (k Keeper) SubscriptionExists(ctx sdk.Context, subscriptionId uint64) bool {
+func (k Keeper) SubscriptionExists(ctx sdk.Context, subscriptionId string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetSubscriptionKey(subscriptionId))
 }
 
-func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId uint64) (types.Subscription, sdk.Error) {
+func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.Subscription, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetSubscriptionKey(subscriptionId)
 
@@ -45,47 +45,15 @@ func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId uint64) (types.S
 	return subscription, nil
 }
 
-func (k Keeper) SubmitSubscription(ctx sdk.Context, content types.SubscriptionContent) (types.Subscription, sdk.Error) {
-	subscriptionId, err := k.GetSubscriptionID(ctx)
-	if err != nil {
-		return types.Subscription{}, err
-	}
-
-	subscription := types.NewSubscription(subscriptionId, content)
-
-	k.SetSubscription(ctx, subscription)
-	k.SetSubscriptionID(ctx, subscriptionId+1)
-
-	return subscription, nil
-}
-
 func (k Keeper) SetSubscription(ctx sdk.Context, subscription types.Subscription) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetSubscriptionKey(subscription.Id)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(subscription))
 }
 
-// GetSubscriptionID gets the highest subscription ID
-func (k Keeper) GetSubscriptionID(ctx sdk.Context) (subscriptionId uint64, err sdk.Error) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.SubscriptionIdKey)
-	if bz == nil {
-		return 0, types.ErrInvalidGenesis(types.DefaultCodespace, "initial subscription ID hasn't been set")
-	}
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &subscriptionId)
-	return subscriptionId, nil
-}
-
-// Set the subscription ID
-func (k Keeper) SetSubscriptionID(ctx sdk.Context, subscriptionId uint64) {
-	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(subscriptionId)
-	store.Set(types.SubscriptionIdKey, bz)
-}
-
 // -------------------------------------------------------- Subscriptions Charge
 
-func (k Keeper) ChargeSubscriptionFee(ctx sdk.Context, subscriptionId uint64) sdk.Error {
+func (k Keeper) ChargeSubscriptionFee(ctx sdk.Context, subscriptionId string) sdk.Error {
 
 	subscription, err := k.GetSubscription(ctx, subscriptionId)
 	if err != nil {

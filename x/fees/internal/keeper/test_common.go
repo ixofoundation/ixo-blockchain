@@ -25,6 +25,13 @@ var (
 	validChargeMinimum, _ = sdk.ParseCoins("3res")
 	validChargeMaximum    = sdk.NewCoins()
 
+	validFeeId1          = types.FeePrefix + "f1"
+	validFeeId2          = types.FeePrefix + "f2"
+	validFeeContractId1  = types.FeeContractPrefix + "fc1"
+	validFeeContractId2  = types.FeeContractPrefix + "fc2"
+	validSubscriptionId1 = types.SubscriptionPrefix + "s1"
+	validSubscriptionId2 = types.SubscriptionPrefix + "s2"
+
 	validDoubledChargeAmount, _ = sdk.ParseCoins("2ixo,4res")
 
 	validDiscounts = types.NewDiscounts(
@@ -52,7 +59,7 @@ var (
 		validDistribution)
 
 	validFeeContractContent = types.NewFeeContractContent(
-		1, feeCreatorAddr, feePayerAddr, false, true)
+		validFeeId1, feeCreatorAddr, feePayerAddr, false, true)
 )
 
 func ValidateVariables() sdk.Error {
@@ -76,12 +83,12 @@ func ValidateVariables() sdk.Error {
 		return err
 	}
 
-	err = types.NewFee(1, validFeeContent).Validate()
+	err = types.NewFee(validFeeId1, validFeeContent).Validate()
 	if err != nil {
 		return err
 	}
 
-	err = types.NewFeeContract(1, validFeeContractContent).Validate()
+	err = types.NewFeeContract(validFeeContractId1, validFeeContractContent).Validate()
 	if err != nil {
 		return err
 	}

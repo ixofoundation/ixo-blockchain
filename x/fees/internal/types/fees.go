@@ -70,11 +70,11 @@ func (fc FeeContent) GetDiscountPercent(discountId uint64) (sdk.Dec, sdk.Error) 
 }
 
 type Fee struct {
-	Id      uint64     `json:"id" yaml:"id"`
+	Id      string     `json:"id" yaml:"id"`
 	Content FeeContent `json:"content" yaml:"content"`
 }
 
-func NewFee(id uint64, content FeeContent) Fee {
+func NewFee(id string, content FeeContent) Fee {
 	return Fee{
 		Id:      id,
 		Content: content,
@@ -82,11 +82,14 @@ func NewFee(id uint64, content FeeContent) Fee {
 }
 
 func (f Fee) Validate() sdk.Error {
+	if !IsValidFeeId(f.Id) {
+		return ErrInvalidId(DefaultCodespace, "fee id invalid")
+	}
 	return f.Content.Validate()
 }
 
 type FeeContractContent struct {
-	FeeId            uint64         `json:"fee_id" yaml:"fee_id"`
+	FeeId            string         `json:"fee_id" yaml:"fee_id"`
 	Creator          sdk.AccAddress `json:"creator" yaml:"creator"`
 	Payer            sdk.AccAddress `json:"payer" yaml:"payer"`
 	CumulativeCharge sdk.Coins      `json:"cumulative_charge" yaml:"cumulative_charge"`
@@ -95,7 +98,7 @@ type FeeContractContent struct {
 	Authorised       bool           `json:"authorised" yaml:"authorised"`
 }
 
-func NewFeeContractContent(feeId uint64, creator, payer sdk.AccAddress,
+func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
 	canDeauthorise, authorised bool) FeeContractContent {
 	return FeeContractContent{
 		FeeId:            feeId,
@@ -123,23 +126,31 @@ func (fc FeeContractContent) Validate() sdk.Error {
 		return sdk.ErrInvalidAddress("empty payer address")
 	}
 
+	// Validate IDs
+	if !IsValidFeeId(fc.FeeId) {
+		return ErrInvalidId(DefaultCodespace, "fee id invalid")
+	}
+
 	return nil
 }
 
 type FeeContract struct {
-	Id      uint64             `json:"id" yaml:"id"`
+	Id      string             `json:"id" yaml:"id"`
 	Content FeeContractContent `json:"content" yaml:"content"`
 }
 
-func NewFeeContract(id uint64, content FeeContractContent) FeeContract {
+func NewFeeContract(id string, content FeeContractContent) FeeContract {
 	return FeeContract{
 		Id:      id,
 		Content: content,
 	}
 }
 
-func (f FeeContract) Validate() sdk.Error {
-	return f.Content.Validate()
+func (fc FeeContract) Validate() sdk.Error {
+	if !IsValidFeeContractId(fc.Id) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
+	}
+	return fc.Content.Validate()
 }
 
 func (fc FeeContract) IsFirstCharge() bool {

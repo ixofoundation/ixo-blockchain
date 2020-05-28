@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func NewMsgSetFeeContractAuthorisation(feeContractId uint64, authorised bool,
+func NewMsgSetFeeContractAuthorisation(feeContractId string, authorised bool,
 	payerDid sovrin.SovrinDid) MsgSetFeeContractAuthorisation {
 	return MsgSetFeeContractAuthorisation{
 		SignBytes:     "",
@@ -17,28 +17,30 @@ func NewMsgSetFeeContractAuthorisation(feeContractId uint64, authorised bool,
 	}
 }
 
-func NewMsgCreateFee(feeContent FeeContent,
+func NewMsgCreateFee(feeId string, feeContent FeeContent,
 	creatorDid sovrin.SovrinDid) MsgCreateFee {
 	return MsgCreateFee{
 		SignBytes:  "",
 		PubKey:     creatorDid.VerifyKey,
 		CreatorDid: creatorDid.Did,
+		FeeId:      feeId,
 		FeeContent: feeContent,
 	}
 }
 
-func NewMsgCreateFeeContract(feeId uint64, payer sdk.AccAddress,
+func NewMsgCreateFeeContract(feeId, feeContractId string, payer sdk.AccAddress,
 	canDeauthorise bool, creatorDid sovrin.SovrinDid) MsgCreateFeeContract {
 	return MsgCreateFeeContract{
 		SignBytes:      "",
 		PubKey:         creatorDid.VerifyKey,
 		CreatorDid:     creatorDid.Did,
 		FeeId:          feeId,
+		FeeContractId:  feeContractId,
 		Payer:          payer,
 		CanDeauthorise: canDeauthorise,
 	}
 }
-func NewMsgGrantFeeDiscount(feeContractId, discountId uint64,
+func NewMsgGrantFeeDiscount(feeContractId string, discountId uint64,
 	recipient sdk.AccAddress, creatorDid sovrin.SovrinDid) MsgGrantFeeDiscount {
 	return MsgGrantFeeDiscount{
 		SignBytes:             "",
@@ -50,7 +52,7 @@ func NewMsgGrantFeeDiscount(feeContractId, discountId uint64,
 	}
 }
 
-func NewMsgRevokeFeeDiscount(feeContractId, discountId uint64,
+func NewMsgRevokeFeeDiscount(feeContractId string, discountId uint64,
 	holder sdk.AccAddress, creatorDid sovrin.SovrinDid) MsgRevokeFeeDiscount {
 	return MsgRevokeFeeDiscount{
 		SignBytes:             "",
@@ -62,7 +64,7 @@ func NewMsgRevokeFeeDiscount(feeContractId, discountId uint64,
 	}
 }
 
-func NewMsgChargeFee(feeContractId uint64, creatorDid sovrin.SovrinDid) MsgChargeFee {
+func NewMsgChargeFee(feeContractId string, creatorDid sovrin.SovrinDid) MsgChargeFee {
 	return MsgChargeFee{
 		SignBytes:             "",
 		PubKey:                creatorDid.VerifyKey,

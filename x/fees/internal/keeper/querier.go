@@ -5,7 +5,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"strconv"
 )
 
 const (
@@ -41,38 +40,34 @@ func queryParams(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 }
 
 func queryFee(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
-	feeId, err := strconv.ParseUint(path[0], 0, 64)
-	if err != nil {
-		return nil, sdk.ErrInternal(err.Error())
-	}
+	feeId := path[0]
 
 	fee, err := k.GetFee(ctx, feeId)
 	if err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("fee '%d' does not exist", feeId))
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf(
+			"fee '%s' does not exist", feeId))
 	}
 
-	res, err := codec.MarshalJSONIndent(k.cdc, fee)
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err.Error()))
+	res, err2 := codec.MarshalJSONIndent(k.cdc, fee)
+	if err2 != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err2.Error()))
 	}
 
 	return res, nil
 }
 
 func queryFeeContract(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
-	feeContractId, err := strconv.ParseUint(path[0], 0, 64)
+	feeContractId := path[0]
+
+	feeContract, err := k.GetFeeContract(ctx, feeContractId)
 	if err != nil {
-		return nil, sdk.ErrInternal(err.Error())
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf(
+			"fee contract '%s' does not exist", feeContractId))
 	}
 
-	fee, err := k.GetFeeContract(ctx, feeContractId)
-	if err != nil {
-		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("fee contract '%d' does not exist", feeContractId))
-	}
-
-	res, err := codec.MarshalJSONIndent(k.cdc, fee)
-	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err.Error()))
+	res, err2 := codec.MarshalJSONIndent(k.cdc, feeContract)
+	if err2 != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err2.Error()))
 	}
 
 	return res, nil

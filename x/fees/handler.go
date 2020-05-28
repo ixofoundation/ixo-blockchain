@@ -88,11 +88,14 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 
 func handleMsgCreateFee(ctx sdk.Context, k Keeper, msg MsgCreateFee) sdk.Result {
 
-	// Submit fee
-	_, err := k.SubmitFee(ctx, msg.FeeContent)
-	if err != nil {
+	// Create and validate fee
+	fee := types.NewFee(msg.FeeId, msg.FeeContent)
+	if err := fee.Validate(); err != nil {
 		return err.Result()
 	}
+
+	// Submit fee
+	k.SetFee(ctx, fee)
 
 	return sdk.Result{}
 }
@@ -106,14 +109,17 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, msg MsgCreateFeeContr
 
 	// Create fee contract content
 	creatorAddr := types.DidToAddr(msg.CreatorDid)
-	feeContract := NewFeeContractContent(
+	feeContractContent := NewFeeContractContent(
 		msg.FeeId, creatorAddr, msg.Payer, msg.CanDeauthorise, false)
 
-	// Submit fee
-	_, err := k.SubmitFeeContract(ctx, feeContract)
-	if err != nil {
+	// Create fee contract and validate
+	feeContract := NewFeeContract(msg.FeeContractId, feeContractContent)
+	if err := feeContract.Validate(); err != nil {
 		return err.Result()
 	}
+
+	// Submit fee contract
+	k.SetFeeContract(ctx, feeContract)
 
 	return sdk.Result{}
 }

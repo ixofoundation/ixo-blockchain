@@ -82,19 +82,21 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-fee [fee-content] [creator-sovrin-did]",
+		Use:   "create-fee [fee-id] [fee-content] [creator-sovrin-did]",
 		Short: "Create and sign a create-fee tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
-				return errors.New("You must provide the fee content json and " +
-					"creator private key")
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the fee id, fee content " +
+					"json, and creator private key")
 			}
 
-			feeContentStr := args[0]
-			sovrinDidStr := args[1]
+			feeIdStr := args[0]
+			feeContentStr := args[1]
+			sovrinDidStr := args[2]
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
 
@@ -104,7 +106,7 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateFee(feeContent, sovrinDid)
+			msg := types.NewMsgCreateFee(feeIdStr, feeContent, sovrinDid)
 
 			// TODO: implement properly
 
