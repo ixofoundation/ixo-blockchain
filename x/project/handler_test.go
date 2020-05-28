@@ -151,20 +151,9 @@ func Test_WithdrawFunds(t *testing.T) {
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), InternalAccountID(msg1.GetProjectDid()))
 	require.Nil(t, err)
 
-	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
-
 	require.False(t, k.ProjectDocExists(ctx, msg1.GetProjectDid()))
 	k.SetProjectDoc(ctx, &msg1)
 
-	// TODO: implement below code
-
-	_ = msg
-	_ = bk
-
-	//ethClient, err1 := ixo.NewEthClient()
-	//require.Nil(t, err1)
-	//require.NotNil(t, ethClient)
-	//
-	//res := handleMsgWithdrawFunds(ctx, k, bk, pk, ethClient, msg)
-	//require.NotNil(t, res)
+	res := handleMsgWithdrawFunds(ctx, k, bk, msg)
+	require.NotNil(t, res)
 }
