@@ -96,10 +96,11 @@ type FeeContractContent struct {
 	CurrentRemainder sdk.Coins      `json:"current_charge" yaml:"current_charge"`
 	CanDeauthorise   bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	Authorised       bool           `json:"authorised" yaml:"authorised"`
+	DiscountIds      []uint64       `json:"discount_ids" yaml:"discount_ids"`
 }
 
 func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
-	canDeauthorise, authorised bool) FeeContractContent {
+	canDeauthorise, authorised bool, discountIds []uint64) FeeContractContent {
 	return FeeContractContent{
 		FeeId:            feeId,
 		Creator:          creator,
@@ -108,6 +109,7 @@ func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
 		CurrentRemainder: sdk.NewCoins(),
 		CanDeauthorise:   canDeauthorise,
 		Authorised:       authorised,
+		DiscountIds:      discountIds,
 	}
 }
 

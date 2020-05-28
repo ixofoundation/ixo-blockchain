@@ -29,7 +29,7 @@ func NewMsgCreateFee(feeId string, feeContent FeeContent,
 }
 
 func NewMsgCreateFeeContract(feeId, feeContractId string, payer sdk.AccAddress,
-	canDeauthorise bool, creatorDid sovrin.SovrinDid) MsgCreateFeeContract {
+	canDeauthorise bool, discountIds []uint64, creatorDid sovrin.SovrinDid) MsgCreateFeeContract {
 	return MsgCreateFeeContract{
 		SignBytes:      "",
 		PubKey:         creatorDid.VerifyKey,
@@ -38,6 +38,7 @@ func NewMsgCreateFeeContract(feeId, feeContractId string, payer sdk.AccAddress,
 		FeeContractId:  feeContractId,
 		Payer:          payer,
 		CanDeauthorise: canDeauthorise,
+		DiscountIds:    discountIds,
 	}
 }
 func NewMsgGrantFeeDiscount(feeContractId string, discountId uint64,

@@ -110,7 +110,7 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, msg MsgCreateFeeContr
 	// Create fee contract content
 	creatorAddr := types.DidToAddr(msg.CreatorDid)
 	feeContractContent := NewFeeContractContent(
-		msg.FeeId, creatorAddr, msg.Payer, msg.CanDeauthorise, false)
+		msg.FeeId, creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountIds)
 
 	// Create fee contract and validate
 	feeContract := NewFeeContract(msg.FeeContractId, feeContractContent)

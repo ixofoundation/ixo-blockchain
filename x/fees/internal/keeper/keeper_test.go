@@ -4,31 +4,20 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/crypto"
 	"testing"
 	"time"
 )
 
 func TestKeeperSetGet(t *testing.T) {
-	startingDiscountHoldersId := uint64(1)
-
 	ctx, k, _ := CreateTestInput()
 
-	// Check Fee, FeeContract, Subscription, DiscountHolders existence
+	// Check Fee, FeeContract, Subscription, existence
 	feeGet, err := k.GetFee(ctx, "dummyId")
 	require.NotNil(t, err)
 	feeContractGet, err := k.GetFeeContract(ctx, "dummyId")
 	require.NotNil(t, err)
 	blockSubscriptionGet, err := k.GetSubscription(ctx, "dummyId")
 	require.NotNil(t, err)
-	discountHoldersIter := k.GetDiscountHoldersIteratorByFeeContract(ctx, "dummyFeeId", startingDiscountHoldersId, "dummyContractId")
-	require.False(t, discountHoldersIter.Valid())
-	discountHoldersIter = k.GetDiscountHoldersIteratorByDiscount(ctx, "dummyFeeId", startingDiscountHoldersId)
-	require.False(t, discountHoldersIter.Valid())
-	discountHoldersIter = k.GetDiscountHoldersIteratorByFee(ctx, "dummyFeeId")
-	require.False(t, discountHoldersIter.Valid())
-	discountHoldersIter = k.GetAllDiscountHoldersIterator(ctx)
-	require.False(t, discountHoldersIter.Valid())
 
 	// Submitted Fee
 	fee := types.NewFee(validFeeId1, validFeeContent)
@@ -73,43 +62,22 @@ func TestKeeperSetGet(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, timeSubscription.Id, timeSubscriptionGet.Id)
 
-	// Set Discount Holder
-	holder1 := sdk.AccAddress(crypto.AddressHash([]byte("holder1")))
-	holder2 := sdk.AccAddress(crypto.AddressHash([]byte("holder2")))
-	holder3 := sdk.AccAddress(crypto.AddressHash([]byte("holder3")))
-	holder4 := sdk.AccAddress(crypto.AddressHash([]byte("holder4")))
-	k.SetDiscountHolder(ctx, types.NewDiscountHolder(validFeeId1, validFeeContractId1, 1, holder1))
-	k.SetDiscountHolder(ctx, types.NewDiscountHolder(validFeeId1, validFeeContractId2, 2, holder2))
-	k.SetDiscountHolder(ctx, types.NewDiscountHolder(validFeeId2, validFeeContractId1, 3, holder3))
-	k.SetDiscountHolder(ctx, types.NewDiscountHolder("someFeeId", validFeeContractId1, 4, holder4))
+	// Set FeeContract discounts
+	err = k.AddFeeContractDiscount(ctx, validFeeContractId1, 1)
+	require.Nil(t, err)
+	err = k.AddFeeContractDiscount(ctx, validFeeContractId1, 2)
+	require.Nil(t, err)
+	err = k.AddFeeContractDiscount(ctx, validFeeContractId2, 3)
+	require.Error(t, err) // since we used non-existent fee contract ID
 
-	// Check that 4 discount holders in general
-	discountHoldersIter = k.GetAllDiscountHoldersIterator(ctx)
-	for i := 0; i < 4; i++ {
-		_ = k.MustGetDiscountHolderByKey(ctx, discountHoldersIter.Key())
-		discountHoldersIter.Next()
-	}
-	require.False(t, discountHoldersIter.Valid())
+	// Get FeeContract
+	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
+	require.Nil(t, err)
 
-	// Check that 2 discount holders for validFeeId1
-	discountHoldersIter = k.GetDiscountHoldersIteratorByFee(ctx, validFeeId1)
-	for i := 0; i < 2; i++ {
-		_ = k.MustGetDiscountHolderByKey(ctx, discountHoldersIter.Key())
-		discountHoldersIter.Next()
-	}
-	require.False(t, discountHoldersIter.Valid())
-
-	// Check that 1 discount holder for validFeeId1 and discount id 2
-	discountId := uint64(2)
-	discountHoldersIter = k.GetDiscountHoldersIteratorByDiscount(ctx, validFeeId1, discountId)
-	discountholder := k.MustGetDiscountHolderByKey(ctx, discountHoldersIter.Key())
-	require.Equal(t, discountId, discountholder.DiscountId)
-	discountHoldersIter.Next()
-	require.False(t, discountHoldersIter.Valid())
-
-	// Check that 0 discount holders for validFeeId1 and discount id 3
-	discountHoldersIter = k.GetDiscountHoldersIteratorByDiscount(ctx, validFeeId1, 3)
-	require.False(t, discountHoldersIter.Valid())
+	// Check that fee contract has the two discount IDs
+	require.Len(t, feeContract.Content.DiscountIds, 2)
+	require.Equal(t, feeContract.Content.DiscountIds[0], uint64(1))
+	require.Equal(t, feeContract.Content.DiscountIds[1], uint64(2))
 }
 
 func TestKeeperChargeFee(t *testing.T) {
@@ -203,9 +171,8 @@ func TestKeeperChargeFeeWithDiscounts(t *testing.T) {
 	require.Nil(t, err)
 
 	// Set discount
-	discountHolder := types.NewDiscountHolder(
-		fee.Id, feeContract.Id, fiftyPercentOffId, feeContract.Content.Payer)
-	k.SetDiscountHolder(ctx, discountHolder)
+	err = k.AddFeeContractDiscount(ctx, feeContract.Id, fiftyPercentOffId)
+	require.Nil(t, err)
 
 	// At this point, cumulative: /
 	// ChargeAmt:  2ixo, 4res (discounted to 1ixo, 2res)

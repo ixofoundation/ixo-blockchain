@@ -59,7 +59,7 @@ var (
 		validDistribution)
 
 	validFeeContractContent = types.NewFeeContractContent(
-		validFeeId1, feeCreatorAddr, feePayerAddr, false, true)
+		validFeeId1, feeCreatorAddr, feePayerAddr, false, true, nil)
 )
 
 func ValidateVariables() sdk.Error {

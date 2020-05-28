@@ -78,8 +78,7 @@ func (k Keeper) FeeContractExists(ctx sdk.Context, feeContractId string) bool {
 	return store.Has(types.GetFeeContractKey(feeContractId))
 }
 
-func (k Keeper) GetFeeContract(ctx sdk.Context,
-	feeContractId string) (types.FeeContract, sdk.Error) {
+func (k Keeper) GetFeeContract(ctx sdk.Context, feeContractId string) (types.FeeContract, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetFeeContractKey(feeContractId)
 
@@ -119,18 +118,31 @@ func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId string,
 	return nil
 }
 
+func (k Keeper) AddFeeContractDiscount(ctx sdk.Context, feeContractId string, discountId uint64) sdk.Error {
+	// Get fee contract
+	feeContract, err := k.GetFeeContract(ctx, feeContractId)
+	if err != nil {
+		return err
+	}
+
+	// Append discount ID and update fee contract
+	feeContract.Content.DiscountIds = append(feeContract.Content.DiscountIds, discountId)
+	k.SetFeeContract(ctx, feeContract)
+	return nil
+}
+
 // -------------------------------------------------------- FeeContracts Charge
 
-func applyDiscount(ctx sdk.Context, k Keeper, fee types.Fee, feeContractId string,
+func applyDiscount(ctx sdk.Context, k Keeper, fee types.Fee, feeContract types.FeeContract,
 	payer sdk.AccAddress, payAmount sdk.Coins) (sdk.Coins, sdk.Error) {
 
-	// Apply first discount held, if any
-	discountId, holdsDiscount, err := k.GetFirstDiscountHeld(ctx, fee.Id, feeContractId, payer)
-	if err != nil {
-		return nil, err
-	} else if !holdsDiscount {
+	// No discounts held
+	if len(feeContract.Content.DiscountIds) == 0 {
 		return payAmount, nil
 	}
+
+	// Use first discount
+	discountId := feeContract.Content.DiscountIds[0]
 
 	// Get discount percentage to calculate discount amount. Any rounding
 	// when multiplying means the payer receives a slightly smaller discount.
@@ -197,7 +209,7 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper,
 	// Assume payer will pay ChargeAmount, apply discount (if any),
 	// and calculate initial cumulative (before adjustments)
 	payAmount := feeData.ChargeAmount
-	payAmount, err = applyDiscount(ctx, k, fee, feeContract.Id, fcData.Payer, payAmount)
+	payAmount, err = applyDiscount(ctx, k, fee, feeContract, fcData.Payer, payAmount)
 	if err != nil {
 		return false, err
 	}

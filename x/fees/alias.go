@@ -36,9 +36,8 @@ type (
 	Distribution       = types.Distribution
 	DistributionShare  = types.DistributionShare
 
-	Discount       = types.Discount
-	Discounts      = types.Discounts
-	DiscountHolder = types.DiscountHolder
+	Discount  = types.Discount
+	Discounts = types.Discounts
 
 	Subscription        = types.Subscription
 	SubscriptionContent = types.SubscriptionContent
@@ -71,9 +70,8 @@ var (
 	NewDistribution       = types.NewDistribution
 	NewDistributionShare  = types.NewDistributionShare
 
-	NewDiscount       = types.NewDiscount
-	NewDiscounts      = types.NewDiscounts
-	NewDiscountHolder = types.NewDiscountHolder
+	NewDiscount  = types.NewDiscount
+	NewDiscounts = types.NewDiscounts
 
 	NewSubscription             = types.NewSubscription
 	NewBlockSubscriptionContent = types.NewBlockSubscriptionContent

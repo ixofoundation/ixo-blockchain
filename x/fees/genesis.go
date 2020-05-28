@@ -23,11 +23,6 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	for _, s := range data.Subscriptions {
 		keeper.SetSubscription(ctx, s)
 	}
-
-	// Init discount holders
-	for _, dh := range data.DiscountHolders {
-		keeper.SetDiscountHolder(ctx, dh)
-	}
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
@@ -59,14 +54,5 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 		subscriptions = append(subscriptions, subscription)
 	}
 
-	// Export discount holders
-	var discountHolders []DiscountHolder
-	iterator = keeper.GetAllDiscountHoldersIterator(ctx)
-	for ; iterator.Valid(); iterator.Next() {
-		discountHolder := keeper.MustGetDiscountHolderByKey(ctx, iterator.Key())
-		discountHolders = append(discountHolders, discountHolder)
-	}
-
-	return NewGenesisState(params, fees, feeContracts,
-		subscriptions, discountHolders)
+	return NewGenesisState(params, fees, feeContracts, subscriptions)
 }

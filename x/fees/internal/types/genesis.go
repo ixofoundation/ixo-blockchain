@@ -1,21 +1,19 @@
 package types
 
 type GenesisState struct {
-	Params          Params           `json:"params" yaml:"params"`
-	Fees            []Fee            `json:"fees" yaml:"fees"`
-	FeeContracts    []FeeContract    `json:"fee_contracts" yaml:"fee_contracts"`
-	Subscriptions   []Subscription   `json:"subscriptions" yaml:"subscriptions"`
-	DiscountHolders []DiscountHolder `json:"discount_holders" yaml:"discount_holders"`
+	Params        Params         `json:"params" yaml:"params"`
+	Fees          []Fee          `json:"fees" yaml:"fees"`
+	FeeContracts  []FeeContract  `json:"fee_contracts" yaml:"fee_contracts"`
+	Subscriptions []Subscription `json:"subscriptions" yaml:"subscriptions"`
 }
 
 func NewGenesisState(params Params, fees []Fee, feeContracts []FeeContract,
-	subscriptions []Subscription, discountHolders []DiscountHolder) GenesisState {
+	subscriptions []Subscription) GenesisState {
 	return GenesisState{
-		Params:          params,
-		Fees:            fees,
-		FeeContracts:    feeContracts,
-		Subscriptions:   subscriptions,
-		DiscountHolders: discountHolders,
+		Params:        params,
+		Fees:          fees,
+		FeeContracts:  feeContracts,
+		Subscriptions: subscriptions,
 	}
 }
 

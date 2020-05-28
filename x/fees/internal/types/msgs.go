@@ -132,6 +132,7 @@ type MsgCreateFeeContract struct {
 	FeeContractId  string         `json:"fee_contract_id" yaml:"fee_contract_id"`
 	Payer          sdk.AccAddress `json:"payer" yaml:"payer"`
 	CanDeauthorise bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
+	DiscountIds    []uint64       `json:"discount_ids" yaml:"discount_ids"`
 }
 
 var _ FeesMessage = MsgCreateFeeContract{}
