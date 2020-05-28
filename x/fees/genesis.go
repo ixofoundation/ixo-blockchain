@@ -61,7 +61,7 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 
 	// Export discount holders
 	var discountHolders []DiscountHolder
-	iterator = keeper.GetFeesDiscountsHoldersIterator(ctx)
+	iterator = keeper.GetAllDiscountHoldersIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		discountHolder := keeper.MustGetDiscountHolderByKey(ctx, iterator.Key())
 		discountHolders = append(discountHolders, discountHolder)

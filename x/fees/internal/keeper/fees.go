@@ -121,9 +121,11 @@ func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId string,
 
 // -------------------------------------------------------- FeeContracts Charge
 
-func applyDiscount(ctx sdk.Context, k Keeper, fee types.Fee, payer sdk.AccAddress, payAmount sdk.Coins) (sdk.Coins, sdk.Error) {
+func applyDiscount(ctx sdk.Context, k Keeper, fee types.Fee, feeContractId string,
+	payer sdk.AccAddress, payAmount sdk.Coins) (sdk.Coins, sdk.Error) {
+
 	// Apply first discount held, if any
-	discountId, holdsDiscount, err := k.GetFirstDiscountHeld(ctx, fee.Id, payer)
+	discountId, holdsDiscount, err := k.GetFirstDiscountHeld(ctx, fee.Id, feeContractId, payer)
 	if err != nil {
 		return nil, err
 	} else if !holdsDiscount {
@@ -195,7 +197,7 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper,
 	// Assume payer will pay ChargeAmount, apply discount (if any),
 	// and calculate initial cumulative (before adjustments)
 	payAmount := feeData.ChargeAmount
-	payAmount, err = applyDiscount(ctx, k, fee, feeContract.Content.Payer, payAmount)
+	payAmount, err = applyDiscount(ctx, k, fee, feeContract.Id, fcData.Payer, payAmount)
 	if err != nil {
 		return false, err
 	}

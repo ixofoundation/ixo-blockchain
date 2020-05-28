@@ -38,16 +38,20 @@ func GetSubscriptionKey(subscriptionId string) []byte {
 	return append(SubscriptionKeyPrefix, []byte(subscriptionId)...)
 }
 
-func GetDiscountHolderKey(feeId string, discountId uint64, addr sdk.AccAddress) []byte {
-	return append(GetDiscountHoldersKey(feeId, discountId), addr.Bytes()...)
+func GetDiscountHolderKey(feeId string, discountId uint64, feeContractId string, addr sdk.AccAddress) []byte {
+	return append(GetDiscountHoldersKeyForFeeContract(feeId, discountId, feeContractId), addr.Bytes()...)
 }
 
-func GetDiscountHoldersKey(feeId string, discountId uint64) []byte {
+func GetDiscountHoldersKeyForFeeContract(feeId string, discountId uint64, feeContractId string) []byte {
+	return append(GetDiscountHoldersKeyForDiscountId(feeId, discountId), []byte(feeContractId)...)
+}
+
+func GetDiscountHoldersKeyForDiscountId(feeId string, discountId uint64) []byte {
 	bz := make([]byte, 8)
 	binary.LittleEndian.PutUint64(bz, discountId)
-	return append(GetDiscountsHoldersKey(feeId), bz...)
+	return append(GetDiscountsHoldersKeyForFee(feeId), bz...)
 }
 
-func GetDiscountsHoldersKey(feeId string) []byte {
+func GetDiscountsHoldersKeyForFee(feeId string) []byte {
 	return append(DiscountHolderKeyPrefix, []byte(feeId)...)
 }
