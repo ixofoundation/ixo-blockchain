@@ -53,6 +53,22 @@ func (k Keeper) SetFee(ctx sdk.Context, fee types.Fee) {
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(fee))
 }
 
+func (k Keeper) DiscountIdExists(ctx sdk.Context, feeId string, discountId uint64) (bool, sdk.Error) {
+	// Get fee
+	fee, err := k.GetFee(ctx, feeId)
+	if err != nil {
+		return false, err
+	}
+
+	// Search for discount ID
+	for _, d := range fee.Content.Discounts {
+		if d.Id == discountId {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // -------------------------------------------------------- FeeContracts Get/Set
 
 func (k Keeper) GetFeeContractIterator(ctx sdk.Context) sdk.Iterator {
@@ -118,15 +134,56 @@ func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId string,
 	return nil
 }
 
-func (k Keeper) AddFeeContractDiscount(ctx sdk.Context, feeContractId string, discountId uint64) sdk.Error {
+func (k Keeper) GrantFeeDiscount(ctx sdk.Context, feeContractId string, discountId uint64) sdk.Error {
 	// Get fee contract
 	feeContract, err := k.GetFeeContract(ctx, feeContractId)
 	if err != nil {
 		return err
 	}
 
+	// Check if discount had already been granted
+	index := -1
+	for i, d := range feeContract.Content.DiscountIds {
+		if d == discountId {
+			index = i
+		}
+	}
+
+	// If discount found, just return (not considered an error)
+	if index >= 0 {
+		return nil
+	}
+
 	// Append discount ID and update fee contract
 	feeContract.Content.DiscountIds = append(feeContract.Content.DiscountIds, discountId)
+	k.SetFeeContract(ctx, feeContract)
+	return nil
+}
+
+func (k Keeper) RevokeFeeDiscount(ctx sdk.Context, feeContractId string, discountId uint64) sdk.Error {
+	// Get fee contract
+	feeContract, err := k.GetFeeContract(ctx, feeContractId)
+	if err != nil {
+		return err
+	}
+
+	// Find discount's index
+	index := -1
+	for i, d := range feeContract.Content.DiscountIds {
+		if d == discountId {
+			index = i
+		}
+	}
+
+	// If discount not found, just return (not considered an error)
+	if index == -1 {
+		return nil
+	}
+
+	// Remove the discount and update the fee contract
+	feeContract.Content.DiscountIds = append(
+		feeContract.Content.DiscountIds[:index],
+		feeContract.Content.DiscountIds[index+1:]...)
 	k.SetFeeContract(ctx, feeContract)
 	return nil
 }

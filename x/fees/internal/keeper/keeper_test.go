@@ -62,22 +62,34 @@ func TestKeeperSetGet(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, timeSubscription.Id, timeSubscriptionGet.Id)
 
-	// Set FeeContract discounts
-	err = k.AddFeeContractDiscount(ctx, validFeeContractId1, 1)
+	// Grant FeeContract discounts
+	err = k.GrantFeeDiscount(ctx, validFeeContractId1, 1)
 	require.Nil(t, err)
-	err = k.AddFeeContractDiscount(ctx, validFeeContractId1, 2)
+	err = k.GrantFeeDiscount(ctx, validFeeContractId1, 2)
 	require.Nil(t, err)
-	err = k.AddFeeContractDiscount(ctx, validFeeContractId2, 3)
+	err = k.GrantFeeDiscount(ctx, validFeeContractId2, 3)
 	require.Error(t, err) // since we used non-existent fee contract ID
 
-	// Get FeeContract
+	// Check that fee contract has the two discount IDs
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-
-	// Check that fee contract has the two discount IDs
 	require.Len(t, feeContract.Content.DiscountIds, 2)
 	require.Equal(t, feeContract.Content.DiscountIds[0], uint64(1))
 	require.Equal(t, feeContract.Content.DiscountIds[1], uint64(2))
+
+	// Revoke FeeContract discounts
+	err = k.RevokeFeeDiscount(ctx, validFeeContractId1, 1)
+	require.Nil(t, err)
+	err = k.RevokeFeeDiscount(ctx, validFeeContractId1, 4)
+	require.Nil(t, err) // invalid discount ID not considered an error
+	err = k.RevokeFeeDiscount(ctx, validFeeContractId2, 3)
+	require.Error(t, err) // since we used non-existent fee contract ID
+
+	// Check that fee contract has just one discount now
+	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
+	require.Nil(t, err)
+	require.Len(t, feeContract.Content.DiscountIds, 1)
+	require.Equal(t, feeContract.Content.DiscountIds[0], uint64(2))
 }
 
 func TestKeeperChargeFee(t *testing.T) {
@@ -171,7 +183,7 @@ func TestKeeperChargeFeeWithDiscounts(t *testing.T) {
 	require.Nil(t, err)
 
 	// Set discount
-	err = k.AddFeeContractDiscount(ctx, feeContract.Id, fiftyPercentOffId)
+	err = k.GrantFeeDiscount(ctx, feeContract.Id, fiftyPercentOffId)
 	require.Nil(t, err)
 
 	// At this point, cumulative: /

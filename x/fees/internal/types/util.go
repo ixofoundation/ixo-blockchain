@@ -44,33 +44,33 @@ func NewMsgCreateFeeContract(feeId, feeContractId string, payer sdk.AccAddress,
 func NewMsgGrantFeeDiscount(feeContractId string, discountId uint64,
 	recipient sdk.AccAddress, creatorDid sovrin.SovrinDid) MsgGrantFeeDiscount {
 	return MsgGrantFeeDiscount{
-		SignBytes:             "",
-		PubKey:                creatorDid.VerifyKey,
-		FeeContractCreatorDid: creatorDid.Did,
-		FeeContractId:         feeContractId,
-		DiscountId:            discountId,
-		Recipient:             recipient,
+		SignBytes:     "",
+		PubKey:        creatorDid.VerifyKey,
+		SenderDid:     creatorDid.Did,
+		FeeContractId: feeContractId,
+		DiscountId:    discountId,
+		Recipient:     recipient,
 	}
 }
 
 func NewMsgRevokeFeeDiscount(feeContractId string, discountId uint64,
 	holder sdk.AccAddress, creatorDid sovrin.SovrinDid) MsgRevokeFeeDiscount {
 	return MsgRevokeFeeDiscount{
-		SignBytes:             "",
-		PubKey:                creatorDid.VerifyKey,
-		FeeContractCreatorDid: creatorDid.Did,
-		FeeContractId:         feeContractId,
-		DiscountId:            discountId,
-		Holder:                holder,
+		SignBytes:     "",
+		PubKey:        creatorDid.VerifyKey,
+		SenderDid:     creatorDid.Did,
+		FeeContractId: feeContractId,
+		DiscountId:    discountId,
+		Holder:        holder,
 	}
 }
 
 func NewMsgChargeFee(feeContractId string, creatorDid sovrin.SovrinDid) MsgChargeFee {
 	return MsgChargeFee{
-		SignBytes:             "",
-		PubKey:                creatorDid.VerifyKey,
-		FeeContractCreatorDid: creatorDid.Did,
-		FeeContractId:         feeContractId,
+		SignBytes:     "",
+		PubKey:        creatorDid.VerifyKey,
+		SenderDid:     creatorDid.Did,
+		FeeContractId: feeContractId,
 	}
 }
 

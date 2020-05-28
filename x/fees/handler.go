@@ -125,11 +125,57 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, msg MsgCreateFeeContr
 }
 
 func handleMsgGrantFeeDiscount(ctx sdk.Context, k Keeper, msg MsgGrantFeeDiscount) sdk.Result {
-	panic("not implemented") // TODO: implement
+
+	// Get FeeContract
+	feeContract, err := k.GetFeeContract(ctx, msg.FeeContractId)
+	if err != nil {
+		return err.Result()
+	}
+
+	// Confirm that signer is actually the creator of the fee contract
+	creatorAddr := types.DidToAddr(msg.SenderDid)
+	if !creatorAddr.Equals(feeContract.Content.Creator) {
+		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
+	}
+
+	// Confirm that discount ID is in the fee (to avoid invalid discount IDs)
+	found, err := k.DiscountIdExists(ctx, feeContract.Content.FeeId, msg.DiscountId)
+	if err != nil {
+		return err.Result()
+	} else if !found {
+		return types.ErrInvalidId(types.DefaultCodespace, "discount ID not in fee's discount list").Result()
+	}
+
+	// Grant the fee discount
+	err = k.GrantFeeDiscount(ctx, feeContract.Id, msg.DiscountId)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{}
 }
 
 func handleMsgRevokeFeeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeFeeDiscount) sdk.Result {
-	panic("not implemented") // TODO: implement
+
+	// Get FeeContract
+	feeContract, err := k.GetFeeContract(ctx, msg.FeeContractId)
+	if err != nil {
+		return err.Result()
+	}
+
+	// Confirm that signer is actually the creator of the fee contract
+	creatorAddr := types.DidToAddr(msg.SenderDid)
+	if !creatorAddr.Equals(feeContract.Content.Creator) {
+		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
+	}
+
+	// Revoke the fee discount
+	err = k.RevokeFeeDiscount(ctx, feeContract.Id, msg.DiscountId)
+	if err != nil {
+		return err.Result()
+	}
+
+	return sdk.Result{}
 }
 
 func handleMsgChargeFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgChargeFee) sdk.Result {
@@ -141,7 +187,7 @@ func handleMsgChargeFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCharge
 	}
 
 	// Confirm that signer is actually the creator of the fee contract
-	creatorAddr := types.DidToAddr(msg.FeeContractCreatorDid)
+	creatorAddr := types.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(feeContract.Content.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}

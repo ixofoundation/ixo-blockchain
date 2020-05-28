@@ -184,12 +184,12 @@ func (msg MsgCreateFeeContract) GetSignBytes() []byte {
 }
 
 type MsgGrantFeeDiscount struct {
-	SignBytes             string         `json:"signBytes" yaml:"signBytes"`
-	PubKey                string         `json:"pub_key" yaml:"pub_key"`
-	FeeContractCreatorDid ixo.Did        `json:"fee_contract_creator_did" yaml:"fee_contract_creator_did"`
-	FeeContractId         string         `json:"fee_contract_id" yaml:"fee_contract_id"`
-	DiscountId            uint64         `json:"discount_id" yaml:"discount_id"`
-	Recipient             sdk.AccAddress `json:"recipient" yaml:"recipient"`
+	SignBytes     string         `json:"signBytes" yaml:"signBytes"`
+	PubKey        string         `json:"pub_key" yaml:"pub_key"`
+	SenderDid     ixo.Did        `json:"sender_did" yaml:"sender_did"`
+	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
+	DiscountId    uint64         `json:"discount_id" yaml:"discount_id"`
+	Recipient     sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
 
 var _ FeesMessage = MsgGrantFeeDiscount{}
@@ -200,15 +200,15 @@ func (msg MsgGrantFeeDiscount) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
 		return err
-	} else if valid, err = CheckNotEmpty(msg.FeeContractCreatorDid, "FeeContractCreatorDid"); !valid {
+	} else if valid, err = CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	} else if msg.Recipient.Empty() {
 		return sdk.ErrInvalidAddress("recipient address is empty")
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.FeeContractCreatorDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "fee creator did is invalid")
+	if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	// Check that IDs valid
@@ -219,7 +219,7 @@ func (msg MsgGrantFeeDiscount) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgGrantFeeDiscount) GetSenderDid() ixo.Did { return msg.FeeContractCreatorDid }
+func (msg MsgGrantFeeDiscount) GetSenderDid() ixo.Did { return msg.SenderDid }
 func (msg MsgGrantFeeDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
@@ -239,12 +239,12 @@ func (msg MsgGrantFeeDiscount) GetSignBytes() []byte {
 }
 
 type MsgRevokeFeeDiscount struct {
-	SignBytes             string         `json:"signBytes" yaml:"signBytes"`
-	PubKey                string         `json:"pub_key" yaml:"pub_key"`
-	FeeContractCreatorDid ixo.Did        `json:"fee_contract_creator_did" yaml:"fee_contract_creator_did"`
-	FeeContractId         string         `json:"fee_contract_id" yaml:"fee_contract_id"`
-	DiscountId            uint64         `json:"discount_id" yaml:"discount_id"`
-	Holder                sdk.AccAddress `json:"holder" yaml:"holder"`
+	SignBytes     string         `json:"signBytes" yaml:"signBytes"`
+	PubKey        string         `json:"pub_key" yaml:"pub_key"`
+	SenderDid     ixo.Did        `json:"sender_did" yaml:"sender_did"`
+	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
+	DiscountId    uint64         `json:"discount_id" yaml:"discount_id"`
+	Holder        sdk.AccAddress `json:"holder" yaml:"holder"`
 }
 
 var _ FeesMessage = MsgRevokeFeeDiscount{}
@@ -255,15 +255,15 @@ func (msg MsgRevokeFeeDiscount) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
 		return err
-	} else if valid, err = CheckNotEmpty(msg.FeeContractCreatorDid, "FeeContractCreatorDid"); !valid {
+	} else if valid, err = CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	} else if msg.Holder.Empty() {
 		return sdk.ErrInvalidAddress("holder address is empty")
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.FeeContractCreatorDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "fee creator did is invalid")
+	if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	// Check that IDs valid
@@ -274,7 +274,7 @@ func (msg MsgRevokeFeeDiscount) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgRevokeFeeDiscount) GetSenderDid() ixo.Did { return msg.FeeContractCreatorDid }
+func (msg MsgRevokeFeeDiscount) GetSenderDid() ixo.Did { return msg.SenderDid }
 func (msg MsgRevokeFeeDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
@@ -294,10 +294,10 @@ func (msg MsgRevokeFeeDiscount) GetSignBytes() []byte {
 }
 
 type MsgChargeFee struct {
-	SignBytes             string  `json:"signBytes" yaml:"signBytes"`
-	PubKey                string  `json:"pub_key" yaml:"pub_key"`
-	FeeContractCreatorDid ixo.Did `json:"fee_contract_creator_did" yaml:"fee_contract_creator_did"`
-	FeeContractId         string  `json:"fee_contract_id" yaml:"fee_contract_id"`
+	SignBytes     string  `json:"signBytes" yaml:"signBytes"`
+	PubKey        string  `json:"pub_key" yaml:"pub_key"`
+	SenderDid     ixo.Did `json:"sender_did" yaml:"sender_did"`
+	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
 }
 
 var _ FeesMessage = MsgChargeFee{}
@@ -308,13 +308,13 @@ func (msg MsgChargeFee) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
 		return err
-	} else if valid, err = CheckNotEmpty(msg.FeeContractCreatorDid, "FeeContractCreatorDid"); !valid {
+	} else if valid, err = CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.FeeContractCreatorDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "fee creator did is invalid")
+	if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	// Check that IDs valid
@@ -325,7 +325,7 @@ func (msg MsgChargeFee) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgChargeFee) GetSenderDid() ixo.Did { return msg.FeeContractCreatorDid }
+func (msg MsgChargeFee) GetSenderDid() ixo.Did { return msg.SenderDid }
 func (msg MsgChargeFee) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
 }
