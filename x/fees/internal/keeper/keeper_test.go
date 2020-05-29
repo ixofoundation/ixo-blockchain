@@ -8,6 +8,36 @@ import (
 	"time"
 )
 
+func TestKeeperIdReserver(t *testing.T) {
+	_, k, _ := CreateTestInput()
+
+	testFeeId1 := types.FeeIdPrefix + "test1"
+	testFeeId2 := types.FeeIdPrefix + "test2"
+	testFeeConId1 := types.FeeContractIdPrefix + "test1"
+	testFeeConId2 := types.FeeContractIdPrefix + "test2"
+	testSubId1 := types.SubscriptionIdPrefix + "test1"
+	testSubId2 := types.SubscriptionIdPrefix + "test2"
+
+	// Check that currently not reserved
+	require.False(t, k.FeeIdReserved(testFeeId1))
+	require.False(t, k.FeeIdReserved(testFeeId2))
+	require.False(t, k.FeeContractIdReserved(testFeeConId1))
+	require.False(t, k.FeeContractIdReserved(testFeeConId2))
+	require.False(t, k.SubscriptionIdReserved(testSubId1))
+	require.False(t, k.SubscriptionIdReserved(testSubId2))
+
+	// Reserve 'test1' in general
+	k.reservedIdPrefixes = []string{"test1"}
+
+	// Check that 'test1' IDs now reserved and 'test2' IDs still unreserved
+	require.True(t, k.FeeIdReserved(testFeeId1))
+	require.False(t, k.FeeIdReserved(testFeeId2))
+	require.True(t, k.FeeContractIdReserved(testFeeConId1))
+	require.False(t, k.FeeContractIdReserved(testFeeConId2))
+	require.True(t, k.SubscriptionIdReserved(testSubId1))
+	require.False(t, k.SubscriptionIdReserved(testSubId2))
+}
+
 func TestKeeperSetGet(t *testing.T) {
 	ctx, k, _ := CreateTestInput()
 
