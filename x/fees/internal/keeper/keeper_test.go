@@ -42,11 +42,11 @@ func TestKeeperSetGet(t *testing.T) {
 	ctx, k, _ := CreateTestInput()
 
 	// Check Fee, FeeContract, Subscription, existence
-	feeGet, err := k.GetFee(ctx, "dummyId")
+	_, err := k.GetFee(ctx, "dummyId")
 	require.NotNil(t, err)
-	feeContractGet, err := k.GetFeeContract(ctx, "dummyId")
+	_, err = k.GetFeeContract(ctx, "dummyId")
 	require.NotNil(t, err)
-	blockSubscriptionGet, err := k.GetSubscription(ctx, "dummyId")
+	_, err = k.GetSubscription(ctx, "dummyId")
 	require.NotNil(t, err)
 
 	// Submitted Fee
@@ -54,7 +54,7 @@ func TestKeeperSetGet(t *testing.T) {
 	k.SetFee(ctx, fee)
 
 	// Check Fee
-	feeGet, err = k.GetFee(ctx, fee.Id)
+	feeGet, err := k.GetFee(ctx, fee.Id)
 	require.Nil(t, err)
 	require.Equal(t, fee.Id, feeGet.Id)
 
@@ -63,31 +63,29 @@ func TestKeeperSetGet(t *testing.T) {
 	k.SetFeeContract(ctx, feeContract)
 
 	// Check FeeContract
-	feeContractGet, err = k.GetFeeContract(ctx, feeContract.Id)
+	feeContractGet, err := k.GetFeeContract(ctx, feeContract.Id)
 	require.Nil(t, err)
 	require.Equal(t, feeContract.Id, feeContractGet.Id)
 
-	// Submitted BlockSubscription
-	blockSubscriptionContent := types.NewBlockSubscriptionContent(
-		feeContract.Id, sdk.NewUint(10), 100, 0)
-	blockSubscription := types.NewSubscription(
-		validFeeContractId1, &blockSubscriptionContent)
+	// Create BlockPeriod Subscription
+	blockPeriod := types.NewBlockPeriod(100, 0)
+	blockSubscription := types.NewSubscription(validSubscriptionId1,
+		feeContract.Id, sdk.NewUint(10), &blockPeriod)
 	k.SetSubscription(ctx, blockSubscription)
 
-	// Check BlockSubscription
-	blockSubscriptionGet, err = k.GetSubscription(ctx, blockSubscription.Id)
+	// Check BlockPeriod Subscription
+	blockSubscriptionGet, err := k.GetSubscription(ctx, blockSubscription.Id)
 	require.Nil(t, err)
 	require.Equal(t, blockSubscription.Id, blockSubscriptionGet.Id)
 
-	// Submitted TimeSubscription
+	// Submitted TimePeriod Subscription
 	duration, _ := time.ParseDuration("2h")
-	timeSubscriptionContent := types.NewTimeSubscriptionContent(
-		feeContract.Id, sdk.NewUint(10), duration, time.Now())
-	timeSubscription := types.NewSubscription(
-		validSubscriptionId2, &timeSubscriptionContent)
+	timePeriod := types.NewTimePeriod(duration, time.Now())
+	timeSubscription := types.NewSubscription(validSubscriptionId2,
+		feeContract.Id, sdk.NewUint(10), &timePeriod)
 	k.SetSubscription(ctx, timeSubscription)
 
-	// Check TimeSubscription
+	// Check TimePeriod Subscription
 	timeSubscriptionGet, err := k.GetSubscription(ctx, timeSubscription.Id)
 	require.Nil(t, err)
 	require.Equal(t, timeSubscription.Id, timeSubscriptionGet.Id)
@@ -290,10 +288,10 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	k.SetFee(ctx, fee)
 	k.SetFeeContract(ctx, feeContract)
 
-	// Create and submit TestSubscription
-	testSubscriptionContent := types.NewTestSubscriptionContent(
-		feeContract.Id, sdk.NewUint(10), 100, 0)
-	testSubscription := types.NewSubscription(validSubscriptionId1, testSubscriptionContent)
+	// Create and submit Subscription
+	testPeriod := types.NewTestPeriod(100, 0)
+	testSubscription := types.NewSubscription(validSubscriptionId1,
+		feeContract.Id, sdk.NewUint(10), testPeriod)
 	k.SetSubscription(ctx, testSubscription)
 
 	// Set payer balance

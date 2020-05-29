@@ -12,11 +12,11 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
-func queryFeeParamsHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryParamsHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
-			keeper.QueryParams), nil)
+		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s",
+			types.QuerierRoute, keeper.QueryParams), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
@@ -85,5 +85,31 @@ func queryFeeContractHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		rest.PostProcessResponse(w, cliCtx, feeContract)
+	}
+}
+
+func querySubscriptionHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		subscriptionId := vars[RestSubscriptionId]
+
+		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+			types.QuerierRoute, keeper.QuerySubscription, subscriptionId), nil)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+
+			return
+		}
+
+		var subscription types.Subscription
+		if err := cliCtx.Codec.UnmarshalJSON(bz, &subscription); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, subscription)
 	}
 }

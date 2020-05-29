@@ -10,10 +10,10 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
-func GetFeesRequestHandler(cdc *codec.Codec) *cobra.Command {
+func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getFees",
-		Short: "Query fees",
+		Use:   "params",
+		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
 				WithCodec(cdc)
@@ -76,17 +76,51 @@ func GetCmdFeeContract(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			feeId := args[0]
+			feeContractId := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s/%s",
-					types.QuerierRoute, keeper.QueryFeeContract, feeId), nil)
+				fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+					keeper.QueryFeeContract, feeContractId), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
 			}
 
-			var out types.Fee
+			var out types.FeeContract
+			err = cdc.UnmarshalJSON(res, &out)
+			if err != nil {
+				return err
+			}
+
+			output, err := cdc.MarshalJSONIndent(out, "", "  ")
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+}
+
+func GetCmdSubscription(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "subscription [subscription-id]",
+		Short: "Query info of a subscription",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			subscriptionId := args[0]
+
+			res, _, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+					keeper.QuerySubscription, subscriptionId), nil)
+			if err != nil {
+				fmt.Printf("%s", err.Error())
+				return nil
+			}
+
+			var out types.Subscription
 			err = cdc.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err

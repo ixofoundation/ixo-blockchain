@@ -42,14 +42,16 @@ func NewMsgCreateFeeContract(feeId, feeContractId string, payer sdk.AccAddress,
 	}
 }
 
-func NewMsgCreateSubscription(subscriptionId string, subscriptionContent SubscriptionContent,
-	creatorDid sovrin.SovrinDid) MsgCreateSubscription {
+func NewMsgCreateSubscription(subscriptionId, feeContractId string, maxPeriods sdk.Uint,
+	period Period, creatorDid sovrin.SovrinDid) MsgCreateSubscription {
 	return MsgCreateSubscription{
-		SignBytes:           "",
-		PubKey:              creatorDid.VerifyKey,
-		CreatorDid:          creatorDid.Did,
-		SubscriptionId:      subscriptionId,
-		SubscriptionContent: subscriptionContent,
+		SignBytes:      "",
+		PubKey:         creatorDid.VerifyKey,
+		CreatorDid:     creatorDid.Did,
+		SubscriptionId: subscriptionId,
+		FeeContractId:  feeContractId,
+		MaxPeriods:     maxPeriods,
+		Period:         period,
 	}
 }
 

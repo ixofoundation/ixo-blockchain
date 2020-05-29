@@ -22,6 +22,7 @@ const (
 )
 
 func parseBool(boolStr, boolName string) (bool, sdk.Error) {
+	boolStr = strings.ToLower(strings.TrimSpace(boolStr))
 	if boolStr == TRUE {
 		return true, nil
 	} else if boolStr == FALSE {
@@ -81,7 +82,7 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			feeContractIdStr := args[0]
-			authorisedStr := strings.ToLower(args[1])
+			authorisedStr := args[1]
 			sovrinDidStr := args[2]
 
 			authorised, err := parseBool(authorisedStr, "authorised")
@@ -90,6 +91,7 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
 			msg := types.NewMsgSetFeeContractAuthorisation(
 				feeContractIdStr, authorised, sovrinDid)
 
@@ -100,7 +102,7 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-fee [fee-id] [fee-content] [creator-sovrin-did]",
+		Use:   "create-fee [fee-id] [fee-content-json] [creator-sovrin-did]",
 		Short: "Create and sign a create-fee tx using DIDs",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -127,15 +129,15 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use: "create-fee-contract [fee-id] [fee-contract-id] [payer-addr] " +
+		Use: "create-fee-contract [fee-contract-id] [fee-id] [payer-addr] " +
 			"[can-deauthorise] [discount-id] [creator-sovrin-did]",
 		Short: "Create and sign a create-fee-contract tx using DIDs",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			feeIdStr := args[0]
-			feeContractIdStr := args[1]
+			feeContractIdStr := args[0]
+			feeIdStr := args[1]
 			payerAddrStr := args[2]
 			canDeauthoriseStr := args[3]
 			discountIdStr := args[4]
@@ -157,6 +159,7 @@ func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
 			msg := types.NewMsgCreateFeeContract(
 				feeIdStr, feeContractIdStr, payerAddr,
 				canDeauthorise, discountId, sovrinDid)
@@ -168,25 +171,34 @@ func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-subscription [subscription-id] [subscription-content] [creator-sovrin-did]",
+		Use: "create-subscription [subscription-id] [fee-contract-id] " +
+			"[max-periods] [period-json] [creator-sovrin-did]",
 		Short: "Create and sign a create-subscription tx using DIDs",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			subIdStr := args[0]
-			subContentStr := args[1]
-			sovrinDidStr := args[2]
+			feeContractIdStr := args[1]
+			maxPeriodsStr := args[2]
+			periodStr := args[3]
+			sovrinDidStr := args[4]
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
-
-			var subContent types.SubscriptionContent
-			err := json.Unmarshal([]byte(subContentStr), &subContent)
+			maxPeriods, err := sdk.ParseUint(maxPeriodsStr)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateSubscription(subIdStr, subContent, sovrinDid)
+			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
+			var period types.Period
+			err = cdc.UnmarshalJSON([]byte(periodStr), &period)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCreateSubscription(subIdStr,
+				feeContractIdStr, maxPeriods, period, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -218,6 +230,7 @@ func GetCmdGrantFeeDiscount(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
 			msg := types.NewMsgGrantFeeDiscount(
 				feeContractIdStr, discountId, recipientAddr, sovrinDid)
 
@@ -244,6 +257,7 @@ func GetCmdRevokeFeeDiscount(cdc *codec.Codec) *cobra.Command {
 			}
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
 			msg := types.NewMsgRevokeFeeDiscount(
 				feeContractIdStr, holderAddr, sovrinDid)
 
@@ -264,6 +278,7 @@ func GetCmdChargeFee(cdc *codec.Codec) *cobra.Command {
 			sovrinDidStr := args[1]
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
 			msg := types.NewMsgChargeFee(feeContractIdStr, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)

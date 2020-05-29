@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	QueryParams      = "queryParams"
-	QueryFee         = "queryFee"
-	QueryFeeContract = "queryFeeContract"
+	QueryParams       = "queryParams"
+	QueryFee          = "queryFee"
+	QueryFeeContract  = "queryFeeContract"
+	QuerySubscription = "querySubscription"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -22,6 +23,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryFee(ctx, path[1:], k)
 		case QueryFeeContract:
 			return queryFeeContract(ctx, path[1:], k)
+		case QuerySubscription:
+			return querySubscription(ctx, path[1:], k)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown fees query endpoint")
 		}
@@ -66,6 +69,23 @@ func queryFeeContract(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Err
 	}
 
 	res, err2 := codec.MarshalJSONIndent(k.cdc, feeContract)
+	if err2 != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err2.Error()))
+	}
+
+	return res, nil
+}
+
+func querySubscription(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+	subscriptionId := path[0]
+
+	subscription, err := k.GetSubscription(ctx, subscriptionId)
+	if err != nil {
+		return nil, sdk.ErrUnknownRequest(fmt.Sprintf(
+			"subscription '%s' does not exist", subscriptionId))
+	}
+
+	res, err2 := codec.MarshalJSONIndent(k.cdc, subscription)
 	if err2 != nil {
 		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err2.Error()))
 	}

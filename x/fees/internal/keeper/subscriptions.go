@@ -59,21 +59,20 @@ func (k Keeper) ChargeSubscriptionFee(ctx sdk.Context, subscriptionId string) sd
 	if err != nil {
 		return err
 	}
-	sData := subscription.Content
 
 	// Check if should charge
-	if !sData.ShouldCharge(ctx) {
+	if !subscription.ShouldCharge(ctx) {
 		return types.ErrTriedToChargeSubscriptionFeeWhenShouldnt(types.DefaultCodespace)
 	}
 
 	// Charge fee
-	charged, err := k.ChargeFee(ctx, k.bankKeeper, sData.GetFeeContractId())
+	charged, err := k.ChargeFee(ctx, k.bankKeeper, subscription.FeeContractId)
 	if err != nil {
 		return err
 	}
 
 	// Update and save subscription
-	sData.NextPeriod(charged)
+	subscription.NextPeriod(charged)
 	k.SetSubscription(ctx, subscription)
 
 	return nil

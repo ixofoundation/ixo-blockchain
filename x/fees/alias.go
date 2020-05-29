@@ -39,10 +39,10 @@ type (
 	Discount  = types.Discount
 	Discounts = types.Discounts
 
-	Subscription        = types.Subscription
-	SubscriptionContent = types.SubscriptionContent
-	BlockSubscription   = types.BlockSubscriptionContent
-	TimeSubscription    = types.TimeSubscriptionContent
+	Subscription = types.Subscription
+	Period       = types.Period
+	BlockPeriod  = types.BlockPeriod
+	TimePeriod   = types.TimePeriod
 
 	MsgSetFeeContractAuthorisation = types.MsgSetFeeContractAuthorisation
 	MsgCreateFee                   = types.MsgCreateFee
@@ -75,9 +75,9 @@ var (
 	NewDiscount  = types.NewDiscount
 	NewDiscounts = types.NewDiscounts
 
-	NewSubscription             = types.NewSubscription
-	NewBlockSubscriptionContent = types.NewBlockSubscriptionContent
-	NewTimeSubscriptionContent  = types.NewTimeSubscriptionContent
+	NewSubscription = types.NewSubscription
+	NewBlockPeriod  = types.NewBlockPeriod
+	NewTimePeriod   = types.NewTimePeriod
 
 	// variable aliases
 	ModuleCdc = types.ModuleCdc

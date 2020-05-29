@@ -184,11 +184,13 @@ func (msg MsgCreateFeeContract) GetSignBytes() []byte {
 }
 
 type MsgCreateSubscription struct {
-	SignBytes           string              `json:"signBytes" yaml:"signBytes"`
-	PubKey              string              `json:"pub_key" yaml:"pub_key"`
-	CreatorDid          ixo.Did             `json:"creator_did" yaml:"creator_did"`
-	SubscriptionId      string              `json:"subscription_id" yaml:"subscription_id"`
-	SubscriptionContent SubscriptionContent `json:"subscription_content" yaml:"subscription_content"`
+	SignBytes      string   `json:"signBytes" yaml:"signBytes"`
+	PubKey         string   `json:"pub_key" yaml:"pub_key"`
+	CreatorDid     ixo.Did  `json:"creator_did" yaml:"creator_did"`
+	SubscriptionId string   `json:"subscription_id" yaml:"subscription_id"`
+	FeeContractId  string   `json:"fee_contract_id" yaml:"fee_contract_id"`
+	MaxPeriods     sdk.Uint `json:"max_periods" yaml:"max_periods"`
+	Period         Period   `json:"period" yaml:"period"`
 }
 
 var _ FeesMessage = MsgCreateSubscription{}
@@ -213,8 +215,8 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 		return ErrInvalidId(DefaultCodespace, "fee id invalid")
 	}
 
-	// Validate SubscriptionContent
-	if err := msg.SubscriptionContent.Validate(); err != nil {
+	// Validate Period
+	if err := msg.Period.Validate(); err != nil {
 		return err
 	}
 

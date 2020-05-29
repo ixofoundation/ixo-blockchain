@@ -14,10 +14,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 	iterator := keeper.GetSubscriptionIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		subscription := keeper.MustGetSubscriptionByKey(ctx, iterator.Key())
-		subContent := subscription.Content
 
 		// Skip if should not charge
-		if !subContent.ShouldCharge(ctx) {
+		if !subscription.ShouldCharge(ctx) {
 			continue
 		}
 
@@ -31,7 +30,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		// the next block to prevent spending too much time charging fees
 
 		// Delete subscription if it has ended and no more charges
-		if subContent.Ended() && !subContent.ShouldCharge(ctx) {
+		if subscription.Ended() && !subscription.ShouldCharge(ctx) {
 			// TODO: delete subscription
 		}
 
@@ -91,6 +90,12 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 
 func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFee) sdk.Result {
 
+	// Ensure that fee doesn't already exist
+	if k.FeeExists(ctx, msg.FeeId) {
+		return types.ErrAlreadyExists(types.DefaultCodespace, fmt.Sprintf(
+			"fee '%s' already exists", msg.FeeId)).Result()
+	}
+
 	// Ensure that fee ID is not reserved
 	if k.FeeIdReserved(msg.FeeId) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
@@ -118,6 +123,12 @@ func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreate
 }
 
 func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFeeContract) sdk.Result {
+
+	// Ensure that fee contract doesn't already exist
+	if k.FeeContractExists(ctx, msg.FeeContractId) {
+		return types.ErrAlreadyExists(types.DefaultCodespace, fmt.Sprintf(
+			"fee contract '%s' already exists", msg.FeeContractId)).Result()
+	}
 
 	// Ensure that fee contract ID is not reserved
 	if k.FeeContractIdReserved(msg.FeeContractId) {
@@ -155,6 +166,12 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg M
 
 func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscription) sdk.Result {
 
+	// Ensure that subscription doesn't already exist
+	if k.SubscriptionExists(ctx, msg.SubscriptionId) {
+		return types.ErrAlreadyExists(types.DefaultCodespace, fmt.Sprintf(
+			"subscription '%s' already exists", msg.SubscriptionId)).Result()
+	}
+
 	// Ensure that subscription ID is not reserved
 	if k.SubscriptionIdReserved(msg.SubscriptionId) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
@@ -162,7 +179,7 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscri
 	}
 
 	// Get fee contract
-	feeContract, err := k.GetFeeContract(ctx, msg.SubscriptionContent.GetFeeContractId())
+	feeContract, err := k.GetFeeContract(ctx, msg.FeeContractId)
 	if err != nil {
 		return err.Result()
 	}
@@ -174,7 +191,8 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscri
 	}
 
 	// Create subscription and validate
-	subscription := NewSubscription(msg.SubscriptionId, msg.SubscriptionContent)
+	subscription := NewSubscription(msg.SubscriptionId,
+		msg.FeeContractId, msg.MaxPeriods, msg.Period)
 	if err := subscription.Validate(); err != nil {
 		return err.Result()
 	}

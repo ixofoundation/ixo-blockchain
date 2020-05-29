@@ -117,7 +117,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	types.RegisterCodec(cdc)
-	cdc.RegisterConcrete(types.TestSubscriptionContent{}, "fees/TesSubscriptionContent", nil)
+	cdc.RegisterConcrete(types.TestPeriod{}, "fees/TestPeriod", nil)
 
 	keyParams := sdk.NewKVStoreKey("subspace")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")

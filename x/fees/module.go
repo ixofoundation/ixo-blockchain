@@ -65,6 +65,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		cli.GetCmdSetFeeContractAuthorisation(cdc),
 		cli.GetCmdCreateFee(cdc),
 		cli.GetCmdCreateFeeContract(cdc),
+		cli.GetCmdCreateSubscription(cdc),
 		cli.GetCmdGrantFeeDiscount(cdc),
 		cli.GetCmdRevokeFeeDiscount(cdc),
 		cli.GetCmdChargeFee(cdc),
@@ -83,9 +84,10 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	feeQueryCmd.AddCommand(client.GetCommands(
-		cli.GetFeesRequestHandler(cdc),
+		cli.GetParamsRequestHandler(cdc),
 		cli.GetCmdFee(cdc),
 		cli.GetCmdFeeContract(cdc),
+		cli.GetCmdSubscription(cdc),
 	)...)
 
 	return feeQueryCmd

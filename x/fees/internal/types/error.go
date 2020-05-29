@@ -6,17 +6,18 @@ import (
 )
 
 const (
-	DefaultCodespace               sdk.CodespaceType = ModuleName
-	CodeInvalidDistribution        sdk.CodeType      = 101
-	CodeInvalidShare               sdk.CodeType      = 102
-	CodeInvalidSubscriptionContent sdk.CodeType      = 103
-	CodeInvalidFeeContractAction   sdk.CodeType      = 104
-	CodeInvalidDiscount            sdk.CodeType      = 105
-	CodeInvalidDiscountRequest     sdk.CodeType      = 106
-	CodeInvalidFee                 sdk.CodeType      = 107
-	CodeInvalidSubscriptionAction  sdk.CodeType      = 108
-	CodeInvalidId                  sdk.CodeType      = 109
-	CodeInvalidArgument            sdk.CodeType      = 110
+	DefaultCodespace              sdk.CodespaceType = ModuleName
+	CodeInvalidDistribution       sdk.CodeType      = 101
+	CodeInvalidShare              sdk.CodeType      = 102
+	CodeInvalidPeriod             sdk.CodeType      = 103
+	CodeInvalidFeeContractAction  sdk.CodeType      = 104
+	CodeInvalidDiscount           sdk.CodeType      = 105
+	CodeInvalidDiscountRequest    sdk.CodeType      = 106
+	CodeInvalidFee                sdk.CodeType      = 107
+	CodeInvalidSubscriptionAction sdk.CodeType      = 108
+	CodeInvalidId                 sdk.CodeType      = 109
+	CodeInvalidArgument           sdk.CodeType      = 110
+	CodeAlreadyExists             sdk.CodeType      = 111
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -29,9 +30,9 @@ func ErrDistributionPercentagesNot100(codespace sdk.CodespaceType, total sdk.Dec
 	return sdk.NewError(codespace, CodeInvalidDistribution, errMsg)
 }
 
-func ErrInvalidSubscriptionContent(codespace sdk.CodespaceType, errMsg string) sdk.Error {
-	errMsg = fmt.Sprintf("subscription content is invalid: %s", errMsg)
-	return sdk.NewError(codespace, CodeInvalidSubscriptionContent, errMsg)
+func ErrInvalidPeriod(codespace sdk.CodespaceType, errMsg string) sdk.Error {
+	errMsg = fmt.Sprintf("period is invalid: %s", errMsg)
+	return sdk.NewError(codespace, CodeInvalidPeriod, errMsg)
 }
 
 func ErrFeeContractCannotBeDeauthorised(codespace sdk.CodespaceType) sdk.Error {
@@ -75,4 +76,8 @@ func ErrInvalidId(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 
 func ErrInvalidArgument(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidArgument, errMsg)
+}
+
+func ErrAlreadyExists(codespace sdk.CodespaceType, errMsg string) sdk.Error {
+	return sdk.NewError(codespace, CodeAlreadyExists, errMsg)
 }
