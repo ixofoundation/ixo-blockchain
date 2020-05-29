@@ -31,7 +31,7 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL"
+ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Ledgering Francesco DID..."
 ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
 echo "Ledgering Shaun DID..."

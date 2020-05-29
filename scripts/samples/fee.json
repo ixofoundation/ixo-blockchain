@@ -1,0 +1,17 @@
+{
+  "charge_amount": [
+    {
+      "denom": "ixo",
+      "amount": "10"
+    }
+  ],
+  "charge_minimum": [],
+  "charge_maximum": [],
+  "discounts": [],
+  "wallet_distribution": [
+    {
+      "address": "ixo1x2x0thq6x2rx7txl0ujpyg9rr0c8mc8ad904xw",
+      "percentage": "100"
+    }
+  ]
+}
