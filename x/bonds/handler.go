@@ -59,7 +59,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
-	if keeper.CoinKeeper.BlacklistedAddr(msg.FeeAddress) {
+	if keeper.BankKeeper.BlacklistedAddr(msg.FeeAddress) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress)).Result()
 	}
 
@@ -286,7 +286,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 	}
 
 	// Use max prices as the amount to send to the liquidity pool (i.e. price)
-	err := keeper.CoinKeeper.SendCoins(ctx, buyerAddr, bond.ReserveAddress, msg.MaxPrices)
+	err := keeper.BankKeeper.SendCoins(ctx, buyerAddr, bond.ReserveAddress, msg.MaxPrices)
 	if err != nil {
 		return err.Result()
 	}
