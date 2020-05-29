@@ -183,6 +183,63 @@ func (msg MsgCreateFeeContract) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
 
+type MsgCreateSubscription struct {
+	SignBytes           string              `json:"signBytes" yaml:"signBytes"`
+	PubKey              string              `json:"pub_key" yaml:"pub_key"`
+	CreatorDid          ixo.Did             `json:"creator_did" yaml:"creator_did"`
+	SubscriptionId      string              `json:"subscription_id" yaml:"subscription_id"`
+	SubscriptionContent SubscriptionContent `json:"subscription_content" yaml:"subscription_content"`
+}
+
+var _ FeesMessage = MsgCreateSubscription{}
+
+func (msg MsgCreateSubscription) Type() string  { return "create-subscription" }
+func (msg MsgCreateSubscription) Route() string { return RouterKey }
+func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err = CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
+		return err
+	}
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.CreatorDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeId(msg.SubscriptionId) {
+		return ErrInvalidId(DefaultCodespace, "fee id invalid")
+	}
+
+	// Validate SubscriptionContent
+	if err := msg.SubscriptionContent.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (msg MsgCreateSubscription) GetSenderDid() ixo.Did { return msg.CreatorDid }
+func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+}
+
+func (msg MsgCreateSubscription) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+func (msg MsgCreateSubscription) GetPubKey() string { return msg.PubKey }
+
+func (msg MsgCreateSubscription) GetSignBytes() []byte {
+	return []byte(msg.SignBytes)
+}
+
 type MsgGrantFeeDiscount struct {
 	SignBytes     string         `json:"signBytes" yaml:"signBytes"`
 	PubKey        string         `json:"pub_key" yaml:"pub_key"`

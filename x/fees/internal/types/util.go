@@ -41,6 +41,18 @@ func NewMsgCreateFeeContract(feeId, feeContractId string, payer sdk.AccAddress,
 		DiscountId:     discountId,
 	}
 }
+
+func NewMsgCreateSubscription(subscriptionId string, subscriptionContent SubscriptionContent,
+	creatorDid sovrin.SovrinDid) MsgCreateSubscription {
+	return MsgCreateSubscription{
+		SignBytes:           "",
+		PubKey:              creatorDid.VerifyKey,
+		CreatorDid:          creatorDid.Did,
+		SubscriptionId:      subscriptionId,
+		SubscriptionContent: subscriptionContent,
+	}
+}
+
 func NewMsgGrantFeeDiscount(feeContractId string, discountId sdk.Uint,
 	recipient sdk.AccAddress, creatorDid sovrin.SovrinDid) MsgGrantFeeDiscount {
 	return MsgGrantFeeDiscount{

@@ -9,9 +9,9 @@ const (
 
 	FeeRemainderPool = "fee_remainder_pool"
 
-	FeePrefix          = "fee:"
-	FeeContractPrefix  = FeePrefix + "contract:"
-	SubscriptionPrefix = FeePrefix + "subscription:"
+	FeeIdPrefix          = "fee:"
+	FeeContractIdPrefix  = FeeIdPrefix + "contract:"
+	SubscriptionIdPrefix = FeeIdPrefix + "subscription:"
 )
 
 var (

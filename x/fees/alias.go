@@ -10,9 +10,9 @@ const (
 
 	FeeRemainderPool = types.FeeRemainderPool
 
-	FeePrefix          = types.FeePrefix
-	FeeContractPrefix  = types.FeeContractPrefix
-	SubscriptionPrefix = types.SubscriptionPrefix
+	FeePrefix          = types.FeeIdPrefix
+	FeeContractPrefix  = types.FeeContractIdPrefix
+	SubscriptionPrefix = types.SubscriptionIdPrefix
 
 	DefaultParamspace = types.DefaultParamspace
 	QuerierRoute      = types.QuerierRoute
@@ -47,6 +47,7 @@ type (
 	MsgSetFeeContractAuthorisation = types.MsgSetFeeContractAuthorisation
 	MsgCreateFee                   = types.MsgCreateFee
 	MsgCreateFeeContract           = types.MsgCreateFeeContract
+	MsgCreateSubscription          = types.MsgCreateSubscription
 	MsgGrantFeeDiscount            = types.MsgGrantFeeDiscount
 	MsgRevokeFeeDiscount           = types.MsgRevokeFeeDiscount
 	MsgChargeFee                   = types.MsgChargeFee

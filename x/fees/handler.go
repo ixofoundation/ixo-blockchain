@@ -52,6 +52,8 @@ func NewHandler(k Keeper, bk bank.Keeper) sdk.Handler {
 			return handleMsgCreateFee(ctx, k, bk, msg)
 		case MsgCreateFeeContract:
 			return handleMsgCreateFeeContract(ctx, k, bk, msg)
+		case MsgCreateSubscription:
+			return handleMsgCreateSubscription(ctx, k, msg)
 		case MsgGrantFeeDiscount:
 			return handleMsgGrantFeeDiscount(ctx, k, msg)
 		case MsgRevokeFeeDiscount:
@@ -89,6 +91,12 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 
 func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFee) sdk.Result {
 
+	// Ensure that fee ID is not reserved
+	if k.IdReserved(msg.FeeId) {
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
+			"using a reserved prefix", msg.FeeId)).Result()
+	}
+
 	// Create and validate fee
 	fee := types.NewFee(msg.FeeId, msg.FeeContent)
 	if err := fee.Validate(); err != nil {
@@ -110,6 +118,12 @@ func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreate
 }
 
 func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFeeContract) sdk.Result {
+
+	// Ensure that fee contract ID is not reserved
+	if k.IdReserved(msg.FeeContractId) {
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
+			"using a reserved prefix", msg.FeeContractId)).Result()
+	}
 
 	// Ensure payer is not a blacklisted address
 	if bk.BlacklistedAddr(msg.Payer) {
@@ -135,6 +149,38 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg M
 
 	// Submit fee contract
 	k.SetFeeContract(ctx, feeContract)
+
+	return sdk.Result{}
+}
+
+func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscription) sdk.Result {
+
+	// Ensure that subscription ID is not reserved
+	if k.IdReserved(msg.SubscriptionId) {
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
+			"using a reserved prefix", msg.SubscriptionId)).Result()
+	}
+
+	// Get fee contract
+	feeContract, err := k.GetFeeContract(ctx, msg.SubscriptionContent.GetFeeContractId())
+	if err != nil {
+		return err.Result()
+	}
+
+	// Confirm that signer is actually the creator of the fee contract
+	creatorAddr := types.DidToAddr(msg.CreatorDid)
+	if !creatorAddr.Equals(feeContract.Content.Payer) {
+		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
+	}
+
+	// Create subscription and validate
+	subscription := NewSubscription(msg.SubscriptionId, msg.SubscriptionContent)
+	if err := subscription.Validate(); err != nil {
+		return err.Result()
+	}
+
+	// Submit subscription
+	k.SetSubscription(ctx, subscription)
 
 	return sdk.Result{}
 }

@@ -25,12 +25,12 @@ var (
 	validChargeMinimum, _ = sdk.ParseCoins("3res")
 	validChargeMaximum    = sdk.NewCoins()
 
-	validFeeId1          = types.FeePrefix + "f1"
-	validFeeId2          = types.FeePrefix + "f2"
-	validFeeContractId1  = types.FeeContractPrefix + "fc1"
-	validFeeContractId2  = types.FeeContractPrefix + "fc2"
-	validSubscriptionId1 = types.SubscriptionPrefix + "s1"
-	validSubscriptionId2 = types.SubscriptionPrefix + "s2"
+	validFeeId1          = types.FeeIdPrefix + "f1"
+	validFeeId2          = types.FeeIdPrefix + "f2"
+	validFeeContractId1  = types.FeeContractIdPrefix + "fc1"
+	validFeeContractId2  = types.FeeContractIdPrefix + "fc2"
+	validSubscriptionId1 = types.SubscriptionIdPrefix + "s1"
+	validSubscriptionId2 = types.SubscriptionIdPrefix + "s2"
 
 	validDoubledChargeAmount, _ = sdk.ParseCoins("2ixo,4res")
 
@@ -128,7 +128,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	accountKeeper := auth.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
 
-	keeper := NewKeeper(cdc, storeKey, feesSubspace, bankKeeper)
+	keeper := NewKeeper(cdc, storeKey, feesSubspace, bankKeeper, nil)
 
 	return ctx, keeper, cdc
 }
