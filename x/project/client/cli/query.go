@@ -136,7 +136,7 @@ func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
 
 func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getParams",
+		Use:   "params",
 		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().
