@@ -115,7 +115,7 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
 
 			var feeContent types.FeeContent
-			err := json.Unmarshal([]byte(feeContentStr), &feeContent)
+			err := cdc.UnmarshalJSON([]byte(feeContentStr), &feeContent)
 			if err != nil {
 				return err
 			}

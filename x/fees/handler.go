@@ -186,7 +186,7 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscri
 
 	// Confirm that signer is actually the creator of the fee contract
 	creatorAddr := types.DidToAddr(msg.CreatorDid)
-	if !creatorAddr.Equals(feeContract.Content.Payer) {
+	if !creatorAddr.Equals(feeContract.Content.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
 
