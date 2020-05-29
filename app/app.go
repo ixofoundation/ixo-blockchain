@@ -88,6 +88,10 @@ var (
 		treasury.ModuleName:              {supply.Minter, supply.Burner},
 		fees.FeeRemainderPool:            nil,
 	}
+
+	feesReservedIdPrefixes = []string{
+		project.ModuleName,
+	}
 )
 
 func MakeCodec() *codec.Codec {
@@ -187,7 +191,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		app.slashingKeeper.Hooks()))
 
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.feesKeeper = fees.NewKeeper(app.cdc, keys[fees.StoreKey], feesSubspace, app.bankKeeper)
+	app.feesKeeper = fees.NewKeeper(app.cdc, keys[fees.StoreKey], feesSubspace, app.bankKeeper, feesReservedIdPrefixes)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace, app.accountKeeper, app.feesKeeper)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
