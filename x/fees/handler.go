@@ -92,7 +92,7 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFee) sdk.Result {
 
 	// Ensure that fee ID is not reserved
-	if k.IdReserved(msg.FeeId) {
+	if k.FeeIdReserved(msg.FeeId) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
 			"using a reserved prefix", msg.FeeId)).Result()
 	}
@@ -120,7 +120,7 @@ func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreate
 func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFeeContract) sdk.Result {
 
 	// Ensure that fee contract ID is not reserved
-	if k.IdReserved(msg.FeeContractId) {
+	if k.FeeContractIdReserved(msg.FeeContractId) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
 			"using a reserved prefix", msg.FeeContractId)).Result()
 	}
@@ -156,7 +156,7 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg M
 func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscription) sdk.Result {
 
 	// Ensure that subscription ID is not reserved
-	if k.IdReserved(msg.SubscriptionId) {
+	if k.SubscriptionIdReserved(msg.SubscriptionId) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
 			"using a reserved prefix", msg.SubscriptionId)).Result()
 	}

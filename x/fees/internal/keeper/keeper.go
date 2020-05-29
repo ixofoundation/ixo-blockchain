@@ -39,13 +39,26 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
 }
 
-// IdReserved checks whether the id (belonging to a Fee, FeeContract, or
-// Subscription) has a prefix that has been reserved (i.e. should not be used).
-func (k Keeper) IdReserved(id string) bool {
+// idReserved checks if the id (from a Fee, FeeContract, or Subscription)
+// is using a reserved prefix (i.e. should not be used). The prefixPrefix
+// indicates whether we are referring to a Fee, FeeContract, Subscription
+func (k Keeper) idReserved(id string, prefixPrefix string) bool {
 	for _, prefix := range k.reservedIdPrefixes {
-		if strings.HasPrefix(id, types.FeeIdPrefix+prefix) {
+		if strings.HasPrefix(id, prefixPrefix+prefix) {
 			return true
 		}
 	}
 	return false
+}
+
+func (k Keeper) FeeIdReserved(feeId string) bool {
+	return k.idReserved(feeId, types.FeeIdPrefix)
+}
+
+func (k Keeper) FeeContractIdReserved(feeId string) bool {
+	return k.idReserved(feeId, types.FeeContractIdPrefix)
+}
+
+func (k Keeper) SubscriptionIdReserved(feeId string) bool {
+	return k.idReserved(feeId, types.SubscriptionIdPrefix)
 }
