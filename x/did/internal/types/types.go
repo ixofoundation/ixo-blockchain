@@ -36,9 +36,9 @@ func (dd BaseDidDoc) GetCredentials() []DidCredential { return dd.Credentials }
 
 func InitDidDoc(did ixo.Did, pubKey string) BaseDidDoc {
 	return BaseDidDoc{
-		did,
-		pubKey,
-		make([]DidCredential, 0),
+		Did:         did,
+		PubKey:      pubKey,
+		Credentials: nil,
 	}
 }
 
