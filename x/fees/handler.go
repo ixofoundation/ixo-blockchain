@@ -1,6 +1,7 @@
 package fees
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/keeper"
@@ -48,9 +49,9 @@ func NewHandler(k Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgSetFeeContractAuthorisation:
 			return handleMsgSetFeeContractAuthorisation(ctx, k, msg)
 		case MsgCreateFee:
-			return handleMsgCreateFee(ctx, k, msg)
+			return handleMsgCreateFee(ctx, k, bk, msg)
 		case MsgCreateFeeContract:
-			return handleMsgCreateFeeContract(ctx, k, msg)
+			return handleMsgCreateFeeContract(ctx, k, bk, msg)
 		case MsgGrantFeeDiscount:
 			return handleMsgGrantFeeDiscount(ctx, k, msg)
 		case MsgRevokeFeeDiscount:
@@ -86,12 +87,20 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 	return sdk.Result{}
 }
 
-func handleMsgCreateFee(ctx sdk.Context, k Keeper, msg MsgCreateFee) sdk.Result {
+func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFee) sdk.Result {
 
 	// Create and validate fee
 	fee := types.NewFee(msg.FeeId, msg.FeeContent)
 	if err := fee.Validate(); err != nil {
 		return err.Result()
+	}
+
+	// Ensure no blacklisted address in wallet distribution
+	for _, share := range fee.Content.WalletDistribution {
+		if bk.BlacklistedAddr(share.Address) {
+			return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed "+
+				"to receive transactions", share.Address)).Result()
+		}
 	}
 
 	// Submit fee
@@ -100,7 +109,13 @@ func handleMsgCreateFee(ctx sdk.Context, k Keeper, msg MsgCreateFee) sdk.Result 
 	return sdk.Result{}
 }
 
-func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, msg MsgCreateFeeContract) sdk.Result {
+func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFeeContract) sdk.Result {
+
+	// Ensure payer is not a blacklisted address
+	if bk.BlacklistedAddr(msg.Payer) {
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed "+
+			"to receive transactions", msg.Payer)).Result()
+	}
 
 	// Confirm that fee exists
 	if !k.FeeExists(ctx, msg.FeeId) {
