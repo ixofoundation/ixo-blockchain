@@ -16,6 +16,7 @@ const (
 	CodeInvalidFee                 sdk.CodeType      = 107
 	CodeInvalidSubscriptionAction  sdk.CodeType      = 108
 	CodeInvalidId                  sdk.CodeType      = 109
+	CodeInvalidArgument            sdk.CodeType      = 110
 )
 
 func ErrNegativeSharePercentage(codespace sdk.CodespaceType) sdk.Error {
@@ -70,4 +71,8 @@ func ErrTriedToChargeSubscriptionFeeWhenShouldnt(codespace sdk.CodespaceType) sd
 
 func ErrInvalidId(codespace sdk.CodespaceType, errMsg string) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidId, errMsg)
+}
+
+func ErrInvalidArgument(codespace sdk.CodespaceType, errMsg string) sdk.Error {
+	return sdk.NewError(codespace, CodeInvalidArgument, errMsg)
 }
