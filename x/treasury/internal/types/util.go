@@ -10,18 +10,16 @@ import (
 
 func NewMsgSend(toDid ixo.Did, amount sdk.Coins, senderDid sovrin.SovrinDid) MsgSend {
 	return MsgSend{
-		SignBytes: "",
-		PubKey:    senderDid.VerifyKey,
-		FromDid:   senderDid.Did,
-		ToDid:     toDid,
-		Amount:    amount,
+		PubKey:  senderDid.VerifyKey,
+		FromDid: senderDid.Did,
+		ToDid:   toDid,
+		Amount:  amount,
 	}
 }
 
 func NewMsgOracleTransfer(fromDid, toDid ixo.Did, amount sdk.Coins,
 	oracleDid sovrin.SovrinDid, proof string) MsgOracleTransfer {
 	return MsgOracleTransfer{
-		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
 		OracleDid: oracleDid.Did,
 		FromDid:   fromDid,
@@ -34,7 +32,6 @@ func NewMsgOracleTransfer(fromDid, toDid ixo.Did, amount sdk.Coins,
 func NewMsgOracleMint(toDid ixo.Did, amount sdk.Coins,
 	oracleDid sovrin.SovrinDid, proof string) MsgOracleMint {
 	return MsgOracleMint{
-		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
 		OracleDid: oracleDid.Did,
 		ToDid:     toDid,
@@ -46,7 +43,6 @@ func NewMsgOracleMint(toDid ixo.Did, amount sdk.Coins,
 func NewMsgOracleBurn(fromDid ixo.Did, amount sdk.Coins,
 	oracleDid sovrin.SovrinDid, proof string) MsgOracleBurn {
 	return MsgOracleBurn{
-		SignBytes: "",
 		PubKey:    oracleDid.VerifyKey,
 		OracleDid: oracleDid.Did,
 		FromDid:   fromDid,

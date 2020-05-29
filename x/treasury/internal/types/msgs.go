@@ -16,11 +16,10 @@ type TreasuryMessage interface {
 }
 
 type MsgSend struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pub_key" yaml:"pub_key"`
-	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
-	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
-	Amount    sdk.Coins `json:"amount" yaml:"amount"`
+	PubKey  string    `json:"pub_key" yaml:"pub_key"`
+	FromDid ixo.Did   `json:"from_did" yaml:"from_did"`
+	ToDid   ixo.Did   `json:"to_did" yaml:"to_did"`
+	Amount  sdk.Coins `json:"amount" yaml:"amount"`
 }
 
 var _ TreasuryMessage = MsgSend{}
@@ -68,11 +67,11 @@ func (msg MsgSend) String() string {
 func (msg MsgSend) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSend) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgOracleTransfer struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pub_key" yaml:"pub_key"`
 	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
 	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
@@ -130,11 +129,11 @@ func (msg MsgOracleTransfer) String() string {
 func (msg MsgOracleTransfer) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleTransfer) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgOracleMint struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pub_key" yaml:"pub_key"`
 	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
 	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
@@ -187,11 +186,11 @@ func (msg MsgOracleMint) String() string {
 func (msg MsgOracleMint) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleMint) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgOracleBurn struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	PubKey    string    `json:"pub_key" yaml:"pub_key"`
 	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
 	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
@@ -244,5 +243,6 @@ func (msg MsgOracleBurn) String() string {
 func (msg MsgOracleBurn) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleBurn) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }

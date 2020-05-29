@@ -10,7 +10,6 @@ import (
 
 func NewMsgCreateProject(senderDid ixo.Did, projectDoc ProjectDoc, projectDid sovrin.SovrinDid) MsgCreateProject {
 	return MsgCreateProject{
-		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  senderDid,
 		ProjectDid: projectDid.Did,
@@ -21,7 +20,6 @@ func NewMsgCreateProject(senderDid ixo.Did, projectDoc ProjectDoc, projectDid so
 
 func NewMsgUpdateProjectStatus(senderDid ixo.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid sovrin.SovrinDid) MsgUpdateProjectStatus {
 	return MsgUpdateProjectStatus{
-		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  senderDid,
 		ProjectDid: projectDid.Did,
@@ -31,7 +29,6 @@ func NewMsgUpdateProjectStatus(senderDid ixo.Did, updateProjectStatusDoc UpdateP
 
 func NewMsgCreateAgent(txHash string, senderDid ixo.Did, createAgentDoc CreateAgentDoc, projectDid sovrin.SovrinDid) MsgCreateAgent {
 	return MsgCreateAgent{
-		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -41,7 +38,6 @@ func NewMsgCreateAgent(txHash string, senderDid ixo.Did, createAgentDoc CreateAg
 
 func NewMsgUpdateAgent(txHash string, senderDid ixo.Did, updateAgentDoc UpdateAgentDoc, projectDid sovrin.SovrinDid) MsgUpdateAgent {
 	return MsgUpdateAgent{
-		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -51,7 +47,6 @@ func NewMsgUpdateAgent(txHash string, senderDid ixo.Did, updateAgentDoc UpdateAg
 
 func NewMsgCreateClaim(txHash string, senderDid ixo.Did, createClaimDoc CreateClaimDoc, projectDid sovrin.SovrinDid) MsgCreateClaim {
 	return MsgCreateClaim{
-		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -61,7 +56,6 @@ func NewMsgCreateClaim(txHash string, senderDid ixo.Did, createClaimDoc CreateCl
 
 func NewMsgCreateEvaluation(txHash string, senderDid ixo.Did, createEvaluationDoc CreateEvaluationDoc, projectDid sovrin.SovrinDid) MsgCreateEvaluation {
 	return MsgCreateEvaluation{
-		SignBytes:  "",
 		ProjectDid: projectDid.Did,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -71,7 +65,6 @@ func NewMsgCreateEvaluation(txHash string, senderDid ixo.Did, createEvaluationDo
 
 func NewMsgWithdrawFunds(senderDid ixo.Did, data WithdrawFundsDoc) MsgWithdrawFunds {
 	return MsgWithdrawFunds{
-		SignBytes: "",
 		SenderDid: senderDid,
 		Data:      data,
 	}

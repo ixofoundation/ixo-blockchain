@@ -9,7 +9,6 @@ import (
 )
 
 type MsgCreateBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes              string         `json:"signBytes" yaml:"signBytes"`
 	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
 	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
 	Token                  string         `json:"token" yaml:"token"`
@@ -36,7 +35,6 @@ func NewMsgCreateBond(token, name, description string, creatorDid ixo.Did,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
 	allowSell string, batchBlocks sdk.Uint, bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
-		SignBytes:              "",
 		BondDid:                bondDid.Did,
 		PubKey:                 bondDid.VerifyKey,
 		Token:                  token,
@@ -154,7 +152,8 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
@@ -166,7 +165,6 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 func (msg MsgCreateBond) Type() string { return "create_bond" }
 
 type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes              string  `json:"signBytes" yaml:"signBytes"`
 	BondDid                ixo.Did `json:"bond_did" yaml:"bond_did"`
 	Token                  string  `json:"token" yaml:"token"`
 	Name                   string  `json:"name" yaml:"name"`
@@ -180,7 +178,6 @@ type MsgEditBond struct { // signBytes should not be changed to sign_bytes becau
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editorDid ixo.Did, bondDid sovrin.SovrinDid) MsgEditBond {
 	return MsgEditBond{
-		SignBytes:              "",
 		BondDid:                bondDid.Did,
 		Token:                  token,
 		Name:                   name,
@@ -239,7 +236,8 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgEditBond) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
@@ -251,7 +249,6 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 func (msg MsgEditBond) Type() string { return "edit_bond" }
 
 type MsgBuy struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
 	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
 	PubKey    string    `json:"pub_key" yaml:"pub_key"`
 	Amount    sdk.Coin  `json:"amount" yaml:"amount"`
@@ -262,7 +259,6 @@ type MsgBuy struct { // signBytes should not be changed to sign_bytes because of
 func NewMsgBuy(buyerDid sovrin.SovrinDid, amount sdk.Coin, maxPrices sdk.Coins,
 	bondDid ixo.Did) MsgBuy {
 	return MsgBuy{
-		SignBytes: "",
 		BuyerDid:  buyerDid.Did,
 		PubKey:    buyerDid.VerifyKey,
 		Amount:    amount,
@@ -304,7 +300,8 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgBuy) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
@@ -316,7 +313,6 @@ func (msg MsgBuy) Route() string { return RouterKey }
 func (msg MsgBuy) Type() string { return "buy" }
 
 type MsgSell struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes string   `json:"signBytes" yaml:"signBytes"`
 	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
 	PubKey    string   `json:"pub_key" yaml:"pub_key"`
 	Amount    sdk.Coin `json:"amount" yaml:"amount"`
@@ -325,7 +321,6 @@ type MsgSell struct { // signBytes should not be changed to sign_bytes because o
 
 func NewMsgSell(sellerDid sovrin.SovrinDid, amount sdk.Coin, bondDid ixo.Did) MsgSell {
 	return MsgSell{
-		SignBytes: "",
 		SellerDid: sellerDid.Did,
 		PubKey:    sellerDid.VerifyKey,
 		Amount:    amount,
@@ -361,7 +356,8 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSell) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
@@ -373,7 +369,6 @@ func (msg MsgSell) Route() string { return RouterKey }
 func (msg MsgSell) Type() string { return "sell" }
 
 type MsgSwap struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes  string   `json:"signBytes" yaml:"signBytes"`
 	SwapperDid ixo.Did  `json:"swapper_did" yaml:"swapper_did"`
 	PubKey     string   `json:"pub_key" yaml:"pub_key"`
 	BondDid    ixo.Did  `json:"bond_did" yaml:"bond_did"`
@@ -384,7 +379,6 @@ type MsgSwap struct { // signBytes should not be changed to sign_bytes because o
 func NewMsgSwap(swapperDid sovrin.SovrinDid, from sdk.Coin, toToken string,
 	bondDid ixo.Did) MsgSwap {
 	return MsgSwap{
-		SignBytes:  "",
 		SwapperDid: swapperDid.Did,
 		PubKey:     swapperDid.VerifyKey,
 		From:       from,
@@ -439,7 +433,8 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSwap) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {

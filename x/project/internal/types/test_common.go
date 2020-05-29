@@ -6,7 +6,6 @@ import (
 )
 
 var ValidCreateProjectMsg = MsgCreateProject{
-	SignBytes:  "SampleSignBytes",
 	TxHash:     "SampleTxBytes",
 	SenderDid:  "SenderDid",
 	ProjectDid: "ProjectDid",
@@ -23,7 +22,6 @@ var ValidCreateProjectMsg = MsgCreateProject{
 }
 
 var ValidUpdateProjectMsg = MsgCreateProject{
-	SignBytes:  "UpdatedSignBytes",
 	TxHash:     "UpdatedTxBytes",
 	SenderDid:  "SenderDid",
 	ProjectDid: "ProjectDid",

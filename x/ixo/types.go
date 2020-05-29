@@ -118,12 +118,6 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 				return nil, sdk.ErrTxDecode("Multiple messages not supported")
 			}
 
-			signByteString := getSignBytes(txBytes)
-
-			msgPayload := payloadArray[0].(map[string]interface{})
-			msg := msgPayload["value"].(map[string]interface{})
-			msg["signBytes"] = signByteString
-
 			txBytes, _ = json.Marshal(upTx)
 
 			err = cdc.UnmarshalJSON(txBytes, &tx)

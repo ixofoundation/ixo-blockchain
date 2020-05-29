@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
@@ -10,15 +9,14 @@ import (
 )
 
 type MsgAddDid struct {
-	DidDoc    BaseDidDoc `json:"didDoc" yaml:"didDoc"`
-	SignBytes string     `json:"signBytes" yaml:"signBytes"`
+	DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
 }
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	didDoc := BaseDidDoc{
 		Did:         did,
 		PubKey:      publicKey,
-		Credentials: make([]DidCredential, 0),
+		Credentials: nil,
 	}
 
 	return MsgAddDid{
@@ -62,7 +60,8 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgAddDid) String() string {
@@ -121,12 +120,8 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-
-	return b
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgAddCredential) IsNewDid() bool { return false }

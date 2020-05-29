@@ -10,7 +10,6 @@ import (
 )
 
 type MsgCreateBond struct {
-	SignBytes string  `json:"signBytes" yaml:"signBytes"`
 	TxHash    string  `json:"tx_hash" yaml:"tx_hash"`
 	SenderDid ixo.Did `json:"sender_did" yaml:"sender_did"`
 	BondDid   ixo.Did `json:"bond_did" yaml:"bond_did"`
@@ -65,7 +64,8 @@ func (msg *MsgCreateBond) SetStatus(status BondStatus) {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgCreateBond) IsNewDid() bool { return true }
@@ -73,7 +73,6 @@ func (msg MsgCreateBond) IsNewDid() bool { return true }
 var _ StoredBondDoc = (*MsgCreateBond)(nil)
 
 type MsgUpdateBondStatus struct {
-	SignBytes string              `json:"signBytes" yaml:"signBytes"`
 	SenderDid ixo.Did             `json:"sender_did" yaml:"sender_did"`
 	BondDid   ixo.Did             `json:"bond_did" yaml:"bond_did"`
 	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`
@@ -104,7 +103,8 @@ func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateBondStatus) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {

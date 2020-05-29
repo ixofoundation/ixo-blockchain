@@ -16,7 +16,6 @@ type FeesMessage interface {
 }
 
 type MsgSetFeeContractAuthorisation struct {
-	SignBytes     string  `json:"signBytes" yaml:"signBytes"`
 	PubKey        string  `json:"pub_key" yaml:"pub_key"`
 	PayerDid      ixo.Did `json:"payer_did" yaml:"payer_did"`
 	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
@@ -64,11 +63,11 @@ func (msg MsgSetFeeContractAuthorisation) String() string {
 func (msg MsgSetFeeContractAuthorisation) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSetFeeContractAuthorisation) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgCreateFee struct {
-	SignBytes  string     `json:"signBytes" yaml:"signBytes"`
 	PubKey     string     `json:"pub_key" yaml:"pub_key"`
 	CreatorDid ixo.Did    `json:"creator_did" yaml:"creator_did"`
 	FeeId      string     `json:"fee_id" yaml:"fee_id"`
@@ -121,11 +120,11 @@ func (msg MsgCreateFee) String() string {
 func (msg MsgCreateFee) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateFee) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgCreateFeeContract struct {
-	SignBytes      string         `json:"signBytes" yaml:"signBytes"`
 	PubKey         string         `json:"pub_key" yaml:"pub_key"`
 	CreatorDid     ixo.Did        `json:"creator_did" yaml:"creator_did"`
 	FeeId          string         `json:"fee_id" yaml:"fee_id"`
@@ -180,11 +179,11 @@ func (msg MsgCreateFeeContract) String() string {
 func (msg MsgCreateFeeContract) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateFeeContract) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgCreateSubscription struct {
-	SignBytes      string   `json:"signBytes" yaml:"signBytes"`
 	PubKey         string   `json:"pub_key" yaml:"pub_key"`
 	CreatorDid     ixo.Did  `json:"creator_did" yaml:"creator_did"`
 	SubscriptionId string   `json:"subscription_id" yaml:"subscription_id"`
@@ -239,11 +238,11 @@ func (msg MsgCreateSubscription) String() string {
 func (msg MsgCreateSubscription) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgGrantFeeDiscount struct {
-	SignBytes     string         `json:"signBytes" yaml:"signBytes"`
 	PubKey        string         `json:"pub_key" yaml:"pub_key"`
 	SenderDid     ixo.Did        `json:"sender_did" yaml:"sender_did"`
 	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
@@ -294,11 +293,11 @@ func (msg MsgGrantFeeDiscount) String() string {
 func (msg MsgGrantFeeDiscount) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgGrantFeeDiscount) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgRevokeFeeDiscount struct {
-	SignBytes     string         `json:"signBytes" yaml:"signBytes"`
 	PubKey        string         `json:"pub_key" yaml:"pub_key"`
 	SenderDid     ixo.Did        `json:"sender_did" yaml:"sender_did"`
 	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
@@ -348,11 +347,11 @@ func (msg MsgRevokeFeeDiscount) String() string {
 func (msg MsgRevokeFeeDiscount) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgRevokeFeeDiscount) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }
 
 type MsgChargeFee struct {
-	SignBytes     string  `json:"signBytes" yaml:"signBytes"`
 	PubKey        string  `json:"pub_key" yaml:"pub_key"`
 	SenderDid     ixo.Did `json:"sender_did" yaml:"sender_did"`
 	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
@@ -399,5 +398,6 @@ func (msg MsgChargeFee) String() string {
 func (msg MsgChargeFee) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgChargeFee) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
 }

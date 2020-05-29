@@ -39,12 +39,7 @@ func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg,
 	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
-	msgBytes, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-
-	signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
+	signature := ixo.SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
 	tx := ixo.NewIxoTxSingleMsg(msg, signature)
 
 	bz, err := cdc.MarshalJSON(tx)
