@@ -20,35 +20,36 @@ func NewTestPeriod(periodLength, periodStartBlock int64) TestPeriod {
 	}
 }
 
-func (s TestPeriod) periodEndBlock() int64 {
-	return s.PeriodStartBlock + s.PeriodLength
+func (p TestPeriod) periodEndBlock() int64 {
+	return p.PeriodStartBlock + p.PeriodLength
 }
 
-func (s TestPeriod) GetPeriodUnit() string {
+func (p TestPeriod) GetPeriodUnit() string {
 	return BlockPeriodUnit
 }
 
-func (s TestPeriod) Validate() sdk.Error {
+func (p TestPeriod) Validate() sdk.Error {
 	// Validate period-related values
-	if s.PeriodStartBlock > s.periodEndBlock() {
+	if p.PeriodStartBlock > p.periodEndBlock() {
 		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
-	} else if s.PeriodLength <= 0 {
+	} else if p.PeriodLength <= 0 {
 		return ErrInvalidPeriod(DefaultCodespace, "period length must be greater than zero")
-	} else if s.PeriodStartBlock+s.PeriodLength != s.periodEndBlock() {
+	} else if p.PeriodStartBlock+p.PeriodLength != p.periodEndBlock() {
 		return ErrInvalidPeriod(DefaultCodespace, "period start + period length != period end")
 	}
 
 	return nil
 }
 
-func (s TestPeriod) periodStarted(ctx sdk.Context) bool {
+func (p TestPeriod) periodStarted(ctx sdk.Context) bool {
 	return true
 }
 
-func (s TestPeriod) periodEnded(ctx sdk.Context) bool {
+func (p TestPeriod) periodEnded(ctx sdk.Context) bool {
 	return true
 }
 
-func (s TestPeriod) nextPeriod() {
-	s.PeriodStartBlock = s.periodEndBlock()
+func (p TestPeriod) nextPeriod() Period {
+	p.PeriodStartBlock = p.periodEndBlock()
+	return p
 }

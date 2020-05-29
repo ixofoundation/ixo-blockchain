@@ -29,13 +29,19 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		// Note: if fee can be re-charged immediately, this should be done in
 		// the next block to prevent spending too much time charging fees
 
-		// Delete subscription if it has ended and no more charges
-		if subscription.Ended() && !subscription.ShouldCharge(ctx) {
+		// Get updated subscription
+		subscription, err = keeper.GetSubscription(ctx, subscription.Id)
+		if err != nil {
+			panic(err)
+		}
+
+		// Delete subscription if it has completed
+		if subscription.IsComplete() {
 			// TODO: delete subscription
 		}
 
-		// Save subscription
-		keeper.SetSubscription(ctx, subscription)
+		// Note: no need to save the subscription, as it is being saved by the
+		// functions operating on it, such as ChargeSubscriptionFee()
 	}
 	return []abci.ValidatorUpdate{}
 }
