@@ -63,8 +63,11 @@ func (msg MsgSetFeeContractAuthorisation) String() string {
 func (msg MsgSetFeeContractAuthorisation) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSetFeeContractAuthorisation) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgCreateFee struct {
@@ -120,8 +123,11 @@ func (msg MsgCreateFee) String() string {
 func (msg MsgCreateFee) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateFee) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgCreateFeeContract struct {
@@ -179,8 +185,11 @@ func (msg MsgCreateFeeContract) String() string {
 func (msg MsgCreateFeeContract) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateFeeContract) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgCreateSubscription struct {
@@ -238,8 +247,11 @@ func (msg MsgCreateSubscription) String() string {
 func (msg MsgCreateSubscription) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgGrantFeeDiscount struct {
@@ -293,8 +305,11 @@ func (msg MsgGrantFeeDiscount) String() string {
 func (msg MsgGrantFeeDiscount) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgGrantFeeDiscount) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgRevokeFeeDiscount struct {
@@ -347,8 +362,11 @@ func (msg MsgRevokeFeeDiscount) String() string {
 func (msg MsgRevokeFeeDiscount) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgRevokeFeeDiscount) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgChargeFee struct {
@@ -398,6 +416,9 @@ func (msg MsgChargeFee) String() string {
 func (msg MsgChargeFee) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgChargeFee) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }

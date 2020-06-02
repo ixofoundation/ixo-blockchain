@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -152,8 +153,11 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
@@ -236,8 +240,11 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgEditBond) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
@@ -300,8 +307,11 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgBuy) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
@@ -356,8 +366,11 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSell) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
@@ -433,8 +446,11 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSwap) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {

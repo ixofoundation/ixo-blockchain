@@ -64,8 +64,11 @@ func (msg *MsgCreateBond) SetStatus(status BondStatus) {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateBond) IsNewDid() bool { return true }
@@ -103,8 +106,11 @@ func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateBondStatus) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {

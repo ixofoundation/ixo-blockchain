@@ -67,8 +67,11 @@ func (msg MsgSend) String() string {
 func (msg MsgSend) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSend) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgOracleTransfer struct {
@@ -129,8 +132,11 @@ func (msg MsgOracleTransfer) String() string {
 func (msg MsgOracleTransfer) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleTransfer) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgOracleMint struct {
@@ -186,8 +192,11 @@ func (msg MsgOracleMint) String() string {
 func (msg MsgOracleMint) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleMint) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgOracleBurn struct {
@@ -243,6 +252,9 @@ func (msg MsgOracleBurn) String() string {
 func (msg MsgOracleBurn) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleBurn) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
