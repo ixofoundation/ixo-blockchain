@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/ixofoundation/ixo-cosmos/x/fees/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
 type Keeper struct {

@@ -3,9 +3,9 @@ package bonddoc
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type InternalAccountID = string
@@ -28,13 +28,11 @@ func NewHandler(k Keeper) sdk.Handler {
 func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Result {
 
 	if k.BondDocExists(ctx, msg.GetBondDid()) {
-		return did.ErrorInvalidDid(types.DefaultCodeSpace, fmt.Sprintf("Bond doc already exists")).Result()
+		return did.ErrorInvalidDid(types.DefaultCodespace, fmt.Sprintf("Bond doc already exists")).Result()
 	}
 	k.SetBondDoc(ctx, &msg)
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatus) sdk.Result {
@@ -54,13 +52,14 @@ func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatu
 	ExistingBondDoc.SetStatus(newStatus)
 	_, _ = k.UpdateBondDoc(ctx, ExistingBondDoc)
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func getBondDoc(ctx sdk.Context, k Keeper, bondDid ixo.Did) (StoredBondDoc, sdk.Error) {
 	ixoBondDoc, err := k.GetBondDoc(ctx, bondDid)
+	if err != nil {
+		return nil, err
+	}
 
-	return ixoBondDoc.(StoredBondDoc), err
+	return ixoBondDoc.(StoredBondDoc), nil
 }

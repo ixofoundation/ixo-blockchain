@@ -5,19 +5,18 @@ import (
 )
 
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(&Bond{}, "cosmos-sdk/Bond", nil)
-	cdc.RegisterConcrete(&FunctionParam{}, "cosmos-sdk/FunctionParam", nil)
-	cdc.RegisterConcrete(&FunctionParams{}, "cosmos-sdk/FunctionParams", nil)
-	cdc.RegisterConcrete(&Batch{}, "cosmos-sdk/Batch", nil)
-	cdc.RegisterConcrete(&BaseOrder{}, "cosmos-sdk/BaseOrder", nil)
-	cdc.RegisterConcrete(&BuyOrder{}, "cosmos-sdk/BuyOrder", nil)
-	cdc.RegisterConcrete(&SellOrder{}, "cosmos-sdk/SellOrder", nil)
-	cdc.RegisterConcrete(&SwapOrder{}, "cosmos-sdk/SwapOrder", nil)
-	cdc.RegisterConcrete(MsgCreateBond{}, "cosmos-sdk/MsgCreateBond", nil)
-	cdc.RegisterConcrete(MsgEditBond{}, "cosmos-sdk/MsgEditBond", nil)
-	cdc.RegisterConcrete(MsgBuy{}, "cosmos-sdk/MsgBuy", nil)
-	cdc.RegisterConcrete(MsgSell{}, "cosmos-sdk/MsgSell", nil)
-	cdc.RegisterConcrete(MsgSwap{}, "cosmos-sdk/MsgSwap", nil)
+	cdc.RegisterConcrete(&Bond{}, "bonds/Bond", nil)
+	cdc.RegisterConcrete(&FunctionParam{}, "bonds/FunctionParam", nil)
+	cdc.RegisterConcrete(&Batch{}, "bonds/Batch", nil)
+	cdc.RegisterConcrete(&BaseOrder{}, "bonds/BaseOrder", nil)
+	cdc.RegisterConcrete(&BuyOrder{}, "bonds/BuyOrder", nil)
+	cdc.RegisterConcrete(&SellOrder{}, "bonds/SellOrder", nil)
+	cdc.RegisterConcrete(&SwapOrder{}, "bonds/SwapOrder", nil)
+	cdc.RegisterConcrete(MsgCreateBond{}, "bonds/MsgCreateBond", nil)
+	cdc.RegisterConcrete(MsgEditBond{}, "bonds/MsgEditBond", nil)
+	cdc.RegisterConcrete(MsgBuy{}, "bonds/MsgBuy", nil)
+	cdc.RegisterConcrete(MsgSell{}, "bonds/MsgSell", nil)
+	cdc.RegisterConcrete(MsgSwap{}, "bonds/MsgSwap", nil)
 }
 
 // ModuleCdc is the codec for the module

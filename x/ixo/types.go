@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -11,7 +12,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 )
 
-var IxoDecimals = sdk.NewDec(100000000)
+var (
+	IxoDecimals = sdk.NewDec(100000000)
+	ValidDid    = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
+	IsValidDid  = ValidDid.MatchString
+	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html
+	// IsValidDid adapted from the above link but assumes no sub-namespaces
+	// TODO: ValidDid needs to be updated once we no longer want to be able
+	//   to consider project accounts as DIDs (especially in treasury module),
+	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
+)
 
 const IxoNativeToken = "ixo"
 
@@ -85,8 +95,6 @@ type DidDoc interface {
 	GetPubKey() string
 }
 
-type Project = string
-
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 	return func(txBytes []byte) (sdk.Tx, sdk.Error) {
 
@@ -99,7 +107,12 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 			var tx = IxoTx{}
 
 			var upTx map[string]interface{}
-			json.Unmarshal(txBytes, &upTx)
+
+			err := json.Unmarshal(txBytes, &upTx)
+			if err != nil {
+				return nil, sdk.ErrTxDecode(err.Error())
+			}
+
 			payloadArray := upTx["payload"].([]interface{})
 			if len(payloadArray) != 1 {
 				return nil, sdk.ErrTxDecode("Multiple messages not supported")
@@ -113,7 +126,7 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 
 			txBytes, _ = json.Marshal(upTx)
 
-			err := cdc.UnmarshalJSON(txBytes, &tx)
+			err = cdc.UnmarshalJSON(txBytes, &tx)
 			if err != nil {
 				return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 			}

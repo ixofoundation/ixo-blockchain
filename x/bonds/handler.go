@@ -3,8 +3,8 @@ package bonds
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
 )
@@ -59,13 +59,16 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
+	if keeper.CoinKeeper.BlacklistedAddr(msg.FeeAddress) {
+		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress)).Result()
+	}
 
 	if keeper.BondExists(ctx, msg.BondDid) {
-		return types.ErrBondAlreadyExists(DefaultCodeSpace, msg.BondDid).Result()
+		return types.ErrBondAlreadyExists(DefaultCodespace, msg.BondDid).Result()
 	} else if keeper.BondDidExists(ctx, msg.Token) {
-		return types.ErrBondTokenIsTaken(DefaultCodeSpace, msg.Token).Result()
+		return types.ErrBondTokenIsTaken(DefaultCodespace, msg.Token).Result()
 	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
-		return types.ErrBondTokenCannotBeStakingToken(DefaultCodeSpace).Result()
+		return types.ErrBondTokenCannotBeStakingToken(DefaultCodespace).Result()
 	}
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)

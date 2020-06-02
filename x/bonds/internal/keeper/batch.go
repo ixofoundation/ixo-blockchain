@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid ixo.Did) types.Batch {

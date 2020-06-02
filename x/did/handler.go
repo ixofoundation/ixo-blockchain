@@ -3,8 +3,8 @@ package did
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
@@ -32,9 +32,7 @@ func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) s
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }
 
 func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCredential) sdk.Result {
@@ -43,7 +41,5 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 		return err.Result()
 	}
 
-	return sdk.Result{
-		Code: sdk.CodeOK,
-	}
+	return sdk.Result{}
 }

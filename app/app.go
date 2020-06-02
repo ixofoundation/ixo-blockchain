@@ -2,7 +2,7 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/ixofoundation/ixo-cosmos/x/oracles"
+	"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"io"
 	"os"
 
@@ -29,13 +29,13 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds"
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/project"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/project"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury"
 )
 
 const (
@@ -267,7 +267,7 @@ func (app *ixoApp) LoadHeight(height int64) error {
 func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
-		modAccAddrs[app.supplyKeeper.GetModuleAddress(acc).String()] = true
+		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
 	}
 
 	return modAccAddrs
@@ -298,19 +298,19 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
-		switch msg.Type() {
-		case did.ModuleName:
+		switch msg.Route() {
+		case did.RouterKey:
 			return didAnteHandler(ctx, tx, false)
-		case project.ModuleName:
+		case project.RouterKey:
 			return projectAnteHandler(ctx, tx, false)
-		case bonddoc.ModuleName:
+		case bonddoc.RouterKey:
 			return bonddocAnteHandler(ctx, tx, false)
-		case bonds.ModuleName:
+		case bonds.RouterKey:
 			return bondsAnteHandler(ctx, tx, false)
-		case treasury.ModuleName:
+		case treasury.RouterKey:
 			return treasuryAnteHandler(ctx, tx, false)
 		default:
-			return cosmosAnteHandler(ctx, tx, true)
+			return cosmosAnteHandler(ctx, tx, false)
 		}
 	}
 }

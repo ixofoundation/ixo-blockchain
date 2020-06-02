@@ -10,9 +10,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -27,6 +27,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		senderDid := r.URL.Query().Get("senderDid")
 		projectDocParam := r.URL.Query().Get("projectDoc")
 		didDocParam := r.URL.Query().Get("didDoc")
 		mode := r.URL.Query().Get("mode")
@@ -49,7 +50,7 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
-		msg := types.NewMsgCreateProject(projectDoc, didDoc)
+		msg := types.NewMsgCreateProject(senderDid, projectDoc, didDoc)
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(didDoc.Secret.SignKey))
 		copy(privKey[32:], base58.Decode(didDoc.VerifyKey))

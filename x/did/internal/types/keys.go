@@ -1,14 +1,14 @@
 package types
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 const (
 	ModuleName   = "did"
 	StoreKey     = ModuleName
-	RouterKey    = StoreKey
-	QuerierRoute = RouterKey
+	RouterKey    = ModuleName
+	QuerierRoute = ModuleName
 )
 
 var DidKey = []byte{0x01}

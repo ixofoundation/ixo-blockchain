@@ -1,8 +1,8 @@
 package oracles
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/oracles/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/oracles/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/types"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 	BurnCap     = types.BurnCap
 	TransferCap = types.TransferCap
 
-	DefaultCodeSpace = types.DefaultCodeSpace
+	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

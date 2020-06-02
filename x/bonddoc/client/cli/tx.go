@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
@@ -57,24 +57,29 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 
 func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createBond [bond-json] [sovrin-did]",
+		Use:   "createBond [sender-did] [bond-json] [sovrin-did]",
 		Short: "Create a new BondDoc signed by the sovrinDID of the bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 2 || len(args[0]) == 0 || len(args[1]) == 0 {
-				return errors.New("You must provide the bond data and the bonds private key")
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the sender-did, " +
+					"bond data, and the bond's private key")
 			}
 
+			senderDid := args[0]
+			bondDocStr := args[1]
+			sovrinDid := unmarshalSovrinDID(args[2])
+
 			bondDoc := types.BondDoc{}
-			err := json.Unmarshal([]byte(args[0]), &bondDoc)
+			err := json.Unmarshal([]byte(bondDocStr), &bondDoc)
 			if err != nil {
 				panic(err)
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[1])
-			msg := types.NewMsgCreateBond(bondDoc, sovrinDid)
+			msg := types.NewMsgCreateBond(senderDid, bondDoc, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -89,8 +94,10 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 3 || len(args[0]) == 0 || len(args[1]) == 0 || len(args[2]) == 0 {
-				return errors.New("You must provide the status and the bonds private key")
+			if len(args) != 3 || len(args[0]) == 0 ||
+				len(args[1]) == 0 || len(args[2]) == 0 {
+				return errors.New("You must provide the sender-did, " +
+					"status, and the bond's private key")
 			}
 
 			senderDid := args[0]

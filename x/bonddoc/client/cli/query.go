@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func GetCmdBondDoc(cdc *codec.Codec) *cobra.Command {

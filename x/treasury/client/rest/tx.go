@@ -9,9 +9,9 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -101,6 +101,7 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		toDidParam := r.URL.Query().Get("toDid")
 		amountParam := r.URL.Query().Get("amount")
 		oracleDidParam := r.URL.Query().Get("oracleDid")
+		proofParam := r.URL.Query().Get("proof")
 
 		mode := r.URL.Query().Get("mode")
 		cliCtx = cliCtx.WithBroadcastMode(mode)
@@ -122,7 +123,7 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSendOnBehalfOf(fromDidParam, toDidParam, coins, oracleDid)
+		msg := types.NewMsgOracleTransfer(fromDidParam, toDidParam, coins, oracleDid, proofParam)
 
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))
@@ -172,6 +173,7 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		toDidParam := r.URL.Query().Get("toDid")
 		amountParam := r.URL.Query().Get("amount")
 		oracleDidParam := r.URL.Query().Get("oracleDid")
+		proofParam := r.URL.Query().Get("proof")
 
 		mode := r.URL.Query().Get("mode")
 		cliCtx = cliCtx.WithBroadcastMode(mode)
@@ -193,7 +195,7 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgMint(toDidParam, coins, oracleDid)
+		msg := types.NewMsgOracleMint(toDidParam, coins, oracleDid, proofParam)
 
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))
@@ -243,6 +245,7 @@ func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		fromDidParam := r.URL.Query().Get("fromDid")
 		amountParam := r.URL.Query().Get("amount")
 		oracleDidParam := r.URL.Query().Get("oracleDid")
+		proofParam := r.URL.Query().Get("proof")
 
 		mode := r.URL.Query().Get("mode")
 		cliCtx = cliCtx.WithBroadcastMode(mode)
@@ -264,7 +267,7 @@ func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBurn(fromDidParam, coins, oracleDid)
+		msg := types.NewMsgOracleBurn(fromDidParam, coins, oracleDid, proofParam)
 
 		privKey := [64]byte{}
 		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))

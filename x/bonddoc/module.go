@@ -12,9 +12,9 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/client/cli"
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/client/rest"
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/client/rest"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/keeper"
 )
 
 var (

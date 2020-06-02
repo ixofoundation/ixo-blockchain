@@ -1,8 +1,8 @@
 package did
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
 const (
@@ -11,7 +11,7 @@ const (
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
 
-	DefaultCodeSpace = types.DefaultCodeSpace
+	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

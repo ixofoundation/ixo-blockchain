@@ -2,10 +2,11 @@ package types
 
 import (
 	"encoding/json"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type MsgCreateProject struct {
@@ -19,32 +20,28 @@ type MsgCreateProject struct {
 
 var _ sdk.Msg = MsgCreateProject{}
 
-func (msg MsgCreateProject) Type() string  { return ModuleName }
+func (msg MsgCreateProject) Type() string  { return "create-project" }
 func (msg MsgCreateProject) Route() string { return RouterKey }
+
 func (msg MsgCreateProject) ValidateBasic() sdk.Error {
-	valid, err := CheckNotEmpty(msg.PubKey, "PubKey")
-	if !valid {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.NodeDid, "NodeDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.RequiredClaims, "RequiredClaims"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy"); !valid {
 		return err
 	}
 
-	valid, err = CheckNotEmpty(msg.ProjectDid, "ProjectDid")
-	if !valid {
-		return err
-	}
-
-	valid, err = CheckNotEmpty(msg.Data.NodeDid, "NodeDid")
-	if !valid {
-		return err
-	}
-
-	valid, err = CheckNotEmpty(msg.Data.RequiredClaims, "RequiredClaims")
-	if !valid {
-		return err
-	}
-
-	valid, err = CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy")
-	if !valid {
-		return err
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
@@ -88,9 +85,31 @@ type MsgUpdateProjectStatus struct {
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateProjectStatus) Type() string             { return ModuleName }
-func (msg MsgUpdateProjectStatus) Route() string            { return RouterKey }
-func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error { return nil }
+func (msg MsgUpdateProjectStatus) Type() string  { return "update-project-status" }
+func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
+
+func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// TODO: perform some checks on the Data (of type UpdateProjectStatusDoc)
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	}
+
+	// IsValidProgressionFrom checked by the handler
+
+	return nil
+}
+
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	return []byte(msg.SignBytes)
 }
@@ -99,12 +118,12 @@ func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
 }
 
-func (ups MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
-	return ups.ProjectDid
+func (msg MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
+	return msg.ProjectDid
 }
 
-func (ups MsgUpdateProjectStatus) GetStatus() ProjectStatus {
-	return ups.Data.Status
+func (msg MsgUpdateProjectStatus) GetStatus() ProjectStatus {
+	return msg.Data.Status
 }
 
 func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
@@ -120,9 +139,27 @@ type MsgCreateAgent struct {
 
 func (msg MsgCreateAgent) IsNewDid() bool     { return false }
 func (msg MsgCreateAgent) IsWithdrawal() bool { return false }
-func (msg MsgCreateAgent) Type() string       { return ModuleName }
+func (msg MsgCreateAgent) Type() string       { return "create-agent" }
 func (msg MsgCreateAgent) Route() string      { return RouterKey }
 func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// TODO: perform some checks on the Data (of type CreateAgentDoc)
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	} else if !ixo.IsValidDid(msg.Data.AgentDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
+	}
+
 	return nil
 }
 
@@ -156,9 +193,27 @@ type MsgUpdateAgent struct {
 
 func (msg MsgUpdateAgent) IsNewDid() bool     { return false }
 func (msg MsgUpdateAgent) IsWithdrawal() bool { return false }
-func (msg MsgUpdateAgent) Type() string       { return ModuleName }
+func (msg MsgUpdateAgent) Type() string       { return "update-agent" }
 func (msg MsgUpdateAgent) Route() string      { return RouterKey }
 func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// TODO: perform some checks on the Data (of type UpdateAgentDoc)
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	} else if !ixo.IsValidDid(msg.Data.Did) {
+		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
+	}
+
 	return nil
 }
 
@@ -193,9 +248,26 @@ type MsgCreateClaim struct {
 
 func (msg MsgCreateClaim) IsNewDid() bool     { return false }
 func (msg MsgCreateClaim) IsWithdrawal() bool { return false }
-func (msg MsgCreateClaim) Type() string       { return ModuleName }
+func (msg MsgCreateClaim) Type() string       { return "create-claim" }
 func (msg MsgCreateClaim) Route() string      { return RouterKey }
+
 func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// TODO: perform some checks on the Data (of type CreateClaimDoc)
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	}
+
 	return nil
 }
 
@@ -230,9 +302,26 @@ type MsgCreateEvaluation struct {
 
 func (msg MsgCreateEvaluation) IsNewDid() bool     { return false }
 func (msg MsgCreateEvaluation) IsWithdrawal() bool { return false }
-func (msg MsgCreateEvaluation) Type() string       { return ModuleName }
+func (msg MsgCreateEvaluation) Type() string       { return "create-evaluation" }
 func (msg MsgCreateEvaluation) Route() string      { return RouterKey }
+
 func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// TODO: perform some checks on the Data (of type CreateEvaluationDoc)
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	}
+
 	return nil
 }
 
@@ -265,16 +354,46 @@ type MsgWithdrawFunds struct {
 
 func (msg MsgWithdrawFunds) IsNewDid() bool     { return false }
 func (msg MsgWithdrawFunds) IsWithdrawal() bool { return true }
-func (msg MsgWithdrawFunds) Type() string       { return ModuleName }
+func (msg MsgWithdrawFunds) Type() string       { return "withdraw-funds" }
 func (msg MsgWithdrawFunds) Route() string      { return RouterKey }
+
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.RecipientDid, "RecipientDid"); !valid {
+		return err
+	}
+
+	// TODO: perform some checks on the Data (of type WithdrawFundsDoc)
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	} else if !ixo.IsValidDid(msg.Data.ProjectDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+	} else if !ixo.IsValidDid(msg.Data.RecipientDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "recipient did is invalid")
+	}
+
+	// Check that the sender is also the recipient
+	if msg.SenderDid != msg.Data.RecipientDid {
+		return sdk.ErrInternal("sender did must match recipient did")
+	}
+
+	// Check that amount is positive
+	if !msg.Data.Amount.IsPositive() {
+		return sdk.ErrInternal("amount should be positive")
+	}
+
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSenderDid() ixo.Did                 { return msg.SenderDid }
 func (msg MsgWithdrawFunds) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{[]byte(msg.Data.RecipientDid)}
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {

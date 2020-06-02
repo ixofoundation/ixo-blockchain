@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	DefaultCodeSpace       sdk.CodespaceType = ModuleName
+	DefaultCodespace       sdk.CodespaceType = ModuleName
 	CodeInvalidDid                           = 201
 	CodeInvalidPubKey                        = 202
 	CodeInvalidIssuer                        = 203

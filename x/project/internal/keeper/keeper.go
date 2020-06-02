@@ -6,11 +6,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/ixofoundation/ixo-cosmos/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/fees"
 
-	"github.com/ixofoundation/ixo-cosmos/x/did"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 type Keeper struct {
@@ -71,7 +71,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid ixo.Did) (types.Stored
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "Invalid ProjectDid Address")
+		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
 	}
 
 	var projectDoc types.MsgCreateProject
@@ -90,7 +90,7 @@ func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc types.StoredProj
 	existedDoc, _ := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
 	if existedDoc == nil {
 
-		return nil, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc details are not exist")
+		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc details are not exist")
 	} else {
 
 		existedDoc.SetStatus(newProjectDoc.GetStatus())
@@ -115,9 +115,9 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) types.Account
 
 	bz := store.Get(key)
 	if bz == nil {
-		return make(map[string]sdk.AccAddress)
+		return make(types.AccountMap)
 	} else {
-		var accountMap map[string]sdk.AccAddress
+		var accountMap types.AccountMap
 		if err := json.Unmarshal(bz, &accountMap); err != nil {
 			panic(err)
 		}
@@ -126,7 +126,8 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid ixo.Did) types.Account
 	}
 }
 
-func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did, accountId string, account auth.Account) {
+func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
+	accountId types.InternalAccountID, account auth.Account) {
 	accountMap := k.GetAccountMap(ctx, projectDid)
 	_, found := accountMap[accountId]
 	if found {
@@ -145,8 +146,9 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 	store.Set(key, bz)
 }
 
-func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did, accountId string) (auth.Account, sdk.Error) {
-	address := types.StringToAddr(projectDid + "/" + accountId)
+func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did,
+	accountId types.InternalAccountID) (auth.Account, sdk.Error) {
+	address := types.StringToAddr(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")
@@ -170,7 +172,7 @@ func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid ixo
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodeSpace, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
 	} else {
 		var txs []types.WithdrawalInfo
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)

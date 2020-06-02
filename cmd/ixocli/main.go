@@ -17,8 +17,8 @@ import (
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tmlibs/cli"
 
-	"github.com/ixofoundation/ixo-cosmos/app"
-	ixoClient "github.com/ixofoundation/ixo-cosmos/client"
+	"github.com/ixofoundation/ixo-blockchain/app"
+	ixoClient "github.com/ixofoundation/ixo-blockchain/client"
 )
 
 func main() {
@@ -52,7 +52,7 @@ func main() {
 		client.LineBreak,
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "NS", app.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "IXO", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)

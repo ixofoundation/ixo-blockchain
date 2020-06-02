@@ -5,5 +5,5 @@ import (
 )
 
 const (
-	DefaultCodeSpace types.CodespaceType = ModuleName
+	DefaultCodespace types.CodespaceType = ModuleName
 )

@@ -1,14 +1,17 @@
 package treasury
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
 
 const (
-	ModuleName = types.ModuleName
-	RouterKey  = types.RouterKey
-	StoreKey   = types.StoreKey
+	ModuleName   = types.ModuleName
+	QuerierRoute = types.QuerierRoute
+	RouterKey    = types.RouterKey
+	StoreKey     = types.StoreKey
+
+	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

@@ -1,15 +1,15 @@
 package types
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 const (
 	ModuleName        = "project"
 	DefaultParamspace = ModuleName
 	StoreKey          = ModuleName
-	RouterKey         = StoreKey
-	QuerierRoute      = RouterKey
+	RouterKey         = ModuleName
+	QuerierRoute      = ModuleName
 )
 
 var (

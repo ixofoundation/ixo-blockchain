@@ -6,10 +6,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	client2 "github.com/ixofoundation/ixo-cosmos/x/bonds/client"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
+	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"strings"
 )
 
 func GetTxCmd(cdc *codec.Codec) *cobra.Command {
@@ -57,63 +58,61 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			// Check that bond token is a valid token name
-			err = client2.CheckCoinDenom(_token)
-			if err != nil {
-				return err
-			}
-
 			// Parse function parameters
-			functionParams, err := client2.ParseFunctionParams(_functionParameters, _functionType)
+			functionParams, err := client2.ParseFunctionParams(_functionParameters)
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
 
 			// Parse reserve tokens
-			reserveTokens, err := client2.ParseReserveTokens(_reserveTokens, _functionType, _token)
-			if err != nil {
-				return fmt.Errorf(err.Error())
-			}
+			reserveTokens := strings.Split(_reserveTokens, ",")
 
+			// Parse tx fee percentage
 			txFeePercentage, err := sdk.NewDecFromStr(_txFeePercentage)
 			if err != nil {
 				return fmt.Errorf(types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, "tx fee percentage").Error())
 			}
 
+			// Parse exit fee percentage
 			exitFeePercentage, err := sdk.NewDecFromStr(_exitFeePercentage)
 			if err != nil {
 				return fmt.Errorf(types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, "exit fee percentage").Error())
 			}
 
-			if txFeePercentage.Add(exitFeePercentage).GTE(sdk.NewDec(100)) {
-				return fmt.Errorf(types.ErrFeesCannotBeOrExceed100Percent(types.DefaultCodespace).Error())
-			}
-
+			// Parse fee address
 			feeAddress, err := sdk.AccAddressFromBech32(_feeAddress)
 			if err != nil {
 				return err
 			}
 
-			maxSupply, err := client2.ParseMaxSupply(_maxSupply, _token)
+			// Parse max supply
+			maxSupply, err := sdk.ParseCoin(_maxSupply)
 			if err != nil {
 				return err
 			}
 
+			// Parse order quantity limits
 			orderQuantityLimits, err := sdk.ParseCoins(_orderQuantityLimits)
 			if err != nil {
 				return err
 			}
 
-			// Parse sanity
-			sanityRate, sanityMarginPercentage, err := client2.ParseSanityValues(_sanityRate, _sanityMarginPercentage)
+			// parse sanity rate
+			sanityRate, err := sdk.NewDecFromStr(_sanityRate)
+			if err != nil {
+				return fmt.Errorf(err.Error())
+			}
+
+			// Parse sanity margin percentage
+			sanityMarginPercentage, err := sdk.NewDecFromStr(_sanityMarginPercentage)
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
 
 			// Parse batch blocks
-			batchBlocks, err := client2.ParseBatchBlocks(_batchBlocks)
+			batchBlocks, err := sdk.ParseUint(_batchBlocks)
 			if err != nil {
-				return fmt.Errorf(err.Error())
+				return types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
 			}
 
 			// Parse bond's sovrin DID
@@ -259,13 +258,7 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// Check that from amount and token can be parsed to a coin
-			from, err := client2.ParseCoin(args[0], args[1])
-			if err != nil {
-				return err
-			}
-
-			// Check that to_token is a valid token name
-			err = client2.CheckCoinDenom(args[2])
+			from, err := client2.ParseTwoPartCoin(args[0], args[1])
 			if err != nil {
 				return err
 			}

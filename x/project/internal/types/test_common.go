@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 var ValidCreateProjectMsg = MsgCreateProject{
@@ -39,12 +40,13 @@ var ValidUpdateProjectMsg = MsgCreateProject{
 }
 
 var ValidWithdrawalInfo = WithdrawalInfo{
-	ActionID:            "1",
-	ProjectEthWallet:    "0x0F6A8D732716BA24B213D7C28984FBE1248D009D",
-	RecipientEthAddress: "0x6440b8c5f5a3c725eb394c7c40994afaf50a0d39",
-	Amount:              10,
+	ActionID:     "1",
+	ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
+	RecipientDid: "6iftm1hHdaU6LJGKayRMev",
+	Amount:       sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(10)),
 }
 
 var (
 	ValidAddress1, _ = sdk.AccAddressFromHex("0F6A8D732716BA24B213D7C28984FBE1248D009D")
+	ValidAccId1      = InternalAccountID(ValidAddress1.String())
 )

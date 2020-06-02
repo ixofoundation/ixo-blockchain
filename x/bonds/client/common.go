@@ -7,19 +7,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"strings"
 )
-
-func getRequiredParamsForFunctionType(fnType string) (fnParams []string, err sdk.Error) {
-	expectedParams, ok := types.RequiredParamsForFunctionType[fnType]
-	if !ok {
-		return nil, types.ErrUnrecognizedFunctionType(types.DefaultCodespace)
-	}
-	return expectedParams, nil
-}
 
 func splitParameters(fnParamsStr string) (paramValuePairs []string) {
 	// If empty, just return empty list
@@ -43,31 +35,21 @@ func paramsListToMap(paramValuePairs []string) (paramsFieldMap map[string]string
 	return paramsFieldMap, nil
 }
 
-func paramsMapToObj(paramsFieldMap map[string]string, expectedParams []string) (functionParams types.FunctionParams, err sdk.Error) {
-	for _, p := range expectedParams {
-		val, ok := sdk.NewIntFromString(paramsFieldMap[p])
+func paramsMapToObj(paramsFieldMap map[string]string) (functionParams types.FunctionParams, err sdk.Error) {
+	for p, v := range paramsFieldMap {
+		vInt, ok := sdk.NewIntFromString(v)
 		if !ok {
-			return nil, types.ErrFunctionParameterMissingOrNonInteger(types.DefaultCodespace, p)
+			return nil, types.ErrArgumentMissingOrNonInteger(types.DefaultCodespace, p)
 		} else {
-			functionParams = append(functionParams, types.NewFunctionParam(p, val))
+			functionParams = append(functionParams, types.NewFunctionParam(p, vInt))
 		}
 	}
 	return functionParams, nil
 }
 
-func ParseFunctionParams(fnParamsStr string, fnType string) (fnParams types.FunctionParams, err sdk.Error) {
-
-	// Come up with list of expected parameters
-	expectedParams, err := getRequiredParamsForFunctionType(fnType)
-	if err != nil {
-		return nil, err
-	}
-
+func ParseFunctionParams(fnParamsStr string) (fnParams types.FunctionParams, err sdk.Error) {
 	// Split (if not empty) and check number of parameters
 	paramValuePairs := splitParameters(fnParamsStr)
-	if len(paramValuePairs) != len(expectedParams) {
-		return nil, types.ErrIncorrectNumberOfFunctionParameters(types.DefaultCodespace, len(expectedParams))
-	}
 
 	// Parse function parameters into map
 	paramsFieldMap, err := paramsListToMap(paramValuePairs)
@@ -76,7 +58,7 @@ func ParseFunctionParams(fnParamsStr string, fnType string) (fnParams types.Func
 	}
 
 	// Parse parameters into integers
-	functionParams, err := paramsMapToObj(paramsFieldMap, expectedParams)
+	functionParams, err := paramsMapToObj(paramsFieldMap)
 	if err != nil {
 		return nil, err
 	}
@@ -84,120 +66,7 @@ func ParseFunctionParams(fnParamsStr string, fnType string) (fnParams types.Func
 	return functionParams, nil
 }
 
-func checkReserveTokenNames(resTokens []string, token string) error {
-	// Check that no token is the same as the main token, no token
-	// is duplicate, and that the token is a valid denomination
-	uniqueReserveTokens := make(map[string]string)
-	for _, r := range resTokens {
-		// Check if same as main token
-		if r == token {
-			return types.ErrBondTokenCannotAlsoBeReserveToken(types.DefaultCodespace)
-		}
-
-		// Check if duplicate
-		if _, ok := uniqueReserveTokens[r]; ok {
-			return types.ErrDuplicateReserveToken(types.DefaultCodespace)
-		} else {
-			uniqueReserveTokens[r] = ""
-		}
-
-		// Check if can be parsed as coin
-		err := CheckCoinDenom(r)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func checkNoOfReserveTokens(resTokens []string, fnType string) sdk.Error {
-	// Come up with number of expected reserve tokens
-	expectedNoOfTokens, ok := types.NoOfReserveTokensForFunctionType[fnType]
-	if !ok {
-		return types.ErrUnrecognizedFunctionType(types.DefaultCodespace)
-	}
-
-	// Check that number of reserve tokens is correct (if expecting a specific number of tokens)
-	if expectedNoOfTokens != types.AnyNumberOfReserveTokens && len(resTokens) != expectedNoOfTokens {
-		return types.ErrIncorrectNumberOfReserveTokens(types.DefaultCodespace, expectedNoOfTokens)
-	}
-
-	return nil
-}
-
-func ParseReserveTokens(resTokensStr string, fnType string, token string) (resTokens []string, err error) {
-	resTokens = strings.Split(resTokensStr, ",")
-	if err = checkReserveTokenNames(resTokens, token); err != nil {
-		return nil, err
-	} else if err = checkNoOfReserveTokens(resTokens, fnType); err != nil {
-		return nil, err
-	}
-	return resTokens, nil
-}
-
-func ParseMaxSupply(maxSupplyStr string, token string) (coin sdk.Coin, err error) {
-	maxSupply, err := sdk.ParseCoin(maxSupplyStr)
-	if err != nil {
-		return sdk.Coin{}, err
-	} else if maxSupply.Denom != token {
-		return sdk.Coin{}, types.ErrMaxSupplyDenomDoesNotMatchTokenDenom(types.DefaultCodespace)
-	}
-	return maxSupply, nil
-}
-
-func parseNonNegativeDec(decStr string, decName string) (dec sdk.Dec, err sdk.Error) {
-	dec, err = sdk.NewDecFromStr(decStr)
-	if err != nil {
-		return sdk.Dec{}, types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, decName)
-	} else if dec.IsNegative() {
-		return sdk.Dec{}, types.ErrArgumentCannotBeNegative(types.DefaultCodespace, decName)
-	}
-	return dec, nil
-}
-
-func ParseSanityValues(sanityRateStr string, sanityMarginPercentageStr string) (sanityRate, sanityMarginPercentage sdk.Dec, err sdk.Error) {
-
-	// If sanity rate is provided, margin percentage has to be provided
-	// If sanity rate is not provided, margin percentage is ignored
-
-	if sanityRateStr == "" {
-		sanityRate = sdk.ZeroDec()
-		sanityMarginPercentage = sdk.ZeroDec()
-	} else {
-		// Check that both parsable and not negative
-		sanityRate, err = parseNonNegativeDec(sanityRateStr, "sanity rate")
-		if err != nil {
-			return sdk.Dec{}, sdk.Dec{}, err
-		}
-		sanityMarginPercentage, err = parseNonNegativeDec(sanityMarginPercentageStr, "sanity margin percentage")
-		if err != nil {
-			return sdk.Dec{}, sdk.Dec{}, err
-		}
-	}
-
-	return sanityRate, sanityMarginPercentage, nil
-}
-
-func ParseBatchBlocks(batchBlocksStr string) (batchBlocks sdk.Uint, err error) {
-
-	batchBlocks, err = sdk.ParseUint(batchBlocksStr)
-	if err != nil {
-		return sdk.Uint{}, types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
-	}
-	return batchBlocks, nil
-}
-
-func CheckCoinDenom(denom string) (err error) {
-	coin, err := sdk.ParseCoin("0" + denom)
-	if err != nil {
-		return err
-	} else if denom != coin.Denom {
-		return types.ErrInvalidCoinDenomination(types.DefaultCodespace, denom)
-	}
-	return nil
-}
-
-func ParseCoin(amount, denom string) (coin sdk.Coin, err error) {
+func ParseTwoPartCoin(amount, denom string) (coin sdk.Coin, err error) {
 	coin, err = sdk.ParseCoin(amount + denom)
 	if err != nil {
 		return sdk.Coin{}, err

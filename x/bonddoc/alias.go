@@ -1,8 +1,8 @@
 package bonddoc
 
 import (
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
 )
 
 const (
@@ -11,7 +11,7 @@ const (
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
 
-	DefaultCodeSpace = types.DefaultCodeSpace
+	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

@@ -4,8 +4,8 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-cosmos/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func NewAnteHandler(bonddocKeeper Keeper) sdk.AnteHandler {

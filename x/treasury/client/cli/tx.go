@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
-	"github.com/ixofoundation/ixo-cosmos/x/treasury/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
 
 func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
@@ -70,13 +70,15 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 			}
 
 			toDid := args[0]
+			coinsStr := args[1]
+			sovrinDidStr := args[2]
 
-			coins, err := sdk.ParseCoins(args[1])
+			coins, err := sdk.ParseCoins(coinsStr)
 			if err != nil {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[2])
+			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
 			msg := types.NewMsgSend(toDid, coins, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
@@ -86,28 +88,31 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "oracle-transfer [from-did] [to-did] [amount] [oracle-sovrin-did]",
+		Use:   "oracle-transfer [from-did] [to-did] [amount] [oracle-sovrin-did] [proof]",
 		Short: "Create and sign an oracle-transfer tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 ||
-				len(args[2]) == 0 || len(args[3]) == 0 {
+			if len(args) != 5 || len(args[0]) == 0 || len(args[1]) == 0 ||
+				len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 {
 				return errors.New("You must provide the sender and receiver " +
-					"DID, amount, and sender private key")
+					"DID, amount, sender private key, and proof")
 			}
 
 			fromDid := args[0]
 			toDid := args[1]
+			coinsStr := args[2]
+			sovrinDidStr := args[3]
+			proof := args[4]
 
-			coins, err := sdk.ParseCoins(args[2])
+			coins, err := sdk.ParseCoins(coinsStr)
 			if err != nil {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[3])
-			msg := types.NewMsgSendOnBehalfOf(fromDid, toDid, coins, sovrinDid)
+			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			msg := types.NewMsgOracleTransfer(fromDid, toDid, coins, sovrinDid, proof)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -116,27 +121,30 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "oracle-mint [to-did] [amount] [oracle-sovrin-did]",
+		Use:   "oracle-mint [to-did] [amount] [oracle-sovrin-did] [proof]",
 		Short: "Create and sign an oracle-mint tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 3 || len(args[0]) == 0 ||
-				len(args[1]) == 0 || len(args[2]) == 0 {
+			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 ||
+				len(args[2]) == 0 || len(args[3]) == 0 {
 				return errors.New("You must provide the recipient DID, " +
-					"amount, and oracle private key")
+					"amount, oracle private key, and proof")
 			}
 
 			toDid := args[0]
+			coinsStr := args[1]
+			sovrinDidStr := args[2]
+			proof := args[3]
 
-			coins, err := sdk.ParseCoins(args[1])
+			coins, err := sdk.ParseCoins(coinsStr)
 			if err != nil {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[2])
-			msg := types.NewMsgMint(toDid, coins, sovrinDid)
+			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			msg := types.NewMsgOracleMint(toDid, coins, sovrinDid, proof)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
@@ -145,27 +153,30 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "oracle-burn [from-did] [amount] [oracle-sovrin-did]",
+		Use:   "oracle-burn [from-did] [amount] [oracle-sovrin-did] [proof]",
 		Short: "Create and sign an oracle-burn tx using DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().
 				WithCodec(cdc)
 
-			if len(args) != 3 || len(args[0]) == 0 ||
-				len(args[1]) == 0 || len(args[2]) == 0 {
+			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 ||
+				len(args[2]) == 0 || len(args[3]) == 0 {
 				return errors.New("You must provide the source DID, " +
-					"amount, and oracle private key")
+					"amount, oracle private key, and proof")
 			}
 
 			fromDid := args[0]
+			coinsStr := args[1]
+			sovrinDidStr := args[2]
+			proof := args[3]
 
-			coins, err := sdk.ParseCoins(args[1])
+			coins, err := sdk.ParseCoins(coinsStr)
 			if err != nil {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[2])
-			msg := types.NewMsgBurn(fromDid, coins, sovrinDid)
+			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			msg := types.NewMsgOracleBurn(fromDid, coins, sovrinDid, proof)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

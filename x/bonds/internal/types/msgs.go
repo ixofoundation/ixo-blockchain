@@ -2,8 +2,9 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"strings"
 )
 
@@ -82,16 +83,55 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	}
 	// Note: FunctionParameters can be empty
 
+	// Check that bond token is a valid token name
+	err := CheckCoinDenom(msg.Token)
+	if err != nil {
+		return ErrInvalidCoinDenomination(DefaultCodespace, msg.Token)
+	}
+
+	// Validate function parameters
+	if err := msg.FunctionParameters.Validate(msg.FunctionType); err != nil {
+		return err
+	}
+
+	// Validate reserve tokens
+	if err = CheckReserveTokenNames(msg.ReserveTokens, msg.Token); err != nil {
+		return err
+	} else if err = CheckNoOfReserveTokens(msg.ReserveTokens, msg.FunctionType); err != nil {
+		return err
+	}
+
+	// Validate coins
+	if !msg.MaxSupply.IsValid() {
+		return sdk.ErrInternal("max supply is invalid")
+	} else if !msg.OrderQuantityLimits.IsValid() {
+		return sdk.ErrInternal("order quantity limits are invalid")
+	}
+
+	// Check that max supply denom matches token denom
+	if msg.MaxSupply.Denom != msg.Token {
+		return ErrMaxSupplyDenomDoesNotMatchTokenDenom(DefaultCodespace)
+	}
+
+	// Check that Sanity values not negative
+	if msg.SanityRate.IsNegative() {
+		return ErrArgumentCannotBeNegative(DefaultCodespace, "SanityRate")
+	} else if msg.SanityMarginPercentage.IsNegative() {
+		return ErrArgumentCannotBeNegative(DefaultCodespace, "SanityMarginPercentage")
+	}
+
 	// Check that true or false
 	if msg.AllowSells != TRUE && msg.AllowSells != FALSE {
 		return ErrArgumentMissingOrNonBoolean(DefaultCodespace, "AllowSells")
 	}
 
-	// Check that not negative
+	// Check FeePercentages not negative and don't add up to 100
 	if msg.TxFeePercentage.IsNegative() {
 		return ErrArgumentCannotBeNegative(DefaultCodespace, "TxFeePercentage")
 	} else if msg.ExitFeePercentage.IsNegative() {
 		return ErrArgumentCannotBeNegative(DefaultCodespace, "ExitFeePercentage")
+	} else if msg.TxFeePercentage.Add(msg.ExitFeePercentage).GTE(sdk.NewDec(100)) {
+		return ErrFeesCannotBeOrExceed100Percent(DefaultCodespace)
 	}
 
 	// Check that not zero
@@ -99,16 +139,16 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentMustBePositive(DefaultCodespace, "BatchBlocks")
 	} else if msg.MaxSupply.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "MaxSupply")
-	} else {
-		// TODO: consider allowing negative function parameters where possible
-		for _, fp := range msg.FunctionParameters {
-			if fp.Value.IsZero() {
-				return ErrArgumentMustBePositive(DefaultCodespace, "FunctionParams:"+fp.Param)
-			}
-		}
 	}
 
 	// Note: uniqueness of reserve tokens checked when parsing
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.CreatorDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+	}
 
 	return nil
 }
@@ -123,7 +163,7 @@ func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
-func (msg MsgCreateBond) Type() string { return ModuleName }
+func (msg MsgCreateBond) Type() string { return "create_bond" }
 
 type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes              string  `json:"signBytes" yaml:"signBytes"`
@@ -188,6 +228,13 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 		return ErrDidNotEditAnything(DefaultCodespace)
 	}
 
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.EditorDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "editor did is invalid")
+	}
+
 	return nil
 }
 
@@ -201,7 +248,7 @@ func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 
 func (msg MsgEditBond) Route() string { return RouterKey }
 
-func (msg MsgEditBond) Type() string { return ModuleName }
+func (msg MsgEditBond) Type() string { return "edit_bond" }
 
 type MsgBuy struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes string    `json:"signBytes" yaml:"signBytes"`
@@ -234,9 +281,23 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	}
 
-	// Check that non zero
-	if msg.Amount.Amount.IsZero() {
+	// Check that amount valid and non zero
+	if !msg.Amount.IsValid() {
+		return sdk.ErrInternal("amount is invalid")
+	} else if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
+	}
+
+	// Check that maxPrices valid
+	if !msg.MaxPrices.IsValid() {
+		return sdk.ErrInternal("maxprices is invalid")
+	}
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.BuyerDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "buyer did is invalid")
 	}
 
 	return nil
@@ -252,7 +313,7 @@ func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 
 func (msg MsgBuy) Route() string { return RouterKey }
 
-func (msg MsgBuy) Type() string { return ModuleName }
+func (msg MsgBuy) Type() string { return "buy" }
 
 type MsgSell struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes string   `json:"signBytes" yaml:"signBytes"`
@@ -282,9 +343,18 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	}
 
-	// Check that non zero
-	if msg.Amount.Amount.IsZero() {
+	// Check that amount valid and non zero
+	if !msg.Amount.IsValid() {
+		return sdk.ErrInternal("amount is invalid")
+	} else if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
+	}
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.SellerDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "seller did is invalid")
 	}
 
 	return nil
@@ -300,7 +370,7 @@ func (msg MsgSell) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSell) Route() string { return RouterKey }
 
-func (msg MsgSell) Type() string { return ModuleName }
+func (msg MsgSell) Type() string { return "sell" }
 
 type MsgSwap struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
 	SignBytes  string   `json:"signBytes" yaml:"signBytes"`
@@ -335,6 +405,17 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "ToToken")
 	}
 
+	// Validate from amount
+	if !msg.From.IsValid() {
+		return sdk.ErrInternal("from amount is invalid")
+	}
+
+	// Validate to token
+	err := CheckCoinDenom(msg.ToToken)
+	if err != nil {
+		return err
+	}
+
 	// Check if from and to the same token
 	if msg.From.Denom == msg.ToToken {
 		return ErrFromAndToCannotBeTheSameToken(DefaultCodespace)
@@ -346,6 +427,14 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 	}
 
 	// Note: From denom and amount must be valid since sdk.Coin
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !ixo.IsValidDid(msg.SwapperDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "swapper did is invalid")
+	}
+
 	return nil
 }
 
@@ -359,4 +448,4 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSwap) Route() string { return RouterKey }
 
-func (msg MsgSwap) Type() string { return ModuleName }
+func (msg MsgSwap) Type() string { return "swap" }

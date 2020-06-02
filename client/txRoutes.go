@@ -22,7 +22,7 @@ import (
 	core "github.com/tendermint/tendermint/rpc/core/types"
 
 	genutilrest "github.com/cosmos/cosmos-sdk/x/genutil/client/rest"
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func QueryTxCmd(cdc *codec.Codec) *cobra.Command {

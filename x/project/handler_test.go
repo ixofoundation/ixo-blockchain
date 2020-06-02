@@ -1,7 +1,6 @@
 package project
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -10,16 +9,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-cosmos/x/ixo"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/keeper"
-	"github.com/ixofoundation/ixo-cosmos/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, keeper, cdc, feesKeeper, bankKeeper := keeper.CreateTestInput()
+	ctx, k, cdc, feesKeeper, bankKeeper := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
+	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 	params := feesKeeper.GetParams(ctx)
@@ -35,24 +34,21 @@ func TestHandler_CreateClaim(t *testing.T) {
 		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
 	}
 
-	res := handleMsgCreateClaim(ctx, keeper, feesKeeper, bankKeeper, projectMsg)
+	res := handleMsgCreateClaim(ctx, k, feesKeeper, bankKeeper, projectMsg)
 	require.NotNil(t, res)
 }
 
 func TestHandler_ProjectMsg(t *testing.T) {
-	ctx, keeper, cdc, _, _ := keeper.CreateTestInput()
+	ctx, k, cdc, _, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateProject{}, "ixo/createProjectMsg", nil)
+	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	res := handleMsgCreateProject(ctx, keeper, types.ValidCreateProjectMsg)
-
-	var projectDoc MsgCreateProject
-	json.Unmarshal(res.Data, &projectDoc)
+	res := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
 	require.True(t, res.IsOK())
 
-	res = handleMsgCreateProject(ctx, keeper, types.ValidCreateProjectMsg)
+	res = handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
 	require.False(t, res.IsOK())
 
 }
@@ -60,7 +56,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	ctx, k, cdc, fk, bk := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateEvaluation{}, "ixo/createEvaluationMsg", nil)
+	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
@@ -101,8 +97,11 @@ func Test_CreateEvaluation(t *testing.T) {
 		},
 	}
 
-	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
-	createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), msg.GetProjectDid())
+	var err sdk.Error
+	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
+	require.Nil(t, err)
+	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.GetProjectDid()))
+	require.Nil(t, err)
 
 	require.False(t, k.ProjectDocExists(ctx, msg.GetProjectDid()))
 	k.SetProjectDoc(ctx, &msg)
@@ -114,18 +113,18 @@ func Test_CreateEvaluation(t *testing.T) {
 func Test_WithdrawFunds(t *testing.T) {
 	ctx, k, cdc, _, bk := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
+	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	cdc.RegisterConcrete(types.MsgWithdrawFunds{}, "ixo-cosmos/withdrawFundsMsg", nil)
 
 	msg := types.MsgWithdrawFunds{
 		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
 		Data: types.WithdrawFundsDoc{
-			ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-			EthWallet:  "ethwallet",
-			Amount:     "100",
-			IsRefund:   true,
+			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
+			RecipientDid: "6iftm1hHdaU6LJGKayRMev",
+			Amount:       sdk.NewInt(100),
+			IsRefund:     true,
 		},
 	}
 
@@ -145,8 +144,12 @@ func Test_WithdrawFunds(t *testing.T) {
 			Status:               "PAIDOUT",
 		},
 	}
-	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
-	createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), msg1.GetProjectDid())
+
+	var err sdk.Error
+	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
+	require.Nil(t, err)
+	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), InternalAccountID(msg1.GetProjectDid()))
+	require.Nil(t, err)
 
 	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
 
