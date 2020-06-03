@@ -76,6 +76,7 @@ var (
 		oracles.AppModuleBasic{},
 	)
 
+	// Module account permissions
 	maccPerms = map[string][]string{
 		auth.FeeCollectorName:            nil,
 		distribution.ModuleName:          nil,
@@ -89,9 +90,8 @@ var (
 		fees.FeeRemainderPool:            nil,
 	}
 
-	feesReservedIdPrefixes = []string{
-		project.ModuleName,
-	}
+	// Reserved fees module ID prefixes
+	feesReservedIdPrefixes = []string{}
 )
 
 func MakeCodec() *codec.Codec {

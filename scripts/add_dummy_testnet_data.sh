@@ -265,7 +265,7 @@ ixocli tx fees create-fee "$FEE" "$CREATOR" --broadcast-mode block
 
 # Create fee contract
 echo "Creating fee contract..."
-FEE_ID="fee:fee1"  # from FEE
+FEE_ID="fee:fee1" # from FEE
 FEE_CONTRACT_ID="fee:contract:fee1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
