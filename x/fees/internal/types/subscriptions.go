@@ -135,8 +135,6 @@ func (p BlockPeriod) Validate() sdk.Error {
 		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
 	} else if p.PeriodLength <= 0 {
 		return ErrInvalidPeriod(DefaultCodespace, "period length must be greater than zero")
-	} else if p.PeriodStartBlock+p.PeriodLength != p.periodEndBlock() {
-		return ErrInvalidPeriod(DefaultCodespace, "period start + period length != period end")
 	}
 
 	return nil
@@ -160,19 +158,19 @@ func (p BlockPeriod) nextPeriod() Period {
 var _ Period = TimePeriod{}
 
 type TimePeriod struct {
-	PeriodLength    time.Duration `json:"period_length" yaml:"period_length"`
-	PeriodStartTime time.Time     `json:"period_start_time" yaml:"period_start_time"`
+	PeriodDurationNs time.Duration `json:"period_duration_ns" yaml:"period_duration_ns"`
+	PeriodStartTime  time.Time     `json:"period_start_time" yaml:"period_start_time"`
 }
 
-func NewTimePeriod(periodLength time.Duration, periodStartTime time.Time) TimePeriod {
+func NewTimePeriod(periodDurationNs time.Duration, periodStartTime time.Time) TimePeriod {
 	return TimePeriod{
-		PeriodLength:    periodLength,
-		PeriodStartTime: periodStartTime,
+		PeriodDurationNs: periodDurationNs,
+		PeriodStartTime:  periodStartTime,
 	}
 }
 
 func (p TimePeriod) periodEndTime() time.Time {
-	return p.PeriodStartTime.Add(p.PeriodLength)
+	return p.PeriodStartTime.Add(p.PeriodDurationNs)
 }
 
 func (p TimePeriod) GetPeriodUnit() string {
@@ -184,10 +182,8 @@ func (p TimePeriod) Validate() sdk.Error {
 	// Validate period-related values
 	if p.PeriodStartTime.After(p.periodEndTime()) {
 		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
-	} else if p.PeriodLength <= 0 {
-		return ErrInvalidPeriod(DefaultCodespace, "period length cannot be zero")
-	} else if !p.PeriodStartTime.Add(p.PeriodLength).Equal(p.periodEndTime()) {
-		return ErrInvalidPeriod(DefaultCodespace, "period start + period length != period end")
+	} else if p.PeriodDurationNs <= 0 {
+		return ErrInvalidPeriod(DefaultCodespace, "period duration cannot be zero")
 	}
 
 	return nil
