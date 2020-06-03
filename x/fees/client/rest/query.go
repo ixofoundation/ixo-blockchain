@@ -12,6 +12,20 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
 )
 
+func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	r.HandleFunc("/fees/params",
+		queryParamsHandler(cliCtx)).Methods("GET")
+
+	r.HandleFunc(fmt.Sprintf("/fees/{%s}", RestFeeId),
+		queryFeeHandler(cliCtx)).Methods("GET")
+
+	r.HandleFunc(fmt.Sprintf("/fee/contracts/{%s}", RestFeeContractId),
+		queryFeeContractHandler(cliCtx)).Methods("GET")
+
+	r.HandleFunc(fmt.Sprintf("/fee/subscriptions/{%s}", RestSubscriptionId),
+		querySubscriptionHandler(cliCtx)).Methods("GET")
+}
+
 func queryParamsHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
