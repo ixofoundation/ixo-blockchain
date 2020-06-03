@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type MsgCreateBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+type MsgCreateBond struct {
 	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
 	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
 	Token                  string         `json:"token" yaml:"token"`
@@ -168,7 +168,7 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 
 func (msg MsgCreateBond) Type() string { return "create_bond" }
 
-type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+type MsgEditBond struct {
 	BondDid                ixo.Did `json:"bond_did" yaml:"bond_did"`
 	Token                  string  `json:"token" yaml:"token"`
 	Name                   string  `json:"name" yaml:"name"`
@@ -255,7 +255,7 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return "edit_bond" }
 
-type MsgBuy struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+type MsgBuy struct {
 	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
 	PubKey    string    `json:"pub_key" yaml:"pub_key"`
 	Amount    sdk.Coin  `json:"amount" yaml:"amount"`
@@ -322,7 +322,7 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return "buy" }
 
-type MsgSell struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+type MsgSell struct {
 	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
 	PubKey    string   `json:"pub_key" yaml:"pub_key"`
 	Amount    sdk.Coin `json:"amount" yaml:"amount"`
@@ -381,7 +381,7 @@ func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return "sell" }
 
-type MsgSwap struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
+type MsgSwap struct {
 	SwapperDid ixo.Did  `json:"swapper_did" yaml:"swapper_did"`
 	PubKey     string   `json:"pub_key" yaml:"pub_key"`
 	BondDid    ixo.Did  `json:"bond_did" yaml:"bond_did"`
