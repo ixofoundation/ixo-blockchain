@@ -62,10 +62,10 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	feesTxCmd.AddCommand(client.PostCommands(
-		cli.GetCmdSetFeeContractAuthorisation(cdc),
 		cli.GetCmdCreateFee(cdc),
 		cli.GetCmdCreateFeeContract(cdc),
 		cli.GetCmdCreateSubscription(cdc),
+		cli.GetCmdSetFeeContractAuthorisation(cdc),
 		cli.GetCmdGrantFeeDiscount(cdc),
 		cli.GetCmdRevokeFeeDiscount(cdc),
 		cli.GetCmdChargeFee(cdc),

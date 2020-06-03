@@ -68,33 +68,6 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 	return sovrinDid
 }
 
-func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "set-fee-contract-authorisation [fee-contract-id] [authorised] [payer-sovrin-did]",
-		Short: "Create and sign a set-fee-contract-authorisation tx using DIDs",
-		Args:  cobra.ExactArgs(3),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
-			feeContractIdStr := args[0]
-			authorisedStr := args[1]
-			sovrinDidStr := args[2]
-
-			authorised, err := parseBool(authorisedStr, "authorised")
-			if err != nil {
-				return err
-			}
-
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
-
-			msg := types.NewMsgSetFeeContractAuthorisation(
-				feeContractIdStr, authorised, sovrinDid)
-
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
-		},
-	}
-}
-
 func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "create-fee [fee-json] [creator-sovrin-did]",
@@ -193,6 +166,33 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				feeContractIdStr, maxPeriods, period, sovrinDid)
+
+			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+		},
+	}
+}
+
+func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "set-fee-contract-authorisation [fee-contract-id] [authorised] [payer-sovrin-did]",
+		Short: "Create and sign a set-fee-contract-authorisation tx using DIDs",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.NewCLIContext().WithCodec(cdc)
+
+			feeContractIdStr := args[0]
+			authorisedStr := args[1]
+			sovrinDidStr := args[2]
+
+			authorised, err := parseBool(authorisedStr, "authorised")
+			if err != nil {
+				return err
+			}
+
+			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+
+			msg := types.NewMsgSetFeeContractAuthorisation(
+				feeContractIdStr, authorised, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},
