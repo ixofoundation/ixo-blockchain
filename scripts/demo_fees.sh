@@ -26,11 +26,11 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Ledgering Francesco DID..."
-ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block
 echo "Ledgering Shaun DID..."
-ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Create fee
 echo "Creating fee..."
@@ -44,7 +44,7 @@ echo "Creating fee contract..."
 FEE_CONTRACT_ID="fee:contract:fee1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixocli q did getAddressFromDid $FRANCESCO_DID)"
+PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
 ixocli tx fees create-fee-contract "$FEE_CONTRACT_ID" "$FEE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block
 
 # Authorise fee contract

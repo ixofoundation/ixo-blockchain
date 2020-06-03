@@ -39,9 +39,9 @@ FRANCESCO_DID_FULL="{\"did\":\"did:ixo:UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Ledgering DID 2/2..."
-ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block
 
 echo "Creating bond..."
 ixocli tx bonds create-bond \
@@ -64,7 +64,7 @@ ixocli tx bonds create-bond \
   --creator-did="$MIGUEL_DID" \
   --broadcast-mode block
 echo "Created bond..."
-ixocli query bonds bond "$BOND_DID"
+ixocli q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
 ixocli tx bonds edit-bond \
@@ -74,24 +74,24 @@ ixocli tx bonds edit-bond \
   --editor-did="$MIGUEL_DID" \
   --broadcast-mode block
 echo "Edited bond..."
-ixocli query bonds bond "$BOND_DID"
+ixocli q bonds bond "$BOND_DID"
 
 echo "Miguel buys 10abc..."
 tx buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixocli query auth account "$MIGUEL_ADDR"
+ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
 tx buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixocli query auth account "$FRANCESCO_ADDR"
+ixocli q auth account "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
 tx sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixocli query auth account "$MIGUEL_ADDR"
+ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
 tx sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixocli query auth account "$FRANCESCO_ADDR"
+ixocli q auth account "$FRANCESCO_ADDR"

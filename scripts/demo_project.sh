@@ -31,36 +31,36 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Ledgering Francesco DID..."
-ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block
 echo "Ledgering Shaun DID..."
-ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
 echo "Creating project..."
-ixocli tx project createProject "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to CREATED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to PENDING..."
-ixocli tx project updateProjectStatus "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Fund project and progress status to FUNDED
 echo "Funding project (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
 ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_DID/$PROJECT_DID" 10000000000ixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project updateProjectStatus "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Create claim and evaluation
 echo "Creating a claim in project..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project createClaim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Creating an evaluation in project..."
 SENDER_DID="$MIGUEL_DID"
-STATUS="1" # createEvaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
-ixocli tx project createEvaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block
+STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
+ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Expected InitiatingNodePayFees:  100000000
 # Expected IxoFees:                 50000000
@@ -72,13 +72,13 @@ ixocli tx project createEvaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$
 # Progress project status to PAIDOUT
 SENDER_DID="$SHAUN_DID"
 echo "Updating project to STARTED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" STARTED "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to STOPPED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" STOPPED "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to PAIDOUT..."
-ixocli tx project updateProjectStatus "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Project withdrawals query..."
-ixocli q project getProjectTxs $PROJECT_DID
+ixocli q project get-project-txs $PROJECT_DID
 
 # Expected InitiatingNodePayFees:          0
 # Expected IxoFees:                        0
@@ -105,7 +105,7 @@ echo "Withdraw funds as Miguel..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":false}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
-ixocli q project getProjectTxs $PROJECT_DID
+ixocli q project get-project-txs $PROJECT_DID
 
 # Expected InitiatingNodePayFees:          0
 # Expected IxoFees:                        0
@@ -120,7 +120,7 @@ echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
-ixocli q project getProjectTxs $PROJECT_DID
+ixocli q project get-project-txs $PROJECT_DID
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
@@ -128,7 +128,7 @@ echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
-ixocli q project getProjectTxs $PROJECT_DID
+ixocli q project get-project-txs $PROJECT_DID
 
 # Expected InitiatingNodePayFees:          0
 # Expected IxoFees:                        0

@@ -15,8 +15,7 @@ func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
 		Use:   "params",
 		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 				keeper.QueryParams), nil)

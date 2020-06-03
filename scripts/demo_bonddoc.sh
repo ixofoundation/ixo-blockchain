@@ -28,13 +28,13 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 
 # Ledger DIDs
 echo "Ledgering Shaun DID..."
-ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Create bonddoc and progress status to OPEN
 SENDER_DID="$SHAUN_DID"
 echo "Creating bonddoc..."
-ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC_INFO" "$BONDDOC_DID_FULL" --broadcast-mode block
+ixocli tx bonddoc create-bond "$SENDER_DID" "$BONDDOC_INFO" "$BONDDOC_DID_FULL" --broadcast-mode block
 echo "Updating bonddoc to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC_DID_FULL" --broadcast-mode block
+ixocli tx bonddoc update-bond-status "$SENDER_DID" PREISSUANCE "$BONDDOC_DID_FULL" --broadcast-mode block
 echo "Updating bonddoc to OPEN..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" OPEN "$BONDDOC_DID_FULL" --broadcast-mode block
+ixocli tx bonddoc update-bond-status "$SENDER_DID" OPEN "$BONDDOC_DID_FULL" --broadcast-mode block
