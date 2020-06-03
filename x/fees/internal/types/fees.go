@@ -9,7 +9,8 @@ const (
 	FeeEvaluationTransaction FeeType = "FeeEvaluationTransaction"
 )
 
-type FeeContent struct {
+type Fee struct {
+	Id                 string       `json:"id" yaml:"id"`
 	ChargeAmount       sdk.Coins    `json:"charge_amount" yaml:"charge_amount"`
 	ChargeMinimum      sdk.Coins    `json:"charge_minimum" yaml:"charge_minimum"`
 	ChargeMaximum      sdk.Coins    `json:"charge_maximum" yaml:"charge_maximum"`
@@ -17,9 +18,10 @@ type FeeContent struct {
 	WalletDistribution Distribution `json:"wallet_distribution" yaml:"wallet_distribution"`
 }
 
-func NewFeeContent(chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
-	discounts Discounts, walletDistribution Distribution) FeeContent {
-	return FeeContent{
+func NewFee(id string, chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
+	discounts Discounts, walletDistribution Distribution) Fee {
+	return Fee{
+		Id:                 id,
 		ChargeAmount:       chargeAmount,
 		ChargeMinimum:      chargeMinimum,
 		ChargeMaximum:      chargeMaximum,
@@ -28,11 +30,25 @@ func NewFeeContent(chargeAmount, chargeMinimum, chargeMaximum sdk.Coins,
 	}
 }
 
-func (fc FeeContent) Validate() sdk.Error {
+func (f Fee) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, sdk.Error) {
+	for _, discount := range f.Discounts {
+		if discount.Id.Equal(discountId) {
+			return discount.Percent, nil
+		}
+	}
+	return sdk.Dec{}, ErrDiscountIdIsNotInFee(DefaultCodespace)
+}
+
+func (f Fee) Validate() sdk.Error {
+	// Validate ID
+	if !IsValidFeeId(f.Id) {
+		return ErrInvalidId(DefaultCodespace, "fee id invalid")
+	}
+
 	// Validate charge amount, minimum, maximum
-	amt := &fc.ChargeAmount
-	min := &fc.ChargeMinimum
-	max := &fc.ChargeMaximum
+	amt := &f.ChargeAmount
+	min := &f.ChargeMinimum
+	max := &f.ChargeMaximum
 	if !amt.IsValid() {
 		return ErrInvalidFee(DefaultCodespace, "ChargeAmount coins invalid")
 	} else if !min.IsValid() {
@@ -48,47 +64,20 @@ func (fc FeeContent) Validate() sdk.Error {
 	}
 
 	// Validate discounts
-	if err := fc.Discounts.Validate(); err != nil {
+	if err := f.Discounts.Validate(); err != nil {
 		return err
 	}
 
 	// Validate wallet distribution
-	if err := fc.WalletDistribution.Validate(); err != nil {
+	if err := f.WalletDistribution.Validate(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (fc FeeContent) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, sdk.Error) {
-	for _, discount := range fc.Discounts {
-		if discount.Id.Equal(discountId) {
-			return discount.Percent, nil
-		}
-	}
-	return sdk.Dec{}, ErrDiscountIdIsNotInFee(DefaultCodespace)
-}
-
-type Fee struct {
-	Id      string     `json:"id" yaml:"id"`
-	Content FeeContent `json:"content" yaml:"content"`
-}
-
-func NewFee(id string, content FeeContent) Fee {
-	return Fee{
-		Id:      id,
-		Content: content,
-	}
-}
-
-func (f Fee) Validate() sdk.Error {
-	if !IsValidFeeId(f.Id) {
-		return ErrInvalidId(DefaultCodespace, "fee id invalid")
-	}
-	return f.Content.Validate()
-}
-
-type FeeContractContent struct {
+type FeeContract struct {
+	Id               string         `json:"id" yaml:"id"`
 	FeeId            string         `json:"fee_id" yaml:"fee_id"`
 	Creator          sdk.AccAddress `json:"creator" yaml:"creator"`
 	Payer            sdk.AccAddress `json:"payer" yaml:"payer"`
@@ -99,9 +88,10 @@ type FeeContractContent struct {
 	DiscountId       sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
-func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
-	canDeauthorise, authorised bool, discountId sdk.Uint) FeeContractContent {
-	return FeeContractContent{
+func NewFeeContract(id, feeId string, creator, payer sdk.AccAddress,
+	canDeauthorise, authorised bool, discountId sdk.Uint) FeeContract {
+	return FeeContract{
+		Id:               id,
 		FeeId:            feeId,
 		Creator:          creator,
 		Payer:            payer,
@@ -113,13 +103,18 @@ func NewFeeContractContent(feeId string, creator, payer sdk.AccAddress,
 	}
 }
 
-func NewFeeContractContentNoDiscount(feeId string, creator, payer sdk.AccAddress,
-	canDeauthorise, authorised bool) FeeContractContent {
-	return NewFeeContractContent(
-		feeId, creator, payer, canDeauthorise, authorised, sdk.ZeroUint())
+func NewFeeContractNoDiscount(id, feeId string, creator, payer sdk.AccAddress,
+	canDeauthorise, authorised bool) FeeContract {
+	return NewFeeContract(
+		id, feeId, creator, payer, canDeauthorise, authorised, sdk.ZeroUint())
 }
 
-func (fc FeeContractContent) Validate() sdk.Error {
+func (fc FeeContract) Validate() sdk.Error {
+	// Validate ID
+	if !IsValidFeeContractId(fc.Id) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
+	}
+
 	// Validate coins
 	if !fc.CumulativeCharge.IsValid() {
 		return ErrInvalidFee(DefaultCodespace, "CumulativeCharge coins invalid")
@@ -142,34 +137,15 @@ func (fc FeeContractContent) Validate() sdk.Error {
 	return nil
 }
 
-type FeeContract struct {
-	Id      string             `json:"id" yaml:"id"`
-	Content FeeContractContent `json:"content" yaml:"content"`
-}
-
-func NewFeeContract(id string, content FeeContractContent) FeeContract {
-	return FeeContract{
-		Id:      id,
-		Content: content,
-	}
-}
-
-func (fc FeeContract) Validate() sdk.Error {
-	if !IsValidFeeContractId(fc.Id) {
-		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
-	}
-	return fc.Content.Validate()
-}
-
 func (fc FeeContract) IsFirstCharge() bool {
-	return fc.Content.CumulativeCharge.IsZero()
+	return fc.CumulativeCharge.IsZero()
 }
 
 // CanCharge False if not authorised or the (non-zero!) max has been reached
 func (fc FeeContract) CanCharge(fee Fee) bool {
-	if fee.Id != fc.Content.FeeId {
+	if fee.Id != fc.FeeId {
 		panic("fee ID mismatch in CanCharge")
 	}
-	max := fee.Content.ChargeMaximum
-	return fc.Content.Authorised && (max.IsZero() || max.IsAllGT(fc.Content.CumulativeCharge))
+	max := fee.ChargeMaximum
+	return fc.Authorised && (max.IsZero() || max.IsAllGT(fc.CumulativeCharge))
 }

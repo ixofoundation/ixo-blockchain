@@ -34,13 +34,13 @@ ixocli tx did addDidDoc "$SHAUN_DID_FULL" --broadcast-mode block
 
 # Create fee
 echo "Creating fee..."
-FEE_ID="fee:fee1"
-CONTENT="$(sed 's/"/\"/g' samples/fee.json | tr -d '\n' | tr -d '[:blank:]')"
+FEE="$(sed 's/"/\"/g' samples/fee.json | tr -d '\n' | tr -d '[:blank:]')"
 CREATOR="$MIGUEL_DID_FULL"
-ixocli tx fees create-fee "$FEE_ID" "$CONTENT" "$CREATOR" --broadcast-mode block
+ixocli tx fees create-fee "$FEE" "$CREATOR" --broadcast-mode block
 
 # Create fee contract
 echo "Creating fee contract..."
+FEE_ID="fee:fee1"  # from FEE
 FEE_CONTRACT_ID="fee:contract:fee1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"

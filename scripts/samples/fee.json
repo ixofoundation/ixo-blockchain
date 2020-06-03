@@ -1,4 +1,5 @@
 {
+  "id": "fee:fee1",
   "charge_amount": [
     {
       "denom": "ixo",

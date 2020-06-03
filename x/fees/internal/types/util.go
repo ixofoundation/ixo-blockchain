@@ -16,13 +16,11 @@ func NewMsgSetFeeContractAuthorisation(feeContractId string, authorised bool,
 	}
 }
 
-func NewMsgCreateFee(feeId string, feeContent FeeContent,
-	creatorDid sovrin.SovrinDid) MsgCreateFee {
+func NewMsgCreateFee(fee Fee, creatorDid sovrin.SovrinDid) MsgCreateFee {
 	return MsgCreateFee{
 		PubKey:     creatorDid.VerifyKey,
 		CreatorDid: creatorDid.Did,
-		FeeId:      feeId,
-		FeeContent: feeContent,
+		Fee:        fee,
 	}
 }
 

@@ -44,22 +44,24 @@ var (
 		types.NewDistributionShare(shareAddr1, sdk.NewDec(50)),
 		types.NewDistributionShare(shareAddr2, sdk.NewDec(50)))
 
-	validFeeContent = types.NewFeeContent(
+	validFee = types.NewFee(
+		validFeeId1,
 		validChargeAmount,
 		validChargeMinimum,
 		validChargeMaximum,
 		validDiscounts,
 		validDistribution)
 
-	validDoubleChargeFeeContent = types.NewFeeContent(
+	validDoubleChargeFee = types.NewFee(
+		validFeeId1,
 		validDoubledChargeAmount,
 		validChargeMinimum,
 		validChargeMaximum,
 		validDiscounts,
 		validDistribution)
 
-	validFeeContractContent = types.NewFeeContractContentNoDiscount(
-		validFeeId1, feeCreatorAddr, feePayerAddr, false, true)
+	validFeeContract = types.NewFeeContractNoDiscount(
+		validFeeContractId1, validFeeId1, feeCreatorAddr, feePayerAddr, false, true)
 )
 
 func ValidateVariables() sdk.Error {
@@ -73,22 +75,17 @@ func ValidateVariables() sdk.Error {
 		return err
 	}
 
-	err = validFeeContent.Validate()
+	err = validFee.Validate()
 	if err != nil {
 		return err
 	}
 
-	err = validFeeContractContent.Validate()
+	err = validDoubleChargeFee.Validate()
 	if err != nil {
 		return err
 	}
 
-	err = types.NewFee(validFeeId1, validFeeContent).Validate()
-	if err != nil {
-		return err
-	}
-
-	err = types.NewFeeContract(validFeeContractId1, validFeeContractContent).Validate()
+	err = validFeeContract.Validate()
 	if err != nil {
 		return err
 	}

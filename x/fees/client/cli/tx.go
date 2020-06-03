@@ -97,25 +97,24 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-fee [fee-id] [fee-content-json] [creator-sovrin-did]",
+		Use:   "create-fee [fee-json] [creator-sovrin-did]",
 		Short: "Create and sign a create-fee tx using DIDs",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			feeIdStr := args[0]
-			feeContentStr := args[1]
-			sovrinDidStr := args[2]
+			feeStr := args[0]
+			sovrinDidStr := args[1]
 
 			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
 
-			var feeContent types.FeeContent
-			err := cdc.UnmarshalJSON([]byte(feeContentStr), &feeContent)
+			var fee types.Fee
+			err := cdc.UnmarshalJSON([]byte(feeStr), &fee)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateFee(feeIdStr, feeContent, sovrinDid)
+			msg := types.NewMsgCreateFee(fee, sovrinDid)
 
 			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
 		},

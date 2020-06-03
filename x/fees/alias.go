@@ -29,12 +29,10 @@ type (
 
 	FeeType = types.FeeType
 
-	Fee                = types.Fee
-	FeeContent         = types.FeeContent
-	FeeContract        = types.FeeContract
-	FeeContractContent = types.FeeContractContent
-	Distribution       = types.Distribution
-	DistributionShare  = types.DistributionShare
+	Fee               = types.Fee
+	FeeContract       = types.FeeContract
+	Distribution      = types.Distribution
+	DistributionShare = types.DistributionShare
 
 	Discount  = types.Discount
 	Discounts = types.Discounts
@@ -64,13 +62,11 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
-	NewFee                          = types.NewFee
-	NewFeeContent                   = types.NewFeeContent
-	NewFeeContract                  = types.NewFeeContract
-	NewFeeContractContent           = types.NewFeeContractContent
-	NewFeeContractContentNoDiscount = types.NewFeeContractContentNoDiscount
-	NewDistribution                 = types.NewDistribution
-	NewDistributionShare            = types.NewDistributionShare
+	NewFee                   = types.NewFee
+	NewFeeContract           = types.NewFeeContract
+	NewFeeContractNoDiscount = types.NewFeeContractNoDiscount
+	NewDistribution          = types.NewDistribution
+	NewDistributionShare     = types.NewDistributionShare
 
 	NewDiscount  = types.NewDiscount
 	NewDiscounts = types.NewDiscounts

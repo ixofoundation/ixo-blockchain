@@ -61,7 +61,7 @@ func (k Keeper) DiscountIdExists(ctx sdk.Context, feeId string, discountId sdk.U
 	}
 
 	// Search for discount ID
-	for _, d := range fee.Content.Discounts {
+	for _, d := range fee.Discounts {
 		if d.Id.Equal(discountId) {
 			return true, nil
 		}
@@ -123,12 +123,12 @@ func (k Keeper) SetFeeContractAuthorised(ctx sdk.Context, feeContractId string,
 	}
 
 	// If de-authorising, check if can be de-authorised
-	if !authorised && !feeContract.Content.CanDeauthorise {
+	if !authorised && !feeContract.CanDeauthorise {
 		return types.ErrFeeContractCannotBeDeauthorised(types.DefaultCodespace)
 	}
 
 	// Set authorised state
-	feeContract.Content.Authorised = authorised
+	feeContract.Authorised = authorised
 	k.SetFeeContract(ctx, feeContract)
 
 	return nil
@@ -142,7 +142,7 @@ func (k Keeper) GrantFeeDiscount(ctx sdk.Context, feeContractId string, discount
 	}
 
 	// Overwrite previous discount ID
-	feeContract.Content.DiscountId = discountId
+	feeContract.DiscountId = discountId
 	k.SetFeeContract(ctx, feeContract)
 	return nil
 }
@@ -155,7 +155,7 @@ func (k Keeper) RevokeFeeDiscount(ctx sdk.Context, feeContractId string) sdk.Err
 	}
 
 	// Set discount ID to zero
-	feeContract.Content.DiscountId = sdk.ZeroUint()
+	feeContract.DiscountId = sdk.ZeroUint()
 	k.SetFeeContract(ctx, feeContract)
 	return nil
 }
@@ -166,13 +166,13 @@ func applyDiscount(ctx sdk.Context, k Keeper, fee types.Fee, feeContract types.F
 	payer sdk.AccAddress, payAmount sdk.Coins) (sdk.Coins, sdk.Error) {
 
 	// No discounts held
-	if feeContract.Content.DiscountId.IsZero() {
+	if feeContract.DiscountId.IsZero() {
 		return payAmount, nil
 	}
 
 	// Get discount percentage to calculate discount amount. Any rounding
 	// when multiplying means the payer receives a slightly smaller discount.
-	discountPercent, err := fee.Content.GetDiscountPercent(feeContract.Content.DiscountId)
+	discountPercent, err := fee.GetDiscountPercent(feeContract.DiscountId)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func adjustForMinimums(fee types.Fee, feeContract types.FeeContract, cumulative 
 	// is less than the minimum (applied on each denomination independently)
 	if feeContract.IsFirstCharge() {
 		for i, coin := range cumulative {
-			minAmt := fee.Content.ChargeMinimum.AmountOf(coin.Denom)
+			minAmt := fee.ChargeMinimum.AmountOf(coin.Denom)
 			if !minAmt.IsZero() && minAmt.GT(coin.Amount) {
 				cumulative[i] = sdk.NewCoin(coin.Denom, minAmt)
 			}
@@ -205,7 +205,7 @@ func adjustForMaximums(fee types.Fee, cumulative sdk.Coins) {
 	// Reduce to the maximum charge if the cumulative charge is more than the
 	// maximum (applied on each denomination independently)
 	for i, coin := range cumulative {
-		maxAmt := fee.Content.ChargeMaximum.AmountOf(coin.Denom)
+		maxAmt := fee.ChargeMaximum.AmountOf(coin.Denom)
 		if !maxAmt.IsZero() && maxAmt.LT(coin.Amount) {
 			cumulative[i] = sdk.NewCoin(coin.Denom, maxAmt)
 		}
@@ -215,56 +215,54 @@ func adjustForMaximums(fee types.Fee, cumulative sdk.Coins) {
 func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper,
 	feeContractId string) (charged bool, err sdk.Error) {
 
-	feeContract, err := k.GetFeeContract(ctx, feeContractId)
+	feeCon, err := k.GetFeeContract(ctx, feeContractId)
 	if err != nil {
 		return false, err
 	}
-	fcData := &feeContract.Content
 
-	fee, err := k.GetFee(ctx, fcData.FeeId)
+	fee, err := k.GetFee(ctx, feeCon.FeeId)
 	if err != nil {
 		return false, err
 	}
-	feeData := &fee.Content
 
 	// Check if can charge (this is false if e.g. max charge has been reached)
-	if !feeContract.CanCharge(fee) {
+	if !feeCon.CanCharge(fee) {
 		return false, nil
 	}
 
 	// Assume payer will pay ChargeAmount, apply discount (if any),
 	// and calculate initial cumulative (before adjustments)
-	payAmount := feeData.ChargeAmount
-	payAmount, err = applyDiscount(ctx, k, fee, feeContract, fcData.Payer, payAmount)
+	payAmount := fee.ChargeAmount
+	payAmount, err = applyDiscount(ctx, k, fee, feeCon, feeCon.Payer, payAmount)
 	if err != nil {
 		return false, err
 	}
-	cumulative := fcData.CumulativeCharge.Add(payAmount)
+	cumulative := feeCon.CumulativeCharge.Add(payAmount)
 
 	// In-place cumulative adjustments (i.e. considering minimums and maximums)
-	adjustForMinimums(fee, feeContract, cumulative)
+	adjustForMinimums(fee, feeCon, cumulative)
 	adjustForMaximums(fee, cumulative)
 
 	// Find actual charge from adjusted cumulative:
 	//    adjustedCumul = previousCumul + actualCharge
 	// => actualCharge = adjustedCumul - previousCumul
-	charge := cumulative.Sub(fcData.CumulativeCharge)
+	charge := cumulative.Sub(feeCon.CumulativeCharge)
 
 	// Stop if payer doesn't have enough coins. However, this is not considered
 	// an error but the caller should be looking at the 'charged' bool result
-	if !bankKeeper.HasCoins(ctx, fcData.Payer, charge) {
+	if !bankKeeper.HasCoins(ctx, feeCon.Payer, charge) {
 		return false, nil
 	}
 
 	// Total input is charge plus current remainder in FeeRemainderPool
-	inputFromFeeRemainderPool := fcData.CurrentRemainder
+	inputFromFeeRemainderPool := feeCon.CurrentRemainder
 	totalInputAmount := charge.Add(inputFromFeeRemainderPool)
 
 	// Calculate list of outputs and calculate the total output to payees based
 	// on the calculated wallet distributions
 	var outputToPayees sdk.Coins
 	var outputs []bank.Output
-	distributions := fee.Content.WalletDistribution.GetDistributionsFor(totalInputAmount)
+	distributions := fee.WalletDistribution.GetDistributionsFor(totalInputAmount)
 	for i, share := range distributions {
 		// Get integer output
 		outputAmt, _ := share.TruncateDecimal()
@@ -272,7 +270,7 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper,
 		// If amount not zero, update total and add as output
 		if !outputAmt.IsZero() {
 			outputToPayees = outputToPayees.Add(outputAmt)
-			address := fee.Content.WalletDistribution[i].Address
+			address := fee.WalletDistribution[i].Address
 			outputs = append(outputs, bank.NewOutput(address, outputAmt))
 		}
 	}
@@ -285,7 +283,7 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper,
 	}
 
 	// Construct list of inputs (charge and from FeeRemainderPool if non zero)
-	inputs := []bank.Input{bank.NewInput(fcData.Payer, charge)}
+	inputs := []bank.Input{bank.NewInput(feeCon.Payer, charge)}
 	if !inputFromFeeRemainderPool.IsZero() {
 		feeRemainderPoolAddr := supply.NewModuleAddress(types.FeeRemainderPool)
 		inputs = append(inputs, bank.NewInput(feeRemainderPoolAddr, inputFromFeeRemainderPool))
@@ -298,9 +296,9 @@ func (k Keeper) ChargeFee(ctx sdk.Context, bankKeeper bank.Keeper,
 	}
 
 	// Update and save fee contract
-	fcData.CumulativeCharge = fcData.CumulativeCharge.Add(charge)
-	fcData.CurrentRemainder = fcData.CurrentRemainder.Add(outputToFeeRemainderPool).Sub(inputFromFeeRemainderPool)
-	k.SetFeeContract(ctx, feeContract)
+	feeCon.CumulativeCharge = feeCon.CumulativeCharge.Add(charge)
+	feeCon.CurrentRemainder = feeCon.CurrentRemainder.Add(outputToFeeRemainderPool).Sub(inputFromFeeRemainderPool)
+	k.SetFeeContract(ctx, feeCon)
 
 	return true, nil
 }

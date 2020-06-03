@@ -81,7 +81,7 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 
 	// Confirm that signer is actually the payer in the fee contract
 	payerAddr := types.DidToAddr(msg.PayerDid)
-	if !payerAddr.Equals(feeContract.Content.Payer) {
+	if !payerAddr.Equals(feeContract.Payer) {
 		return sdk.ErrInvalidAddress("signer must be fee contract payer").Result()
 	}
 
@@ -97,25 +97,24 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateFee) sdk.Result {
 
 	// Ensure that fee doesn't already exist
-	if k.FeeExists(ctx, msg.FeeId) {
+	if k.FeeExists(ctx, msg.Fee.Id) {
 		return types.ErrAlreadyExists(types.DefaultCodespace, fmt.Sprintf(
-			"fee '%s' already exists", msg.FeeId)).Result()
+			"fee '%s' already exists", msg.Fee.Id)).Result()
 	}
 
 	// Ensure that fee ID is not reserved
-	if k.FeeIdReserved(msg.FeeId) {
+	if k.FeeIdReserved(msg.Fee.Id) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed as it is "+
-			"using a reserved prefix", msg.FeeId)).Result()
+			"using a reserved prefix", msg.Fee.Id)).Result()
 	}
 
 	// Create and validate fee
-	fee := types.NewFee(msg.FeeId, msg.FeeContent)
-	if err := fee.Validate(); err != nil {
+	if err := msg.Fee.Validate(); err != nil {
 		return err.Result()
 	}
 
 	// Ensure no blacklisted address in wallet distribution
-	for _, share := range fee.Content.WalletDistribution {
+	for _, share := range msg.Fee.WalletDistribution {
 		if bk.BlacklistedAddr(share.Address) {
 			return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed "+
 				"to receive transactions", share.Address)).Result()
@@ -123,7 +122,7 @@ func handleMsgCreateFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreate
 	}
 
 	// Submit fee
-	k.SetFee(ctx, fee)
+	k.SetFee(ctx, msg.Fee)
 
 	return sdk.Result{}
 }
@@ -153,13 +152,10 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg M
 		return sdk.ErrInternal("invalid fee").Result()
 	}
 
-	// Create fee contract content
-	creatorAddr := types.DidToAddr(msg.CreatorDid)
-	feeContractContent := NewFeeContractContent(
-		msg.FeeId, creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
-
 	// Create fee contract and validate
-	feeContract := NewFeeContract(msg.FeeContractId, feeContractContent)
+	creatorAddr := types.DidToAddr(msg.CreatorDid)
+	feeContract := NewFeeContract(msg.FeeContractId, msg.FeeId,
+		creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
 	if err := feeContract.Validate(); err != nil {
 		return err.Result()
 	}
@@ -192,7 +188,7 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscri
 
 	// Confirm that signer is actually the creator of the fee contract
 	creatorAddr := types.DidToAddr(msg.CreatorDid)
-	if !creatorAddr.Equals(feeContract.Content.Creator) {
+	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
 
@@ -219,12 +215,12 @@ func handleMsgGrantFeeDiscount(ctx sdk.Context, k Keeper, msg MsgGrantFeeDiscoun
 
 	// Confirm that signer is actually the creator of the fee contract
 	creatorAddr := types.DidToAddr(msg.SenderDid)
-	if !creatorAddr.Equals(feeContract.Content.Creator) {
+	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
 
 	// Confirm that discount ID is in the fee (to avoid invalid discount IDs)
-	found, err := k.DiscountIdExists(ctx, feeContract.Content.FeeId, msg.DiscountId)
+	found, err := k.DiscountIdExists(ctx, feeContract.FeeId, msg.DiscountId)
 	if err != nil {
 		return err.Result()
 	} else if !found {
@@ -250,7 +246,7 @@ func handleMsgRevokeFeeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeFeeDisco
 
 	// Confirm that signer is actually the creator of the fee contract
 	creatorAddr := types.DidToAddr(msg.SenderDid)
-	if !creatorAddr.Equals(feeContract.Content.Creator) {
+	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
 
@@ -273,7 +269,7 @@ func handleMsgChargeFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCharge
 
 	// Confirm that signer is actually the creator of the fee contract
 	creatorAddr := types.DidToAddr(msg.SenderDid)
-	if !creatorAddr.Equals(feeContract.Content.Creator) {
+	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
 
