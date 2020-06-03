@@ -34,8 +34,6 @@ func (p TestPeriod) Validate() sdk.Error {
 		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
 	} else if p.PeriodLength <= 0 {
 		return ErrInvalidPeriod(DefaultCodespace, "period length must be greater than zero")
-	} else if p.PeriodStartBlock+p.PeriodLength != p.periodEndBlock() {
-		return ErrInvalidPeriod(DefaultCodespace, "period start + period length != period end")
 	}
 
 	return nil
