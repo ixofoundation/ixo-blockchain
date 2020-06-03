@@ -59,7 +59,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
-	if keeper.CoinKeeper.BlacklistedAddr(msg.FeeAddress) {
+	if keeper.BankKeeper.BlacklistedAddr(msg.FeeAddress) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress)).Result()
 	}
 
@@ -73,7 +73,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
-	bond := NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
+	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
 		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
 		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
@@ -120,6 +120,9 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 }
 
 func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditBond) sdk.Result {
+
+	// Note: since the expected signer is BondDid, it is not a requirement that
+	// the editor of the bond is also the creator.
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -283,7 +286,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 	}
 
 	// Use max prices as the amount to send to the liquidity pool (i.e. price)
-	err := keeper.CoinKeeper.SendCoins(ctx, buyerAddr, bond.ReserveAddress, msg.MaxPrices)
+	err := keeper.BankKeeper.SendCoins(ctx, buyerAddr, bond.ReserveAddress, msg.MaxPrices)
 	if err != nil {
 		return err.Result()
 	}

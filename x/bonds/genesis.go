@@ -2,6 +2,7 @@ package bonds
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 )
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
@@ -19,8 +20,8 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	// Export bonds and batches
-	var bonds []Bond
-	var batches []Batch
+	var bonds []types.Bond
+	var batches []types.Batch
 
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {

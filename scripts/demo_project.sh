@@ -21,7 +21,7 @@ fi
 
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 PROJECT_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
-PROJECT_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"500\",\"evaluatorPayPerClaim\":\"50\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-01-01T01:01:01.000Z\",\"createdBy\":\"Miguel\",\"status\":\"\"}"
+PROJECT_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"500\",\"evaluatorPayPerClaim\":\"50\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-01-01T01:01:01.000Z\",\"createdBy\":\"Creator\",\"status\":\"\"}"
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
@@ -31,7 +31,7 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL"
+ixocli tx did addDidDoc "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Ledgering Francesco DID..."
 ixocli tx did addDidDoc "$FRANCESCO_DID_FULL" --broadcast-mode block
 echo "Ledgering Shaun DID..."
@@ -48,9 +48,9 @@ ixocli tx project updateProjectStatus "$SENDER_DID" PENDING "$PROJECT_DID_FULL" 
 
 # Fund project and progress status to FUNDED
 echo "Funding project (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-SENDER_DID="$SHAUN_DID"
 ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_DID/$PROJECT_DID" 10000000000ixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block
 echo "Updating project to FUNDED..."
+SENDER_DID="$SHAUN_DID"
 ixocli tx project updateProjectStatus "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Create claim and evaluation
@@ -101,6 +101,7 @@ echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixocli q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 
 # Withdraw funds (from miguel's project account, i.e. as non-refund)
+echo "Withdraw funds as Miguel..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":false}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
@@ -115,6 +116,7 @@ ixocli q project getProjectTxs $PROJECT_DID
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
+echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."
@@ -122,6 +124,7 @@ ixocli q project getProjectTxs $PROJECT_DID
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
+echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block
 echo "Project withdrawals query..."

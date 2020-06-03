@@ -10,7 +10,6 @@ import (
 
 func NewMsgCreateBond(senderDid ixo.Did, bondDoc BondDoc, bondDid sovrin.SovrinDid) MsgCreateBond {
 	return MsgCreateBond{
-		SignBytes: "",
 		TxHash:    "",
 		SenderDid: senderDid,
 		BondDid:   bondDid.Did,
@@ -21,7 +20,6 @@ func NewMsgCreateBond(senderDid ixo.Did, bondDoc BondDoc, bondDid sovrin.SovrinD
 
 func NewMsgUpdateBondStatus(senderDid ixo.Did, updateBondStatusDoc UpdateBondStatusDoc, bondDid sovrin.SovrinDid) MsgUpdateBondStatus {
 	return MsgUpdateBondStatus{
-		SignBytes: "",
 		SenderDid: senderDid,
 		BondDid:   bondDid.Did,
 		Data:      updateBondStatusDoc,

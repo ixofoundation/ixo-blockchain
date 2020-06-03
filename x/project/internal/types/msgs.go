@@ -10,7 +10,6 @@ import (
 )
 
 type MsgCreateProject struct {
-	SignBytes  string     `json:"signBytes" yaml:"signBytes"`
 	TxHash     string     `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did    `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did    `json:"projectDid" yaml:"projectDid"`
@@ -69,7 +68,11 @@ func (msg *MsgCreateProject) SetStatus(status ProjectStatus) {
 }
 
 func (msg MsgCreateProject) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateProject) IsNewDid() bool     { return true }
@@ -78,7 +81,6 @@ func (msg MsgCreateProject) IsWithdrawal() bool { return false }
 var _ StoredProjectDoc = (*MsgCreateProject)(nil)
 
 type MsgUpdateProjectStatus struct {
-	SignBytes  string                 `json:"signBytes" yaml:"signBytes"`
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did                `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did                `json:"projectDid" yaml:"projectDid"`
@@ -111,7 +113,11 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
@@ -130,7 +136,6 @@ func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
 func (msg MsgUpdateProjectStatus) IsWithdrawal() bool { return false }
 
 type MsgCreateAgent struct {
-	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
 	TxHash     string         `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
@@ -170,7 +175,11 @@ func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateAgent) String() string {
@@ -184,7 +193,6 @@ func (msg MsgCreateAgent) String() string {
 var _ sdk.Msg = MsgCreateAgent{}
 
 type MsgUpdateAgent struct {
-	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
 	TxHash     string         `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
@@ -224,7 +232,11 @@ func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgUpdateAgent) String() string {
@@ -239,7 +251,6 @@ func (msg MsgUpdateAgent) String() string {
 var _ sdk.Msg = MsgUpdateAgent{}
 
 type MsgCreateClaim struct {
-	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
 	TxHash     string         `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
@@ -278,7 +289,11 @@ func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateClaim) String() string {
@@ -293,7 +308,6 @@ func (msg MsgCreateClaim) String() string {
 var _ sdk.Msg = MsgCreateClaim{}
 
 type MsgCreateEvaluation struct {
-	SignBytes  string              `json:"signBytes" yaml:"signBytes"`
 	TxHash     string              `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did             `json:"senderDid" yaml:"senderDid"`
 	ProjectDid ixo.Did             `json:"projectDid" yaml:"projectDid"`
@@ -332,7 +346,11 @@ func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateEvaluation) String() string {
@@ -347,7 +365,6 @@ func (msg MsgCreateEvaluation) String() string {
 var _ sdk.Msg = MsgCreateEvaluation{}
 
 type MsgWithdrawFunds struct {
-	SignBytes string           `json:"signBytes" yaml:"signBytes"`
 	SenderDid ixo.Did          `json:"senderDid" yaml:"senderDid"`
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
@@ -397,7 +414,11 @@ func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgWithdrawFunds) String() string {

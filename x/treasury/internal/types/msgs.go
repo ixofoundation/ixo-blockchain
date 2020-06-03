@@ -16,11 +16,10 @@ type TreasuryMessage interface {
 }
 
 type MsgSend struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
-	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
-	Amount    sdk.Coins `json:"amount" yaml:"amount"`
+	PubKey  string    `json:"pub_key" yaml:"pub_key"`
+	FromDid ixo.Did   `json:"from_did" yaml:"from_did"`
+	ToDid   ixo.Did   `json:"to_did" yaml:"to_did"`
+	Amount  sdk.Coins `json:"amount" yaml:"amount"`
 }
 
 var _ TreasuryMessage = MsgSend{}
@@ -44,11 +43,9 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -70,15 +67,18 @@ func (msg MsgSend) String() string {
 func (msg MsgSend) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSend) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgOracleTransfer struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
-	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
-	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
+	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -108,11 +108,9 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -134,14 +132,17 @@ func (msg MsgOracleTransfer) String() string {
 func (msg MsgOracleTransfer) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleTransfer) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgOracleMint struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
-	ToDid     ixo.Did   `json:"toDid" yaml:"toDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
+	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -167,11 +168,9 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -193,14 +192,17 @@ func (msg MsgOracleMint) String() string {
 func (msg MsgOracleMint) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleMint) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 type MsgOracleBurn struct {
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	PubKey    string    `json:"pubKey" yaml:"pubKey"`
-	OracleDid ixo.Did   `json:"oracleDid" yaml:"oracleDid"`
-	FromDid   ixo.Did   `json:"fromDid" yaml:"fromDid"`
+	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -226,11 +228,9 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
 	}
 
-	// Check amount
+	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
 		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
-	} else if !msg.Amount.IsAllPositive() {
-		return sdk.ErrInsufficientCoins("send amount must be positive")
 	}
 
 	return nil
@@ -252,5 +252,9 @@ func (msg MsgOracleBurn) String() string {
 func (msg MsgOracleBurn) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleBurn) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }

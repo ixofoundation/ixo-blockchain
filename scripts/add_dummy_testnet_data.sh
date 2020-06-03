@@ -46,8 +46,8 @@ BONDDOC1_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
 BONDDOC2_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
 BONDDOC1_DID_FULL="{\"did\":\"did:ixo:48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
 BONDDOC2_DID_FULL="{\"did\":\"did:ixo:RYLHkfNpbA8Losy68jt4yF\",\"verifyKey\":\"ENmMCsfNmjYoTRhNgnwXbQAw6p8JKH9DCJfGTPXNfsxW\",\"encryptionPublicKey\":\"5unQBt6JPW1pq9AqoRNhFJmibv8JqeoyyNvN3gF24EaU\",\"secret\":{\"seed\":\"d2c05b107acc2dfe3e9d67e98c993a9c03d227ed8f4505c43997cf4e7819bee2\",\"signKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\",\"encryptionPrivateKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\"}}"
-BONDDOC1_INFO="{\"createdOn\":\"createdOn\",\"createdBy\":\"createdBy\"}"
-BONDDOC2_INFO="{\"createdOn\":\"createdOn\",\"createdBy\":\"createdBy\"}"
+BONDDOC1_INFO="{\"created_on\":\"created_on\",\"created_by\":\"created_by\"}"
+BONDDOC2_INFO="{\"created_on\":\"created_on\",\"created_by\":\"created_by\"}"
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
@@ -255,3 +255,19 @@ echo "Updating bonddoc 2 to PREISSUANCE..."
 ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block
 echo "Updating bonddoc 2 to OPEN..."
 ixocli tx bonddoc updateBondStatus "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL"
+
+# ----------------------------------------------------------------------------------------- fees
+# Create fee
+echo "Creating fee..."
+FEE="$(sed 's/"/\"/g' samples/fee.json | tr -d '\n' | tr -d '[:blank:]')"
+CREATOR="$MIGUEL_DID_FULL"
+ixocli tx fees create-fee "$FEE" "$CREATOR" --broadcast-mode block
+
+# Create fee contract
+echo "Creating fee contract..."
+FEE_ID="fee:fee1" # from FEE
+FEE_CONTRACT_ID="fee:contract:fee1"
+DISCOUNT_ID=0
+CREATOR="$SHAUN_DID_FULL"
+PAYER_ADDR="$(ixocli q did getAddressFromDid $FRANCESCO_DID)"
+ixocli tx fees create-fee-contract "$FEE_CONTRACT_ID" "$FEE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block

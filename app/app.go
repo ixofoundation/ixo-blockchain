@@ -76,6 +76,7 @@ var (
 		oracles.AppModuleBasic{},
 	)
 
+	// Module account permissions
 	maccPerms = map[string][]string{
 		auth.FeeCollectorName:            nil,
 		distribution.ModuleName:          nil,
@@ -86,7 +87,11 @@ var (
 		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
 		bonds.BatchesIntermediaryAccount: nil,
 		treasury.ModuleName:              {supply.Minter, supply.Burner},
+		fees.FeeRemainderPool:            nil,
 	}
+
+	// Reserved fees module ID prefixes
+	feesReservedIdPrefixes = []string{}
 )
 
 func MakeCodec() *codec.Codec {
@@ -186,7 +191,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		app.slashingKeeper.Hooks()))
 
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.feesKeeper = fees.NewKeeper(app.cdc, feesSubspace)
+	app.feesKeeper = fees.NewKeeper(app.cdc, keys[fees.StoreKey], feesSubspace, app.bankKeeper, feesReservedIdPrefixes)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace, app.accountKeeper, app.feesKeeper)
 	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
@@ -207,7 +212,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
 
 		did.NewAppModule(app.didKeeper),
-		fees.NewAppModule(app.feesKeeper),
+		fees.NewAppModule(app.feesKeeper, app.bankKeeper),
 		project.NewAppModule(app.projectKeeper, app.feesKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
@@ -216,7 +221,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	)
 
 	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName, bonds.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, bonds.ModuleName)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, bonds.ModuleName, fees.ModuleName)
 
 	app.mm.SetOrderInitGenesis(genaccounts.ModuleName, distribution.ModuleName,
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
@@ -295,6 +300,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
 	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
 	treasuryAnteHandler := treasury.NewAnteHandler(app.didKeeper)
+	feesAnteHandler := fees.NewAnteHandler(app.didKeeper)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
@@ -309,6 +315,8 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			return bondsAnteHandler(ctx, tx, false)
 		case treasury.RouterKey:
 			return treasuryAnteHandler(ctx, tx, false)
+		case fees.RouterKey:
+			return feesAnteHandler(ctx, tx, false)
 		default:
 			return cosmosAnteHandler(ctx, tx, false)
 		}

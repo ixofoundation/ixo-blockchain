@@ -10,11 +10,10 @@ import (
 )
 
 type MsgCreateBond struct {
-	SignBytes string  `json:"signBytes" yaml:"signBytes"`
-	TxHash    string  `json:"txHash" yaml:"txHash"`
-	SenderDid ixo.Did `json:"senderDid" yaml:"senderDid"`
-	BondDid   ixo.Did `json:"bondDid" yaml:"bondDid"`
-	PubKey    string  `json:"pubKey" yaml:"pubKey"`
+	TxHash    string  `json:"tx_hash" yaml:"tx_hash"`
+	SenderDid ixo.Did `json:"sender_did" yaml:"sender_did"`
+	BondDid   ixo.Did `json:"bond_did" yaml:"bond_did"`
+	PubKey    string  `json:"pub_key" yaml:"pub_key"`
 	Data      BondDoc `json:"data" yaml:"data"`
 }
 
@@ -65,7 +64,11 @@ func (msg *MsgCreateBond) SetStatus(status BondStatus) {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgCreateBond) IsNewDid() bool { return true }
@@ -73,9 +76,8 @@ func (msg MsgCreateBond) IsNewDid() bool { return true }
 var _ StoredBondDoc = (*MsgCreateBond)(nil)
 
 type MsgUpdateBondStatus struct {
-	SignBytes string              `json:"signBytes" yaml:"signBytes"`
-	SenderDid ixo.Did             `json:"senderDid" yaml:"senderDid"`
-	BondDid   ixo.Did             `json:"bondDid" yaml:"bondDid"`
+	SenderDid ixo.Did             `json:"sender_did" yaml:"sender_did"`
+	BondDid   ixo.Did             `json:"bond_did" yaml:"bond_did"`
 	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`
 }
 
@@ -104,7 +106,11 @@ func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateBondStatus) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {

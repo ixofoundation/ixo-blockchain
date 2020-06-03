@@ -314,8 +314,8 @@ func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProject
 func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
 
 	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
-	var validatingNodeSetAddr sdk.AccAddress
 
+	var validatingNodeSetAddr sdk.AccAddress
 	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId) // not found
 	if !found {
 		validatingNodeSetAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)

@@ -242,7 +242,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.Amount.String(), bo.AccountDid))
 
 	// Get new bond token balance
-	bondTokenBalance := k.CoinKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
+	bondTokenBalance := k.BankKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
@@ -273,14 +273,14 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 
 	// Send total returns to seller (totalReturns should never be zero)
 	// TODO: investigate possibility of zero totalReturns
-	err = k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, sellerAddr, totalReturns)
+	err = k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, sellerAddr, totalReturns)
 	if err != nil {
 		return err
 	}
 
 	// Send total fee to fee address
 	if !totalFees.IsZero() {
-		err := k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, bond.FeeAddress, totalFees)
+		err := k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, bond.FeeAddress, totalFees)
 		if err != nil {
 			return err
 		}
@@ -293,7 +293,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.Se
 	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.Amount.String(), so.AccountDid))
 
 	// Get new bond token balance
-	bondTokenBalance := k.CoinKeeper.GetCoins(ctx, sellerAddr).AmountOf(bond.Token)
+	bondTokenBalance := k.BankKeeper.GetCoins(ctx, sellerAddr).AmountOf(bond.Token)
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
@@ -330,7 +330,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrder
 
 	// Give resultant tokens to swapper (reserveReturns should never be zero)
 	swapperAddr := types.DidToAddr(so.AccountDid)
-	err = k.CoinKeeper.SendCoins(ctx, bond.ReserveAddress, swapperAddr, reserveReturns)
+	err = k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, swapperAddr, reserveReturns)
 	if err != nil {
 		return err, false
 	}

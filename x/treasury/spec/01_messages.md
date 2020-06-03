@@ -26,7 +26,6 @@ Sending of tokens between two addresses identified by DIDs and signed by the sen
 
 | **Field**              | **Type**         | **Description**                                                                                               |
 |:-----------------------|:-----------------|:--------------------------------------------------------------------------------------------------------------|
-| SignBytes | string    | The bytes for the message signer to sign on |
 | PubKey    | string    | PubKey of the message signer |
 | FromDid   | ixo.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | ToDid     | ixo.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
@@ -34,7 +33,6 @@ Sending of tokens between two addresses identified by DIDs and signed by the sen
 
 ```go
 type MsgSend struct {
-	SignBytes string
 	PubKey    string
 	FromDid   ixo.Did
 	ToDid     ixo.Did
@@ -48,7 +46,6 @@ Sending of tokens between two addresses identified by DIDs and signed by an orac
 
 | **Field**              | **Type**         | **Description**                                                                                               |
 |:-----------------------|:-----------------|:--------------------------------------------------------------------------------------------------------------|
-| SignBytes | string    | The bytes for the message signer to sign on |
 | PubKey    | string    | PubKey of the message signer |
 | OracleDid | ixo.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | FromDid   | ixo.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
@@ -58,7 +55,6 @@ Sending of tokens between two addresses identified by DIDs and signed by an orac
 
 ```go
 type MsgOracleTransfer struct {
-	SignBytes string
 	PubKey    string
 	OracleDid ixo.Did
 	FromDid   ixo.Did
@@ -74,7 +70,6 @@ Minting of tokens to an address identified by a DID and signed by an oracle is d
 
 | **Field**              | **Type**         | **Description**                                                                                               |
 |:-----------------------|:-----------------|:--------------------------------------------------------------------------------------------------------------|
-| SignBytes | string    | The bytes for the message signer to sign on |
 | PubKey    | string    | PubKey of the message signer |
 | OracleDid | ixo.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | ToDid     | ixo.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
@@ -83,7 +78,6 @@ Minting of tokens to an address identified by a DID and signed by an oracle is d
 
 ```go
 type MsgOracleMint struct {
-	SignBytes string
 	PubKey    string
 	OracleDid ixo.Did
 	ToDid     ixo.Did
@@ -98,7 +92,6 @@ Burning of tokens from an address identified by a DID and signed by an oracle is
 
 | **Field**              | **Type**         | **Description**                                                                                               |
 |:-----------------------|:-----------------|:--------------------------------------------------------------------------------------------------------------|
-| SignBytes | string    | The bytes for the message signer to sign on |
 | PubKey    | string    | PubKey of the message signer |
 | OracleDid | ixo.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 | FromDid   | ixo.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
@@ -107,7 +100,6 @@ Burning of tokens from an address identified by a DID and signed by an oracle is
 
 ```go
 type MsgOracleBurn struct {
-	SignBytes string
 	PubKey    string
 	OracleDid ixo.Did
 	FromDid   ixo.Did

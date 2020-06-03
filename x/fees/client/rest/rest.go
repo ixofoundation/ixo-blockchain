@@ -5,6 +5,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const (
+	RestFeeId          = "fee_id"
+	RestFeeContractId  = "fee_contract_id"
+	RestSubscriptionId = "subscription_id"
+)
+
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/fees", queryFeesRequestHandler(cliCtx)).Methods("GET")
+	registerQueryRoutes(cliCtx, r)
+	registerTxRoutes(cliCtx, r)
 }

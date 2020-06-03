@@ -13,7 +13,7 @@ import (
 )
 
 type Keeper struct {
-	CoinKeeper    bank.Keeper
+	BankKeeper    bank.Keeper
 	SupplyKeeper  supply.Keeper
 	accountKeeper auth.AccountKeeper
 	StakingKeeper staking.Keeper
@@ -23,7 +23,7 @@ type Keeper struct {
 	cdc *codec.Codec
 }
 
-func NewKeeper(coinKeeper bank.Keeper, supplyKeeper supply.Keeper,
+func NewKeeper(bankKeeper bank.Keeper, supplyKeeper supply.Keeper,
 	accountKeeper auth.AccountKeeper, stakingKeeper staking.Keeper,
 	storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 
@@ -33,7 +33,7 @@ func NewKeeper(coinKeeper bank.Keeper, supplyKeeper supply.Keeper,
 	}
 
 	return Keeper{
-		CoinKeeper:    coinKeeper,
+		BankKeeper:    bankKeeper,
 		SupplyKeeper:  supplyKeeper,
 		accountKeeper: accountKeeper,
 		StakingKeeper: stakingKeeper,

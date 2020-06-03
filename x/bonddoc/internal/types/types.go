@@ -54,8 +54,8 @@ type UpdateBondStatusDoc struct {
 }
 
 type BondDoc struct {
-	CreatedOn string     `json:"createdOn" yaml:"createdOn"`
-	CreatedBy string     `json:"createdBy" yaml:"createdBy"`
+	CreatedOn string     `json:"created_on" yaml:"created_on"`
+	CreatedBy string     `json:"created_by" yaml:"created_by"`
 	Status    BondStatus `json:"status" yaml:"status"`
 }
 

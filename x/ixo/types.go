@@ -1,7 +1,6 @@
 package ixo
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -118,12 +117,6 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 				return nil, sdk.ErrTxDecode("Multiple messages not supported")
 			}
 
-			signByteString := getSignBytes(txBytes)
-
-			msgPayload := payloadArray[0].(map[string]interface{})
-			msg := msgPayload["value"].(map[string]interface{})
-			msg["signBytes"] = signByteString
-
 			txBytes, _ = json.Marshal(upTx)
 
 			err = cdc.UnmarshalJSON(txBytes, &tx)
@@ -143,15 +136,4 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 
 		}
 	}
-}
-
-func getSignBytes(txBytes []byte) string {
-	const strtTxt string = "\"value\":"
-	const endTxt string = "}],\"signatures\":"
-
-	strt := bytes.Index(txBytes, []byte(strtTxt)) + len(strtTxt)
-	end := bytes.Index(txBytes, []byte(endTxt))
-
-	signBytes := txBytes[strt:end]
-	return string(signBytes)
 }

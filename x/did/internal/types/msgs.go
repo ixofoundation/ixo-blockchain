@@ -10,15 +10,14 @@ import (
 )
 
 type MsgAddDid struct {
-	DidDoc    BaseDidDoc `json:"didDoc" yaml:"didDoc"`
-	SignBytes string     `json:"signBytes" yaml:"signBytes"`
+	DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
 }
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	didDoc := BaseDidDoc{
 		Did:         did,
 		PubKey:      publicKey,
-		Credentials: make([]DidCredential, 0),
+		Credentials: nil,
 	}
 
 	return MsgAddDid{
@@ -62,7 +61,11 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
 }
 
 func (msg MsgAddDid) String() string {
@@ -121,12 +124,11 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
+	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
+	} else {
+		return bz
 	}
-
-	return b
 }
 
 func (msg MsgAddCredential) IsNewDid() bool { return false }
