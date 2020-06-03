@@ -52,17 +52,11 @@ func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
 
 func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "createBond [sender-did] [bond-json] [sovrin-did]",
+		Use:   "create-bond [sender-did] [bond-json] [sovrin-did]",
 		Short: "Create a new BondDoc signed by the sovrinDID of the bond",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 3 || len(args[0]) == 0 ||
-				len(args[1]) == 0 || len(args[2]) == 0 {
-				return errors.New("You must provide the sender-did, " +
-					"bond data, and the bond's private key")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			senderDid := args[0]
 			bondDocStr := args[1]
@@ -83,17 +77,11 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "updateBondStatus [sender-did] [status] [sovrin-did]",
+		Use:   "update-bond-status [sender-did] [status] [sovrin-did]",
 		Short: "Update the status of a bond signed by the sovrinDID of the bond",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 3 || len(args[0]) == 0 ||
-				len(args[1]) == 0 || len(args[2]) == 0 {
-				return errors.New("You must provide the sender-did, " +
-					"status, and the bond's private key")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			senderDid := args[0]
 			status := args[1]

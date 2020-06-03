@@ -16,15 +16,11 @@ import (
 
 func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectDoc [did]",
+		Use:   "get-project-doc [did]",
 		Short: "Query ProjectDoc for a DID",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a did")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			didAddr := args[0]
 			key := ixo.Did(didAddr)
@@ -54,15 +50,11 @@ func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectAccounts [did]",
+		Use:   "get-project-accounts [did]",
 		Short: "Get a Project accounts of a Project by Did",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a project did")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			projectDid := args[0]
 
@@ -96,15 +88,12 @@ func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectTxs [project-did]",
+		Use:   "get-project-txs [project-did]",
 		Short: "Get a Project txs for a projectDid",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a project did")
-			}
 			projectDid := args[0]
 
 			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
@@ -139,8 +128,7 @@ func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
 		Use:   "params",
 		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 				keeper.QueryParams), nil)

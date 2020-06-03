@@ -59,18 +59,18 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 # ----------------------------------------------------------------------------------------- dids
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL"
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering DID 2/3..."
-ixocli tx did addDidDoc "$FRANCESCO_DID_FULL"
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering DID 3/3..."
-ixocli tx did addDidDoc "$SHAUN_DID_FULL"
+ixocli tx did add-did-doc "$SHAUN_DID_FULL"
 
 echo "Sleeping for a bit..."
 sleep 6 # to make sure DIDs were ledgered before proceeding
 
 # Adding KYC credentials
 echo "Adding KYC credential 1/1..."
-ixocli tx did addKycCredential "$MIGUEL_DID" "$FRANCESCO_DID_FULL"
+ixocli tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL"
 
 # ----------------------------------------------------------------------------------------- mints/burns
 # Mint and burn ixo tokens
@@ -193,9 +193,9 @@ ixocli tx bonds buy 5token4 "2token1,2token2" "$BOND4_DID" "$MIGUEL_DID_FULL"
 # Create projects (this creates a project doc for the respective project)
 SENDER_DID="$SHAUN_DID"
 echo "Creating project 1/2..."
-ixocli tx project createProject "$SENDER_DID" "$PROJECT1_INFO" "$PROJECT1_DID_FULL"
+ixocli tx project create-project "$SENDER_DID" "$PROJECT1_INFO" "$PROJECT1_DID_FULL"
 echo "Creating project 2/2..."
-ixocli tx project createProject "$SENDER_DID" "$PROJECT2_INFO" "$PROJECT2_DID_FULL"
+ixocli tx project create-project "$SENDER_DID" "$PROJECT2_INFO" "$PROJECT2_DID_FULL"
 
 echo "Sleeping for a bit..."
 sleep 6 # to make sure projects were ledgered before proceeding
@@ -203,46 +203,46 @@ sleep 6 # to make sure projects were ledgered before proceeding
 # Update project status (this updates the status in the project doc for the respective project)
 SENDER_DID="$SHAUN_DID"
 echo "Updating project 1 to CREATED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT1_DID_FULL"
+ixocli tx project update-project-status "$SENDER_DID" CREATED "$PROJECT1_DID_FULL"
 echo "Updating project 2 to CREATED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Updating project 2 to PENDING..."
-ixocli tx project updateProjectStatus "$SENDER_DID" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Fund project (using treasury 'send' and 'oracle-transfer')
 echo "Funding project 2 (using treasury 'send' from Miguel)..."
 ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
 echo "Funding project 2 (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
 ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block
-# The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
+# The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project get-project-accounts $PROJECT2_DID)
 # Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
 echo "Updating project 2 to FUNDED..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project updateProjectStatus "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Adding a claim and evaluation
 echo "Creating a claim in project 2..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project createClaim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
 echo "Creating an evaluation in project 2..."
 SENDER_DID="$MIGUEL_DID"
-STATUS="1" # createEvaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
-ixocli tx project createEvaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block
+STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
+ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block
 
 # Adding agents (this creates a project account for the agent in the respective project)
 echo "Adding agent to project 1..."
 SENDER_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
 AGENT_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
 ROLE="SA"
-ixocli tx project createAgent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PROJECT1_DID_FULL"
+ixocli tx project create-agent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PROJECT1_DID_FULL"
 
 # ----------------------------------------------------------------------------------------- bonddocs
 # Creating bonddoc
 SENDER_DID="$SHAUN_DID"
 echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL"
+ixocli tx bonddoc create-bond "$SENDER_DID" "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL"
 echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL"
+ixocli tx bonddoc create-bond "$SENDER_DID" "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL"
 
 echo "Sleeping for a bit..."
 sleep 6 # to make sure bonddocs were ledgered before proceeding
@@ -250,11 +250,11 @@ sleep 6 # to make sure bonddocs were ledgered before proceeding
 # Updating bonddoc status
 SENDER_DID="$SHAUN_DID"
 echo "Updating bonddoc 1 to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC1_DID_FULL"
+ixocli tx bonddoc update-bond-status "$SENDER_DID" PREISSUANCE "$BONDDOC1_DID_FULL"
 echo "Updating bonddoc 2 to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block
+ixocli tx bonddoc update-bond-status "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block
 echo "Updating bonddoc 2 to OPEN..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL"
+ixocli tx bonddoc update-bond-status "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL"
 
 # ----------------------------------------------------------------------------------------- fees
 # Create fee
@@ -269,5 +269,5 @@ FEE_ID="fee:fee1" # from FEE
 FEE_CONTRACT_ID="fee:contract:fee1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixocli q did getAddressFromDid $FRANCESCO_DID)"
+PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
 ixocli tx fees create-fee-contract "$FEE_CONTRACT_ID" "$FEE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block

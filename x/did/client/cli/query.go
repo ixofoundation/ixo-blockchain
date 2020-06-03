@@ -13,7 +13,7 @@ import (
 
 func GetCmdAddressFromDid() *cobra.Command {
 	return &cobra.Command{
-		Use:   "getAddressFromDid [did]",
+		Use:   "get-address-from-did [did]",
 		Short: "Query for an account address by DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -30,17 +30,14 @@ func GetCmdAddressFromDid() *cobra.Command {
 
 func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getDidDoc [did]",
+		Use:   "get-did-doc [did]",
 		Short: "Query DidDoc for a DID",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a did")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			didAddr := args[0]
 			key := ixo.Did(didAddr)
-
-			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryDidDoc, key), nil)
@@ -71,7 +68,7 @@ func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getAllDids",
+		Use:   "get-all-dids",
 		Short: "Query all DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
@@ -101,7 +98,7 @@ func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdAllDidDocs(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getAllDidDocs",
+		Use:   "get-all-did-docs",
 		Short: "Query all DID documents",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)

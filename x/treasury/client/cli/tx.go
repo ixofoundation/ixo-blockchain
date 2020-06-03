@@ -8,7 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -54,15 +53,9 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "send [to-did] [amount] [sender-sovrin-did]",
 		Short: "Create and sign a send tx using DIDs",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 3 || len(args[0]) == 0 ||
-				len(args[1]) == 0 || len(args[2]) == 0 {
-				return errors.New("You must provide the receiver DID, " +
-					"amount, and sender private key")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			toDid := args[0]
 			coinsStr := args[1]
@@ -85,15 +78,9 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "oracle-transfer [from-did] [to-did] [amount] [oracle-sovrin-did] [proof]",
 		Short: "Create and sign an oracle-transfer tx using DIDs",
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 5 || len(args[0]) == 0 || len(args[1]) == 0 ||
-				len(args[2]) == 0 || len(args[3]) == 0 || len(args[4]) == 0 {
-				return errors.New("You must provide the sender and receiver " +
-					"DID, amount, sender private key, and proof")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			fromDid := args[0]
 			toDid := args[1]
@@ -118,15 +105,9 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "oracle-mint [to-did] [amount] [oracle-sovrin-did] [proof]",
 		Short: "Create and sign an oracle-mint tx using DIDs",
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 ||
-				len(args[2]) == 0 || len(args[3]) == 0 {
-				return errors.New("You must provide the recipient DID, " +
-					"amount, oracle private key, and proof")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			toDid := args[0]
 			coinsStr := args[1]
@@ -150,15 +131,9 @@ func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "oracle-burn [from-did] [amount] [oracle-sovrin-did] [proof]",
 		Short: "Create and sign an oracle-burn tx using DIDs",
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 4 || len(args[0]) == 0 || len(args[1]) == 0 ||
-				len(args[2]) == 0 || len(args[3]) == 0 {
-				return errors.New("You must provide the source DID, " +
-					"amount, oracle private key, and proof")
-			}
+			ctx := context.NewCLIContext().WithCodec(cdc)
 
 			fromDid := args[0]
 			coinsStr := args[1]
