@@ -91,7 +91,9 @@ var (
 	}
 
 	// Reserved fees module ID prefixes
-	feesReservedIdPrefixes = []string{}
+	feesReservedIdPrefixes = []string{
+		project.ProjectFeesIdPrefix,
+	}
 )
 
 func MakeCodec() *codec.Codec {

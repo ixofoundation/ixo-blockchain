@@ -26,7 +26,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper) sdk.Handler {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
 		case MsgCreateProject:
-			return handleMsgCreateProject(ctx, k, msg)
+			return handleMsgCreateProject(ctx, k, fk, msg)
 		case MsgUpdateProjectStatus:
 			return handleMsgUpdateProjectStatus(ctx, k, bk, msg)
 		case MsgCreateAgent:
@@ -45,7 +45,7 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk.Result {
+func handleMsgCreateProject(ctx sdk.Context, k Keeper, fk fees.Keeper, msg MsgCreateProject) sdk.Result {
 
 	_, err := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
 	if err != nil {
@@ -62,6 +62,19 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 	}
 	k.SetProjectDoc(ctx, &msg)
 	k.SetProjectWithdrawalTransactions(ctx, msg.GetProjectDid(), nil)
+
+	claimFee, err := generateFee(ctx, k, fk, fees.FeeClaimTransaction, msg.ProjectDid)
+	if err != nil {
+		return err.Result()
+	}
+
+	evalFee, err := generateFee(ctx, k, fk, fees.FeeEvaluationTransaction, msg.ProjectDid)
+	if err != nil {
+		return err.Result()
+	}
+
+	fk.SetFee(ctx, claimFee)
+	fk.SetFee(ctx, evalFee)
 
 	return sdk.Result{}
 }
@@ -207,7 +220,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 	}
 
 	// Process claim fees
-	_, err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
+	err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
@@ -223,7 +236,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	_, err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.GetProjectDid())
+	err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
@@ -311,29 +324,73 @@ func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProject
 	return ixoProjectDoc.(StoredProjectDoc), nil
 }
 
-func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
+func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) sdk.Error {
 
-	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
+	projectAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(projectDid))
 
+	// Create and validate fee contract
+	feeContract := fees.NewFeeContractNoDiscount(getOneTimeUseFeeContractId(),
+		getFeeId(feeType, projectDid), projectAddr, projectAddr, false, true)
+	if err := feeContract.Validate(); err != nil {
+		return err
+	}
+
+	// Submit fee contract
+	fk.SetFeeContract(ctx, feeContract)
+
+	// Charge fee
+	charged, err := fk.ChargeFee(ctx, bk, feeContract.Id)
+	if err != nil {
+		return err
+	}
+
+	// Fee should always be chargeable in this case
+	if !charged {
+		panic("could not process fees; fee charge failed")
+	}
+
+	return nil
+}
+
+func getFeeId(feeType fees.FeeType, projectDid ixo.Did) string {
+	return fmt.Sprintf("%s%s_%s_%s",
+		fees.FeePrefix, ProjectFeesIdPrefix, feeType, projectDid)
+}
+
+func getOneTimeUseFeeContractId() string {
+	// One time use because we don't necessarily want to identifying what the
+	// fee contract is being used for. This also means it will be overwritten
+	// as soon as another one-time-use fee contract ID is created.
+	return fmt.Sprintf("%s%s_%s",
+		fees.FeeContractPrefix, ProjectFeesIdPrefix, "one_time_use")
+}
+
+func generateFee(ctx sdk.Context, k Keeper, fk fees.Keeper,
+	feeType fees.FeeType, projectDid ixo.Did) (fees.Fee, sdk.Error) {
+
+	// Get validating node set address
 	var validatingNodeSetAddr sdk.AccAddress
-	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId) // not found
+	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
 	if !found {
 		validatingNodeSetAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
 	} else {
 		validatingNodeSetAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
 	}
 
+	// Get ixo address
 	var ixoAddr sdk.AccAddress
-	found = checkAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId) // found
+	found = checkAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
 	if !found {
 		ixoAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
 	} else {
 		ixoAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
 	}
 
+	// Get fee adjusters
 	ixoFactor := fk.GetParams(ctx).IxoFactor
-	nodePercentage := fk.GetParams(ctx).NodeFeePercentage
+	nodePercentage := fk.GetParams(ctx).NodeFeePercentage.Mul(sdk.NewDec(100))
 
+	// Calculate fee amount based on fee type and adjusters
 	var adjustedFeeAmount sdk.Dec
 	switch feeType {
 	case fees.FeeClaimTransaction:
@@ -341,23 +398,24 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 	case fees.FeeEvaluationTransaction:
 		adjustedFeeAmount = fk.GetParams(ctx).EvaluationFeeAmount.Mul(ixoFactor)
 	default:
-		return sdk.Result{}, sdk.ErrUnknownRequest("Invalid Fee type.")
+		return fees.Fee{}, sdk.ErrUnknownRequest("Invalid Fee type.")
 	}
 
-	nodeAmount := adjustedFeeAmount.Mul(nodePercentage).RoundInt64()
-	ixoAmount := adjustedFeeAmount.RoundInt64() - nodeAmount
+	// Construct fee values
+	adjustedFeeCoins := sdk.NewCoins(
+		sdk.NewInt64Coin(ixo.IxoNativeToken, adjustedFeeAmount.RoundInt64()))
+	distribution := fees.NewDistribution(
+		fees.NewDistributionShare(validatingNodeSetAddr, nodePercentage),
+		fees.NewDistributionShare(ixoAddr, sdk.NewDec(100).Sub(nodePercentage)))
 
-	err := bk.SendCoins(ctx, projectAddr, validatingNodeSetAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodeAmount)})
-	if err != nil {
-		return sdk.Result{}, err
+	// Create and validate fee
+	fee := fees.NewFee(getFeeId(feeType, projectDid),
+		adjustedFeeCoins, adjustedFeeCoins, adjustedFeeCoins, nil, distribution)
+	if err := fee.Validate(); err != nil {
+		return fees.Fee{}, err
 	}
 
-	err = bk.SendCoins(ctx, projectAddr, ixoAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, ixoAmount)})
-	if err != nil {
-		return sdk.Result{}, err
-	}
-
-	return sdk.Result{}, nil
+	return fee, nil
 }
 
 func processEvaluatorPay(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, projectDid, senderDid ixo.Did, evaluatorPay int64) sdk.Error {
