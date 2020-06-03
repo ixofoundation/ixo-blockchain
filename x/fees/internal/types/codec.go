@@ -9,10 +9,10 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(BlockPeriod{}, "fees/BlockPeriod", nil)
 	cdc.RegisterConcrete(TimePeriod{}, "fees/TimePeriod", nil)
 
-	cdc.RegisterConcrete(MsgSetFeeContractAuthorisation{}, "fees/MsgSetFeeContractAuthorisation", nil)
 	cdc.RegisterConcrete(MsgCreateFee{}, "fees/MsgCreateFee", nil)
 	cdc.RegisterConcrete(MsgCreateFeeContract{}, "fees/MsgCreateFeeContract", nil)
 	cdc.RegisterConcrete(MsgCreateSubscription{}, "fees/MsgCreateSubscription", nil)
+	cdc.RegisterConcrete(MsgSetFeeContractAuthorisation{}, "fees/MsgSetFeeContractAuthorisation", nil)
 	cdc.RegisterConcrete(MsgGrantFeeDiscount{}, "fees/MsgGrantFeeDiscount", nil)
 	cdc.RegisterConcrete(MsgRevokeFeeDiscount{}, "fees/MsgRevokeFeeDiscount", nil)
 	cdc.RegisterConcrete(MsgChargeFee{}, "fees/MsgChargeFee", nil)
