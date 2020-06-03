@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,6 +11,10 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/types"
 )
+
+func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	r.HandleFunc("/fees", queryFeesRequestHandler(cliCtx)).Methods("GET")
+}
 
 func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
