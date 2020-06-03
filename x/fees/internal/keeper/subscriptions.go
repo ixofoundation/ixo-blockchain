@@ -73,7 +73,7 @@ func (k Keeper) ChargeSubscriptionFee(ctx sdk.Context, subscriptionId string) sd
 
 	// If the max number of periods has not been reached, then the ?charge?
 	// was due to the current period, so we can move to the next period.
-	// Otherwise, it means we're tackling accumulated periods. If the fee
+	// Otherwise, it means we're tackling accumulated periods, and if the fee
 	// was charged, then we should deduct an accumulated period
 	if !subscription.MaxPeriodsReached() {
 		subscription.NextPeriod(charged)
@@ -82,6 +82,11 @@ func (k Keeper) ChargeSubscriptionFee(ctx sdk.Context, subscriptionId string) sd
 			subscription.PeriodsAccumulated.Sub(sdk.OneUint())
 	}
 
+	// If the fee was not charged (assuming err == nil) this is because either
+	// the payer does not have enough coins, or because the fee *cannot* be
+	// charged (i.e. maximum charge reached, fee not authorised, etc.)
+
+	// Update subscription
 	k.SetSubscription(ctx, subscription)
 
 	return nil
