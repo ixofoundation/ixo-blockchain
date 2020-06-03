@@ -71,10 +71,9 @@ func (msg MsgSetFeeContractAuthorisation) GetSignBytes() []byte {
 }
 
 type MsgCreateFee struct {
-	PubKey     string     `json:"pub_key" yaml:"pub_key"`
-	CreatorDid ixo.Did    `json:"creator_did" yaml:"creator_did"`
-	FeeId      string     `json:"fee_id" yaml:"fee_id"`
-	FeeContent FeeContent `json:"fee_content" yaml:"fee_content"`
+	PubKey     string  `json:"pub_key" yaml:"pub_key"`
+	CreatorDid ixo.Did `json:"creator_did" yaml:"creator_did"`
+	Fee        Fee     `json:"fee" yaml:"fee"`
 }
 
 var _ FeesMessage = MsgCreateFee{}
@@ -94,13 +93,8 @@ func (msg MsgCreateFee) ValidateBasic() sdk.Error {
 		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
 	}
 
-	// Check that IDs valid
-	if !IsValidFeeId(msg.FeeId) {
-		return ErrInvalidId(DefaultCodespace, "fee id invalid")
-	}
-
-	// Validate FeeContent
-	if err := msg.FeeContent.Validate(); err != nil {
+	// Validate Fee
+	if err := msg.Fee.Validate(); err != nil {
 		return err
 	}
 

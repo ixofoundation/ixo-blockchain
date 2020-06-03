@@ -27,7 +27,6 @@ func TestHandler_CreateClaim(t *testing.T) {
 	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
 	feesKeeper.SetParams(ctx, params)
 	projectMsg := types.MsgCreateClaim{
-		SignBytes:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		TxHash:     "txHash",
 		SenderDid:  "senderDid",
@@ -70,7 +69,6 @@ func Test_CreateEvaluation(t *testing.T) {
 	fk.SetParams(ctx, params)
 
 	evaluationMsg := types.MsgCreateEvaluation{
-		SignBytes:  "",
 		TxHash:     "txHash",
 		SenderDid:  "senderDid",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -81,7 +79,6 @@ func Test_CreateEvaluation(t *testing.T) {
 	}
 
 	msg := types.MsgCreateProject{
-		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -118,7 +115,6 @@ func Test_WithdrawFunds(t *testing.T) {
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
 	msg := types.MsgWithdrawFunds{
-		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
 		Data: types.WithdrawFundsDoc{
 			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
@@ -129,7 +125,6 @@ func Test_WithdrawFunds(t *testing.T) {
 	}
 
 	msg1 := types.MsgCreateProject{
-		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",

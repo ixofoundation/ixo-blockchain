@@ -6,5 +6,5 @@ import (
 )
 
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/fees", queryFeesRequestHandler(cliCtx)).Methods("GET")
+	registerQueryRoutes(cliCtx, r)
 }

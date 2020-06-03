@@ -50,7 +50,7 @@ func TestKeeperSetGet(t *testing.T) {
 	require.NotNil(t, err)
 
 	// Submitted Fee
-	fee := types.NewFee(validFeeId1, validFeeContent)
+	fee := validFee
 	k.SetFee(ctx, fee)
 
 	// Check Fee
@@ -59,7 +59,7 @@ func TestKeeperSetGet(t *testing.T) {
 	require.Equal(t, fee.Id, feeGet.Id)
 
 	// Submitted FeeContract
-	feeContract := types.NewFeeContract(validFeeContractId1, validFeeContractContent)
+	feeContract := validFeeContract
 	k.SetFeeContract(ctx, feeContract)
 
 	// Check FeeContract
@@ -93,7 +93,7 @@ func TestKeeperSetGet(t *testing.T) {
 	// Check that currently discount is set as zero
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	require.True(t, feeContract.Content.DiscountId.IsZero())
+	require.True(t, feeContract.DiscountId.IsZero())
 
 	// Grant FeeContract discounts
 	err = k.GrantFeeDiscount(ctx, validFeeContractId1, sdk.NewUint(1))
@@ -104,7 +104,7 @@ func TestKeeperSetGet(t *testing.T) {
 	// Check that fee contract now has the discount ID (=1)
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	require.Equal(t, feeContract.Content.DiscountId, sdk.NewUint(1))
+	require.Equal(t, feeContract.DiscountId, sdk.NewUint(1))
 
 	// Overwrite grant with a new discount grant
 	err = k.GrantFeeDiscount(ctx, validFeeContractId1, sdk.NewUint(2))
@@ -113,7 +113,7 @@ func TestKeeperSetGet(t *testing.T) {
 	// Check that fee contract has the new discount ID (=2)
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	require.Equal(t, feeContract.Content.DiscountId, sdk.NewUint(2))
+	require.Equal(t, feeContract.DiscountId, sdk.NewUint(2))
 
 	// Revoke FeeContract discounts
 	err = k.RevokeFeeDiscount(ctx, validFeeContractId1)
@@ -122,22 +122,22 @@ func TestKeeperSetGet(t *testing.T) {
 	// Check that the discount ID is now back to zero
 	feeContract, err = k.GetFeeContract(ctx, validFeeContractId1)
 	require.Nil(t, err)
-	require.True(t, feeContract.Content.DiscountId.IsZero())
+	require.True(t, feeContract.DiscountId.IsZero())
 }
 
 func TestKeeperChargeFee(t *testing.T) {
 	ctx, k, _ := CreateTestInput()
 
 	// Create and submit Fee and FeeContract
-	fee := types.NewFee(validFeeId1, validFeeContent)
-	feeContract := types.NewFeeContract(validFeeContractId1, validFeeContractContent)
+	fee := validFee
+	feeContract := validFeeContract
 	k.SetFee(ctx, fee)
 	k.SetFeeContract(ctx, feeContract)
 
 	// Set payer balance
 	balance, err2 := sdk.ParseCoins("10ixo,10res")
 	require.Nil(t, err2)
-	err := k.bankKeeper.SetCoins(ctx, feeContract.Content.Payer, balance)
+	err := k.bankKeeper.SetCoins(ctx, feeContract.Payer, balance)
 	require.Nil(t, err)
 
 	// At this point, cumulative: /
@@ -153,7 +153,7 @@ func TestKeeperChargeFee(t *testing.T) {
 	require.True(t, charged)
 
 	// Check balance
-	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 := sdk.ParseCoins("9ixo,7res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -171,7 +171,7 @@ func TestKeeperChargeFee(t *testing.T) {
 	require.True(t, charged)
 
 	// Check balance
-	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 = sdk.ParseCoins("8ixo,5res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -186,7 +186,7 @@ func TestKeeperChargeFee(t *testing.T) {
 	require.True(t, charged)
 
 	// Check balance
-	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 = sdk.ParseCoins("7ixo,3res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -204,15 +204,15 @@ func TestKeeperChargeFeeWithDiscounts(t *testing.T) {
 	ctx, k, _ := CreateTestInput()
 
 	// Create and submit Fee (!!double charge!!) and FeeContract
-	fee := types.NewFee(validFeeId1, validDoubleChargeFeeContent)
-	feeContract := types.NewFeeContract(validFeeContractId1, validFeeContractContent)
+	fee := validDoubleChargeFee
+	feeContract := validFeeContract
 	k.SetFee(ctx, fee)
 	k.SetFeeContract(ctx, feeContract)
 
 	// Set payer balance
 	balance, err2 := sdk.ParseCoins("10ixo,10res")
 	require.Nil(t, err2)
-	err := k.bankKeeper.SetCoins(ctx, feeContract.Content.Payer, balance)
+	err := k.bankKeeper.SetCoins(ctx, feeContract.Payer, balance)
 	require.Nil(t, err)
 
 	// Set discount
@@ -232,7 +232,7 @@ func TestKeeperChargeFeeWithDiscounts(t *testing.T) {
 	require.True(t, charged)
 
 	// Check balance
-	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 := sdk.ParseCoins("9ixo,7res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -250,7 +250,7 @@ func TestKeeperChargeFeeWithDiscounts(t *testing.T) {
 	require.True(t, charged)
 
 	// Check balance
-	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 = sdk.ParseCoins("8ixo,5res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -265,7 +265,7 @@ func TestKeeperChargeFeeWithDiscounts(t *testing.T) {
 	require.True(t, charged)
 
 	// Check balance
-	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 = sdk.ParseCoins("7ixo,3res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -283,8 +283,8 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	ctx, k, _ := CreateTestInput()
 
 	// Create and submit Fee and FeeContract
-	fee := types.NewFee(validFeeId1, validFeeContent)
-	feeContract := types.NewFeeContract(validFeeContractId1, validFeeContractContent)
+	fee := validFee
+	feeContract := validFeeContract
 	k.SetFee(ctx, fee)
 	k.SetFeeContract(ctx, feeContract)
 
@@ -297,7 +297,7 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	// Set payer balance
 	balance, err2 := sdk.ParseCoins("10ixo,10res")
 	require.Nil(t, err2)
-	err := k.bankKeeper.SetCoins(ctx, feeContract.Content.Payer, balance)
+	err := k.bankKeeper.SetCoins(ctx, feeContract.Payer, balance)
 	require.Nil(t, err)
 
 	// At this point, cumulative: /
@@ -312,7 +312,7 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	require.Nil(t, err)
 
 	// Check balance
-	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance := k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 := sdk.ParseCoins("9ixo,7res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -329,7 +329,7 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	require.Nil(t, err)
 
 	// Check balance
-	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 = sdk.ParseCoins("8ixo,5res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -343,7 +343,7 @@ func TestKeeperChargeSubscriptionFee(t *testing.T) {
 	require.Nil(t, err)
 
 	// Check balance
-	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Content.Payer)
+	newBalance = k.bankKeeper.GetCoins(ctx, feeContract.Payer)
 	expected, err2 = sdk.ParseCoins("7ixo,3res")
 	require.Nil(t, err2)
 	require.Equal(t, expected.String(), newBalance.String())
