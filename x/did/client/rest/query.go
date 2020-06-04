@@ -33,7 +33,7 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 			return
 		}
 
-		accAddress := types.DidToAddr(vars["did"])
+		accAddress := ixo.DidToAddr(vars["did"])
 
 		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
 	}

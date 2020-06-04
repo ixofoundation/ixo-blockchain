@@ -3,6 +3,7 @@ package ixo
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tendermint/tendermint/crypto"
 	"regexp"
 	"time"
 
@@ -26,6 +27,14 @@ var (
 )
 
 const IxoNativeToken = "ixo"
+
+func StringToAddr(str string) sdk.AccAddress {
+	return sdk.AccAddress(crypto.AddressHash([]byte(str)))
+}
+
+func DidToAddr(did Did) sdk.AccAddress {
+	return StringToAddr(did)
+}
 
 type IxoTx struct {
 	Msgs       []sdk.Msg      `json:"payload" yaml:"payload"`

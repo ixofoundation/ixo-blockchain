@@ -183,7 +183,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid ixo.Did,
 
 func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.BuyOrder, prices sdk.DecCoins) (err sdk.Error) {
 	bond := k.MustGetBond(ctx, bondDid)
-	buyerAddr := types.DidToAddr(bo.AccountDid)
+	buyerAddr := ixo.DidToAddr(bo.AccountDid)
 
 	// Mint bond tokens
 	err = k.SupplyKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
@@ -261,7 +261,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid ixo.Did, bo types.Buy
 
 func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid ixo.Did, so types.SellOrder, prices sdk.DecCoins) (err sdk.Error) {
 	bond := k.MustGetBond(ctx, bondDid)
-	sellerAddr := types.DidToAddr(so.AccountDid)
+	sellerAddr := ixo.DidToAddr(so.AccountDid)
 
 	reserveReturns := types.MultiplyDecCoinsByInt(prices, so.Amount.Amount)
 	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
@@ -329,7 +329,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid ixo.Did, so types.SwapOrder
 	}
 
 	// Give resultant tokens to swapper (reserveReturns should never be zero)
-	swapperAddr := types.DidToAddr(so.AccountDid)
+	swapperAddr := ixo.DidToAddr(so.AccountDid)
 	err = k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, swapperAddr, reserveReturns)
 	if err != nil {
 		return err, false
@@ -424,7 +424,7 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid ixo.Did) {
 					logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 					// Return from amount to swapper
-					swapperAddr := types.DidToAddr(so.AccountDid)
+					swapperAddr := ixo.DidToAddr(so.AccountDid)
 					err := k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
 						types.BatchesIntermediaryAccount, swapperAddr, sdk.Coins{so.Amount})
 					if err != nil {
@@ -492,7 +492,7 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid ixo.Did) (cance
 				))
 
 				// Return reserve to buyer
-				buyerAddr := types.DidToAddr(bo.AccountDid)
+				buyerAddr := ixo.DidToAddr(bo.AccountDid)
 				err := k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
 					types.BatchesIntermediaryAccount, buyerAddr, bo.MaxPrices)
 				if err != nil {

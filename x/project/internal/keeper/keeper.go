@@ -148,7 +148,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid ixo.Did,
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid ixo.Did,
 	accountId types.InternalAccountID) (auth.Account, sdk.Error) {
-	address := types.StringToAddr(accountId.ToAddressKey(projectDid))
+	address := ixo.StringToAddr(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")

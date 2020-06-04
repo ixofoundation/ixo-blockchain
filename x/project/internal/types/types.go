@@ -1,7 +1,6 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/crypto"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -146,8 +145,4 @@ type ProjectMsg interface {
 	sdk.Msg
 	IsNewDid() bool
 	IsWithdrawal() bool
-}
-
-func StringToAddr(str string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(str)))
 }
