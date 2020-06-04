@@ -3,16 +3,15 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
@@ -31,31 +30,6 @@ func parseBool(boolStr, boolName string) (bool, sdk.Error) {
 		return false, types.ErrInvalidArgument(types.DefaultCodespace, ""+
 			fmt.Sprintf("%s is not a valid bool (true/false)", boolName))
 	}
-}
-
-func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg,
-	sovrinDid sovrin.SovrinDid) error {
-	privKey := [64]byte{}
-	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
-
-	signature := ixo.SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
-	tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-	bz, err := cdc.MarshalJSON(tx)
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := ctx.BroadcastTx(bz)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(res.String())
-	fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
-	return nil
-
 }
 
 func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
@@ -89,7 +63,7 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateFee(fee, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -131,7 +105,7 @@ func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 				feeIdStr, feeContractIdStr, payerAddr,
 				canDeauthorise, discountId, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -167,7 +141,7 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				feeContractIdStr, maxPeriods, period, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -194,7 +168,7 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgSetFeeContractAuthorisation(
 				feeContractIdStr, authorised, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -228,7 +202,7 @@ func GetCmdGrantFeeDiscount(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgGrantFeeDiscount(
 				feeContractIdStr, discountId, recipientAddr, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -255,7 +229,7 @@ func GetCmdRevokeFeeDiscount(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgRevokeFeeDiscount(
 				feeContractIdStr, holderAddr, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -275,7 +249,7 @@ func GetCmdChargeFee(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgChargeFee(feeContractIdStr, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
 		},
 	}
 }

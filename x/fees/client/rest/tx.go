@@ -3,15 +3,15 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"net/http"
 	"strings"
 
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
@@ -42,37 +42,6 @@ func parseBool(boolStr, boolName string) (bool, error) {
 	}
 }
 
-func IxoSignAndBroadcast(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
-	privKey := [64]byte{}
-	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
-
-	msgBytes, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-
-	signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
-	tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-	bz, err := ctx.Codec.MarshalJSON(tx)
-	if err != nil {
-		return nil, fmt.Errorf("Could not marshall tx to binary. Error: %s", err.Error())
-	}
-
-	res, err := ctx.BroadcastTx(bz)
-	if err != nil {
-		return nil, fmt.Errorf("Could not broadcast tx. Error: %s", err.Error())
-	}
-
-	output, err := json.MarshalIndent(res, "", "  ")
-	if err != nil {
-		return nil, err
-	}
-
-	return output, nil
-}
-
 func createFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -101,14 +70,14 @@ func createFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgCreateFee(fee, sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }
 
@@ -158,14 +127,14 @@ func createFeeContractHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgCreateFeeContract(feeIdParam, feeContractIdParam,
 			payerAddr, canDeauthorise, discountId, sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }
 
@@ -208,14 +177,14 @@ func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgCreateSubscription(subIdParam, feeContractIdParam,
 			maxPeriods, period, sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }
 
@@ -248,14 +217,14 @@ func setFeeContractAuthorisationHandler(ctx context.CLIContext) http.HandlerFunc
 		msg := types.NewMsgSetFeeContractAuthorisation(feeContractIdParam,
 			authorised, sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }
 
@@ -296,14 +265,14 @@ func grantFeeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgGrantFeeDiscount(feeContractIdParam, discountId,
 			recipientAddr, sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }
 
@@ -336,14 +305,14 @@ func revokeFeeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgRevokeFeeDiscount(feeContractIdParam, holderAddr,
 			sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }
 
@@ -367,13 +336,13 @@ func chargeFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgChargeFee(feeContractIdParam, sovrinDid)
 
-		output, err := IxoSignAndBroadcast(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, ctx, output)
 	}
 }

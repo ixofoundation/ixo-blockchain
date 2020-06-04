@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
@@ -47,41 +46,11 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 		msg := types.NewMsgCreateBond(senderDid, bondDoc, didDoc)
-		privKey := [64]byte{}
-		copy(privKey[:], base58.Decode(didDoc.Secret.SignKey))
-		copy(privKey[32:], base58.Decode(didDoc.VerifyKey))
 
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
-			return
-		}
-
-		signature := ixo.SignIxoMessage(msgBytes, didDoc.Did, privKey)
-		tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
-
-			return
-		}
-
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
-
-			return
-		}
-
-		output, err := json.MarshalIndent(res, "", "  ")
+		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, didDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
@@ -124,45 +93,14 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 		}
 
 		msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
-		privKey := [64]byte{}
-		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall msg to json. Error: %s", err.Error())))
-
-			return
-		}
-		signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
-		tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
-
-			return
-		}
-
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
-
-			return
-		}
-
-		output, err := json.MarshalIndent(res, "", "  ")
+		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
 		rest.PostProcessResponse(w, cliCtx, output)
-
 	}
 }

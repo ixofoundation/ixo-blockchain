@@ -1,10 +1,14 @@
 package ixo
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/btcsuite/btcutil/base58"
+	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 type PubKeyGetter func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result)
@@ -128,4 +132,50 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 
 		return newCtx, sdk.Result{GasWanted: ixoTx.Fee.Gas}, false // continue...
 	}
+}
+
+func signAndBroadcast(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+	privKey := [64]byte{}
+	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
+	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+
+	signature := SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
+	tx := NewIxoTxSingleMsg(msg, signature)
+
+	bz, err := ctx.Codec.MarshalJSON(tx)
+	if err != nil {
+		return sdk.TxResponse{}, fmt.Errorf("Could not marshall tx to binary. Error: %s", err.Error())
+	}
+
+	res, err := ctx.BroadcastTx(bz)
+	if err != nil {
+		return sdk.TxResponse{}, fmt.Errorf("Could not broadcast tx. Error: %s", err.Error())
+	}
+
+	return res, nil
+}
+
+func SignAndBroadcastCli(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+	res, err := signAndBroadcast(ctx, msg, sovrinDid)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(res.String())
+	fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
+	return nil
+}
+
+func SignAndBroadcastRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
+	res, err := signAndBroadcast(ctx, msg, sovrinDid)
+	if err != nil {
+		return nil, err
+	}
+
+	output, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return output, nil
 }

@@ -8,6 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"strings"
@@ -124,7 +125,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				orderQuantityLimits, sanityRate, sanityMarginPercentage,
 				_allowSells, batchBlocks, bondDid)
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, bondDid)
 		},
 	}
 
@@ -175,7 +176,7 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
 				_sanityMarginPercentage, _editorDid, bondDid)
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, bondDid)
 		},
 	}
 
@@ -215,7 +216,7 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgBuy(buyerDid, bondCoinWithAmount, maxPrices, args[2])
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, buyerDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, buyerDid)
 		},
 	}
 	return cmd
@@ -240,7 +241,7 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgSell(sellerDid, bondCoinWithAmount, args[1])
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, sellerDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, sellerDid)
 		},
 	}
 	return cmd
@@ -268,7 +269,7 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgSwap(swapperDid, from, args[2], args[3])
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, swapperDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, swapperDid)
 		},
 	}
 	return cmd
