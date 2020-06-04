@@ -1,8 +1,6 @@
 package rest
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -37,16 +35,13 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -81,16 +76,13 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		oracleDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(oracleDidParam), &oracleDid)
+		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -124,16 +116,13 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		oracleDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(oracleDidParam), &oracleDid)
+		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -167,16 +156,13 @@ func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		oracleDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(oracleDidParam), &oracleDid)
+		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 

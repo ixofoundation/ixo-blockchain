@@ -29,13 +29,11 @@ func queryBondDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		}
 

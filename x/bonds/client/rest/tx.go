@@ -8,6 +8,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"net/http"
 	"strings"
 )
@@ -144,7 +145,11 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse bond's sovrin DID
-		bondDid := client.UnmarshalSovrinDID(req.BondDid)
+		bondDid, err2 := sovrin.UnmarshalSovrinDid(req.BondDid)
+		if err2 != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
+			return
+		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
 			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
@@ -190,7 +195,11 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse bond's sovrin DID
-		bondDid := client.UnmarshalSovrinDID(req.BondDid)
+		bondDid, err := sovrin.UnmarshalSovrinDid(req.BondDid)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate,
@@ -243,7 +252,11 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse buyer's sovrin DID
-		buyerDid := client.UnmarshalSovrinDID(req.BuyerDid)
+		buyerDid, err := sovrin.UnmarshalSovrinDid(req.BuyerDid)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		msg := types.NewMsgBuy(buyerDid, bondCoin, maxPrices, req.BondDid)
 
@@ -287,7 +300,11 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse seller's sovrin DID
-		sellerDid := client.UnmarshalSovrinDID(req.SellerDid)
+		sellerDid, err := sovrin.UnmarshalSovrinDid(req.SellerDid)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		msg := types.NewMsgSell(sellerDid, bondCoin, req.BondDid)
 
@@ -333,7 +350,12 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse swapper's sovrin DID
-		swapperDid := client.UnmarshalSovrinDID(req.SwapperDid)
+		swapperDid, err := sovrin.UnmarshalSovrinDid(req.SwapperDid)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
 
 		msg := types.NewMsgSwap(swapperDid, fromCoin, req.ToToken, req.BondDid)
 

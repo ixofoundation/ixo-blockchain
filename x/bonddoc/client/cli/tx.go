@@ -12,16 +12,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
-
 func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "create-bond [sender-did] [bond-json] [sovrin-did]",
@@ -32,10 +22,13 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			senderDid := args[0]
 			bondDocStr := args[1]
-			sovrinDid := unmarshalSovrinDID(args[2])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			if err != nil {
+				return err
+			}
 
-			bondDoc := types.BondDoc{}
-			err := json.Unmarshal([]byte(bondDocStr), &bondDoc)
+			var bondDoc types.BondDoc
+			err = json.Unmarshal([]byte(bondDocStr), &bondDoc)
 			if err != nil {
 				panic(err)
 			}
@@ -57,7 +50,10 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 
 			senderDid := args[0]
 			status := args[1]
-			sovrinDid := unmarshalSovrinDID(args[2])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			if err != nil {
+				return err
+			}
 
 			bondStatus := types.BondStatus(status)
 			if bondStatus != types.PreIssuanceStatus &&

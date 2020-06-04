@@ -52,6 +52,21 @@ func GenerateMnemonic() string {
 	return mnemonicWords
 }
 
+func fromJsonString(jsonSovrinDid string) (SovrinDid, error) {
+	var did SovrinDid
+	err := json.Unmarshal([]byte(jsonSovrinDid), &did)
+	if err != nil {
+		err := fmt.Errorf("Could not unmarshal did into struct. Error: %s", err.Error())
+		return SovrinDid{}, err
+	}
+
+	return did, nil
+}
+
+func UnmarshalSovrinDid(jsonSovrinDid string) (SovrinDid, error) {
+	return fromJsonString(jsonSovrinDid)
+}
+
 func FromMnemonic(mnemonic string) SovrinDid {
 	seed := sha256.New()
 	seed.Write([]byte(mnemonic))
@@ -60,7 +75,6 @@ func FromMnemonic(mnemonic string) SovrinDid {
 	copy(seed32[:], seed.Sum(nil)[:32])
 
 	return FromSeed(seed32)
-
 }
 
 func FromSeed(seed [32]byte) SovrinDid {

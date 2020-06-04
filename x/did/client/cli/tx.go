@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
@@ -17,16 +16,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
-
 func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "add-did-doc [sovrin-did]",
@@ -35,7 +24,10 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			sovrinDid := unmarshalSovrinDID(args[0])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[0])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -58,7 +50,10 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 				return errors.New("The did is not on the blockchain")
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[1])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[1])
+			if err != nil {
+				return err
+			}
 
 			t := time.Now()
 			issued := t.Format(time.RFC3339)

@@ -30,21 +30,19 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		projectDocParam := r.URL.Query().Get("projectDoc")
 		didDocParam := r.URL.Query().Get("didDoc")
 		mode := r.URL.Query().Get("mode")
+
 		var projectDoc types.ProjectDoc
 		err := json.Unmarshal([]byte(projectDocParam), &projectDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall projectDoc into struct. Error: %s", err.Error())))
-
 			return
 		}
 
-		var didDoc sovrin.SovrinDid
-		err = json.Unmarshal([]byte(didDocParam), &didDoc)
+		didDoc, err := sovrin.UnmarshalSovrinDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -70,11 +68,10 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
 		mode := r.URL.Query().Get("mode")
 
-		var sovrinDid sovrin.SovrinDid
-		err := json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall sovrinDid into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -89,7 +86,6 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 			projectStatus != types.PaidoutStatus {
 			_, _ = w.Write([]byte("The status must be one of 'CREATED', " +
 				"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'"))
-
 			return
 		}
 
@@ -120,12 +116,10 @@ func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		projectDidParam := r.URL.Query().Get("projectDid")
 		mode := r.URL.Query().Get("mode")
 
-		var projectDid sovrin.SovrinDid
-		err := json.Unmarshal([]byte(projectDidParam), &projectDid)
+		projectDid, err := sovrin.UnmarshalSovrinDid(projectDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall projectDid into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -133,7 +127,6 @@ func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		if role != "SA" && role != "EA" && role != "IA" {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "The role must be one of 'SA', 'EA' or 'IA'")
-
 			return
 		}
 
@@ -164,12 +157,10 @@ func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
 		mode := r.URL.Query().Get("mode")
 
-		var sovrinDid sovrin.SovrinDid
-		err := json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall SovrinDid into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -202,12 +193,10 @@ func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
 		mode := r.URL.Query().Get("mode")
 
-		var sovrinDid sovrin.SovrinDid
-		err := json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall sovrinDid into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -216,7 +205,6 @@ func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 		claimStatus := types.ClaimStatus(status)
 		if claimStatus != types.PendingClaim && claimStatus != types.ApprovedClaim && claimStatus != types.RejectedClaim {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "The status must be one of '0' (Pending), '1' (Approved) or '2' (Rejected)")
-
 			return
 		}
 
@@ -241,20 +229,19 @@ func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		senderDidParams := r.URL.Query().Get("senderDid")
-		dataParams := r.URL.Query().Get("data")
+		senderDidParam := r.URL.Query().Get("senderDid")
+		dataParam := r.URL.Query().Get("data")
 		mode := r.URL.Query().Get("mode")
 
-		var senderDid sovrin.SovrinDid
-		err := json.Unmarshal([]byte(senderDidParams), &senderDid)
+		senderDid, err := sovrin.UnmarshalSovrinDid(senderDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall sovrinDid into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
 		var data types.WithdrawFundsDoc
-		err = json.Unmarshal([]byte(dataParams), &data)
+		err = json.Unmarshal([]byte(dataParam), &data)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall data into struct. Error: %s", err.Error())))

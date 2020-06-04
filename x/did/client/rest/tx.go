@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"net/http"
@@ -28,12 +27,11 @@ func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		didDocParam := r.URL.Query().Get("didDoc")
 		mode := r.URL.Query().Get("mode")
 		cliCtx = cliCtx.WithBroadcastMode(mode)
-		sovrinDid := sovrin.SovrinDid{}
-		err := json.Unmarshal([]byte(didDocParam), &sovrinDid)
+
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -64,16 +62,13 @@ func addCredentialRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte("The did is not found"))
-
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(didDocParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 

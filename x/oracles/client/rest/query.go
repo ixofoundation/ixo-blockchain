@@ -24,7 +24,6 @@ func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -32,7 +31,6 @@ func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 

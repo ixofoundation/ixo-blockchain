@@ -132,10 +132,7 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 
 		txByteString := string(txBytes[0:1])
 		if txByteString == "{" {
-			var tx = IxoTx{}
-
 			var upTx map[string]interface{}
-
 			err := json.Unmarshal(txBytes, &upTx)
 			if err != nil {
 				return nil, sdk.ErrTxDecode(err.Error())
@@ -148,13 +145,12 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 
 			txBytes, _ = json.Marshal(upTx)
 
+			var tx IxoTx
 			err = cdc.UnmarshalJSON(txBytes, &tx)
 			if err != nil {
 				return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 			}
-
 			return tx, nil
-
 		} else {
 			var tx = auth.StdTx{}
 			err := cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx)
@@ -162,7 +158,6 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 				return nil, sdk.ErrTxDecode("").TraceSDK(err.Error())
 			}
 			return tx, nil
-
 		}
 	}
 }

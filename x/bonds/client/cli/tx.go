@@ -9,6 +9,7 @@ import (
 	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"strings"
@@ -117,7 +118,10 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse bond's sovrin DID
-			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+			bondDid, err := sovrin.UnmarshalSovrinDid(_bondDid)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				_creatorDid, _functionType, functionParams, reserveTokens,
@@ -170,7 +174,10 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			// Parse bond's sovrin DID
-			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+			bondDid, err := sovrin.UnmarshalSovrinDid(_bondDid)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
@@ -212,7 +219,10 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse buyer's sovrin DID
-			buyerDid := client2.UnmarshalSovrinDID(args[3])
+			buyerDid, err := sovrin.UnmarshalSovrinDid(args[3])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgBuy(buyerDid, bondCoinWithAmount, maxPrices, args[2])
 
@@ -237,7 +247,10 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse seller's sovrin DID
-			sellerDid := client2.UnmarshalSovrinDID(args[2])
+			sellerDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgSell(sellerDid, bondCoinWithAmount, args[1])
 
@@ -265,7 +278,10 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse swapper's sovrin DID
-			swapperDid := client2.UnmarshalSovrinDID(args[4])
+			swapperDid, err := sovrin.UnmarshalSovrinDid(args[4])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgSwap(swapperDid, from, args[2], args[3])
 

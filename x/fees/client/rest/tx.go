@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -60,11 +59,10 @@ func createFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -116,11 +114,10 @@ func createFeeContractHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -166,11 +163,10 @@ func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -206,11 +202,10 @@ func setFeeContractAuthorisationHandler(ctx context.CLIContext) http.HandlerFunc
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -254,11 +249,10 @@ func grantFeeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -294,11 +288,10 @@ func revokeFeeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -326,11 +319,10 @@ func chargeFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
 
-		sovrinDid := sovrin.SovrinDid{}
-		err := json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 

@@ -29,8 +29,7 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 
 		if !ixo.IsValidDid(vars["did"]) {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Error: input is not a valid did"))
-
+			_, _ = w.Write([]byte("input is not a valid did"))
 			return
 		}
 
@@ -52,13 +51,11 @@ func queryDidDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
 			_, _ = w.Write([]byte("No data for respected did address."))
-
 			return
 		}
 
@@ -78,7 +75,6 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
@@ -103,14 +99,12 @@ func queryAllDidDocsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
 			_, _ = w.Write([]byte("No data present."))
-
 			return
 		}
 

@@ -34,7 +34,6 @@ func queryParamsHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -42,7 +41,6 @@ func queryParamsHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 
@@ -60,7 +58,6 @@ func queryFeeHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -68,7 +65,6 @@ func queryFeeHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &fee); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 
@@ -86,7 +82,6 @@ func queryFeeContractHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -94,7 +89,6 @@ func queryFeeContractHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &feeContract); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 
@@ -112,7 +106,6 @@ func querySubscriptionHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -120,7 +113,6 @@ func querySubscriptionHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &subscription); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 

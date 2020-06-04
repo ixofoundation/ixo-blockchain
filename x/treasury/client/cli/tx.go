@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,16 +10,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
-
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
 
 func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
@@ -39,7 +28,11 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgSend(toDid, coins, sovrinDid)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -66,7 +59,11 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgOracleTransfer(fromDid, toDid, coins, sovrinDid, proof)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -92,7 +89,11 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgOracleMint(toDid, coins, sovrinDid, proof)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -118,7 +119,11 @@ func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgOracleBurn(fromDid, coins, sovrinDid, proof)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)

@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
@@ -32,16 +31,6 @@ func parseBool(boolStr, boolName string) (bool, sdk.Error) {
 	}
 }
 
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
-
 func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "create-fee [fee-json] [creator-sovrin-did]",
@@ -53,10 +42,13 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 			feeStr := args[0]
 			sovrinDidStr := args[1]
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			var fee types.Fee
-			err := cdc.UnmarshalJSON([]byte(feeStr), &fee)
+			err = cdc.UnmarshalJSON([]byte(feeStr), &fee)
 			if err != nil {
 				return err
 			}
@@ -99,7 +91,10 @@ func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgCreateFeeContract(
 				feeIdStr, feeContractIdStr, payerAddr,
@@ -130,7 +125,10 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			var period types.Period
 			err = cdc.UnmarshalJSON([]byte(periodStr), &period)
@@ -163,7 +161,10 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err2 := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err2 != nil {
+				return err2
+			}
 
 			msg := types.NewMsgSetFeeContractAuthorisation(
 				feeContractIdStr, authorised, sovrinDid)
@@ -197,7 +198,10 @@ func GetCmdGrantFeeDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgGrantFeeDiscount(
 				feeContractIdStr, discountId, recipientAddr, sovrinDid)
@@ -224,7 +228,10 @@ func GetCmdRevokeFeeDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgRevokeFeeDiscount(
 				feeContractIdStr, holderAddr, sovrinDid)
@@ -245,7 +252,10 @@ func GetCmdChargeFee(cdc *codec.Codec) *cobra.Command {
 			feeContractIdStr := args[0]
 			sovrinDidStr := args[1]
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgChargeFee(feeContractIdStr, sovrinDid)
 

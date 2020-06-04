@@ -12,16 +12,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
-
 func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "create-project [sender-did] [project-json] [sovrin-did]",
@@ -32,12 +22,15 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 
 			senderDid := args[0]
 			projectDocStr := args[1]
-			sovrinDid := unmarshalSovrinDID(args[2])
-
-			projectDoc := types.ProjectDoc{}
-			err := json.Unmarshal([]byte(projectDocStr), &projectDoc)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
 			if err != nil {
-				panic(err)
+				return err
+			}
+
+			var projectDoc types.ProjectDoc
+			err = json.Unmarshal([]byte(projectDocStr), &projectDoc)
+			if err != nil {
+				return err
 			}
 
 			msg := types.NewMsgCreateProject(senderDid, projectDoc, sovrinDid)
@@ -57,7 +50,10 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 
 			senderDid := args[0]
 			status := args[1]
-			sovrinDid := unmarshalSovrinDID(args[2])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			if err != nil {
+				return err
+			}
 
 			projectStatus := types.ProjectStatus(status)
 			if projectStatus != types.CreatedProject &&
@@ -103,7 +99,11 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 				Role:     role,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[4])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[4])
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, sovrinDid)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -135,7 +135,11 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 				Role:   agentRole,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[5])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[5])
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, sovrinDid)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -158,7 +162,11 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 				ClaimID: claimId,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[3])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[3])
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, sovrinDid)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -188,7 +196,11 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 				Status:  claimStatus,
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[4])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[4])
+			if err != nil {
+				return err
+			}
+
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, sovrinDid)
 
 			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
@@ -204,9 +216,13 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			senderDid := unmarshalSovrinDID(args[0])
+			senderDid, err := sovrin.UnmarshalSovrinDid(args[0])
+			if err != nil {
+				return err
+			}
+
 			var data types.WithdrawFundsDoc
-			err := json.Unmarshal([]byte(args[1]), &data)
+			err = json.Unmarshal([]byte(args[1]), &data)
 			if err != nil {
 				return err
 			}

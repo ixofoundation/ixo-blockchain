@@ -26,21 +26,19 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		bondDocParam := r.URL.Query().Get("bondDoc")
 		didDocParam := r.URL.Query().Get("didDoc")
 		mode := r.URL.Query().Get("mode")
+
 		var bondDoc types.BondDoc
 		err := json.Unmarshal([]byte(bondDocParam), &bondDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall bondDoc into struct. Error: %s", err.Error())))
-
 			return
 		}
 
-		var didDoc sovrin.SovrinDid
-		err = json.Unmarshal([]byte(didDocParam), &didDoc)
+		didDoc, err := sovrin.UnmarshalSovrinDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -66,11 +64,10 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 		sovrinDidParam := r.URL.Query().Get("sovrinDid")
 		mode := r.URL.Query().Get("mode")
 
-		var sovrinDid sovrin.SovrinDid
-		err := json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall sovrinDid into struct. Error: %s", err.Error())))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 

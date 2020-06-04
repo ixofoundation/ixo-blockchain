@@ -1,10 +1,8 @@
 package client
 
 import (
-	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"strings"
 )
 
@@ -69,14 +67,4 @@ func ParseTwoPartCoin(amount, denom string) (coin sdk.Coin, err error) {
 		return sdk.Coin{}, types.ErrInvalidCoinDenomination(types.DefaultCodespace, denom)
 	}
 	return coin, nil
-}
-
-func UnmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
 }
