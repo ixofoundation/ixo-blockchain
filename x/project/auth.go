@@ -40,7 +40,7 @@ func NewAnteHandler(projectKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler 
 				projectDid := ixo.Did(msg.GetSigners()[0])
 				projectDoc, err := projectKeeper.GetProjectDoc(ctx, projectDid)
 				if err != nil {
-					return ctx, sdk.ErrInternal("project did not found").Result(), false
+					return ctx, sdk.ErrInternal("project did not found").Result(), true
 				}
 
 				copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))

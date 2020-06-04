@@ -28,7 +28,7 @@ func NewAnteHandler(bonddocKeeper Keeper) sdk.AnteHandler {
 			bondDid := ixo.Did(msg.GetSigners()[0])
 			bondDoc, err := bonddocKeeper.GetBondDoc(ctx, bondDid)
 			if err != nil {
-				return ctx, sdk.ErrInternal("bond did not found").Result(), false
+				return ctx, sdk.ErrInternal("bond did not found").Result(), true
 			}
 
 			copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
