@@ -117,19 +117,19 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
 			}
 
-			// Parse bond's sovrin DID
-			bondDid, err := sovrin.UnmarshalSovrinDid(_bondDid)
+			// Parse creator's sovrin DID
+			creatorDid, err := sovrin.UnmarshalSovrinDid(_creatorDid)
 			if err != nil {
 				return err
 			}
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
-				_creatorDid, _functionType, functionParams, reserveTokens,
+				creatorDid, _functionType, functionParams, reserveTokens,
 				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
 				orderQuantityLimits, sanityRate, sanityMarginPercentage,
-				_allowSells, batchBlocks, bondDid)
+				_allowSells, batchBlocks, _bondDid)
 
-			return ixo.SignAndBroadcastCli(cliCtx, msg, bondDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, creatorDid)
 		},
 	}
 
@@ -173,17 +173,17 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			// Parse bond's sovrin DID
-			bondDid, err := sovrin.UnmarshalSovrinDid(_bondDid)
+			// Parse editor's sovrin DID
+			editorDid, err := sovrin.UnmarshalSovrinDid(_editorDid)
 			if err != nil {
 				return err
 			}
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, _editorDid, bondDid)
+				_sanityMarginPercentage, editorDid, _bondDid)
 
-			return ixo.SignAndBroadcastCli(cliCtx, msg, bondDid)
+			return ixo.SignAndBroadcastCli(cliCtx, msg, editorDid)
 		},
 	}
 

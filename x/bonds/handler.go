@@ -75,11 +75,10 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
-		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
-		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
+		msg.CreatorPubKey, msg.FunctionType, msg.FunctionParameters,
+		msg.ReserveTokens, reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks,
-		msg.BondDid, msg.PubKey)
+		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks, msg.BondDid)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
 	keeper.SetBondDid(ctx, bond.Token, bond.BondDid)
@@ -122,12 +121,14 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditBond) sdk.Result {
 
-	// Note: since the expected signer is BondDid, it is not a requirement that
-	// the editor of the bond is also the creator.
-
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
+	}
+
+	if bond.CreatorDid != msg.EditorDid {
+		errMsg := fmt.Sprintf("Editor must be the creator of the bond")
+		return sdk.ErrInternal(errMsg).Result()
 	}
 
 	if msg.Name != types.DoNotModifyField {

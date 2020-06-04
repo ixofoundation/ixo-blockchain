@@ -17,15 +17,14 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 		switch msg := msg.(type) {
 		case types.MsgCreateBond:
 			senderDid = msg.CreatorDid
-			copy(pubKey[:], base58.Decode(msg.PubKey))
+			copy(pubKey[:], base58.Decode(msg.CreatorPubKey))
 		case types.MsgEditBond:
 			senderDid = msg.EditorDid
-			bondDid := msg.GetSignerDid()
-			bond, found := keeper.GetBond(ctx, bondDid)
+			bond, found := keeper.GetBond(ctx, msg.BondDid)
 			if !found {
 				return pubKey, sdk.ErrInternal("bond not found").Result()
 			}
-			copy(pubKey[:], base58.Decode(bond.PubKey))
+			copy(pubKey[:], base58.Decode(bond.CreatorPubKey))
 		case types.MsgBuy:
 			senderDid = msg.BuyerDid
 			copy(pubKey[:], base58.Decode(msg.PubKey))

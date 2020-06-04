@@ -144,20 +144,20 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse bond's sovrin DID
-		bondDid, err2 := sovrin.UnmarshalSovrinDid(req.BondDid)
+		// Parse creator's sovrin DID
+		creatorDid, err2 := sovrin.UnmarshalSovrinDid(req.CreatorDid)
 		if err2 != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
+			creatorDid, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			req.AllowSells, batchBlocks, bondDid)
+			req.AllowSells, batchBlocks, req.BondDid)
 
-		output, err2 := ixo.SignAndBroadcastRest(cliCtx, msg, bondDid)
+		output, err2 := ixo.SignAndBroadcastRest(cliCtx, msg, creatorDid)
 		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err2.Error()))
@@ -194,8 +194,8 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse bond's sovrin DID
-		bondDid, err := sovrin.UnmarshalSovrinDid(req.BondDid)
+		// Parse editor's sovrin DID
+		editorDid, err := sovrin.UnmarshalSovrinDid(req.EditorDid)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -203,9 +203,9 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, req.EditorDid, bondDid)
+			req.SanityMarginPercentage, editorDid, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, bondDid)
+		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, editorDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

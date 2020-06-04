@@ -19,13 +19,13 @@ var (
 
 type MsgCreateBond struct {
 	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
 	Token                  string         `json:"token" yaml:"token"`
 	Name                   string         `json:"name" yaml:"name"`
 	Description            string         `json:"description" yaml:"description"`
 	FunctionType           string         `json:"function_type" yaml:"function_type"`
 	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
 	CreatorDid             ixo.Did        `json:"creator_did" yaml:"creator_did"`
+	CreatorPubKey          string         `json:"pub_key" yaml:"pub_key"`
 	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
 	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
 	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
@@ -38,18 +38,18 @@ type MsgCreateBond struct {
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 }
 
-func NewMsgCreateBond(token, name, description string, creatorDid ixo.Did,
+func NewMsgCreateBond(token, name, description string, creatorDid sovrin.SovrinDid,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, batchBlocks sdk.Uint, bondDid sovrin.SovrinDid) MsgCreateBond {
+	allowSell string, batchBlocks sdk.Uint, bondDid ixo.Did) MsgCreateBond {
 	return MsgCreateBond{
-		BondDid:                bondDid.Did,
-		PubKey:                 bondDid.VerifyKey,
+		BondDid:                bondDid,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
-		CreatorDid:             creatorDid,
+		CreatorDid:             creatorDid.Did,
+		CreatorPubKey:          creatorDid.VerifyKey,
 		FunctionType:           functionType,
 		FunctionParameters:     functionParameters,
 		ReserveTokens:          reserveTokens,
@@ -69,8 +69,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
-	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
 	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {
@@ -79,6 +77,8 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Description")
 	} else if strings.TrimSpace(msg.CreatorDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "CreatorDid")
+	} else if strings.TrimSpace(msg.CreatorPubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "CreatorPubKey")
 	} else if len(msg.ReserveTokens) == 0 {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Reserve token")
 	} else if msg.FeeAddress.Empty() {
@@ -169,7 +169,7 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 }
 
 func (msg MsgCreateBond) GetSignerDid() ixo.Did {
-	return msg.BondDid
+	return msg.CreatorDid
 }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
@@ -192,16 +192,16 @@ type MsgEditBond struct {
 }
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editorDid ixo.Did, bondDid sovrin.SovrinDid) MsgEditBond {
+	sanityMarginPercentage string, editorDid sovrin.SovrinDid, bondDid ixo.Did) MsgEditBond {
 	return MsgEditBond{
-		BondDid:                bondDid.Did,
+		BondDid:                bondDid,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
 		OrderQuantityLimits:    orderQuantityLimits,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
-		EditorDid:              editorDid,
+		EditorDid:              editorDid.Did,
 	}
 }
 
@@ -260,7 +260,7 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 }
 
 func (msg MsgEditBond) GetSignerDid() ixo.Did {
-	return msg.BondDid
+	return msg.EditorDid
 }
 
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
