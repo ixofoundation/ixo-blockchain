@@ -97,6 +97,8 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
+	} else if valid, err := CheckNotEmpty(msg.Proof, "Proof"); !valid {
+		return err
 	}
 
 	// Check that DIDs valid
@@ -159,6 +161,8 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
+	} else if valid, err := CheckNotEmpty(msg.Proof, "Proof"); !valid {
+		return err
 	}
 
 	// Check that DIDs valid
@@ -218,6 +222,8 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Proof, "Proof"); !valid {
 		return err
 	}
 
