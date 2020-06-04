@@ -8,19 +8,12 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-func NewAnteHandler(bondsKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
-
-		ixoTx, ok := tx.(ixo.IxoTx)
-		if !ok {
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
-		}
-
-		msg := ixoTx.GetMsgs()[0]
-		pubKey := [32]byte{}
-		var senderDid ixo.Did
+func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result) {
 
 		// Get signer PubKey and sender DID
+		var pubKey [32]byte
+		var senderDid ixo.Did
 		switch msg := msg.(type) {
 		case types.MsgCreateBond:
 			senderDid = msg.CreatorDid
@@ -28,9 +21,9 @@ func NewAnteHandler(bondsKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
 		case types.MsgEditBond:
 			senderDid = msg.EditorDid
 			bondDid := ixo.Did(msg.GetSigners()[0])
-			bond, found := bondsKeeper.GetBond(ctx, bondDid)
+			bond, found := keeper.GetBond(ctx, bondDid)
 			if !found {
-				return ctx, sdk.ErrInternal("bond not found").Result(), true
+				return pubKey, sdk.ErrInternal("bond not found").Result()
 			}
 			copy(pubKey[:], base58.Decode(bond.PubKey))
 		case types.MsgBuy:
@@ -49,23 +42,9 @@ func NewAnteHandler(bondsKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
 		// Check that sender's DID is ledgered
 		senderDidDoc, _ := didKeeper.GetDidDoc(ctx, senderDid)
 		if senderDidDoc == nil {
-			return ctx,
-				sdk.ErrUnauthorized("Sender did not found").Result(),
-				true
+			return pubKey, sdk.ErrUnauthorized("Sender did not found").Result()
 		}
 
-		var sigs = ixoTx.GetSignatures()
-		if len(sigs) != 1 {
-			return ctx,
-				sdk.ErrUnauthorized("there can only be one signer").Result(),
-				true
-		}
-		res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-		if !res {
-			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
-		}
-
-		return ctx, sdk.Result{}, false // continue...
+		return pubKey, sdk.Result{}
 	}
 }

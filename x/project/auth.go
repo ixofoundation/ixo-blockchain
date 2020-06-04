@@ -9,57 +9,33 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
-func NewAnteHandler(projectKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
-
-		ixoTx, ok := tx.(ixo.IxoTx)
-		if !ok {
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
-		}
-
-		msg := ixoTx.GetMsgs()[0]
+func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result) {
+		// Message must be a ProjectMsg
 		projectMsg := msg.(types.ProjectMsg)
-		pubKey := [32]byte{}
 
+		// Get signer PubKey
+		var pubKey [32]byte
 		if projectMsg.IsNewDid() {
 			createProjectMsg := msg.(types.MsgCreateProject)
 			copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
-
 		} else {
 			if projectMsg.IsWithdrawal() {
 				signerDid := ixo.Did(msg.GetSigners()[0])
 				didDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
 				if didDoc == nil {
-					return ctx,
-						sdk.ErrUnauthorized("Issuer did not found").Result(),
-						true
+					return pubKey, sdk.ErrUnauthorized("Issuer did not found").Result()
 				}
-
 				copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
 			} else {
 				projectDid := ixo.Did(msg.GetSigners()[0])
-				projectDoc, err := projectKeeper.GetProjectDoc(ctx, projectDid)
+				projectDoc, err := keeper.GetProjectDoc(ctx, projectDid)
 				if err != nil {
-					return ctx, sdk.ErrInternal("project did not found").Result(), false
+					return pubKey, sdk.ErrInternal("project did not found").Result()
 				}
-
 				copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
 			}
 		}
-
-		var sigs = ixoTx.GetSignatures()
-		if len(sigs) != 1 {
-			return ctx,
-				sdk.ErrUnauthorized("there can only be one signer").Result(),
-				true
-		}
-		res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-		if !res {
-			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
-		}
-
-		return ctx, sdk.Result{}, false // continue...
-
+		return pubKey, sdk.Result{}
 	}
 }

@@ -294,13 +294,20 @@ func (app *ixoApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList
 }
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
+	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
+	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
+	bonddocPubKeyGetter := bonddoc.GetPubKeyGetter(app.bonddocKeeper)
+	bondsPubKeyGetter := bonds.GetPubKeyGetter(app.bondsKeeper, app.didKeeper)
+	treasuryPubKeyGetter := treasury.GetPubKeyGetter(app.didKeeper)
+	feesPubKeyGetter := fees.GetPubKeyGetter(app.didKeeper)
+
 	cosmosAnteHandler := auth.NewAnteHandler(app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
-	didAnteHandler := did.NewAnteHandler(app.didKeeper)
-	projectAnteHandler := project.NewAnteHandler(app.projectKeeper, app.didKeeper)
-	bonddocAnteHandler := bonddoc.NewAnteHandler(app.bonddocKeeper)
-	bondsAnteHandler := bonds.NewAnteHandler(app.bondsKeeper, app.didKeeper)
-	treasuryAnteHandler := treasury.NewAnteHandler(app.didKeeper)
-	feesAnteHandler := fees.NewAnteHandler(app.didKeeper)
+	didAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
+	projectAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
+	bonddocAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, bonddocPubKeyGetter)
+	bondsAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, bondsPubKeyGetter)
+	treasuryAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, treasuryPubKeyGetter)
+	feesAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, feesPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]

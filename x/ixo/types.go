@@ -13,8 +13,11 @@ import (
 
 var (
 	IxoDecimals = sdk.NewDec(100000000)
-	ValidDid    = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
-	IsValidDid  = ValidDid.MatchString
+
+	maxGasWanted = uint64((1 << 63) - 1)
+
+	ValidDid   = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
+	IsValidDid = ValidDid.MatchString
 	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html
 	// IsValidDid adapted from the above link but assumes no sub-namespaces
 	// TODO: ValidDid needs to be updated once we no longer want to be able
@@ -26,7 +29,9 @@ const IxoNativeToken = "ixo"
 
 type IxoTx struct {
 	Msgs       []sdk.Msg      `json:"payload" yaml:"payload"`
+	Fee        auth.StdFee    `json:"fee" yaml:"fee"`
 	Signatures []IxoSignature `json:"signatures" yaml:"signatures"`
+	Memo       string         `json:"memo" yaml:"memo"`
 }
 
 type IxoSignature struct {
@@ -65,7 +70,31 @@ func (tx IxoTx) GetMsgs() []sdk.Msg { return tx.Msgs }
 
 func (tx IxoTx) GetMemo() string { return "" }
 
-func (tx IxoTx) ValidateBasic() sdk.Error { return nil }
+func (tx IxoTx) ValidateBasic() sdk.Error {
+	// Fee validation
+	if tx.Fee.Gas > maxGasWanted {
+		return sdk.ErrGasOverflow(fmt.Sprintf("invalid gas supplied; %d > %d", tx.Fee.Gas, maxGasWanted))
+	}
+	if tx.Fee.Amount.IsAnyNegative() {
+		return sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee %s amount provided", tx.Fee.Amount))
+	}
+
+	// Signatures validation
+	var ixoSigs = tx.GetSignatures()
+	if len(ixoSigs) == 0 {
+		return sdk.ErrNoSignatures("no signers")
+	}
+	if len(ixoSigs) != 1 {
+		return sdk.ErrUnauthorized("there can only be one signer")
+	}
+
+	// Messages validation
+	if len(tx.Msgs) != 1 {
+		return sdk.ErrUnauthorized("there can only be one message")
+	}
+
+	return nil
+}
 
 func (tx IxoTx) GetSignatures() []IxoSignature {
 	return tx.Signatures
@@ -79,7 +108,7 @@ func (tx IxoTx) String() string {
 	return fmt.Sprintf("%v", string(output))
 }
 
-func FeePayer(tx sdk.Tx) sdk.AccAddress {
+func (tx IxoTx) GetSigner() sdk.AccAddress {
 	return tx.GetMsgs()[0].GetSigners()[0]
 }
 

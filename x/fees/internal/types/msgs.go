@@ -9,7 +9,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-type FeesMessage interface {
+type FeesMsg interface {
 	sdk.Msg
 	GetPubKey() string
 	GetSenderDid() ixo.Did
@@ -22,7 +22,7 @@ type MsgSetFeeContractAuthorisation struct {
 	Authorised    bool    `json:"authorised" yaml:"authorised"`
 }
 
-var _ FeesMessage = MsgSetFeeContractAuthorisation{}
+var _ FeesMsg = MsgSetFeeContractAuthorisation{}
 
 func (msg MsgSetFeeContractAuthorisation) Type() string  { return "set-fee-contract-authorisation" }
 func (msg MsgSetFeeContractAuthorisation) Route() string { return RouterKey }
@@ -76,7 +76,7 @@ type MsgCreateFee struct {
 	Fee        Fee     `json:"fee" yaml:"fee"`
 }
 
-var _ FeesMessage = MsgCreateFee{}
+var _ FeesMsg = MsgCreateFee{}
 
 func (msg MsgCreateFee) Type() string  { return "create-fee" }
 func (msg MsgCreateFee) Route() string { return RouterKey }
@@ -134,7 +134,7 @@ type MsgCreateFeeContract struct {
 	DiscountId     sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
-var _ FeesMessage = MsgCreateFeeContract{}
+var _ FeesMsg = MsgCreateFeeContract{}
 
 func (msg MsgCreateFeeContract) Type() string  { return "create-fee-contract" }
 func (msg MsgCreateFeeContract) Route() string { return RouterKey }
@@ -195,7 +195,7 @@ type MsgCreateSubscription struct {
 	Period         Period   `json:"period" yaml:"period"`
 }
 
-var _ FeesMessage = MsgCreateSubscription{}
+var _ FeesMsg = MsgCreateSubscription{}
 
 func (msg MsgCreateSubscription) Type() string  { return "create-subscription" }
 func (msg MsgCreateSubscription) Route() string { return RouterKey }
@@ -256,7 +256,7 @@ type MsgGrantFeeDiscount struct {
 	Recipient     sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
 
-var _ FeesMessage = MsgGrantFeeDiscount{}
+var _ FeesMsg = MsgGrantFeeDiscount{}
 
 func (msg MsgGrantFeeDiscount) Type() string  { return "grant-fee-discount" }
 func (msg MsgGrantFeeDiscount) Route() string { return RouterKey }
@@ -313,7 +313,7 @@ type MsgRevokeFeeDiscount struct {
 	Holder        sdk.AccAddress `json:"holder" yaml:"holder"`
 }
 
-var _ FeesMessage = MsgRevokeFeeDiscount{}
+var _ FeesMsg = MsgRevokeFeeDiscount{}
 
 func (msg MsgRevokeFeeDiscount) Type() string  { return "revoke-fee-discount" }
 func (msg MsgRevokeFeeDiscount) Route() string { return RouterKey }
@@ -369,7 +369,7 @@ type MsgChargeFee struct {
 	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
 }
 
-var _ FeesMessage = MsgChargeFee{}
+var _ FeesMsg = MsgChargeFee{}
 
 func (msg MsgChargeFee) Type() string  { return "charge-fee" }
 func (msg MsgChargeFee) Route() string { return RouterKey }
