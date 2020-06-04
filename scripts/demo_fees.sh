@@ -26,17 +26,17 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block -y
 echo "Ledgering Francesco DID..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 echo "Ledgering Shaun DID..."
-ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block
+ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block -y
 
 # Create fee
 echo "Creating fee..."
 FEE="$(sed 's/"/\"/g' samples/fee.json | tr -d '\n' | tr -d '[:blank:]')"
 CREATOR="$MIGUEL_DID_FULL"
-ixocli tx fees create-fee "$FEE" "$CREATOR" --broadcast-mode block
+ixocli tx fees create-fee "$FEE" "$CREATOR" --broadcast-mode block -y
 
 # Create fee contract
 echo "Creating fee contract..."
@@ -45,12 +45,12 @@ FEE_CONTRACT_ID="fee:contract:fee1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
 PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
-ixocli tx fees create-fee-contract "$FEE_CONTRACT_ID" "$FEE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block
+ixocli tx fees create-fee-contract "$FEE_CONTRACT_ID" "$FEE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block -y
 
 # Authorise fee contract
 echo "Authorising fee contract..."
 PAYER="$FRANCESCO_DID_FULL"
-ixocli tx fees set-fee-contract-authorisation "$FEE_CONTRACT_ID" True "$PAYER" --broadcast-mode block
+ixocli tx fees set-fee-contract-authorisation "$FEE_CONTRACT_ID" True "$PAYER" --broadcast-mode block -y
 
 # Create subscription (with block period)
 echo "Creating subscription 1/2 (with block period)..."
@@ -58,7 +58,7 @@ SUBSCRIPTION_ID="fee:subscription:fee1"
 PERIOD="$(sed 's/"/\"/g' samples/period_block.json | tr -d '\n' | tr -d '[:blank:]')"
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
-ixocli tx fees create-subscription "$SUBSCRIPTION_ID" "$FEE_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block
+ixocli tx fees create-subscription "$SUBSCRIPTION_ID" "$FEE_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block -y
 
 echo "Wait a few seconds for the subscription to get charged..."
 sleep 6
@@ -66,7 +66,7 @@ sleep 6
 # Deauthorise fee contract
 echo "Deauthorising fee contract..."
 PAYER="$FRANCESCO_DID_FULL"
-ixocli tx fees set-fee-contract-authorisation "$FEE_CONTRACT_ID" False "$PAYER" --broadcast-mode block
+ixocli tx fees set-fee-contract-authorisation "$FEE_CONTRACT_ID" False "$PAYER" --broadcast-mode block -y
 
 echo "Now the subscription (block-period) will just accumulate periods and not charge."
 echo ""
@@ -77,6 +77,6 @@ SUBSCRIPTION_ID="fee:subscription:fee2"
 PERIOD="$(sed 's/"/\"/g' samples/period_time.json | tr -d '\n' | tr -d '[:blank:]')"
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
-ixocli tx fees create-subscription "$SUBSCRIPTION_ID" "$FEE_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block
+ixocli tx fees create-subscription "$SUBSCRIPTION_ID" "$FEE_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block -y
 
 echo "The subscription (time-period) will just accumulate periods and not charge."
