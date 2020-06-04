@@ -189,6 +189,7 @@ type MsgEditBond struct {
 	SanityRate             string  `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string  `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	EditorDid              ixo.Did `json:"editor_did" yaml:"editor_did"`
+	EditorPubKey           string  `json:"pub_key" yaml:"pub_key"`
 }
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
@@ -202,6 +203,7 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
 		EditorDid:              editorDid.Did,
+		EditorPubKey:           editorDid.VerifyKey,
 	}
 }
 
@@ -221,6 +223,8 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SanityMarginPercentage")
 	} else if strings.TrimSpace(msg.EditorDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "EditorDid")
+	} else if strings.TrimSpace(msg.EditorPubKey) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "EditorPubKey")
 	}
 	// Note: order quantity limits can be blank
 
