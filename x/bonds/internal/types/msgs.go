@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+var (
+	_ ixo.IxoMsg = MsgCreateBond{}
+	_ ixo.IxoMsg = MsgEditBond{}
+	_ ixo.IxoMsg = MsgBuy{}
+	_ ixo.IxoMsg = MsgSell{}
+	_ ixo.IxoMsg = MsgSwap{}
+)
+
 type MsgCreateBond struct {
 	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
 	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
@@ -160,8 +168,12 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 	}
 }
 
+func (msg MsgCreateBond) GetSignerDid() ixo.Did {
+	return msg.BondDid
+}
+
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.BondDid)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
@@ -247,8 +259,12 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 	}
 }
 
+func (msg MsgEditBond) GetSignerDid() ixo.Did {
+	return msg.BondDid
+}
+
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.BondDid)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgEditBond) Route() string { return RouterKey }
@@ -314,8 +330,12 @@ func (msg MsgBuy) GetSignBytes() []byte {
 	}
 }
 
+func (msg MsgBuy) GetSignerDid() ixo.Did {
+	return msg.BuyerDid
+}
+
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.BuyerDid)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgBuy) Route() string { return RouterKey }
@@ -373,8 +393,12 @@ func (msg MsgSell) GetSignBytes() []byte {
 	}
 }
 
+func (msg MsgSell) GetSignerDid() ixo.Did {
+	return msg.SellerDid
+}
+
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.SellerDid)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgSell) Route() string { return RouterKey }
@@ -453,8 +477,12 @@ func (msg MsgSwap) GetSignBytes() []byte {
 	}
 }
 
+func (msg MsgSwap) GetSignerDid() ixo.Did {
+	return msg.SwapperDid
+}
+
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.SwapperDid)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgSwap) Route() string { return RouterKey }

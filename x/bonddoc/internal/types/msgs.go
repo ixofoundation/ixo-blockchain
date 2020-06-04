@@ -9,6 +9,13 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
+var (
+	_ ixo.IxoMsg = MsgCreateBond{}
+	_ ixo.IxoMsg = MsgUpdateBondStatus{}
+
+	_ StoredBondDoc = (*MsgCreateBond)(nil)
+)
+
 type MsgCreateBond struct {
 	TxHash    string  `json:"tx_hash" yaml:"tx_hash"`
 	SenderDid ixo.Did `json:"sender_did" yaml:"sender_did"`
@@ -17,10 +24,9 @@ type MsgCreateBond struct {
 	Data      BondDoc `json:"data" yaml:"data"`
 }
 
-var _ sdk.Msg = MsgCreateBond{}
-
 func (msg MsgCreateBond) Type() string  { return "create-bond" }
 func (msg MsgCreateBond) Route() string { return RouterKey }
+
 func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
@@ -42,11 +48,13 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 
 	return nil
 }
+func (msg MsgCreateBond) GetBondDid() ixo.Did { return msg.BondDid }
+func (msg MsgCreateBond) GetSignerDid() ixo.Did {
+	return msg.GetBondDid()
+}
 
-func (msg MsgCreateBond) GetBondDid() ixo.Did   { return msg.BondDid }
-func (msg MsgCreateBond) GetSenderDid() ixo.Did { return msg.SenderDid }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetBondDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateBond) String() string {
@@ -56,9 +64,9 @@ func (msg MsgCreateBond) String() string {
 	}
 	return string(b)
 }
-
 func (msg MsgCreateBond) GetPubKey() string     { return msg.PubKey }
 func (msg MsgCreateBond) GetStatus() BondStatus { return msg.Data.Status }
+
 func (msg *MsgCreateBond) SetStatus(status BondStatus) {
 	msg.Data.Status = status
 }
@@ -70,10 +78,6 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 		return bz
 	}
 }
-
-func (msg MsgCreateBond) IsNewDid() bool { return true }
-
-var _ StoredBondDoc = (*MsgCreateBond)(nil)
 
 type MsgUpdateBondStatus struct {
 	SenderDid ixo.Did             `json:"sender_did" yaml:"sender_did"`
@@ -113,17 +117,10 @@ func (msg MsgUpdateBondStatus) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetBondDid())}
-}
-
-func (msg MsgUpdateBondStatus) GetBondDid() ixo.Did {
+func (msg MsgUpdateBondStatus) GetSignerDid() ixo.Did {
 	return msg.BondDid
 }
 
-func (msg MsgUpdateBondStatus) GetStatus() BondStatus {
-	return msg.Data.Status
+func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
-
-func (msg MsgUpdateBondStatus) IsNewDid() bool     { return false }
-func (msg MsgUpdateBondStatus) IsWithdrawal() bool { return false }

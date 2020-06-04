@@ -10,7 +10,7 @@ import (
 )
 
 func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 		// Message must be a ProjectMsg
 		projectMsg := msg.(types.ProjectMsg)
 
@@ -21,14 +21,14 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			copy(pubKey[:], base58.Decode(createProjectMsg.GetPubKey()))
 		} else {
 			if projectMsg.IsWithdrawal() {
-				signerDid := ixo.Did(msg.GetSigners()[0])
+				signerDid := msg.GetSignerDid()
 				didDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
 				if didDoc == nil {
-					return pubKey, sdk.ErrUnauthorized("Issuer did not found").Result()
+					return pubKey, sdk.ErrUnauthorized("signer did not found").Result()
 				}
 				copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
 			} else {
-				projectDid := ixo.Did(msg.GetSigners()[0])
+				projectDid := msg.GetSignerDid()
 				projectDoc, err := keeper.GetProjectDoc(ctx, projectDid)
 				if err != nil {
 					return pubKey, sdk.ErrInternal("project did not found").Result()

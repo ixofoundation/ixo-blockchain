@@ -9,6 +9,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+var (
+	_ ixo.IxoMsg = MsgAddDid{}
+	_ ixo.IxoMsg = MsgAddCredential{}
+)
+
 type MsgAddDid struct {
 	DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
 }
@@ -25,14 +30,16 @@ func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	}
 }
 
-var _ sdk.Msg = MsgAddDid{}
-
 func (msg MsgAddDid) Type() string { return "did" }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
+func (msg MsgAddDid) GetSignerDid() ixo.Did {
+	return msg.DidDoc.Did
+}
+
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.DidDoc.GetDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgAddDid) ValidateBasic() sdk.Error {
@@ -72,8 +79,6 @@ func (msg MsgAddDid) String() string {
 	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
 }
 
-func (msg MsgAddDid) IsNewDid() bool { return true }
-
 type MsgAddCredential struct {
 	DidCredential DidCredential `json:"credential" yaml:"credential"`
 }
@@ -94,12 +99,15 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 	}
 }
 
-var _ sdk.Msg = MsgAddCredential{}
-
 func (msg MsgAddCredential) Type() string  { return "did" }
 func (msg MsgAddCredential) Route() string { return RouterKey }
+
+func (msg MsgAddCredential) GetSignerDid() ixo.Did {
+	return msg.DidCredential.Issuer
+}
+
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.DidCredential.Issuer)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgAddCredential) String() string {
@@ -130,5 +138,3 @@ func (msg MsgAddCredential) GetSignBytes() []byte {
 		return bz
 	}
 }
-
-func (msg MsgAddCredential) IsNewDid() bool { return false }

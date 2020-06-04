@@ -9,19 +9,21 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-type FeesMsg interface {
-	sdk.Msg
-	GetPubKey() string
-	GetSenderDid() ixo.Did
-}
+var (
+	_ ixo.IxoMsg = MsgCreateFee{}
+	_ ixo.IxoMsg = MsgCreateFeeContract{}
+	_ ixo.IxoMsg = MsgCreateSubscription{}
+	_ ixo.IxoMsg = MsgSetFeeContractAuthorisation{}
+	_ ixo.IxoMsg = MsgGrantFeeDiscount{}
+	_ ixo.IxoMsg = MsgRevokeFeeDiscount{}
+	_ ixo.IxoMsg = MsgChargeFee{}
+)
 
 type MsgCreateFee struct {
 	PubKey     string  `json:"pub_key" yaml:"pub_key"`
 	CreatorDid ixo.Did `json:"creator_did" yaml:"creator_did"`
 	Fee        Fee     `json:"fee" yaml:"fee"`
 }
-
-var _ FeesMsg = MsgCreateFee{}
 
 func (msg MsgCreateFee) Type() string  { return "create-fee" }
 func (msg MsgCreateFee) Route() string { return RouterKey }
@@ -46,9 +48,10 @@ func (msg MsgCreateFee) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateFee) GetSenderDid() ixo.Did { return msg.CreatorDid }
+func (msg MsgCreateFee) GetSignerDid() ixo.Did { return msg.CreatorDid }
+
 func (msg MsgCreateFee) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateFee) String() string {
@@ -58,8 +61,6 @@ func (msg MsgCreateFee) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgCreateFee) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateFee) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -78,8 +79,6 @@ type MsgCreateFeeContract struct {
 	CanDeauthorise bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	DiscountId     sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
-
-var _ FeesMsg = MsgCreateFeeContract{}
 
 func (msg MsgCreateFeeContract) Type() string  { return "create-fee-contract" }
 func (msg MsgCreateFeeContract) Route() string { return RouterKey }
@@ -108,9 +107,10 @@ func (msg MsgCreateFeeContract) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateFeeContract) GetSenderDid() ixo.Did { return msg.CreatorDid }
+func (msg MsgCreateFeeContract) GetSignerDid() ixo.Did { return msg.CreatorDid }
+
 func (msg MsgCreateFeeContract) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateFeeContract) String() string {
@@ -120,8 +120,6 @@ func (msg MsgCreateFeeContract) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgCreateFeeContract) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateFeeContract) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -139,8 +137,6 @@ type MsgCreateSubscription struct {
 	MaxPeriods     sdk.Uint `json:"max_periods" yaml:"max_periods"`
 	Period         Period   `json:"period" yaml:"period"`
 }
-
-var _ FeesMsg = MsgCreateSubscription{}
 
 func (msg MsgCreateSubscription) Type() string  { return "create-subscription" }
 func (msg MsgCreateSubscription) Route() string { return RouterKey }
@@ -170,9 +166,10 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateSubscription) GetSenderDid() ixo.Did { return msg.CreatorDid }
+func (msg MsgCreateSubscription) GetSignerDid() ixo.Did { return msg.CreatorDid }
+
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateSubscription) String() string {
@@ -182,8 +179,6 @@ func (msg MsgCreateSubscription) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgCreateSubscription) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -199,8 +194,6 @@ type MsgSetFeeContractAuthorisation struct {
 	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
 	Authorised    bool    `json:"authorised" yaml:"authorised"`
 }
-
-var _ FeesMsg = MsgSetFeeContractAuthorisation{}
 
 func (msg MsgSetFeeContractAuthorisation) Type() string  { return "set-fee-contract-authorisation" }
 func (msg MsgSetFeeContractAuthorisation) Route() string { return RouterKey }
@@ -225,9 +218,10 @@ func (msg MsgSetFeeContractAuthorisation) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSetFeeContractAuthorisation) GetSenderDid() ixo.Did { return msg.PayerDid }
+func (msg MsgSetFeeContractAuthorisation) GetSignerDid() ixo.Did { return msg.PayerDid }
+
 func (msg MsgSetFeeContractAuthorisation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgSetFeeContractAuthorisation) String() string {
@@ -237,8 +231,6 @@ func (msg MsgSetFeeContractAuthorisation) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgSetFeeContractAuthorisation) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSetFeeContractAuthorisation) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -255,8 +247,6 @@ type MsgGrantFeeDiscount struct {
 	DiscountId    sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 	Recipient     sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
-
-var _ FeesMsg = MsgGrantFeeDiscount{}
 
 func (msg MsgGrantFeeDiscount) Type() string  { return "grant-fee-discount" }
 func (msg MsgGrantFeeDiscount) Route() string { return RouterKey }
@@ -283,9 +273,10 @@ func (msg MsgGrantFeeDiscount) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgGrantFeeDiscount) GetSenderDid() ixo.Did { return msg.SenderDid }
+func (msg MsgGrantFeeDiscount) GetSignerDid() ixo.Did { return msg.SenderDid }
+
 func (msg MsgGrantFeeDiscount) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgGrantFeeDiscount) String() string {
@@ -295,8 +286,6 @@ func (msg MsgGrantFeeDiscount) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgGrantFeeDiscount) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgGrantFeeDiscount) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -312,8 +301,6 @@ type MsgRevokeFeeDiscount struct {
 	FeeContractId string         `json:"fee_contract_id" yaml:"fee_contract_id"`
 	Holder        sdk.AccAddress `json:"holder" yaml:"holder"`
 }
-
-var _ FeesMsg = MsgRevokeFeeDiscount{}
 
 func (msg MsgRevokeFeeDiscount) Type() string  { return "revoke-fee-discount" }
 func (msg MsgRevokeFeeDiscount) Route() string { return RouterKey }
@@ -340,9 +327,10 @@ func (msg MsgRevokeFeeDiscount) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgRevokeFeeDiscount) GetSenderDid() ixo.Did { return msg.SenderDid }
+func (msg MsgRevokeFeeDiscount) GetSignerDid() ixo.Did { return msg.SenderDid }
+
 func (msg MsgRevokeFeeDiscount) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgRevokeFeeDiscount) String() string {
@@ -352,8 +340,6 @@ func (msg MsgRevokeFeeDiscount) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgRevokeFeeDiscount) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgRevokeFeeDiscount) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -368,8 +354,6 @@ type MsgChargeFee struct {
 	SenderDid     ixo.Did `json:"sender_did" yaml:"sender_did"`
 	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
 }
-
-var _ FeesMsg = MsgChargeFee{}
 
 func (msg MsgChargeFee) Type() string  { return "charge-fee" }
 func (msg MsgChargeFee) Route() string { return RouterKey }
@@ -394,9 +378,10 @@ func (msg MsgChargeFee) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgChargeFee) GetSenderDid() ixo.Did { return msg.SenderDid }
+func (msg MsgChargeFee) GetSignerDid() ixo.Did { return msg.SenderDid }
+
 func (msg MsgChargeFee) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgChargeFee) String() string {
@@ -406,8 +391,6 @@ func (msg MsgChargeFee) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgChargeFee) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgChargeFee) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {

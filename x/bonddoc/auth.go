@@ -9,22 +9,22 @@ import (
 )
 
 func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result) {
-		// Message must be a BondMsg
-		bondMsg := msg.(types.BondMsg)
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 
 		// Get signer PubKey
 		var pubKey [32]byte
-		if bondMsg.IsNewDid() {
-			createBondMsg := msg.(types.MsgCreateBond)
-			copy(pubKey[:], base58.Decode(createBondMsg.GetPubKey()))
-		} else {
-			bondDid := ixo.Did(msg.GetSigners()[0])
+		switch msg := msg.(type) {
+		case types.MsgCreateBond:
+			copy(pubKey[:], base58.Decode(msg.GetPubKey()))
+		case types.MsgUpdateBondStatus:
+			bondDid := msg.GetSignerDid()
 			bondDoc, err := keeper.GetBondDoc(ctx, bondDid)
 			if err != nil {
 				return pubKey, sdk.ErrInternal("bond did not found").Result()
 			}
 			copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
+		default:
+			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 		return pubKey, sdk.Result{}
 	}

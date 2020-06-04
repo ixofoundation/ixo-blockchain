@@ -9,7 +9,7 @@ import (
 )
 
 func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 
 		// Get signer PubKey and sender DID
 		var pubKey [32]byte
@@ -20,7 +20,7 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			copy(pubKey[:], base58.Decode(msg.PubKey))
 		case types.MsgEditBond:
 			senderDid = msg.EditorDid
-			bondDid := ixo.Did(msg.GetSigners()[0])
+			bondDid := msg.GetSignerDid()
 			bond, found := keeper.GetBond(ctx, bondDid)
 			if !found {
 				return pubKey, sdk.ErrInternal("bond not found").Result()
@@ -36,7 +36,7 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			senderDid = msg.SwapperDid
 			copy(pubKey[:], base58.Decode(msg.PubKey))
 		default:
-			panic("Unrecognized message type")
+			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 
 		// Check that sender's DID is ledgered

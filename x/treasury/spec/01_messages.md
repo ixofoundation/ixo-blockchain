@@ -8,18 +8,6 @@ func DidToAddr(did ixo.Did) sdk.AccAddress {
 }
 ```
 
-## TreasuryMessage
-
-A general `TreasuryMessage` interface is defind to be implemented by every message in the Treasury module. Each message must implement the `GetPubKey()` and `GetSenderDid()` functions, both of which are used only in the Treasury module's AnteHandler. The embedded sdk.Msg ensures that the Treasury messages also follow the standard Cosmos SDK message interface.
-
-```go
-type TreasuryMessage interface {
-	sdk.Msg
-	GetPubKey() string
-	GetSenderDid() ixo.Did
-}
-``` 
-
 ## MsgSend
 
 Sending of tokens between two addresses identified by DIDs and signed by the sender is done using `MsgSend`. The handler for this message converts the FromDid and ToDid to `sdk.AccAddress` and then uses the Cosmos SDK `Bank` module keeper to perform the send. This message is expected to fail only if the address to which the FromDid maps to does not have enough tokens.

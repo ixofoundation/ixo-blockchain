@@ -9,11 +9,12 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-type TreasuryMessage interface {
-	sdk.Msg
-	GetPubKey() string
-	GetSenderDid() ixo.Did
-}
+var (
+	_ ixo.IxoMsg = MsgSend{}
+	_ ixo.IxoMsg = MsgOracleTransfer{}
+	_ ixo.IxoMsg = MsgOracleMint{}
+	_ ixo.IxoMsg = MsgOracleBurn{}
+)
 
 type MsgSend struct {
 	PubKey  string    `json:"pub_key" yaml:"pub_key"`
@@ -21,8 +22,6 @@ type MsgSend struct {
 	ToDid   ixo.Did   `json:"to_did" yaml:"to_did"`
 	Amount  sdk.Coins `json:"amount" yaml:"amount"`
 }
-
-var _ TreasuryMessage = MsgSend{}
 
 func (msg MsgSend) Type() string  { return "send" }
 func (msg MsgSend) Route() string { return RouterKey }
@@ -51,9 +50,12 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSend) GetSenderDid() ixo.Did { return msg.FromDid }
+func (msg MsgSend) GetSignerDid() ixo.Did {
+	return msg.FromDid
+}
+
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgSend) String() string {
@@ -63,8 +65,6 @@ func (msg MsgSend) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgSend) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgSend) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -82,8 +82,6 @@ type MsgOracleTransfer struct {
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
-
-var _ TreasuryMessage = MsgOracleTransfer{}
 
 func (msg MsgOracleTransfer) Type() string  { return "oracle-transfer" }
 func (msg MsgOracleTransfer) Route() string { return RouterKey }
@@ -118,9 +116,12 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleTransfer) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleTransfer) GetSignerDid() ixo.Did {
+	return msg.OracleDid
+}
+
 func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgOracleTransfer) String() string {
@@ -130,8 +131,6 @@ func (msg MsgOracleTransfer) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgOracleTransfer) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleTransfer) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -148,8 +147,6 @@ type MsgOracleMint struct {
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
-
-var _ TreasuryMessage = MsgOracleMint{}
 
 func (msg MsgOracleMint) Type() string  { return "oracle-mint" }
 func (msg MsgOracleMint) Route() string { return RouterKey }
@@ -180,9 +177,12 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleMint) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleMint) GetSignerDid() ixo.Did {
+	return msg.OracleDid
+}
+
 func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgOracleMint) String() string {
@@ -192,8 +192,6 @@ func (msg MsgOracleMint) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgOracleMint) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleMint) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
@@ -210,8 +208,6 @@ type MsgOracleBurn struct {
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
-
-var _ TreasuryMessage = MsgOracleBurn{}
 
 func (msg MsgOracleBurn) Type() string  { return "oracle-burn" }
 func (msg MsgOracleBurn) Route() string { return RouterKey }
@@ -242,9 +238,12 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleBurn) GetSenderDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleBurn) GetSignerDid() ixo.Did {
+	return msg.OracleDid
+}
+
 func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgOracleBurn) String() string {
@@ -254,8 +253,6 @@ func (msg MsgOracleBurn) String() string {
 	}
 	return string(b)
 }
-
-func (msg MsgOracleBurn) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgOracleBurn) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {

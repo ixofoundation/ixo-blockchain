@@ -66,7 +66,3 @@ func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
 
 	dd.Credentials = append(dd.Credentials, cred)
 }
-
-type DidMsg interface {
-	IsNewDid() bool
-}

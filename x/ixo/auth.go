@@ -11,7 +11,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
-type PubKeyGetter func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result)
+type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
 
 func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
 	sig IxoSignature, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
@@ -114,8 +114,13 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 			signerAcc = ak.GetAccount(newCtx, signerAcc.GetAddress())
 		}
 
+		// all messages must be of type IxoMsg
+		msg, ok := ixoTx.GetMsgs()[0].(IxoMsg)
+		if !ok {
+			return ctx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
+		}
+
 		// Get pubKey
-		msg := ixoTx.GetMsgs()[0]
 		pubKey, res := pubKeyGetter(ctx, msg)
 		if !res.IsOK() {
 			return newCtx, res, true

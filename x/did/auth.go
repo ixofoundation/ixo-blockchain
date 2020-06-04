@@ -8,23 +8,22 @@ import (
 )
 
 func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg sdk.Msg) ([32]byte, sdk.Result) {
-		// Message must be a DidMsg
-		didMsg := msg.(types.DidMsg)
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 
 		// Get signer PubKey
 		var pubKey [32]byte
-		if didMsg.IsNewDid() {
-			addDidMsg := didMsg.(types.MsgAddDid)
-			copy(pubKey[:], base58.Decode(addDidMsg.DidDoc.PubKey))
-		} else {
-			did := ixo.Did(msg.GetSigners()[0])
+		switch msg := msg.(type) {
+		case types.MsgAddDid:
+			copy(pubKey[:], base58.Decode(msg.DidDoc.PubKey))
+		case types.MsgAddCredential:
+			did := msg.GetSignerDid()
 			didDoc, _ := keeper.GetDidDoc(ctx, did)
 			if didDoc == nil {
 				return pubKey, sdk.ErrUnauthorized("Issuer did not found").Result()
 			}
-
 			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
+		default:
+			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 		return pubKey, sdk.Result{}
 	}

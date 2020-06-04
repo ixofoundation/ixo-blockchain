@@ -69,12 +69,12 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	msg MsgUpdateProjectStatus) sdk.Result {
 
-	existingProjectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	existingProjectDoc, err := getProjectDoc(ctx, k, msg.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	newStatus := msg.GetStatus()
+	newStatus := msg.Data.Status
 	if !newStatus.IsValidProgressionFrom(existingProjectDoc.GetStatus()) {
 		return sdk.ErrUnknownRequest("Invalid Status Progression requested").Result()
 	}
@@ -171,13 +171,13 @@ func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Did,
 func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateAgent) sdk.Result {
 
 	// Check if project exists
-	_, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	_, err := getProjectDoc(ctx, k, msg.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
 	// Create account in project accounts for the agent
-	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.Data.AgentDid))
+	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InternalAccountID(msg.Data.AgentDid))
 	if err != nil {
 		err.Result()
 	}
@@ -188,7 +188,7 @@ func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCrea
 func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpdateAgent) sdk.Result {
 
 	// Check if project exists
-	_, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	_, err := getProjectDoc(ctx, k, msg.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
@@ -201,13 +201,13 @@ func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpda
 func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
 
 	// Check if project exists
-	_, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	_, err := getProjectDoc(ctx, k, msg.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
 	// Process claim fees
-	_, err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.GetProjectDid())
+	_, err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
@@ -218,18 +218,18 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
 
 	// Check if project exists
-	projectDoc, err := getProjectDoc(ctx, k, msg.GetProjectDid())
+	projectDoc, err := getProjectDoc(ctx, k, msg.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	_, err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.GetProjectDid())
+	_, err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
 
-	err = processEvaluatorPay(ctx, k, fk, bk, msg.GetProjectDid(),
-		msg.GetSenderDid(), projectDoc.GetEvaluatorPay())
+	err = processEvaluatorPay(ctx, k, fk, bk, msg.ProjectDid,
+		msg.SenderDid, projectDoc.GetEvaluatorPay())
 	if err != nil {
 		return err.Result()
 	}
@@ -240,7 +240,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	msg MsgWithdrawFunds) sdk.Result {
 
-	withdrawFundsDoc := msg.GetWithdrawFundsDoc()
+	withdrawFundsDoc := msg.Data
 	projectDoc, err := getProjectDoc(ctx, k, withdrawFundsDoc.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()

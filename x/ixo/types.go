@@ -48,6 +48,11 @@ type IxoSignature struct {
 	Created        time.Time `json:"created" yaml:"created"`
 }
 
+type IxoMsg interface {
+	sdk.Msg
+	GetSignerDid() Did
+}
+
 func NewSignature(created time.Time, signature [64]byte) IxoSignature {
 	return IxoSignature{
 		SignatureValue: signature,
