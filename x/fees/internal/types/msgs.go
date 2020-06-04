@@ -15,61 +15,6 @@ type FeesMsg interface {
 	GetSenderDid() ixo.Did
 }
 
-type MsgSetFeeContractAuthorisation struct {
-	PubKey        string  `json:"pub_key" yaml:"pub_key"`
-	PayerDid      ixo.Did `json:"payer_did" yaml:"payer_did"`
-	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
-	Authorised    bool    `json:"authorised" yaml:"authorised"`
-}
-
-var _ FeesMsg = MsgSetFeeContractAuthorisation{}
-
-func (msg MsgSetFeeContractAuthorisation) Type() string  { return "set-fee-contract-authorisation" }
-func (msg MsgSetFeeContractAuthorisation) Route() string { return RouterKey }
-func (msg MsgSetFeeContractAuthorisation) ValidateBasic() sdk.Error {
-	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
-		return err
-	} else if valid, err = CheckNotEmpty(msg.PayerDid, "PayerDid"); !valid {
-		return err
-	}
-
-	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.PayerDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "payer did is invalid")
-	}
-
-	// Check that IDs valid
-	if !IsValidFeeContractId(msg.FeeContractId) {
-		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
-	}
-
-	return nil
-}
-
-func (msg MsgSetFeeContractAuthorisation) GetSenderDid() ixo.Did { return msg.PayerDid }
-func (msg MsgSetFeeContractAuthorisation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
-}
-
-func (msg MsgSetFeeContractAuthorisation) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
-
-func (msg MsgSetFeeContractAuthorisation) GetPubKey() string { return msg.PubKey }
-
-func (msg MsgSetFeeContractAuthorisation) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return bz
-	}
-}
-
 type MsgCreateFee struct {
 	PubKey     string  `json:"pub_key" yaml:"pub_key"`
 	CreatorDid ixo.Did `json:"creator_did" yaml:"creator_did"`
@@ -241,6 +186,61 @@ func (msg MsgCreateSubscription) String() string {
 func (msg MsgCreateSubscription) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return bz
+	}
+}
+
+type MsgSetFeeContractAuthorisation struct {
+	PubKey        string  `json:"pub_key" yaml:"pub_key"`
+	PayerDid      ixo.Did `json:"payer_did" yaml:"payer_did"`
+	FeeContractId string  `json:"fee_contract_id" yaml:"fee_contract_id"`
+	Authorised    bool    `json:"authorised" yaml:"authorised"`
+}
+
+var _ FeesMsg = MsgSetFeeContractAuthorisation{}
+
+func (msg MsgSetFeeContractAuthorisation) Type() string  { return "set-fee-contract-authorisation" }
+func (msg MsgSetFeeContractAuthorisation) Route() string { return RouterKey }
+func (msg MsgSetFeeContractAuthorisation) ValidateBasic() sdk.Error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+		return err
+	} else if valid, err = CheckNotEmpty(msg.PayerDid, "PayerDid"); !valid {
+		return err
+	}
+
+	// Check that DIDs valid
+	if !ixo.IsValidDid(msg.PayerDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "payer did is invalid")
+	}
+
+	// Check that IDs valid
+	if !IsValidFeeContractId(msg.FeeContractId) {
+		return ErrInvalidId(DefaultCodespace, "fee contract id invalid")
+	}
+
+	return nil
+}
+
+func (msg MsgSetFeeContractAuthorisation) GetSenderDid() ixo.Did { return msg.PayerDid }
+func (msg MsgSetFeeContractAuthorisation) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{[]byte(msg.GetSenderDid())}
+}
+
+func (msg MsgSetFeeContractAuthorisation) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+func (msg MsgSetFeeContractAuthorisation) GetPubKey() string { return msg.PubKey }
+
+func (msg MsgSetFeeContractAuthorisation) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
