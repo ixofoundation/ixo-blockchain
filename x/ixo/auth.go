@@ -25,6 +25,10 @@ func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
 	// Consume signature gas
 	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 
+	// WARNING: careful with adding 'simulate' bool in the below condition as
+	// simulations are not supported throughout ixo blockchain and this might
+	// cause signature verification to be skipped but tx still gets broadcasted!
+
 	// Verify signature
 	if res := VerifySignature(msg, pubKey, sig); !res {
 		return nil, sdk.ErrUnauthorized("Signature Verification failed").Result()
