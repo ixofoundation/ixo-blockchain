@@ -26,6 +26,7 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 PASSWORD="12345678"
+GAS_PRICES="0.025ixo"
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -39,9 +40,9 @@ FRANCESCO_DID_FULL="{\"did\":\"did:ixo:UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 2/2..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "Creating bond..."
 ixocli tx bonds create-bond \
@@ -62,46 +63,46 @@ ixocli tx bonds create-bond \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
-  --broadcast-mode block -y
+  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Created bond..."
 ixocli q bonds bond "$BOND_DID"
 
 echo "Miguel buys 1abc..."
-ixocli tx bonds buy 1abc 500res,1000rez "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds buy 1abc 500res,1000rez "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
-ixocli tx bonds buy 10abc 10100res,10100rez "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds buy 10abc 10100res,10100rez "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
 
 echo "Miguel swap 500 res to rez..."
-ixocli tx bonds swap 500 res rez "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds swap 500 res rez "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco swap 500 rez to res..."
-ixocli tx bonds swap 500 rez res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds swap 500 rez res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
 
 echo "Miguel swaps above order limit (tx will fail)..."
-ixocli tx bonds swap 5001 res rez "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds swap 5001 res rez "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account (no  changes)..."
 ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco swaps to violate sanity (tx will be successful but order will fail)..."
-ixocli tx bonds swap 5000 rez res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds swap 5000 rez res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account (no changes)..."
 ixocli q auth account "$FRANCESCO_ADDR"
 
 echo "Miguel sells 1abc..."
-ixocli tx bonds sell 1abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds sell 1abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
-ixocli tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixocli tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"

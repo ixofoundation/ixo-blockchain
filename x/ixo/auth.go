@@ -1,14 +1,20 @@
 package ixo
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/input"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+	"github.com/spf13/viper"
+	"os"
 )
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
@@ -139,13 +145,18 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 	}
 }
 
-func signAndBroadcast(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+	if len(stdSignMsg.Msgs) != 1 {
+		panic("expected one message")
+	}
+	msg := stdSignMsg.Msgs[0]
+
 	privKey := [64]byte{}
 	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
 	signature := SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
-	tx := NewIxoTxSingleMsg(msg, signature)
+	tx := NewIxoTxSingleMsg(msg, stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
 	bz, err := ctx.Codec.MarshalJSON(tx)
 	if err != nil {
@@ -160,8 +171,43 @@ func signAndBroadcast(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.Sovr
 	return res, nil
 }
 
-func SignAndBroadcastCli(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
-	res, err := signAndBroadcast(ctx, msg, sovrinDid)
+func SignAndBroadcastCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+
+	txBldr := auth.NewTxBuilderFromCLI()
+	if !cliCtx.SkipConfirm {
+		stdSignMsg, err := txBldr.BuildSignMsg([]sdk.Msg{msg})
+		if err != nil {
+			return err
+		}
+
+		var json []byte
+		if viper.GetBool(flags.FlagIndentResponse) {
+			json, err = cliCtx.Codec.MarshalJSONIndent(stdSignMsg, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			json = cliCtx.Codec.MustMarshalJSON(stdSignMsg)
+		}
+
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", json)
+
+		buf := bufio.NewReader(os.Stdin)
+		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf)
+		if err != nil || !ok {
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+			return err
+		}
+	}
+
+	// Build the transaction
+	stdSignMsg, err := txBldr.BuildSignMsg([]sdk.Msg{msg})
+	if err != nil {
+		return err
+	}
+
+	// Sign and broadcast
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
 	if err != nil {
 		return err
 	}
@@ -172,7 +218,17 @@ func SignAndBroadcastCli(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.S
 }
 
 func SignAndBroadcastRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
-	res, err := signAndBroadcast(ctx, msg, sovrinDid)
+
+	// TODO: implement properly using txBldr (or just remove function completely)
+
+	stdSignMsg := auth.StdSignMsg{
+		Fee:  types.StdFee{},
+		Msgs: []sdk.Msg{msg},
+		Memo: "",
+	}
+
+	// Sign and broadcast
+	res, err := signAndBroadcast(ctx, stdSignMsg, sovrinDid)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +237,5 @@ func SignAndBroadcastRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.
 	if err != nil {
 		return nil, err
 	}
-
 	return output, nil
 }

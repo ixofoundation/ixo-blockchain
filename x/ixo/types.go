@@ -60,24 +60,17 @@ func NewSignature(created time.Time, signature [64]byte) IxoSignature {
 	}
 }
 
-func NewIxoTx(msgs []sdk.Msg, sigs []IxoSignature) IxoTx {
+func NewIxoTx(msgs []sdk.Msg, fee auth.StdFee, sigs []IxoSignature, memo string) IxoTx {
 	return IxoTx{
 		Msgs:       msgs,
+		Fee:        fee,
 		Signatures: sigs,
+		Memo:       memo,
 	}
 }
 
-func NewIxoTxSingleMsg(msg sdk.Msg, signature IxoSignature) IxoTx {
-	sigs := make([]IxoSignature, 0)
-	sigs = append(sigs, signature)
-
-	msgs := make([]sdk.Msg, 0)
-	msgs = append(msgs, msg)
-
-	return IxoTx{
-		Msgs:       msgs,
-		Signatures: sigs,
-	}
+func NewIxoTxSingleMsg(msg sdk.Msg, fee auth.StdFee, signature IxoSignature, memo string) IxoTx {
+	return NewIxoTx([]sdk.Msg{msg}, fee, []IxoSignature{signature}, memo)
 }
 
 func (tx IxoTx) GetMsgs() []sdk.Msg { return tx.Msgs }
