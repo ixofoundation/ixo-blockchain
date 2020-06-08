@@ -137,8 +137,7 @@ func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 			return nil, sdk.ErrTxDecode("txBytes are empty")
 		}
 
-		txByteString := string(txBytes[0:1])
-		if txByteString == "{" {
+		if string(txBytes[0:1]) == "{" {
 			var upTx map[string]interface{}
 			err := json.Unmarshal(txBytes, &upTx)
 			if err != nil {
