@@ -309,7 +309,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	treasuryAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, treasuryPubKeyGetter)
 	feesAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, feesPubKeyGetter)
 
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
+	return func(ctx sdk.Context, tx sdk.Tx, _ bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
 		switch msg.Route() {
 		case did.RouterKey:
