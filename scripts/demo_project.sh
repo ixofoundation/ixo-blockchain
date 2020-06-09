@@ -20,8 +20,7 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 GAS_PRICES="0.025ixo"
-DOUBLE_GAS="400000"  # for Evaluation creation
-PROJECT_FEE_FUND="50000ixo" # 0.025 * 200000 * (8txs + 1double-gas-tx, so 10txs)
+PROJECT_FEE_FUND="45000ixo" # 0.025 * 200000 * 9txs
 
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 PROJECT_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
@@ -68,7 +67,7 @@ ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT_DID_
 echo "Creating an evaluation in project..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
-ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas="$DOUBLE_GAS" --gas-prices="$GAS_PRICES" -y
+ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Expected InitiatingNodePayFees:  100000000
 # Expected IxoFees:                 50000000

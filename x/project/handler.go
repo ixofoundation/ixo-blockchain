@@ -47,13 +47,22 @@ func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper) sdk.Handler {
 
 func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk.Result {
 
-	_, err := createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
-	if err != nil {
+	projectDid := msg.GetProjectDid()
+
+	var err sdk.Error
+	if _, err = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId); err != nil {
 		return err.Result()
 	}
-
-	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.GetProjectDid()))
-	if err != nil {
+	if _, err = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountPayFeesId); err != nil {
+		return err.Result()
+	}
+	if _, err = createAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId); err != nil {
+		return err.Result()
+	}
+	if _, err = createAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId); err != nil {
+		return err.Result()
+	}
+	if _, err = createAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(msg.GetProjectDid())); err != nil {
 		err.Result()
 	}
 
@@ -207,7 +216,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 	}
 
 	// Process claim fees
-	_, err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.ProjectDid)
+	err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
@@ -223,11 +232,13 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	_, err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.ProjectDid)
+	// Process evaluation fees
+	err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
 
+	// Process evaluator pay
 	err = processEvaluatorPay(ctx, k, fk, bk, msg.ProjectDid,
 		msg.SenderDid, projectDoc.GetEvaluatorPay())
 	if err != nil {
@@ -311,24 +322,18 @@ func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProject
 	return ixoProjectDoc.(StoredProjectDoc), nil
 }
 
-func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) (sdk.Result, sdk.Error) {
+func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) sdk.Error {
 
 	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
 
-	var validatingNodeSetAddr sdk.AccAddress
-	found := checkAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId) // not found
-	if !found {
-		validatingNodeSetAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
-	} else {
-		validatingNodeSetAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
+	validatingNodeSetAddr, err := getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
+	if err != nil {
+		return err
 	}
 
-	var ixoAddr sdk.AccAddress
-	found = checkAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId) // found
-	if !found {
-		ixoAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
-	} else {
-		ixoAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	ixoAddr, err := getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
+	if err != nil {
+		return err
 	}
 
 	ixoFactor := fk.GetParams(ctx).IxoFactor
@@ -341,23 +346,23 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 	case fees.FeeEvaluationTransaction:
 		adjustedFeeAmount = fk.GetParams(ctx).EvaluationFeeAmount.Mul(ixoFactor)
 	default:
-		return sdk.Result{}, sdk.ErrUnknownRequest("Invalid Fee type.")
+		return sdk.ErrUnknownRequest("Invalid Fee type.")
 	}
 
 	nodeAmount := adjustedFeeAmount.Mul(nodePercentage).RoundInt64()
 	ixoAmount := adjustedFeeAmount.RoundInt64() - nodeAmount
 
-	err := bk.SendCoins(ctx, projectAddr, validatingNodeSetAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodeAmount)})
+	err = bk.SendCoins(ctx, projectAddr, validatingNodeSetAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, nodeAmount)})
 	if err != nil {
-		return sdk.Result{}, err
+		return err
 	}
 
 	err = bk.SendCoins(ctx, projectAddr, ixoAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, ixoAmount)})
 	if err != nil {
-		return sdk.Result{}, err
+		return err
 	}
 
-	return sdk.Result{}, nil
+	return nil
 }
 
 func processEvaluatorPay(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, projectDid, senderDid ixo.Did, evaluatorPay int64) sdk.Error {
@@ -369,20 +374,14 @@ func processEvaluatorPay(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keep
 	projectAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(projectDid))
 	evaluatorAccAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, InternalAccountID(senderDid))
 
-	found := checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
-	var nodeAddr sdk.AccAddress
-	if !found {
-		nodeAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
-	} else {
-		nodeAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+	nodeAddr, err := getAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
+	if err != nil {
+		return err
 	}
 
-	found = checkAccountInProjectAccounts(ctx, k, projectDid, InitiatingNodeAccountPayFeesId)
-	var ixoAddr sdk.AccAddress
-	if !found {
-		ixoAddr, _ = createAccountInProjectAccounts(ctx, k, projectDid, IxoAccountPayFeesId)
-	} else {
-		ixoAddr, _ = getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountPayFeesId)
+	ixoAddr, err := getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountPayFeesId)
+	if err != nil {
+		return err
 	}
 
 	feePercentage := fk.GetParams(ctx).EvaluationPayFeePercentage
@@ -394,7 +393,7 @@ func processEvaluatorPay(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keep
 	nodePayFees := evaluatorPayFeeAmount.Mul(nodeFeePercentage)
 	ixoPayFees := evaluatorPayFeeAmount.Sub(nodePayFees)
 
-	err := bk.SendCoins(ctx, projectAddr, evaluatorAccAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, evaluatorPayLessFees.RoundInt64())})
+	err = bk.SendCoins(ctx, projectAddr, evaluatorAccAddr, sdk.Coins{sdk.NewInt64Coin(ixo.IxoNativeToken, evaluatorPayLessFees.RoundInt64())})
 	if err != nil {
 		return err
 	}

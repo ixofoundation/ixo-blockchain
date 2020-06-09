@@ -21,11 +21,10 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025ixo"
-DOUBLE_GAS="400000"  # for Evaluation creation
 BONDDOC1_FEE_FUND="10000ixo" # 0.025 * 200000 * 2txs
 BONDDOC2_FEE_FUND="15000ixo" # 0.025 * 200000 * 3txs
 PROJECT1_FEE_FUND="15000ixo" # 0.025 * 200000 * 3txs
-PROJECT2_FEE_FUND="35000ixo" # 0.025 * 200000 * (5txs + 1double-gas-tx, so 7txs)
+PROJECT2_FEE_FUND="30000ixo" # 0.025 * 200000 * 6txs
 
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
@@ -240,7 +239,7 @@ ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID
 echo "Creating an evaluation in project 2..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
-ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block --gas="$DOUBLE_GAS" --gas-prices="$GAS_PRICES" -y
+ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding agents (this creates a project account for the agent in the respective project)
 echo "Adding agent to project 1..."
