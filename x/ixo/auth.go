@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
@@ -175,11 +176,60 @@ func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrin
 	return res, nil
 }
 
+func simulateMsgs(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.Msg) (estimated, adjusted uint64, err error) {
+	// Build the transaction
+	stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+	if err != nil {
+		return
+	}
+
+	// the ante handler will populate with a sentinel pubkey
+	signature := IxoSignature{}
+	tx := NewIxoTxSingleMsg(
+		stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
+
+	bz, err := cliCtx.Codec.MarshalJSON(tx)
+	if err != nil {
+		err = fmt.Errorf("Could not marshall tx to binary. Error: %s", err.Error())
+		return
+	}
+
+	estimated, adjusted, err = utils.CalculateGas(
+		cliCtx.QueryWithData, cliCtx.Codec, bz, txBldr.GasAdjustment())
+	return
+}
+
+func enrichWithGas(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.Msg) (auth.TxBuilder, error) {
+	_, adjusted, err := simulateMsgs(txBldr, cliCtx, msgs)
+	if err != nil {
+		return txBldr, err
+	}
+
+	return txBldr.WithGas(adjusted), nil
+}
+
 func SignAndBroadcastCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
 
+	msgs := []sdk.Msg{msg}
 	txBldr := auth.NewTxBuilderFromCLI()
+
+	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
+		var err error // important so that enrichWithGas overwrites txBldr
+		txBldr, err = enrichWithGas(txBldr, cliCtx, msgs)
+		if err != nil {
+			return err
+		}
+
+		gasEst := utils.GasEstimateResponse{GasEstimate: txBldr.Gas()}
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", gasEst.String())
+	}
+
+	if cliCtx.Simulate {
+		return nil
+	}
+
 	if !cliCtx.SkipConfirm {
-		stdSignMsg, err := txBldr.BuildSignMsg([]sdk.Msg{msg})
+		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
 		if err != nil {
 			return err
 		}
@@ -205,7 +255,7 @@ func SignAndBroadcastCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovri
 	}
 
 	// Build the transaction
-	stdSignMsg, err := txBldr.BuildSignMsg([]sdk.Msg{msg})
+	stdSignMsg, err := txBldr.BuildSignMsg(msgs)
 	if err != nil {
 		return err
 	}
