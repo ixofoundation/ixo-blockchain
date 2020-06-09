@@ -309,23 +309,23 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	treasuryAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, treasuryPubKeyGetter)
 	feesAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, feesPubKeyGetter)
 
-	return func(ctx sdk.Context, tx sdk.Tx, _ bool) (_ sdk.Context, _ sdk.Result, abort bool) {
+	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
 		switch msg.Route() {
 		case did.RouterKey:
-			return didAnteHandler(ctx, tx, false)
+			return didAnteHandler(ctx, tx, simulate)
 		case project.RouterKey:
-			return projectAnteHandler(ctx, tx, false)
+			return projectAnteHandler(ctx, tx, simulate)
 		case bonddoc.RouterKey:
-			return bonddocAnteHandler(ctx, tx, false)
+			return bonddocAnteHandler(ctx, tx, simulate)
 		case bonds.RouterKey:
-			return bondsAnteHandler(ctx, tx, false)
+			return bondsAnteHandler(ctx, tx, simulate)
 		case treasury.RouterKey:
-			return treasuryAnteHandler(ctx, tx, false)
+			return treasuryAnteHandler(ctx, tx, simulate)
 		case fees.RouterKey:
-			return feesAnteHandler(ctx, tx, false)
+			return feesAnteHandler(ctx, tx, simulate)
 		default:
-			return cosmosAnteHandler(ctx, tx, false)
+			return cosmosAnteHandler(ctx, tx, simulate)
 		}
 	}
 }

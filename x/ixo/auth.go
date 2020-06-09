@@ -21,17 +21,24 @@ import (
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
 
 func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
-	sig IxoSignature, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
+	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
+
+	if simulate {
+		// Simulated txs should not contain a signature and are not required to
+		// contain a pubkey, so we must account for tx size of including an
+		// IxoSignature and simulate gas consumption (assuming ED25519 key).
+		//consumeSimSigGas(ctx.GasMeter(), sig, params)
+
+		// NOTE: this is not the case in the ixo blockchain. The IxoSignature
+		// will be blank but still count towards the transaction size given
+		// that it uses a fixed length byte array [64]byte as the sig value.
+	}
 
 	// Consume signature gas
 	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 
-	// WARNING: careful with adding 'simulate' bool in the below condition as
-	// simulations are not supported throughout ixo blockchain and this might
-	// cause signature verification to be skipped but tx still gets broadcasted!
-
 	// Verify signature
-	if res := VerifySignature(msg, pubKey, sig); !res {
+	if !simulate && !VerifySignature(msg, pubKey, sig) {
 		return nil, sdk.ErrUnauthorized("Signature Verification failed").Result()
 	}
 
@@ -139,7 +146,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 
 		// check signature, return account with incremented nonce
 		ixoSig := ixoTx.GetSignatures()[0]
-		signerAcc, res = processSig(newCtx, signerAcc, msg, pubKey, ixoSig, params)
+		signerAcc, res = processSig(newCtx, signerAcc, msg, pubKey, ixoSig, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -183,8 +190,9 @@ func simulateMsgs(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.M
 		return
 	}
 
-	// the ante handler will populate with a sentinel pubkey
+	// Signature set to a blank signature
 	signature := IxoSignature{}
+	signature.Created = signature.Created.Add(1)
 	tx := NewIxoTxSingleMsg(
 		stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
