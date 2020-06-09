@@ -55,7 +55,7 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateFee(fee, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -100,7 +100,7 @@ func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 				feeIdStr, feeContractIdStr, payerAddr,
 				canDeauthorise, discountId, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -139,7 +139,7 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				feeContractIdStr, maxPeriods, period, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -169,7 +169,7 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgSetFeeContractAuthorisation(
 				feeContractIdStr, authorised, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -206,7 +206,7 @@ func GetCmdGrantFeeDiscount(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgGrantFeeDiscount(
 				feeContractIdStr, discountId, recipientAddr, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -236,7 +236,7 @@ func GetCmdRevokeFeeDiscount(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgRevokeFeeDiscount(
 				feeContractIdStr, holderAddr, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -259,7 +259,7 @@ func GetCmdChargeFee(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgChargeFee(feeContractIdStr, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }

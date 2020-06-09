@@ -45,7 +45,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 		msg := types.NewMsgCreateBond(senderDid, bondDoc, didDoc)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, didDoc)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, didDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -91,7 +91,7 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 
 		msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

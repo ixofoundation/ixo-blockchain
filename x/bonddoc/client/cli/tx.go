@@ -35,7 +35,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateBond(senderDid, bondDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -72,7 +72,7 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }

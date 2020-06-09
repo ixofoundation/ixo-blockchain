@@ -30,7 +30,7 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -61,7 +61,7 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, sovrinDid.Did, issued)
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }

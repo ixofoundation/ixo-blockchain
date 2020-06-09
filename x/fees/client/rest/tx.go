@@ -68,7 +68,7 @@ func createFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgCreateFee(fee, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -124,7 +124,7 @@ func createFeeContractHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgCreateFeeContract(feeIdParam, feeContractIdParam,
 			payerAddr, canDeauthorise, discountId, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -173,7 +173,7 @@ func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgCreateSubscription(subIdParam, feeContractIdParam,
 			maxPeriods, period, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -212,7 +212,7 @@ func setFeeContractAuthorisationHandler(ctx context.CLIContext) http.HandlerFunc
 		msg := types.NewMsgSetFeeContractAuthorisation(feeContractIdParam,
 			authorised, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -259,7 +259,7 @@ func grantFeeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgGrantFeeDiscount(feeContractIdParam, discountId,
 			recipientAddr, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -298,7 +298,7 @@ func revokeFeeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgRevokeFeeDiscount(feeContractIdParam, holderAddr,
 			sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -328,7 +328,7 @@ func chargeFeeHandler(ctx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgChargeFee(feeContractIdParam, sovrinDid)
 
-		output, err := ixo.SignAndBroadcastRest(ctx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

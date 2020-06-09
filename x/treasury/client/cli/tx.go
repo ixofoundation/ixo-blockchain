@@ -35,7 +35,7 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgSend(toDid, coins, sovrinDid)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -66,7 +66,7 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgOracleTransfer(fromDid, toDid, coins, sovrinDid, proof)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -96,7 +96,7 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgOracleMint(toDid, coins, sovrinDid, proof)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -126,7 +126,7 @@ func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgOracleBurn(fromDid, coins, sovrinDid, proof)
 
-			return ixo.SignAndBroadcastCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }

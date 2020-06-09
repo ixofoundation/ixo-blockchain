@@ -208,7 +208,7 @@ func enrichWithGas(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.
 	return txBldr.WithGas(adjusted), nil
 }
 
-func SignAndBroadcastCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
 
 	msgs := []sdk.Msg{msg}
 	txBldr := auth.NewTxBuilderFromCLI()
@@ -271,7 +271,7 @@ func SignAndBroadcastCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovri
 	return nil
 }
 
-func SignAndBroadcastRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
+func SignAndBroadcastTxRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
 
 	// TODO: implement properly using txBldr (or just remove function completely)
 

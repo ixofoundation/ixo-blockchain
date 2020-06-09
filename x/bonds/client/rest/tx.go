@@ -157,7 +157,7 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
 			req.AllowSells, batchBlocks, req.BondDid)
 
-		output, err2 := ixo.SignAndBroadcastRest(cliCtx, msg, creatorDid)
+		output, err2 := ixo.SignAndBroadcastTxRest(cliCtx, msg, creatorDid)
 		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err2.Error()))
@@ -205,7 +205,7 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			req.OrderQuantityLimits, req.SanityRate,
 			req.SanityMarginPercentage, editorDid, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, editorDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, editorDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -260,7 +260,7 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgBuy(buyerDid, bondCoin, maxPrices, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, buyerDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, buyerDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -308,7 +308,7 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgSell(sellerDid, bondCoin, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, sellerDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sellerDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -359,7 +359,7 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgSwap(swapperDid, fromCoin, req.ToToken, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastRest(cliCtx, msg, swapperDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, swapperDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
