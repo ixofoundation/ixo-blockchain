@@ -21,6 +21,8 @@ fi
 
 GAS_PRICES="0.025ixo"
 ixocli_tx() {
+  # This function first approximates the gas (adjusted to 105%) and then
+  # supplies this for the actual transaction broadcasting as the --gas.
   cmd="$1 $2"
   shift
   shift
