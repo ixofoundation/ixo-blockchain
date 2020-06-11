@@ -58,7 +58,8 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 func RegisterTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/txs/{hash}", QueryTxRequestHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/txs", QueryTxsRequestHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx)).Methods("POST")
+	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx, false)).Methods("POST")
+	r.HandleFunc("/txs_auto_gas", BroadcastTxRequest(cliCtx, true)).Methods("POST")
 }
 
 func QueryTxRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
@@ -186,7 +187,7 @@ type BroadcastReq struct {
 	Mode string `json:"mode" yaml:"mode"`
 }
 
-func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
+func BroadcastTxRequest(cliCtx context.CLIContext, estimateGasAutomatically bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req BroadcastReq
 
@@ -214,16 +215,32 @@ func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Deduce fee automatically if it was excluded (skip upon error)
-		// TODO: report errors rather than skipping?
-		if tx, err := ixo.DefaultTxDecoder(cliCtx.Codec)(txBytes); err == nil {
-			if tx, ok := tx.(ixo.IxoTx); ok && tx.Fee.Amount.Empty() {
-				if fee, err := ixo.ApproximateFeeForTx(cliCtx, tx, tx.Memo); err == nil {
-					tx.Fee = fee
-					if txBytesNew, err := cliCtx.Codec.MarshalJSON(tx); err == nil {
-						txBytes = txBytesNew
-					}
+		if estimateGasAutomatically {
+			tx, err := ixo.DefaultTxDecoder(cliCtx.Codec)(txBytes)
+			if err != nil {
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			// all transactions must be of type ixo.IxoTx
+			ixoTx, ok := tx.(ixo.IxoTx)
+			if !ok {
+				rest.WriteErrorResponse(w, http.StatusBadRequest, sdk.ErrInternal("tx must be ixo.IxoTx").Error())
+				return
+			}
+
+			// Deduce fee automatically only if it was excluded
+			if ixoTx.Fee.Amount.Empty() {
+				// Approximate fee
+				fee, err := ixo.ApproximateFeeForTx(cliCtx, ixoTx)
+				if err != nil {
+					rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+					return
 				}
+
+				// Set fee and marshall tx back to JSON
+				ixoTx.Fee = fee
+				txBytes = cliCtx.Codec.MustMarshalJSON(ixoTx)
 			}
 		}
 

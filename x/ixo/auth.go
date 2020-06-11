@@ -216,13 +216,14 @@ func enrichWithGas(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.
 	return txBldr.WithGas(adjusted), nil
 }
 
-func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, memo string) (auth.StdFee, error) {
+func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, error) {
 
+	// Set up a transaction builder
 	cdc := cliCtx.Codec
 	txEncoder := auth.DefaultTxEncoder
 	gasAdjustment := float64(1.5)
 	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
-	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, "dummyChain", memo, fees, nil)
+	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, "dummyChain", tx.Memo, fees, nil)
 
 	// Approximate gas consumption
 	txBldr, err := enrichWithGas(txBldr, cliCtx, tx.Msgs)
