@@ -74,6 +74,14 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
+	// TODO: investigate ways to prevent reserve address from receiving transactions
+
+	// Not critical since as is no tokens can be taken out of the reserve, unless
+	// programmatically. However, increases in balance still affect calculations.
+	// Two possible solutions are (i) add new reserve addresses to the bank module
+	// blacklisted addresses (but no guarantee that this will be sufficient), or
+	// (ii) use a global res. address and store (in the bond) the share of the pool.
+
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
 		msg.CreatorPubKey, msg.FunctionType, msg.FunctionParameters,
 		msg.ReserveTokens, reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,

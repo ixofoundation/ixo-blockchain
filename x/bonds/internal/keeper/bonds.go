@@ -111,7 +111,6 @@ func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid ixo.Did) {
 }
 
 func (k Keeper) GetReserveBalances(ctx sdk.Context, bondDid ixo.Did) sdk.Coins {
-	// TODO: investigate ways to prevent reserve address from being reused since this affects calculations
 	bond := k.MustGetBond(ctx, bondDid)
 	return k.BankKeeper.GetCoins(ctx, bond.ReserveAddress)
 }
