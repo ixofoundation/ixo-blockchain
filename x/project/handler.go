@@ -306,7 +306,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid ixo.Di
 	}
 
 	var actionId [32]byte
-	dec := sdk.OneDec() // TODO: should increment with each withdrawal
+	dec := sdk.OneDec() // TODO: should increment with each withdrawal (ref: #113)
 	copy(actionId[:], dec.Bytes())
 
 	addProjectWithdrawalTransaction(ctx, k, projectDid, actionId, recipientDid, amount)
