@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/ixofoundation/ixo-blockchain/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/payments"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -14,20 +14,21 @@ import (
 )
 
 type Keeper struct {
-	cdc           *codec.Codec
-	storeKey      sdk.StoreKey
-	paramSpace    params.Subspace
-	AccountKeeper auth.AccountKeeper
-	feesKeeper    fees.Keeper
+	cdc            *codec.Codec
+	storeKey       sdk.StoreKey
+	paramSpace     params.Subspace
+	AccountKeeper  auth.AccountKeeper
+	paymentsKeeper payments.Keeper
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace, accountKeeper auth.AccountKeeper, feesKeeper fees.Keeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
+	accountKeeper auth.AccountKeeper, paymentsKeeper payments.Keeper) Keeper {
 	return Keeper{
-		cdc:           cdc,
-		storeKey:      key,
-		paramSpace:    paramSpace.WithKeyTable(types.ParamKeyTable()),
-		AccountKeeper: accountKeeper,
-		feesKeeper:    feesKeeper,
+		cdc:            cdc,
+		storeKey:       key,
+		paramSpace:     paramSpace.WithKeyTable(types.ParamKeyTable()),
+		AccountKeeper:  accountKeeper,
+		paymentsKeeper: paymentsKeeper,
 	}
 }
 

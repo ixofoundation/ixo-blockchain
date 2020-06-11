@@ -1,5 +1,5 @@
 {
-  "type": "fees/BlockPeriod",
+  "type": "payments/BlockPeriod",
   "value": {
     "period_length": "3",
     "period_start_block": "5"

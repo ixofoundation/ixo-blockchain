@@ -268,18 +268,18 @@ ixocli tx bonddoc update-bond-status "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FU
 echo "Updating bonddoc 2 to OPEN..."
 ixocli tx bonddoc update-bond-status "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
-# ----------------------------------------------------------------------------------------- fees
-# Create fee
-echo "Creating fee..."
-FEE="$(sed 's/"/\"/g' samples/fee.json | tr -d '\n' | tr -d '[:blank:]')"
+# ----------------------------------------------------------------------------------------- payments
+# Create payment
+echo "Creating payment template..."
+PAYMENT_TEMPLATE="$(sed 's/"/\"/g' samples/payment_template.json | tr -d '\n' | tr -d '[:blank:]')"
 CREATOR="$MIGUEL_DID_FULL"
-ixocli tx fees create-fee "$FEE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# Create fee contract
-echo "Creating fee contract..."
-FEE_ID="fee:fee1" # from FEE
-FEE_CONTRACT_ID="fee:contract:fee1"
+# Create payment contract
+echo "Creating payment contract..."
+PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
+PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
 PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
-ixocli tx fees create-fee-contract "$FEE_CONTRACT_ID" "$FEE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

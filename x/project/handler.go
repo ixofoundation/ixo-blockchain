@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	"github.com/ixofoundation/ixo-blockchain/x/fees"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/payments"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
 
-func NewHandler(k Keeper, fk fees.Keeper, bk bank.Keeper) sdk.Handler {
+func NewHandler(k Keeper, fk payments.Keeper, bk bank.Keeper) sdk.Handler {
 
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -207,7 +207,8 @@ func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpda
 	return sdk.Result{}
 }
 
-func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
+func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk payments.Keeper,
+	bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
 
 	// Check if project exists
 	_, err := getProjectDoc(ctx, k, msg.ProjectDid)
@@ -216,7 +217,8 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 	}
 
 	// Process claim fees
-	err = processFees(ctx, k, fk, bk, fees.FeeClaimTransaction, msg.ProjectDid)
+	err = processFees(
+		ctx, k, fk, bk, payments.FeeClaimTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
@@ -224,7 +226,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Kee
 	return sdk.Result{}
 }
 
-func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
+func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk payments.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
 
 	// Check if project exists
 	projectDoc, err := getProjectDoc(ctx, k, msg.ProjectDid)
@@ -233,7 +235,8 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk fees.Keeper, bk ban
 	}
 
 	// Process evaluation fees
-	err = processFees(ctx, k, fk, bk, fees.FeeEvaluationTransaction, msg.ProjectDid)
+	err = processFees(
+		ctx, k, fk, bk, payments.FeeEvaluationTransaction, msg.ProjectDid)
 	if err != nil {
 		return err.Result()
 	}
@@ -322,7 +325,8 @@ func getProjectDoc(ctx sdk.Context, k Keeper, projectDid ixo.Did) (StoredProject
 	return ixoProjectDoc.(StoredProjectDoc), nil
 }
 
-func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeType fees.FeeType, projectDid ixo.Did) sdk.Error {
+func processFees(ctx sdk.Context, k Keeper, fk payments.Keeper, bk bank.Keeper,
+	feeType payments.FeeType, projectDid ixo.Did) sdk.Error {
 
 	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
 
@@ -341,9 +345,9 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 
 	var adjustedFeeAmount sdk.Dec
 	switch feeType {
-	case fees.FeeClaimTransaction:
+	case payments.FeeClaimTransaction:
 		adjustedFeeAmount = fk.GetParams(ctx).ClaimFeeAmount.Mul(ixoFactor)
-	case fees.FeeEvaluationTransaction:
+	case payments.FeeEvaluationTransaction:
 		adjustedFeeAmount = fk.GetParams(ctx).EvaluationFeeAmount.Mul(ixoFactor)
 	default:
 		return sdk.ErrUnknownRequest("Invalid Fee type.")
@@ -365,7 +369,8 @@ func processFees(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, feeT
 	return nil
 }
 
-func processEvaluatorPay(ctx sdk.Context, k Keeper, fk fees.Keeper, bk bank.Keeper, projectDid, senderDid ixo.Did, evaluatorPay int64) sdk.Error {
+func processEvaluatorPay(ctx sdk.Context, k Keeper, fk payments.Keeper,
+	bk bank.Keeper, projectDid, senderDid ixo.Did, evaluatorPay int64) sdk.Error {
 
 	if evaluatorPay == 0 {
 		return nil
