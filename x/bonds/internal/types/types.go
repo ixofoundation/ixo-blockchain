@@ -2,18 +2,12 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 const (
 	TRUE  = "true"
 	FALSE = "false"
 )
-
-func DidToAddr(did ixo.Did) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(did)))
-}
 
 func CheckReserveTokenNames(resTokens []string, token string) sdk.Error {
 	// Check that no token is the same as the main token, no token

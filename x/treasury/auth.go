@@ -6,43 +6,32 @@ import (
 
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
 
-func NewAnteHandler(didKeeper did.Keeper) sdk.AnteHandler {
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
+func GetPubKeyGetter(didKeeper did.Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 
-		ixoTx, ok := tx.(ixo.IxoTx)
-		if !ok {
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
+		// Get signer PubKey
+		var pubKey [32]byte
+		switch msg := msg.(type) {
+		case MsgSend:
+			copy(pubKey[:], base58.Decode(msg.PubKey))
+		case MsgOracleMint:
+			copy(pubKey[:], base58.Decode(msg.PubKey))
+		case MsgOracleBurn:
+			copy(pubKey[:], base58.Decode(msg.PubKey))
+		case MsgOracleTransfer:
+			copy(pubKey[:], base58.Decode(msg.PubKey))
+		default:
+			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
-
-		msg := ixoTx.GetMsgs()[0]
-		treasuryMsg := msg.(types.TreasuryMessage)
-		pubKey := [32]byte{}
-		copy(pubKey[:], base58.Decode(treasuryMsg.GetPubKey()))
 
 		// Check that sender's DID is ledgered
-		senderDidDoc, _ := didKeeper.GetDidDoc(ctx, treasuryMsg.GetSenderDid())
+		senderDidDoc, _ := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
 		if senderDidDoc == nil {
-			return ctx,
-				sdk.ErrUnauthorized("Sender did not found").Result(),
-				true
+			return pubKey, sdk.ErrUnauthorized("Sender did not found").Result()
 		}
 
-		var sigs = ixoTx.GetSignatures()
-		if len(sigs) != 1 {
-			return ctx,
-				sdk.ErrUnauthorized("there can only be one signer").Result(),
-				true
-		}
-		res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-		if !res {
-			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
-		}
-
-		return ctx, sdk.Result{}, false // continue...
-
+		return pubKey, sdk.Result{}
 	}
 }

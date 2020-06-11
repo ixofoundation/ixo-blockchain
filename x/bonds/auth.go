@@ -8,31 +8,19 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-func NewAnteHandler(bondsKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
-
-		ixoTx, ok := tx.(ixo.IxoTx)
-		if !ok {
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
-		}
-
-		msg := ixoTx.GetMsgs()[0]
-		pubKey := [32]byte{}
-		var senderDid ixo.Did
+func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 
 		// Get signer PubKey and sender DID
+		var pubKey [32]byte
+		var senderDid ixo.Did
 		switch msg := msg.(type) {
 		case types.MsgCreateBond:
 			senderDid = msg.CreatorDid
-			copy(pubKey[:], base58.Decode(msg.PubKey))
+			copy(pubKey[:], base58.Decode(msg.CreatorPubKey))
 		case types.MsgEditBond:
 			senderDid = msg.EditorDid
-			bondDid := ixo.Did(msg.GetSigners()[0])
-			bond, found := bondsKeeper.GetBond(ctx, bondDid)
-			if !found {
-				return ctx, sdk.ErrInternal("bond not found").Result(), true
-			}
-			copy(pubKey[:], base58.Decode(bond.PubKey))
+			copy(pubKey[:], base58.Decode(msg.EditorPubKey))
 		case types.MsgBuy:
 			senderDid = msg.BuyerDid
 			copy(pubKey[:], base58.Decode(msg.PubKey))
@@ -43,29 +31,15 @@ func NewAnteHandler(bondsKeeper Keeper, didKeeper did.Keeper) sdk.AnteHandler {
 			senderDid = msg.SwapperDid
 			copy(pubKey[:], base58.Decode(msg.PubKey))
 		default:
-			panic("Unrecognized message type")
+			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 
 		// Check that sender's DID is ledgered
 		senderDidDoc, _ := didKeeper.GetDidDoc(ctx, senderDid)
 		if senderDidDoc == nil {
-			return ctx,
-				sdk.ErrUnauthorized("Sender did not found").Result(),
-				true
+			return pubKey, sdk.ErrUnauthorized("Sender did not found").Result()
 		}
 
-		var sigs = ixoTx.GetSignatures()
-		if len(sigs) != 1 {
-			return ctx,
-				sdk.ErrUnauthorized("there can only be one signer").Result(),
-				true
-		}
-		res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-		if !res {
-			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
-		}
-
-		return ctx, sdk.Result{}, false // continue...
+		return pubKey, sdk.Result{}
 	}
 }

@@ -1,11 +1,9 @@
 package rest
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"net/http"
 
@@ -37,58 +35,26 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		sovrinDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(sovrinDidParam), &sovrinDid)
+		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
 		msg := types.NewMsgSend(toDidParam, coins, sovrinDid)
 
-		privKey := [64]byte{}
-		copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-		copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
-
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			panic(err)
-		}
-
-		signature := ixo.SignIxoMessage(msgBytes, sovrinDid.Did, privKey)
-		tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
-
-			return
-		}
-
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
-
-			return
-		}
-
-		output, err := json.MarshalIndent(res, "", "  ")
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
@@ -110,58 +76,26 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		oracleDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(oracleDidParam), &oracleDid)
+		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
 		msg := types.NewMsgOracleTransfer(fromDidParam, toDidParam, coins, oracleDid, proofParam)
 
-		privKey := [64]byte{}
-		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))
-		copy(privKey[32:], base58.Decode(oracleDid.VerifyKey))
-
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			panic(err)
-		}
-
-		signature := ixo.SignIxoMessage(msgBytes, oracleDid.Did, privKey)
-		tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
-
-			return
-		}
-
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
-
-			return
-		}
-
-		output, err := json.MarshalIndent(res, "", "  ")
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
@@ -182,58 +116,26 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		oracleDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(oracleDidParam), &oracleDid)
+		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
 		msg := types.NewMsgOracleMint(toDidParam, coins, oracleDid, proofParam)
 
-		privKey := [64]byte{}
-		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))
-		copy(privKey[32:], base58.Decode(oracleDid.VerifyKey))
-
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			panic(err)
-		}
-
-		signature := ixo.SignIxoMessage(msgBytes, oracleDid.Did, privKey)
-		tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
-
-			return
-		}
-
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
-
-			return
-		}
-
-		output, err := json.MarshalIndent(res, "", "  ")
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }
 
@@ -254,57 +156,25 @@ func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		oracleDid := sovrin.SovrinDid{}
-		err = json.Unmarshal([]byte(oracleDidParam), &oracleDid)
+		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall didDoc into struct. Error: %s", err.Error())))
-
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
 		msg := types.NewMsgOracleBurn(fromDidParam, coins, oracleDid, proofParam)
 
-		privKey := [64]byte{}
-		copy(privKey[:], base58.Decode(oracleDid.Secret.SignKey))
-		copy(privKey[32:], base58.Decode(oracleDid.VerifyKey))
-
-		msgBytes, err := json.Marshal(msg)
-		if err != nil {
-			panic(err)
-		}
-
-		signature := ixo.SignIxoMessage(msgBytes, oracleDid.Did, privKey)
-		tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-		bz, err := cliCtx.Codec.MarshalJSON(tx)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not marshall tx to binary. Error: %s", err.Error())))
-
-			return
-		}
-
-		res, err := cliCtx.BroadcastTx(bz)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not broadcast tx. Error: %s", err.Error())))
-
-			return
-		}
-
-		output, err := json.MarshalIndent(res, "", "  ")
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
-
 			return
 		}
 
-		_, _ = w.Write(output)
+		rest.PostProcessResponse(w, cliCtx, output)
 	}
 }

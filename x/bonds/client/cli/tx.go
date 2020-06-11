@@ -8,6 +8,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"strings"
@@ -115,16 +117,19 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
 			}
 
-			// Parse bond's sovrin DID
-			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+			// Parse creator's sovrin DID
+			creatorDid, err := sovrin.UnmarshalSovrinDid(_creatorDid)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
-				_creatorDid, _functionType, functionParams, reserveTokens,
+				creatorDid, _functionType, functionParams, reserveTokens,
 				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
 				orderQuantityLimits, sanityRate, sanityMarginPercentage,
-				_allowSells, batchBlocks, bondDid)
+				_allowSells, batchBlocks, _bondDid)
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, creatorDid)
 		},
 	}
 
@@ -168,14 +173,17 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			// Parse bond's sovrin DID
-			bondDid := client2.UnmarshalSovrinDID(_bondDid)
+			// Parse editor's sovrin DID
+			editorDid, err := sovrin.UnmarshalSovrinDid(_editorDid)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, _editorDid, bondDid)
+				_sanityMarginPercentage, editorDid, _bondDid)
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, bondDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, editorDid)
 		},
 	}
 
@@ -211,11 +219,14 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse buyer's sovrin DID
-			buyerDid := client2.UnmarshalSovrinDID(args[3])
+			buyerDid, err := sovrin.UnmarshalSovrinDid(args[3])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgBuy(buyerDid, bondCoinWithAmount, maxPrices, args[2])
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, buyerDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, buyerDid)
 		},
 	}
 	return cmd
@@ -236,11 +247,14 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse seller's sovrin DID
-			sellerDid := client2.UnmarshalSovrinDID(args[2])
+			sellerDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgSell(sellerDid, bondCoinWithAmount, args[1])
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, sellerDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sellerDid)
 		},
 	}
 	return cmd
@@ -264,11 +278,14 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse swapper's sovrin DID
-			swapperDid := client2.UnmarshalSovrinDID(args[4])
+			swapperDid, err := sovrin.UnmarshalSovrinDid(args[4])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgSwap(swapperDid, from, args[2], args[3])
 
-			return client2.IxoSignAndBroadcast(cdc, cliCtx, msg, swapperDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, swapperDid)
 		},
 	}
 	return cmd

@@ -9,6 +9,18 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
+var (
+	_ ixo.IxoMsg = MsgCreateProject{}
+	_ ixo.IxoMsg = MsgUpdateProjectStatus{}
+	_ ixo.IxoMsg = MsgCreateAgent{}
+	_ ixo.IxoMsg = MsgUpdateAgent{}
+	_ ixo.IxoMsg = MsgCreateClaim{}
+	_ ixo.IxoMsg = MsgCreateEvaluation{}
+	_ ixo.IxoMsg = MsgWithdrawFunds{}
+
+	_ StoredProjectDoc = (*MsgCreateProject)(nil)
+)
+
 type MsgCreateProject struct {
 	TxHash     string     `json:"txHash" yaml:"txHash"`
 	SenderDid  ixo.Did    `json:"senderDid" yaml:"senderDid"`
@@ -17,9 +29,8 @@ type MsgCreateProject struct {
 	Data       ProjectDoc `json:"data" yaml:"data"`
 }
 
-var _ sdk.Msg = MsgCreateProject{}
+func (msg MsgCreateProject) Type() string { return "create-project" }
 
-func (msg MsgCreateProject) Type() string  { return "create-project" }
 func (msg MsgCreateProject) Route() string { return RouterKey }
 
 func (msg MsgCreateProject) ValidateBasic() sdk.Error {
@@ -48,8 +59,10 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateProject) GetProjectDid() ixo.Did { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateProject) GetSignerDid() ixo.Did  { return msg.ProjectDid }
+
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateProject) String() string {
@@ -75,10 +88,9 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgCreateProject) IsNewDid() bool     { return true }
-func (msg MsgCreateProject) IsWithdrawal() bool { return false }
+func (msg MsgCreateProject) IsNewDid() bool { return true }
 
-var _ StoredProjectDoc = (*MsgCreateProject)(nil)
+func (msg MsgCreateProject) IsWithdrawal() bool { return false }
 
 type MsgUpdateProjectStatus struct {
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
@@ -120,16 +132,12 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
-}
-
-func (msg MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
+func (msg MsgUpdateProjectStatus) GetSignerDid() ixo.Did {
 	return msg.ProjectDid
 }
 
-func (msg MsgUpdateProjectStatus) GetStatus() ProjectStatus {
-	return msg.Data.Status
+func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
@@ -168,10 +176,12 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateAgent) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateAgent) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateAgent) GetSignerDid() ixo.Did {
+	return msg.ProjectDid
+}
+
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
@@ -189,8 +199,6 @@ func (msg MsgCreateAgent) String() string {
 	}
 	return string(b)
 }
-
-var _ sdk.Msg = MsgCreateAgent{}
 
 type MsgUpdateAgent struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
@@ -225,10 +233,12 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgUpdateAgent) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgUpdateAgent) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgUpdateAgent) GetSignerDid() ixo.Did {
+	return msg.ProjectDid
+}
+
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
@@ -247,8 +257,6 @@ func (msg MsgUpdateAgent) String() string {
 
 	return string(b)
 }
-
-var _ sdk.Msg = MsgUpdateAgent{}
 
 type MsgCreateClaim struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
@@ -282,10 +290,12 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateClaim) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateClaim) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateClaim) GetSignerDid() ixo.Did {
+	return msg.ProjectDid
+}
+
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
@@ -304,8 +314,6 @@ func (msg MsgCreateClaim) String() string {
 
 	return string(b)
 }
-
-var _ sdk.Msg = MsgCreateClaim{}
 
 type MsgCreateEvaluation struct {
 	TxHash     string              `json:"txHash" yaml:"txHash"`
@@ -339,10 +347,12 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateEvaluation) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateEvaluation) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateEvaluation) GetSignerDid() ixo.Did {
+	return msg.ProjectDid
+}
+
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
@@ -361,8 +371,6 @@ func (msg MsgCreateEvaluation) String() string {
 
 	return string(b)
 }
-
-var _ sdk.Msg = MsgCreateEvaluation{}
 
 type MsgWithdrawFunds struct {
 	SenderDid ixo.Did          `json:"senderDid" yaml:"senderDid"`
@@ -408,9 +416,12 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
+func (msg MsgWithdrawFunds) GetSignerDid() ixo.Did {
+	return msg.Data.RecipientDid
+}
+
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.Data.RecipientDid)}
+	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
@@ -429,5 +440,3 @@ func (msg MsgWithdrawFunds) String() string {
 
 	return string(b)
 }
-
-var _ sdk.Msg = MsgWithdrawFunds{}

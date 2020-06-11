@@ -1,18 +1,16 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
@@ -33,41 +31,6 @@ func parseBool(boolStr, boolName string) (bool, sdk.Error) {
 	}
 }
 
-func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg,
-	sovrinDid sovrin.SovrinDid) error {
-	privKey := [64]byte{}
-	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
-
-	signature := ixo.SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
-	tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-	bz, err := cdc.MarshalJSON(tx)
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := ctx.BroadcastTx(bz)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(res.String())
-	fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
-	return nil
-
-}
-
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
-
 func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "create-fee [fee-json] [creator-sovrin-did]",
@@ -79,17 +42,20 @@ func GetCmdCreateFee(cdc *codec.Codec) *cobra.Command {
 			feeStr := args[0]
 			sovrinDidStr := args[1]
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			var fee types.Fee
-			err := cdc.UnmarshalJSON([]byte(feeStr), &fee)
+			err = cdc.UnmarshalJSON([]byte(feeStr), &fee)
 			if err != nil {
 				return err
 			}
 
 			msg := types.NewMsgCreateFee(fee, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -125,13 +91,16 @@ func GetCmdCreateFeeContract(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgCreateFeeContract(
 				feeIdStr, feeContractIdStr, payerAddr,
 				canDeauthorise, discountId, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -156,7 +125,10 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			var period types.Period
 			err = cdc.UnmarshalJSON([]byte(periodStr), &period)
@@ -167,7 +139,7 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				feeContractIdStr, maxPeriods, period, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -189,12 +161,15 @@ func GetCmdSetFeeContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err2 := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err2 != nil {
+				return err2
+			}
 
 			msg := types.NewMsgSetFeeContractAuthorisation(
 				feeContractIdStr, authorised, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -223,12 +198,15 @@ func GetCmdGrantFeeDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgGrantFeeDiscount(
 				feeContractIdStr, discountId, recipientAddr, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -250,12 +228,15 @@ func GetCmdRevokeFeeDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgRevokeFeeDiscount(
 				feeContractIdStr, holderAddr, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -271,11 +252,14 @@ func GetCmdChargeFee(cdc *codec.Codec) *cobra.Command {
 			feeContractIdStr := args[0]
 			sovrinDidStr := args[1]
 
-			sovrinDid := unmarshalSovrinDID(sovrinDidStr)
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgChargeFee(feeContractIdStr, sovrinDid)
 
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }

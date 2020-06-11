@@ -19,8 +19,21 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
   wait
 fi
 
-PASSWORD="12345678"
 GAS_PRICES="0.025ixo"
+ixocli_tx() {
+  # This function first approximates the gas (adjusted to 105%) and then
+  # supplies this for the actual transaction broadcasting as the --gas.
+  # This might fail sometimes: https://github.com/cosmos/cosmos-sdk/issues/4938
+  cmd="$1 $2"
+  shift
+  shift
+  APPROX=$(ixocli tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1ixo --dry-run "$@" 2>&1)
+  APPROX=${APPROX//gas estimate: /}
+  echo "Gas estimate: $APPROX"
+  ixocli tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@"
+}
+
+PASSWORD="12345678"
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -34,12 +47,12 @@ FRANCESCO_DID_FULL="{\"did\":\"did:ixo:UKzkhVSHc3qEFva5EY2XHt\",\"verifyKey\":\"
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli_tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block -y
 echo "Ledgering DID 2/2..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli_tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 
 echo "Creating bond..."
-ixocli tx bonds create-bond \
+ixocli_tx bonds create-bond \
   --token=abc \
   --name="A B C" \
   --description="Description about A B C" \
@@ -57,36 +70,24 @@ ixocli tx bonds create-bond \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Created bond..."
-ixocli q bonds bond "$BOND_DID"
+  --broadcast-mode block -y
 
 echo "Editing bond..."
-ixocli tx bonds edit-bond \
+ixocli_tx bonds edit-bond \
   --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Edited bond..."
-ixocli q bonds bond "$BOND_DID"
+  --broadcast-mode block -y
 
 echo "Miguel buys 10abc..."
-ixocli tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
+ixocli_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
 
 echo "Francesco buys 10abc..."
-ixocli tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixocli_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 
 echo "Miguel sells 10abc..."
-ixocli tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
+ixocli_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
 
 echo "Francesco sells 10abc..."
-ixocli tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixocli_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y

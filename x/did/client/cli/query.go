@@ -21,7 +21,7 @@ func GetCmdAddressFromDid() *cobra.Command {
 				return errors.New("input is not a valid did")
 			}
 
-			accAddress := types.DidToAddr(args[0])
+			accAddress := ixo.DidToAddr(args[0])
 			fmt.Println(accAddress.String())
 			return nil
 		},

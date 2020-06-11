@@ -8,44 +8,24 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
-func NewAnteHandler(bonddocKeeper Keeper) sdk.AnteHandler {
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
+func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
 
-		ixoTx, ok := tx.(ixo.IxoTx)
-		if !ok {
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
-		}
-
-		msg := ixoTx.GetMsgs()[0]
-		bondMsg := msg.(types.BondMsg)
-		pubKey := [32]byte{}
-
-		if bondMsg.IsNewDid() {
-			createBondMsg := msg.(types.MsgCreateBond)
-			copy(pubKey[:], base58.Decode(createBondMsg.GetPubKey()))
-
-		} else {
-			bondDid := ixo.Did(msg.GetSigners()[0])
-			bondDoc, err := bonddocKeeper.GetBondDoc(ctx, bondDid)
+		// Get signer PubKey
+		var pubKey [32]byte
+		switch msg := msg.(type) {
+		case types.MsgCreateBond:
+			copy(pubKey[:], base58.Decode(msg.GetPubKey()))
+		case types.MsgUpdateBondStatus:
+			bondDid := msg.GetSignerDid()
+			bondDoc, err := keeper.GetBondDoc(ctx, bondDid)
 			if err != nil {
-				return ctx, sdk.ErrInternal("bond did not found").Result(), true
+				return pubKey, sdk.ErrInternal("bond did not found").Result()
 			}
-
 			copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
+		default:
+			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
-
-		var sigs = ixoTx.GetSignatures()
-		if len(sigs) != 1 {
-			return ctx,
-				sdk.ErrUnauthorized("there can only be one signer").Result(),
-				true
-		}
-		res := ixo.VerifySignature(msg, pubKey, sigs[0])
-
-		if !res {
-			return ctx, sdk.ErrInternal("Signature Verification failed").Result(), true
-		}
-
-		return ctx, sdk.Result{}, false // continue...
+		return pubKey, sdk.Result{}
 	}
 }

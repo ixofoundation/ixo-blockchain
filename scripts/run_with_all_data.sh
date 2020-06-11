@@ -49,6 +49,11 @@ FROM="\"ixo_did\": \"\""
 TO="\"ixo_did\": \"$IXO_DID\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
+# Set min-gas-prices
+FROM="minimum-gas-prices = \"\""
+TO="minimum-gas-prices = \"0.025ixo\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+
 ixocli config chain-id pandora-1
 ixocli config output json
 ixocli config indent true

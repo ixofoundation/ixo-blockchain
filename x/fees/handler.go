@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/fees/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -47,7 +48,6 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func NewHandler(k Keeper, bk bank.Keeper) sdk.Handler {
-
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
@@ -80,7 +80,7 @@ func handleMsgSetFeeContractAuthorisation(ctx sdk.Context, k Keeper, msg MsgSetF
 	}
 
 	// Confirm that signer is actually the payer in the fee contract
-	payerAddr := types.DidToAddr(msg.PayerDid)
+	payerAddr := ixo.DidToAddr(msg.PayerDid)
 	if !payerAddr.Equals(feeContract.Payer) {
 		return sdk.ErrInvalidAddress("signer must be fee contract payer").Result()
 	}
@@ -153,7 +153,7 @@ func handleMsgCreateFeeContract(ctx sdk.Context, k Keeper, bk bank.Keeper, msg M
 	}
 
 	// Create fee contract and validate
-	creatorAddr := types.DidToAddr(msg.CreatorDid)
+	creatorAddr := ixo.DidToAddr(msg.CreatorDid)
 	feeContract := NewFeeContract(msg.FeeContractId, msg.FeeId,
 		creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
 	if err := feeContract.Validate(); err != nil {
@@ -187,7 +187,7 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper, msg MsgCreateSubscri
 	}
 
 	// Confirm that signer is actually the creator of the fee contract
-	creatorAddr := types.DidToAddr(msg.CreatorDid)
+	creatorAddr := ixo.DidToAddr(msg.CreatorDid)
 	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
@@ -214,7 +214,7 @@ func handleMsgGrantFeeDiscount(ctx sdk.Context, k Keeper, msg MsgGrantFeeDiscoun
 	}
 
 	// Confirm that signer is actually the creator of the fee contract
-	creatorAddr := types.DidToAddr(msg.SenderDid)
+	creatorAddr := ixo.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
@@ -245,7 +245,7 @@ func handleMsgRevokeFeeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeFeeDisco
 	}
 
 	// Confirm that signer is actually the creator of the fee contract
-	creatorAddr := types.DidToAddr(msg.SenderDid)
+	creatorAddr := ixo.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}
@@ -268,7 +268,7 @@ func handleMsgChargeFee(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCharge
 	}
 
 	// Confirm that signer is actually the creator of the fee contract
-	creatorAddr := types.DidToAddr(msg.SenderDid)
+	creatorAddr := ixo.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(feeContract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be fee contract creator").Result()
 	}

@@ -11,7 +11,6 @@ import (
 type InternalAccountID = string
 
 func NewHandler(k Keeper) sdk.Handler {
-
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
@@ -37,12 +36,12 @@ func handleMsgCreateBond(ctx sdk.Context, k Keeper, msg MsgCreateBond) sdk.Resul
 
 func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatus) sdk.Result {
 
-	ExistingBondDoc, err := getBondDoc(ctx, k, msg.GetBondDid())
+	ExistingBondDoc, err := getBondDoc(ctx, k, msg.BondDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Bond").Result()
 	}
 
-	newStatus := msg.GetStatus()
+	newStatus := msg.Data.Status
 	if !newStatus.IsValidProgressionFrom(ExistingBondDoc.GetStatus()) {
 		return sdk.ErrUnknownRequest("Invalid Status Progression requested").Result()
 	}

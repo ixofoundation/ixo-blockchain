@@ -40,13 +40,11 @@ func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		}
 
@@ -69,13 +67,11 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		}
 
@@ -84,7 +80,6 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
-
 			return
 		}
 
@@ -106,14 +101,12 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		var txs []types.WithdrawalInfo
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		} else {
 			cliCtx.Codec.MustUnmarshalJSON(res, &txs)
@@ -133,7 +126,6 @@ func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -141,7 +133,6 @@ func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 

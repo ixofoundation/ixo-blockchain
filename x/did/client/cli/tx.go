@@ -1,58 +1,20 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
-
-func IxoSignAndBroadcast(cdc *codec.Codec, ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
-	privKey := [64]byte{}
-	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
-
-	signature := ixo.SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
-	tx := ixo.NewIxoTxSingleMsg(msg, signature)
-
-	bz, err := cdc.MarshalJSON(tx)
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := ctx.BroadcastTx(bz)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(res.String())
-	fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
-
-	return nil
-
-}
-
-func unmarshalSovrinDID(sovrinJson string) sovrin.SovrinDid {
-	sovrinDid := sovrin.SovrinDid{}
-	sovrinErr := json.Unmarshal([]byte(sovrinJson), &sovrinDid)
-	if sovrinErr != nil {
-		panic(sovrinErr)
-	}
-
-	return sovrinDid
-}
 
 func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
@@ -62,10 +24,13 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.NewCLIContext().WithCodec(cdc)
 
-			sovrinDid := unmarshalSovrinDID(args[0])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[0])
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }
@@ -85,7 +50,10 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 				return errors.New("The did is not on the blockchain")
 			}
 
-			sovrinDid := unmarshalSovrinDID(args[1])
+			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[1])
+			if err != nil {
+				return err
+			}
 
 			t := time.Now()
 			issued := t.Format(time.RFC3339)
@@ -93,7 +61,7 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, sovrinDid.Did, issued)
-			return IxoSignAndBroadcast(cdc, ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
 		},
 	}
 }

@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
 )
@@ -73,12 +74,19 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
+	// TODO: investigate ways to prevent reserve address from receiving transactions
+
+	// Not critical since as is no tokens can be taken out of the reserve, unless
+	// programmatically. However, increases in balance still affect calculations.
+	// Two possible solutions are (i) add new reserve addresses to the bank module
+	// blacklisted addresses (but no guarantee that this will be sufficient), or
+	// (ii) use a global res. address and store (in the bond) the share of the pool.
+
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
-		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
-		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
+		msg.CreatorPubKey, msg.FunctionType, msg.FunctionParameters,
+		msg.ReserveTokens, reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks,
-		msg.BondDid, msg.PubKey)
+		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks, msg.BondDid)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
 	keeper.SetBondDid(ctx, bond.Token, bond.BondDid)
@@ -121,12 +129,14 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditBond) sdk.Result {
 
-	// Note: since the expected signer is BondDid, it is not a requirement that
-	// the editor of the bond is also the creator.
-
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
+	}
+
+	if bond.CreatorDid != msg.EditorDid {
+		errMsg := fmt.Sprintf("Editor must be the creator of the bond")
+		return sdk.ErrInternal(errMsg).Result()
 	}
 
 	if msg.Name != types.DoNotModifyField {
@@ -197,7 +207,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 }
 
 func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := types.DidToAddr(msg.BuyerDid)
+	buyerAddr := ixo.DidToAddr(msg.BuyerDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -266,7 +276,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := types.DidToAddr(msg.BuyerDid)
+	buyerAddr := ixo.DidToAddr(msg.BuyerDid)
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
@@ -326,7 +336,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 }
 
 func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk.Result {
-	sellerAddr := types.DidToAddr(msg.SellerDid)
+	sellerAddr := ixo.DidToAddr(msg.SellerDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -393,7 +403,7 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 }
 
 func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk.Result {
-	swapperAddr := types.DidToAddr(msg.SwapperDid)
+	swapperAddr := ixo.DidToAddr(msg.SwapperDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {

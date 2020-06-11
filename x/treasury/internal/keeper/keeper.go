@@ -32,8 +32,8 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper bank.Keeper,
 }
 
 func (k Keeper) Send(ctx sdk.Context, fromDid, toDid ixo.Did, amount sdk.Coins) sdk.Error {
-	fromAddress := types.DidToAddr(fromDid)
-	toAddress := types.DidToAddr(toDid)
+	fromAddress := ixo.DidToAddr(fromDid)
+	toAddress := ixo.DidToAddr(toDid)
 
 	err := k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, amount)
 	if err != nil {
@@ -71,7 +71,7 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid ixo.Di
 }
 
 func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid ixo.Did, amount sdk.Coins) sdk.Error {
-	toAddress := types.DidToAddr(toDid)
+	toAddress := ixo.DidToAddr(toDid)
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -111,7 +111,7 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid ixo.Did, amount sdk
 }
 
 func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid ixo.Did, amount sdk.Coins) sdk.Error {
-	fromAddress := types.DidToAddr(fromDid)
+	fromAddress := ixo.DidToAddr(fromDid)
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {

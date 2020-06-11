@@ -110,16 +110,15 @@ type Bond struct {
 	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
+	CreatorPubKey          string         `json:"pub_key" yaml:"pub_key"`
 }
 
 func NewBond(token, name, description string, creatorDid ixo.Did,
-	functionType string, functionParameters FunctionParams,
-	reserveTokens []string, reserveAdddress sdk.AccAddress,
-	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
-	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
-	sanityMarginPercentage sdk.Dec, allowSells string,
-	batchBlocks sdk.Uint, bondDid ixo.Did, pubKey string) Bond {
+	creatorPubKey, functionType string, functionParameters FunctionParams,
+	reserveTokens []string, reserveAdddress sdk.AccAddress, txFeePercentage,
+	exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
+	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
+	allowSells string, batchBlocks sdk.Uint, bondDid ixo.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -130,6 +129,7 @@ func NewBond(token, name, description string, creatorDid ixo.Did,
 		Name:                   name,
 		Description:            description,
 		CreatorDid:             creatorDid,
+		CreatorPubKey:          creatorPubKey,
 		FunctionType:           functionType,
 		FunctionParameters:     functionParameters,
 		ReserveTokens:          reserveTokens,
@@ -145,7 +145,6 @@ func NewBond(token, name, description string, creatorDid ixo.Did,
 		AllowSells:             allowSells,
 		BatchBlocks:            batchBlocks,
 		BondDid:                bondDid,
-		PubKey:                 pubKey,
 	}
 }
 
