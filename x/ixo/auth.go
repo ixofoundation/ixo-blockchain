@@ -18,6 +18,11 @@ import (
 	"os"
 )
 
+var (
+	expectedMinGasPrices = "0.025ixo"
+	// TODO: parameterise (or remove) hard-coded gas prices
+)
+
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
 
 func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
@@ -243,8 +248,7 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, erro
 	}
 
 	// Clear fees and set gas-prices to deduce updated fee = (gas * gas-prices)
-	// TODO: parameterise hard-coded gas prices
-	signMsg, err := txBldr.WithFees("").WithGasPrices("0.025ixo").BuildSignMsg(tx.Msgs)
+	signMsg, err := txBldr.WithFees("").WithGasPrices(expectedMinGasPrices).BuildSignMsg(tx.Msgs)
 	if err != nil {
 		return auth.StdFee{}, err
 	}
