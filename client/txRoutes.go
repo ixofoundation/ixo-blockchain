@@ -214,6 +214,19 @@ func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Deduce fee automatically if it was excluded (skip upon error)
+		// TODO: report errors rather than skipping?
+		if tx, err := ixo.DefaultTxDecoder(cliCtx.Codec)(txBytes); err == nil {
+			if tx, ok := tx.(ixo.IxoTx); ok && tx.Fee.Amount.Empty() {
+				if fee, err := ixo.ApproximateFeeForTx(cliCtx, tx, tx.Memo); err == nil {
+					tx.Fee = fee
+					if txBytesNew, err := cliCtx.Codec.MarshalJSON(tx); err == nil {
+						txBytes = txBytesNew
+					}
+				}
+			}
+		}
+
 		cliCtx = cliCtx.WithBroadcastMode(req.Mode)
 
 		res, err := cliCtx.BroadcastTx(txBytes)

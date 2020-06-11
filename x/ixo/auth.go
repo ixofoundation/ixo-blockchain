@@ -216,6 +216,29 @@ func enrichWithGas(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.
 	return txBldr.WithGas(adjusted), nil
 }
 
+func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, memo string) (auth.StdFee, error) {
+
+	cdc := cliCtx.Codec
+	txEncoder := auth.DefaultTxEncoder
+	gasAdjustment := float64(1.5)
+	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
+	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, "dummyChain", memo, fees, nil)
+
+	// Approximate gas consumption
+	txBldr, err := enrichWithGas(txBldr, cliCtx, tx.Msgs)
+	if err != nil {
+		return auth.StdFee{}, err
+	}
+
+	// Clear fees and set gas-prices to deduce updated fee = (gas * gas-prices)
+	signMsg, err := txBldr.WithFees("").WithGasPrices("0.025ixo").BuildSignMsg(tx.Msgs)
+	if err != nil {
+		return auth.StdFee{}, err
+	}
+
+	return signMsg.Fee, nil
+}
+
 func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
 
 	msgs := []sdk.Msg{msg}
