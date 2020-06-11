@@ -27,13 +27,13 @@ func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var params types.Oracles
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
+		var oracles types.Oracles
+		if err := cliCtx.Codec.UnmarshalJSON(bz, &oracles); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, params)
+		rest.PostProcessResponse(w, cliCtx, oracles)
 	}
 }

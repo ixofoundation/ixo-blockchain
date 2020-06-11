@@ -24,8 +24,8 @@ func GetOraclesRequestHandler(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var params types.Oracles
-			if err := cdc.UnmarshalJSON(bz, &params); err != nil {
+			var oracles types.Oracles
+			if err := cdc.UnmarshalJSON(bz, &oracles); err != nil {
 				return err
 			}
 
