@@ -157,7 +157,8 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 	}
 }
 
-func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrinDid sovrin.SovrinDid,
+	estimateGasAutomatically bool) (sdk.TxResponse, error) {
 	if len(stdSignMsg.Msgs) != 1 {
 		panic("expected one message")
 	}
@@ -169,6 +170,16 @@ func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrin
 
 	signature := SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
 	tx := NewIxoTxSingleMsg(msg, stdSignMsg.Fee, signature, stdSignMsg.Memo)
+
+	// Deduce fee automatically if indicated to do so, but only if it was excluded
+	if estimateGasAutomatically && tx.Fee.Amount.Empty() {
+		// Approximate and set fee
+		fee, err := ApproximateFeeForTx(ctx, tx)
+		if err != nil {
+			return sdk.TxResponse{}, err
+		}
+		tx.Fee = fee
+	}
 
 	bz, err := ctx.Codec.MarshalJSON(tx)
 	if err != nil {
@@ -232,6 +243,7 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, erro
 	}
 
 	// Clear fees and set gas-prices to deduce updated fee = (gas * gas-prices)
+	// TODO: parameterise hard-coded gas prices
 	signMsg, err := txBldr.WithFees("").WithGasPrices("0.025ixo").BuildSignMsg(tx.Msgs)
 	if err != nil {
 		return auth.StdFee{}, err
@@ -293,7 +305,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid, false)
 	if err != nil {
 		return err
 	}
@@ -305,7 +317,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 
 func SignAndBroadcastTxRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
 
-	// TODO: implement properly using txBldr (or just remove function completely)
+	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
 	stdSignMsg := auth.StdSignMsg{
 		Fee:  types.StdFee{},
@@ -314,7 +326,7 @@ func SignAndBroadcastTxRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovri
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(ctx, stdSignMsg, sovrinDid)
+	res, err := signAndBroadcast(ctx, stdSignMsg, sovrinDid, true)
 	if err != nil {
 		return nil, err
 	}
