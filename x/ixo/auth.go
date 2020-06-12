@@ -11,7 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/spf13/viper"
@@ -175,8 +174,8 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 	}
 }
 
-func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg, sovrinDid sovrin.SovrinDid,
-	estimateGasAutomatically bool) (sdk.TxResponse, error) {
+func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg,
+	sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
 	if len(msg.Msgs) != 1 {
 		panic("expected one message")
 	}
@@ -187,16 +186,6 @@ func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg, sovrinDid sov
 
 	signature := SignIxoMessage(msg.Bytes(), privKey)
 	tx := NewIxoTxSingleMsg(msg.Msgs[0], msg.Fee, signature, msg.Memo)
-
-	// Deduce fee automatically if indicated to do so, but only if it was excluded
-	if estimateGasAutomatically && tx.Fee.Amount.Empty() {
-		// Approximate and set fee
-		fee, err := ApproximateFeeForTx(ctx, tx)
-		if err != nil {
-			return sdk.TxResponse{}, err
-		}
-		tx.Fee = fee
-	}
 
 	bz, err := ctx.Codec.MarshalJSON(tx)
 	if err != nil {
@@ -244,14 +233,13 @@ func enrichWithGas(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.
 	return txBldr.WithGas(adjusted), nil
 }
 
-func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, error) {
+func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, chainId string) (auth.StdFee, error) {
 
 	// Set up a transaction builder
 	cdc := cliCtx.Codec
 	txEncoder := auth.DefaultTxEncoder
 	gasAdjustment := float64(1.5)
 	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
-	chainId := cliCtx.Verifier.ChainID()
 	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, chainId, tx.Memo, fees, nil)
 
 	// Approximate gas consumption
@@ -325,7 +313,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid, false)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
 	if err != nil {
 		return err
 	}
@@ -339,14 +327,23 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid so
 
 	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
+	// Construct dummy tx and approximate and set fee
+	tx := NewIxoTxSingleMsg(msg, auth.StdFee{}, IxoSignature{}, "")
+	chainId := viper.GetString(flags.FlagChainID)
+	fee, err := ApproximateFeeForTx(cliCtx, tx, chainId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Construct sign message
 	stdSignMsg := auth.StdSignMsg{
-		Fee:  types.StdFee{},
+		Fee:  fee,
 		Msgs: []sdk.Msg{msg},
 		Memo: "",
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid, true)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
 	if err != nil {
 		return nil, err
 	}

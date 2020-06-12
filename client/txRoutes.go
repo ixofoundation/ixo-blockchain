@@ -285,7 +285,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
 		// Approximate fee
-		fee, err := ixo.ApproximateFeeForTx(cliCtx, tx)
+		fee, err := ixo.ApproximateFeeForTx(cliCtx, tx, txBldr.ChainID())
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
