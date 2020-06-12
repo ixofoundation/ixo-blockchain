@@ -1,22 +1,23 @@
-package project
+package payments
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/x/bank"
 
 	"github.com/cosmos/cosmos-sdk/client"
+
+	"github.com/ixofoundation/ixo-blockchain/x/payments/client/cli"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
-	"github.com/ixofoundation/ixo-blockchain/x/project/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/x/project/client/rest"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/client/rest"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/keeper"
 )
 
 var (
@@ -52,60 +53,56 @@ func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router
 }
 
 func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
-	projectTxCmd := &cobra.Command{
+	paymentsTxCmd := &cobra.Command{
 		Use:                        ModuleName,
-		Short:                      "project transaction sub commands",
+		Short:                      "payments transaction sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 
-	projectTxCmd.AddCommand(client.PostCommands(
-		cli.GetCmdCreateProject(cdc),
-		cli.GetCmdCreateAgent(cdc),
-		cli.GetCmdUpdateProjectStatus(cdc),
-		cli.GetCmdUpdateAgent(cdc),
-		cli.GetCmdCreateClaim(cdc),
-		cli.GetCmdCreateEvaluation(cdc),
-		cli.GetCmdWithdrawFunds(cdc),
+	paymentsTxCmd.AddCommand(client.PostCommands(
+		cli.GetCmdCreatePaymentTemplate(cdc),
+		cli.GetCmdCreatePaymentContract(cdc),
+		cli.GetCmdCreateSubscription(cdc),
+		cli.GetCmdSetPaymentContractAuthorisation(cdc),
+		cli.GetCmdGrantPaymentDiscount(cdc),
+		cli.GetCmdRevokePaymentDiscount(cdc),
+		cli.GetCmdEffectPayment(cdc),
 	)...)
 
-	return projectTxCmd
+	return paymentsTxCmd
 }
 
 func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	projectQueryCmd := &cobra.Command{
+	paymentsQueryCmd := &cobra.Command{
 		Use:                        ModuleName,
-		Short:                      "project query sub commands",
+		Short:                      "payments query sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 
-	projectQueryCmd.AddCommand(client.GetCommands(
-		cli.GetCmdProjectDoc(cdc),
-		cli.GetCmdProjectAccounts(cdc),
-		cli.GetCmdProjectTxs(cdc),
+	paymentsQueryCmd.AddCommand(client.GetCommands(
 		cli.GetParamsRequestHandler(cdc),
+		cli.GetCmdPaymentTemplate(cdc),
+		cli.GetCmdPaymentContract(cdc),
+		cli.GetCmdSubscription(cdc),
 	)...)
 
-	return projectQueryCmd
+	return paymentsQueryCmd
 }
 
 type AppModule struct {
 	AppModuleBasic
-	keeper         keeper.Keeper
-	paymentsKeeper payments.Keeper
-	bankKeeper     bank.Keeper
+	keeper     keeper.Keeper
+	bankKeeper bank.Keeper
 }
 
-func NewAppModule(keeper Keeper, paymentsKeeper payments.Keeper,
-	bankKeeper bank.Keeper) AppModule {
-
+func NewAppModule(keeper Keeper, bankKeeper bank.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
-		paymentsKeeper: paymentsKeeper,
 		bankKeeper:     bankKeeper,
 	}
 }
@@ -114,14 +111,15 @@ func (AppModule) Name() string {
 	return ModuleName
 }
 
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
+}
 
 func (AppModule) Route() string {
 	return RouterKey
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper, am.paymentsKeeper, am.bankKeeper)
+	return NewHandler(am.keeper, am.bankKeeper)
 }
 
 func (AppModule) QuerierRoute() string {
@@ -129,7 +127,7 @@ func (AppModule) QuerierRoute() string {
 }
 
 func (am AppModule) NewQuerierHandler() sdk.Querier {
-	return keeper.NewQuerier(am.keeper)
+	return NewQuerier(am.keeper)
 }
 
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
@@ -147,6 +145,6 @@ func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 }
 
-func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	return EndBlocker(ctx, am.keeper)
 }

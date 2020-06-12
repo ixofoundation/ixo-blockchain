@@ -13,10 +13,10 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/fees", queryFeesRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/oracles", queryOraclesRequestHandler(cliCtx)).Methods("GET")
 }
 
-func queryFeesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryOraclesRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,

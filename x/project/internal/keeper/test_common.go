@@ -11,16 +11,17 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmDB "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-blockchain/x/fees"
+	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
-func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Keeper) {
+func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
+	payments.Keeper, bank.Keeper) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	actStoreKey := sdk.NewKVStoreKey(auth.StoreKey)
 	keyParams := sdk.NewKVStoreKey("subspace")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
-	keyFees := sdk.NewKVStoreKey(fees.StoreKey)
+	keyFees := sdk.NewKVStoreKey(payments.StoreKey)
 
 	db := tmDB.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
@@ -39,16 +40,16 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec, fees.Keeper, bank.Kee
 		cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount,
 	)
 
-	feesSubspace := pk1.Subspace(fees.DefaultParamspace)
+	paymentsSubspace := pk1.Subspace(payments.DefaultParamspace)
 	projectSubspace := pk1.Subspace(types.DefaultParamspace)
 
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
-	feeKeeper := fees.NewKeeper(cdc, keyFees, feesSubspace, bankKeeper, nil)
-	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, feeKeeper)
+	paymentsKeeper := payments.NewKeeper(cdc, keyFees, paymentsSubspace, bankKeeper, nil)
+	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, paymentsKeeper)
 
-	feeKeeper.SetParams(ctx, fees.DefaultParams())
+	paymentsKeeper.SetParams(ctx, payments.DefaultParams())
 
-	return ctx, keeper, cdc, feeKeeper, bankKeeper
+	return ctx, keeper, cdc, paymentsKeeper, bankKeeper
 }
 
 func MakeTestCodec() *codec.Codec {
