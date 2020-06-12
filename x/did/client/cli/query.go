@@ -34,12 +34,12 @@ func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
 		Short: "Query DidDoc for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			didAddr := args[0]
 			key := ixo.Did(didAddr)
 
-			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryDidDoc, key), nil)
 			if err != nil {
 				return err
@@ -71,9 +71,9 @@ func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 		Use:   "get-all-dids",
 		Short: "Query all DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryAllDids, "ALL"), nil)
 			if err != nil {
 				return err
@@ -101,9 +101,9 @@ func GetCmdAllDidDocs(cdc *codec.Codec) *cobra.Command {
 		Use:   "get-all-did-docs",
 		Short: "Query all DID documents",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryAllDidDocs, "ALL"), nil)
 			if err != nil {
 				return err
