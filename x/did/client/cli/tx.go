@@ -22,12 +22,13 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 		Short: "Add a new SovrinDid",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[0])
 			if err != nil {
 				return err
 			}
+
+			ctx := context.NewCLIContext().WithCodec(cdc)
+			ctx = ctx.WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
 
 			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
 			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)

@@ -5,11 +5,10 @@ import (
 	"os"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/ed25519"
 )
 
-func SignIxoMessage(signBytes []byte, did string, privKey [64]byte) IxoSignature {
+func SignIxoMessage(signBytes []byte, privKey [64]byte) IxoSignature {
 
 	signatureBytes := ed25519.Sign(&privKey, signBytes)
 	signature := *signatureBytes
@@ -17,10 +16,8 @@ func SignIxoMessage(signBytes []byte, did string, privKey [64]byte) IxoSignature
 	return NewSignature(time.Now(), signature)
 }
 
-func VerifySignature(msg sdk.Msg, publicKey [32]byte, sig IxoSignature) bool {
-	signatureBytes := [64]byte(sig.SignatureValue)
-	result := ed25519.Verify(&publicKey, msg.GetSignBytes(), &signatureBytes)
-
+func VerifySignature(signBytes []byte, publicKey [32]byte, sig IxoSignature) bool {
+	result := ed25519.Verify(&publicKey, signBytes, &sig.SignatureValue)
 	if !result {
 		fmt.Println("******* VERIFY_MSG: Failed ******* ")
 	}

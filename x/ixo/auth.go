@@ -25,7 +25,7 @@ var (
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
 
-func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
+func processSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
 	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
 
 	if simulate {
@@ -43,7 +43,7 @@ func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
 	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 
 	// Verify signature
-	if !simulate && !VerifySignature(msg, pubKey, sig) {
+	if !simulate && !VerifySignature(signBytes, pubKey, sig) {
 		return nil, sdk.ErrUnauthorized("Signature Verification failed").Result()
 	}
 
@@ -52,6 +52,17 @@ func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
 	}
 
 	return acc, res
+}
+
+func getSignBytes(chainID string, ixoTx IxoTx, acc auth.Account, genesis bool) []byte {
+	var accNum uint64
+	if !genesis {
+		accNum = acc.GetAccountNumber()
+	}
+
+	return auth.StdSignBytes(
+		chainID, accNum, acc.GetSequence(), ixoTx.Fee, ixoTx.Msgs, ixoTx.Memo,
+	)
 }
 
 func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
@@ -151,7 +162,9 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 
 		// check signature, return account with incremented nonce
 		ixoSig := ixoTx.GetSignatures()[0]
-		signerAcc, res = processSig(newCtx, signerAcc, msg, pubKey, ixoSig, simulate, params)
+		isGenesis := ctx.BlockHeight() == 0
+		signBytes := getSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
+		signerAcc, res = processSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -162,19 +175,18 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 	}
 }
 
-func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrinDid sovrin.SovrinDid,
+func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg, sovrinDid sovrin.SovrinDid,
 	estimateGasAutomatically bool) (sdk.TxResponse, error) {
-	if len(stdSignMsg.Msgs) != 1 {
+	if len(msg.Msgs) != 1 {
 		panic("expected one message")
 	}
-	msg := stdSignMsg.Msgs[0]
 
 	privKey := [64]byte{}
 	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
-	signature := SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
-	tx := NewIxoTxSingleMsg(msg, stdSignMsg.Fee, signature, stdSignMsg.Memo)
+	signature := SignIxoMessage(msg.Bytes(), privKey)
+	tx := NewIxoTxSingleMsg(msg.Msgs[0], msg.Fee, signature, msg.Memo)
 
 	// Deduce fee automatically if indicated to do so, but only if it was excluded
 	if estimateGasAutomatically && tx.Fee.Amount.Empty() {
@@ -257,9 +269,12 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, erro
 }
 
 func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+	txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+	if err != nil {
+		return err
+	}
 
 	msgs := []sdk.Msg{msg}
-	txBldr := auth.NewTxBuilderFromCLI()
 
 	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
 		var err error // important so that enrichWithGas overwrites txBldr
