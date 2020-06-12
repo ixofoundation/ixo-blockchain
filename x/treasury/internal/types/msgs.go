@@ -70,7 +70,7 @@ func (msg MsgSend) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -136,7 +136,7 @@ func (msg MsgOracleTransfer) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -197,7 +197,7 @@ func (msg MsgOracleMint) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -258,6 +258,6 @@ func (msg MsgOracleBurn) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }

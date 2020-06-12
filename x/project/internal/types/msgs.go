@@ -84,7 +84,7 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -128,7 +128,7 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -188,7 +188,7 @@ func (msg MsgCreateAgent) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -245,7 +245,7 @@ func (msg MsgUpdateAgent) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -302,7 +302,7 @@ func (msg MsgCreateClaim) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -359,7 +359,7 @@ func (msg MsgCreateEvaluation) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -428,7 +428,7 @@ func (msg MsgWithdrawFunds) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 

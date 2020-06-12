@@ -71,7 +71,7 @@ func (msg MsgAddDid) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -135,6 +135,6 @@ func (msg MsgAddCredential) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
