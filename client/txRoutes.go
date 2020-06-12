@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"io/ioutil"
 	"net/http"
@@ -60,6 +61,7 @@ func RegisterTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/txs", QueryTxsRequestHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx, false)).Methods("POST")
 	r.HandleFunc("/txs_auto_gas", BroadcastTxRequest(cliCtx, true)).Methods("POST")
+	r.HandleFunc("/sign_data/{msg}", SignDataRequest(cliCtx)).Methods("GET")
 }
 
 func QueryTxRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
@@ -253,6 +255,80 @@ func BroadcastTxRequest(cliCtx context.CLIContext, estimateGasAutomatically bool
 		}
 
 		rest.PostProcessResponseBare(w, cliCtx, res)
+	}
+}
+
+type SignDataResponse struct {
+	SignBytes string      `json:"sign_bytes" yaml:"sign_bytes"`
+	Fee       auth.StdFee `json:"fee" yaml:"fee"`
+}
+
+func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		vars := mux.Vars(r)
+		msgParam := vars["msg"]
+
+		msgBytes, err := hex.DecodeString(strings.TrimPrefix(msgParam, "0x"))
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		var msg sdk.Msg
+		err = cliCtx.Codec.UnmarshalJSON(msgBytes, &msg)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// all messages must be of type ixo.IxoMsg
+		ixoMsg, ok := msg.(ixo.IxoMsg)
+		if !ok {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, sdk.ErrInternal("msg must be ixo.IxoMsg").Error())
+			return
+		}
+
+		// Deduce and set signer address
+		signerAddress := ixo.DidToAddr(ixoMsg.GetSignerDid())
+		cliCtx = cliCtx.WithFromAddress(signerAddress)
+
+		txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		msgs := []sdk.Msg{ixoMsg}
+
+		// Build the transaction
+		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// Create dummy tx with signature set to a blank signature
+		signature := ixo.IxoSignature{}
+		signature.Created = signature.Created.Add(1) // maximizes signature length
+		tx := ixo.NewIxoTxSingleMsg(
+			stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
+
+		// Approximate fee
+		fee, err := ixo.ApproximateFeeForTx(cliCtx, tx)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		stdSignMsg.Fee = fee
+
+		// Produce response from sign bytes and fees
+		output := SignDataResponse{
+			SignBytes: string(stdSignMsg.Bytes()),
+			Fee:       stdSignMsg.Fee,
+		}
+
+		rest.PostProcessResponseBare(w, cliCtx, output)
 	}
 }
 

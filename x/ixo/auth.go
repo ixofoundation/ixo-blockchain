@@ -220,7 +220,7 @@ func simulateMsgs(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.M
 
 	// Signature set to a blank signature
 	signature := IxoSignature{}
-	signature.Created = signature.Created.Add(1)
+	signature.Created = signature.Created.Add(1) // maximizes signature length
 	tx := NewIxoTxSingleMsg(
 		stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
@@ -251,7 +251,8 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, erro
 	txEncoder := auth.DefaultTxEncoder
 	gasAdjustment := float64(1.5)
 	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
-	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, "dummyChain", tx.Memo, fees, nil)
+	chainId := cliCtx.Verifier.ChainID()
+	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, chainId, tx.Memo, fees, nil)
 
 	// Approximate gas consumption
 	txBldr, err := enrichWithGas(txBldr, cliCtx, tx.Msgs)
@@ -334,7 +335,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	return nil
 }
 
-func SignAndBroadcastTxRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
+func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
 
 	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
@@ -345,7 +346,7 @@ func SignAndBroadcastTxRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovri
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(ctx, stdSignMsg, sovrinDid, true)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid, true)
 	if err != nil {
 		return nil, err
 	}
