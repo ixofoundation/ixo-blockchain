@@ -1,17 +1,14 @@
 package cli
 
 import (
-	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
@@ -56,11 +53,6 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
-
-			_, _, err = cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute, keeper.QueryDidDoc, didAddr), nil)
-			if err != nil {
-				return errors.New("The did is not on the blockchain")
-			}
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, sovrinDid.Did, issued)
 			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
