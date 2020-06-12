@@ -59,8 +59,7 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 func RegisterTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/txs/{hash}", QueryTxRequestHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/txs", QueryTxsRequestHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx, false)).Methods("POST")
-	r.HandleFunc("/txs_auto_gas", BroadcastTxRequest(cliCtx, true)).Methods("POST")
+	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx)).Methods("POST")
 	r.HandleFunc("/sign_data/{msg}", SignDataRequest(cliCtx)).Methods("GET")
 }
 
@@ -189,7 +188,7 @@ type BroadcastReq struct {
 	Mode string `json:"mode" yaml:"mode"`
 }
 
-func BroadcastTxRequest(cliCtx context.CLIContext, estimateGasAutomatically bool) http.HandlerFunc {
+func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req BroadcastReq
 
@@ -215,35 +214,6 @@ func BroadcastTxRequest(cliCtx context.CLIContext, estimateGasAutomatically bool
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
-		}
-
-		if estimateGasAutomatically {
-			tx, err := ixo.DefaultTxDecoder(cliCtx.Codec)(txBytes)
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-				return
-			}
-
-			// all transactions must be of type ixo.IxoTx
-			ixoTx, ok := tx.(ixo.IxoTx)
-			if !ok {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, sdk.ErrInternal("tx must be ixo.IxoTx").Error())
-				return
-			}
-
-			// Deduce fee automatically only if it was excluded
-			if ixoTx.Fee.Amount.Empty() {
-				// Approximate fee
-				fee, err := ixo.ApproximateFeeForTx(cliCtx, ixoTx)
-				if err != nil {
-					rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-					return
-				}
-
-				// Set fee and marshall tx back to JSON
-				ixoTx.Fee = fee
-				txBytes = cliCtx.Codec.MustMarshalJSON(ixoTx)
-			}
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(req.Mode)
