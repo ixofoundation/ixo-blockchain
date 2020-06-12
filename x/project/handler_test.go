@@ -16,16 +16,16 @@ import (
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, k, cdc, feesKeeper, bankKeeper := keeper.CreateTestInput()
+	ctx, k, cdc, paymentsKeeper, bankKeeper := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	params := feesKeeper.GetParams(ctx)
+	params := paymentsKeeper.GetParams(ctx)
 	params.IxoFactor = sdk.OneDec()
 	params.NodeFeePercentage = sdk.ZeroDec()
 	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
-	feesKeeper.SetParams(ctx, params)
+	paymentsKeeper.SetParams(ctx, params)
 	projectMsg := types.MsgCreateClaim{
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		TxHash:     "txHash",
@@ -33,7 +33,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
 	}
 
-	res := handleMsgCreateClaim(ctx, k, feesKeeper, bankKeeper, projectMsg)
+	res := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, projectMsg)
 	require.NotNil(t, res)
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/tendermint/tendermint/crypto"
+	"gopkg.in/yaml.v2"
 	"regexp"
 	"time"
 
@@ -46,6 +47,27 @@ type IxoTx struct {
 type IxoSignature struct {
 	SignatureValue [64]byte  `json:"signatureValue" yaml:"signatureValue"`
 	Created        time.Time `json:"created" yaml:"created"`
+}
+
+// MarshalYAML returns the YAML representation of the signature.
+func (is IxoSignature) MarshalYAML() (interface{}, error) {
+	var (
+		bz  []byte
+		err error
+	)
+
+	bz, err = yaml.Marshal(struct {
+		SignatureValue string
+		Created        string
+	}{
+		SignatureValue: fmt.Sprintf("%s", is.SignatureValue),
+		Created:        is.Created.String(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return string(bz), err
 }
 
 type IxoMsg interface {

@@ -20,7 +20,7 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 GAS_PRICES="0.025ixo"
-BONDDOC_FEE_FUND="15000ixo"  # 0.025 * 200000 * 3txs
+BONDDOC_FEE_FUND="15000ixo" # 0.025 * 200000 * 3txs
 
 BONDDOC_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
 BONDDOC_DID_FULL="{\"did\":\"did:ixo:48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
