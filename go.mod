@@ -22,4 +22,5 @@ require (
 	github.com/tendermint/tm-db v0.2.0
 	github.com/tendermint/tmlibs v0.8.1
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	gopkg.in/yaml.v2 v2.2.4
 )
