@@ -18,8 +18,9 @@ import (
 )
 
 var (
-	expectedMinGasPrices = "0.025ixo"
-	// TODO: parameterise (or remove) hard-coded gas prices
+	expectedMinGasPrices       = "0.025ixo"
+	approximationGasAdjustment = float64(1.5)
+	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 )
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
@@ -238,7 +239,7 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, chainId string) (a
 	// Set up a transaction builder
 	cdc := cliCtx.Codec
 	txEncoder := auth.DefaultTxEncoder
-	gasAdjustment := float64(1.5)
+	gasAdjustment := approximationGasAdjustment
 	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
 	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, chainId, tx.Memo, fees, nil)
 
