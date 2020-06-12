@@ -27,11 +27,11 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			ctx := context.NewCLIContext().WithCodec(cdc)
-			ctx = ctx.WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
 
 			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -42,14 +42,7 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 		Short: "Add a new KYC Credential for a Did by the signer",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			didAddr := args[0]
-
-			_, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute, keeper.QueryDidDoc, didAddr), nil)
-			if err != nil {
-				return errors.New("The did is not on the blockchain")
-			}
 
 			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[1])
 			if err != nil {
@@ -61,8 +54,16 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
+			_, _, err = cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute, keeper.QueryDidDoc, didAddr), nil)
+			if err != nil {
+				return errors.New("The did is not on the blockchain")
+			}
+
 			msg := types.NewMsgAddCredential(didAddr, credTypes, sovrinDid.Did, issued)
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }

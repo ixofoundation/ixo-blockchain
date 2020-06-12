@@ -58,8 +58,6 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_bondDid := viper.GetString(FlagBondDid)
 			_creatorDid := viper.GetString(FlagCreatorDid)
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			// Parse function parameters
 			functionParams, err := client2.ParseFunctionParams(_functionParameters)
 			if err != nil {
@@ -123,6 +121,9 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(creatorDid.Did))
+
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				creatorDid, _functionType, functionParams, reserveTokens,
 				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
@@ -171,13 +172,14 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			_bondDid := viper.GetString(FlagBondDid)
 			_editorDid := viper.GetString(FlagEditorDid)
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			// Parse editor's sovrin DID
 			editorDid, err := sovrin.UnmarshalSovrinDid(_editorDid)
 			if err != nil {
 				return err
 			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(editorDid.Did))
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
@@ -206,8 +208,6 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 		Short: "Buy from a bond",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			bondCoinWithAmount, err := sdk.ParseCoin(args[0])
 			if err != nil {
 				return err
@@ -224,6 +224,9 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(buyerDid.Did))
+
 			msg := types.NewMsgBuy(buyerDid, bondCoinWithAmount, maxPrices, args[2])
 
 			return ixo.SignAndBroadcastTxCli(cliCtx, msg, buyerDid)
@@ -239,8 +242,6 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 		Short:   "Sell from a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			bondCoinWithAmount, err := sdk.ParseCoin(args[0])
 			if err != nil {
 				return err
@@ -251,6 +252,9 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sellerDid.Did))
 
 			msg := types.NewMsgSell(sellerDid, bondCoinWithAmount, args[1])
 
@@ -269,8 +273,6 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 		Short: "Perform a swap between two tokens",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
 			// Check that from amount and token can be parsed to a coin
 			from, err := client2.ParseTwoPartCoin(args[0], args[1])
 			if err != nil {
@@ -282,6 +284,9 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(swapperDid.Did))
 
 			msg := types.NewMsgSwap(swapperDid, from, args[2], args[3])
 

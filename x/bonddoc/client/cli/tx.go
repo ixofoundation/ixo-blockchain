@@ -18,8 +18,6 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 		Short: "Create a new BondDoc signed by the sovrinDID of the bond",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			senderDid := args[0]
 			bondDocStr := args[1]
 			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
@@ -33,9 +31,12 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				panic(err)
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreateBond(senderDid, bondDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -46,8 +47,6 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 		Short: "Update the status of a bond signed by the sovrinDID of the bond",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			senderDid := args[0]
 			status := args[1]
 			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
@@ -70,9 +69,12 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 				Status: bondStatus,
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }

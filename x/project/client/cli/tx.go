@@ -18,8 +18,6 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 		Short: "Create a new ProjectDoc signed by the sovrinDID of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			senderDid := args[0]
 			projectDocStr := args[1]
 			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
@@ -33,9 +31,12 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreateProject(senderDid, projectDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -46,8 +47,6 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 		Short: "Update the status of a project signed by the sovrinDID of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			senderDid := args[0]
 			status := args[1]
 			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
@@ -70,9 +69,12 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 				Status: projectStatus,
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -84,8 +86,6 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 		Short: "Create a new agent on a project signed by the sovrinDID of the project",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			txHash := args[0]
 			senderDid := args[1]
 			agentDid := args[2]
@@ -104,9 +104,12 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -118,8 +121,6 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 		Short: "Update the status of an agent on a project signed by the sovrinDID of the project",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			txHash := args[0]
 			senderDid := args[1]
 			agentDid := args[2]
@@ -140,9 +141,12 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -153,8 +157,6 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 		Short: "Create a new claim on a project signed by the sovrinDID of the project",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			txHash := args[0]
 			senderDid := args[1]
 			claimId := args[2]
@@ -167,9 +169,12 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -181,8 +186,6 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 		Short: "Create a new claim evaluation on a project signed by the sovrinDID of the project",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			txHash := args[0]
 			senderDid := args[1]
 			claimId := args[2]
@@ -201,9 +204,12 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -214,8 +220,6 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 		Short: "Withdraw funds.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			senderDid, err := sovrin.UnmarshalSovrinDid(args[0])
 			if err != nil {
 				return err
@@ -227,9 +231,12 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(senderDid.Did))
+
 			msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, senderDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, senderDid)
 		},
 	}
 }
