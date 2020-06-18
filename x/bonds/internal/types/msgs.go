@@ -168,9 +168,8 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgCreateBond) GetSignerDid() ixo.Did {
-	return msg.CreatorDid
-}
+func (msg MsgCreateBond) GetSignerDid() ixo.Did   { return msg.CreatorDid }
+func (msg MsgCreateBond) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -263,9 +262,8 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgEditBond) GetSignerDid() ixo.Did {
-	return msg.EditorDid
-}
+func (msg MsgEditBond) GetSignerDid() ixo.Did   { return msg.EditorDid }
+func (msg MsgEditBond) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -334,9 +332,8 @@ func (msg MsgBuy) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgBuy) GetSignerDid() ixo.Did {
-	return msg.BuyerDid
-}
+func (msg MsgBuy) GetSignerDid() ixo.Did   { return msg.BuyerDid }
+func (msg MsgBuy) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -397,9 +394,8 @@ func (msg MsgSell) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgSell) GetSignerDid() ixo.Did {
-	return msg.SellerDid
-}
+func (msg MsgSell) GetSignerDid() ixo.Did   { return msg.SellerDid }
+func (msg MsgSell) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -481,9 +477,8 @@ func (msg MsgSwap) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgSwap) GetSignerDid() ixo.Did {
-	return msg.SwapperDid
-}
+func (msg MsgSwap) GetSignerDid() ixo.Did   { return msg.SwapperDid }
+func (msg MsgSwap) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}

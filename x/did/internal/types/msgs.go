@@ -34,9 +34,8 @@ func (msg MsgAddDid) Type() string { return "did" }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
-func (msg MsgAddDid) GetSignerDid() ixo.Did {
-	return msg.DidDoc.Did
-}
+func (msg MsgAddDid) GetSignerDid() ixo.Did   { return msg.DidDoc.Did }
+func (msg MsgAddDid) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -102,9 +101,8 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 func (msg MsgAddCredential) Type() string  { return "did" }
 func (msg MsgAddCredential) Route() string { return RouterKey }
 
-func (msg MsgAddCredential) GetSignerDid() ixo.Did {
-	return msg.DidCredential.Issuer
-}
+func (msg MsgAddCredential) GetSignerDid() ixo.Did   { return msg.DidCredential.Issuer }
+func (msg MsgAddCredential) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}

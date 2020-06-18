@@ -57,9 +57,10 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateProject) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateProject) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg MsgCreateProject) GetSignerDid() ixo.Did  { return msg.ProjectDid }
+func (msg MsgCreateProject) GetProjectDid() ixo.Did  { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSenderDid() ixo.Did   { return msg.SenderDid }
+func (msg MsgCreateProject) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateProject) GetFeePayerDid() ixo.Did { return msg.SenderDid }
 
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -128,9 +129,8 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgUpdateProjectStatus) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgUpdateProjectStatus) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgUpdateProjectStatus) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -167,9 +167,8 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateAgent) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgCreateAgent) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateAgent) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -222,9 +221,8 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgUpdateAgent) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgUpdateAgent) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgUpdateAgent) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -277,9 +275,8 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateClaim) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgCreateClaim) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateClaim) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -332,9 +329,8 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateEvaluation) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgCreateEvaluation) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateEvaluation) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -399,9 +395,8 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSignerDid() ixo.Did {
-	return msg.Data.RecipientDid
-}
+func (msg MsgWithdrawFunds) GetSignerDid() ixo.Did   { return msg.Data.RecipientDid }
+func (msg MsgWithdrawFunds) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
