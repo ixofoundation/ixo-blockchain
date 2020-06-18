@@ -138,9 +138,3 @@ type WithdrawFundsDoc struct {
 	Amount       sdk.Int `json:"amount" yaml:"amount"`
 	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
 }
-
-type ProjectMsg interface {
-	ixo.IxoMsg
-	IsNewDid() bool
-	IsWithdrawal() bool
-}

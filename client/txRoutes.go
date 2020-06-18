@@ -259,9 +259,10 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Deduce and set signer address
-		signerAddress := ixo.DidToAddr(ixoMsg.GetSignerDid())
-		cliCtx = cliCtx.WithFromAddress(signerAddress)
+		// Deduce and set fee payer address (this is typically the signer)
+		// At the time of writing, the only exception is MsgCreateProject
+		feePayerAddress := ixo.DidToAddr(ixoMsg.GetFeePayerDid())
+		cliCtx = cliCtx.WithFromAddress(feePayerAddress)
 
 		txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
 		if err != nil {

@@ -57,9 +57,10 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateProject) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateProject) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg MsgCreateProject) GetSignerDid() ixo.Did  { return msg.ProjectDid }
+func (msg MsgCreateProject) GetProjectDid() ixo.Did  { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSenderDid() ixo.Did   { return msg.SenderDid }
+func (msg MsgCreateProject) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateProject) GetFeePayerDid() ixo.Did { return msg.SenderDid }
 
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -87,10 +88,6 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 		return sdk.MustSortJSON(bz)
 	}
 }
-
-func (msg MsgCreateProject) IsNewDid() bool { return true }
-
-func (msg MsgCreateProject) IsWithdrawal() bool { return false }
 
 type MsgUpdateProjectStatus struct {
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
@@ -132,16 +129,12 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgUpdateProjectStatus) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgUpdateProjectStatus) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgUpdateProjectStatus) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
-
-func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
-func (msg MsgUpdateProjectStatus) IsWithdrawal() bool { return false }
 
 type MsgCreateAgent struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
@@ -150,10 +143,8 @@ type MsgCreateAgent struct {
 	Data       CreateAgentDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateAgent) IsNewDid() bool     { return false }
-func (msg MsgCreateAgent) IsWithdrawal() bool { return false }
-func (msg MsgCreateAgent) Type() string       { return "create-agent" }
-func (msg MsgCreateAgent) Route() string      { return RouterKey }
+func (msg MsgCreateAgent) Type() string  { return "create-agent" }
+func (msg MsgCreateAgent) Route() string { return RouterKey }
 func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
@@ -176,9 +167,8 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateAgent) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgCreateAgent) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateAgent) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -207,10 +197,8 @@ type MsgUpdateAgent struct {
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateAgent) IsNewDid() bool     { return false }
-func (msg MsgUpdateAgent) IsWithdrawal() bool { return false }
-func (msg MsgUpdateAgent) Type() string       { return "update-agent" }
-func (msg MsgUpdateAgent) Route() string      { return RouterKey }
+func (msg MsgUpdateAgent) Type() string  { return "update-agent" }
+func (msg MsgUpdateAgent) Route() string { return RouterKey }
 func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
@@ -233,9 +221,8 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgUpdateAgent) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgUpdateAgent) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgUpdateAgent) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -265,10 +252,8 @@ type MsgCreateClaim struct {
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateClaim) IsNewDid() bool     { return false }
-func (msg MsgCreateClaim) IsWithdrawal() bool { return false }
-func (msg MsgCreateClaim) Type() string       { return "create-claim" }
-func (msg MsgCreateClaim) Route() string      { return RouterKey }
+func (msg MsgCreateClaim) Type() string  { return "create-claim" }
+func (msg MsgCreateClaim) Route() string { return RouterKey }
 
 func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -290,9 +275,8 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateClaim) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgCreateClaim) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateClaim) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -322,10 +306,8 @@ type MsgCreateEvaluation struct {
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateEvaluation) IsNewDid() bool     { return false }
-func (msg MsgCreateEvaluation) IsWithdrawal() bool { return false }
-func (msg MsgCreateEvaluation) Type() string       { return "create-evaluation" }
-func (msg MsgCreateEvaluation) Route() string      { return RouterKey }
+func (msg MsgCreateEvaluation) Type() string  { return "create-evaluation" }
+func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
 func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -347,9 +329,8 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateEvaluation) GetSignerDid() ixo.Did {
-	return msg.ProjectDid
-}
+func (msg MsgCreateEvaluation) GetSignerDid() ixo.Did   { return msg.ProjectDid }
+func (msg MsgCreateEvaluation) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -377,10 +358,8 @@ type MsgWithdrawFunds struct {
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgWithdrawFunds) IsNewDid() bool     { return false }
-func (msg MsgWithdrawFunds) IsWithdrawal() bool { return true }
-func (msg MsgWithdrawFunds) Type() string       { return "withdraw-funds" }
-func (msg MsgWithdrawFunds) Route() string      { return RouterKey }
+func (msg MsgWithdrawFunds) Type() string  { return "withdraw-funds" }
+func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -416,9 +395,8 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSignerDid() ixo.Did {
-	return msg.Data.RecipientDid
-}
+func (msg MsgWithdrawFunds) GetSignerDid() ixo.Did   { return msg.Data.RecipientDid }
+func (msg MsgWithdrawFunds) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
 
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
