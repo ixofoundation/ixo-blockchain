@@ -73,7 +73,6 @@ func (is IxoSignature) MarshalYAML() (interface{}, error) {
 type IxoMsg interface {
 	sdk.Msg
 	GetSignerDid() Did
-	GetFeePayerDid() Did
 }
 
 func NewSignature(created time.Time, signature [64]byte) IxoSignature {

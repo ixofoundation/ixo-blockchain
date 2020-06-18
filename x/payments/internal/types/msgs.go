@@ -48,8 +48,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreatePaymentTemplate) GetSignerDid() ixo.Did   { return msg.CreatorDid }
-func (msg MsgCreatePaymentTemplate) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgCreatePaymentTemplate) GetSignerDid() ixo.Did { return msg.CreatorDid }
 
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -108,8 +107,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreatePaymentContract) GetSignerDid() ixo.Did   { return msg.CreatorDid }
-func (msg MsgCreatePaymentContract) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgCreatePaymentContract) GetSignerDid() ixo.Did { return msg.CreatorDid }
 
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -168,8 +166,7 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateSubscription) GetSignerDid() ixo.Did   { return msg.CreatorDid }
-func (msg MsgCreateSubscription) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgCreateSubscription) GetSignerDid() ixo.Did { return msg.CreatorDid }
 
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -223,8 +220,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() ixo.Did   { return msg.PayerDid }
-func (msg MsgSetPaymentContractAuthorisation) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() ixo.Did { return msg.PayerDid }
 
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -279,8 +275,7 @@ func (msg MsgGrantDiscount) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgGrantDiscount) GetSignerDid() ixo.Did   { return msg.SenderDid }
-func (msg MsgGrantDiscount) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgGrantDiscount) GetSignerDid() ixo.Did { return msg.SenderDid }
 
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -334,8 +329,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgRevokeDiscount) GetSignerDid() ixo.Did   { return msg.SenderDid }
-func (msg MsgRevokeDiscount) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgRevokeDiscount) GetSignerDid() ixo.Did { return msg.SenderDid }
 
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
@@ -386,8 +380,7 @@ func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgEffectPayment) GetSignerDid() ixo.Did   { return msg.SenderDid }
-func (msg MsgEffectPayment) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
+func (msg MsgEffectPayment) GetSignerDid() ixo.Did { return msg.SenderDid }
 
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
