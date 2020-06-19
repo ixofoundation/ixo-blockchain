@@ -301,13 +301,23 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	treasuryPubKeyGetter := treasury.GetPubKeyGetter(app.didKeeper)
 	paymentsPubKeyGetter := payments.GetPubKeyGetter(app.didKeeper)
 
-	cosmosAnteHandler := auth.NewAnteHandler(app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
-	didAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
-	projectAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
-	bonddocAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, bonddocPubKeyGetter)
-	bondsAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, bondsPubKeyGetter)
-	treasuryAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, treasuryPubKeyGetter)
-	paymentsAnteHandler := ixo.NewAnteHandler(app.accountKeeper, app.supplyKeeper, paymentsPubKeyGetter)
+	cosmosAnteHandler := auth.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
+	didAnteHandler := ixo.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
+	projectAnteHandler := ixo.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
+	bonddocAnteHandler := ixo.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, bonddocPubKeyGetter)
+	bondsAnteHandler := ixo.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, bondsPubKeyGetter)
+	treasuryAnteHandler := ixo.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, treasuryPubKeyGetter)
+	paymentsAnteHandler := ixo.NewAnteHandler(
+		app.accountKeeper, app.supplyKeeper, paymentsPubKeyGetter)
+
+	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+		app.accountKeeper, app.supplyKeeper, app.bankKeeper, projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
 		msg := tx.GetMsgs()[0]
@@ -315,7 +325,12 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		case did.RouterKey:
 			return didAnteHandler(ctx, tx, simulate)
 		case project.RouterKey:
-			return projectAnteHandler(ctx, tx, simulate)
+			switch msg.Type() {
+			case project.TypeMsgCreateProject:
+				return projectCreationAnteHandler(ctx, tx, simulate)
+			default:
+				return projectAnteHandler(ctx, tx, simulate)
+			}
 		case bonddoc.RouterKey:
 			return bonddocAnteHandler(ctx, tx, simulate)
 		case bonds.RouterKey:

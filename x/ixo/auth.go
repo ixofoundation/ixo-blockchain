@@ -11,7 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/spf13/viper"
@@ -19,13 +18,14 @@ import (
 )
 
 var (
-	expectedMinGasPrices = "0.025ixo"
-	// TODO: parameterise (or remove) hard-coded gas prices
+	expectedMinGasPrices       = "0.025ixo"
+	approximationGasAdjustment = float64(1.5)
+	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 )
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
 
-func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
+func ProcessSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
 	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
 
 	if simulate {
@@ -43,7 +43,7 @@ func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
 	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 
 	// Verify signature
-	if !simulate && !VerifySignature(msg, pubKey, sig) {
+	if !simulate && !VerifySignature(signBytes, pubKey, sig) {
 		return nil, sdk.ErrUnauthorized("Signature Verification failed").Result()
 	}
 
@@ -52,6 +52,17 @@ func processSig(ctx sdk.Context, acc auth.Account, msg sdk.Msg, pubKey [32]byte,
 	}
 
 	return acc, res
+}
+
+func getSignBytes(chainID string, ixoTx IxoTx, acc auth.Account, genesis bool) []byte {
+	var accNum uint64
+	if !genesis {
+		accNum = acc.GetAccountNumber()
+	}
+
+	return auth.StdSignBytes(
+		chainID, accNum, acc.GetSequence(), ixoTx.Fee, ixoTx.Msgs, ixoTx.Memo,
+	)
 }
 
 func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
@@ -69,7 +80,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 			// during runTx.
 			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
+			return newCtx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
 		}
 
 		params := ak.GetParams(ctx)
@@ -121,7 +132,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 
 		// fetch first (and only) signer, who's going to pay the fees
 		signerAddr := ixoTx.GetSigner()
-		signerAcc, res := auth.GetSignerAcc(ctx, ak, signerAddr)
+		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -140,7 +151,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 		// all messages must be of type IxoMsg
 		msg, ok := ixoTx.GetMsgs()[0].(IxoMsg)
 		if !ok {
-			return ctx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
+			return newCtx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
 		}
 
 		// Get pubKey
@@ -151,7 +162,9 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 
 		// check signature, return account with incremented nonce
 		ixoSig := ixoTx.GetSignatures()[0]
-		signerAcc, res = processSig(newCtx, signerAcc, msg, pubKey, ixoSig, simulate, params)
+		isGenesis := ctx.BlockHeight() == 0
+		signBytes := getSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
+		signerAcc, res = ProcessSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -162,29 +175,18 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 	}
 }
 
-func signAndBroadcast(ctx context.CLIContext, stdSignMsg auth.StdSignMsg, sovrinDid sovrin.SovrinDid,
-	estimateGasAutomatically bool) (sdk.TxResponse, error) {
-	if len(stdSignMsg.Msgs) != 1 {
+func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg,
+	sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+	if len(msg.Msgs) != 1 {
 		panic("expected one message")
 	}
-	msg := stdSignMsg.Msgs[0]
 
 	privKey := [64]byte{}
 	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
 
-	signature := SignIxoMessage(msg.GetSignBytes(), sovrinDid.Did, privKey)
-	tx := NewIxoTxSingleMsg(msg, stdSignMsg.Fee, signature, stdSignMsg.Memo)
-
-	// Deduce fee automatically if indicated to do so, but only if it was excluded
-	if estimateGasAutomatically && tx.Fee.Amount.Empty() {
-		// Approximate and set fee
-		fee, err := ApproximateFeeForTx(ctx, tx)
-		if err != nil {
-			return sdk.TxResponse{}, err
-		}
-		tx.Fee = fee
-	}
+	signature := SignIxoMessage(msg.Bytes(), privKey)
+	tx := NewIxoTxSingleMsg(msg.Msgs[0], msg.Fee, signature, msg.Memo)
 
 	bz, err := ctx.Codec.MarshalJSON(tx)
 	if err != nil {
@@ -208,7 +210,7 @@ func simulateMsgs(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.M
 
 	// Signature set to a blank signature
 	signature := IxoSignature{}
-	signature.Created = signature.Created.Add(1)
+	signature.Created = signature.Created.Add(1) // maximizes signature length
 	tx := NewIxoTxSingleMsg(
 		stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
@@ -232,14 +234,14 @@ func enrichWithGas(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.
 	return txBldr.WithGas(adjusted), nil
 }
 
-func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, error) {
+func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, chainId string) (auth.StdFee, error) {
 
 	// Set up a transaction builder
 	cdc := cliCtx.Codec
 	txEncoder := auth.DefaultTxEncoder
-	gasAdjustment := float64(1.5)
+	gasAdjustment := approximationGasAdjustment
 	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
-	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, "dummyChain", tx.Memo, fees, nil)
+	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, chainId, tx.Memo, fees, nil)
 
 	// Approximate gas consumption
 	txBldr, err := enrichWithGas(txBldr, cliCtx, tx.Msgs)
@@ -257,9 +259,12 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx) (auth.StdFee, erro
 }
 
 func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+	txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+	if err != nil {
+		return err
+	}
 
 	msgs := []sdk.Msg{msg}
-	txBldr := auth.NewTxBuilderFromCLI()
 
 	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
 		var err error // important so that enrichWithGas overwrites txBldr
@@ -309,7 +314,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid, false)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
 	if err != nil {
 		return err
 	}
@@ -319,18 +324,27 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	return nil
 }
 
-func SignAndBroadcastTxRest(ctx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
+func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
 
 	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
+	// Construct dummy tx and approximate and set fee
+	tx := NewIxoTxSingleMsg(msg, auth.StdFee{}, IxoSignature{}, "")
+	chainId := viper.GetString(flags.FlagChainID)
+	fee, err := ApproximateFeeForTx(cliCtx, tx, chainId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Construct sign message
 	stdSignMsg := auth.StdSignMsg{
-		Fee:  types.StdFee{},
+		Fee:  fee,
 		Msgs: []sdk.Msg{msg},
 		Memo: "",
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(ctx, stdSignMsg, sovrinDid, true)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
 	if err != nil {
 		return nil, err
 	}

@@ -164,14 +164,11 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
-func (msg MsgCreateBond) GetSignerDid() ixo.Did {
-	return msg.CreatorDid
-}
-
+func (msg MsgCreateBond) GetSignerDid() ixo.Did { return msg.CreatorDid }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -259,14 +256,11 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
-func (msg MsgEditBond) GetSignerDid() ixo.Did {
-	return msg.EditorDid
-}
-
+func (msg MsgEditBond) GetSignerDid() ixo.Did { return msg.EditorDid }
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -330,14 +324,11 @@ func (msg MsgBuy) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
-func (msg MsgBuy) GetSignerDid() ixo.Did {
-	return msg.BuyerDid
-}
-
+func (msg MsgBuy) GetSignerDid() ixo.Did { return msg.BuyerDid }
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -393,14 +384,11 @@ func (msg MsgSell) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
-func (msg MsgSell) GetSignerDid() ixo.Did {
-	return msg.SellerDid
-}
-
+func (msg MsgSell) GetSignerDid() ixo.Did { return msg.SellerDid }
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -477,14 +465,11 @@ func (msg MsgSwap) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
-func (msg MsgSwap) GetSignerDid() ixo.Did {
-	return msg.SwapperDid
-}
-
+func (msg MsgSwap) GetSignerDid() ixo.Did { return msg.SwapperDid }
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }

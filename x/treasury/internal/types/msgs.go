@@ -50,10 +50,7 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSend) GetSignerDid() ixo.Did {
-	return msg.FromDid
-}
-
+func (msg MsgSend) GetSignerDid() ixo.Did { return msg.FromDid }
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -70,7 +67,7 @@ func (msg MsgSend) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -116,10 +113,7 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleTransfer) GetSignerDid() ixo.Did {
-	return msg.OracleDid
-}
-
+func (msg MsgOracleTransfer) GetSignerDid() ixo.Did { return msg.OracleDid }
 func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -136,7 +130,7 @@ func (msg MsgOracleTransfer) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -177,10 +171,7 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleMint) GetSignerDid() ixo.Did {
-	return msg.OracleDid
-}
-
+func (msg MsgOracleMint) GetSignerDid() ixo.Did { return msg.OracleDid }
 func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -197,7 +188,7 @@ func (msg MsgOracleMint) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -238,10 +229,7 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleBurn) GetSignerDid() ixo.Did {
-	return msg.OracleDid
-}
-
+func (msg MsgOracleBurn) GetSignerDid() ixo.Did { return msg.OracleDid }
 func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -258,6 +246,6 @@ func (msg MsgOracleBurn) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }

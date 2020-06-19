@@ -37,8 +37,6 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a create-payment-template tx using DIDs",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			templateJsonStr := args[0]
 			sovrinDidStr := args[1]
 
@@ -53,9 +51,12 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreatePaymentTemplate(template, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -67,8 +68,6 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a create-payment-contract tx using DIDs",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			contractIdStr := args[0]
 			templateIdStr := args[1]
 			payerAddrStr := args[2]
@@ -96,11 +95,14 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreatePaymentContract(
 				templateIdStr, contractIdStr, payerAddr,
 				canDeauthorise, discountId, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -112,8 +114,6 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a create-subscription tx using DIDs",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			subIdStr := args[0]
 			contractIdStr := args[1]
 			maxPeriodsStr := args[2]
@@ -136,10 +136,13 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				contractIdStr, maxPeriods, period, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -151,8 +154,6 @@ func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a set-payment-contract-authorisation tx using DIDs",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			contractIdStr := args[0]
 			authorisedStr := args[1]
 			sovrinDidStr := args[2]
@@ -167,10 +168,13 @@ func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 				return err2
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgSetPaymentContractAuthorisation(
 				contractIdStr, authorised, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -182,8 +186,6 @@ func GetCmdGrantPaymentDiscount(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a grant-discount tx using DIDs",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			contractIdStr := args[0]
 			discountIdStr := args[1]
 			recipientAddrStr := args[2]
@@ -204,10 +206,13 @@ func GetCmdGrantPaymentDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgGrantDiscount(
 				contractIdStr, discountId, recipientAddr, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -218,8 +223,6 @@ func GetCmdRevokePaymentDiscount(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a revoke-discount tx using DIDs",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			contractIdStr := args[0]
 			holderAddrStr := args[1]
 			sovrinDidStr := args[2]
@@ -234,10 +237,13 @@ func GetCmdRevokePaymentDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgRevokeDiscount(
 				contractIdStr, holderAddr, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -248,8 +254,6 @@ func GetCmdEffectPayment(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a effect-payment tx using DIDs",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			contractIdStr := args[0]
 			sovrinDidStr := args[1]
 
@@ -258,9 +262,12 @@ func GetCmdEffectPayment(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgEffectPayment(contractIdStr, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }

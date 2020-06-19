@@ -49,7 +49,6 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreatePaymentTemplate) GetSignerDid() ixo.Did { return msg.CreatorDid }
-
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -66,7 +65,7 @@ func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -108,7 +107,6 @@ func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreatePaymentContract) GetSignerDid() ixo.Did { return msg.CreatorDid }
-
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -125,7 +123,7 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -167,7 +165,6 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateSubscription) GetSignerDid() ixo.Did { return msg.CreatorDid }
-
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -184,7 +181,7 @@ func (msg MsgCreateSubscription) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -221,7 +218,6 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() ixo.Did { return msg.PayerDid }
-
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -238,7 +234,7 @@ func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -276,7 +272,6 @@ func (msg MsgGrantDiscount) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgGrantDiscount) GetSignerDid() ixo.Did { return msg.SenderDid }
-
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -293,7 +288,7 @@ func (msg MsgGrantDiscount) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -330,7 +325,6 @@ func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgRevokeDiscount) GetSignerDid() ixo.Did { return msg.SenderDid }
-
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -347,7 +341,7 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -381,7 +375,6 @@ func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgEffectPayment) GetSignerDid() ixo.Did { return msg.SenderDid }
-
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -398,6 +391,6 @@ func (msg MsgEffectPayment) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }

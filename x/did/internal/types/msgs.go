@@ -34,10 +34,7 @@ func (msg MsgAddDid) Type() string { return "did" }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
-func (msg MsgAddDid) GetSignerDid() ixo.Did {
-	return msg.DidDoc.Did
-}
-
+func (msg MsgAddDid) GetSignerDid() ixo.Did { return msg.DidDoc.Did }
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -71,7 +68,7 @@ func (msg MsgAddDid) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }
 
@@ -102,10 +99,7 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 func (msg MsgAddCredential) Type() string  { return "did" }
 func (msg MsgAddCredential) Route() string { return RouterKey }
 
-func (msg MsgAddCredential) GetSignerDid() ixo.Did {
-	return msg.DidCredential.Issuer
-}
-
+func (msg MsgAddCredential) GetSignerDid() ixo.Did { return msg.DidCredential.Issuer }
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -135,6 +129,6 @@ func (msg MsgAddCredential) GetSignBytes() []byte {
 	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
 	} else {
-		return bz
+		return sdk.MustSortJSON(bz)
 	}
 }

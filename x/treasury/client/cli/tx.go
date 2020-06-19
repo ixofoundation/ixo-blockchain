@@ -17,8 +17,6 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign a send tx using DIDs",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			toDid := args[0]
 			coinsStr := args[1]
 			sovrinDidStr := args[2]
@@ -33,9 +31,12 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgSend(toDid, coins, sovrinDid)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -46,8 +47,6 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign an oracle-transfer tx using DIDs",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			fromDid := args[0]
 			toDid := args[1]
 			coinsStr := args[2]
@@ -64,9 +63,12 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgOracleTransfer(fromDid, toDid, coins, sovrinDid, proof)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -77,8 +79,6 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign an oracle-mint tx using DIDs",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			toDid := args[0]
 			coinsStr := args[1]
 			sovrinDidStr := args[2]
@@ -94,9 +94,12 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgOracleMint(toDid, coins, sovrinDid, proof)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
@@ -107,8 +110,6 @@ func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 		Short: "Create and sign an oracle-burn tx using DIDs",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().WithCodec(cdc)
-
 			fromDid := args[0]
 			coinsStr := args[1]
 			sovrinDidStr := args[2]
@@ -124,9 +125,12 @@ func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+
 			msg := types.NewMsgOracleBurn(fromDid, coins, sovrinDid, proof)
 
-			return ixo.SignAndBroadcastTxCli(ctx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
 		},
 	}
 }
