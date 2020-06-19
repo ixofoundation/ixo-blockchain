@@ -25,7 +25,7 @@ var (
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
 
-func processSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
+func ProcessSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
 	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
 
 	if simulate {
@@ -80,7 +80,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 			// during runTx.
 			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return ctx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
+			return newCtx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
 		}
 
 		params := ak.GetParams(ctx)
@@ -132,7 +132,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 
 		// fetch first (and only) signer, who's going to pay the fees
 		signerAddr := ixoTx.GetSigner()
-		signerAcc, res := auth.GetSignerAcc(ctx, ak, signerAddr)
+		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -151,7 +151,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 		// all messages must be of type IxoMsg
 		msg, ok := ixoTx.GetMsgs()[0].(IxoMsg)
 		if !ok {
-			return ctx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
+			return newCtx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
 		}
 
 		// Get pubKey
@@ -164,7 +164,7 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 		ixoSig := ixoTx.GetSignatures()[0]
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
-		signerAcc, res = processSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
+		signerAcc, res = ProcessSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}

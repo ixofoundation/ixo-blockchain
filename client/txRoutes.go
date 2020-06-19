@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -258,39 +259,45 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, sdk.ErrInternal("msg must be ixo.IxoMsg").Error())
 			return
 		}
-
-		// Deduce and set signer address
-		signerAddress := ixo.DidToAddr(ixoMsg.GetSignerDid())
-		cliCtx = cliCtx.WithFromAddress(signerAddress)
-
-		txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
 		msgs := []sdk.Msg{ixoMsg}
 
-		// Build the transaction
-		stdSignMsg, err := txBldr.BuildSignMsg(msgs)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		// obtain stdSignMsg (create-project is a special case)
+		var stdSignMsg auth.StdSignMsg
+		switch ixoMsg.Type() {
+		case project.TypeMsgCreateProject:
+			stdSignMsg = project.GetProjectCreationStdSignMsg(msgs)
+		default:
+			// Deduce and set signer address
+			signerAddress := ixo.DidToAddr(ixoMsg.GetSignerDid())
+			cliCtx = cliCtx.WithFromAddress(signerAddress)
 
-		// Create dummy tx with signature set to a blank signature
-		signature := ixo.IxoSignature{}
-		signature.Created = signature.Created.Add(1) // maximizes signature length
-		tx := ixo.NewIxoTxSingleMsg(
-			stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
+			txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+			if err != nil {
+				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 
-		// Approximate fee
-		fee, err := ixo.ApproximateFeeForTx(cliCtx, tx, txBldr.ChainID())
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+			// Build the transaction
+			stdSignMsg, err = txBldr.BuildSignMsg(msgs)
+			if err != nil {
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			// Create dummy tx with blank signature for fee approximation
+			signature := ixo.IxoSignature{}
+			signature.Created = signature.Created.Add(1) // maximizes signature length
+			tx := ixo.NewIxoTxSingleMsg(
+				stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
+
+			// Approximate fee
+			fee, err := ixo.ApproximateFeeForTx(cliCtx, tx, txBldr.ChainID())
+			if err != nil {
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			stdSignMsg.Fee = fee
 		}
-		stdSignMsg.Fee = fee
 
 		// Produce response from sign bytes and fees
 		output := SignDataResponse{

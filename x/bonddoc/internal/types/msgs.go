@@ -48,10 +48,8 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 
 	return nil
 }
-func (msg MsgCreateBond) GetBondDid() ixo.Did     { return msg.BondDid }
-func (msg MsgCreateBond) GetSignerDid() ixo.Did   { return msg.GetBondDid() }
-func (msg MsgCreateBond) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
-
+func (msg MsgCreateBond) GetBondDid() ixo.Did   { return msg.BondDid }
+func (msg MsgCreateBond) GetSignerDid() ixo.Did { return msg.GetBondDid() }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -116,9 +114,7 @@ func (msg MsgUpdateBondStatus) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgUpdateBondStatus) GetSignerDid() ixo.Did   { return msg.BondDid }
-func (msg MsgUpdateBondStatus) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
-
+func (msg MsgUpdateBondStatus) GetSignerDid() ixo.Did { return msg.BondDid }
 func (msg MsgUpdateBondStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }

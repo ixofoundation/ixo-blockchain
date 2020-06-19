@@ -50,9 +50,7 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSend) GetSignerDid() ixo.Did   { return msg.FromDid }
-func (msg MsgSend) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
-
+func (msg MsgSend) GetSignerDid() ixo.Did { return msg.FromDid }
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -115,9 +113,7 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleTransfer) GetSignerDid() ixo.Did   { return msg.OracleDid }
-func (msg MsgOracleTransfer) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
-
+func (msg MsgOracleTransfer) GetSignerDid() ixo.Did { return msg.OracleDid }
 func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -175,9 +171,7 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleMint) GetSignerDid() ixo.Did   { return msg.OracleDid }
-func (msg MsgOracleMint) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
-
+func (msg MsgOracleMint) GetSignerDid() ixo.Did { return msg.OracleDid }
 func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
@@ -235,9 +229,7 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleBurn) GetSignerDid() ixo.Did   { return msg.OracleDid }
-func (msg MsgOracleBurn) GetFeePayerDid() ixo.Did { return msg.GetSignerDid() }
-
+func (msg MsgOracleBurn) GetSignerDid() ixo.Did { return msg.OracleDid }
 func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
 }
