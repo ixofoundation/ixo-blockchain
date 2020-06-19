@@ -46,11 +46,8 @@ func main() {
 		queryCmd(cdc),
 		txCmd(cdc),
 		version.Cmd,
-		client.LineBreak,
 		lcd.ServeCommand(cdc, registerRoutes),
-		client.LineBreak,
 		keys.Commands(),
-		client.LineBreak,
 	)
 
 	executor := cli.PrepareMainCmd(rootCmd, "IXO", app.DefaultCLIHome)
@@ -69,12 +66,10 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 
 	queryCmd.AddCommand(
 		authCli.GetAccountCmd(cdc),
-		client.LineBreak,
 		rpc.ValidatorCommand(cdc),
 		rpc.BlockCommand(),
 		authCli.QueryTxsByEventsCmd(cdc),
 		cli2.QueryTxCmd(cdc),
-		client.LineBreak,
 	)
 
 	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
@@ -90,13 +85,10 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 
 	txCmd.AddCommand(
 		bankCli.SendTxCmd(cdc),
-		client.LineBreak,
 		authCli.GetSignCommand(cdc),
 		authCli.GetMultiSignCommand(cdc),
-		client.LineBreak,
 		authCli.GetBroadcastCommand(cdc),
 		authCli.GetEncodeCommand(cdc),
-		client.LineBreak,
 	)
 
 	app.ModuleBasics.AddTxCommands(txCmd, cdc)
