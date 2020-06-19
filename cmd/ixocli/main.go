@@ -1,6 +1,8 @@
 package main
 
 import (
+	cli2 "github.com/ixofoundation/ixo-blockchain/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/client/tx"
 	"os"
 	"path"
 
@@ -18,7 +20,6 @@ import (
 	"github.com/tendermint/tmlibs/cli"
 
 	"github.com/ixofoundation/ixo-blockchain/app"
-	ixoClient "github.com/ixofoundation/ixo-blockchain/client"
 )
 
 func main() {
@@ -72,7 +73,7 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		rpc.ValidatorCommand(cdc),
 		rpc.BlockCommand(),
 		authCli.QueryTxsByEventsCmd(cdc),
-		ixoClient.QueryTxCmd(cdc),
+		cli2.QueryTxCmd(cdc),
 		client.LineBreak,
 	)
 
@@ -131,6 +132,6 @@ func initConfig(cmd *cobra.Command) error {
 
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
-	ixoClient.RegisterTxRoutes(rs.CliCtx, rs.Mux)
+	tx.RegisterTxRoutes(rs.CliCtx, rs.Mux)
 	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }
