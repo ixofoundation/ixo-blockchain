@@ -8,11 +8,11 @@ yes $PASSWORD | ixocli keys delete miguel --force
 yes $PASSWORD | ixocli keys add miguel
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000stake,1000000res,1000000rez,100000000000ixo
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000stake,1000000res,1000000rez,100000000000uixo
 
 # Add DID-based genesis account
 MIGUEL_ADDR="ixo1x2x0thq6x2rx7txl0ujpyg9rr0c8mc8ad904xw" # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun
-yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez,100000000000ixo
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez,100000000000uixo
 
 # Add genesis oracle
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"

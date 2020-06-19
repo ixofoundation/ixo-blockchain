@@ -26,7 +26,7 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 PASSWORD="12345678"
-GAS_PRICES="0.025ixo"
+GAS_PRICES="0.025uixo"
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"

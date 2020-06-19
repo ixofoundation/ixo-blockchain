@@ -19,7 +19,7 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
   wait
 fi
 
-GAS_PRICES="0.025ixo"
+GAS_PRICES="0.025uixo"
 ixocli_tx() {
   # This function first approximates the gas (adjusted to 105%) and then
   # supplies this for the actual transaction broadcasting as the --gas.
@@ -27,7 +27,7 @@ ixocli_tx() {
   cmd="$1 $2"
   shift
   shift
-  APPROX=$(ixocli tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1ixo --dry-run "$@" 2>&1)
+  APPROX=$(ixocli tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --dry-run "$@" 2>&1)
   APPROX=${APPROX//gas estimate: /}
   echo "Gas estimate: $APPROX"
   ixocli tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@"
