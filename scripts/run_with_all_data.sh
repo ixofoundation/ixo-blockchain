@@ -23,17 +23,17 @@ yes $PASSWORD | ixocli keys add fee4
 yes $PASSWORD | ixocli keys add fee5
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000stake,1000000res,1000000rez,100000000000uixo
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000stake,1000000res,1000000rez,100000000000uixo
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000stake,1000000res,1000000rez,100000000000uixo
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000uixos,100000000000uixo,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000uixos,100000000000uixo,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000uixos,100000000000uixo,1000000res,1000000rez
 
 # Add DID-based genesis accounts
 MIGUEL_ADDR="ixo1x2x0thq6x2rx7txl0ujpyg9rr0c8mc8ad904xw"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun
 FRANCESCO_ADDR="ixo1nnxvyr6hs0sglppqzw4v5s9r5dwh89423xu5zp" # address from did:ixo:UKzkhVSHc3qEFva5EY2XHt
 SHAUN_ADDR="ixo1vnsjples23f6ggtsvu5s24vv86ue0hl2hvnnsd"     # address from did:ixo:U4tSpzzv91HHqWW1YmFkHJ
-yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000stake,1000000res,1000000rez,100000000000uixo
-yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000stake,1000000res,1000000rez,100000000000uixo
-yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000stake,1000000res,1000000rez,100000000000uixo
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000uixos,100000000000uixo,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000uixos,100000000000uixo,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000uixos,100000000000uixo,1000000res,1000000rez
 
 # Add genesis oracles
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
@@ -49,6 +49,12 @@ FROM="\"ixo_did\": \"\""
 TO="\"ixo_did\": \"$IXO_DID\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
+# Set staking token
+STAKING_TOKEN="uixos"
+FROM="\"bond_denom\": \"stake\""
+TO="\"bond_denom\": \"$STAKING_TOKEN\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 # Set min-gas-prices
 FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025uixo\""
@@ -59,7 +65,7 @@ ixocli config output json
 ixocli config indent true
 ixocli config trust-node true
 
-yes $PASSWORD | ixod gentx --name miguel
+yes $PASSWORD | ixod gentx --name miguel --amount 1000000uixos
 
 ixod collect-gentxs
 ixod validate-genesis
