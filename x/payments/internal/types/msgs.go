@@ -9,6 +9,16 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
+const (
+	TypeMsgCreatePaymentTemplate           = "create-payment-template"
+	TypeMsgCreatePaymentContract           = "create-payment-contract"
+	TypeMsgCreateSubscription              = "create-subscription"
+	TypeMsgSetPaymentContractAuthorisation = "set-payment-contract-authorisation"
+	TypeMsgGrantDiscount                   = "grant-discount"
+	TypeMsgRevokeDiscount                  = "revoke-discount"
+	TypeMsgEffectPayment                   = "effect-payment"
+)
+
 var (
 	_ ixo.IxoMsg = MsgCreatePaymentTemplate{}
 	_ ixo.IxoMsg = MsgCreatePaymentContract{}
@@ -25,7 +35,7 @@ type MsgCreatePaymentTemplate struct {
 	PaymentTemplate PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 }
 
-func (msg MsgCreatePaymentTemplate) Type() string  { return "create-payment-template" }
+func (msg MsgCreatePaymentTemplate) Type() string  { return TypeMsgCreatePaymentTemplate }
 func (msg MsgCreatePaymentTemplate) Route() string { return RouterKey }
 func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -79,7 +89,7 @@ type MsgCreatePaymentContract struct {
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
-func (msg MsgCreatePaymentContract) Type() string  { return "create-payment-contract" }
+func (msg MsgCreatePaymentContract) Type() string  { return TypeMsgCreatePaymentContract }
 func (msg MsgCreatePaymentContract) Route() string { return RouterKey }
 func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -136,7 +146,7 @@ type MsgCreateSubscription struct {
 	Period            Period   `json:"period" yaml:"period"`
 }
 
-func (msg MsgCreateSubscription) Type() string  { return "create-subscription" }
+func (msg MsgCreateSubscription) Type() string  { return TypeMsgCreateSubscription }
 func (msg MsgCreateSubscription) Route() string { return RouterKey }
 func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -193,7 +203,7 @@ type MsgSetPaymentContractAuthorisation struct {
 }
 
 func (msg MsgSetPaymentContractAuthorisation) Type() string {
-	return "set-payment-contract-authorisation"
+	return TypeMsgSetPaymentContractAuthorisation
 }
 func (msg MsgSetPaymentContractAuthorisation) Route() string { return RouterKey }
 func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
@@ -246,7 +256,7 @@ type MsgGrantDiscount struct {
 	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
 
-func (msg MsgGrantDiscount) Type() string  { return "grant-discount" }
+func (msg MsgGrantDiscount) Type() string  { return TypeMsgGrantDiscount }
 func (msg MsgGrantDiscount) Route() string { return RouterKey }
 func (msg MsgGrantDiscount) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -299,7 +309,7 @@ type MsgRevokeDiscount struct {
 	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
 }
 
-func (msg MsgRevokeDiscount) Type() string  { return "revoke-discount" }
+func (msg MsgRevokeDiscount) Type() string  { return TypeMsgRevokeDiscount }
 func (msg MsgRevokeDiscount) Route() string { return RouterKey }
 func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -351,7 +361,7 @@ type MsgEffectPayment struct {
 	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
 }
 
-func (msg MsgEffectPayment) Type() string  { return "effect-payment" }
+func (msg MsgEffectPayment) Type() string  { return TypeMsgEffectPayment }
 func (msg MsgEffectPayment) Route() string { return RouterKey }
 func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
 	// Check that not empty

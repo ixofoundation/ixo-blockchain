@@ -10,7 +10,13 @@ import (
 )
 
 const (
-	TypeMsgCreateProject = "create-project"
+	TypeMsgCreateProject       = "create-project"
+	TypeMsgUpdateProjectStatus = "update-project-status"
+	TypeMsgCreateAgent         = "create-agent"
+	TypeMsgUpdateAgent         = "update-agent"
+	TypeMsgCreateClaim         = "create-claim"
+	TypeMsgCreateEvaluation    = "create-evaluation"
+	TypeMsgWithdrawFunds       = "withdraw-funds"
 )
 
 var (
@@ -98,7 +104,7 @@ type MsgUpdateProjectStatus struct {
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateProjectStatus) Type() string  { return "update-project-status" }
+func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
 func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
 
 func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
@@ -143,7 +149,7 @@ type MsgCreateAgent struct {
 	Data       CreateAgentDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateAgent) Type() string  { return "create-agent" }
+func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
 func (msg MsgCreateAgent) Route() string { return RouterKey }
 func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -195,7 +201,7 @@ type MsgUpdateAgent struct {
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateAgent) Type() string  { return "update-agent" }
+func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
 func (msg MsgUpdateAgent) Route() string { return RouterKey }
 func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -248,7 +254,7 @@ type MsgCreateClaim struct {
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateClaim) Type() string  { return "create-claim" }
+func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
 func (msg MsgCreateClaim) Route() string { return RouterKey }
 
 func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
@@ -300,7 +306,7 @@ type MsgCreateEvaluation struct {
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateEvaluation) Type() string  { return "create-evaluation" }
+func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
 func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
 func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
@@ -350,7 +356,7 @@ type MsgWithdrawFunds struct {
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgWithdrawFunds) Type() string  { return "withdraw-funds" }
+func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
 func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {

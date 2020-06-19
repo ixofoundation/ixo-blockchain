@@ -9,6 +9,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	TypeMsgAddDid        = "add-did"
+	TypeMsgAddCredential = "add-credential"
+)
+
 var (
 	_ ixo.IxoMsg = MsgAddDid{}
 	_ ixo.IxoMsg = MsgAddCredential{}
@@ -30,7 +35,7 @@ func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	}
 }
 
-func (msg MsgAddDid) Type() string { return "did" }
+func (msg MsgAddDid) Type() string { return TypeMsgAddDid }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
@@ -96,7 +101,7 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 	}
 }
 
-func (msg MsgAddCredential) Type() string  { return "did" }
+func (msg MsgAddCredential) Type() string  { return TypeMsgAddCredential }
 func (msg MsgAddCredential) Route() string { return RouterKey }
 
 func (msg MsgAddCredential) GetSignerDid() ixo.Did { return msg.DidCredential.Issuer }

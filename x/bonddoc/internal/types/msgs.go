@@ -9,6 +9,11 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
+const (
+	TypeMsgCreateBond       = "create-bond"
+	TypeMsgUpdateBondStatus = "update-bond-status"
+)
+
 var (
 	_ ixo.IxoMsg = MsgCreateBond{}
 	_ ixo.IxoMsg = MsgUpdateBondStatus{}
@@ -24,7 +29,7 @@ type MsgCreateBond struct {
 	Data      BondDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateBond) Type() string  { return "create-bond" }
+func (msg MsgCreateBond) Type() string  { return TypeMsgCreateBond }
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
 func (msg MsgCreateBond) ValidateBasic() sdk.Error {
@@ -82,7 +87,7 @@ type MsgUpdateBondStatus struct {
 	Data      UpdateBondStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateBondStatus) Type() string  { return "update-bond-status" }
+func (msg MsgUpdateBondStatus) Type() string  { return TypeMsgUpdateBondStatus }
 func (msg MsgUpdateBondStatus) Route() string { return RouterKey }
 
 func (msg MsgUpdateBondStatus) ValidateBasic() sdk.Error {
