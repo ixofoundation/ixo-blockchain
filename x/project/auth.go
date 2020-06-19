@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	MsgCreateProjectFee            = int64(100000)
+	MsgCreateProjectFee            = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
 )
 
