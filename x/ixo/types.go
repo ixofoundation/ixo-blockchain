@@ -27,7 +27,7 @@ var (
 	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
 )
 
-const IxoNativeToken = "ixo"
+const IxoNativeToken = "uixo"
 
 func StringToAddr(str string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(str)))

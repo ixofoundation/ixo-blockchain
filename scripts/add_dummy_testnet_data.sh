@@ -20,11 +20,11 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 PASSWORD="12345678"
-GAS_PRICES="0.025ixo"
-BONDDOC1_FEE_FUND="10000ixo" # 0.025 * 200000 * 2txs
-BONDDOC2_FEE_FUND="15000ixo" # 0.025 * 200000 * 3txs
-PROJECT1_FEE_FUND="15000ixo" # 0.025 * 200000 * 3txs
-PROJECT2_FEE_FUND="30000ixo" # 0.025 * 200000 * 6txs
+GAS_PRICES="0.025uixo"
+BONDDOC1_FEE_FUND="10000uixo" # 0.025 * 200000 * 2txs
+BONDDOC2_FEE_FUND="15000uixo" # 0.025 * 200000 * 3txs
+PROJECT1_FEE_FUND="15000uixo" # 0.025 * 200000 * 3txs
+PROJECT2_FEE_FUND="30000uixo" # 0.025 * 200000 * 6txs
 
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
@@ -86,10 +86,10 @@ ixocli tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --gas-price
 
 # ----------------------------------------------------------------------------------------- mints/burns
 # Mint and burn ixo tokens
-echo "Minting 1000ixo tokens to Miguel using Miguel oracle..."
-ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000ixo "$MIGUEL_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
-echo "Burning 1000ixo tokens from Francesco using Francesco oracle..."
-ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000ixo "$FRANCESCO_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+echo "Minting 1000uixo tokens to Miguel using Miguel oracle..."
+ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000uixo "$MIGUEL_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+echo "Burning 1000uixo tokens from Francesco using Francesco oracle..."
+ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000uixo "$FRANCESCO_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
 
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
@@ -223,11 +223,11 @@ ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT2_DID_FUL
 
 # Fund project (using treasury 'send' and 'oracle-transfer')
 echo "Funding project 2 (using treasury 'send' from Miguel)..."
-ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000uixo "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Funding project 2 (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 # The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project get-project-accounts $PROJECT2_DID)
-# Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
+# Note that we're actually sending just 100uixo, since ixoDecimals is 1e8 and we're sending 100e8uixo
 echo "Updating project 2 to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	expectedMinGasPrices       = "0.025ixo"
+	expectedMinGasPrices       = "0.025" + IxoNativeToken
 	approximationGasAdjustment = float64(1.5)
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 )
