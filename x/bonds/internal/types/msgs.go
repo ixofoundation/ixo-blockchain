@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+const (
+	TypeMsgCreateBond = "create_bond"
+	TypeMsgEditBond   = "edit_bond"
+	TypeMsgBuy        = "buy"
+	TypeMsgSell       = "sell"
+	TypeMsgSwap       = "swap"
+)
+
 var (
 	_ ixo.IxoMsg = MsgCreateBond{}
 	_ ixo.IxoMsg = MsgEditBond{}
@@ -175,7 +183,7 @@ func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
-func (msg MsgCreateBond) Type() string { return "create_bond" }
+func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
 type MsgEditBond struct {
 	BondDid                ixo.Did `json:"bond_did" yaml:"bond_did"`
@@ -267,7 +275,7 @@ func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 
 func (msg MsgEditBond) Route() string { return RouterKey }
 
-func (msg MsgEditBond) Type() string { return "edit_bond" }
+func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
 type MsgBuy struct {
 	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
@@ -335,7 +343,7 @@ func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 
 func (msg MsgBuy) Route() string { return RouterKey }
 
-func (msg MsgBuy) Type() string { return "buy" }
+func (msg MsgBuy) Type() string { return TypeMsgBuy }
 
 type MsgSell struct {
 	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
@@ -395,7 +403,7 @@ func (msg MsgSell) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSell) Route() string { return RouterKey }
 
-func (msg MsgSell) Type() string { return "sell" }
+func (msg MsgSell) Type() string { return TypeMsgSell }
 
 type MsgSwap struct {
 	SwapperDid ixo.Did  `json:"swapper_did" yaml:"swapper_did"`
@@ -476,4 +484,4 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 
 func (msg MsgSwap) Route() string { return RouterKey }
 
-func (msg MsgSwap) Type() string { return "swap" }
+func (msg MsgSwap) Type() string { return TypeMsgSwap }

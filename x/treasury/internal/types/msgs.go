@@ -9,6 +9,13 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
+const (
+	TypeMsgSend           = "send"
+	TypeMsgOracleTransfer = "oracle-transfer"
+	TypeMsgOracleMint     = "oracle-mint"
+	TypeMsgOracleBurn     = "oracle-burn"
+)
+
 var (
 	_ ixo.IxoMsg = MsgSend{}
 	_ ixo.IxoMsg = MsgOracleTransfer{}
@@ -23,7 +30,7 @@ type MsgSend struct {
 	Amount  sdk.Coins `json:"amount" yaml:"amount"`
 }
 
-func (msg MsgSend) Type() string  { return "send" }
+func (msg MsgSend) Type() string  { return TypeMsgSend }
 func (msg MsgSend) Route() string { return RouterKey }
 func (msg MsgSend) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -80,7 +87,7 @@ type MsgOracleTransfer struct {
 	Proof     string    `json:"proof" yaml:"proof"`
 }
 
-func (msg MsgOracleTransfer) Type() string  { return "oracle-transfer" }
+func (msg MsgOracleTransfer) Type() string  { return TypeMsgOracleTransfer }
 func (msg MsgOracleTransfer) Route() string { return RouterKey }
 func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -142,7 +149,7 @@ type MsgOracleMint struct {
 	Proof     string    `json:"proof" yaml:"proof"`
 }
 
-func (msg MsgOracleMint) Type() string  { return "oracle-mint" }
+func (msg MsgOracleMint) Type() string  { return TypeMsgOracleMint }
 func (msg MsgOracleMint) Route() string { return RouterKey }
 func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -200,7 +207,7 @@ type MsgOracleBurn struct {
 	Proof     string    `json:"proof" yaml:"proof"`
 }
 
-func (msg MsgOracleBurn) Type() string  { return "oracle-burn" }
+func (msg MsgOracleBurn) Type() string  { return TypeMsgOracleBurn }
 func (msg MsgOracleBurn) Route() string { return RouterKey }
 func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	// Check that not empty
