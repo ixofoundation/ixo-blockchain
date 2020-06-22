@@ -23,15 +23,26 @@ type MsgAddDid struct {
 	DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
 }
 
-func NewMsgAddDid(did string, publicKey string) MsgAddDid {
-	didDoc := BaseDidDoc{
-		Did:         did,
-		PubKey:      publicKey,
-		Credentials: nil,
+func (msg *MsgAddDid) UnmarshalJSON(bytes []byte) error {
+	var msg2 struct {
+		DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
+	}
+	err := json.Unmarshal(bytes, &msg2)
+	if err != nil {
+		return err
 	}
 
+	if msg2.DidDoc.Credentials == nil {
+		msg2.DidDoc.Credentials = []DidCredential{}
+	}
+
+	*msg = msg2
+	return nil
+}
+
+func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	return MsgAddDid{
-		DidDoc: didDoc,
+		DidDoc: NewBaseDidDoc(did, publicKey),
 	}
 }
 
