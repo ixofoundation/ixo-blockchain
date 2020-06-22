@@ -13,31 +13,17 @@ type BaseDidDoc struct {
 	Credentials []DidCredential `json:"credentials" yaml:"credentials"`
 }
 
-type DidCredential struct {
-	CredType []string `json:"type" yaml:"type"`
-	Issuer   ixo.Did  `json:"issuer" yaml:"issuer"`
-	Issued   string   `json:"issued" yaml:"issued"`
-	Claim    Claim    `json:"claim" yaml:"claim"`
+func NewBaseDidDoc(did ixo.Did, pubKey string) BaseDidDoc {
+	return BaseDidDoc{
+		Did:         did,
+		PubKey:      pubKey,
+		Credentials: []DidCredential{},
+	}
 }
-
-type Claim struct {
-	Id           ixo.Did `json:"id" yaml:"id"`
-	KYCValidated bool    `json:"KYCValidated" yaml:"KYCValidated"`
-}
-
-type Credential struct{}
 
 func (dd BaseDidDoc) GetDid() ixo.Did                 { return dd.Did }
 func (dd BaseDidDoc) GetPubKey() string               { return dd.PubKey }
 func (dd BaseDidDoc) GetCredentials() []DidCredential { return dd.Credentials }
-
-func InitDidDoc(did ixo.Did, pubKey string) BaseDidDoc {
-	return BaseDidDoc{
-		Did:         did,
-		PubKey:      pubKey,
-		Credentials: nil,
-	}
-}
 
 func (dd BaseDidDoc) SetDid(did ixo.Did) error {
 	if len(dd.Did) != 0 {
@@ -66,3 +52,17 @@ func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
 
 	dd.Credentials = append(dd.Credentials, cred)
 }
+
+type DidCredential struct {
+	CredType []string `json:"type" yaml:"type"`
+	Issuer   ixo.Did  `json:"issuer" yaml:"issuer"`
+	Issued   string   `json:"issued" yaml:"issued"`
+	Claim    Claim    `json:"claim" yaml:"claim"`
+}
+
+type Claim struct {
+	Id           ixo.Did `json:"id" yaml:"id"`
+	KYCValidated bool    `json:"KYCValidated" yaml:"KYCValidated"`
+}
+
+type Credential struct{}
