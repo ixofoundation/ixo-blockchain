@@ -16,7 +16,7 @@ yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000uixos,100000000
 
 # Add genesis oracle
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID"
+yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "uixo:mint"
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"

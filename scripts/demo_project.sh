@@ -40,10 +40,6 @@ ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-pri
 echo "Ledgering Shaun DID..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# Fund project account
-echo "Funding project account so it can pay fees..."
-ixocli tx treasury send $PROJECT_DID $PROJECT_FEE_FUND "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
 echo "Creating project..."

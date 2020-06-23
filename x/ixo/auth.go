@@ -355,3 +355,7 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid so
 	}
 	return output, nil
 }
+
+func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext, msg auth.StdSignMsg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+	return signAndBroadcast(cliCtx, msg, sovrinDid)
+}

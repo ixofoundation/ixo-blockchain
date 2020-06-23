@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -35,8 +36,16 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
 
 			msg := types.NewMsgCreateProject(senderDid, projectDoc, sovrinDid)
+			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectFee)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, sovrinDid)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(res.String())
+			fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
+			return nil
 		},
 	}
 }

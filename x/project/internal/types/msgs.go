@@ -2,7 +2,10 @@ package types
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -17,6 +20,9 @@ const (
 	TypeMsgCreateClaim         = "create-claim"
 	TypeMsgCreateEvaluation    = "create-evaluation"
 	TypeMsgWithdrawFunds       = "withdraw-funds"
+
+	MsgCreateProjectFee            = int64(1000000)
+	MsgCreateProjectTransactionFee = int64(10000)
 )
 
 var (
@@ -37,6 +43,23 @@ type MsgCreateProject struct {
 	ProjectDid ixo.Did    `json:"projectDid" yaml:"projectDid"`
 	PubKey     string     `json:"pubKey" yaml:"pubKey"`
 	Data       ProjectDoc `json:"data" yaml:"data"`
+}
+
+func (msg MsgCreateProject) ToStdSignMsg(fee int64) auth.StdSignMsg {
+	chainID := viper.GetString(flags.FlagChainID)
+	accNum, accSeq := uint64(0), uint64(0)
+	stdFee := auth.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
+		ixo.IxoNativeToken, sdk.NewInt(fee))))
+	memo := viper.GetString(flags.FlagMemo)
+
+	return auth.StdSignMsg{
+		ChainID:       chainID,
+		AccountNumber: accNum,
+		Sequence:      accSeq,
+		Fee:           stdFee,
+		Msgs:          []sdk.Msg{msg},
+		Memo:          memo,
+	}
 }
 
 func (msg MsgCreateProject) Type() string { return TypeMsgCreateProject }

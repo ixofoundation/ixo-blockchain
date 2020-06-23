@@ -3,20 +3,12 @@ package project
 import (
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/spf13/viper"
-
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-)
-
-const (
-	MsgCreateProjectFee            = int64(1000000)
-	MsgCreateProjectTransactionFee = int64(10000)
 )
 
 func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
@@ -115,23 +107,6 @@ func getProjectCreationSignBytes(chainID string, ixoTx ixo.IxoTx, acc auth.Accou
 	return auth.StdSignBytes(
 		chainID, accNum, acc.GetSequence(), ixoTx.Fee, ixoTx.Msgs, ixoTx.Memo,
 	)
-}
-
-func GetProjectCreationStdSignMsg(msgs []sdk.Msg) auth.StdSignMsg {
-	chainID := viper.GetString(flags.FlagChainID)
-	accNum, accSeq := uint64(0), uint64(0)
-	fee := auth.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
-		ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectFee))))
-	memo := viper.GetString(flags.FlagMemo)
-
-	return auth.StdSignMsg{
-		ChainID:       chainID,
-		AccountNumber: accNum,
-		Sequence:      accSeq,
-		Fee:           fee,
-		Msgs:          msgs,
-		Memo:          memo,
-	}
 }
 
 func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,

@@ -70,19 +70,15 @@ ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 3/3..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# Fund project and bonddoc accounts
-echo "Funding project account 1/2 so it can pay fees..."
-ixocli tx treasury send $PROJECT1_DID $PROJECT1_FEE_FUND "$SHAUN_DID_FULL" --gas-prices="$GAS_PRICES" -y
-echo "Funding project account 2/2 so it can pay fees..."
-ixocli tx treasury send $PROJECT2_DID $PROJECT2_FEE_FUND "$SHAUN_DID_FULL" --gas-prices="$GAS_PRICES" -y
+# Fund bonddoc accounts
 echo "Funding bonddoc account 1/2 so it can pay fees..."
-ixocli tx treasury send $BONDDOC1_DID $BONDDOC1_FEE_FUND "$SHAUN_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixocli tx treasury send $BONDDOC1_DID $BONDDOC1_FEE_FUND "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Funding bonddoc account 2/2 so it can pay fees..."
 ixocli tx treasury send $BONDDOC2_DID $BONDDOC2_FEE_FUND "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding KYC credentials
 echo "Adding KYC credential 1/1..."
-ixocli tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # ----------------------------------------------------------------------------------------- mints/burns
 # Mint and burn ixo tokens
@@ -90,6 +86,9 @@ echo "Minting 1000uixo tokens to Miguel using Miguel oracle..."
 ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000uixo "$MIGUEL_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
 echo "Burning 1000uixo tokens from Francesco using Francesco oracle..."
 ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000uixo "$FRANCESCO_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+
+echo "Sleeping for a bit..."
+sleep 7 # to make sure mints/burns were processed before proceeding
 
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
@@ -111,7 +110,7 @@ ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND1_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
 echo "Creating bond 2/4..."
@@ -132,7 +131,7 @@ ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=3 \
   --bond-did="$BOND2_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
 echo "Creating bond 3/4..."
@@ -153,7 +152,7 @@ ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
 echo "Creating bond 4/4..."
@@ -174,19 +173,13 @@ ixocli tx bonds create-bond \
   --allow-sells=true \
   --batch-blocks=1 \
   --bond-did="$BOND4_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
-
-echo "Sleeping for a bit..."
-sleep 6 # to make sure bonds were ledgered before proceeding
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Buy 5token1, 5token2 from Miguel
 echo "Buying 5token1 from Miguel..."
-ixocli tx bonds buy 5token1 "100000res" "$BOND1_DID" "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixocli tx bonds buy 5token1 "100000res" "$BOND1_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Buying 5token2 from Miguel..."
-ixocli tx bonds buy 5token2 "100000res" "$BOND2_DID" "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
-
-echo "Sleeping for a bit..."
-sleep 6 # to make sure buys were processed before proceeding
+ixocli tx bonds buy 5token2 "100000res" "$BOND2_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Buy token2 and token3 from Francesco and Shaun
 echo "Buying 5token2 from Francesco..."
@@ -195,7 +188,7 @@ echo "Buying 5token3 from Shaun..."
 ixocli tx bonds buy 5token3 "100res,100rez" "$BOND3_DID" "$SHAUN_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 echo "Sleeping for a bit..."
-sleep 6 # to make sure buys were processed before proceeding
+sleep 7 # to make sure buys were processed before proceeding
 
 # Buy 5token4 from Miguel (using token1 and token2)
 echo "Buying 5token4 from Miguel..."
@@ -210,7 +203,7 @@ echo "Creating project 2/2..."
 ixocli tx project create-project "$SENDER_DID" "$PROJECT2_INFO" "$PROJECT2_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 echo "Sleeping for a bit..."
-sleep 6 # to make sure projects were ledgered before proceeding
+sleep 7 # to make sure projects were ledgered before proceeding
 
 # Update project status (this updates the status in the project doc for the respective project)
 SENDER_DID="$SHAUN_DID"
@@ -257,7 +250,7 @@ echo "Creating bonddoc 2/2..."
 ixocli tx bonddoc create-bond "$SENDER_DID" "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 echo "Sleeping for a bit..."
-sleep 6 # to make sure bonddocs were ledgered before proceeding
+sleep 7 # to make sure bonddocs were ledgered before proceeding
 
 # Updating bonddoc status
 SENDER_DID="$SHAUN_DID"
