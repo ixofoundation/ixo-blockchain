@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"github.com/ixofoundation/ixo-blockchain/x/nft"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"io"
 	"os"
@@ -74,6 +75,7 @@ var (
 		bonds.AppModuleBasic{},
 		treasury.AppModuleBasic{},
 		oracles.AppModuleBasic{},
+		nft.AppModuleBasic{},
 	)
 
 	// Module account permissions
@@ -128,6 +130,7 @@ type ixoApp struct {
 	bondsKeeper    bonds.Keeper
 	oraclesKeeper  oracles.Keeper
 	treasuryKeeper treasury.Keeper
+	nftKeeper      nft.Keeper
 
 	mm *module.Manager
 }
@@ -144,7 +147,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, did.StoreKey, payments.StoreKey,
 		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey, treasury.StoreKey,
-		oracles.StoreKey)
+		oracles.StoreKey, nft.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -197,6 +200,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
 	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper, app.oraclesKeeper, app.supplyKeeper)
+	app.nftKeeper = nft.NewKeeper(app.cdc, keys[nft.StoreKey])
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
@@ -211,13 +215,14 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
 
-		did.NewAppModule(app.didKeeper),
+		did.NewAppModule(app.didKeeper, app.nftKeeper),
 		payments.NewAppModule(app.paymentsKeeper, app.bankKeeper),
 		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.bankKeeper),
 		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 		treasury.NewAppModule(app.treasuryKeeper),
 		oracles.NewAppModule(app.oraclesKeeper),
+		nft.NewAppModule(app.nftKeeper, app.accountKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName, bonds.ModuleName)
@@ -227,7 +232,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, payments.ModuleName,
-		bonddoc.ModuleName, bonds.ModuleName, treasury.ModuleName, oracles.ModuleName)
+		bonddoc.ModuleName, bonds.ModuleName, treasury.ModuleName, oracles.ModuleName,
+		nft.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())

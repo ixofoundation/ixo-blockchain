@@ -2,16 +2,18 @@ package did
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/nft"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-func NewHandler(k keeper.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper, nftKeeper nft.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgAddDid:
-			return handleMsgAddDidDoc(ctx, k, msg)
+			return handleMsgAddDidDoc(ctx, k, nftKeeper, msg)
 		case types.MsgAddCredential:
 			return handleMsgAddCredential(ctx, k, msg)
 		default:
@@ -20,16 +22,22 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) sdk.Result {
+func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, nftKeeper nft.Keeper, msg types.MsgAddDid) sdk.Result {
 	newDidDoc := msg.DidDoc
+
+	baseNft := nft.NewBaseNFT("miguel", ixo.DidToAddr(msg.DidDoc.Did), "token")
+	err := nftKeeper.MintNFT(ctx, "avatar", &baseNft)
+	if err != nil {
+		return sdk.ErrInternal(err.Error()).Result()
+	}
 
 	if len(newDidDoc.Credentials) > 0 {
 		return sdk.ErrUnknownRequest("Cannot add a new DID with existing Credentials").Result()
 	}
 
-	err := k.SetDidDoc(ctx, newDidDoc)
-	if err != nil {
-		return err.Result()
+	err2 := k.SetDidDoc(ctx, newDidDoc)
+	if err2 != nil {
+		return err2.Result()
 	}
 
 	return sdk.Result{}
