@@ -24,7 +24,7 @@ func RegisterTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/txs/{hash}", QueryTxRequestHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/txs", QueryTxsRequestHandlerFn(cliCtx)).Methods("GET")
 	r.HandleFunc("/txs", BroadcastTxRequest(cliCtx)).Methods("POST")
-	r.HandleFunc("/sign_data/{msg}", SignDataRequest(cliCtx)).Methods("GET")
+	r.HandleFunc("/sign_data", SignDataRequest(cliCtx)).Methods("POST")
 }
 
 func QueryTxRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
@@ -157,6 +157,10 @@ func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
+type SignDataReq struct {
+	Msg string `json:"msg" yaml:"msg"`
+}
+
 type SignDataResponse struct {
 	SignBytes string      `json:"sign_bytes" yaml:"sign_bytes"`
 	Fee       auth.StdFee `json:"fee" yaml:"fee"`
@@ -164,11 +168,21 @@ type SignDataResponse struct {
 
 func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		vars := mux.Vars(r)
-		msgParam := vars["msg"]
+		var req SignDataReq
 
-		msgBytes, err := hex.DecodeString(strings.TrimPrefix(msgParam, "0x"))
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		err = cliCtx.Codec.UnmarshalJSON(body, &req)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msgBytes, err := hex.DecodeString(strings.TrimPrefix(req.Msg, "0x"))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
