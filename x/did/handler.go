@@ -2,7 +2,6 @@ package did
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/nft"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
@@ -24,12 +23,6 @@ func NewHandler(k keeper.Keeper, nftKeeper nft.Keeper) sdk.Handler {
 
 func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, nftKeeper nft.Keeper, msg types.MsgAddDid) sdk.Result {
 	newDidDoc := msg.DidDoc
-
-	baseNft := nft.NewBaseNFT("miguel", ixo.DidToAddr(msg.DidDoc.Did), "token")
-	err := nftKeeper.MintNFT(ctx, "avatar", &baseNft)
-	if err != nil {
-		return sdk.ErrInternal(err.Error()).Result()
-	}
 
 	if len(newDidDoc.Credentials) > 0 {
 		return sdk.ErrUnknownRequest("Cannot add a new DID with existing Credentials").Result()
