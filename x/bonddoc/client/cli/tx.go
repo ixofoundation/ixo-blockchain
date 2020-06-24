@@ -4,23 +4,23 @@ import (
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-bond [sender-did] [bond-json] [sovrin-did]",
-		Short: "Create a new BondDoc signed by the sovrinDID of the bond",
+		Use:   "create-bond [sender-did] [bond-json] [ixo-did]",
+		Short: "Create a new BondDoc signed by the ixoDid of the bond",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
 			bondDocStr := args[1]
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			ixoDid, err := did.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
@@ -32,24 +32,24 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
-			msg := types.NewMsgCreateBond(senderDid, bondDoc, sovrinDid)
+			msg := types.NewMsgCreateBond(senderDid, bondDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
 
 func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "update-bond-status [sender-did] [status] [sovrin-did]",
-		Short: "Update the status of a bond signed by the sovrinDID of the bond",
+		Use:   "update-bond-status [sender-did] [status] [ixo-did]",
+		Short: "Update the status of a bond signed by the ixoDid of the bond",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
 			status := args[1]
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			ixoDid, err := did.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
@@ -70,11 +70,11 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
-			msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
+			msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }

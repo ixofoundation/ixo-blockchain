@@ -1,41 +1,26 @@
-package ixo
+package types
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tendermint/tendermint/crypto"
-	"gopkg.in/yaml.v2"
-	"regexp"
-	"time"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	"gopkg.in/yaml.v2"
+	"time"
 )
 
-var (
-	IxoDecimals = sdk.NewDec(100000000)
-
+const (
 	maxGasWanted = uint64((1 << 63) - 1)
-
-	ValidDid   = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
-	IsValidDid = ValidDid.MatchString
-	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html
-	// IsValidDid adapted from the above link but assumes no sub-namespaces
-	// TODO: ValidDid needs to be updated once we no longer want to be able
-	//   to consider project accounts as DIDs (especially in treasury module),
-	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
 )
 
-const IxoNativeToken = "uixo"
-
-func StringToAddr(str string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(str)))
+type IxoMsg interface {
+	sdk.Msg
+	GetSignerDid() exported.Did
 }
 
-func DidToAddr(did Did) sdk.AccAddress {
-	return StringToAddr(did)
-}
+var _ sdk.Tx = (*IxoTx)(nil)
 
 type IxoTx struct {
 	Msgs       []sdk.Msg      `json:"payload" yaml:"payload"`
@@ -44,9 +29,29 @@ type IxoTx struct {
 	Memo       string         `json:"memo" yaml:"memo"`
 }
 
+func NewIxoTx(msgs []sdk.Msg, fee auth.StdFee, sigs []IxoSignature, memo string) IxoTx {
+	return IxoTx{
+		Msgs:       msgs,
+		Fee:        fee,
+		Signatures: sigs,
+		Memo:       memo,
+	}
+}
+
+func NewIxoTxSingleMsg(msg sdk.Msg, fee auth.StdFee, signature IxoSignature, memo string) IxoTx {
+	return NewIxoTx([]sdk.Msg{msg}, fee, []IxoSignature{signature}, memo)
+}
+
 type IxoSignature struct {
 	SignatureValue [64]byte  `json:"signatureValue" yaml:"signatureValue"`
 	Created        time.Time `json:"created" yaml:"created"`
+}
+
+func NewIxoSignature(created time.Time, signature [64]byte) IxoSignature {
+	return IxoSignature{
+		SignatureValue: signature,
+		Created:        created,
+	}
 }
 
 // MarshalYAML returns the YAML representation of the signature.
@@ -68,31 +73,6 @@ func (is IxoSignature) MarshalYAML() (interface{}, error) {
 	}
 
 	return string(bz), err
-}
-
-type IxoMsg interface {
-	sdk.Msg
-	GetSignerDid() Did
-}
-
-func NewSignature(created time.Time, signature [64]byte) IxoSignature {
-	return IxoSignature{
-		SignatureValue: signature,
-		Created:        created,
-	}
-}
-
-func NewIxoTx(msgs []sdk.Msg, fee auth.StdFee, sigs []IxoSignature, memo string) IxoTx {
-	return IxoTx{
-		Msgs:       msgs,
-		Fee:        fee,
-		Signatures: sigs,
-		Memo:       memo,
-	}
-}
-
-func NewIxoTxSingleMsg(msg sdk.Msg, fee auth.StdFee, signature IxoSignature, memo string) IxoTx {
-	return NewIxoTx([]sdk.Msg{msg}, fee, []IxoSignature{signature}, memo)
 }
 
 func (tx IxoTx) GetMsgs() []sdk.Msg { return tx.Msgs }
@@ -139,17 +119,6 @@ func (tx IxoTx) String() string {
 
 func (tx IxoTx) GetSigner() sdk.AccAddress {
 	return tx.GetMsgs()[0].GetSigners()[0]
-}
-
-var _ sdk.Tx = (*IxoTx)(nil)
-
-type Did = string
-
-type DidDoc interface {
-	SetDid(did Did) error
-	GetDid() Did
-	SetPubKey(pubkey string) error
-	GetPubKey() string
 }
 
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {

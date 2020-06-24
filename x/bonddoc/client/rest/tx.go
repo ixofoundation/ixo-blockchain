@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -35,7 +35,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		didDoc, err := sovrin.UnmarshalSovrinDid(didDocParam)
+		didDoc, err := did.UnmarshalIxoDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -61,10 +61,10 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 
 		senderDid := r.URL.Query().Get("senderDid")
 		status := r.URL.Query().Get("status")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 		mode := r.URL.Query().Get("mode")
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -89,9 +89,9 @@ func updateBondStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 			Status: bondStatus,
 		}
 
-		msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, sovrinDid)
+		msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

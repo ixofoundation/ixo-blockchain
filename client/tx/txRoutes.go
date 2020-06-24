@@ -12,6 +12,7 @@ import (
 	genutilrest "github.com/cosmos/cosmos-sdk/x/genutil/client/rest"
 	"github.com/gorilla/mux"
 	utils2 "github.com/ixofoundation/ixo-blockchain/client/utils"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"io/ioutil"
@@ -211,7 +212,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 				project.MsgCreateProjectFee)
 		default:
 			// Deduce and set signer address
-			signerAddress := ixo.DidToAddr(ixoMsg.GetSignerDid())
+			signerAddress := did.DidToAddr(ixoMsg.GetSignerDid())
 			cliCtx = cliCtx.WithFromAddress(signerAddress)
 
 			txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)

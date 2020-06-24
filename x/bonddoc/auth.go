@@ -16,15 +16,13 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 		switch msg := msg.(type) {
 		case types.MsgCreateBond:
 			copy(pubKey[:], base58.Decode(msg.GetPubKey()))
-		case types.MsgUpdateBondStatus:
-			bondDid := msg.GetSignerDid()
-			bondDoc, err := keeper.GetBondDoc(ctx, bondDid)
+		default:
+			// For the remaining messages, the bond is the signer
+			bondDoc, err := keeper.GetBondDoc(ctx, msg.GetSignerDid())
 			if err != nil {
 				return pubKey, sdk.ErrInternal("bond did not found").Result()
 			}
 			copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
-		default:
-			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 		return pubKey, sdk.Result{}
 	}

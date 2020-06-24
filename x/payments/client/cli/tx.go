@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
 
@@ -10,7 +11,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 )
 
@@ -33,14 +33,14 @@ func parseBool(boolStr, boolName string) (bool, sdk.Error) {
 
 func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-payment-template [payment-template-json] [creator-sovrin-did]",
+		Use:   "create-payment-template [payment-template-json] [creator-ixo-did]",
 		Short: "Create and sign a create-payment-template tx using DIDs",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			templateJsonStr := args[0]
-			sovrinDidStr := args[1]
+			ixoDidStr := args[1]
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
@@ -52,11 +52,11 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
-			msg := types.NewMsgCreatePaymentTemplate(template, sovrinDid)
+			msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -64,7 +64,7 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use: "create-payment-contract [payment-contract-id] [payment-template-id] " +
-			"[payer-addr] [can-deauthorise] [discount-id] [creator-sovrin-did]",
+			"[payer-addr] [can-deauthorise] [discount-id] [creator-ixo-did]",
 		Short: "Create and sign a create-payment-contract tx using DIDs",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -73,7 +73,7 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 			payerAddrStr := args[2]
 			canDeauthoriseStr := args[3]
 			discountIdStr := args[4]
-			sovrinDidStr := args[5]
+			ixoDidStr := args[5]
 
 			payerAddr, err := sdk.AccAddressFromBech32(payerAddrStr)
 			if err != nil {
@@ -90,19 +90,19 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgCreatePaymentContract(
 				templateIdStr, contractIdStr, payerAddr,
-				canDeauthorise, discountId, sovrinDid)
+				canDeauthorise, discountId, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -110,7 +110,7 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use: "create-subscription [subscription-id] [payment-contract-id] " +
-			"[max-periods] [period-json] [creator-sovrin-did]",
+			"[max-periods] [period-json] [creator-ixo-did]",
 		Short: "Create and sign a create-subscription tx using DIDs",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -118,14 +118,14 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			contractIdStr := args[1]
 			maxPeriodsStr := args[2]
 			periodStr := args[3]
-			sovrinDidStr := args[4]
+			ixoDidStr := args[4]
 
 			maxPeriods, err := sdk.ParseUint(maxPeriodsStr)
 			if err != nil {
 				return err
 			}
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
@@ -137,12 +137,12 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgCreateSubscription(subIdStr,
-				contractIdStr, maxPeriods, period, sovrinDid)
+				contractIdStr, maxPeriods, period, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -150,31 +150,31 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use: "set-payment-contract-authorisation [payment-contract-id] " +
-			"[authorised] [payer-sovrin-did]",
+			"[authorised] [payer-ixo-did]",
 		Short: "Create and sign a set-payment-contract-authorisation tx using DIDs",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contractIdStr := args[0]
 			authorisedStr := args[1]
-			sovrinDidStr := args[2]
+			ixoDidStr := args[2]
 
 			authorised, err := parseBool(authorisedStr, "authorised")
 			if err != nil {
 				return err
 			}
 
-			sovrinDid, err2 := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err2 := did.UnmarshalIxoDid(ixoDidStr)
 			if err2 != nil {
 				return err2
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgSetPaymentContractAuthorisation(
-				contractIdStr, authorised, sovrinDid)
+				contractIdStr, authorised, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -182,14 +182,14 @@ func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 func GetCmdGrantPaymentDiscount(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use: "grant-discount [payment-contract-id] [discount-id] " +
-			"[recipient-addr] [creator-sovrin-did]",
+			"[recipient-addr] [creator-ixo-did]",
 		Short: "Create and sign a grant-discount tx using DIDs",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contractIdStr := args[0]
 			discountIdStr := args[1]
 			recipientAddrStr := args[2]
-			sovrinDidStr := args[3]
+			ixoDidStr := args[3]
 
 			discountId, err := sdk.ParseUint(discountIdStr)
 			if err != nil {
@@ -201,73 +201,73 @@ func GetCmdGrantPaymentDiscount(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgGrantDiscount(
-				contractIdStr, discountId, recipientAddr, sovrinDid)
+				contractIdStr, discountId, recipientAddr, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
 
 func GetCmdRevokePaymentDiscount(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "revoke-discount [payment-contract-id] [holder-addr] [creator-sovrin-did]",
+		Use:   "revoke-discount [payment-contract-id] [holder-addr] [creator-ixo-did]",
 		Short: "Create and sign a revoke-discount tx using DIDs",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contractIdStr := args[0]
 			holderAddrStr := args[1]
-			sovrinDidStr := args[2]
+			ixoDidStr := args[2]
 
 			holderAddr, err := sdk.AccAddressFromBech32(holderAddrStr)
 			if err != nil {
 				return err
 			}
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgRevokeDiscount(
-				contractIdStr, holderAddr, sovrinDid)
+				contractIdStr, holderAddr, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
 
 func GetCmdEffectPayment(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "effect-payment [payment-contract-id] [creator-sovrin-did]",
+		Use:   "effect-payment [payment-contract-id] [creator-ixo-did]",
 		Short: "Create and sign a effect-payment tx using DIDs",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contractIdStr := args[0]
-			sovrinDidStr := args[1]
+			ixoDidStr := args[1]
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidStr)
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(did.DidToAddr(ixoDid.Did))
 
-			msg := types.NewMsgEffectPayment(contractIdStr, sovrinDid)
+			msg := types.NewMsgEffectPayment(contractIdStr, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }

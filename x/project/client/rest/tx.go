@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
@@ -39,7 +40,7 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		didDoc, err := sovrin.UnmarshalSovrinDid(didDocParam)
+		didDoc, err := did.UnmarshalIxoDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -65,10 +66,10 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 
 		senderDid := r.URL.Query().Get("senderDid")
 		status := r.URL.Query().Get("status")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 		mode := r.URL.Query().Get("mode")
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -93,9 +94,9 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 			Status: projectStatus,
 		}
 
-		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, sovrinDid)
+		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -116,7 +117,7 @@ func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		projectDidParam := r.URL.Query().Get("projectDid")
 		mode := r.URL.Query().Get("mode")
 
-		projectDid, err := sovrin.UnmarshalSovrinDid(projectDidParam)
+		projectDid, err := did.UnmarshalIxoDid(projectDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -154,10 +155,10 @@ func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		txHash := r.URL.Query().Get("txHash")
 		senderDid := r.URL.Query().Get("senderDid")
 		claimId := r.URL.Query().Get("claimId")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 		mode := r.URL.Query().Get("mode")
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -170,9 +171,9 @@ func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 
-		msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, sovrinDid)
+		msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -190,10 +191,10 @@ func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 		senderDid := r.URL.Query().Get("senderDid")
 		claimDid := r.URL.Query().Get("claimDid")
 		status := r.URL.Query().Get("status")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 		mode := r.URL.Query().Get("mode")
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -213,9 +214,9 @@ func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 			Status:  claimStatus,
 		}
 
-		msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, sovrinDid)
+		msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -233,7 +234,7 @@ func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		dataParam := r.URL.Query().Get("data")
 		mode := r.URL.Query().Get("mode")
 
-		senderDid, err := sovrin.UnmarshalSovrinDid(senderDidParam)
+		senderDid, err := did.UnmarshalIxoDid(senderDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))

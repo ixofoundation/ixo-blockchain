@@ -1,4 +1,4 @@
-package ixo
+package types
 
 import (
 	"bufio"
@@ -12,9 +12,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
+	"github.com/tendermint/ed25519"
 	"os"
+	"time"
 )
 
 var (
@@ -24,6 +26,19 @@ var (
 )
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
+
+func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
+	return func(ctx sdk.Context, msg IxoMsg) (pubKey [32]byte, res sdk.Result) {
+
+		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
+		if err != nil {
+			return pubKey, err.Result()
+		}
+
+		copy(pubKey[:], base58.Decode(signerDidDoc.GetPubKey()))
+		return pubKey, sdk.Result{}
+	}
+}
 
 func ProcessSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
 	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
@@ -65,7 +80,7 @@ func getSignBytes(chainID string, ixoTx IxoTx, acc auth.Account, genesis bool) [
 	)
 }
 
-func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
+func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
@@ -176,14 +191,14 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 }
 
 func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg,
-	sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+	ixoDid exported.IxoDid) (sdk.TxResponse, error) {
 	if len(msg.Msgs) != 1 {
 		panic("expected one message")
 	}
 
 	privKey := [64]byte{}
-	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+	copy(privKey[:], base58.Decode(ixoDid.Secret.SignKey))
+	copy(privKey[32:], base58.Decode(ixoDid.VerifyKey))
 
 	signature := SignIxoMessage(msg.Bytes(), privKey)
 	tx := NewIxoTxSingleMsg(msg.Msgs[0], msg.Fee, signature, msg.Memo)
@@ -258,7 +273,7 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, chainId string) (a
 	return signMsg.Fee, nil
 }
 
-func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
+func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) error {
 	txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
 	if err != nil {
 		return err
@@ -314,7 +329,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, ixoDid)
 	if err != nil {
 		return err
 	}
@@ -324,7 +339,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	return nil
 }
 
-func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
+func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) ([]byte, error) {
 
 	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
@@ -344,7 +359,7 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid so
 	}
 
 	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, ixoDid)
 	if err != nil {
 		return nil, err
 	}
@@ -356,6 +371,23 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid so
 	return output, nil
 }
 
-func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext, msg auth.StdSignMsg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
-	return signAndBroadcast(cliCtx, msg, sovrinDid)
+func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext,
+	msg auth.StdSignMsg, ixoDid exported.IxoDid) (sdk.TxResponse, error) {
+	return signAndBroadcast(cliCtx, msg, ixoDid)
+}
+
+func SignIxoMessage(signBytes []byte, privKey [64]byte) IxoSignature {
+
+	signatureBytes := ed25519.Sign(&privKey, signBytes)
+	signature := *signatureBytes
+
+	return NewIxoSignature(time.Now(), signature)
+}
+
+func VerifySignature(signBytes []byte, publicKey [32]byte, sig IxoSignature) bool {
+	result := ed25519.Verify(&publicKey, signBytes, &sig.SignatureValue)
+	if !result {
+		fmt.Println("******* VERIFY_MSG: Failed ******* ")
+	}
+	return result
 }

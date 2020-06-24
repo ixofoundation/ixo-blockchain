@@ -39,8 +39,8 @@ var (
 
 type MsgCreateProject struct {
 	TxHash     string     `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did    `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did    `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did    `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did    `json:"projectDid" yaml:"projectDid"`
 	PubKey     string     `json:"pubKey" yaml:"pubKey"`
 	Data       ProjectDoc `json:"data" yaml:"data"`
 }
@@ -81,20 +81,20 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateProject) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateProject) GetSenderDid() ixo.Did  { return msg.SenderDid }
-func (msg MsgCreateProject) GetSignerDid() ixo.Did  { return msg.ProjectDid }
+func (msg MsgCreateProject) GetProjectDid() did.Did { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSenderDid() did.Did  { return msg.SenderDid }
+func (msg MsgCreateProject) GetSignerDid() did.Did  { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateProject) String() string {
@@ -122,8 +122,8 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 
 type MsgUpdateProjectStatus struct {
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did                `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did                `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
@@ -141,9 +141,9 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type UpdateProjectStatusDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
@@ -160,15 +160,15 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	}
 }
 
-func (msg MsgUpdateProjectStatus) GetSignerDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 type MsgCreateAgent struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       CreateAgentDoc `json:"data" yaml:"data"`
 }
 
@@ -185,20 +185,20 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type CreateAgentDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.AgentDid) {
+	} else if !did.IsValidDid(msg.Data.AgentDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateAgent) GetSignerDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
@@ -219,8 +219,8 @@ func (msg MsgCreateAgent) String() string {
 
 type MsgUpdateAgent struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
@@ -237,20 +237,20 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type UpdateAgentDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.Did) {
+	} else if !did.IsValidDid(msg.Data.Did) {
 		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgUpdateAgent) GetSignerDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgUpdateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
@@ -272,8 +272,8 @@ func (msg MsgUpdateAgent) String() string {
 
 type MsgCreateClaim struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
@@ -291,18 +291,18 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type CreateClaimDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateClaim) GetSignerDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateClaim) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
@@ -324,8 +324,8 @@ func (msg MsgCreateClaim) String() string {
 
 type MsgCreateEvaluation struct {
 	TxHash     string              `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did             `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did             `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did             `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did             `json:"projectDid" yaml:"projectDid"`
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
@@ -343,18 +343,18 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type CreateEvaluationDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateEvaluation) GetSignerDid() ixo.Did { return msg.ProjectDid }
+func (msg MsgCreateEvaluation) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
@@ -375,7 +375,7 @@ func (msg MsgCreateEvaluation) String() string {
 }
 
 type MsgWithdrawFunds struct {
-	SenderDid ixo.Did          `json:"senderDid" yaml:"senderDid"`
+	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
@@ -395,11 +395,11 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type WithdrawFundsDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.SenderDid) {
+	if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.ProjectDid) {
+	} else if !did.IsValidDid(msg.Data.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.RecipientDid) {
+	} else if !did.IsValidDid(msg.Data.RecipientDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "recipient did is invalid")
 	}
 
@@ -416,9 +416,9 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSignerDid() ixo.Did { return msg.Data.RecipientDid }
+func (msg MsgWithdrawFunds) GetSignerDid() did.Did { return msg.Data.RecipientDid }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {

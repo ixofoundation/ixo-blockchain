@@ -10,25 +10,24 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "add-did-doc [sovrin-did]",
-		Short: "Add a new SovrinDid",
+		Use:   "add-did-doc [ixo-did]",
+		Short: "Add a new IxoDid",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[0])
+			ixoDid, err := types.UnmarshalIxoDid(args[0])
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(types.DidToAddr(ixoDid.Did))
 
-			msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -41,7 +40,7 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			didAddr := args[0]
 
-			sovrinDid, err := sovrin.UnmarshalSovrinDid(args[1])
+			ixoDid, err := types.UnmarshalIxoDid(args[1])
 			if err != nil {
 				return err
 			}
@@ -52,10 +51,10 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sovrinDid.Did))
+				WithFromAddress(types.DidToAddr(ixoDid.Did))
 
-			msg := types.NewMsgAddCredential(didAddr, credTypes, sovrinDid.Did, issued)
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sovrinDid)
+			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
+			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
 		},
 	}
 }

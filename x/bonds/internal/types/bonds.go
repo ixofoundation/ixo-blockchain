@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"sort"
 )
 
@@ -94,7 +94,7 @@ type Bond struct {
 	Token                  string         `json:"token" yaml:"token"`
 	Name                   string         `json:"name" yaml:"name"`
 	Description            string         `json:"description" yaml:"description"`
-	CreatorDid             ixo.Did        `json:"creator_did" yaml:"creator_did"`
+	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
 	FunctionType           string         `json:"function_type" yaml:"function_type"`
 	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
 	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
@@ -109,16 +109,15 @@ type Bond struct {
 	CurrentSupply          sdk.Coin       `json:"current_supply" yaml:"current_supply"`
 	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
-	CreatorPubKey          string         `json:"pub_key" yaml:"pub_key"`
+	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewBond(token, name, description string, creatorDid ixo.Did,
-	creatorPubKey, functionType string, functionParameters FunctionParams,
+func NewBond(token, name, description string, creatorDid did.Did,
+	functionType string, functionParameters FunctionParams,
 	reserveTokens []string, reserveAdddress sdk.AccAddress, txFeePercentage,
 	exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSells string, batchBlocks sdk.Uint, bondDid ixo.Did) Bond {
+	allowSells string, batchBlocks sdk.Uint, bondDid did.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -129,7 +128,6 @@ func NewBond(token, name, description string, creatorDid ixo.Did,
 		Name:                   name,
 		Description:            description,
 		CreatorDid:             creatorDid,
-		CreatorPubKey:          creatorPubKey,
 		FunctionType:           functionType,
 		FunctionParameters:     functionParameters,
 		ReserveTokens:          reserveTokens,

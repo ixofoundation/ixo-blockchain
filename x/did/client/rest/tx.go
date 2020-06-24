@@ -12,7 +12,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -28,16 +27,16 @@ func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		mode := r.URL.Query().Get("mode")
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(didDocParam)
+		ixoDid, err := types.UnmarshalIxoDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgAddDid(sovrinDid.Did, sovrinDid.VerifyKey)
+		msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -65,7 +64,7 @@ func addCredentialRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(didDocParam)
+		ixoDid, err := types.UnmarshalIxoDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -77,9 +76,9 @@ func addCredentialRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		credTypes := []string{"Credential", "ProofOfKYC"}
 
-		msg := types.NewMsgAddCredential(did, credTypes, sovrinDid.Did, issued)
+		msg := types.NewMsgAddCredential(did, credTypes, ixoDid.Did, issued)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

@@ -15,15 +15,13 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 		switch msg := msg.(type) {
 		case types.MsgAddDid:
 			copy(pubKey[:], base58.Decode(msg.DidDoc.PubKey))
-		case types.MsgAddCredential:
-			did := msg.GetSignerDid()
-			didDoc, _ := keeper.GetDidDoc(ctx, did)
+		default:
+			// For the remaining messages, the did is the signer
+			didDoc, _ := keeper.GetDidDoc(ctx, msg.GetSignerDid())
 			if didDoc == nil {
 				return pubKey, sdk.ErrUnauthorized("Issuer did not found").Result()
 			}
 			copy(pubKey[:], base58.Decode(didDoc.GetPubKey()))
-		default:
-			return pubKey, sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 		return pubKey, sdk.Result{}
 	}
