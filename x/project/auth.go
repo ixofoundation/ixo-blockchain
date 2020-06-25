@@ -9,32 +9,34 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/tendermint/tendermint/crypto"
+	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
 
 		// Get signer PubKey
-		var pubKey [32]byte
+		var pubKeyRaw [32]byte
 		switch msg := msg.(type) {
 		case MsgCreateProject:
-			copy(pubKey[:], base58.Decode(msg.GetPubKey()))
+			copy(pubKeyRaw[:], base58.Decode(msg.GetPubKey()))
 		case MsgWithdrawFunds:
 			signerDid := msg.GetSignerDid()
 			signerDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
 			if signerDoc == nil {
 				return pubKey, sdk.ErrUnauthorized("signer did not found").Result()
 			}
-			copy(pubKey[:], base58.Decode(signerDoc.GetPubKey()))
+			copy(pubKeyRaw[:], base58.Decode(signerDoc.GetPubKey()))
 		default:
 			// For the remaining messages, the project is the signer
 			projectDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
 			if err != nil {
 				return pubKey, sdk.ErrInternal("project did not found").Result()
 			}
-			copy(pubKey[:], base58.Decode(projectDoc.GetPubKey()))
+			copy(pubKeyRaw[:], base58.Decode(projectDoc.GetPubKey()))
 		}
-		return pubKey, sdk.Result{}
+		return ed25519Keys.PubKeyEd25519(pubKeyRaw), sdk.Result{}
 	}
 }
 
@@ -180,10 +182,10 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		}
 
 		// check signature, return account with incremented nonce
-		ixoSig := ixoTx.GetSignatures()[0]
+		ixoSig := auth.StdSignature{PubKey: pubKey, Signature: ixoTx.GetSignatures()[0].SignatureValue[:]}
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
-		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
+		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}

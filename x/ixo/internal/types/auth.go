@@ -15,6 +15,8 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
 	"github.com/tendermint/ed25519"
+	"github.com/tendermint/tendermint/crypto"
+	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
 	"os"
 	"time"
 )
@@ -25,23 +27,69 @@ var (
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 )
 
-type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
+type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, sdk.Result)
 
 func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
-	return func(ctx sdk.Context, msg IxoMsg) (pubKey [32]byte, res sdk.Result) {
+	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
 
 		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
 		if err != nil {
 			return pubKey, err.Result()
 		}
 
-		copy(pubKey[:], base58.Decode(signerDidDoc.GetPubKey()))
-		return pubKey, sdk.Result{}
+		var pubKeyRaw [32]byte
+		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
+		return ed25519Keys.PubKeyEd25519(pubKeyRaw), sdk.Result{}
 	}
 }
 
-func ProcessSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
-	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
+// ProcessPubKey verifies that the given account address matches that of the
+// IxoSignature. In addition, it will set the public key of the account if it
+// has not been set.
+func processPubKey(acc auth.Account, pubKey crypto.PubKey, simulate bool) (crypto.PubKey, sdk.Result) {
+	// If pubkey is not known for account, set it from the StdSignature.
+	accPubKey := acc.GetPubKey()
+	if simulate {
+		// In simulate mode the transaction comes with no signatures, thus if the
+		// account's pubkey is nil, both signature verification and gasKVStore.Set()
+		// shall consume enough gas to process an ed25519 pubkey
+		if accPubKey == nil {
+			return ed25519Keys.PubKeyEd25519{}, sdk.Result{}
+		}
+
+		return accPubKey, sdk.Result{}
+	}
+
+	if accPubKey == nil {
+		accPubKey = pubKey
+		if accPubKey == nil {
+			return nil, sdk.ErrInvalidPubKey("PubKey not found").Result()
+		}
+
+		// TODO: uncomment as soon as this is true for pubkeys and accounts
+		// Note: once the below is uncommented, this function can actually be
+		//       removed and replaced by use of the same one in Cosmos SDK
+		//if !bytes.Equal(accPubKey.Address(), acc.GetAddress()) {
+		//	return nil, sdk.ErrInvalidPubKey(
+		//		fmt.Sprintf("PubKey does not match Signer address %s", acc.GetAddress())).Result()
+		//}
+	}
+
+	return accPubKey, sdk.Result{}
+}
+
+func ProcessSig(ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBytes []byte,
+	simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
+
+	pubKey, res := processPubKey(acc, sig.PubKey, simulate)
+	if !res.IsOK() {
+		return nil, res
+	}
+
+	err := acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, sdk.ErrInternal("setting PubKey on signer's account").Result()
+	}
 
 	if simulate {
 		// Simulated txs should not contain a signature and are not required to
@@ -58,7 +106,7 @@ func ProcessSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]
 	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 
 	// Verify signature
-	if !simulate && !VerifySignature(signBytes, pubKey, sig) {
+	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
 		return nil, sdk.ErrUnauthorized("Signature Verification failed").Result()
 	}
 
@@ -176,10 +224,10 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 		}
 
 		// check signature, return account with incremented nonce
-		ixoSig := ixoTx.GetSignatures()[0]
+		ixoSig := auth.StdSignature{PubKey: pubKey, Signature: ixoTx.GetSignatures()[0].SignatureValue[:]}
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
-		signerAcc, res = ProcessSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
+		signerAcc, res = ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -382,12 +430,4 @@ func SignIxoMessage(signBytes []byte, privKey [64]byte) IxoSignature {
 	signature := *signatureBytes
 
 	return NewIxoSignature(time.Now(), signature)
-}
-
-func VerifySignature(signBytes []byte, publicKey [32]byte, sig IxoSignature) bool {
-	result := ed25519.Verify(&publicKey, signBytes, &sig.SignatureValue)
-	if !result {
-		fmt.Println("******* VERIFY_MSG: Failed ******* ")
-	}
-	return result
 }

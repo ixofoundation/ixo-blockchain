@@ -86,6 +86,10 @@ func UnmarshalIxoDid(jsonIxoDid string) (exported.IxoDid, error) {
 }
 
 func DidToAddr(did exported.Did) sdk.AccAddress {
+	// TODO: pubkey-to-addr instead of did-to-addr
+	//var pubKey ed25519Keys.PubKeyEd25519
+	//copy(pubKey[:], base58.Decode(pubKeyStr))
+	//return sdk.AccAddress(pubKey.Address())
 	return StringToAddr(did)
 }
 

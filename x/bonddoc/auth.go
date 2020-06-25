@@ -3,27 +3,29 @@ package bonddoc
 import (
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto"
+	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
 
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) ([32]byte, sdk.Result) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
 
 		// Get signer PubKey
-		var pubKey [32]byte
+		var pubKeyRaw [32]byte
 		switch msg := msg.(type) {
 		case types.MsgCreateBond:
-			copy(pubKey[:], base58.Decode(msg.GetPubKey()))
+			copy(pubKeyRaw[:], base58.Decode(msg.GetPubKey()))
 		default:
 			// For the remaining messages, the bond is the signer
 			bondDoc, err := keeper.GetBondDoc(ctx, msg.GetSignerDid())
 			if err != nil {
 				return pubKey, sdk.ErrInternal("bond did not found").Result()
 			}
-			copy(pubKey[:], base58.Decode(bondDoc.GetPubKey()))
+			copy(pubKeyRaw[:], base58.Decode(bondDoc.GetPubKey()))
 		}
-		return pubKey, sdk.Result{}
+		return ed25519Keys.PubKeyEd25519(pubKeyRaw), sdk.Result{}
 	}
 }
