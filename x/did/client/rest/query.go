@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +11,6 @@ import (
 	rest "github.com/ixofoundation/ixo-blockchain/client"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -27,13 +27,13 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 
-		if !ixo.IsValidDid(vars["did"]) {
+		if !types.IsValidDid(vars["did"]) {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("input is not a valid did"))
 			return
 		}
 
-		accAddress := ixo.DidToAddr(vars["did"])
+		accAddress := types.DidToAddr(vars["did"])
 
 		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
 	}
@@ -45,7 +45,7 @@ func queryDidDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
-		key := ixo.Did(didAddr)
+		key := exported.Did(didAddr)
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryDidDoc, key), nil)
 		if err != nil {
@@ -83,7 +83,7 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var dids []ixo.Did
+		var dids []exported.Did
 		cliCtx.Codec.MustUnmarshalJSON(res, &dids)
 
 		rest.PostProcessResponse(w, cliCtx.Codec, dids, true)

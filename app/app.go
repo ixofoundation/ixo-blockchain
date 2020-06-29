@@ -294,27 +294,22 @@ func (app *ixoApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList
 }
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
+
+	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
 	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
 	bonddocPubKeyGetter := bonddoc.GetPubKeyGetter(app.bonddocKeeper)
-	bondsPubKeyGetter := bonds.GetPubKeyGetter(app.bondsKeeper, app.didKeeper)
-	treasuryPubKeyGetter := treasury.GetPubKeyGetter(app.didKeeper)
-	paymentsPubKeyGetter := payments.GetPubKeyGetter(app.didKeeper)
 
+	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
+		app.accountKeeper, app.supplyKeeper, defaultPubKeyGetter)
+	didAnteHandler := ixo.NewDefaultAnteHandler(
+		app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
+	projectAnteHandler := ixo.NewDefaultAnteHandler(
+		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
+	bonddocAnteHandler := ixo.NewDefaultAnteHandler(
+		app.accountKeeper, app.supplyKeeper, bonddocPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
-	didAnteHandler := ixo.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
-	projectAnteHandler := ixo.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
-	bonddocAnteHandler := ixo.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, bonddocPubKeyGetter)
-	bondsAnteHandler := ixo.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, bondsPubKeyGetter)
-	treasuryAnteHandler := ixo.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, treasuryPubKeyGetter)
-	paymentsAnteHandler := ixo.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, paymentsPubKeyGetter)
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper, projectPubKeyGetter)
@@ -334,11 +329,11 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		case bonddoc.RouterKey:
 			return bonddocAnteHandler(ctx, tx, simulate)
 		case bonds.RouterKey:
-			return bondsAnteHandler(ctx, tx, simulate)
+			return defaultIxoAnteHandler(ctx, tx, simulate)
 		case treasury.RouterKey:
-			return treasuryAnteHandler(ctx, tx, simulate)
+			return defaultIxoAnteHandler(ctx, tx, simulate)
 		case payments.RouterKey:
-			return paymentsAnteHandler(ctx, tx, simulate)
+			return defaultIxoAnteHandler(ctx, tx, simulate)
 		default:
 			return cosmosAnteHandler(ctx, tx, simulate)
 		}

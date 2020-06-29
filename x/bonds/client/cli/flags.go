@@ -50,7 +50,7 @@ func init() {
 	fsBondCreate.String(FlagSanityMarginPercentage, "", "For swappers, this is the acceptable deviation from the sanity rate")
 	fsBondCreate.String(FlagAllowSells, "", "Whether or not sells will be allowed")
 	fsBondCreate.String(FlagBatchBlocks, "", "The duration in terms of blocks of each orders batch")
-	fsBondCreate.String(FlagBondDid, "", "Bond's Sovrin DID")
+	fsBondCreate.String(FlagBondDid, "", "Bond's DID")
 	fsBondCreate.String(FlagCreatorDid, "", "Bond creator's DID")
 
 	fsBondEdit.String(FlagName, types.DoNotModifyField, "The bond's name")
@@ -58,6 +58,6 @@ func init() {
 	fsBondEdit.String(FlagOrderQuantityLimits, types.DoNotModifyField, "The max number of tokens bought/sold/swapped per order")
 	fsBondEdit.String(FlagSanityRate, types.DoNotModifyField, "For swappers, this is the typical t1 per t2 rate")
 	fsBondEdit.String(FlagSanityMarginPercentage, types.DoNotModifyField, "For swappers, this is the acceptable deviation from the sanity rate")
-	fsBondEdit.String(FlagBondDid, "", "Bond's Sovrin DID")
+	fsBondEdit.String(FlagBondDid, "", "Bond's DID")
 	fsBondEdit.String(FlagEditorDid, "", "Bond editor's DID")
 }

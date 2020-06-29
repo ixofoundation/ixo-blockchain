@@ -1,7 +1,8 @@
-package ixo
+package types
 
 import (
 	"bufio"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
@@ -12,38 +13,127 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
+	"github.com/tendermint/ed25519"
+	"github.com/tendermint/tendermint/crypto"
+	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/tendermint/tendermint/crypto/multisig"
 	"os"
+	"time"
 )
 
 var (
 	expectedMinGasPrices       = "0.025" + IxoNativeToken
 	approximationGasAdjustment = float64(1.5)
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
+
+	// simulation signature values used to estimate gas consumption
+	simEd25519Pubkey ed25519Keys.PubKeyEd25519
+	simEd25519Sig    [32]byte
 )
 
-type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) ([32]byte, sdk.Result)
+func init() {
+	// This decodes a valid hex string into a ed25519Pubkey for use in transaction simulation
+	bz, _ := hex.DecodeString("035AD6810A47F073553FF30D2FCC7E0D3B1C0B74B61A1AAA2582344037151E14")
+	copy(simEd25519Pubkey[:], bz)
+}
 
-func ProcessSig(ctx sdk.Context, acc auth.Account, signBytes []byte, pubKey [32]byte,
-	sig IxoSignature, simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
+type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, sdk.Result)
+
+func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
+	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
+
+		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
+		if err != nil {
+			return pubKey, err.Result()
+		}
+
+		var pubKeyRaw [ed25519.PublicKeySize]byte
+		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
+		return ed25519Keys.PubKeyEd25519(pubKeyRaw), sdk.Result{}
+	}
+}
+
+// ProcessPubKey verifies that the given account address matches that of the
+// IxoSignature. In addition, it will set the public key of the account if it
+// has not been set.
+func processPubKey(acc auth.Account, pubKey crypto.PubKey, simulate bool) (crypto.PubKey, sdk.Result) {
+	// If pubkey is not known for account, set it from the StdSignature.
+	accPubKey := acc.GetPubKey()
+	if simulate {
+		// In simulate mode the transaction comes with no signatures, thus if the
+		// account's pubkey is nil, both signature verification and gasKVStore.Set()
+		// shall consume enough gas to process an ed25519 pubkey
+		if accPubKey == nil {
+			return simEd25519Pubkey, sdk.Result{}
+		}
+
+		return accPubKey, sdk.Result{}
+	}
+
+	if accPubKey == nil {
+		accPubKey = pubKey
+		if accPubKey == nil {
+			return nil, sdk.ErrInvalidPubKey("PubKey not found").Result()
+		}
+
+		// TODO: uncomment as soon as this is true for pubkeys and accounts
+		// Note: once the below is uncommented, this function can actually be
+		//       removed and replaced by use of the same one in Cosmos SDK
+		//if !bytes.Equal(accPubKey.Address(), acc.GetAddress()) {
+		//	return nil, sdk.ErrInvalidPubKey(
+		//		fmt.Sprintf("PubKey does not match Signer address %s", acc.GetAddress())).Result()
+		//}
+	}
+
+	return accPubKey, sdk.Result{}
+}
+
+func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdSignature, params auth.Params) {
+	simSig := IxoSignature{}
+	if len(sig.Signature) == 0 {
+		simSig.SignatureValue = simEd25519Sig[:]
+	}
+	simSig.Created = simSig.Created.Add(1) // maximizes signature length
+
+	sigBz := ModuleCdc.MustMarshalBinaryLengthPrefixed(simSig)
+	cost := sdk.Gas(len(sigBz) + 6)
+
+	// If the pubkey is a multi-signature pubkey, then we estimate for the maximum
+	// number of signers.
+	if _, ok := pubkey.(multisig.PubKeyMultisigThreshold); ok {
+		cost *= params.TxSigLimit
+	}
+
+	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
+}
+
+func ProcessSig(ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBytes []byte,
+	simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
+
+	pubKey, res := processPubKey(acc, sig.PubKey, simulate)
+	if !res.IsOK() {
+		return nil, res
+	}
+
+	err := acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, sdk.ErrInternal("setting PubKey on signer's account").Result()
+	}
 
 	if simulate {
 		// Simulated txs should not contain a signature and are not required to
 		// contain a pubkey, so we must account for tx size of including an
-		// IxoSignature and simulate gas consumption (assuming ED25519 key).
-		//consumeSimSigGas(ctx.GasMeter(), sig, params)
-
-		// NOTE: this is not the case in the ixo blockchain. The IxoSignature
-		// will be blank but still count towards the transaction size given
-		// that it uses a fixed length byte array [64]byte as the sig value.
+		// IxoSignature and simulate gas consumption (assuming an ED25519 key).
+		consumeSimSigGas(ctx.GasMeter(), pubKey, sig, params)
 	}
 
 	// Consume signature gas
 	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 
 	// Verify signature
-	if !simulate && !VerifySignature(signBytes, pubKey, sig) {
+	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
 		return nil, sdk.ErrUnauthorized("Signature Verification failed").Result()
 	}
 
@@ -65,7 +155,7 @@ func getSignBytes(chainID string, ixoTx IxoTx, acc auth.Account, genesis bool) [
 	)
 }
 
-func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
+func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
@@ -161,10 +251,10 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 		}
 
 		// check signature, return account with incremented nonce
-		ixoSig := ixoTx.GetSignatures()[0]
+		ixoSig := auth.StdSignature{PubKey: pubKey, Signature: ixoTx.GetSignatures()[0].SignatureValue[:]}
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
-		signerAcc, res = ProcessSig(newCtx, signerAcc, signBytes, pubKey, ixoSig, simulate, params)
+		signerAcc, res = ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
 		}
@@ -176,14 +266,14 @@ func NewAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKey
 }
 
 func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg,
-	sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
+	ixoDid exported.IxoDid) (sdk.TxResponse, error) {
 	if len(msg.Msgs) != 1 {
 		panic("expected one message")
 	}
 
-	privKey := [64]byte{}
-	copy(privKey[:], base58.Decode(sovrinDid.Secret.SignKey))
-	copy(privKey[32:], base58.Decode(sovrinDid.VerifyKey))
+	var privKey ed25519Keys.PrivKeyEd25519
+	copy(privKey[:], base58.Decode(ixoDid.Secret.SignKey))
+	copy(privKey[32:], base58.Decode(ixoDid.VerifyKey))
 
 	signature := SignIxoMessage(msg.Bytes(), privKey)
 	tx := NewIxoTxSingleMsg(msg.Msgs[0], msg.Fee, signature, msg.Memo)
@@ -210,7 +300,6 @@ func simulateMsgs(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.M
 
 	// Signature set to a blank signature
 	signature := IxoSignature{}
-	signature.Created = signature.Created.Add(1) // maximizes signature length
 	tx := NewIxoTxSingleMsg(
 		stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
@@ -258,16 +347,26 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, chainId string) (a
 	return signMsg.Fee, nil
 }
 
-func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) error {
-	txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+func GenerateOrBroadcastMsgs(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) error {
+	msgs := []sdk.Msg{msg}
+	txBldr := auth.NewTxBuilderFromCLI()
+
+	if cliCtx.GenerateOnly {
+		return utils.PrintUnsignedStdTx(txBldr, cliCtx, msgs)
+	}
+
+	return CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs, ixoDid)
+}
+
+func CompleteAndBroadcastTxCLI(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.Msg, ixoDid exported.IxoDid) error {
+	txBldr, err := utils.PrepareTxBuilder(txBldr, cliCtx)
 	if err != nil {
 		return err
 	}
 
-	msgs := []sdk.Msg{msg}
+	//fromName := cliCtx.GetFromName()
 
 	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
-		var err error // important so that enrichWithGas overwrites txBldr
 		txBldr, err = enrichWithGas(txBldr, cliCtx, msgs)
 		if err != nil {
 			return err
@@ -307,14 +406,19 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 		}
 	}
 
+	//passphrase, err := keys.GetPassphrase(fromName)
+	//if err != nil {
+	//	return err
+	//}
+
 	// Build the transaction
 	stdSignMsg, err := txBldr.BuildSignMsg(msgs)
 	if err != nil {
 		return err
 	}
 
-	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
+	// Sign and broadcast to a Tendermint node
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, ixoDid)
 	if err != nil {
 		return err
 	}
@@ -324,7 +428,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sov
 	return nil
 }
 
-func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid sovrin.SovrinDid) ([]byte, error) {
+func CompleteAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) ([]byte, error) {
 
 	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
@@ -343,8 +447,8 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid so
 		Memo: "",
 	}
 
-	// Sign and broadcast
-	res, err := signAndBroadcast(cliCtx, stdSignMsg, sovrinDid)
+	// Sign and broadcast to a Tendermint node
+	res, err := signAndBroadcast(cliCtx, stdSignMsg, ixoDid)
 	if err != nil {
 		return nil, err
 	}
@@ -356,6 +460,12 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, sovrinDid so
 	return output, nil
 }
 
-func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext, msg auth.StdSignMsg, sovrinDid sovrin.SovrinDid) (sdk.TxResponse, error) {
-	return signAndBroadcast(cliCtx, msg, sovrinDid)
+func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext,
+	msg auth.StdSignMsg, ixoDid exported.IxoDid) (sdk.TxResponse, error) {
+	return signAndBroadcast(cliCtx, msg, ixoDid)
+}
+
+func SignIxoMessage(signBytes []byte, privKey [ed25519.PrivateKeySize]byte) IxoSignature {
+	signatureBytes := ed25519.Sign(&privKey, signBytes)
+	return NewIxoSignature(time.Now(), (*signatureBytes)[:])
 }

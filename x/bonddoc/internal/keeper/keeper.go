@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type Keeper struct {
@@ -38,12 +37,12 @@ func (k Keeper) MustGetBondDocByKey(ctx sdk.Context, key []byte) types.StoredBon
 	return &bondDoc
 }
 
-func (k Keeper) BondDocExists(ctx sdk.Context, bondDid ixo.Did) bool {
+func (k Keeper) BondDocExists(ctx sdk.Context, bondDid did.Did) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetBondPrefixKey(bondDid))
 }
 
-func (k Keeper) GetBondDoc(ctx sdk.Context, bondDid ixo.Did) (types.StoredBondDoc, sdk.Error) {
+func (k Keeper) GetBondDoc(ctx sdk.Context, bondDid did.Did) (types.StoredBondDoc, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetBondPrefixKey(bondDid)
 

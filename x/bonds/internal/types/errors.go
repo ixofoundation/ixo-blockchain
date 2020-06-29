@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"strings"
 )
 
@@ -98,12 +98,12 @@ func ErrIncorrectNumberOfFunctionParameters(codespace sdk.CodespaceType, expecte
 	return sdk.NewError(codespace, CodeIncorrectNumberOfValues, errMsg)
 }
 
-func ErrBondDoesNotExist(codespace sdk.CodespaceType, bondDid ixo.Did) sdk.Error {
+func ErrBondDoesNotExist(codespace sdk.CodespaceType, bondDid did.Did) sdk.Error {
 	errMsg := fmt.Sprintf("Bond '%s' does not exist", bondDid)
 	return sdk.NewError(codespace, CodeBondDoesNotExist, errMsg)
 }
 
-func ErrBondAlreadyExists(codespace sdk.CodespaceType, bondDid ixo.Did) sdk.Error {
+func ErrBondAlreadyExists(codespace sdk.CodespaceType, bondDid did.Did) sdk.Error {
 	errMsg := fmt.Sprintf("Bond '%s' already exists", bondDid)
 	return sdk.NewError(codespace, CodeBondAlreadyExists, errMsg)
 }

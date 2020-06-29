@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -23,7 +23,7 @@ func queryBondDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 
-		key := ixo.Did(didAddr)
+		key := did.Did(didAddr)
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryBondDoc, key), nil)
 		if err != nil {

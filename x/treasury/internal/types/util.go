@@ -2,26 +2,22 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"strings"
-
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 )
 
-func NewMsgSend(toDid ixo.Did, amount sdk.Coins, senderDid sovrin.SovrinDid) MsgSend {
+func NewMsgSend(toDid did.Did, amount sdk.Coins, senderDid did.Did) MsgSend {
 	return MsgSend{
-		PubKey:  senderDid.VerifyKey,
-		FromDid: senderDid.Did,
+		FromDid: senderDid,
 		ToDid:   toDid,
 		Amount:  amount,
 	}
 }
 
-func NewMsgOracleTransfer(fromDid, toDid ixo.Did, amount sdk.Coins,
-	oracleDid sovrin.SovrinDid, proof string) MsgOracleTransfer {
+func NewMsgOracleTransfer(fromDid, toDid did.Did, amount sdk.Coins,
+	oracleDid did.Did, proof string) MsgOracleTransfer {
 	return MsgOracleTransfer{
-		PubKey:    oracleDid.VerifyKey,
-		OracleDid: oracleDid.Did,
+		OracleDid: oracleDid,
 		FromDid:   fromDid,
 		ToDid:     toDid,
 		Amount:    amount,
@@ -29,22 +25,20 @@ func NewMsgOracleTransfer(fromDid, toDid ixo.Did, amount sdk.Coins,
 	}
 }
 
-func NewMsgOracleMint(toDid ixo.Did, amount sdk.Coins,
-	oracleDid sovrin.SovrinDid, proof string) MsgOracleMint {
+func NewMsgOracleMint(toDid did.Did, amount sdk.Coins,
+	oracleDid did.Did, proof string) MsgOracleMint {
 	return MsgOracleMint{
-		PubKey:    oracleDid.VerifyKey,
-		OracleDid: oracleDid.Did,
+		OracleDid: oracleDid,
 		ToDid:     toDid,
 		Amount:    amount,
 		Proof:     proof,
 	}
 }
 
-func NewMsgOracleBurn(fromDid ixo.Did, amount sdk.Coins,
-	oracleDid sovrin.SovrinDid, proof string) MsgOracleBurn {
+func NewMsgOracleBurn(fromDid did.Did, amount sdk.Coins,
+	oracleDid did.Did, proof string) MsgOracleBurn {
 	return MsgOracleBurn{
-		PubKey:    oracleDid.VerifyKey,
-		OracleDid: oracleDid.Did,
+		OracleDid: oracleDid,
 		FromDid:   fromDid,
 		Amount:    amount,
 		Proof:     proof,

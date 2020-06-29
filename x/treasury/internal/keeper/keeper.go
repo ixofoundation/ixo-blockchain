@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
@@ -31,9 +31,9 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper bank.Keeper,
 	}
 }
 
-func (k Keeper) Send(ctx sdk.Context, fromDid, toDid ixo.Did, amount sdk.Coins) sdk.Error {
-	fromAddress := ixo.DidToAddr(fromDid)
-	toAddress := ixo.DidToAddr(toDid)
+func (k Keeper) Send(ctx sdk.Context, fromDid, toDid did.Did, amount sdk.Coins) sdk.Error {
+	fromAddress := did.DidToAddr(fromDid)
+	toAddress := did.DidToAddr(toDid)
 
 	err := k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, amount)
 	if err != nil {
@@ -43,7 +43,7 @@ func (k Keeper) Send(ctx sdk.Context, fromDid, toDid ixo.Did, amount sdk.Coins) 
 	return nil
 }
 
-func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid ixo.Did, amount sdk.Coins) sdk.Error {
+func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid did.Did, amount sdk.Coins) sdk.Error {
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -70,8 +70,8 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid ixo.Di
 	return k.Send(ctx, fromDid, toDid, amount)
 }
 
-func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid ixo.Did, amount sdk.Coins) sdk.Error {
-	toAddress := ixo.DidToAddr(toDid)
+func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid did.Did, amount sdk.Coins) sdk.Error {
+	toAddress := did.DidToAddr(toDid)
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -110,8 +110,8 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid ixo.Did, amount sdk
 	return nil
 }
 
-func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid ixo.Did, amount sdk.Coins) sdk.Error {
-	fromAddress := ixo.DidToAddr(fromDid)
+func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount sdk.Coins) sdk.Error {
+	fromAddress := did.DidToAddr(fromDid)
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {

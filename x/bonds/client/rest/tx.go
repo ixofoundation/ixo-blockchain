@@ -7,8 +7,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+
 	"net/http"
 	"strings"
 )
@@ -144,20 +145,20 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse creator's sovrin DID
-		creatorDid, err2 := sovrin.UnmarshalSovrinDid(req.CreatorDid)
+		// Parse creator's ixo DID
+		creatorDid, err2 := did.UnmarshalIxoDid(req.CreatorDid)
 		if err2 != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			creatorDid, req.FunctionType, functionParams, reserveTokens,
+			creatorDid.Did, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
 			req.AllowSells, batchBlocks, req.BondDid)
 
-		output, err2 := ixo.SignAndBroadcastTxRest(cliCtx, msg, creatorDid)
+		output, err2 := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, creatorDid)
 		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err2.Error()))
@@ -194,8 +195,8 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse editor's sovrin DID
-		editorDid, err := sovrin.UnmarshalSovrinDid(req.EditorDid)
+		// Parse editor's ixo DID
+		editorDid, err := did.UnmarshalIxoDid(req.EditorDid)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -203,9 +204,9 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, editorDid, req.BondDid)
+			req.SanityMarginPercentage, editorDid.Did, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, editorDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, editorDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -251,16 +252,16 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse buyer's sovrin DID
-		buyerDid, err := sovrin.UnmarshalSovrinDid(req.BuyerDid)
+		// Parse buyer's ixo DID
+		buyerDid, err := did.UnmarshalIxoDid(req.BuyerDid)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgBuy(buyerDid, bondCoin, maxPrices, req.BondDid)
+		msg := types.NewMsgBuy(buyerDid.Did, bondCoin, maxPrices, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, buyerDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, buyerDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -299,16 +300,16 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse seller's sovrin DID
-		sellerDid, err := sovrin.UnmarshalSovrinDid(req.SellerDid)
+		// Parse seller's ixo DID
+		sellerDid, err := did.UnmarshalIxoDid(req.SellerDid)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgSell(sellerDid, bondCoin, req.BondDid)
+		msg := types.NewMsgSell(sellerDid.Did, bondCoin, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sellerDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, sellerDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -349,17 +350,17 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse swapper's sovrin DID
-		swapperDid, err := sovrin.UnmarshalSovrinDid(req.SwapperDid)
+		// Parse swapper's ixo DID
+		swapperDid, err := did.UnmarshalIxoDid(req.SwapperDid)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgSwap(swapperDid, fromCoin, req.ToToken, req.BondDid)
+		msg := types.NewMsgSwap(swapperDid.Did, fromCoin, req.ToToken, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, swapperDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, swapperDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

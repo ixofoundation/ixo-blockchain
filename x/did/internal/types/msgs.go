@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
 
@@ -33,7 +34,7 @@ func (msg *MsgAddDid) UnmarshalJSON(bytes []byte) error {
 	}
 
 	if msg2.DidDoc.Credentials == nil {
-		msg2.DidDoc.Credentials = []DidCredential{}
+		msg2.DidDoc.Credentials = []exported.DidCredential{}
 	}
 
 	*msg = msg2
@@ -50,9 +51,9 @@ func (msg MsgAddDid) Type() string { return TypeMsgAddDid }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
-func (msg MsgAddDid) GetSignerDid() ixo.Did { return msg.DidDoc.Did }
+func (msg MsgAddDid) GetSignerDid() exported.Did { return msg.DidDoc.Did }
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgAddDid) ValidateBasic() sdk.Error {
@@ -73,7 +74,7 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DID valid
-	if !ixo.IsValidDid(msg.DidDoc.Did) {
+	if !IsValidDid(msg.DidDoc.Did) {
 		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
 	}
 
@@ -93,15 +94,15 @@ func (msg MsgAddDid) String() string {
 }
 
 type MsgAddCredential struct {
-	DidCredential DidCredential `json:"credential" yaml:"credential"`
+	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
 }
 
 func NewMsgAddCredential(did string, credType []string, issuer string, issued string) MsgAddCredential {
-	didCredential := DidCredential{
+	didCredential := exported.DidCredential{
 		CredType: credType,
 		Issuer:   issuer,
 		Issued:   issued,
-		Claim: Claim{
+		Claim: exported.Claim{
 			Id:           did,
 			KYCValidated: true,
 		},
@@ -115,9 +116,9 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 func (msg MsgAddCredential) Type() string  { return TypeMsgAddCredential }
 func (msg MsgAddCredential) Route() string { return RouterKey }
 
-func (msg MsgAddCredential) GetSignerDid() ixo.Did { return msg.DidCredential.Issuer }
+func (msg MsgAddCredential) GetSignerDid() exported.Did { return msg.DidCredential.Issuer }
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgAddCredential) String() string {
@@ -134,7 +135,7 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DID valid
-	if !ixo.IsValidDid(msg.DidCredential.Issuer) {
+	if !IsValidDid(msg.DidCredential.Issuer) {
 		return ErrorInvalidDid(DefaultCodespace, "issuer did is invalid")
 	}
 

@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"strings"
 )
@@ -83,10 +83,10 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 	// (ii) use a global res. address and store (in the bond) the share of the pool.
 
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
-		msg.CreatorPubKey, msg.FunctionType, msg.FunctionParameters,
-		msg.ReserveTokens, reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
-		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks, msg.BondDid)
+		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens, reserveAddress,
+		msg.TxFeePercentage, msg.ExitFeePercentage, msg.FeeAddress, msg.MaxSupply,
+		msg.OrderQuantityLimits, msg.SanityRate, msg.SanityMarginPercentage,
+		msg.AllowSells, msg.BatchBlocks, msg.BondDid)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
 	keeper.SetBondDid(ctx, bond.Token, bond.BondDid)
@@ -207,7 +207,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 }
 
 func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := ixo.DidToAddr(msg.BuyerDid)
+	buyerAddr := did.DidToAddr(msg.BuyerDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -276,7 +276,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := ixo.DidToAddr(msg.BuyerDid)
+	buyerAddr := did.DidToAddr(msg.BuyerDid)
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
@@ -336,7 +336,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 }
 
 func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk.Result {
-	sellerAddr := ixo.DidToAddr(msg.SellerDid)
+	sellerAddr := did.DidToAddr(msg.SellerDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -403,7 +403,7 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 }
 
 func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk.Result {
-	swapperAddr := ixo.DidToAddr(msg.SwapperDid)
+	swapperAddr := did.DidToAddr(msg.SwapperDid)
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {

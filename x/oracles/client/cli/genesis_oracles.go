@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,7 +26,7 @@ func AddGenesisOracleCmd(ctx *server.Context, cdc *codec.Codec,
 			config := ctx.Config
 			config.SetRoot(viper.GetString(cli.HomeFlag))
 
-			oracleDid := ixo.Did(args[0])
+			oracleDid := did.Did(args[0])
 			if len(oracleDid) == 0 {
 				return fmt.Errorf("oracle did cannot be empty")
 			}
@@ -38,7 +38,7 @@ func AddGenesisOracleCmd(ctx *server.Context, cdc *codec.Codec,
 			}
 
 			// Check that oracle DID is valid
-			if !ixo.IsValidDid(oracleDid) {
+			if !did.IsValidDid(oracleDid) {
 				return fmt.Errorf("oracle did is invalid")
 			}
 

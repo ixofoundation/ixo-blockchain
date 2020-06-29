@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	abci "github.com/tendermint/tendermint/abci/types"
-
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 const (
@@ -57,7 +56,7 @@ func queryAllDids(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
 }
 
 func queryAllDidDocs(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
-	var didDocs []ixo.DidDoc
+	var didDocs []exported.DidDoc
 	didDocs = k.GetAllDidDocs(ctx)
 
 	res, errRes := json.Marshal(didDocs)

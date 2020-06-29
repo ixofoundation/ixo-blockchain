@@ -8,8 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"strings"
@@ -115,22 +116,22 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
 			}
 
-			// Parse creator's sovrin DID
-			creatorDid, err := sovrin.UnmarshalSovrinDid(_creatorDid)
+			// Parse creator's ixo DID
+			creatorDid, err := did.UnmarshalIxoDid(_creatorDid)
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(creatorDid.Did))
+				WithFromAddress(did.DidToAddr(creatorDid.Did))
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
-				creatorDid, _functionType, functionParams, reserveTokens,
+				creatorDid.Did, _functionType, functionParams, reserveTokens,
 				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
 				orderQuantityLimits, sanityRate, sanityMarginPercentage,
 				_allowSells, batchBlocks, _bondDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, creatorDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
 		},
 	}
 
@@ -172,20 +173,20 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			_bondDid := viper.GetString(FlagBondDid)
 			_editorDid := viper.GetString(FlagEditorDid)
 
-			// Parse editor's sovrin DID
-			editorDid, err := sovrin.UnmarshalSovrinDid(_editorDid)
+			// Parse editor's ixo DID
+			editorDid, err := did.UnmarshalIxoDid(_editorDid)
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(editorDid.Did))
+				WithFromAddress(did.DidToAddr(editorDid.Did))
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, editorDid, _bondDid)
+				_sanityMarginPercentage, editorDid.Did, _bondDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, editorDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
 	}
 
@@ -203,8 +204,8 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "buy [bond-token-with-amount] [max-prices] [bond-did] [buyer-did]",
 		Example: "" +
-			"buy 10abc 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <buyer-sovrin-did>\n" +
-			"buy 10abc 1000res1,1000res2 U7GK8p8rVhJMKhBVRCJJ8c <buyer-sovrin-did>",
+			"buy 10abc 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <buyer-ixo-did>\n" +
+			"buy 10abc 1000res1,1000res2 U7GK8p8rVhJMKhBVRCJJ8c <buyer-ixo-did>",
 		Short: "Buy from a bond",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -218,18 +219,19 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// Parse buyer's sovrin DID
-			buyerDid, err := sovrin.UnmarshalSovrinDid(args[3])
+			// Parse buyer's ixo DID
+			buyerDid, err := did.UnmarshalIxoDid(args[3])
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(buyerDid.Did))
+				WithFromAddress(did.DidToAddr(buyerDid.Did))
 
-			msg := types.NewMsgBuy(buyerDid, bondCoinWithAmount, maxPrices, args[2])
+			msg := types.NewMsgBuy(
+				buyerDid.Did, bondCoinWithAmount, maxPrices, args[2])
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, buyerDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, buyerDid)
 		},
 	}
 	return cmd
@@ -238,7 +240,7 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sell [bond-token-with-amount] [bond-did] [seller-did]",
-		Example: "sell 10abc U7GK8p8rVhJMKhBVRCJJ8c <seller-sovrin-did>",
+		Example: "sell 10abc U7GK8p8rVhJMKhBVRCJJ8c <seller-ixo-did>",
 		Short:   "Sell from a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -247,18 +249,18 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// Parse seller's sovrin DID
-			sellerDid, err := sovrin.UnmarshalSovrinDid(args[2])
+			// Parse seller's ixo DID
+			sellerDid, err := did.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(sellerDid.Did))
+				WithFromAddress(did.DidToAddr(sellerDid.Did))
 
-			msg := types.NewMsgSell(sellerDid, bondCoinWithAmount, args[1])
+			msg := types.NewMsgSell(sellerDid.Did, bondCoinWithAmount, args[1])
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sellerDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sellerDid)
 		},
 	}
 	return cmd
@@ -268,8 +270,8 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "swap [from-amount] [from-token] [to-token] [bond-did] [swapper-did]",
 		Example: "" +
-			"swap 100 res1 res2 U7GK8p8rVhJMKhBVRCJJ8c <swapper-sovrin-did>\n" +
-			"swap 100 res2 res1 U7GK8p8rVhJMKhBVRCJJ8c <swapper-sovrin-did>",
+			"swap 100 res1 res2 U7GK8p8rVhJMKhBVRCJJ8c <swapper-ixo-did>\n" +
+			"swap 100 res2 res1 U7GK8p8rVhJMKhBVRCJJ8c <swapper-ixo-did>",
 		Short: "Perform a swap between two tokens",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -279,18 +281,18 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// Parse swapper's sovrin DID
-			swapperDid, err := sovrin.UnmarshalSovrinDid(args[4])
+			// Parse swapper's ixo DID
+			swapperDid, err := did.UnmarshalIxoDid(args[4])
 			if err != nil {
 				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixo.DidToAddr(swapperDid.Did))
+				WithFromAddress(did.DidToAddr(swapperDid.Did))
 
-			msg := types.NewMsgSwap(swapperDid, from, args[2], args[3])
+			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3])
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, swapperDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, swapperDid)
 		},
 	}
 	return cmd
