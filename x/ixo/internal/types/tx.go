@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/tendermint/ed25519"
 	"gopkg.in/yaml.v2"
 	"time"
 )
@@ -44,12 +43,12 @@ func NewIxoTxSingleMsg(msg sdk.Msg, fee auth.StdFee, signature IxoSignature, mem
 }
 
 type IxoSignature struct {
-	SignatureValue [ed25519.SignatureSize]byte `json:"signatureValue" yaml:"signatureValue"`
-	Created        time.Time                   `json:"created" yaml:"created"`
+	SignatureValue []byte    `json:"signatureValue" yaml:"signatureValue"`
+	Created        time.Time `json:"created" yaml:"created"`
 }
 
 func NewIxoSignature(
-	created time.Time, signature [ed25519.SignatureSize]byte,
+	created time.Time, signature []byte,
 ) IxoSignature {
 	return IxoSignature{
 		SignatureValue: signature,

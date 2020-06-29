@@ -230,7 +230,6 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 
 			// Create dummy tx with blank signature for fee approximation
 			signature := ixo.IxoSignature{}
-			signature.Created = signature.Created.Add(1) // maximizes signature length
 			tx := ixo.NewIxoTxSingleMsg(
 				stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 

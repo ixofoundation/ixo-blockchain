@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -8,7 +10,36 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/client/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
+
+func PrintOutput(ctx context.CLIContext, toPrint fmt.Stringer) (err error) {
+	var out []byte
+
+	switch ctx.OutputFormat {
+	case "text":
+		out, err = yaml.Marshal(&toPrint)
+
+	case "json":
+		out, err = json.Marshal(toPrint)
+
+		if ctx.Indent {
+			var buf bytes.Buffer
+			err = json.Indent(&buf, out, "", "  ")
+			if err != nil {
+				return err
+			}
+			out = buf.Bytes()
+		}
+	}
+
+	if err != nil {
+		return
+	}
+
+	fmt.Println(string(out))
+	return
+}
 
 // Custom tx query function because of custom IxoTx (#ref: 128)
 func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
@@ -29,7 +60,7 @@ func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 				return fmt.Errorf("No transaction found with hash %s", args[0])
 			}
 
-			return cliCtx.PrintOutput(output)
+			return PrintOutput(cliCtx, output)
 		},
 	}
 

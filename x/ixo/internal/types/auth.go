@@ -2,6 +2,7 @@ package types
 
 import (
 	"bufio"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
@@ -17,6 +18,7 @@ import (
 	"github.com/tendermint/ed25519"
 	"github.com/tendermint/tendermint/crypto"
 	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/tendermint/tendermint/crypto/multisig"
 	"os"
 	"time"
 )
@@ -25,7 +27,17 @@ var (
 	expectedMinGasPrices       = "0.025" + IxoNativeToken
 	approximationGasAdjustment = float64(1.5)
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
+
+	// simulation signature values used to estimate gas consumption
+	simEd25519Pubkey ed25519Keys.PubKeyEd25519
+	simEd25519Sig    [32]byte
 )
+
+func init() {
+	// This decodes a valid hex string into a ed25519Pubkey for use in transaction simulation
+	bz, _ := hex.DecodeString("035AD6810A47F073553FF30D2FCC7E0D3B1C0B74B61A1AAA2582344037151E14")
+	copy(simEd25519Pubkey[:], bz)
+}
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, sdk.Result)
 
@@ -54,7 +66,7 @@ func processPubKey(acc auth.Account, pubKey crypto.PubKey, simulate bool) (crypt
 		// account's pubkey is nil, both signature verification and gasKVStore.Set()
 		// shall consume enough gas to process an ed25519 pubkey
 		if accPubKey == nil {
-			return ed25519Keys.PubKeyEd25519{}, sdk.Result{}
+			return simEd25519Pubkey, sdk.Result{}
 		}
 
 		return accPubKey, sdk.Result{}
@@ -78,6 +90,25 @@ func processPubKey(acc auth.Account, pubKey crypto.PubKey, simulate bool) (crypt
 	return accPubKey, sdk.Result{}
 }
 
+func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdSignature, params auth.Params) {
+	simSig := IxoSignature{}
+	if len(sig.Signature) == 0 {
+		simSig.SignatureValue = simEd25519Sig[:]
+	}
+	simSig.Created = simSig.Created.Add(1) // maximizes signature length
+
+	sigBz := ModuleCdc.MustMarshalBinaryLengthPrefixed(simSig)
+	cost := sdk.Gas(len(sigBz) + 6)
+
+	// If the pubkey is a multi-signature pubkey, then we estimate for the maximum
+	// number of signers.
+	if _, ok := pubkey.(multisig.PubKeyMultisigThreshold); ok {
+		cost *= params.TxSigLimit
+	}
+
+	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
+}
+
 func ProcessSig(ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBytes []byte,
 	simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
 
@@ -94,13 +125,8 @@ func ProcessSig(ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBy
 	if simulate {
 		// Simulated txs should not contain a signature and are not required to
 		// contain a pubkey, so we must account for tx size of including an
-		// IxoSignature and simulate gas consumption (assuming ED25519 key).
-		//consumeSimSigGas(ctx.GasMeter(), sig, params)
-
-		// NOTE: this is not the case in the ixo blockchain. The IxoSignature
-		// will be blank but still count towards the transaction size given
-		// that it uses a fixed length byte array [64]byte as the sig value.
-		// (sub-note: [64]byte used because the ed25519.SignatureSize == 64)
+		// IxoSignature and simulate gas consumption (assuming an ED25519 key).
+		consumeSimSigGas(ctx.GasMeter(), pubKey, sig, params)
 	}
 
 	// Consume signature gas
@@ -274,7 +300,6 @@ func simulateMsgs(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.M
 
 	// Signature set to a blank signature
 	signature := IxoSignature{}
-	signature.Created = signature.Created.Add(1) // maximizes signature length
 	tx := NewIxoTxSingleMsg(
 		stdSignMsg.Msgs[0], stdSignMsg.Fee, signature, stdSignMsg.Memo)
 
@@ -442,5 +467,5 @@ func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext,
 
 func SignIxoMessage(signBytes []byte, privKey [ed25519.PrivateKeySize]byte) IxoSignature {
 	signatureBytes := ed25519.Sign(&privKey, signBytes)
-	return NewIxoSignature(time.Now(), *signatureBytes)
+	return NewIxoSignature(time.Now(), (*signatureBytes)[:])
 }
