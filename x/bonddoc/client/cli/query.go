@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func GetCmdBondDoc(cdc *codec.Codec) *cobra.Command {
@@ -22,7 +22,7 @@ func GetCmdBondDoc(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			didAddr := args[0]
-			key := ixo.Did(didAddr)
+			key := did.Did(didAddr)
 
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryBondDoc, key), nil)

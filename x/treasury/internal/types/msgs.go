@@ -24,9 +24,8 @@ var (
 )
 
 type MsgSend struct {
-	PubKey  string    `json:"pub_key" yaml:"pub_key"`
-	FromDid ixo.Did   `json:"from_did" yaml:"from_did"`
-	ToDid   ixo.Did   `json:"to_did" yaml:"to_did"`
+	FromDid did.Did   `json:"from_did" yaml:"from_did"`
+	ToDid   did.Did   `json:"to_did" yaml:"to_did"`
 	Amount  sdk.Coins `json:"amount" yaml:"amount"`
 }
 
@@ -34,18 +33,16 @@ func (msg MsgSend) Type() string  { return TypeMsgSend }
 func (msg MsgSend) Route() string { return RouterKey }
 func (msg MsgSend) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
-		return err
-	} else if valid, err = CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
 	} else if valid, err = CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.FromDid) {
+	if !did.IsValidDid(msg.FromDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
-	} else if !ixo.IsValidDid(msg.ToDid) {
+	} else if !did.IsValidDid(msg.ToDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
@@ -57,9 +54,9 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgSend) GetSignerDid() ixo.Did { return msg.FromDid }
+func (msg MsgSend) GetSignerDid() did.Did { return msg.FromDid }
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgSend) String() string {
@@ -79,10 +76,9 @@ func (msg MsgSend) GetSignBytes() []byte {
 }
 
 type MsgOracleTransfer struct {
-	PubKey    string    `json:"pub_key" yaml:"pub_key"`
-	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
-	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
-	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
+	OracleDid did.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid   did.Did   `json:"from_did" yaml:"from_did"`
+	ToDid     did.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -91,9 +87,7 @@ func (msg MsgOracleTransfer) Type() string  { return TypeMsgOracleTransfer }
 func (msg MsgOracleTransfer) Route() string { return RouterKey }
 func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
-		return err
-	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
@@ -104,11 +98,11 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.OracleDid) {
+	if !did.IsValidDid(msg.OracleDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
-	} else if !ixo.IsValidDid(msg.FromDid) {
+	} else if !did.IsValidDid(msg.FromDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
-	} else if !ixo.IsValidDid(msg.ToDid) {
+	} else if !did.IsValidDid(msg.ToDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
@@ -120,9 +114,9 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleTransfer) GetSignerDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleTransfer) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgOracleTransfer) String() string {
@@ -142,9 +136,8 @@ func (msg MsgOracleTransfer) GetSignBytes() []byte {
 }
 
 type MsgOracleMint struct {
-	PubKey    string    `json:"pub_key" yaml:"pub_key"`
-	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
-	ToDid     ixo.Did   `json:"to_did" yaml:"to_did"`
+	OracleDid did.Did   `json:"oracle_did" yaml:"oracle_did"`
+	ToDid     did.Did   `json:"to_did" yaml:"to_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -153,9 +146,7 @@ func (msg MsgOracleMint) Type() string  { return TypeMsgOracleMint }
 func (msg MsgOracleMint) Route() string { return RouterKey }
 func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
-		return err
-	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
 		return err
@@ -164,9 +155,9 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.OracleDid) {
+	if !did.IsValidDid(msg.OracleDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
-	} else if !ixo.IsValidDid(msg.ToDid) {
+	} else if !did.IsValidDid(msg.ToDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
 	}
 
@@ -178,9 +169,9 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleMint) GetSignerDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleMint) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgOracleMint) String() string {
@@ -200,9 +191,8 @@ func (msg MsgOracleMint) GetSignBytes() []byte {
 }
 
 type MsgOracleBurn struct {
-	PubKey    string    `json:"pub_key" yaml:"pub_key"`
-	OracleDid ixo.Did   `json:"oracle_did" yaml:"oracle_did"`
-	FromDid   ixo.Did   `json:"from_did" yaml:"from_did"`
+	OracleDid did.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid   did.Did   `json:"from_did" yaml:"from_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
 }
@@ -211,9 +201,7 @@ func (msg MsgOracleBurn) Type() string  { return TypeMsgOracleBurn }
 func (msg MsgOracleBurn) Route() string { return RouterKey }
 func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
-		return err
-	} else if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
@@ -222,9 +210,9 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.OracleDid) {
+	if !did.IsValidDid(msg.OracleDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
-	} else if !ixo.IsValidDid(msg.FromDid) {
+	} else if !did.IsValidDid(msg.FromDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
 	}
 
@@ -236,9 +224,9 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgOracleBurn) GetSignerDid() ixo.Did { return msg.OracleDid }
+func (msg MsgOracleBurn) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{ixo.DidToAddr(msg.GetSignerDid())}
+	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
 }
 
 func (msg MsgOracleBurn) String() string {

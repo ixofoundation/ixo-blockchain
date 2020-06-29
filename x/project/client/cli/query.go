@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
@@ -23,7 +23,7 @@ func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			didAddr := args[0]
-			key := ixo.Did(didAddr)
+			key := did.Did(didAddr)
 
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryProjectDoc, key), nil)

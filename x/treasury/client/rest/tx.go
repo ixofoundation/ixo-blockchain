@@ -5,10 +5,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
+
 	"github.com/ixofoundation/ixo-blockchain/x/treasury/internal/types"
 )
 
@@ -26,7 +27,7 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		toDidParam := r.URL.Query().Get("toDid")
 		amountParam := r.URL.Query().Get("amount")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		cliCtx = cliCtx.WithBroadcastMode(mode)
@@ -38,16 +39,16 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgSend(toDidParam, coins, sovrinDid)
+		msg := types.NewMsgSend(toDidParam, coins, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -79,16 +80,17 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
+		oracleDid, err := did.UnmarshalIxoDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgOracleTransfer(fromDidParam, toDidParam, coins, oracleDid, proofParam)
+		msg := types.NewMsgOracleTransfer(
+			fromDidParam, toDidParam, coins, oracleDid.Did, proofParam)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -119,16 +121,17 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
+		oracleDid, err := did.UnmarshalIxoDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgOracleMint(toDidParam, coins, oracleDid, proofParam)
+		msg := types.NewMsgOracleMint(
+			toDidParam, coins, oracleDid.Did, proofParam)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -159,16 +162,17 @@ func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		oracleDid, err := sovrin.UnmarshalSovrinDid(oracleDidParam)
+		oracleDid, err := did.UnmarshalIxoDid(oracleDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgOracleBurn(fromDidParam, coins, oracleDid, proofParam)
+		msg := types.NewMsgOracleBurn(
+			fromDidParam, coins, oracleDid.Did, proofParam)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonddoc/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type InternalAccountID = string
@@ -54,7 +53,7 @@ func handleMsgUpdateBondStatus(ctx sdk.Context, k Keeper, msg MsgUpdateBondStatu
 	return sdk.Result{}
 }
 
-func getBondDoc(ctx sdk.Context, k Keeper, bondDid ixo.Did) (StoredBondDoc, sdk.Error) {
+func getBondDoc(ctx sdk.Context, k Keeper, bondDid did.Did) (StoredBondDoc, sdk.Error) {
 	ixoBondDoc, err := k.GetBondDoc(ctx, bondDid)
 	if err != nil {
 		return nil, err

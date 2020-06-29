@@ -1,8 +1,6 @@
 package types
 
-import (
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-)
+import "github.com/ixofoundation/ixo-blockchain/x/did"
 
 const (
 	ModuleName        = "project"
@@ -18,14 +16,14 @@ var (
 	WithdrawalKey = []byte{0x03}
 )
 
-func GetProjectPrefixKey(did ixo.Did) []byte {
+func GetProjectPrefixKey(did did.Did) []byte {
 	return append(ProjectKey, []byte(did)...)
 }
 
-func GetAccountPrefixKey(did ixo.Did) []byte {
+func GetAccountPrefixKey(did did.Did) []byte {
 	return append(AccountKey, []byte(did)...)
 }
 
-func GetWithdrawalPrefixKey(did ixo.Did) []byte {
+func GetWithdrawalPrefixKey(did did.Did) []byte {
 	return append(WithdrawalKey, []byte(did)...)
 }

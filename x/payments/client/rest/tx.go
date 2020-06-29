@@ -6,11 +6,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"net/http"
 	"strings"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 )
 
@@ -46,7 +46,7 @@ func createPaymentTemplateHandler(ctx context.CLIContext) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		templateJsonParam := r.URL.Query().Get("paymentTemplateJson")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
@@ -59,16 +59,16 @@ func createPaymentTemplateHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgCreatePaymentTemplate(template, sovrinDid)
+		msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -88,7 +88,7 @@ func createPaymentContractHandler(ctx context.CLIContext) http.HandlerFunc {
 		payerAddrParam := r.URL.Query().Get("payerAddr")
 		canDeauthoriseParam := r.URL.Query().Get("canDeauthorise")
 		discountIdParam := r.URL.Query().Get("discountId")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
@@ -114,17 +114,17 @@ func createPaymentContractHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgCreatePaymentContract(templateIdParam,
-			contractIdParam, payerAddr, canDeauthorise, discountId, sovrinDid)
+		msg := types.NewMsgCreatePaymentContract(templateIdParam, contractIdParam,
+			payerAddr, canDeauthorise, discountId, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -143,7 +143,7 @@ func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 		contractIdParam := r.URL.Query().Get("paymentContractId")
 		maxPeriodsParam := r.URL.Query().Get("maxPeriods")
 		periodParam := r.URL.Query().Get("period")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
@@ -163,7 +163,7 @@ func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -171,9 +171,9 @@ func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgCreateSubscription(subIdParam, contractIdParam,
-			maxPeriods, period, sovrinDid)
+			maxPeriods, period, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -190,7 +190,7 @@ func setPaymentContractAuthorisationHandler(ctx context.CLIContext) http.Handler
 
 		contractIdParam := r.URL.Query().Get("paymentContractId")
 		authorisedParam := r.URL.Query().Get("authorised")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
@@ -202,7 +202,7 @@ func setPaymentContractAuthorisationHandler(ctx context.CLIContext) http.Handler
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -210,9 +210,9 @@ func setPaymentContractAuthorisationHandler(ctx context.CLIContext) http.Handler
 		}
 
 		msg := types.NewMsgSetPaymentContractAuthorisation(contractIdParam,
-			authorised, sovrinDid)
+			authorised, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -230,7 +230,7 @@ func grantDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 		contractIdParam := r.URL.Query().Get("paymentContractId")
 		discountIdParam := r.URL.Query().Get("discountId")
 		recipientAddrParam := r.URL.Query().Get("recipientAddr")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
@@ -249,7 +249,7 @@ func grantDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
@@ -257,9 +257,9 @@ func grantDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgGrantDiscount(contractIdParam, discountId,
-			recipientAddr, sovrinDid)
+			recipientAddr, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -276,7 +276,7 @@ func revokeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 
 		contractIdParam := r.URL.Query().Get("paymentContractId")
 		holderAddrParam := r.URL.Query().Get("holderAddr")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
@@ -288,17 +288,16 @@ func revokeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgRevokeDiscount(contractIdParam, holderAddr,
-			sovrinDid)
+		msg := types.NewMsgRevokeDiscount(contractIdParam, holderAddr, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -314,21 +313,21 @@ func effectPaymentHandler(ctx context.CLIContext) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		contractIdParam := r.URL.Query().Get("paymentContractId")
-		sovrinDidParam := r.URL.Query().Get("sovrinDid")
+		ixoDidParam := r.URL.Query().Get("ixoDid")
 
 		mode := r.URL.Query().Get("mode")
 		ctx = ctx.WithBroadcastMode(mode)
 
-		sovrinDid, err := sovrin.UnmarshalSovrinDid(sovrinDidParam)
+		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgEffectPayment(contractIdParam, sovrinDid)
+		msg := types.NewMsgEffectPayment(contractIdParam, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(ctx, msg, sovrinDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
