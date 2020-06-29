@@ -234,8 +234,8 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	result.AdjustedSupply = adjustedSupply
 	result.Prices = zeroReserveTokensIfEmpty(reservePricesRounded, bond)
 	result.TxFees = zeroReserveTokensIfEmpty(txFee, bond)
-	result.TotalFees = result.TxFees // used in next line
-	result.TotalPrices = result.Prices.Add(result.TotalFees)
+	result.TotalPrices = zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee), bond)
+	result.TotalFees = zeroReserveTokensIfEmpty(txFee, bond)
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, result)
 	if err2 != nil {
@@ -282,8 +282,8 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	result.Returns = zeroReserveTokensIfEmpty(reserveReturnsRounded, bond)
 	result.TxFees = zeroReserveTokensIfEmpty(txFees, bond)
 	result.ExitFees = zeroReserveTokensIfEmpty(exitFees, bond)
-	result.TotalReturns = reserveReturnsRounded.Sub(totalFees)
-	result.TotalFees = totalFees
+	result.TotalReturns = zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond)
+	result.TotalFees = zeroReserveTokensIfEmpty(totalFees, bond)
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, result)
 	if err2 != nil {
