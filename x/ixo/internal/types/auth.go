@@ -37,7 +37,7 @@ func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
 			return pubKey, err.Result()
 		}
 
-		var pubKeyRaw [32]byte
+		var pubKeyRaw [ed25519.PublicKeySize]byte
 		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
 		return ed25519Keys.PubKeyEd25519(pubKeyRaw), sdk.Result{}
 	}
@@ -100,6 +100,7 @@ func ProcessSig(ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBy
 		// NOTE: this is not the case in the ixo blockchain. The IxoSignature
 		// will be blank but still count towards the transaction size given
 		// that it uses a fixed length byte array [64]byte as the sig value.
+		// (sub-note: [64]byte used because the ed25519.SignatureSize == 64)
 	}
 
 	// Consume signature gas
@@ -244,7 +245,7 @@ func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg,
 		panic("expected one message")
 	}
 
-	privKey := [64]byte{}
+	var privKey ed25519Keys.PrivKeyEd25519
 	copy(privKey[:], base58.Decode(ixoDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(ixoDid.VerifyKey))
 
@@ -439,10 +440,7 @@ func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext,
 	return signAndBroadcast(cliCtx, msg, ixoDid)
 }
 
-func SignIxoMessage(signBytes []byte, privKey [64]byte) IxoSignature {
-
+func SignIxoMessage(signBytes []byte, privKey [ed25519.PrivateKeySize]byte) IxoSignature {
 	signatureBytes := ed25519.Sign(&privKey, signBytes)
-	signature := *signatureBytes
-
-	return NewIxoSignature(time.Now(), signature)
+	return NewIxoSignature(time.Now(), *signatureBytes)
 }

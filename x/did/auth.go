@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/tendermint/ed25519"
 	"github.com/tendermint/tendermint/crypto"
 	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
 )
@@ -13,7 +14,7 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
 
 		// Get signer PubKey
-		var pubKeyRaw [32]byte
+		var pubKeyRaw [ed25519.PublicKeySize]byte
 		switch msg := msg.(type) {
 		case types.MsgAddDid:
 			copy(pubKeyRaw[:], base58.Decode(msg.DidDoc.PubKey))

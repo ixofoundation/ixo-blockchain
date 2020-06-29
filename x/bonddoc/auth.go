@@ -3,6 +3,7 @@ package bonddoc
 import (
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/ed25519"
 	"github.com/tendermint/tendermint/crypto"
 	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
 
@@ -14,7 +15,7 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
 
 		// Get signer PubKey
-		var pubKeyRaw [32]byte
+		var pubKeyRaw [ed25519.PublicKeySize]byte
 		switch msg := msg.(type) {
 		case types.MsgCreateBond:
 			copy(pubKeyRaw[:], base58.Decode(msg.GetPubKey()))
