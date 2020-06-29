@@ -50,7 +50,7 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		cliCtx = cliCtx.WithBroadcastMode(mode)
 		msg := types.NewMsgCreateProject(senderDid, projectDoc, didDoc)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, didDoc)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, didDoc)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -96,7 +96,7 @@ func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 
 		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -138,7 +138,7 @@ func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, projectDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, projectDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, projectDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -173,7 +173,7 @@ func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -216,7 +216,7 @@ func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc 
 
 		msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -253,7 +253,7 @@ func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, senderDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, senderDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

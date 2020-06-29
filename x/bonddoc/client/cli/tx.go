@@ -36,7 +36,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateBond(senderDid, bondDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -74,7 +74,7 @@ func GetCmdUpdateBondStatus(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgUpdateBondStatus(senderDid, updateBondStatusDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }

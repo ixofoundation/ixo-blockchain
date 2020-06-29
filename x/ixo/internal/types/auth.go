@@ -321,16 +321,26 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx IxoTx, chainId string) (a
 	return signMsg.Fee, nil
 }
 
-func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) error {
-	txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+func GenerateOrBroadcastMsgs(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) error {
+	msgs := []sdk.Msg{msg}
+	txBldr := auth.NewTxBuilderFromCLI()
+
+	if cliCtx.GenerateOnly {
+		return utils.PrintUnsignedStdTx(txBldr, cliCtx, msgs)
+	}
+
+	return CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs, ixoDid)
+}
+
+func CompleteAndBroadcastTxCLI(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.Msg, ixoDid exported.IxoDid) error {
+	txBldr, err := utils.PrepareTxBuilder(txBldr, cliCtx)
 	if err != nil {
 		return err
 	}
 
-	msgs := []sdk.Msg{msg}
+	//fromName := cliCtx.GetFromName()
 
 	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
-		var err error // important so that enrichWithGas overwrites txBldr
 		txBldr, err = enrichWithGas(txBldr, cliCtx, msgs)
 		if err != nil {
 			return err
@@ -370,13 +380,18 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, ixoDid export
 		}
 	}
 
+	//passphrase, err := keys.GetPassphrase(fromName)
+	//if err != nil {
+	//	return err
+	//}
+
 	// Build the transaction
 	stdSignMsg, err := txBldr.BuildSignMsg(msgs)
 	if err != nil {
 		return err
 	}
 
-	// Sign and broadcast
+	// Sign and broadcast to a Tendermint node
 	res, err := signAndBroadcast(cliCtx, stdSignMsg, ixoDid)
 	if err != nil {
 		return err
@@ -387,7 +402,7 @@ func SignAndBroadcastTxCli(cliCtx context.CLIContext, msg sdk.Msg, ixoDid export
 	return nil
 }
 
-func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) ([]byte, error) {
+func CompleteAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) ([]byte, error) {
 
 	// TODO: implement using txBldr or just remove function completely (ref: #123)
 
@@ -406,7 +421,7 @@ func SignAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg, ixoDid expor
 		Memo: "",
 	}
 
-	// Sign and broadcast
+	// Sign and broadcast to a Tendermint node
 	res, err := signAndBroadcast(cliCtx, stdSignMsg, ixoDid)
 	if err != nil {
 		return nil, err

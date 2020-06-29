@@ -20,8 +20,8 @@ var (
 	ProcessSig                       = types.ProcessSig
 	NewDefaultAnteHandler            = types.NewDefaultAnteHandler
 	ApproximateFeeForTx              = types.ApproximateFeeForTx
-	SignAndBroadcastTxCli            = types.SignAndBroadcastTxCli
-	SignAndBroadcastTxRest           = types.SignAndBroadcastTxRest
+	GenerateOrBroadcastMsgs          = types.GenerateOrBroadcastMsgs
+	CompleteAndBroadcastTxRest       = types.CompleteAndBroadcastTxRest
 	SignAndBroadcastTxFromStdSignMsg = types.SignAndBroadcastTxFromStdSignMsg
 
 	// Types

@@ -48,7 +48,7 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgSend(toDidParam, coins, ixoDid.Did)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -90,7 +90,7 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgOracleTransfer(
 			fromDidParam, toDidParam, coins, oracleDid.Did, proofParam)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -131,7 +131,7 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgOracleMint(
 			toDidParam, coins, oracleDid.Did, proofParam)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -172,7 +172,7 @@ func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		msg := types.NewMsgOracleBurn(
 			fromDidParam, coins, oracleDid.Did, proofParam)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, oracleDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

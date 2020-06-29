@@ -27,7 +27,7 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(types.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -54,7 +54,7 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(types.DidToAddr(ixoDid.Did))
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }

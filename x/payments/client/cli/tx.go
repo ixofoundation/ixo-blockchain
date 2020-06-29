@@ -56,7 +56,7 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -102,7 +102,7 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 				templateIdStr, contractIdStr, payerAddr,
 				canDeauthorise, discountId, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -142,7 +142,7 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				contractIdStr, maxPeriods, period, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -174,7 +174,7 @@ func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgSetPaymentContractAuthorisation(
 				contractIdStr, authorised, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -212,7 +212,7 @@ func GetCmdGrantPaymentDiscount(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgGrantDiscount(
 				contractIdStr, discountId, recipientAddr, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -243,7 +243,7 @@ func GetCmdRevokePaymentDiscount(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgRevokeDiscount(
 				contractIdStr, holderAddr, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -267,7 +267,7 @@ func GetCmdEffectPayment(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgEffectPayment(contractIdStr, ixoDid.Did)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }

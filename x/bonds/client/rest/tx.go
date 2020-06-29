@@ -158,7 +158,7 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
 			req.AllowSells, batchBlocks, req.BondDid)
 
-		output, err2 := ixo.SignAndBroadcastTxRest(cliCtx, msg, creatorDid)
+		output, err2 := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, creatorDid)
 		if err2 != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err2.Error()))
@@ -206,7 +206,7 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			req.OrderQuantityLimits, req.SanityRate,
 			req.SanityMarginPercentage, editorDid.Did, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, editorDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, editorDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -261,7 +261,7 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgBuy(buyerDid.Did, bondCoin, maxPrices, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, buyerDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, buyerDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -309,7 +309,7 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgSell(sellerDid.Did, bondCoin, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, sellerDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, sellerDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -360,7 +360,7 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgSwap(swapperDid.Did, fromCoin, req.ToToken, req.BondDid)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, swapperDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, swapperDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))

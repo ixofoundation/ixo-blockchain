@@ -83,7 +83,7 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -118,7 +118,7 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -155,7 +155,7 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -183,7 +183,7 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -218,7 +218,7 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -245,7 +245,7 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, senderDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, senderDid)
 		},
 	}
 }

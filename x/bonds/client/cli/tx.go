@@ -131,7 +131,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				orderQuantityLimits, sanityRate, sanityMarginPercentage,
 				_allowSells, batchBlocks, _bondDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, creatorDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
 		},
 	}
 
@@ -186,7 +186,7 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
 				_sanityMarginPercentage, editorDid.Did, _bondDid)
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, editorDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
 	}
 
@@ -231,7 +231,7 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgBuy(
 				buyerDid.Did, bondCoinWithAmount, maxPrices, args[2])
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, buyerDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, buyerDid)
 		},
 	}
 	return cmd
@@ -260,7 +260,7 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgSell(sellerDid.Did, bondCoinWithAmount, args[1])
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, sellerDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sellerDid)
 		},
 	}
 	return cmd
@@ -292,7 +292,7 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3])
 
-			return ixo.SignAndBroadcastTxCli(cliCtx, msg, swapperDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, swapperDid)
 		},
 	}
 	return cmd

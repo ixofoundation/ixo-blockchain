@@ -36,7 +36,7 @@ func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
@@ -78,7 +78,7 @@ func addCredentialRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		msg := types.NewMsgAddCredential(did, credTypes, ixoDid.Did, issued)
 
-		output, err := ixo.SignAndBroadcastTxRest(cliCtx, msg, ixoDid)
+		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(err.Error()))
