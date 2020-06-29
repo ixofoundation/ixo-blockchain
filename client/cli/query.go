@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Custom tx query function because of custom IxoTx (#ref: 128)
 func QueryTxCmd(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 
