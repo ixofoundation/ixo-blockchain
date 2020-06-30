@@ -20,7 +20,7 @@ Bonds can be created by any address using `MsgCreateBond`.
 | FeeAddress             | `sdk.AccAddress`   | The address of the account that will store charged fees |
 | MaxSupply              | `sdk.Coin`         | The maximum number of bond tokens that can be minted |
 | OrderQuantityLimits    | `sdk.Coins`        | The maximum number of tokens that one can buy/sell/swap in a single order (e.g. `100abc,200res,300rez`) |
-| SanityRate             | `sdk.Dec`          | For a swapper function bond, restricts the conversion rate (`r1/r2`) to the specified value plus or minus the sanity margin percentage `0` for no sanity checks. |
+| SanityRate             | `sdk.Dec`          | For a swapper function bond, restricts the conversion rate (`r1/r2`) to the specified value plus or minus the sanity margin percentage. `0` for no sanity checks. |
 | SanityMarginPercentage | `sdk.Dec`          | Used as described above. `0` for no sanity checks. |
 | AllowSells             | `string`           | Whether or not selling is allowed (`"true"/"false"`) |
 | Signers                | `[]sdk.AccAddress` | The addresses of the accounts that must sign this message and any future message that edits the bond's parameters. |
