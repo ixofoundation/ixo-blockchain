@@ -29,7 +29,6 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-blockchain/x/bonddoc"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -70,7 +69,6 @@ var (
 		did.AppModuleBasic{},
 		payments.AppModuleBasic{},
 		project.AppModuleBasic{},
-		bonddoc.AppModuleBasic{},
 		bonds.AppModuleBasic{},
 		treasury.AppModuleBasic{},
 		oracles.AppModuleBasic{},
@@ -124,7 +122,6 @@ type ixoApp struct {
 	didKeeper      did.Keeper
 	paymentsKeeper payments.Keeper
 	projectKeeper  project.Keeper
-	bonddocKeeper  bonddoc.Keeper
 	bondsKeeper    bonds.Keeper
 	oraclesKeeper  oracles.Keeper
 	treasuryKeeper treasury.Keeper
@@ -143,8 +140,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, did.StoreKey, payments.StoreKey,
-		project.StoreKey, bonds.StoreKey, bonddoc.StoreKey, treasury.StoreKey,
-		oracles.StoreKey)
+		project.StoreKey, bonds.StoreKey, treasury.StoreKey, oracles.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -193,7 +189,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
 	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace, app.bankKeeper, paymentsReservedIdPrefixes)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace, app.accountKeeper, app.paymentsKeeper)
-	app.bonddocKeeper = bonddoc.NewKeeper(app.cdc, keys[bonddoc.StoreKey])
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, keys[bonds.StoreKey], app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
 	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper, app.oraclesKeeper, app.supplyKeeper)
@@ -214,7 +209,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		did.NewAppModule(app.didKeeper),
 		payments.NewAppModule(app.paymentsKeeper, app.bankKeeper),
 		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.bankKeeper),
-		bonddoc.NewAppModule(app.bonddocKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
 		treasury.NewAppModule(app.treasuryKeeper),
 		oracles.NewAppModule(app.oraclesKeeper),
@@ -227,7 +221,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
 		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
 		genutil.ModuleName, did.ModuleName, project.ModuleName, payments.ModuleName,
-		bonddoc.ModuleName, bonds.ModuleName, treasury.ModuleName, oracles.ModuleName)
+		bonds.ModuleName, treasury.ModuleName, oracles.ModuleName)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
@@ -298,7 +292,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
 	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
-	bonddocPubKeyGetter := bonddoc.GetPubKeyGetter(app.bonddocKeeper)
 
 	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
 		app.accountKeeper, app.supplyKeeper, defaultPubKeyGetter)
@@ -306,8 +299,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
 		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
-	bonddocAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, bonddocPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 
@@ -326,8 +317,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			default:
 				return projectAnteHandler(ctx, tx, simulate)
 			}
-		case bonddoc.RouterKey:
-			return bonddocAnteHandler(ctx, tx, simulate)
 		case bonds.RouterKey:
 			return defaultIxoAnteHandler(ctx, tx, simulate)
 		case treasury.RouterKey:

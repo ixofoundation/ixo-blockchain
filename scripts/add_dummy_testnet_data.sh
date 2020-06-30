@@ -21,10 +21,6 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-BONDDOC1_FEE_FUND="10000uixo" # 0.025 * 200000 * 2txs
-BONDDOC2_FEE_FUND="15000uixo" # 0.025 * 200000 * 3txs
-PROJECT1_FEE_FUND="15000uixo" # 0.025 * 200000 * 3txs
-PROJECT2_FEE_FUND="30000uixo" # 0.025 * 200000 * 6txs
 
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
@@ -47,13 +43,6 @@ PROJECT2_DID_FULL="{\"did\":\"did:ixo:JHcN95bkS4aAWk3TKXapA2\",\"verifyKey\":\"A
 PROJECT1_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"500\",\"evaluatorPayPerClaim\":\"50\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-01-01T01:01:01.000Z\",\"createdBy\":\"Miguel\",\"status\":\"\"}"
 PROJECT2_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"100\",\"evaluatorPayPerClaim\":\"10\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-02-02T02:02:02.000Z\",\"createdBy\":\"Francesco\",\"status\":\"\"}"
 
-BONDDOC1_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
-BONDDOC2_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
-BONDDOC1_DID_FULL="{\"did\":\"did:ixo:48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
-BONDDOC2_DID_FULL="{\"did\":\"did:ixo:RYLHkfNpbA8Losy68jt4yF\",\"verifyKey\":\"ENmMCsfNmjYoTRhNgnwXbQAw6p8JKH9DCJfGTPXNfsxW\",\"encryptionPublicKey\":\"5unQBt6JPW1pq9AqoRNhFJmibv8JqeoyyNvN3gF24EaU\",\"secret\":{\"seed\":\"d2c05b107acc2dfe3e9d67e98c993a9c03d227ed8f4505c43997cf4e7819bee2\",\"signKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\",\"encryptionPrivateKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\"}}"
-BONDDOC1_INFO="{\"created_on\":\"created_on\",\"created_by\":\"created_by\"}"
-BONDDOC2_INFO="{\"created_on\":\"created_on\",\"created_by\":\"created_by\"}"
-
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
@@ -69,12 +58,6 @@ echo "Ledgering DID 2/3..."
 ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 3/3..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-
-# Fund bonddoc accounts
-echo "Funding bonddoc account 1/2 so it can pay fees..."
-ixocli tx treasury send $BONDDOC1_DID $BONDDOC1_FEE_FUND "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Funding bonddoc account 2/2 so it can pay fees..."
-ixocli tx treasury send $BONDDOC2_DID $BONDDOC2_FEE_FUND "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding KYC credentials
 echo "Adding KYC credential 1/1..."
@@ -240,26 +223,6 @@ SENDER_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
 AGENT_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
 ROLE="SA"
 ixocli tx project create-agent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PROJECT1_DID_FULL" --gas-prices="$GAS_PRICES" -y
-
-# ----------------------------------------------------------------------------------------- bonddocs
-# Creating bonddoc
-SENDER_DID="$SHAUN_DID"
-echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc create-bond "$SENDER_DID" "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL" --gas-prices="$GAS_PRICES" -y
-echo "Creating bonddoc 2/2..."
-ixocli tx bonddoc create-bond "$SENDER_DID" "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL" --gas-prices="$GAS_PRICES" -y
-
-echo "Sleeping for a bit..."
-sleep 7 # to make sure bonddocs were ledgered before proceeding
-
-# Updating bonddoc status
-SENDER_DID="$SHAUN_DID"
-echo "Updating bonddoc 1 to PREISSUANCE..."
-ixocli tx bonddoc update-bond-status "$SENDER_DID" PREISSUANCE "$BONDDOC1_DID_FULL" --gas-prices="$GAS_PRICES" -y
-echo "Updating bonddoc 2 to PREISSUANCE..."
-ixocli tx bonddoc update-bond-status "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Updating bonddoc 2 to OPEN..."
-ixocli tx bonddoc update-bond-status "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 # ----------------------------------------------------------------------------------------- payments
 # Create payment
