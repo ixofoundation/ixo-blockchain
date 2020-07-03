@@ -67,3 +67,11 @@ func GetRequiredParamsForFunctionType(fnType string) (fnParams []string, err sdk
 	}
 	return expectedParams, nil
 }
+
+func GetExceptionsForFunctionType(fnType string) (restrictions FunctionParamRestrictions, err sdk.Error) {
+	restrictions, ok := ExtraParameterRestrictions[fnType]
+	if !ok {
+		return nil, ErrUnrecognizedFunctionType(DefaultCodespace)
+	}
+	return restrictions, nil
+}
