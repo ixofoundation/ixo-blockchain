@@ -1,10 +1,12 @@
 # Messages
 
-In this section we describe the processing of the treasury messages and the corresponding updates to the state. The treasury module does not store any state itself. Whenever conversion from DID to address is mentioned, this is being performed as follows:
+In this section we describe the processing of the treasury messages and the corresponding updates to the state. The treasury module does not store any state itself. Whenever conversion from DID to address is mentioned, this is being performed using the public key as follows:
 
 ```go
-func DidToAddr(did did.Did) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(did)))
+func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
+	var pubKey ed25519.PubKeyEd25519
+	copy(pubKey[:], base58.Decode(verifyKey))
+	return sdk.AccAddress(pubKey.Address())
 }
 ```
 

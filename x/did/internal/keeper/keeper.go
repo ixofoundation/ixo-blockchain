@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
@@ -24,13 +25,22 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, s
 	key := types.GetDidPrefixKey(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, types.ErrorInvalidDid(types.DefaultCodespace, "Invalid Did Address")
+		return nil, types.ErrorInvalidDid(
+			types.DefaultCodespace, fmt.Sprintf("Invalid Did Address %s", did))
 	}
 
 	var didDoc types.BaseDidDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &didDoc)
 
 	return didDoc, nil
+}
+
+func (k Keeper) MustGetDidDoc(ctx sdk.Context, did exported.Did) exported.DidDoc {
+	didDoc, err := k.GetDidDoc(ctx, did)
+	if err != nil {
+		panic(err)
+	}
+	return didDoc
 }
 
 func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err sdk.Error) {

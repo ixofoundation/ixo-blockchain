@@ -52,7 +52,7 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did)
 
@@ -96,7 +96,7 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreatePaymentContract(
 				templateIdStr, contractIdStr, payerAddr,
@@ -137,7 +137,7 @@ func GetCmdCreateSubscription(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				contractIdStr, maxPeriods, period, ixoDid.Did)
@@ -169,7 +169,7 @@ func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgSetPaymentContractAuthorisation(
 				contractIdStr, authorised, ixoDid.Did)
@@ -207,7 +207,7 @@ func GetCmdGrantPaymentDiscount(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgGrantDiscount(
 				contractIdStr, discountId, recipientAddr, ixoDid.Did)
@@ -238,7 +238,7 @@ func GetCmdRevokePaymentDiscount(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgRevokeDiscount(
 				contractIdStr, holderAddr, ixoDid.Did)
@@ -263,7 +263,7 @@ func GetCmdEffectPayment(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgEffectPayment(contractIdStr, ixoDid.Did)
 

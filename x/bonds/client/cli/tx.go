@@ -123,7 +123,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(creatorDid.Did))
+				WithFromAddress(creatorDid.Address())
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				creatorDid.Did, _functionType, functionParams, reserveTokens,
@@ -180,7 +180,7 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(editorDid.Did))
+				WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
@@ -226,7 +226,7 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(buyerDid.Did))
+				WithFromAddress(buyerDid.Address())
 
 			msg := types.NewMsgBuy(
 				buyerDid.Did, bondCoinWithAmount, maxPrices, args[2])
@@ -256,7 +256,7 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(sellerDid.Did))
+				WithFromAddress(sellerDid.Address())
 
 			msg := types.NewMsgSell(sellerDid.Did, bondCoinWithAmount, args[1])
 
@@ -288,7 +288,7 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(swapperDid.Did))
+				WithFromAddress(swapperDid.Address())
 
 			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3])
 

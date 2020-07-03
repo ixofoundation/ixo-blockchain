@@ -33,7 +33,7 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(senderDid, projectDoc, ixoDid)
 			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectFee)
@@ -79,7 +79,7 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid)
 
@@ -114,7 +114,7 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid)
 
@@ -151,7 +151,7 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid)
 
@@ -179,7 +179,7 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid)
 
@@ -214,7 +214,7 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid)
 
@@ -229,7 +229,7 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 		Short: "Withdraw funds.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			senderDid, err := did.UnmarshalIxoDid(args[0])
+			ixoDid, err := did.UnmarshalIxoDid(args[0])
 			if err != nil {
 				return err
 			}
@@ -241,11 +241,11 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(senderDid.Did))
+				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
+			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, senderDid)
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }

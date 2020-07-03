@@ -53,7 +53,7 @@ func (msg MsgAddDid) Route() string { return RouterKey }
 
 func (msg MsgAddDid) GetSignerDid() exported.Did { return msg.DidDoc.Did }
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgAddDid) ValidateBasic() sdk.Error {
@@ -118,7 +118,7 @@ func (msg MsgAddCredential) Route() string { return RouterKey }
 
 func (msg MsgAddCredential) GetSignerDid() exported.Did { return msg.DidCredential.Issuer }
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgAddCredential) String() string {

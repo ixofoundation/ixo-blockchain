@@ -4,7 +4,6 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -79,8 +78,14 @@ func handleMsgSetPaymentContractAuthorisation(ctx sdk.Context, k Keeper, msg Msg
 		return err.Result()
 	}
 
+	// Get payer address
+	payerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.PayerDid)
+	if err != nil {
+		return err.Result()
+	}
+	payerAddr := payerDidDoc.Address()
+
 	// Confirm that signer is actually the payer in the payment contract
-	payerAddr := did.DidToAddr(msg.PayerDid)
 	if !payerAddr.Equals(contract.Payer) {
 		return sdk.ErrInvalidAddress("signer must be payment contract payer").Result()
 	}
@@ -153,8 +158,14 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		return sdk.ErrInternal("invalid payment template").Result()
 	}
 
+	// Get creator address
+	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.CreatorDid)
+	if err != nil {
+		return err.Result()
+	}
+	creatorAddr := cretorDidDoc.Address()
+
 	// Create payment contract and validate
-	creatorAddr := did.DidToAddr(msg.CreatorDid)
 	contract := NewPaymentContract(msg.PaymentContractId, msg.PaymentTemplateId,
 		creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
 	if err := contract.Validate(); err != nil {
@@ -188,8 +199,14 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper,
 		return err.Result()
 	}
 
+	// Get creator address
+	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.CreatorDid)
+	if err != nil {
+		return err.Result()
+	}
+	creatorAddr := cretorDidDoc.Address()
+
 	// Confirm that signer is actually the creator of the payment contract
-	creatorAddr := did.DidToAddr(msg.CreatorDid)
 	if !creatorAddr.Equals(contract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be payment contract creator").Result()
 	}
@@ -215,8 +232,14 @@ func handleMsgGrantDiscount(ctx sdk.Context, k Keeper, msg MsgGrantDiscount) sdk
 		return err.Result()
 	}
 
+	// Get creator address
+	creatorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
+	if err != nil {
+		return err.Result()
+	}
+	creatorAddr := creatorDidDoc.Address()
+
 	// Confirm that signer is actually the creator of the payment contract
-	creatorAddr := did.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(contract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be payment contract creator").Result()
 	}
@@ -247,8 +270,14 @@ func handleMsgRevokeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeDiscount) s
 		return err.Result()
 	}
 
+	// Get creator address
+	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
+	if err != nil {
+		return err.Result()
+	}
+	creatorAddr := cretorDidDoc.Address()
+
 	// Confirm that signer is actually the creator of the payment contract
-	creatorAddr := did.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(contract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be payment contract creator").Result()
 	}
@@ -270,8 +299,14 @@ func handleMsgEffectPayment(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgEf
 		return err.Result()
 	}
 
+	// Get creator address
+	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
+	if err != nil {
+		return err.Result()
+	}
+	creatorAddr := cretorDidDoc.Address()
+
 	// Confirm that signer is actually the creator of the payment contract
-	creatorAddr := did.DidToAddr(msg.SenderDid)
 	if !creatorAddr.Equals(contract.Creator) {
 		return sdk.ErrInvalidAddress("signer must be payment contract creator").Result()
 	}

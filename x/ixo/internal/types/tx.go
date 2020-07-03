@@ -119,10 +119,6 @@ func (tx IxoTx) String() string {
 	return fmt.Sprintf("%v", string(output))
 }
 
-func (tx IxoTx) GetSigner() sdk.AccAddress {
-	return tx.GetMsgs()[0].GetSigners()[0]
-}
-
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 	return func(txBytes []byte) (sdk.Tx, sdk.Error) {
 
