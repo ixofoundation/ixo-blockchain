@@ -12,7 +12,7 @@ import (
 	genutilrest "github.com/cosmos/cosmos-sdk/x/genutil/client/rest"
 	"github.com/gorilla/mux"
 	utils2 "github.com/ixofoundation/ixo-blockchain/client/utils"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"io/ioutil"
@@ -159,7 +159,8 @@ func BroadcastTxRequest(cliCtx context.CLIContext) http.HandlerFunc {
 }
 
 type SignDataReq struct {
-	Msg string `json:"msg" yaml:"msg"`
+	Msg    string `json:"msg" yaml:"msg"`
+	PubKey string `json:"pub_key" yaml:"pub_key"`
 }
 
 type SignDataResponse struct {
@@ -212,7 +213,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 				project.MsgCreateProjectFee)
 		default:
 			// Deduce and set signer address
-			signerAddress := did.DidToAddr(ixoMsg.GetSignerDid())
+			signerAddress := exported.VerifyKeyToAddr(req.PubKey)
 			cliCtx = cliCtx.WithFromAddress(signerAddress)
 
 			txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)

@@ -24,7 +24,7 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(types.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
@@ -51,7 +51,7 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(types.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)

@@ -3,6 +3,9 @@ package exported
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/btcsuite/btcutil/base58"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 type Did = string
@@ -12,6 +15,7 @@ type DidDoc interface {
 	GetDid() Did
 	SetPubKey(pubkey string) error
 	GetPubKey() string
+	Address() sdk.AccAddress
 }
 
 type Secret struct {
@@ -36,6 +40,20 @@ type IxoDid struct {
 	Secret              Secret `json:"secret" yaml:"secret"`
 }
 
+// Above IxoDid modelled after Sovrin documents
+// Ref: https://www.npmjs.com/package/sovrin-did
+// {
+//    did: "<base58 did>",
+//    verifyKey: "<base58 publicKey>",
+//    publicKey: "<base58 publicKey>",
+//
+//    secret: {
+//        seed: "<hex encoded 32-byte seed>",
+//        signKey: "<base58 secretKey>",
+//        privateKey: "<base58 privateKey>"
+//    }
+// }
+
 func (id IxoDid) String() string {
 	output, err := json.MarshalIndent(id, "", "  ")
 	if err != nil {
@@ -43,6 +61,16 @@ func (id IxoDid) String() string {
 	}
 
 	return fmt.Sprintf("%v", string(output))
+}
+
+func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
+	var pubKey ed25519.PubKeyEd25519
+	copy(pubKey[:], base58.Decode(verifyKey))
+	return sdk.AccAddress(pubKey.Address())
+}
+
+func (id IxoDid) Address() sdk.AccAddress {
+	return VerifyKeyToAddr(id.VerifyKey)
 }
 
 type Claim struct {

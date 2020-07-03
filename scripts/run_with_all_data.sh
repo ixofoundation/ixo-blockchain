@@ -27,10 +27,10 @@ yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 1000000
 yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000uixos,100000000000uixo,1000000res,1000000rez
 yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000uixos,100000000000uixo,1000000res,1000000rez
 
-# Add DID-based genesis accounts
-MIGUEL_ADDR="ixo1x2x0thq6x2rx7txl0ujpyg9rr0c8mc8ad904xw"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun
-FRANCESCO_ADDR="ixo1nnxvyr6hs0sglppqzw4v5s9r5dwh89423xu5zp" # address from did:ixo:UKzkhVSHc3qEFva5EY2XHt
-SHAUN_ADDR="ixo1vnsjples23f6ggtsvu5s24vv86ue0hl2hvnnsd"     # address from did:ixo:U4tSpzzv91HHqWW1YmFkHJ
+# Add pubkey-based genesis accounts
+MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
+FRANCESCO_ADDR="ixo1cpa6w2wnqyxpxm4rryfjwjnx75kn4xt372dp3y" # address from did:ixo:UKzkhVSHc3qEFva5EY2XHt's pubkey
+SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"     # address from did:ixo:U4tSpzzv91HHqWW1YmFkHJ's pubkey
 yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000uixos,100000000000uixo,1000000res,1000000rez
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000uixos,100000000000uixo,1000000res,1000000rez
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000uixos,100000000000uixo,1000000res,1000000rez
@@ -71,9 +71,9 @@ ixod collect-gentxs
 ixod validate-genesis
 
 # Uncomment the below to broadcast node RPC endpoint
-#FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
-#TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
-#sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
+FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
+TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 ixod start --pruning "syncable" &
 ixocli rest-server --chain-id pandora-1 --trust-node && fg

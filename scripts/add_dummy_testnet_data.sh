@@ -198,12 +198,11 @@ echo "Updating project 2 to PENDING..."
 ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Fund project (using treasury 'send' and 'oracle-transfer')
-echo "Funding project 2 (using treasury 'send' from Miguel)..."
-ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000uixo "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Funding project 2 (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-# The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project get-project-accounts $PROJECT2_DID)
-# Note that we're actually sending just 100uixo, since ixoDecimals is 1e8 and we're sending 100e8uixo
+PROJECT_2_ADDR=$(ixocli q project get-project-accounts $PROJECT2_DID | grep $PROJECT2_DID | cut -d \" -f 4)
+echo "Funding project 2 [$PROJECT_2_ADDR] (using treasury 'send' from Miguel)..."
+ixocli tx treasury send "$PROJECT_2_ADDR" 5000000000uixo "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Funding project 2 [$PROJECT_2_ADDR] (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
+ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_2_ADDR" 5000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Updating project 2 to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

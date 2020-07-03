@@ -17,7 +17,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tendermint/ed25519"
 	"github.com/tendermint/tendermint/crypto"
-	ed25519Keys "github.com/tendermint/tendermint/crypto/ed25519"
+	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/multisig"
 	"os"
 	"time"
@@ -29,8 +29,8 @@ var (
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 
 	// simulation signature values used to estimate gas consumption
-	simEd25519Pubkey ed25519Keys.PubKeyEd25519
-	simEd25519Sig    [32]byte
+	simEd25519Pubkey ed25519tm.PubKeyEd25519
+	simEd25519Sig    [ed25519.SignatureSize]byte
 )
 
 func init() {
@@ -49,45 +49,10 @@ func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
 			return pubKey, err.Result()
 		}
 
-		var pubKeyRaw [ed25519.PublicKeySize]byte
+		var pubKeyRaw ed25519tm.PubKeyEd25519
 		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
-		return ed25519Keys.PubKeyEd25519(pubKeyRaw), sdk.Result{}
+		return pubKeyRaw, sdk.Result{}
 	}
-}
-
-// ProcessPubKey verifies that the given account address matches that of the
-// IxoSignature. In addition, it will set the public key of the account if it
-// has not been set.
-func processPubKey(acc auth.Account, pubKey crypto.PubKey, simulate bool) (crypto.PubKey, sdk.Result) {
-	// If pubkey is not known for account, set it from the StdSignature.
-	accPubKey := acc.GetPubKey()
-	if simulate {
-		// In simulate mode the transaction comes with no signatures, thus if the
-		// account's pubkey is nil, both signature verification and gasKVStore.Set()
-		// shall consume enough gas to process an ed25519 pubkey
-		if accPubKey == nil {
-			return simEd25519Pubkey, sdk.Result{}
-		}
-
-		return accPubKey, sdk.Result{}
-	}
-
-	if accPubKey == nil {
-		accPubKey = pubKey
-		if accPubKey == nil {
-			return nil, sdk.ErrInvalidPubKey("PubKey not found").Result()
-		}
-
-		// TODO: uncomment as soon as this is true for pubkeys and accounts
-		// Note: once the below is uncommented, this function can actually be
-		//       removed and replaced by use of the same one in Cosmos SDK
-		//if !bytes.Equal(accPubKey.Address(), acc.GetAddress()) {
-		//	return nil, sdk.ErrInvalidPubKey(
-		//		fmt.Sprintf("PubKey does not match Signer address %s", acc.GetAddress())).Result()
-		//}
-	}
-
-	return accPubKey, sdk.Result{}
 }
 
 func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdSignature, params auth.Params) {
@@ -112,7 +77,7 @@ func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdS
 func ProcessSig(ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBytes []byte,
 	simulate bool, params auth.Params) (updatedAcc auth.Account, res sdk.Result) {
 
-	pubKey, res := processPubKey(acc, sig.PubKey, simulate)
+	pubKey, res := auth.ProcessPubKey(acc, sig, simulate)
 	if !res.IsOK() {
 		return nil, res
 	}
@@ -220,8 +185,20 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 			return newCtx, res, true
 		}
 
+		// all messages must be of type IxoMsg
+		msg, ok := ixoTx.GetMsgs()[0].(IxoMsg)
+		if !ok {
+			return newCtx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
+		}
+
+		// Get pubKey
+		pubKey, res := pubKeyGetter(ctx, msg)
+		if !res.IsOK() {
+			return newCtx, res, true
+		}
+
 		// fetch first (and only) signer, who's going to pay the fees
-		signerAddr := ixoTx.GetSigner()
+		signerAddr := sdk.AccAddress(pubKey.Address())
 		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
 		if !res.IsOK() {
 			return newCtx, res, true
@@ -236,18 +213,6 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 
 			// reload the account as fees have been deducted
 			signerAcc = ak.GetAccount(newCtx, signerAcc.GetAddress())
-		}
-
-		// all messages must be of type IxoMsg
-		msg, ok := ixoTx.GetMsgs()[0].(IxoMsg)
-		if !ok {
-			return newCtx, sdk.ErrInternal("msg must be ixo.IxoMsg").Result(), true
-		}
-
-		// Get pubKey
-		pubKey, res := pubKeyGetter(ctx, msg)
-		if !res.IsOK() {
-			return newCtx, res, true
 		}
 
 		// check signature, return account with incremented nonce
@@ -271,7 +236,7 @@ func signAndBroadcast(ctx context.CLIContext, msg auth.StdSignMsg,
 		panic("expected one message")
 	}
 
-	var privKey ed25519Keys.PrivKeyEd25519
+	var privKey ed25519tm.PrivKeyEd25519
 	copy(privKey[:], base58.Decode(ixoDid.Secret.SignKey))
 	copy(privKey[32:], base58.Decode(ixoDid.VerifyKey))
 

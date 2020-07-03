@@ -20,7 +20,6 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 GAS_PRICES="0.025uixo"
-PROJECT_FEE_FUND="45000uixo" # 0.025 * 200000 * 9txs
 
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 PROJECT_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
@@ -50,8 +49,13 @@ echo "Updating project to PENDING..."
 ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Fund project and progress status to FUNDED
-echo "Funding project (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_DID/$PROJECT_DID" 10000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+PROJECT_ADDR=$(ixocli q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
+# TODO [[below two lines to be uncommented once treasury module supports sending to addresses]]
+# echo "Funding project at [$PROJECT_ADDR] (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
+# ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_ADDR" 10000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+# TODO [[below two lines to be removed once treasury module supports sending to addresses]]
+echo "Funcing project [$PROJECT_ADDR] using send from miguel..."
+ixocli tx send miguel "$PROJECT_ADDR" 10000000000uixo --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

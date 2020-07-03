@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -17,16 +18,19 @@ type Keeper struct {
 	storeKey       sdk.StoreKey
 	paramSpace     params.Subspace
 	AccountKeeper  auth.AccountKeeper
+	DidKeeper      did.Keeper
 	paymentsKeeper payments.Keeper
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
-	accountKeeper auth.AccountKeeper, paymentsKeeper payments.Keeper) Keeper {
+	accountKeeper auth.AccountKeeper, didKeeper did.Keeper,
+	paymentsKeeper payments.Keeper) Keeper {
 	return Keeper{
 		cdc:            cdc,
 		storeKey:       key,
 		paramSpace:     paramSpace.WithKeyTable(types.ParamKeyTable()),
 		AccountKeeper:  accountKeeper,
+		DidKeeper:      didKeeper,
 		paymentsKeeper: paymentsKeeper,
 	}
 }
@@ -148,7 +152,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
 	accountId types.InternalAccountID) (auth.Account, sdk.Error) {
-	address := did.StringToAddr(accountId.ToAddressKey(projectDid))
+	address := supply.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdk.ErrInvalidAddress("Generate account already exists")

@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmDB "github.com/tendermint/tm-db"
@@ -21,7 +22,8 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 	actStoreKey := sdk.NewKVStoreKey(auth.StoreKey)
 	keyParams := sdk.NewKVStoreKey("subspace")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
-	keyFees := sdk.NewKVStoreKey(payments.StoreKey)
+	keyPayments := sdk.NewKVStoreKey(payments.StoreKey)
+	keyDid := sdk.NewKVStoreKey(did.StoreKey)
 
 	db := tmDB.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
@@ -29,7 +31,8 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 	ms.MountStoreWithDB(actStoreKey, sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeIAVL, nil)
-	ms.MountStoreWithDB(keyFees, sdk.StoreTypeIAVL, nil)
+	ms.MountStoreWithDB(keyPayments, sdk.StoreTypeIAVL, nil)
+	ms.MountStoreWithDB(keyDid, sdk.StoreTypeIAVL, nil)
 	_ = ms.LoadLatestVersion()
 
 	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
@@ -44,8 +47,9 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 	projectSubspace := pk1.Subspace(types.DefaultParamspace)
 
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
-	paymentsKeeper := payments.NewKeeper(cdc, keyFees, paymentsSubspace, bankKeeper, nil)
-	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, paymentsKeeper)
+	didKeeper := did.NewKeeper(cdc, keyDid)
+	paymentsKeeper := payments.NewKeeper(cdc, keyPayments, paymentsSubspace, bankKeeper, didKeeper, nil)
+	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, didKeeper, paymentsKeeper)
 
 	paymentsKeeper.SetParams(ctx, payments.DefaultParams())
 

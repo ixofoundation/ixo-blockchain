@@ -17,10 +17,12 @@ type Keeper struct {
 	bankKeeper    bank.Keeper
 	oraclesKeeper oracles.Keeper
 	supplyKeeper  supply.Keeper
+	didKeeper     did.Keeper
 }
 
 func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper bank.Keeper,
-	oraclesKeeper oracles.Keeper, supplyKeeper supply.Keeper) Keeper {
+	oraclesKeeper oracles.Keeper, supplyKeeper supply.Keeper,
+	didKeeper did.Keeper) Keeper {
 
 	return Keeper{
 		cdc:           cdc,
@@ -28,14 +30,26 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper bank.Keeper,
 		bankKeeper:    bankKeeper,
 		oraclesKeeper: oraclesKeeper,
 		supplyKeeper:  supplyKeeper,
+		didKeeper:     didKeeper,
 	}
 }
 
 func (k Keeper) Send(ctx sdk.Context, fromDid, toDid did.Did, amount sdk.Coins) sdk.Error {
-	fromAddress := did.DidToAddr(fromDid)
-	toAddress := did.DidToAddr(toDid)
+	// Get from address
+	fromDidDoc, err := k.didKeeper.GetDidDoc(ctx, fromDid)
+	if err != nil {
+		return err
+	}
+	fromAddress := fromDidDoc.Address()
 
-	err := k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, amount)
+	// Get to address
+	toDidDoc, err := k.didKeeper.GetDidDoc(ctx, toDid)
+	if err != nil {
+		return err
+	}
+	toAddress := toDidDoc.Address()
+
+	err = k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, amount)
 	if err != nil {
 		return err
 	}
@@ -71,7 +85,12 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid did.Di
 }
 
 func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid did.Did, amount sdk.Coins) sdk.Error {
-	toAddress := did.DidToAddr(toDid)
+	// Get to address
+	toDidDoc, err := k.didKeeper.GetDidDoc(ctx, toDid)
+	if err != nil {
+		return err
+	}
+	toAddress := toDidDoc.Address()
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -95,7 +114,7 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid did.Did, amount sdk
 	}
 
 	// Mint coins to module account
-	err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, amount)
+	err = k.supplyKeeper.MintCoins(ctx, types.ModuleName, amount)
 	if err != nil {
 		return err
 	}
@@ -111,7 +130,12 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid did.Did, amount sdk
 }
 
 func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount sdk.Coins) sdk.Error {
-	fromAddress := did.DidToAddr(fromDid)
+	// Get from address
+	fromDidDoc, err := k.didKeeper.GetDidDoc(ctx, fromDid)
+	if err != nil {
+		return err
+	}
+	fromAddress := fromDidDoc.Address()
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -135,7 +159,7 @@ func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount s
 	}
 
 	// Take tokens to burn from account
-	err := k.supplyKeeper.SendCoinsFromAccountToModule(ctx,
+	err = k.supplyKeeper.SendCoinsFromAccountToModule(ctx,
 		fromAddress, types.ModuleName, amount)
 	if err != nil {
 		return err

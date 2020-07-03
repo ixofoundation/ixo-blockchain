@@ -33,7 +33,7 @@ func GetCmdSend(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgSend(toDid, coins, ixoDid.Did)
 
@@ -65,7 +65,7 @@ func GetCmdOracleTransfer(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgOracleTransfer(
 				fromDid, toDid, coins, ixoDid.Did, proof)
@@ -97,7 +97,7 @@ func GetCmdOracleMint(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgOracleMint(
 				toDid, coins, ixoDid.Did, proof)
@@ -129,7 +129,7 @@ func GetCmdOracleBurn(cdc *codec.Codec) *cobra.Command {
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(did.DidToAddr(ixoDid.Did))
+				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgOracleBurn(
 				fromDid, coins, ixoDid.Did, proof)

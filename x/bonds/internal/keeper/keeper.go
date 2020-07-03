@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -17,6 +18,7 @@ type Keeper struct {
 	SupplyKeeper  supply.Keeper
 	accountKeeper auth.AccountKeeper
 	StakingKeeper staking.Keeper
+	DidKeeper     did.Keeper
 
 	storeKey sdk.StoreKey
 
@@ -25,7 +27,7 @@ type Keeper struct {
 
 func NewKeeper(bankKeeper bank.Keeper, supplyKeeper supply.Keeper,
 	accountKeeper auth.AccountKeeper, stakingKeeper staking.Keeper,
-	storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
+	didKeeper did.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 
 	// ensure batches module account is set
 	if addr := supplyKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {
@@ -37,6 +39,7 @@ func NewKeeper(bankKeeper bank.Keeper, supplyKeeper supply.Keeper,
 		SupplyKeeper:  supplyKeeper,
 		accountKeeper: accountKeeper,
 		StakingKeeper: stakingKeeper,
+		DidKeeper:     didKeeper,
 		storeKey:      storeKey,
 		cdc:           cdc,
 	}

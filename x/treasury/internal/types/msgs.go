@@ -56,7 +56,7 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 
 func (msg MsgSend) GetSignerDid() did.Did { return msg.FromDid }
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgSend) String() string {
@@ -116,7 +116,7 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 
 func (msg MsgOracleTransfer) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgOracleTransfer) String() string {
@@ -171,7 +171,7 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 
 func (msg MsgOracleMint) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgOracleMint) String() string {
@@ -226,7 +226,7 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 
 func (msg MsgOracleBurn) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgOracleBurn) String() string {
