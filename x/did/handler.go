@@ -24,6 +24,8 @@ func NewHandler(k keeper.Keeper, nftKeeper nft.Keeper) sdk.Handler {
 func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, nftKeeper nft.Keeper, msg types.MsgAddDid) sdk.Result {
 	newDidDoc := msg.DidDoc
 
+	// TODO: use NFT module to assign the DID Doc an NFT
+
 	if len(newDidDoc.Credentials) > 0 {
 		return sdk.ErrUnknownRequest("Cannot add a new DID with existing Credentials").Result()
 	}
