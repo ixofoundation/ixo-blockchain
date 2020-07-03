@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
@@ -101,11 +102,13 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	actStoreKey := sdk.NewKVStoreKey(auth.StoreKey)
+	keyDid := sdk.NewKVStoreKey(did.StoreKey)
 
 	db := dbm.NewMemDB()
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(actStoreKey, sdk.StoreTypeIAVL, nil)
+	ms.MountStoreWithDB(keyDid, sdk.StoreTypeIAVL, nil)
 
 	_ = ms.LoadLatestVersion()
 	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
@@ -125,8 +128,8 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 
 	accountKeeper := auth.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
-
-	keeper := NewKeeper(cdc, storeKey, paymentsSubspace, bankKeeper, nil)
+	didKeeper := did.NewKeeper(cdc, keyDid)
+	keeper := NewKeeper(cdc, storeKey, paymentsSubspace, bankKeeper, didKeeper, nil)
 
 	return ctx, keeper, cdc
 }

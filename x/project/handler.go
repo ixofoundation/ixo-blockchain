@@ -302,7 +302,13 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 		return err
 	}
 
-	recipientAddr := did.StringToAddr(recipientDid)
+	// Get recipient address
+	recipientDidDoc, err := k.DidKeeper.GetDidDoc(ctx, recipientDid)
+	if err != nil {
+		return err
+	}
+	recipientAddr := recipientDidDoc.Address()
+
 	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{amount})
 	if err != nil {
 		return err

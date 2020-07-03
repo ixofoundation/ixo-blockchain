@@ -22,6 +22,9 @@ type (
 	Did    = exported.Did
 	DidDoc = exported.DidDoc
 	IxoDid = exported.IxoDid
+
+	MsgAddDid        = types.MsgAddDid
+	MsgAddCredential = types.MsgAddCredential
 )
 
 var (
@@ -40,7 +43,6 @@ var (
 	ErrorInvalidDid = types.ErrorInvalidDid
 
 	IsValidDid      = types.IsValidDid
-	DidToAddr       = types.DidToAddr
-	StringToAddr    = types.StringToAddr
+	IsValidPubKey   = types.IsValidPubKey
 	UnmarshalIxoDid = types.UnmarshalIxoDid
 )

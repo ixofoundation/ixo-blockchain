@@ -25,7 +25,7 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		toDidParam := r.URL.Query().Get("toDid")
+		toDidOrAddrParam := r.URL.Query().Get("toDidOrAddr")
 		amountParam := r.URL.Query().Get("amount")
 		ixoDidParam := r.URL.Query().Get("ixoDid")
 
@@ -46,7 +46,7 @@ func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSend(toDidParam, coins, ixoDid.Did)
+		msg := types.NewMsgSend(toDidOrAddrParam, coins, ixoDid.Did)
 
 		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
@@ -65,7 +65,7 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		fromDidParam := r.URL.Query().Get("fromDid")
-		toDidParam := r.URL.Query().Get("toDid")
+		toDidOrAddrParam := r.URL.Query().Get("toDidOrAddr")
 		amountParam := r.URL.Query().Get("amount")
 		oracleDidParam := r.URL.Query().Get("oracleDid")
 		proofParam := r.URL.Query().Get("proof")
@@ -88,7 +88,7 @@ func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgOracleTransfer(
-			fromDidParam, toDidParam, coins, oracleDid.Did, proofParam)
+			fromDidParam, toDidOrAddrParam, coins, oracleDid.Did, proofParam)
 
 		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {
@@ -106,7 +106,7 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		toDidParam := r.URL.Query().Get("toDid")
+		toDidOrAddrParam := r.URL.Query().Get("toDidOrAddr")
 		amountParam := r.URL.Query().Get("amount")
 		oracleDidParam := r.URL.Query().Get("oracleDid")
 		proofParam := r.URL.Query().Get("proof")
@@ -129,7 +129,7 @@ func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgOracleMint(
-			toDidParam, coins, oracleDid.Did, proofParam)
+			toDidOrAddrParam, coins, oracleDid.Did, proofParam)
 
 		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, oracleDid)
 		if err != nil {

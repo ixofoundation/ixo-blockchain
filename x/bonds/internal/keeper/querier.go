@@ -56,7 +56,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins {
 	if reserveCoins.IsZero() {
 		zeroes, _ := bond.GetNewReserveDecCoins(sdk.OneDec()).TruncateDecimal()
-		for i, _ := range zeroes {
+		for i := range zeroes {
 			zeroes[i].Amount = sdk.ZeroInt()
 		}
 		reserveCoins = zeroes

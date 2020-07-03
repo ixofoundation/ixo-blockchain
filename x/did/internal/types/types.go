@@ -6,13 +6,14 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/tendermint/tendermint/crypto"
 	"regexp"
 )
 
 var (
-	ValidDid   = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
-	IsValidDid = ValidDid.MatchString
+	ValidDid      = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
+	ValidPubKey   = regexp.MustCompile(`^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]{44}$`)
+	IsValidDid    = ValidDid.MatchString
+	IsValidPubKey = ValidPubKey.MatchString
 	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html
 	// IsValidDid adapted from the above link but assumes no sub-namespaces
 	// TODO: ValidDid needs to be updated once we no longer want to be able
@@ -60,6 +61,10 @@ func (dd BaseDidDoc) SetPubKey(pubKey string) error {
 	return nil
 }
 
+func (dd BaseDidDoc) Address() sdk.AccAddress {
+	return exported.VerifyKeyToAddr(dd.GetPubKey())
+}
+
 func (dd *BaseDidDoc) AddCredential(cred exported.DidCredential) {
 	if dd.Credentials == nil {
 		dd.Credentials = make([]exported.DidCredential, 0)
@@ -83,16 +88,4 @@ func fromJsonString(jsonIxoDid string) (exported.IxoDid, error) {
 
 func UnmarshalIxoDid(jsonIxoDid string) (exported.IxoDid, error) {
 	return fromJsonString(jsonIxoDid)
-}
-
-func DidToAddr(did exported.Did) sdk.AccAddress {
-	// TODO: pubkey-to-addr instead of did-to-addr
-	//var pubKey ed25519Keys.PubKeyEd25519
-	//copy(pubKey[:], base58.Decode(pubKeyStr))
-	//return sdk.AccAddress(pubKey.Address())
-	return StringToAddr(did)
-}
-
-func StringToAddr(str string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(str)))
 }

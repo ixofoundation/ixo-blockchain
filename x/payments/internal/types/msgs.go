@@ -57,7 +57,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
 
 func (msg MsgCreatePaymentTemplate) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreatePaymentTemplate) String() string {
@@ -112,7 +112,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
 
 func (msg MsgCreatePaymentContract) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreatePaymentContract) String() string {
@@ -167,7 +167,7 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateSubscription) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreateSubscription) String() string {
@@ -217,7 +217,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() did.Did { return msg.PayerDid }
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgSetPaymentContractAuthorisation) String() string {
@@ -268,7 +268,7 @@ func (msg MsgGrantDiscount) ValidateBasic() sdk.Error {
 
 func (msg MsgGrantDiscount) GetSignerDid() did.Did { return msg.SenderDid }
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgGrantDiscount) String() string {
@@ -318,7 +318,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
 
 func (msg MsgRevokeDiscount) GetSignerDid() did.Did { return msg.SenderDid }
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgRevokeDiscount) String() string {
@@ -365,7 +365,7 @@ func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
 
 func (msg MsgEffectPayment) GetSignerDid() did.Did { return msg.SenderDid }
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{did.DidToAddr(msg.GetSignerDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgEffectPayment) String() string {

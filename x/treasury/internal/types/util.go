@@ -6,32 +6,32 @@ import (
 	"strings"
 )
 
-func NewMsgSend(toDid did.Did, amount sdk.Coins, senderDid did.Did) MsgSend {
+func NewMsgSend(toDidOrAddr string, amount sdk.Coins, senderDid did.Did) MsgSend {
 	return MsgSend{
-		FromDid: senderDid,
-		ToDid:   toDid,
-		Amount:  amount,
+		FromDid:     senderDid,
+		ToDidOrAddr: toDidOrAddr,
+		Amount:      amount,
 	}
 }
 
-func NewMsgOracleTransfer(fromDid, toDid did.Did, amount sdk.Coins,
+func NewMsgOracleTransfer(fromDid did.Did, toDidOrAddr string, amount sdk.Coins,
 	oracleDid did.Did, proof string) MsgOracleTransfer {
 	return MsgOracleTransfer{
-		OracleDid: oracleDid,
-		FromDid:   fromDid,
-		ToDid:     toDid,
-		Amount:    amount,
-		Proof:     proof,
+		OracleDid:   oracleDid,
+		FromDid:     fromDid,
+		ToDidOrAddr: toDidOrAddr,
+		Amount:      amount,
+		Proof:       proof,
 	}
 }
 
-func NewMsgOracleMint(toDid did.Did, amount sdk.Coins,
+func NewMsgOracleMint(toDidOrAddr string, amount sdk.Coins,
 	oracleDid did.Did, proof string) MsgOracleMint {
 	return MsgOracleMint{
-		OracleDid: oracleDid,
-		ToDid:     toDid,
-		Amount:    amount,
-		Proof:     proof,
+		OracleDid:   oracleDid,
+		ToDidOrAddr: toDidOrAddr,
+		Amount:      amount,
+		Proof:       proof,
 	}
 }
 
