@@ -30,7 +30,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) sdk.Result {
 
-	if err := k.Send(ctx, msg.FromDid, msg.ToDid, msg.Amount); err != nil {
+	if err := k.Send(ctx, msg.FromDid, msg.ToDidOrAddr, msg.Amount); err != nil {
 		return err.Result()
 	}
 
@@ -46,7 +46,7 @@ func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) sdk.Resu
 
 func handleMsgOracleTransfer(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleTransfer) sdk.Result {
 
-	if err := k.OracleTransfer(ctx, msg.FromDid, msg.ToDid, msg.OracleDid, msg.Amount); err != nil {
+	if err := k.OracleTransfer(ctx, msg.FromDid, msg.ToDidOrAddr, msg.OracleDid, msg.Amount); err != nil {
 		return err.Result()
 	}
 
@@ -62,7 +62,7 @@ func handleMsgOracleTransfer(ctx sdk.Context, k keeper.Keeper, msg types.MsgOrac
 
 func handleMsgOracleMint(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleMint) sdk.Result {
 
-	if err := k.OracleMint(ctx, msg.OracleDid, msg.ToDid, msg.Amount); err != nil {
+	if err := k.OracleMint(ctx, msg.OracleDid, msg.ToDidOrAddr, msg.Amount); err != nil {
 		return err.Result()
 	}
 

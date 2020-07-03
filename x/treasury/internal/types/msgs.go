@@ -24,9 +24,9 @@ var (
 )
 
 type MsgSend struct {
-	FromDid did.Did   `json:"from_did" yaml:"from_did"`
-	ToDid   did.Did   `json:"to_did" yaml:"to_did"`
-	Amount  sdk.Coins `json:"amount" yaml:"amount"`
+	FromDid     did.Did   `json:"from_did" yaml:"from_did"`
+	ToDidOrAddr did.Did   `json:"to_did" yaml:"to_did"`
+	Amount      sdk.Coins `json:"amount" yaml:"amount"`
 }
 
 func (msg MsgSend) Type() string  { return TypeMsgSend }
@@ -35,15 +35,17 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
-	} else if valid, err = CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
+	} else if valid, err = CheckNotEmpty(msg.ToDidOrAddr, "ToDidOrAddr"); !valid {
 		return err
 	}
 
-	// Check that DIDs valid
+	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.FromDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
-	} else if !did.IsValidDid(msg.ToDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
+	}
+	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
+	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
+		return sdk.ErrInvalidAddress("recipient is neither a did nor an address")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)
@@ -76,11 +78,11 @@ func (msg MsgSend) GetSignBytes() []byte {
 }
 
 type MsgOracleTransfer struct {
-	OracleDid did.Did   `json:"oracle_did" yaml:"oracle_did"`
-	FromDid   did.Did   `json:"from_did" yaml:"from_did"`
-	ToDid     did.Did   `json:"to_did" yaml:"to_did"`
-	Amount    sdk.Coins `json:"amount" yaml:"amount"`
-	Proof     string    `json:"proof" yaml:"proof"`
+	OracleDid   did.Did   `json:"oracle_did" yaml:"oracle_did"`
+	FromDid     did.Did   `json:"from_did" yaml:"from_did"`
+	ToDidOrAddr did.Did   `json:"to_did" yaml:"to_did"`
+	Amount      sdk.Coins `json:"amount" yaml:"amount"`
+	Proof       string    `json:"proof" yaml:"proof"`
 }
 
 func (msg MsgOracleTransfer) Type() string  { return TypeMsgOracleTransfer }
@@ -91,19 +93,21 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.ToDidOrAddr, "ToDidOrAddr"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.Proof, "Proof"); !valid {
 		return err
 	}
 
-	// Check that DIDs valid
+	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.OracleDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
 	} else if !did.IsValidDid(msg.FromDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
-	} else if !did.IsValidDid(msg.ToDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
+	}
+	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
+	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
+		return sdk.ErrInvalidAddress("recipient is neither a did nor an address")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)
@@ -136,10 +140,10 @@ func (msg MsgOracleTransfer) GetSignBytes() []byte {
 }
 
 type MsgOracleMint struct {
-	OracleDid did.Did   `json:"oracle_did" yaml:"oracle_did"`
-	ToDid     did.Did   `json:"to_did" yaml:"to_did"`
-	Amount    sdk.Coins `json:"amount" yaml:"amount"`
-	Proof     string    `json:"proof" yaml:"proof"`
+	OracleDid   did.Did   `json:"oracle_did" yaml:"oracle_did"`
+	ToDidOrAddr did.Did   `json:"to_did" yaml:"to_did"`
+	Amount      sdk.Coins `json:"amount" yaml:"amount"`
+	Proof       string    `json:"proof" yaml:"proof"`
 }
 
 func (msg MsgOracleMint) Type() string  { return TypeMsgOracleMint }
@@ -148,17 +152,19 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.ToDid, "ToDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.ToDidOrAddr, "ToDidOrAddr"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.Proof, "Proof"); !valid {
 		return err
 	}
 
-	// Check that DIDs valid
+	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.OracleDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
-	} else if !did.IsValidDid(msg.ToDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "to did is invalid")
+	}
+	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
+	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
+		return sdk.ErrInvalidAddress("recipient is neither a did nor an address")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)

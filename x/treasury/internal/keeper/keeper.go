@@ -34,7 +34,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper bank.Keeper,
 	}
 }
 
-func (k Keeper) Send(ctx sdk.Context, fromDid, toDid did.Did, amount sdk.Coins) sdk.Error {
+func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amount sdk.Coins) sdk.Error {
 	// Get from address
 	fromDidDoc, err := k.didKeeper.GetDidDoc(ctx, fromDid)
 	if err != nil {
@@ -43,11 +43,20 @@ func (k Keeper) Send(ctx sdk.Context, fromDid, toDid did.Did, amount sdk.Coins) 
 	fromAddress := fromDidDoc.Address()
 
 	// Get to address
-	toDidDoc, err := k.didKeeper.GetDidDoc(ctx, toDid)
-	if err != nil {
-		return err
+	var toAddress sdk.AccAddress
+	if did.IsValidDid(toDidOrAddr) {
+		toDidDoc, err := k.didKeeper.GetDidDoc(ctx, toDidOrAddr)
+		if err != nil {
+			return err
+		}
+		toAddress = toDidDoc.Address()
+	} else {
+		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
+		if err != nil {
+			return sdk.ErrInternal(err.Error())
+		}
+		toAddress = parsedAddr
 	}
-	toAddress := toDidDoc.Address()
 
 	err = k.bankKeeper.SendCoins(ctx, fromAddress, toAddress, amount)
 	if err != nil {
@@ -57,7 +66,8 @@ func (k Keeper) Send(ctx sdk.Context, fromDid, toDid did.Did, amount sdk.Coins) 
 	return nil
 }
 
-func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid did.Did, amount sdk.Coins) sdk.Error {
+func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid did.Did,
+	toDidOrAddr string, oracleDid did.Did, amount sdk.Coins) sdk.Error {
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -81,16 +91,25 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid, toDid, oracleDid did.Di
 	}
 
 	// Perform send
-	return k.Send(ctx, fromDid, toDid, amount)
+	return k.Send(ctx, fromDid, toDidOrAddr, amount)
 }
 
-func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid did.Did, amount sdk.Coins) sdk.Error {
+func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr string, amount sdk.Coins) sdk.Error {
 	// Get to address
-	toDidDoc, err := k.didKeeper.GetDidDoc(ctx, toDid)
-	if err != nil {
-		return err
+	var toAddress sdk.AccAddress
+	if did.IsValidDid(toDidOrAddr) {
+		toDidDoc, err := k.didKeeper.GetDidDoc(ctx, toDidOrAddr)
+		if err != nil {
+			return err
+		}
+		toAddress = toDidDoc.Address()
+	} else {
+		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
+		if err != nil {
+			return sdk.ErrInternal(err.Error())
+		}
+		toAddress = parsedAddr
 	}
-	toAddress := toDidDoc.Address()
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
@@ -114,7 +133,7 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid, toDid did.Did, amount sdk
 	}
 
 	// Mint coins to module account
-	err = k.supplyKeeper.MintCoins(ctx, types.ModuleName, amount)
+	err := k.supplyKeeper.MintCoins(ctx, types.ModuleName, amount)
 	if err != nil {
 		return err
 	}

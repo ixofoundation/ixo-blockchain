@@ -50,12 +50,8 @@ ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL
 
 # Fund project and progress status to FUNDED
 PROJECT_ADDR=$(ixocli q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
-# TODO [[below two lines to be uncommented once treasury module supports sending to addresses]]
-# echo "Funding project at [$PROJECT_ADDR] (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-# ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_ADDR" 10000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-# TODO [[below two lines to be removed once treasury module supports sending to addresses]]
-echo "Funcing project [$PROJECT_ADDR] using send from miguel..."
-ixocli tx send miguel "$PROJECT_ADDR" 10000000000uixo --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Funding project at [$PROJECT_ADDR] (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
+ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_ADDR" 10000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
