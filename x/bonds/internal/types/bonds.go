@@ -340,18 +340,25 @@ func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.
 	case PowerFunction:
 		fallthrough
 	case SigmoidFunction:
-		var returnForBurn sdk.Dec
 		result := bond.CurveIntegral(bond.CurrentSupply.Amount.Sub(burn))
+
+		var reserveBalance sdk.Dec
 		if reserveBalances.Empty() {
-			panic("no reserve available for burn")
+			reserveBalance = sdk.ZeroDec()
 		} else {
 			// Reserve balances should all be equal given that we are always
-			// applying the same additions/subtractions to all reserve balances
-			commonReserveBalance := sdk.NewDecFromInt(reserveBalances[0].Amount)
-			returnForBurn = commonReserveBalance.Sub(result)
+			// applying the same additions/subtractions to all reserve balances.
+			// Thus we can pick the first reserve balance as the global balance.
+			reserveBalance = sdk.NewDecFromInt(reserveBalances[0].Amount)
 		}
-		// TODO: investigate possibility of negative returnForBurn
-		return bond.GetNewReserveDecCoins(returnForBurn)
+
+		if result.GT(reserveBalance) {
+			panic("not enough reserve available for burn")
+		} else {
+			returnForBurn := reserveBalance.Sub(result)
+			return bond.GetNewReserveDecCoins(returnForBurn)
+			// TODO: investigate possibility of negative returnForBurn
+		}
 	case SwapperFunction:
 		return bond.GetReserveDeltaForLiquidityDelta(burn, reserveBalances)
 	default:
