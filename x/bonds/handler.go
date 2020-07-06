@@ -59,7 +59,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) sdk.Result {
-	if keeper.CoinKeeper.BlacklistedAddr(msg.FeeAddress) {
+	if keeper.BankKeeper.BlacklistedAddr(msg.FeeAddress) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress)).Result()
 	}
 
@@ -73,12 +73,19 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 	reserveAddress := keeper.GetNextUnusedReserveAddress(ctx)
 
-	bond := NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
-		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
-		reserveAddress, msg.TxFeePercentage, msg.ExitFeePercentage,
-		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks,
-		msg.BondDid, msg.PubKey)
+	// TODO: investigate ways to prevent reserve address from receiving transactions
+
+	// Not critical since as is no tokens can be taken out of the reserve, unless
+	// programmatically. However, increases in balance still affect calculations.
+	// Two possible solutions are (i) add new reserve addresses to the bank module
+	// blacklisted addresses (but no guarantee that this will be sufficient), or
+	// (ii) use a global res. address and store (in the bond) the share of the pool.
+
+	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
+		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens, reserveAddress,
+		msg.TxFeePercentage, msg.ExitFeePercentage, msg.FeeAddress, msg.MaxSupply,
+		msg.OrderQuantityLimits, msg.SanityRate, msg.SanityMarginPercentage,
+		msg.AllowSells, msg.BatchBlocks, msg.BondDid)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
 	keeper.SetBondDid(ctx, bond.Token, bond.BondDid)
@@ -124,6 +131,11 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
+	}
+
+	if bond.CreatorDid != msg.EditorDid {
+		errMsg := fmt.Sprintf("Editor must be the creator of the bond")
+		return sdk.ErrInternal(errMsg).Result()
 	}
 
 	if msg.Name != types.DoNotModifyField {
@@ -194,7 +206,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 }
 
 func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := types.DidToAddr(msg.BuyerDid)
+	buyerAddr := keeper.DidKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -263,7 +275,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.R
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) sdk.Result {
-	buyerAddr := types.DidToAddr(msg.BuyerDid)
+	buyerAddr := keeper.DidKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
@@ -283,7 +295,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 	}
 
 	// Use max prices as the amount to send to the liquidity pool (i.e. price)
-	err := keeper.CoinKeeper.SendCoins(ctx, buyerAddr, bond.ReserveAddress, msg.MaxPrices)
+	err := keeper.BankKeeper.SendCoins(ctx, buyerAddr, bond.ReserveAddress, msg.MaxPrices)
 	if err != nil {
 		return err.Result()
 	}
@@ -323,7 +335,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 }
 
 func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk.Result {
-	sellerAddr := types.DidToAddr(msg.SellerDid)
+	sellerAddr := keeper.DidKeeper.MustGetDidDoc(ctx, msg.SellerDid).Address()
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -390,7 +402,7 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) sdk
 }
 
 func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) sdk.Result {
-	swapperAddr := types.DidToAddr(msg.SwapperDid)
+	swapperAddr := keeper.DidKeeper.MustGetDidDoc(ctx, msg.SwapperDid).Address()
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {

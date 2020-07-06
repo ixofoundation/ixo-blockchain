@@ -13,11 +13,10 @@ import (
 
 func GetOraclesRequestHandler(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getOracles",
+		Use:   "get-oracles",
 		Short: "Query oracles",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 				keeper.QueryOracles), nil)
@@ -25,8 +24,8 @@ func GetOraclesRequestHandler(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var params types.Oracles
-			if err := cdc.UnmarshalJSON(bz, &params); err != nil {
+			var oracles types.Oracles
+			if err := cdc.UnmarshalJSON(bz, &oracles); err != nil {
 				return err
 			}
 

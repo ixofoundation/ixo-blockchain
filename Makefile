@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-VERSION := v1.0.0 # $(shell echo $(shell git describe --tags) | sed 's/^v//')
+VERSION := v1.2.0 # $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 

@@ -2,11 +2,11 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
 
 type Batch struct {
-	BondDid         ixo.Did      `json:"bond_did" yaml:"bond_did"`
+	BondDid         did.Did      `json:"bond_did" yaml:"bond_did"`
 	BlocksRemaining sdk.Uint     `json:"blocks_remaining" yaml:"blocks_remaining"`
 	TotalBuyAmount  sdk.Coin     `json:"total_buy_amount" yaml:"total_buy_amount"`
 	TotalSellAmount sdk.Coin     `json:"total_sell_amount" yaml:"total_sell_amount"`
@@ -21,7 +21,7 @@ func (b Batch) MoreBuysThanSells() bool { return b.TotalSellAmount.IsLT(b.TotalB
 func (b Batch) MoreSellsThanBuys() bool { return b.TotalBuyAmount.IsLT(b.TotalSellAmount) }
 func (b Batch) EqualBuysAndSells() bool { return b.TotalBuyAmount.IsEqual(b.TotalSellAmount) }
 
-func NewBatch(bondDid ixo.Did, token string, blocks sdk.Uint) Batch {
+func NewBatch(bondDid did.Did, token string, blocks sdk.Uint) Batch {
 	return Batch{
 		BondDid:         bondDid,
 		BlocksRemaining: blocks,
@@ -31,13 +31,13 @@ func NewBatch(bondDid ixo.Did, token string, blocks sdk.Uint) Batch {
 }
 
 type BaseOrder struct {
-	AccountDid   ixo.Did  `json:"sender_did" yaml:"sender_did"`
+	AccountDid   did.Did  `json:"sender_did" yaml:"sender_did"`
 	Amount       sdk.Coin `json:"amount" yaml:"amount"`
 	Cancelled    string   `json:"cancelled" yaml:"cancelled"`
 	CancelReason string   `json:"cancel_reason" yaml:"cancel_reason"`
 }
 
-func NewBaseOrder(accountDid ixo.Did, amount sdk.Coin) BaseOrder {
+func NewBaseOrder(accountDid did.Did, amount sdk.Coin) BaseOrder {
 	return BaseOrder{
 		AccountDid:   accountDid,
 		Amount:       amount,
@@ -55,7 +55,7 @@ type BuyOrder struct {
 	MaxPrices sdk.Coins `json:"max_prices" yaml:"max_prices"`
 }
 
-func NewBuyOrder(buyerDid ixo.Did, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {
+func NewBuyOrder(buyerDid did.Did, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {
 	return BuyOrder{
 		BaseOrder: NewBaseOrder(buyerDid, amount),
 		MaxPrices: maxPrices,
@@ -66,7 +66,7 @@ type SellOrder struct {
 	BaseOrder
 }
 
-func NewSellOrder(sellerDid ixo.Did, amount sdk.Coin) SellOrder {
+func NewSellOrder(sellerDid did.Did, amount sdk.Coin) SellOrder {
 	return SellOrder{
 		BaseOrder: NewBaseOrder(sellerDid, amount),
 	}
@@ -77,7 +77,7 @@ type SwapOrder struct {
 	ToToken string `json:"to_token" yaml:"to_token"`
 }
 
-func NewSwapOrder(swapperDid ixo.Did, from sdk.Coin, toToken string) SwapOrder {
+func NewSwapOrder(swapperDid did.Did, from sdk.Coin, toToken string) SwapOrder {
 	return SwapOrder{
 		BaseOrder: NewBaseOrder(swapperDid, from),
 		ToToken:   toToken,

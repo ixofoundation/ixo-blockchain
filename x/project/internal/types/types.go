@@ -1,12 +1,10 @@
 package types
 
 import (
-	"github.com/tendermint/tendermint/crypto"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 type (
@@ -16,14 +14,14 @@ type (
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
 )
 
-func (id InternalAccountID) ToAddressKey(projectDid ixo.Did) string {
+func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
 	return projectDid + "/" + string(id)
 }
 
 type StoredProjectDoc interface {
 	GetEvaluatorPay() int64
-	GetProjectDid() ixo.Did
-	GetSenderDid() ixo.Did
+	GetProjectDid() did.Did
+	GetSenderDid() did.Did
 	GetPubKey() string
 	GetStatus() ProjectStatus
 	SetStatus(status ProjectStatus)
@@ -64,8 +62,8 @@ func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
 
 type WithdrawalInfo struct {
 	ActionID     string   `json:"actionID" yaml:"actionID"`
-	ProjectDid   ixo.Did  `json:"projectDid" yaml:"projectDid"`
-	RecipientDid ixo.Did  `json:"recipientDid" yaml:"recipientDid"`
+	ProjectDid   did.Did  `json:"projectDid" yaml:"projectDid"`
+	RecipientDid did.Did  `json:"recipientDid" yaml:"recipientDid"`
 	Amount       sdk.Coin `json:"amount" yaml:"amount"`
 }
 
@@ -97,10 +95,8 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 	}
 }
 
-type ProjectDocDecoder func(projectEntryBytes []byte) (StoredProjectDoc, error)
-
 type CreateAgentDoc struct {
-	AgentDid ixo.Did `json:"did" yaml:"did"`
+	AgentDid did.Did `json:"did" yaml:"did"`
 	Role     string  `json:"role" yaml:"role"`
 }
 
@@ -113,7 +109,7 @@ const (
 )
 
 type UpdateAgentDoc struct {
-	Did    ixo.Did     `json:"did" yaml:"did"`
+	Did    did.Did     `json:"did" yaml:"did"`
 	Status AgentStatus `json:"status" yaml:"status"`
 	Role   string      `json:"role" yaml:"role"`
 }
@@ -136,18 +132,8 @@ type CreateEvaluationDoc struct {
 }
 
 type WithdrawFundsDoc struct {
-	ProjectDid   ixo.Did `json:"projectDid" yaml:"projectDid"`
-	RecipientDid ixo.Did `json:"recipientDid" yaml:"recipientDid"`
+	ProjectDid   did.Did `json:"projectDid" yaml:"projectDid"`
+	RecipientDid did.Did `json:"recipientDid" yaml:"recipientDid"`
 	Amount       sdk.Int `json:"amount" yaml:"amount"`
 	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
-}
-
-type ProjectMsg interface {
-	sdk.Msg
-	IsNewDid() bool
-	IsWithdrawal() bool
-}
-
-func StringToAddr(str string) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(str)))
 }

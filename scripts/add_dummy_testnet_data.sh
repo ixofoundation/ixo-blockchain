@@ -20,6 +20,7 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 PASSWORD="12345678"
+GAS_PRICES="0.025uixo"
 
 FEE1=$(yes $PASSWORD | ixocli keys show fee -a)
 FEE2=$(yes $PASSWORD | ixocli keys show fee2 -a)
@@ -30,10 +31,10 @@ BOND1_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 BOND2_DID="did:ixo:JHcN95bkS4aAWk3TKXapA2"
 BOND3_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
 BOND4_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
-BOND1_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
-BOND2_DID_FULL="{\"did\":\"did:ixo:JHcN95bkS4aAWk3TKXapA2\",\"verifyKey\":\"ARTUGePyi4rm3ogq3kjp8dEAVq1RR7Z3HWwLze6Ey4qg\",\"encryptionPublicKey\":\"FjLXxW1N68XgBKekfB2isCLHPwbqhLiQLQFhLiiivXqP\",\"secret\":{\"seed\":\"9fc38edde7b9d7097b0aeefcb22a8fcccb6c0748fc3034eec5abdac0740339f7\",\"signKey\":\"Bken38cPuz2Mosb3poKQHd81Q2BiTWFznG1Wa7ZZkrni\",\"encryptionPrivateKey\":\"Bken38cPuz2Mosb3poKQHd81Q2BiTWFznG1Wa7ZZkrni\"}}"
-BOND3_DID_FULL="{\"did\":\"did:ixo:48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
-BOND4_DID_FULL="{\"did\":\"did:ixo:RYLHkfNpbA8Losy68jt4yF\",\"verifyKey\":\"ENmMCsfNmjYoTRhNgnwXbQAw6p8JKH9DCJfGTPXNfsxW\",\"encryptionPublicKey\":\"5unQBt6JPW1pq9AqoRNhFJmibv8JqeoyyNvN3gF24EaU\",\"secret\":{\"seed\":\"d2c05b107acc2dfe3e9d67e98c993a9c03d227ed8f4505c43997cf4e7819bee2\",\"signKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\",\"encryptionPrivateKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\"}}"
+#BOND1_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW\",\"encryptionPublicKey\":\"domKpTpjrHQtKUnaFLjCuDLe2oHeS4b1sKt7yU9cq7m\",\"secret\":{\"seed\":\"933e454dbcfc1437f3afc10a0cd512cf0339787b6595819849f53707c268b053\",\"signKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\",\"encryptionPrivateKey\":\"Aun1EpjR1HQu1idBsPQ4u4C4dMwtbYPe1SdSC5bUerFC\"}}"
+#BOND2_DID_FULL="{\"did\":\"did:ixo:JHcN95bkS4aAWk3TKXapA2\",\"verifyKey\":\"ARTUGePyi4rm3ogq3kjp8dEAVq1RR7Z3HWwLze6Ey4qg\",\"encryptionPublicKey\":\"FjLXxW1N68XgBKekfB2isCLHPwbqhLiQLQFhLiiivXqP\",\"secret\":{\"seed\":\"9fc38edde7b9d7097b0aeefcb22a8fcccb6c0748fc3034eec5abdac0740339f7\",\"signKey\":\"Bken38cPuz2Mosb3poKQHd81Q2BiTWFznG1Wa7ZZkrni\",\"encryptionPrivateKey\":\"Bken38cPuz2Mosb3poKQHd81Q2BiTWFznG1Wa7ZZkrni\"}}"
+#BOND3_DID_FULL="{\"did\":\"did:ixo:48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
+#BOND4_DID_FULL="{\"did\":\"did:ixo:RYLHkfNpbA8Losy68jt4yF\",\"verifyKey\":\"ENmMCsfNmjYoTRhNgnwXbQAw6p8JKH9DCJfGTPXNfsxW\",\"encryptionPublicKey\":\"5unQBt6JPW1pq9AqoRNhFJmibv8JqeoyyNvN3gF24EaU\",\"secret\":{\"seed\":\"d2c05b107acc2dfe3e9d67e98c993a9c03d227ed8f4505c43997cf4e7819bee2\",\"signKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\",\"encryptionPrivateKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\"}}"
 
 PROJECT1_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 PROJECT2_DID="did:ixo:JHcN95bkS4aAWk3TKXapA2"
@@ -41,13 +42,6 @@ PROJECT1_DID_FULL="{\"did\":\"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c\",\"verifyKey\":\"F
 PROJECT2_DID_FULL="{\"did\":\"did:ixo:JHcN95bkS4aAWk3TKXapA2\",\"verifyKey\":\"ARTUGePyi4rm3ogq3kjp8dEAVq1RR7Z3HWwLze6Ey4qg\",\"encryptionPublicKey\":\"FjLXxW1N68XgBKekfB2isCLHPwbqhLiQLQFhLiiivXqP\",\"secret\":{\"seed\":\"9fc38edde7b9d7097b0aeefcb22a8fcccb6c0748fc3034eec5abdac0740339f7\",\"signKey\":\"Bken38cPuz2Mosb3poKQHd81Q2BiTWFznG1Wa7ZZkrni\",\"encryptionPrivateKey\":\"Bken38cPuz2Mosb3poKQHd81Q2BiTWFznG1Wa7ZZkrni\"}}"
 PROJECT1_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"500\",\"evaluatorPayPerClaim\":\"50\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-01-01T01:01:01.000Z\",\"createdBy\":\"Miguel\",\"status\":\"\"}"
 PROJECT2_INFO="{\"nodeDid\":\"nodeDid\",\"requiredClaims\":\"100\",\"evaluatorPayPerClaim\":\"10\",\"serviceEndpoint\":\"serviceEndpoint\",\"createdOn\":\"2020-02-02T02:02:02.000Z\",\"createdBy\":\"Francesco\",\"status\":\"\"}"
-
-BONDDOC1_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
-BONDDOC2_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
-BONDDOC1_DID_FULL="{\"did\":\"did:ixo:48PVm1uyF6QVDSPdGRWw4T\",\"verifyKey\":\"2hs2cb232Ev97aSQLvrfK4q8ZceBR8cf33UTstWpKU9M\",\"encryptionPublicKey\":\"9k2THnNbTziXGRjn77tvWujffgigRPqPyKZUSdwjmfh2\",\"secret\":{\"seed\":\"82949a422215a5999846beaadf398659157c345564787993f92e91d192f2a9c5\",\"signKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\",\"encryptionPrivateKey\":\"9njRge76sTYdfcpFfBG5p2NwbDXownFzUyTeN3iDQdjz\"}}"
-BONDDOC2_DID_FULL="{\"did\":\"did:ixo:RYLHkfNpbA8Losy68jt4yF\",\"verifyKey\":\"ENmMCsfNmjYoTRhNgnwXbQAw6p8JKH9DCJfGTPXNfsxW\",\"encryptionPublicKey\":\"5unQBt6JPW1pq9AqoRNhFJmibv8JqeoyyNvN3gF24EaU\",\"secret\":{\"seed\":\"d2c05b107acc2dfe3e9d67e98c993a9c03d227ed8f4505c43997cf4e7819bee2\",\"signKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\",\"encryptionPrivateKey\":\"FBgjjwoVPfd8ZUVs4nXVKtf4iV6xwnKhaMKBBEAHvGtH\"}}"
-BONDDOC1_INFO="{\"createdOn\":\"createdOn\",\"createdBy\":\"createdBy\"}"
-BONDDOC2_INFO="{\"createdOn\":\"createdOn\",\"createdBy\":\"createdBy\"}"
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
@@ -59,25 +53,25 @@ SHAUN_DID_FULL="{\"did\":\"did:ixo:U4tSpzzv91HHqWW1YmFkHJ\",\"verifyKey\":\"FkeD
 # ----------------------------------------------------------------------------------------- dids
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixocli tx did addDidDoc "$MIGUEL_DID_FULL"
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 2/3..."
-ixocli tx did addDidDoc "$FRANCESCO_DID_FULL"
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 3/3..."
-ixocli tx did addDidDoc "$SHAUN_DID_FULL"
-
-echo "Sleeping for a bit..."
-sleep 6 # to make sure DIDs were ledgered before proceeding
+ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding KYC credentials
 echo "Adding KYC credential 1/1..."
-ixocli tx did addKycCredential "$MIGUEL_DID" "$FRANCESCO_DID_FULL"
+ixocli tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # ----------------------------------------------------------------------------------------- mints/burns
 # Mint and burn ixo tokens
-echo "Minting 1000ixo tokens to Miguel using Miguel oracle..."
-ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000ixo "$MIGUEL_DID_FULL" "dummy proof"
-echo "Burning 1000ixo tokens from Francesco using Francesco oracle..."
-ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000ixo "$FRANCESCO_DID_FULL" "dummy proof"
+echo "Minting 1000uixo tokens to Miguel using Miguel oracle..."
+ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000uixo "$MIGUEL_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+echo "Burning 1000uixo tokens from Francesco using Francesco oracle..."
+ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000uixo "$FRANCESCO_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+
+echo "Sleeping for a bit..."
+sleep 7 # to make sure mints/burns were processed before proceeding
 
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
@@ -98,8 +92,8 @@ ixocli tx bonds create-bond \
   --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=1 \
-  --bond-did="$BOND1_DID_FULL" \
-  --creator-did="$MIGUEL_DID"
+  --bond-did="$BOND1_DID" \
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
 echo "Creating bond 2/4..."
@@ -119,8 +113,8 @@ ixocli tx bonds create-bond \
   --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=3 \
-  --bond-did="$BOND2_DID_FULL" \
-  --creator-did="$MIGUEL_DID"
+  --bond-did="$BOND2_DID" \
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
 echo "Creating bond 3/4..."
@@ -140,8 +134,8 @@ ixocli tx bonds create-bond \
   --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=2 \
-  --bond-did="$BOND3_DID_FULL" \
-  --creator-did="$MIGUEL_DID"
+  --bond-did="$BOND3_DID" \
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
 echo "Creating bond 4/4..."
@@ -161,97 +155,86 @@ ixocli tx bonds create-bond \
   --sanity-margin-percentage="0" \
   --allow-sells=true \
   --batch-blocks=1 \
-  --bond-did="$BOND4_DID_FULL" \
-  --creator-did="$MIGUEL_DID"
-
-echo "Sleeping for a bit..."
-sleep 6 # to make sure bonds were ledgered before proceeding
+  --bond-did="$BOND4_DID" \
+  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Buy 5token1, 5token2 from Miguel
 echo "Buying 5token1 from Miguel..."
-ixocli tx bonds buy 5token1 "100000res" "$BOND1_DID" "$MIGUEL_DID_FULL"
+ixocli tx bonds buy 5token1 "100000res" "$BOND1_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Buying 5token2 from Miguel..."
-ixocli tx bonds buy 5token2 "100000res" "$BOND2_DID" "$MIGUEL_DID_FULL"
-
-echo "Sleeping for a bit..."
-sleep 6 # to make sure buys were processed before proceeding
+ixocli tx bonds buy 5token2 "100000res" "$BOND2_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Buy token2 and token3 from Francesco and Shaun
 echo "Buying 5token2 from Francesco..."
-ixocli tx bonds buy 5token2 "100000res" "$BOND2_DID" "$FRANCESCO_DID_FULL"
+ixocli tx bonds buy 5token2 "100000res" "$BOND2_DID" "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Buying 5token3 from Shaun..."
-ixocli tx bonds buy 5token3 "100res,100rez" "$BOND3_DID" "$SHAUN_DID_FULL"
+ixocli tx bonds buy 5token3 "100res,100rez" "$BOND3_DID" "$SHAUN_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 echo "Sleeping for a bit..."
-sleep 6 # to make sure buys were processed before proceeding
+sleep 7 # to make sure buys were processed before proceeding
 
 # Buy 5token4 from Miguel (using token1 and token2)
 echo "Buying 5token4 from Miguel..."
-ixocli tx bonds buy 5token4 "2token1,2token2" "$BOND4_DID" "$MIGUEL_DID_FULL"
+ixocli tx bonds buy 5token4 "2token1,2token2" "$BOND4_DID" "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 # ----------------------------------------------------------------------------------------- projects
 # Create projects (this creates a project doc for the respective project)
 SENDER_DID="$SHAUN_DID"
 echo "Creating project 1/2..."
-ixocli tx project createProject "$SENDER_DID" "$PROJECT1_INFO" "$PROJECT1_DID_FULL"
+ixocli tx project create-project "$SENDER_DID" "$PROJECT1_INFO" "$PROJECT1_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Creating project 2/2..."
-ixocli tx project createProject "$SENDER_DID" "$PROJECT2_INFO" "$PROJECT2_DID_FULL"
+ixocli tx project create-project "$SENDER_DID" "$PROJECT2_INFO" "$PROJECT2_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
 echo "Sleeping for a bit..."
-sleep 6 # to make sure projects were ledgered before proceeding
+sleep 7 # to make sure projects were ledgered before proceeding
 
 # Update project status (this updates the status in the project doc for the respective project)
 SENDER_DID="$SHAUN_DID"
 echo "Updating project 1 to CREATED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT1_DID_FULL"
+ixocli tx project update-project-status "$SENDER_DID" CREATED "$PROJECT1_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Updating project 2 to CREATED..."
-ixocli tx project updateProjectStatus "$SENDER_DID" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" CREATED "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Updating project 2 to PENDING..."
-ixocli tx project updateProjectStatus "$SENDER_DID" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Fund project (using treasury 'send' and 'oracle-transfer')
-echo "Funding project 2 (using treasury 'send' from Miguel)..."
-ixocli tx treasury send "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$MIGUEL_DID_FULL" --broadcast-mode block
-echo "Funding project 2 (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT2_DID/$PROJECT2_DID" 5000000000ixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block
-# The address behind "$PROJECT2_DID/$PROJECT2_DID" can also be obtained from (ixocli q project getProjectAccounts $PROJECT2_DID)
-# Note that we're actually sending just 100ixo, since ixoDecimals is 1e8 and we're sending 100e8ixo
+PROJECT_2_ADDR=$(ixocli q project get-project-accounts $PROJECT2_DID | grep $PROJECT2_DID | cut -d \" -f 4)
+echo "Funding project 2 [$PROJECT_2_ADDR] (using treasury 'send' from Miguel)..."
+ixocli tx treasury send "$PROJECT_2_ADDR" 5000000000uixo "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Funding project 2 [$PROJECT_2_ADDR] (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
+ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_2_ADDR" 5000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Updating project 2 to FUNDED..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project updateProjectStatus "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding a claim and evaluation
 echo "Creating a claim in project 2..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project createClaim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block
+ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Creating an evaluation in project 2..."
 SENDER_DID="$MIGUEL_DID"
-STATUS="1" # createEvaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
-ixocli tx project createEvaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block
+STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
+ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding agents (this creates a project account for the agent in the respective project)
 echo "Adding agent to project 1..."
 SENDER_DID="did:ixo:48PVm1uyF6QVDSPdGRWw4T"
 AGENT_DID="did:ixo:RYLHkfNpbA8Losy68jt4yF"
 ROLE="SA"
-ixocli tx project createAgent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PROJECT1_DID_FULL"
+ixocli tx project create-agent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PROJECT1_DID_FULL" --gas-prices="$GAS_PRICES" -y
 
-# ----------------------------------------------------------------------------------------- bonddocs
-# Creating bonddoc
-SENDER_DID="$SHAUN_DID"
-echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC1_INFO" "$BONDDOC1_DID_FULL"
-echo "Creating bonddoc 1/2..."
-ixocli tx bonddoc createBond "$SENDER_DID" "$BONDDOC2_INFO" "$BONDDOC2_DID_FULL"
+# ----------------------------------------------------------------------------------------- payments
+# Create payment
+echo "Creating payment template..."
+PAYMENT_TEMPLATE="$(sed 's/"/\"/g' samples/payment_template.json | tr -d '\n' | tr -d '[:blank:]')"
+CREATOR="$MIGUEL_DID_FULL"
+ixocli tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-echo "Sleeping for a bit..."
-sleep 6 # to make sure bonddocs were ledgered before proceeding
-
-# Updating bonddoc status
-SENDER_DID="$SHAUN_DID"
-echo "Updating bonddoc 1 to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC1_DID_FULL"
-echo "Updating bonddoc 2 to PREISSUANCE..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" PREISSUANCE "$BONDDOC2_DID_FULL" --broadcast-mode block
-echo "Updating bonddoc 2 to OPEN..."
-ixocli tx bonddoc updateBondStatus "$SENDER_DID" OPEN "$BONDDOC2_DID_FULL"
+# Create payment contract
+echo "Creating payment contract..."
+PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
+PAYMENT_CONTRACT_ID="payment:contract:contract1"
+DISCOUNT_ID=0
+CREATOR="$SHAUN_DID_FULL"
+PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
+ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

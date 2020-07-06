@@ -4,32 +4,28 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectDoc [did]",
+		Use:   "get-project-doc [did]",
 		Short: "Query ProjectDoc for a DID",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a did")
-			}
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			didAddr := args[0]
-			key := ixo.Did(didAddr)
+			key := did.Did(didAddr)
 
-			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryProjectDoc, key), nil)
 			if err != nil {
 				return err
@@ -54,19 +50,15 @@ func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectAccounts [did]",
+		Use:   "get-project-accounts [did]",
 		Short: "Get a Project accounts of a Project by Did",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
-
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a project did")
-			}
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			projectDid := args[0]
 
-			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryProjectAccounts, projectDid), nil)
 			if err != nil {
 				return err
@@ -96,18 +88,15 @@ func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getProjectTxs [project-did]",
+		Use:   "get-project-txs [project-did]",
 		Short: "Get a Project txs for a projectDid",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := context.NewCLIContext().
-				WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			if len(args) != 1 || len(args[0]) == 0 {
-				return errors.New("You must provide a project did")
-			}
 			projectDid := args[0]
 
-			res, _, err := ctx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryProjectTx, projectDid), nil)
 			if err != nil {
 				return err
@@ -136,11 +125,10 @@ func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
 
 func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "getParams",
+		Use:   "params",
 		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().
-				WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 				keeper.QueryParams), nil)

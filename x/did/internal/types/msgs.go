@@ -3,37 +3,57 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const (
+	TypeMsgAddDid        = "add-did"
+	TypeMsgAddCredential = "add-credential"
+)
+
+var (
+	_ ixo.IxoMsg = MsgAddDid{}
+	_ ixo.IxoMsg = MsgAddCredential{}
+)
+
 type MsgAddDid struct {
-	DidDoc    BaseDidDoc `json:"didDoc" yaml:"didDoc"`
-	SignBytes string     `json:"signBytes" yaml:"signBytes"`
+	DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
+}
+
+func (msg *MsgAddDid) UnmarshalJSON(bytes []byte) error {
+	var msg2 struct {
+		DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
+	}
+	err := json.Unmarshal(bytes, &msg2)
+	if err != nil {
+		return err
+	}
+
+	if msg2.DidDoc.Credentials == nil {
+		msg2.DidDoc.Credentials = []exported.DidCredential{}
+	}
+
+	*msg = msg2
+	return nil
 }
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
-	didDoc := BaseDidDoc{
-		Did:         did,
-		PubKey:      publicKey,
-		Credentials: make([]DidCredential, 0),
-	}
-
 	return MsgAddDid{
-		DidDoc: didDoc,
+		DidDoc: NewBaseDidDoc(did, publicKey),
 	}
 }
 
-var _ sdk.Msg = MsgAddDid{}
-
-func (msg MsgAddDid) Type() string { return "did" }
+func (msg MsgAddDid) Type() string { return TypeMsgAddDid }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
+func (msg MsgAddDid) GetSignerDid() exported.Did { return msg.DidDoc.Did }
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.DidDoc.GetDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgAddDid) ValidateBasic() sdk.Error {
@@ -54,7 +74,7 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DID valid
-	if !ixo.IsValidDid(msg.DidDoc.Did) {
+	if !IsValidDid(msg.DidDoc.Did) {
 		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
 	}
 
@@ -62,25 +82,27 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
 func (msg MsgAddDid) String() string {
 	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
 }
 
-func (msg MsgAddDid) IsNewDid() bool { return true }
-
 type MsgAddCredential struct {
-	DidCredential DidCredential `json:"credential" yaml:"credential"`
+	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
 }
 
 func NewMsgAddCredential(did string, credType []string, issuer string, issued string) MsgAddCredential {
-	didCredential := DidCredential{
+	didCredential := exported.DidCredential{
 		CredType: credType,
 		Issuer:   issuer,
 		Issued:   issued,
-		Claim: Claim{
+		Claim: exported.Claim{
 			Id:           did,
 			KYCValidated: true,
 		},
@@ -91,12 +113,12 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 	}
 }
 
-var _ sdk.Msg = MsgAddCredential{}
-
-func (msg MsgAddCredential) Type() string  { return "did" }
+func (msg MsgAddCredential) Type() string  { return TypeMsgAddCredential }
 func (msg MsgAddCredential) Route() string { return RouterKey }
+
+func (msg MsgAddCredential) GetSignerDid() exported.Did { return msg.DidCredential.Issuer }
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.DidCredential.Issuer)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgAddCredential) String() string {
@@ -113,7 +135,7 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DID valid
-	if !ixo.IsValidDid(msg.DidCredential.Issuer) {
+	if !IsValidDid(msg.DidCredential.Issuer) {
 		return ErrorInvalidDid(DefaultCodespace, "issuer did is invalid")
 	}
 
@@ -121,12 +143,9 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
+	if bz, err := json.Marshal(msg); err != nil {
 		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
 	}
-
-	return b
 }
-
-func (msg MsgAddCredential) IsNewDid() bool { return false }

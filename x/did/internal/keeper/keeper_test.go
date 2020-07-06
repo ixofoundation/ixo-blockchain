@@ -1,17 +1,17 @@
 package keeper
 
 import (
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func TestKeeper(t *testing.T) {
 	ctx, k, cdc := CreateTestInput()
-	cdc.RegisterInterface((*ixo.DidDoc)(nil), nil)
+	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
 	_, err := k.GetDidDoc(ctx, types.EmptyDid)
 	require.NotNil(t, err)
 

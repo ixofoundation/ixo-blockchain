@@ -16,25 +16,24 @@ import (
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, k, cdc, feesKeeper, bankKeeper := keeper.CreateTestInput()
+	ctx, k, cdc, paymentsKeeper, bankKeeper := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	params := feesKeeper.GetParams(ctx)
+	params := paymentsKeeper.GetParams(ctx)
 	params.IxoFactor = sdk.OneDec()
 	params.NodeFeePercentage = sdk.ZeroDec()
 	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
-	feesKeeper.SetParams(ctx, params)
+	paymentsKeeper.SetParams(ctx, params)
 	projectMsg := types.MsgCreateClaim{
-		SignBytes:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		TxHash:     "txHash",
 		SenderDid:  "senderDid",
 		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
 	}
 
-	res := handleMsgCreateClaim(ctx, k, feesKeeper, bankKeeper, projectMsg)
+	res := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, projectMsg)
 	require.NotNil(t, res)
 }
 
@@ -70,7 +69,6 @@ func Test_CreateEvaluation(t *testing.T) {
 	fk.SetParams(ctx, params)
 
 	evaluationMsg := types.MsgCreateEvaluation{
-		SignBytes:  "",
 		TxHash:     "txHash",
 		SenderDid:  "senderDid",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -81,7 +79,6 @@ func Test_CreateEvaluation(t *testing.T) {
 	}
 
 	msg := types.MsgCreateProject{
-		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -118,7 +115,6 @@ func Test_WithdrawFunds(t *testing.T) {
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
 	msg := types.MsgWithdrawFunds{
-		SignBytes: "",
 		SenderDid: "6iftm1hHdaU6LJGKayRMev",
 		Data: types.WithdrawFundsDoc{
 			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
@@ -129,7 +125,6 @@ func Test_WithdrawFunds(t *testing.T) {
 	}
 
 	msg1 := types.MsgCreateProject{
-		SignBytes:  "",
 		TxHash:     "",
 		SenderDid:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -151,20 +146,9 @@ func Test_WithdrawFunds(t *testing.T) {
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), InternalAccountID(msg1.GetProjectDid()))
 	require.Nil(t, err)
 
-	// TODO (contracts): ck.SetContract(ctx, contracts.KeyProjectRegistryContractAddress, "foundationWallet")
-
 	require.False(t, k.ProjectDocExists(ctx, msg1.GetProjectDid()))
 	k.SetProjectDoc(ctx, &msg1)
 
-	// TODO: implement below code
-
-	_ = msg
-	_ = bk
-
-	//ethClient, err1 := ixo.NewEthClient()
-	//require.Nil(t, err1)
-	//require.NotNil(t, ethClient)
-	//
-	//res := handleMsgWithdrawFunds(ctx, k, bk, pk, ethClient, msg)
-	//require.NotNil(t, res)
+	res := handleMsgWithdrawFunds(ctx, k, bk, msg)
+	require.NotNil(t, res)
 }

@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,15 +11,33 @@ import (
 	rest "github.com/ixofoundation/ixo-blockchain/client"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	// The .* is necessary so that a slash in the did gets included as part of the did
 	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/pubKeyToAddr/{pubKey}", queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/did/{did}", queryDidDocRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/did", queryAllDidsRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandler(cliCtx)).Methods("GET")
+}
+
+func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Content-Type", "application/json")
+		vars := mux.Vars(r)
+
+		if !types.IsValidPubKey(vars["pubKey"]) {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("input is not a valid base-58 encoded pubKey"))
+			return
+		}
+
+		accAddress := exported.VerifyKeyToAddr(vars["pubKey"])
+
+		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
+	}
 }
 
 func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -26,17 +45,26 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
-
-		if !ixo.IsValidDid(vars["did"]) {
+		didAddr := vars["did"]
+		key := exported.Did(didAddr)
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			keeper.QueryDidDoc, key), nil)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte("Error: input is not a valid did"))
-
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+		if len(res) == 0 {
+			w.WriteHeader(http.StatusNoContent)
+			_, _ = w.Write([]byte("No data for respected did address."))
 			return
 		}
 
-		accAddress := types.DidToAddr(vars["did"])
+		var didDoc types.BaseDidDoc
+		cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
+		addressFromDid := didDoc.Address()
 
-		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
+		rest.PostProcessResponse(w, cliCtx.Codec, addressFromDid, true)
 	}
 }
 
@@ -46,19 +74,17 @@ func queryDidDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
-		key := ixo.Did(didAddr)
+		key := exported.Did(didAddr)
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryDidDoc, key), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
 			_, _ = w.Write([]byte("No data for respected did address."))
-
 			return
 		}
 
@@ -78,7 +104,6 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
@@ -87,7 +112,7 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var dids []ixo.Did
+		var dids []exported.Did
 		cliCtx.Codec.MustUnmarshalJSON(res, &dids)
 
 		rest.PostProcessResponse(w, cliCtx.Codec, dids, true)
@@ -103,14 +128,12 @@ func queryAllDidDocsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
 			_, _ = w.Write([]byte("No data present."))
-
 			return
 		}
 

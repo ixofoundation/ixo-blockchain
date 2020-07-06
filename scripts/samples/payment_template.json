@@ -1,0 +1,18 @@
+{
+  "id": "payment:template:template1",
+  "payment_amount": [
+    {
+      "denom": "ixo",
+      "amount": "10"
+    }
+  ],
+  "payment_minimum": [],
+  "payment_maximum": [],
+  "discounts": [],
+  "wallet_distribution": [
+    {
+      "address": "ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx",
+      "percentage": "100"
+    }
+  ]
+}

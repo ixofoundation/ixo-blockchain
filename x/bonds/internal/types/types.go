@@ -2,18 +2,12 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/tendermint/tendermint/crypto"
 )
 
 const (
 	TRUE  = "true"
 	FALSE = "false"
 )
-
-func DidToAddr(did ixo.Did) sdk.AccAddress {
-	return sdk.AccAddress(crypto.AddressHash([]byte(did)))
-}
 
 func CheckReserveTokenNames(resTokens []string, token string) sdk.Error {
 	// Check that no token is the same as the main token, no token
@@ -72,4 +66,12 @@ func GetRequiredParamsForFunctionType(fnType string) (fnParams []string, err sdk
 		return nil, ErrUnrecognizedFunctionType(DefaultCodespace)
 	}
 	return expectedParams, nil
+}
+
+func GetExceptionsForFunctionType(fnType string) (restrictions FunctionParamRestrictions, err sdk.Error) {
+	restrictions, ok := ExtraParameterRestrictions[fnType]
+	if !ok {
+		return nil, ErrUnrecognizedFunctionType(DefaultCodespace)
+	}
+	return restrictions, nil
 }

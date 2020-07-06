@@ -7,7 +7,7 @@ curl -X GET localhost:26657/broadcast_tx_commit?tx=$TX
 echo ""
 
 echo "Now we can query the DID..."
-ixocli q did getDidDoc did:sov:QdoNo5tVgWHwMkbRSVpZTf
+ixocli q did get-did-doc did:sov:QdoNo5tVgWHwMkbRSVpZTf
 
 # Decoded transaction (what we're actually broadcasting):
 # {

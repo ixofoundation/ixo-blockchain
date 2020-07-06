@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
@@ -34,19 +34,17 @@ func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 
-		key := ixo.Did(didAddr)
+		key := did.Did(didAddr)
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryProjectDoc, key), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		}
 
@@ -69,13 +67,11 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		}
 
@@ -84,7 +80,6 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't parse query result. Result: %s. Error: %s", res, err.Error())))
-
 			return
 		}
 
@@ -106,14 +101,12 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Could't query did. Error: %s", err.Error())))
-
 			return
 		}
 
 		var txs []types.WithdrawalInfo
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
-
 			return
 		} else {
 			cliCtx.Codec.MustUnmarshalJSON(res, &txs)
@@ -133,7 +126,6 @@ func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-
 			return
 		}
 
@@ -141,7 +133,6 @@ func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-
 			return
 		}
 

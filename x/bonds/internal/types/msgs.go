@@ -1,23 +1,37 @@
 package types
 
 import (
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo/sovrin"
 	"strings"
 )
 
-type MsgCreateBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes              string         `json:"signBytes" yaml:"signBytes"`
-	BondDid                ixo.Did        `json:"bond_did" yaml:"bond_did"`
-	PubKey                 string         `json:"pub_key" yaml:"pub_key"`
+const (
+	TypeMsgCreateBond = "create_bond"
+	TypeMsgEditBond   = "edit_bond"
+	TypeMsgBuy        = "buy"
+	TypeMsgSell       = "sell"
+	TypeMsgSwap       = "swap"
+)
+
+var (
+	_ ixo.IxoMsg = MsgCreateBond{}
+	_ ixo.IxoMsg = MsgEditBond{}
+	_ ixo.IxoMsg = MsgBuy{}
+	_ ixo.IxoMsg = MsgSell{}
+	_ ixo.IxoMsg = MsgSwap{}
+)
+
+type MsgCreateBond struct {
+	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
 	Token                  string         `json:"token" yaml:"token"`
 	Name                   string         `json:"name" yaml:"name"`
 	Description            string         `json:"description" yaml:"description"`
 	FunctionType           string         `json:"function_type" yaml:"function_type"`
 	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
-	CreatorDid             ixo.Did        `json:"creator_did" yaml:"creator_did"`
+	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
 	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
 	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
 	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
@@ -30,15 +44,13 @@ type MsgCreateBond struct { // signBytes should not be changed to sign_bytes bec
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 }
 
-func NewMsgCreateBond(token, name, description string, creatorDid ixo.Did,
+func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, batchBlocks sdk.Uint, bondDid sovrin.SovrinDid) MsgCreateBond {
+	allowSell string, batchBlocks sdk.Uint, bondDid did.Did) MsgCreateBond {
 	return MsgCreateBond{
-		SignBytes:              "",
-		BondDid:                bondDid.Did,
-		PubKey:                 bondDid.VerifyKey,
+		BondDid:                bondDid,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
@@ -62,8 +74,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
-	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
 	} else if strings.TrimSpace(msg.Token) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
 	} else if strings.TrimSpace(msg.Name) == "" {
@@ -144,9 +154,9 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 	// Note: uniqueness of reserve tokens checked when parsing
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.BondDid) {
+	if !did.IsValidDid(msg.BondDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
-	} else if !ixo.IsValidDid(msg.CreatorDid) {
+	} else if !did.IsValidDid(msg.CreatorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
 	}
 
@@ -154,34 +164,37 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
+func (msg MsgCreateBond) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.BondDid)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
 
-func (msg MsgCreateBond) Type() string { return "create_bond" }
+func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
-type MsgEditBond struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes              string  `json:"signBytes" yaml:"signBytes"`
-	BondDid                ixo.Did `json:"bond_did" yaml:"bond_did"`
+type MsgEditBond struct {
+	BondDid                did.Did `json:"bond_did" yaml:"bond_did"`
 	Token                  string  `json:"token" yaml:"token"`
 	Name                   string  `json:"name" yaml:"name"`
 	Description            string  `json:"description" yaml:"description"`
 	OrderQuantityLimits    string  `json:"order_quantity_limits" yaml:"order_quantity_limits"`
 	SanityRate             string  `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string  `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	EditorDid              ixo.Did `json:"editor_did" yaml:"editor_did"`
+	EditorDid              did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editorDid ixo.Did, bondDid sovrin.SovrinDid) MsgEditBond {
+	sanityMarginPercentage string, editorDid did.Did, bondDid did.Did) MsgEditBond {
 	return MsgEditBond{
-		SignBytes:              "",
-		BondDid:                bondDid.Did,
+		BondDid:                bondDid,
 		Token:                  token,
 		Name:                   name,
 		Description:            description,
@@ -229,9 +242,9 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.BondDid) {
+	if !did.IsValidDid(msg.BondDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
-	} else if !ixo.IsValidDid(msg.EditorDid) {
+	} else if !did.IsValidDid(msg.EditorDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "editor did is invalid")
 	}
 
@@ -239,32 +252,33 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgEditBond) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
+func (msg MsgEditBond) GetSignerDid() did.Did { return msg.EditorDid }
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.BondDid)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgEditBond) Route() string { return RouterKey }
 
-func (msg MsgEditBond) Type() string { return "edit_bond" }
+func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-type MsgBuy struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes string    `json:"signBytes" yaml:"signBytes"`
-	BuyerDid  ixo.Did   `json:"buyer_did" yaml:"buyer_did"`
-	PubKey    string    `json:"pub_key" yaml:"pub_key"`
+type MsgBuy struct {
+	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`
 	Amount    sdk.Coin  `json:"amount" yaml:"amount"`
 	MaxPrices sdk.Coins `json:"max_prices" yaml:"max_prices"`
-	BondDid   ixo.Did   `json:"bond_did" yaml:"bond_did"`
+	BondDid   did.Did   `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgBuy(buyerDid sovrin.SovrinDid, amount sdk.Coin, maxPrices sdk.Coins,
-	bondDid ixo.Did) MsgBuy {
+func NewMsgBuy(buyerDid did.Did, amount sdk.Coin, maxPrices sdk.Coins,
+	bondDid did.Did) MsgBuy {
 	return MsgBuy{
-		SignBytes: "",
-		BuyerDid:  buyerDid.Did,
-		PubKey:    buyerDid.VerifyKey,
+		BuyerDid:  buyerDid,
 		Amount:    amount,
 		MaxPrices: maxPrices,
 		BondDid:   bondDid,
@@ -275,8 +289,6 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 	// Check if empty
 	if strings.TrimSpace(msg.BuyerDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BuyerDid")
-	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	}
@@ -294,9 +306,9 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.BondDid) {
+	if !did.IsValidDid(msg.BondDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
-	} else if !ixo.IsValidDid(msg.BuyerDid) {
+	} else if !did.IsValidDid(msg.BuyerDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "buyer did is invalid")
 	}
 
@@ -304,30 +316,31 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgBuy) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
+func (msg MsgBuy) GetSignerDid() did.Did { return msg.BuyerDid }
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.BuyerDid)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgBuy) Route() string { return RouterKey }
 
-func (msg MsgBuy) Type() string { return "buy" }
+func (msg MsgBuy) Type() string { return TypeMsgBuy }
 
-type MsgSell struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes string   `json:"signBytes" yaml:"signBytes"`
-	SellerDid ixo.Did  `json:"seller_did" yaml:"seller_did"`
-	PubKey    string   `json:"pub_key" yaml:"pub_key"`
+type MsgSell struct {
+	SellerDid did.Did  `json:"seller_did" yaml:"seller_did"`
 	Amount    sdk.Coin `json:"amount" yaml:"amount"`
-	BondDid   ixo.Did  `json:"bond_did" yaml:"bond_did"`
+	BondDid   did.Did  `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgSell(sellerDid sovrin.SovrinDid, amount sdk.Coin, bondDid ixo.Did) MsgSell {
+func NewMsgSell(sellerDid did.Did, amount sdk.Coin, bondDid did.Did) MsgSell {
 	return MsgSell{
-		SignBytes: "",
-		SellerDid: sellerDid.Did,
-		PubKey:    sellerDid.VerifyKey,
+		SellerDid: sellerDid,
 		Amount:    amount,
 		BondDid:   bondDid,
 	}
@@ -337,8 +350,6 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 	// Check if empty
 	if strings.TrimSpace(msg.SellerDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SellerDid")
-	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	}
@@ -351,9 +362,9 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.BondDid) {
+	if !did.IsValidDid(msg.BondDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
-	} else if !ixo.IsValidDid(msg.SellerDid) {
+	} else if !did.IsValidDid(msg.SellerDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "seller did is invalid")
 	}
 
@@ -361,32 +372,33 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSell) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
+func (msg MsgSell) GetSignerDid() did.Did { return msg.SellerDid }
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.SellerDid)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgSell) Route() string { return RouterKey }
 
-func (msg MsgSell) Type() string { return "sell" }
+func (msg MsgSell) Type() string { return TypeMsgSell }
 
-type MsgSwap struct { // signBytes should not be changed to sign_bytes because of ixo.types.DefaultTxDecoder
-	SignBytes  string   `json:"signBytes" yaml:"signBytes"`
-	SwapperDid ixo.Did  `json:"swapper_did" yaml:"swapper_did"`
-	PubKey     string   `json:"pub_key" yaml:"pub_key"`
-	BondDid    ixo.Did  `json:"bond_did" yaml:"bond_did"`
+type MsgSwap struct {
+	SwapperDid did.Did  `json:"swapper_did" yaml:"swapper_did"`
+	BondDid    did.Did  `json:"bond_did" yaml:"bond_did"`
 	From       sdk.Coin `json:"from" yaml:"from"`
 	ToToken    string   `json:"to_token" yaml:"to_token"`
 }
 
-func NewMsgSwap(swapperDid sovrin.SovrinDid, from sdk.Coin, toToken string,
-	bondDid ixo.Did) MsgSwap {
+func NewMsgSwap(swapperDid did.Did, from sdk.Coin, toToken string,
+	bondDid did.Did) MsgSwap {
 	return MsgSwap{
-		SignBytes:  "",
-		SwapperDid: swapperDid.Did,
-		PubKey:     swapperDid.VerifyKey,
+		SwapperDid: swapperDid,
 		From:       from,
 		ToToken:    toToken,
 		BondDid:    bondDid,
@@ -397,8 +409,6 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 	// Check if empty
 	if strings.TrimSpace(msg.SwapperDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SwapperDid")
-	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "PubKey")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
 	} else if strings.TrimSpace(msg.ToToken) == "" {
@@ -429,9 +439,9 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 	// Note: From denom and amount must be valid since sdk.Coin
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.BondDid) {
+	if !did.IsValidDid(msg.BondDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
-	} else if !ixo.IsValidDid(msg.SwapperDid) {
+	} else if !did.IsValidDid(msg.SwapperDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "swapper did is invalid")
 	}
 
@@ -439,13 +449,18 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSwap) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
+func (msg MsgSwap) GetSignerDid() did.Did { return msg.SwapperDid }
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.SwapperDid)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgSwap) Route() string { return RouterKey }
 
-func (msg MsgSwap) Type() string { return "swap" }
+func (msg MsgSwap) Type() string { return TypeMsgSwap }

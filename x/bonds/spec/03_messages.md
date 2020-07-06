@@ -20,7 +20,7 @@ Bonds can be created by any address using `MsgCreateBond`.
 | FeeAddress             | `sdk.AccAddress`   | The address of the account that will store charged fees |
 | MaxSupply              | `sdk.Coin`         | The maximum number of bond tokens that can be minted |
 | OrderQuantityLimits    | `sdk.Coins`        | The maximum number of tokens that one can buy/sell/swap in a single order (e.g. `100abc,200res,300rez`) |
-| SanityRate             | `sdk.Dec`          | For a swapper function bond, restricts the conversion rate (`r1/r2`) to the specified value plus or minus the sanity margin percentage `0` for no sanity checks. |
+| SanityRate             | `sdk.Dec`          | For a swapper function bond, restricts the conversion rate (`r1/r2`) to the specified value plus or minus the sanity margin percentage. `0` for no sanity checks. |
 | SanityMarginPercentage | `sdk.Dec`          | Used as described above. `0` for no sanity checks. |
 | AllowSells             | `string`           | Whether or not selling is allowed (`"true"/"false"`) |
 | Signers                | `[]sdk.AccAddress` | The addresses of the accounts that must sign this message and any future message that edits the bond's parameters. |
@@ -53,10 +53,12 @@ This message is expected to fail if:
 - another bond with this token is already registered, the token is the staking token, or the token is not a valid denomination
 - name or description is an empty string
 - function type is not one of the defined function types (`power_function`, `sigmoid_function`, `swapper_function`)
-- function parameters are faulty for the selected function type:
+- function parameters are negative or faulty for the selected function type:
   - Valid example for `power_function`: `"m:12,n:2,c:100"`
   - Valid example for `sigmoid_function`: `"a:3,b:5,c:1"`
   - For `swapper_function`: `""` (no parameters)
+- function parameters do not satisfy the extra parameter restrictions
+  - Function parameter `c` for `sigmoid_function` cannot be zero
 - reserve tokens list is faulty:
   - For `swapper_function`: two valid comma-separated denominations, e.g. `res,rez`
   - Otherwise: one or more valid comma-separated denominations, e.g. `res,rez,rex`

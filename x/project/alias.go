@@ -15,6 +15,11 @@ const (
 	DefaultCodespace = types.DefaultCodespace
 	PaidoutStatus    = types.PaidoutStatus
 	FundedStatus     = types.FundedStatus
+
+	TypeMsgCreateProject = types.TypeMsgCreateProject
+
+	MsgCreateProjectFee            = types.MsgCreateProjectFee
+	MsgCreateProjectTransactionFee = types.MsgCreateProjectTransactionFee
 )
 
 type (

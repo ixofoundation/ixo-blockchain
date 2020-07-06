@@ -1,6 +1,8 @@
 package main
 
 import (
+	cli2 "github.com/ixofoundation/ixo-blockchain/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/client/tx"
 	"os"
 	"path"
 
@@ -18,7 +20,6 @@ import (
 	"github.com/tendermint/tmlibs/cli"
 
 	"github.com/ixofoundation/ixo-blockchain/app"
-	ixoClient "github.com/ixofoundation/ixo-blockchain/client"
 )
 
 func main() {
@@ -45,11 +46,8 @@ func main() {
 		queryCmd(cdc),
 		txCmd(cdc),
 		version.Cmd,
-		client.LineBreak,
 		lcd.ServeCommand(cdc, registerRoutes),
-		client.LineBreak,
 		keys.Commands(),
-		client.LineBreak,
 	)
 
 	executor := cli.PrepareMainCmd(rootCmd, "IXO", app.DefaultCLIHome)
@@ -68,12 +66,10 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 
 	queryCmd.AddCommand(
 		authCli.GetAccountCmd(cdc),
-		client.LineBreak,
 		rpc.ValidatorCommand(cdc),
 		rpc.BlockCommand(),
 		authCli.QueryTxsByEventsCmd(cdc),
-		ixoClient.QueryTxCmd(cdc),
-		client.LineBreak,
+		cli2.QueryTxCmd(cdc),
 	)
 
 	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
@@ -89,13 +85,10 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 
 	txCmd.AddCommand(
 		bankCli.SendTxCmd(cdc),
-		client.LineBreak,
 		authCli.GetSignCommand(cdc),
 		authCli.GetMultiSignCommand(cdc),
-		client.LineBreak,
 		authCli.GetBroadcastCommand(cdc),
 		authCli.GetEncodeCommand(cdc),
-		client.LineBreak,
 	)
 
 	app.ModuleBasics.AddTxCommands(txCmd, cdc)
@@ -131,6 +124,6 @@ func initConfig(cmd *cobra.Command) error {
 
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
-	ixoClient.RegisterTxRoutes(rs.CliCtx, rs.Mux)
+	tx.RegisterTxRoutes(rs.CliCtx, rs.Mux)
 	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }

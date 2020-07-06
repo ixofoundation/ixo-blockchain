@@ -2,25 +2,68 @@ package types
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/spf13/viper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
 
+const (
+	TypeMsgCreateProject       = "create-project"
+	TypeMsgUpdateProjectStatus = "update-project-status"
+	TypeMsgCreateAgent         = "create-agent"
+	TypeMsgUpdateAgent         = "update-agent"
+	TypeMsgCreateClaim         = "create-claim"
+	TypeMsgCreateEvaluation    = "create-evaluation"
+	TypeMsgWithdrawFunds       = "withdraw-funds"
+
+	MsgCreateProjectFee            = int64(1000000)
+	MsgCreateProjectTransactionFee = int64(10000)
+)
+
+var (
+	_ ixo.IxoMsg = MsgCreateProject{}
+	_ ixo.IxoMsg = MsgUpdateProjectStatus{}
+	_ ixo.IxoMsg = MsgCreateAgent{}
+	_ ixo.IxoMsg = MsgUpdateAgent{}
+	_ ixo.IxoMsg = MsgCreateClaim{}
+	_ ixo.IxoMsg = MsgCreateEvaluation{}
+	_ ixo.IxoMsg = MsgWithdrawFunds{}
+
+	_ StoredProjectDoc = (*MsgCreateProject)(nil)
+)
+
 type MsgCreateProject struct {
-	SignBytes  string     `json:"signBytes" yaml:"signBytes"`
 	TxHash     string     `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did    `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did    `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did    `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did    `json:"projectDid" yaml:"projectDid"`
 	PubKey     string     `json:"pubKey" yaml:"pubKey"`
 	Data       ProjectDoc `json:"data" yaml:"data"`
 }
 
-var _ sdk.Msg = MsgCreateProject{}
+func (msg MsgCreateProject) ToStdSignMsg(fee int64) auth.StdSignMsg {
+	chainID := viper.GetString(flags.FlagChainID)
+	accNum, accSeq := uint64(0), uint64(0)
+	stdFee := auth.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
+		ixo.IxoNativeToken, sdk.NewInt(fee))))
+	memo := viper.GetString(flags.FlagMemo)
 
-func (msg MsgCreateProject) Type() string  { return "create-project" }
+	return auth.StdSignMsg{
+		ChainID:       chainID,
+		AccountNumber: accNum,
+		Sequence:      accSeq,
+		Fee:           stdFee,
+		Msgs:          []sdk.Msg{msg},
+		Memo:          memo,
+	}
+}
+
+func (msg MsgCreateProject) Type() string { return TypeMsgCreateProject }
+
 func (msg MsgCreateProject) Route() string { return RouterKey }
 
 func (msg MsgCreateProject) ValidateBasic() sdk.Error {
@@ -38,19 +81,20 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	}
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateProject) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateProject) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateProject) GetProjectDid() did.Did { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSenderDid() did.Did  { return msg.SenderDid }
+func (msg MsgCreateProject) GetSignerDid() did.Did  { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreateProject) String() string {
@@ -69,23 +113,21 @@ func (msg *MsgCreateProject) SetStatus(status ProjectStatus) {
 }
 
 func (msg MsgCreateProject) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
-func (msg MsgCreateProject) IsNewDid() bool     { return true }
-func (msg MsgCreateProject) IsWithdrawal() bool { return false }
-
-var _ StoredProjectDoc = (*MsgCreateProject)(nil)
-
 type MsgUpdateProjectStatus struct {
-	SignBytes  string                 `json:"signBytes" yaml:"signBytes"`
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did                `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did                `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateProjectStatus) Type() string  { return "update-project-status" }
+func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
 func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
 
 func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
@@ -99,9 +141,9 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type UpdateProjectStatusDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
@@ -111,36 +153,27 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
+func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
-
-func (msg MsgUpdateProjectStatus) GetProjectDid() ixo.Did {
-	return msg.ProjectDid
-}
-
-func (msg MsgUpdateProjectStatus) GetStatus() ProjectStatus {
-	return msg.Data.Status
-}
-
-func (msg MsgUpdateProjectStatus) IsNewDid() bool     { return false }
-func (msg MsgUpdateProjectStatus) IsWithdrawal() bool { return false }
 
 type MsgCreateAgent struct {
-	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       CreateAgentDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateAgent) IsNewDid() bool     { return false }
-func (msg MsgCreateAgent) IsWithdrawal() bool { return false }
-func (msg MsgCreateAgent) Type() string       { return "create-agent" }
-func (msg MsgCreateAgent) Route() string      { return RouterKey }
+func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
+func (msg MsgCreateAgent) Route() string { return RouterKey }
 func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
@@ -152,25 +185,28 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type CreateAgentDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.AgentDid) {
+	} else if !did.IsValidDid(msg.Data.AgentDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateAgent) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateAgent) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
 func (msg MsgCreateAgent) String() string {
@@ -181,20 +217,15 @@ func (msg MsgCreateAgent) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = MsgCreateAgent{}
-
 type MsgUpdateAgent struct {
-	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgUpdateAgent) IsNewDid() bool     { return false }
-func (msg MsgUpdateAgent) IsWithdrawal() bool { return false }
-func (msg MsgUpdateAgent) Type() string       { return "update-agent" }
-func (msg MsgUpdateAgent) Route() string      { return RouterKey }
+func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
+func (msg MsgUpdateAgent) Route() string { return RouterKey }
 func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
@@ -206,25 +237,28 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type UpdateAgentDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.Did) {
+	} else if !did.IsValidDid(msg.Data.Did) {
 		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgUpdateAgent) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgUpdateAgent) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgUpdateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
 func (msg MsgUpdateAgent) String() string {
@@ -236,20 +270,15 @@ func (msg MsgUpdateAgent) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = MsgUpdateAgent{}
-
 type MsgCreateClaim struct {
-	SignBytes  string         `json:"signBytes" yaml:"signBytes"`
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateClaim) IsNewDid() bool     { return false }
-func (msg MsgCreateClaim) IsWithdrawal() bool { return false }
-func (msg MsgCreateClaim) Type() string       { return "create-claim" }
-func (msg MsgCreateClaim) Route() string      { return RouterKey }
+func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
+func (msg MsgCreateClaim) Route() string { return RouterKey }
 
 func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -262,23 +291,26 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type CreateClaimDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateClaim) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateClaim) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateClaim) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
 func (msg MsgCreateClaim) String() string {
@@ -290,20 +322,15 @@ func (msg MsgCreateClaim) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = MsgCreateClaim{}
-
 type MsgCreateEvaluation struct {
-	SignBytes  string              `json:"signBytes" yaml:"signBytes"`
 	TxHash     string              `json:"txHash" yaml:"txHash"`
-	SenderDid  ixo.Did             `json:"senderDid" yaml:"senderDid"`
-	ProjectDid ixo.Did             `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did             `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did             `json:"projectDid" yaml:"projectDid"`
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgCreateEvaluation) IsNewDid() bool     { return false }
-func (msg MsgCreateEvaluation) IsWithdrawal() bool { return false }
-func (msg MsgCreateEvaluation) Type() string       { return "create-evaluation" }
-func (msg MsgCreateEvaluation) Route() string      { return RouterKey }
+func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
+func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
 func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -316,23 +343,26 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type CreateEvaluationDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.ProjectDid) {
+	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.SenderDid) {
+	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateEvaluation) GetProjectDid() ixo.Did { return msg.ProjectDid }
-func (msg MsgCreateEvaluation) GetSenderDid() ixo.Did  { return msg.SenderDid }
+func (msg MsgCreateEvaluation) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.GetProjectDid())}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
 func (msg MsgCreateEvaluation) String() string {
@@ -344,18 +374,13 @@ func (msg MsgCreateEvaluation) String() string {
 	return string(b)
 }
 
-var _ sdk.Msg = MsgCreateEvaluation{}
-
 type MsgWithdrawFunds struct {
-	SignBytes string           `json:"signBytes" yaml:"signBytes"`
-	SenderDid ixo.Did          `json:"senderDid" yaml:"senderDid"`
+	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
-func (msg MsgWithdrawFunds) IsNewDid() bool     { return false }
-func (msg MsgWithdrawFunds) IsWithdrawal() bool { return true }
-func (msg MsgWithdrawFunds) Type() string       { return "withdraw-funds" }
-func (msg MsgWithdrawFunds) Route() string      { return RouterKey }
+func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
+func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	// Check that not empty
@@ -370,11 +395,11 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	// TODO: perform some checks on the Data (of type WithdrawFundsDoc)
 
 	// Check that DIDs valid
-	if !ixo.IsValidDid(msg.SenderDid) {
+	if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.ProjectDid) {
+	} else if !did.IsValidDid(msg.Data.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !ixo.IsValidDid(msg.Data.RecipientDid) {
+	} else if !did.IsValidDid(msg.Data.RecipientDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "recipient did is invalid")
 	}
 
@@ -391,13 +416,17 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetWithdrawFundsDoc() WithdrawFundsDoc { return msg.Data }
+func (msg MsgWithdrawFunds) GetSignerDid() did.Did { return msg.Data.RecipientDid }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{[]byte(msg.Data.RecipientDid)}
+	panic("tried to use unimplemented GetSigners function")
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
-	return []byte(msg.SignBytes)
+	if bz, err := json.Marshal(msg); err != nil {
+		panic(err)
+	} else {
+		return sdk.MustSortJSON(bz)
+	}
 }
 
 func (msg MsgWithdrawFunds) String() string {
@@ -408,5 +437,3 @@ func (msg MsgWithdrawFunds) String() string {
 
 	return string(b)
 }
-
-var _ sdk.Msg = MsgWithdrawFunds{}

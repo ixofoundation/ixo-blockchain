@@ -1,6 +1,7 @@
 package did
 
 import (
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
@@ -17,6 +18,13 @@ const (
 type (
 	Keeper       = keeper.Keeper
 	GenesisState = types.GenesisState
+
+	Did    = exported.Did
+	DidDoc = exported.DidDoc
+	IxoDid = exported.IxoDid
+
+	MsgAddDid        = types.MsgAddDid
+	MsgAddCredential = types.MsgAddCredential
 )
 
 var (
@@ -33,4 +41,8 @@ var (
 	ModuleCdc = types.ModuleCdc
 
 	ErrorInvalidDid = types.ErrorInvalidDid
+
+	IsValidDid      = types.IsValidDid
+	IsValidPubKey   = types.IsValidPubKey
+	UnmarshalIxoDid = types.UnmarshalIxoDid
 )
