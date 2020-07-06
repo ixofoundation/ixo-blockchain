@@ -2,17 +2,16 @@ package did
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/nft"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-func NewHandler(k keeper.Keeper, nftKeeper nft.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case types.MsgAddDid:
-			return handleMsgAddDidDoc(ctx, k, nftKeeper, msg)
+			return handleMsgAddDidDoc(ctx, k, msg)
 		case types.MsgAddCredential:
 			return handleMsgAddCredential(ctx, k, msg)
 		default:
@@ -21,18 +20,16 @@ func NewHandler(k keeper.Keeper, nftKeeper nft.Keeper) sdk.Handler {
 	}
 }
 
-func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, nftKeeper nft.Keeper, msg types.MsgAddDid) sdk.Result {
+func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) sdk.Result {
 	newDidDoc := msg.DidDoc
-
-	// TODO: use NFT module to assign the DID Doc an NFT
 
 	if len(newDidDoc.Credentials) > 0 {
 		return sdk.ErrUnknownRequest("Cannot add a new DID with existing Credentials").Result()
 	}
 
-	err2 := k.SetDidDoc(ctx, newDidDoc)
-	if err2 != nil {
-		return err2.Result()
+	err := k.SetDidDoc(ctx, newDidDoc)
+	if err != nil {
+		return err.Result()
 	}
 
 	return sdk.Result{}

@@ -2,7 +2,6 @@ package did
 
 import (
 	"encoding/json"
-	"github.com/ixofoundation/ixo-blockchain/x/nft"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -89,15 +88,13 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper    keeper.Keeper
-	nftKeeper nft.Keeper
+	keeper keeper.Keeper
 }
 
-func NewAppModule(keeper Keeper, nftKeeper nft.Keeper) AppModule {
+func NewAppModule(keeper Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
-		nftKeeper:      nftKeeper,
 	}
 }
 
@@ -111,7 +108,7 @@ func (AppModule) Route() string {
 	return RouterKey
 }
 
-func (am AppModule) NewHandler() sdk.Handler { return NewHandler(am.keeper, am.nftKeeper) }
+func (am AppModule) NewHandler() sdk.Handler { return NewHandler(am.keeper) }
 
 func (AppModule) QuerierRoute() string { return QuerierRoute }
 

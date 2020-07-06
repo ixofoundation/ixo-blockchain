@@ -210,7 +210,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
 
-		did.NewAppModule(app.didKeeper, app.nftKeeper),
+		did.NewAppModule(app.didKeeper),
 		payments.NewAppModule(app.paymentsKeeper, app.bankKeeper),
 		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.bankKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
