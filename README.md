@@ -39,7 +39,10 @@ bash add_dummy_testnet_data.sh
 cd ixo-blockchain/scripts
 bash demo_bonds.sh              # Option 1
 bash demo_bonds_swapper.sh      # Option 2
-bash demo_project.sh            # Option 3
-bash demo_tx_broadcast_rest.sh  # Option 4
-bash demo_tx_broadcast_rpc.sh   # Option 5
+bash demo_gas_estimation.sh     # Option 3
+bash demo_payments.sh           # Option 4
+bash demo_project.sh            # Option 5
+bash demo_sign_data.sh          # Option 6
+bash demo_tx_broadcast_rest.sh  # Option 7
+bash demo_tx_broadcast_rpc.sh   # Option 8
 ```
