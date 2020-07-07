@@ -8,13 +8,12 @@ const (
 
 type (
 	PubKeyGetter = types.PubKeyGetter
-
-	IxoTx        = types.IxoTx
-	IxoSignature = types.IxoSignature
 	IxoMsg       = types.IxoMsg
 )
 
 var (
+	RegisterCodec = types.RegisterCodec
+
 	// Auth
 	NewDefaultPubKeyGetter           = types.NewDefaultPubKeyGetter
 	ProcessSig                       = types.ProcessSig
@@ -26,8 +25,4 @@ var (
 
 	// Types
 	IxoDecimals = types.IxoDecimals
-
-	// Tx
-	DefaultTxDecoder  = types.DefaultTxDecoder
-	NewIxoTxSingleMsg = types.NewIxoTxSingleMsg
 )

@@ -2,13 +2,13 @@ package rest
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/gorilla/mux"
 
-	rest "github.com/ixofoundation/ixo-blockchain/client"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
@@ -36,7 +36,7 @@ func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx context.CLIContext
 
 		accAddress := exported.VerifyKeyToAddr(vars["pubKey"])
 
-		rest.PostProcessResponse(w, cliCtx.Codec, accAddress, true)
+		rest.PostProcessResponse(w, cliCtx, accAddress)
 	}
 }
 
@@ -64,7 +64,7 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 		cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
 		addressFromDid := didDoc.Address()
 
-		rest.PostProcessResponse(w, cliCtx.Codec, addressFromDid, true)
+		rest.PostProcessResponse(w, cliCtx, addressFromDid)
 	}
 }
 
@@ -91,7 +91,7 @@ func queryDidDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		var didDoc types.BaseDidDoc
 		cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
 
-		rest.PostProcessResponse(w, cliCtx.Codec, didDoc, true)
+		rest.PostProcessResponse(w, cliCtx, didDoc)
 	}
 }
 
@@ -115,7 +115,7 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		var dids []exported.Did
 		cliCtx.Codec.MustUnmarshalJSON(res, &dids)
 
-		rest.PostProcessResponse(w, cliCtx.Codec, dids, true)
+		rest.PostProcessResponse(w, cliCtx, dids)
 	}
 }
 
@@ -140,6 +140,6 @@ func queryAllDidDocsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		var didDocs []types.BaseDidDoc
 		cliCtx.Codec.MustUnmarshalJSON(res, &didDocs)
 
-		rest.PostProcessResponse(w, cliCtx.Codec, didDocs, true)
+		rest.PostProcessResponse(w, cliCtx, didDocs)
 	}
 }

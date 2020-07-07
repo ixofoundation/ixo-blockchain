@@ -94,7 +94,7 @@ func (msg MsgCreateProject) GetProjectDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSenderDid() did.Did  { return msg.SenderDid }
 func (msg MsgCreateProject) GetSignerDid() did.Did  { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateProject) String() string {
@@ -162,7 +162,7 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 
 func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 type MsgCreateAgent struct {
@@ -198,7 +198,7 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
@@ -250,7 +250,7 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 
 func (msg MsgUpdateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
@@ -302,7 +302,7 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateClaim) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
@@ -354,7 +354,7 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateEvaluation) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
@@ -418,7 +418,7 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 
 func (msg MsgWithdrawFunds) GetSignerDid() did.Did { return msg.Data.RecipientDid }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
