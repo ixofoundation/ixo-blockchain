@@ -14,18 +14,22 @@ import (
 func TestProjectDoc(t *testing.T) {
 	ctx, k, _, _, _ := CreateTestInput()
 
-	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
-	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
+	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
+	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
 
-	doc, err := k.GetProjectDoc(ctx, types.ValidCreateProjectMsg.ProjectDid)
+	doc, err := k.GetProjectDoc(ctx, types.ProjectDid)
 	require.Nil(t, err)
-	require.Equal(t, &types.ValidCreateProjectMsg, doc)
+	require.Equal(t, &types.ValidProjectDoc, doc)
 
-	resUpdated, err := k.UpdateProjectDoc(ctx, &types.ValidUpdateProjectMsg)
+	k.SetProjectDoc(ctx, &types.ValidUpdatedProjectDoc)
 	require.Nil(t, err)
 
-	expected, err := k.GetProjectDoc(ctx, types.ValidUpdateProjectMsg.ProjectDid)
-	require.Equal(t, resUpdated, expected)
+	docUpdated, err := k.GetProjectDoc(ctx, types.ProjectDid)
+	require.Nil(t, err)
+	require.Equal(t, &types.ValidProjectDoc, doc)
+
+	expected, err := k.GetProjectDoc(ctx, types.ValidUpdatedProjectDoc.ProjectDid)
+	require.Equal(t, docUpdated, expected)
 
 	_, err = k.GetProjectDoc(ctx, "Invalid Did")
 	require.NotNil(t, err)
@@ -37,16 +41,16 @@ func TestKeeperAccountMap(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
+	account, err := k.CreateNewAccount(ctx, types.ProjectDid, types.ValidAccId1)
 	require.Nil(t, err)
 
-	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1, account)
+	k.AddAccountToProjectAccounts(ctx, types.ProjectDid, types.ValidAccId1, account)
 
-	accountMap := k.GetAccountMap(ctx, types.ValidCreateProjectMsg.ProjectDid)
+	accountMap := k.GetAccountMap(ctx, types.ProjectDid)
 	_, found := accountMap[types.ValidAccId1]
 	require.True(t, found)
 
-	account, err = k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
+	account, err = k.CreateNewAccount(ctx, types.ProjectDid, types.ValidAccId1)
 	require.NotNil(t, err)
 
 }
@@ -59,10 +63,10 @@ func TestKeeperWithdrawalInfo(t *testing.T) {
 	require.NotNil(t, err)
 	require.Equal(t, 0, len(withdrawals))
 
-	k.AddProjectWithdrawalTransaction(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidWithdrawalInfo)
-	k.AddProjectWithdrawalTransaction(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidWithdrawalInfo)
+	k.AddProjectWithdrawalTransaction(ctx, types.ProjectDid, types.ValidWithdrawalInfo)
+	k.AddProjectWithdrawalTransaction(ctx, types.ProjectDid, types.ValidWithdrawalInfo)
 
-	withdrawals, err = k.GetProjectWithdrawalTransactions(ctx, types.ValidCreateProjectMsg.ProjectDid)
+	withdrawals, err = k.GetProjectWithdrawalTransactions(ctx, types.ProjectDid)
 	require.Nil(t, err)
 	require.Equal(t, 2, len(withdrawals))
 }
