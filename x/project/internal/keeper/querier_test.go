@@ -19,8 +19,8 @@ func TestQueryProjectDoc(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
-	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
+	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
+	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
 
 	query := abci.RequestQuery{
 		Path: "",
@@ -28,7 +28,7 @@ func TestQueryProjectDoc(t *testing.T) {
 	}
 
 	querier := NewQuerier(k)
-	res, err := querier(ctx, []string{"queryProjectDoc", types.ValidCreateProjectMsg.ProjectDid}, query)
+	res, err := querier(ctx, []string{"queryProjectDoc", types.ProjectDid}, query)
 	require.Nil(t, err)
 
 	emptyRes, err := querier(ctx, []string{"queryProjectDoc", "InvalidProjectDid"}, query)
@@ -45,8 +45,8 @@ func TestQueryProjectAccounts(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
-	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
+	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
+	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
 
 	query := abci.RequestQuery{
 		Path: "",
@@ -54,14 +54,14 @@ func TestQueryProjectAccounts(t *testing.T) {
 	}
 
 	querier := NewQuerier(k)
-	_, err := querier(ctx, []string{QueryProjectDoc, types.ValidCreateProjectMsg.ProjectDid}, query)
+	_, err := querier(ctx, []string{QueryProjectDoc, types.ProjectDid}, query)
 	require.Nil(t, err)
 
-	account, err := k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
+	account, err := k.CreateNewAccount(ctx, types.ProjectDid, types.ValidAccId1)
 	require.Nil(t, err)
-	k.AddAccountToProjectAccounts(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1, account)
+	k.AddAccountToProjectAccounts(ctx, types.ProjectDid, types.ValidAccId1, account)
 
-	res, err := querier(ctx, []string{QueryProjectAccounts, types.ValidCreateProjectMsg.ProjectDid}, query)
+	res, err := querier(ctx, []string{QueryProjectAccounts, types.ProjectDid}, query)
 	require.Nil(t, err)
 
 	var data interface{}
@@ -71,7 +71,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 	_, errRes := json.Marshal(accountMap)
 	require.Nil(t, errRes)
 
-	account, err = k.CreateNewAccount(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidAccId1)
+	account, err = k.CreateNewAccount(ctx, types.ProjectDid, types.ValidAccId1)
 	require.NotNil(t, err)
 }
 
@@ -81,11 +81,11 @@ func TestQueryTxs(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
-	require.False(t, k.ProjectDocExists(ctx, types.ValidCreateProjectMsg.GetProjectDid()))
-	k.SetProjectDoc(ctx, &types.ValidCreateProjectMsg)
+	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
+	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
 
-	k.AddProjectWithdrawalTransaction(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidWithdrawalInfo)
-	k.AddProjectWithdrawalTransaction(ctx, types.ValidCreateProjectMsg.ProjectDid, types.ValidWithdrawalInfo)
+	k.AddProjectWithdrawalTransaction(ctx, types.ProjectDid, types.ValidWithdrawalInfo)
+	k.AddProjectWithdrawalTransaction(ctx, types.ProjectDid, types.ValidWithdrawalInfo)
 
 	query := abci.RequestQuery{
 		Path: "",
@@ -93,7 +93,7 @@ func TestQueryTxs(t *testing.T) {
 	}
 
 	querier := NewQuerier(k)
-	res, err := querier(ctx, []string{QueryProjectTx, types.ValidCreateProjectMsg.ProjectDid}, query)
+	res, err := querier(ctx, []string{QueryProjectTx, types.ProjectDid}, query)
 	require.Nil(t, err)
 
 	var txs []types.WithdrawalInfo

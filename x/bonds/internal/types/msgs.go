@@ -173,7 +173,7 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 
 func (msg MsgCreateBond) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
@@ -261,7 +261,7 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 
 func (msg MsgEditBond) GetSignerDid() did.Did { return msg.EditorDid }
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgEditBond) Route() string { return RouterKey }
@@ -325,7 +325,7 @@ func (msg MsgBuy) GetSignBytes() []byte {
 
 func (msg MsgBuy) GetSignerDid() did.Did { return msg.BuyerDid }
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgBuy) Route() string { return RouterKey }
@@ -381,7 +381,7 @@ func (msg MsgSell) GetSignBytes() []byte {
 
 func (msg MsgSell) GetSignerDid() did.Did { return msg.SellerDid }
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgSell) Route() string { return RouterKey }
@@ -458,7 +458,7 @@ func (msg MsgSwap) GetSignBytes() []byte {
 
 func (msg MsgSwap) GetSignerDid() did.Did { return msg.SwapperDid }
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgSwap) Route() string { return RouterKey }

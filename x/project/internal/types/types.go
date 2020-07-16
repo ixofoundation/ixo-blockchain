@@ -1,17 +1,24 @@
 package types
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"strconv"
-
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	"strconv"
+)
+
+var (
+	_ StoredProjectDoc = (*ProjectDoc)(nil)
 )
 
 type (
 	InternalAccountID          string
 	AccountMap                 map[InternalAccountID]sdk.AccAddress
+	GenesisAccountMap          map[string]sdk.AccAddress
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
+	ProjectDataMap             map[string]json.RawMessage
 )
 
 func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
@@ -73,26 +80,58 @@ type UpdateProjectStatusDoc struct {
 }
 
 type ProjectDoc struct {
-	NodeDid              string        `json:"nodeDid" yaml:"nodeDid"`
-	RequiredClaims       string        `json:"requiredClaims" yaml:"requiredClaims"`
-	EvaluatorPayPerClaim string        `json:"evaluatorPayPerClaim" yaml:"evaluatorPayPerClaim"`
-	ServiceEndpoint      string        `json:"serviceEndpoint" yaml:"serviceEndpoint"`
-	CreatedOn            string        `json:"createdOn" yaml:"createdOn"`
-	CreatedBy            string        `json:"createdBy" yaml:"createdBy"`
-	Status               ProjectStatus `json:"status" yaml:"status"`
+	TxHash     string          `json:"txHash" yaml:"txHash"`
+	ProjectDid exported.Did    `json:"projectDid" yaml:"projectDid"`
+	SenderDid  exported.Did    `json:"senderDid" yaml:"senderDid"`
+	PubKey     string          `json:"pubKey" yaml:"pubKey"`
+	Status     ProjectStatus   `json:"status" yaml:"status"`
+	Data       json.RawMessage `json:"data" yaml:"data"`
+}
+
+func NewProjectDoc(txHash string, projectDid, senderDid exported.Did,
+	pubKey string, status ProjectStatus, data json.RawMessage) ProjectDoc {
+	return ProjectDoc{
+		TxHash:     txHash,
+		ProjectDid: projectDid,
+		SenderDid:  senderDid,
+		PubKey:     pubKey,
+		Status:     status,
+		Data:       data,
+	}
+}
+
+func (pd ProjectDoc) GetProjectDid() did.Did          { return pd.ProjectDid }
+func (pd ProjectDoc) GetSenderDid() did.Did           { return pd.SenderDid }
+func (pd ProjectDoc) GetPubKey() string               { return pd.PubKey }
+func (pd ProjectDoc) GetStatus() ProjectStatus        { return pd.Status }
+func (pd *ProjectDoc) SetStatus(status ProjectStatus) { pd.Status = status }
+func (pd ProjectDoc) GetProjectData() ProjectDataMap {
+	var dataMap ProjectDataMap
+	err := json.Unmarshal(pd.Data, &dataMap)
+	if err != nil {
+		panic(err)
+	}
+	return dataMap
 }
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
-	if pd.EvaluatorPayPerClaim == "" {
-		return 0
-	} else {
-		i, err := strconv.ParseInt(pd.EvaluatorPayPerClaim, 10, 64)
-		if err != nil {
-			panic(err)
-		}
-
-		return i
+	evaluatorPayPerClaimBz, found := pd.GetProjectData()["evaluatorPayPerClaim"]
+	if !found {
+		panic("evaluatorPayPerClaim not found")
 	}
+
+	var evaluatorPayPerClaimStr string
+	err := json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
+	if err != nil {
+		panic(err)
+	}
+
+	i, err := strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	return i
 }
 
 type CreateAgentDoc struct {

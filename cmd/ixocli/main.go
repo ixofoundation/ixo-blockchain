@@ -1,7 +1,7 @@
 package main
 
 import (
-	cli2 "github.com/ixofoundation/ixo-blockchain/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/client/tx"
 	"os"
 	"path"
@@ -69,7 +69,7 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		rpc.ValidatorCommand(cdc),
 		rpc.BlockCommand(),
 		authCli.QueryTxsByEventsCmd(cdc),
-		cli2.QueryTxCmd(cdc),
+		authCli.QueryTxCmd(cdc),
 	)
 
 	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
@@ -124,6 +124,7 @@ func initConfig(cmd *cobra.Command) error {
 
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
+	rest.RegisterTxRoutes(rs.CliCtx, rs.Mux)
 	tx.RegisterTxRoutes(rs.CliCtx, rs.Mux)
 	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }

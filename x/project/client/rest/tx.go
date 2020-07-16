@@ -32,14 +32,6 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		didDocParam := r.URL.Query().Get("didDoc")
 		mode := r.URL.Query().Get("mode")
 
-		var projectDoc types.ProjectDoc
-		err := json.Unmarshal([]byte(projectDocParam), &projectDoc)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall projectDoc into struct. Error: %s", err.Error())))
-			return
-		}
-
 		didDoc, err := did.UnmarshalIxoDid(didDocParam)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -48,7 +40,8 @@ func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		cliCtx = cliCtx.WithBroadcastMode(mode)
-		msg := types.NewMsgCreateProject(senderDid, projectDoc, didDoc)
+		msg := types.NewMsgCreateProject(
+			senderDid, json.RawMessage(projectDocParam), didDoc)
 
 		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, didDoc)
 		if err != nil {

@@ -1,15 +1,27 @@
 package project
 
 import (
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+	// Marshal/Unmarshal account maps into array of AccountMap
+	accountMapsBz, err := json.Marshal(data.AccountMaps)
+	if err != nil {
+		panic(err)
+	}
+	var accountMaps []AccountMap
+	err = json.Unmarshal(accountMapsBz, &accountMaps)
+	if err != nil {
+		panic(err)
+	}
+
 	// Initialise project docs, account maps, project withdrawals, params
 	for i := range data.ProjectDocs {
 		keeper.SetProjectDoc(ctx, &data.ProjectDocs[i])
 		keeper.SetAccountMap(ctx,
-			data.ProjectDocs[i].GetProjectDid(), data.AccountMaps[i])
+			data.ProjectDocs[i].GetProjectDid(), accountMaps[i])
 		keeper.SetProjectWithdrawalTransactions(ctx,
 			data.ProjectDocs[i].GetProjectDid(), data.WithdrawalsInfos[i])
 	}
@@ -18,7 +30,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	// Export project docs, account maps, project withdrawals
-	var projectDocs []MsgCreateProject
+	var projectDocs []ProjectDoc
 	var accountMaps []AccountMap
 	var withdrawalInfos [][]WithdrawalInfo
 
@@ -28,16 +40,27 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		accountMap := k.GetAccountMap(ctx, projectDoc.GetProjectDid())
 		withdrawalInfo, _ := k.GetProjectWithdrawalTransactions(ctx, projectDoc.GetProjectDid())
 
-		projectDocs = append(projectDocs, *projectDoc.(*MsgCreateProject))
+		projectDocs = append(projectDocs, *projectDoc.(*ProjectDoc))
 		accountMaps = append(accountMaps, accountMap)
 		withdrawalInfos = append(withdrawalInfos, withdrawalInfo)
 	}
 
 	params := k.GetParams(ctx)
 
+	// Marshal/Unmarshal account maps into array of GenesisAccountMap
+	accountMapsBz, err := json.Marshal(accountMaps)
+	if err != nil {
+		panic(err)
+	}
+	var genesisAccountMaps []GenesisAccountMap
+	err = json.Unmarshal(accountMapsBz, &genesisAccountMaps)
+	if err != nil {
+		panic(err)
+	}
+
 	return GenesisState{
 		ProjectDocs:      projectDocs,
-		AccountMaps:      accountMaps,
+		AccountMaps:      genesisAccountMaps,
 		WithdrawalsInfos: withdrawalInfos,
 		Params:           params,
 	}

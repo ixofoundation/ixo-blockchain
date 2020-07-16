@@ -15,7 +15,7 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 		var pubKeyEd25519 ed25519.PubKeyEd25519
 		switch msg := msg.(type) {
 		case MsgAddDid:
-			copy(pubKeyEd25519[:], base58.Decode(msg.DidDoc.PubKey))
+			copy(pubKeyEd25519[:], base58.Decode(msg.PubKey))
 		default:
 			// For the remaining messages, the did is the signer
 			didDoc, _ := keeper.GetDidDoc(ctx, msg.GetSignerDid())
