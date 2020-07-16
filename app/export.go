@@ -161,4 +161,6 @@ func (app *ixoApp) prepForZeroHeightGenesis(ctx sdk.Context, jailWhiteList []str
 			return false
 		},
 	)
+
+	// TODO: perform zero-height prep for payments module (and any other ixo module)
 }
