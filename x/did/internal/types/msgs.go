@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -21,29 +20,14 @@ var (
 )
 
 type MsgAddDid struct {
-	DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
-}
-
-func (msg *MsgAddDid) UnmarshalJSON(bytes []byte) error {
-	var msg2 struct {
-		DidDoc BaseDidDoc `json:"didDoc" yaml:"didDoc"`
-	}
-	err := json.Unmarshal(bytes, &msg2)
-	if err != nil {
-		return err
-	}
-
-	if msg2.DidDoc.Credentials == nil {
-		msg2.DidDoc.Credentials = []exported.DidCredential{}
-	}
-
-	*msg = msg2
-	return nil
+	Did    exported.Did `json:"did" yaml:"did"`
+	PubKey string       `json:"pubKey" yaml:"pubKey"`
 }
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	return MsgAddDid{
-		DidDoc: NewBaseDidDoc(did, publicKey),
+		Did:    did,
+		PubKey: publicKey,
 	}
 }
 
@@ -51,30 +35,21 @@ func (msg MsgAddDid) Type() string { return TypeMsgAddDid }
 
 func (msg MsgAddDid) Route() string { return RouterKey }
 
-func (msg MsgAddDid) GetSignerDid() exported.Did { return msg.DidDoc.Did }
+func (msg MsgAddDid) GetSignerDid() exported.Did { return msg.Did }
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgAddDid) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if strings.TrimSpace(msg.DidDoc.Did) == "" {
+	if strings.TrimSpace(msg.Did) == "" {
 		return ErrorInvalidDid(DefaultCodespace, "did should not be empty")
-	} else if strings.TrimSpace(msg.DidDoc.PubKey) == "" {
+	} else if strings.TrimSpace(msg.PubKey) == "" {
 		return ErrorInvalidPubKey(DefaultCodespace, "pubKey should not be empty")
 	}
 
-	// Check DidDoc credentials for empty fields
-	for _, cred := range msg.DidDoc.Credentials {
-		if strings.TrimSpace(cred.Issuer) == "" {
-			return ErrorInvalidIssuer(DefaultCodespace, "issuer should not be empty")
-		} else if strings.TrimSpace(cred.Claim.Id) == "" {
-			return ErrorInvalidDid(DefaultCodespace, "claim id should not be empty")
-		}
-	}
-
 	// Check that DID valid
-	if !IsValidDid(msg.DidDoc.Did) {
+	if !IsValidDid(msg.Did) {
 		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
 	}
 
@@ -82,15 +57,11 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgAddDid) String() string {
-	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", string(msg.DidDoc.GetDid()), msg.DidDoc.GetPubKey())
+	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", msg.Did, msg.PubKey)
 }
 
 type MsgAddCredential struct {
@@ -118,7 +89,7 @@ func (msg MsgAddCredential) Route() string { return RouterKey }
 
 func (msg MsgAddCredential) GetSignerDid() exported.Did { return msg.DidCredential.Issuer }
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgAddCredential) String() string {
@@ -143,9 +114,5 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }

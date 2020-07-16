@@ -31,7 +31,7 @@ func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			var projectDoc types.MsgCreateProject
+			var projectDoc types.ProjectDoc
 			err = cdc.UnmarshalJSON(res, &projectDoc)
 			if err != nil {
 				return err

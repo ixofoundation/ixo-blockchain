@@ -57,7 +57,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
 
 func (msg MsgCreatePaymentTemplate) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreatePaymentTemplate) String() string {
@@ -69,11 +69,7 @@ func (msg MsgCreatePaymentTemplate) String() string {
 }
 
 func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgCreatePaymentContract struct {
@@ -112,7 +108,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
 
 func (msg MsgCreatePaymentContract) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreatePaymentContract) String() string {
@@ -124,11 +120,7 @@ func (msg MsgCreatePaymentContract) String() string {
 }
 
 func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgCreateSubscription struct {
@@ -167,7 +159,7 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateSubscription) GetSignerDid() did.Did { return msg.CreatorDid }
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateSubscription) String() string {
@@ -179,11 +171,7 @@ func (msg MsgCreateSubscription) String() string {
 }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgSetPaymentContractAuthorisation struct {
@@ -217,7 +205,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() did.Did { return msg.PayerDid }
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgSetPaymentContractAuthorisation) String() string {
@@ -229,11 +217,7 @@ func (msg MsgSetPaymentContractAuthorisation) String() string {
 }
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgGrantDiscount struct {
@@ -268,7 +252,7 @@ func (msg MsgGrantDiscount) ValidateBasic() sdk.Error {
 
 func (msg MsgGrantDiscount) GetSignerDid() did.Did { return msg.SenderDid }
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgGrantDiscount) String() string {
@@ -280,11 +264,7 @@ func (msg MsgGrantDiscount) String() string {
 }
 
 func (msg MsgGrantDiscount) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgRevokeDiscount struct {
@@ -318,7 +298,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
 
 func (msg MsgRevokeDiscount) GetSignerDid() did.Did { return msg.SenderDid }
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgRevokeDiscount) String() string {
@@ -330,11 +310,7 @@ func (msg MsgRevokeDiscount) String() string {
 }
 
 func (msg MsgRevokeDiscount) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgEffectPayment struct {
@@ -365,7 +341,7 @@ func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
 
 func (msg MsgEffectPayment) GetSignerDid() did.Did { return msg.SenderDid }
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgEffectPayment) String() string {
@@ -377,9 +353,5 @@ func (msg MsgEffectPayment) String() string {
 }
 
 func (msg MsgEffectPayment) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }

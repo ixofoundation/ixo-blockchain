@@ -58,7 +58,7 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 
 func (msg MsgSend) GetSignerDid() did.Did { return msg.FromDid }
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgSend) String() string {
@@ -70,11 +70,7 @@ func (msg MsgSend) String() string {
 }
 
 func (msg MsgSend) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgOracleTransfer struct {
@@ -120,7 +116,7 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 
 func (msg MsgOracleTransfer) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleTransfer) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgOracleTransfer) String() string {
@@ -132,11 +128,7 @@ func (msg MsgOracleTransfer) String() string {
 }
 
 func (msg MsgOracleTransfer) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgOracleMint struct {
@@ -177,7 +169,7 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 
 func (msg MsgOracleMint) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleMint) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgOracleMint) String() string {
@@ -189,11 +181,7 @@ func (msg MsgOracleMint) String() string {
 }
 
 func (msg MsgOracleMint) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgOracleBurn struct {
@@ -232,7 +220,7 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 
 func (msg MsgOracleBurn) GetSignerDid() did.Did { return msg.OracleDid }
 func (msg MsgOracleBurn) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgOracleBurn) String() string {
@@ -244,9 +232,5 @@ func (msg MsgOracleBurn) String() string {
 }
 
 func (msg MsgOracleBurn) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }

@@ -58,7 +58,7 @@ func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.Stored
 	}
 
 	bz := store.Get(key)
-	var projectDoc types.MsgCreateProject
+	var projectDoc types.ProjectDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
 	return &projectDoc
@@ -78,7 +78,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.Stored
 		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
 	}
 
-	var projectDoc types.MsgCreateProject
+	var projectDoc types.ProjectDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
 	return &projectDoc, nil
@@ -88,20 +88,6 @@ func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.StoredProjectDoc
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectPrefixKey(projectDoc.GetProjectDid())
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(projectDoc))
-}
-
-func (k Keeper) UpdateProjectDoc(ctx sdk.Context, newProjectDoc types.StoredProjectDoc) (types.StoredProjectDoc, sdk.Error) {
-	existedDoc, _ := k.GetProjectDoc(ctx, newProjectDoc.GetProjectDid())
-	if existedDoc == nil {
-
-		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc details are not exist")
-	} else {
-
-		existedDoc.SetStatus(newProjectDoc.GetStatus())
-		k.SetProjectDoc(ctx, newProjectDoc)
-
-		return newProjectDoc, nil
-	}
 }
 
 func (k Keeper) SetAccountMap(ctx sdk.Context, projectDid did.Did, accountMap types.AccountMap) {

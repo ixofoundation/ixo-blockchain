@@ -34,9 +34,12 @@ type (
 	MsgCreateEvaluation    = types.MsgCreateEvaluation
 	MsgWithdrawFunds       = types.MsgWithdrawFunds
 
-	StoredProjectDoc  = types.StoredProjectDoc
+	ProjectDoc       = types.ProjectDoc
+	StoredProjectDoc = types.StoredProjectDoc
+
 	WithdrawalInfo    = types.WithdrawalInfo
 	AccountMap        = types.AccountMap
+	GenesisAccountMap = types.GenesisAccountMap
 	InternalAccountID = types.InternalAccountID
 )
 
@@ -49,6 +52,8 @@ var (
 	DefaultParams  = types.DefaultParams
 	ValidateParams = types.ValidateParams
 	RegisterCodec  = types.RegisterCodec
+
+	NewProjectDoc = types.NewProjectDoc
 
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState

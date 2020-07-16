@@ -1,6 +1,7 @@
 package project
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -78,30 +79,50 @@ func Test_CreateEvaluation(t *testing.T) {
 		},
 	}
 
+	projectData := struct {
+		NodeDid              string
+		RequiredClaims       string
+		EvaluatorPayPerClaim string
+		ServiceEndpoint      string
+		CreatedOn            string
+		CreatedBy            string
+	}{
+		NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
+		RequiredClaims:       "requireClaims1",
+		EvaluatorPayPerClaim: "10",
+		ServiceEndpoint:      "https://togo.pds.ixo.network",
+		CreatedOn:            "2018-05-21T15:53:18.484Z",
+		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
+	}
+
+	projectDoc := types.ProjectDoc{
+		TxHash:     "",
+		SenderDid:  "",
+		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
+		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
+		Status:     "CREATED",
+		Data:       nil, // marshalled below
+	}
+	projectDocData, err2 := json.Marshal(projectData)
+	require.Nil(t, err2)
+	projectDoc.Data = projectDocData
+
 	msg := types.MsgCreateProject{
 		TxHash:     "",
 		SenderDid:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Data: types.ProjectDoc{
-			NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
-			RequiredClaims:       "requireClaims1",
-			EvaluatorPayPerClaim: "10",
-			ServiceEndpoint:      "https://togo.pds.ixo.network",
-			CreatedOn:            "2018-05-21T15:53:18.484Z",
-			CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
-			Status:               "CREATED",
-		},
+		Data:       projectDoc.Data,
 	}
 
 	var err sdk.Error
-	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), IxoAccountFeesId)
+	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg.GetProjectDid(), InternalAccountID(msg.GetProjectDid()))
+	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InternalAccountID(msg.ProjectDid))
 	require.Nil(t, err)
 
-	require.False(t, k.ProjectDocExists(ctx, msg.GetProjectDid()))
-	k.SetProjectDoc(ctx, &msg)
+	require.False(t, k.ProjectDocExists(ctx, msg.ProjectDid))
+	k.SetProjectDoc(ctx, &projectDoc)
 
 	res := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
 	require.NotNil(t, res)
@@ -124,30 +145,50 @@ func Test_WithdrawFunds(t *testing.T) {
 		},
 	}
 
+	projectData := struct {
+		NodeDid              string
+		RequiredClaims       string
+		EvaluatorPayPerClaim string
+		ServiceEndpoint      string
+		CreatedOn            string
+		CreatedBy            string
+	}{
+		NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
+		RequiredClaims:       "requireClaims1",
+		EvaluatorPayPerClaim: "10",
+		ServiceEndpoint:      "https://togo.pds.ixo.network",
+		CreatedOn:            "2018-05-21T15:53:18.484Z",
+		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
+	}
+
+	projectDoc := types.ProjectDoc{
+		TxHash:     "",
+		SenderDid:  "",
+		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
+		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
+		Status:     "PAIDOUT",
+		Data:       nil, // marshalled below
+	}
+	projectDocData, err2 := json.Marshal(projectData)
+	require.Nil(t, err2)
+	projectDoc.Data = projectDocData
+
 	msg1 := types.MsgCreateProject{
 		TxHash:     "",
 		SenderDid:  "",
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Data: types.ProjectDoc{
-			NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
-			RequiredClaims:       "requireClaims1",
-			EvaluatorPayPerClaim: "10",
-			ServiceEndpoint:      "https://togo.pds.ixo.network",
-			CreatedOn:            "2018-05-21T15:53:18.484Z",
-			CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
-			Status:               "PAIDOUT",
-		},
+		Data:       projectDoc.Data,
 	}
 
 	var err sdk.Error
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), IxoAccountFeesId)
+	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.GetProjectDid(), InternalAccountID(msg1.GetProjectDid()))
+	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, InternalAccountID(msg1.ProjectDid))
 	require.Nil(t, err)
 
-	require.False(t, k.ProjectDocExists(ctx, msg1.GetProjectDid()))
-	k.SetProjectDoc(ctx, &msg1)
+	require.False(t, k.ProjectDocExists(ctx, msg1.ProjectDid))
+	k.SetProjectDoc(ctx, &projectDoc)
 
 	res := handleMsgWithdrawFunds(ctx, k, bk, msg)
 	require.NotNil(t, res)

@@ -1,18 +1,20 @@
 package types
 
 import (
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"strings"
 )
 
-func NewMsgCreateProject(senderDid did.Did, projectDoc ProjectDoc, projectDid did.IxoDid) MsgCreateProject {
+func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
+	projectDid did.IxoDid) MsgCreateProject {
 	return MsgCreateProject{
 		TxHash:     "",
 		SenderDid:  senderDid,
 		ProjectDid: projectDid.Did,
 		PubKey:     projectDid.VerifyKey,
-		Data:       projectDoc,
+		Data:       projectData,
 	}
 }
 

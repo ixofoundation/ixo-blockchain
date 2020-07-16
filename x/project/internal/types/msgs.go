@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/spf13/viper"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -33,16 +34,14 @@ var (
 	_ ixo.IxoMsg = MsgCreateClaim{}
 	_ ixo.IxoMsg = MsgCreateEvaluation{}
 	_ ixo.IxoMsg = MsgWithdrawFunds{}
-
-	_ StoredProjectDoc = (*MsgCreateProject)(nil)
 )
 
 type MsgCreateProject struct {
-	TxHash     string     `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did    `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did    `json:"projectDid" yaml:"projectDid"`
-	PubKey     string     `json:"pubKey" yaml:"pubKey"`
-	Data       ProjectDoc `json:"data" yaml:"data"`
+	TxHash     string          `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	PubKey     string          `json:"pubKey" yaml:"pubKey"`
+	Data       json.RawMessage `json:"data" yaml:"data"`
 }
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) auth.StdSignMsg {
@@ -72,12 +71,28 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.NodeDid, "NodeDid"); !valid {
-		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.RequiredClaims, "RequiredClaims"); !valid {
-		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.CreatedBy, "CreatedBy"); !valid {
-		return err
+	}
+
+	// Check that data marshallable to map[string]json.RawMessage
+	var dataMap ProjectDataMap
+	err := json.Unmarshal(msg.Data, &dataMap)
+	if err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
+
+	// Check that evaluatorPayPerClaim is present and is a string integer
+	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
+	if !found {
+		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
+	}
+	var evaluatorPayPerClaimStr string
+	err = json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
+	if err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
+	_, err = strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
+	if err != nil {
+		return sdk.ErrInternal("evaluatorPayPerClaim should be an integer")
 	}
 
 	// Check that DIDs valid
@@ -90,11 +105,9 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgCreateProject) GetProjectDid() did.Did { return msg.ProjectDid }
-func (msg MsgCreateProject) GetSenderDid() did.Did  { return msg.SenderDid }
-func (msg MsgCreateProject) GetSignerDid() did.Did  { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateProject) String() string {
@@ -105,19 +118,10 @@ func (msg MsgCreateProject) String() string {
 	return string(b)
 }
 
-func (msg MsgCreateProject) GetPubKey() string        { return msg.PubKey }
-func (msg MsgCreateProject) GetEvaluatorPay() int64   { return msg.Data.GetEvaluatorPay() }
-func (msg MsgCreateProject) GetStatus() ProjectStatus { return msg.Data.Status }
-func (msg *MsgCreateProject) SetStatus(status ProjectStatus) {
-	msg.Data.Status = status
-}
+func (msg MsgCreateProject) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateProject) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgUpdateProjectStatus struct {
@@ -153,16 +157,12 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 type MsgCreateAgent struct {
@@ -198,15 +198,11 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateAgent) String() string {
@@ -250,15 +246,11 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 
 func (msg MsgUpdateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgUpdateAgent) String() string {
@@ -302,15 +294,11 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateClaim) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateClaim) String() string {
@@ -354,15 +342,11 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 
 func (msg MsgCreateEvaluation) GetSignerDid() did.Did { return msg.ProjectDid }
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateEvaluation) String() string {
@@ -418,15 +402,11 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 
 func (msg MsgWithdrawFunds) GetSignerDid() did.Did { return msg.Data.RecipientDid }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	panic("tried to use unimplemented GetSigners function")
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgWithdrawFunds) String() string {

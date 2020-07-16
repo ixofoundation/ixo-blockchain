@@ -15,19 +15,13 @@ import (
 
 func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "create-project [sender-did] [project-json] [ixo-did]",
+		Use:   "create-project [sender-did] [project-data-json] [ixo-did]",
 		Short: "Create a new ProjectDoc signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
-			projectDocStr := args[1]
+			projectDataStr := args[1]
 			ixoDid, err := did.UnmarshalIxoDid(args[2])
-			if err != nil {
-				return err
-			}
-
-			var projectDoc types.ProjectDoc
-			err = json.Unmarshal([]byte(projectDocStr), &projectDoc)
 			if err != nil {
 				return err
 			}
@@ -35,7 +29,8 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateProject(senderDid, projectDoc, ixoDid)
+			msg := types.NewMsgCreateProject(
+				senderDid, json.RawMessage(projectDataStr), ixoDid)
 			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectFee)
 
 			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)

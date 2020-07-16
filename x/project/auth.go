@@ -75,7 +75,7 @@ func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
 	return sdk.Result{}
 }
 
-func getProjectCreationSignBytes(chainID string, ixoTx ixo.IxoTx, acc auth.Account, genesis bool) []byte {
+func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc auth.Account, genesis bool) []byte {
 	var accNum uint64
 	if !genesis {
 		// Fixed account number used so that sign bytes do not depend on it
@@ -83,13 +83,14 @@ func getProjectCreationSignBytes(chainID string, ixoTx ixo.IxoTx, acc auth.Accou
 	}
 
 	return auth.StdSignBytes(
-		chainID, accNum, acc.GetSequence(), ixoTx.Fee, ixoTx.Msgs, ixoTx.Memo,
+		chainID, accNum, acc.GetSequence(), tx.Fee, tx.Msgs, tx.Memo,
 	)
 }
 
 func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 	bk bank.Keeper, didKeeper did.Keeper,
 	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
+	// TODO: ensure in all ante handlers not allowing multiple messages
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
@@ -98,13 +99,13 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
 		}
 
-		// all transactions must be of type ixo.IxoTx
-		ixoTx, ok := tx.(ixo.IxoTx)
+		// all transactions must be of type auth.StdTx
+		stdTx, ok := tx.(auth.StdTx)
 		if !ok {
 			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 			// during runTx.
 			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdk.ErrInternal("tx must be ixo.IxoTx").Result(), true
+			return newCtx, sdk.ErrInternal("tx must be auth.StdTx").Result(), true
 		}
 
 		params := ak.GetParams(ctx)
@@ -118,12 +119,12 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		if res := auth.ValidateMemo(auth.StdTx{Memo: ixoTx.Memo}, params); !res.IsOK() {
+		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
 			return newCtx, res, true
 		}
 
 		// message must be of type MsgCreateProject
-		msg, ok := ixoTx.GetMsgs()[0].(MsgCreateProject)
+		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)
 		if !ok {
 			return newCtx, sdk.ErrInternal("msg must be MsgCreateProject").Result(), true
 		}
@@ -144,7 +145,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		// confirm that fee is the exact amount expected
 		expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
 			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectFee)))
-		if !ixoTx.Fee.Amount.IsEqual(expectedTotalFee) {
+		if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
 			return newCtx, sdk.ErrInvalidCoins("invalid fee").Result(), true
 		}
 
@@ -153,7 +154,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
 
 		// deduct the fees
-		if !ixoTx.Fee.Amount.IsZero() {
+		if !stdTx.Fee.Amount.IsZero() {
 			// fetch fee payer account
 			feePayerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.SenderDid)
 			if err != nil {
@@ -187,9 +188,9 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		}
 
 		// check signature, return account with incremented nonce
-		ixoSig := auth.StdSignature{PubKey: projectPubKey, Signature: ixoTx.GetSignatures()[0].SignatureValue[:]}
+		ixoSig := stdTx.GetSignatures()[0]
 		isGenesis := ctx.BlockHeight() == 0
-		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), ixoTx, signerAcc, isGenesis)
+		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
 		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if !res.IsOK() {
 			return newCtx, res, true
@@ -197,6 +198,6 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		ak.SetAccount(newCtx, signerAcc)
 
-		return newCtx, sdk.Result{GasWanted: ixoTx.Fee.Gas}, false // continue...
+		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
 	}
 }
