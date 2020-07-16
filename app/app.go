@@ -210,18 +210,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	)
 	app.crisisKeeper = crisis.NewKeeper(crisisSubspace, invCheckPeriod, app.supplyKeeper, auth.FeeCollectorName)
 
-	// add keepers (for custom ixo modules)
-	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace,
-		app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
-	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
-		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
-	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
-		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], app.cdc)
-	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
-	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
-		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
-
 	// register the proposal types
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
@@ -238,6 +226,20 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
+	// add keepers (for custom ixo modules)
+	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
+	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace,
+		app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
+	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
+		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
+	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
+		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], app.cdc)
+	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
+	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
+		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
+
+	// NOTE: Any module instantiated in the module manager that is later modified
+	// must be passed by reference here.
 	app.mm = module.NewManager(
 		// Standard Cosmos appmodules
 		genaccounts.NewAppModule(app.accountKeeper),
