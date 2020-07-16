@@ -35,7 +35,7 @@ func TestBlackListedAddrs(t *testing.T) {
 
 func setGenesis(ixoApp *ixoApp) error {
 
-	genesisState := ModuleBasics.DefaultGenesis()
+	genesisState := ModuleBasics.DefaultGenesis() // TODO: set to simapp.DefaultGenesisState() once simapp added
 	stateBytes, err := codec.MarshalJSONIndent(ixoApp.cdc, genesisState)
 	if err != nil {
 		return err
