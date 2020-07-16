@@ -69,11 +69,7 @@ func (msg MsgCreatePaymentTemplate) String() string {
 }
 
 func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgCreatePaymentContract struct {
@@ -124,11 +120,7 @@ func (msg MsgCreatePaymentContract) String() string {
 }
 
 func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgCreateSubscription struct {
@@ -179,11 +171,7 @@ func (msg MsgCreateSubscription) String() string {
 }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgSetPaymentContractAuthorisation struct {
@@ -229,11 +217,7 @@ func (msg MsgSetPaymentContractAuthorisation) String() string {
 }
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgGrantDiscount struct {
@@ -280,11 +264,7 @@ func (msg MsgGrantDiscount) String() string {
 }
 
 func (msg MsgGrantDiscount) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgRevokeDiscount struct {
@@ -330,11 +310,7 @@ func (msg MsgRevokeDiscount) String() string {
 }
 
 func (msg MsgRevokeDiscount) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgEffectPayment struct {
@@ -377,9 +353,5 @@ func (msg MsgEffectPayment) String() string {
 }
 
 func (msg MsgEffectPayment) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }

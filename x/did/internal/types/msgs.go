@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -58,11 +57,7 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgAddDid) String() string {
@@ -119,9 +114,5 @@ func (msg MsgAddCredential) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }

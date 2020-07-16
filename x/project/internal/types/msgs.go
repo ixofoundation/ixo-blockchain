@@ -121,11 +121,7 @@ func (msg MsgCreateProject) String() string {
 func (msg MsgCreateProject) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateProject) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgUpdateProjectStatus struct {
@@ -161,11 +157,7 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
@@ -210,11 +202,7 @@ func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateAgent) String() string {
@@ -262,11 +250,7 @@ func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgUpdateAgent) String() string {
@@ -314,11 +298,7 @@ func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateClaim) String() string {
@@ -366,11 +346,7 @@ func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateEvaluation) String() string {
@@ -430,11 +406,7 @@ func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgWithdrawFunds) String() string {

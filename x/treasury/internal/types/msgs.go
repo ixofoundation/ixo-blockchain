@@ -70,11 +70,7 @@ func (msg MsgSend) String() string {
 }
 
 func (msg MsgSend) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgOracleTransfer struct {
@@ -132,11 +128,7 @@ func (msg MsgOracleTransfer) String() string {
 }
 
 func (msg MsgOracleTransfer) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgOracleMint struct {
@@ -189,11 +181,7 @@ func (msg MsgOracleMint) String() string {
 }
 
 func (msg MsgOracleMint) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 type MsgOracleBurn struct {
@@ -244,9 +232,5 @@ func (msg MsgOracleBurn) String() string {
 }
 
 func (msg MsgOracleBurn) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }

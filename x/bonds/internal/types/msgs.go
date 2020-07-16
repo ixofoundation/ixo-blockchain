@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -164,11 +163,7 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateBond) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgCreateBond) GetSignerDid() did.Did { return msg.CreatorDid }
@@ -252,11 +247,7 @@ func (msg MsgEditBond) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgEditBond) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgEditBond) GetSignerDid() did.Did { return msg.EditorDid }
@@ -316,11 +307,7 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgBuy) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgBuy) GetSignerDid() did.Did { return msg.BuyerDid }
@@ -372,11 +359,7 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSell) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgSell) GetSignerDid() did.Did { return msg.SellerDid }
@@ -449,11 +432,7 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgSwap) GetSignBytes() []byte {
-	if bz, err := json.Marshal(msg); err != nil {
-		panic(err)
-	} else {
-		return sdk.MustSortJSON(bz)
-	}
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 func (msg MsgSwap) GetSignerDid() did.Did { return msg.SwapperDid }
