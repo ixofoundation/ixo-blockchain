@@ -13,20 +13,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-	"github.com/cosmos/cosmos-sdk/x/distribution"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	paramsClient "github.com/cosmos/cosmos-sdk/x/params/client"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
@@ -49,23 +48,31 @@ const (
 )
 
 var (
-	DefaultCLIHome  = os.ExpandEnv("$HOME/.ixocli")
+	// default home directories for ixocli
+	DefaultCLIHome = os.ExpandEnv("$HOME/.ixocli")
+
+	// default home directories for ixod
 	DefaultNodeHome = os.ExpandEnv("$HOME/.ixod")
 
+	// The module BasicManager is in charge of setting up basic,
+	// non-dependant module elements, such as codec registration
+	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
+		// Standard Cosmos modules
 		genaccounts.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
 		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		mint.AppModuleBasic{},
-		distribution.AppModuleBasic{},
-		gov.NewAppModuleBasic(paramsClient.ProposalHandler, distribution.ProposalHandler),
+		distr.AppModuleBasic{},
+		gov.NewAppModuleBasic(paramsclient.ProposalHandler, distr.ProposalHandler),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
+		// Custom ixo modules
 		did.AppModuleBasic{},
 		payments.AppModuleBasic{},
 		project.AppModuleBasic{},
@@ -76,12 +83,15 @@ var (
 
 	// Module account permissions
 	maccPerms = map[string][]string{
-		auth.FeeCollectorName:            nil,
-		distribution.ModuleName:          nil,
-		mint.ModuleName:                  {supply.Minter},
-		staking.BondedPoolName:           {supply.Burner, supply.Staking},
-		staking.NotBondedPoolName:        {supply.Burner, supply.Staking},
-		gov.ModuleName:                   {supply.Burner},
+		// Standard Cosmos module accounts
+		auth.FeeCollectorName:     nil,
+		distr.ModuleName:          nil,
+		mint.ModuleName:           {supply.Minter},
+		staking.BondedPoolName:    {supply.Burner, supply.Staking},
+		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		gov.ModuleName:            {supply.Burner},
+
+		// Custom ixo module accounts
 		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
 		bonds.BatchesIntermediaryAccount: nil,
 		treasury.ModuleName:              {supply.Minter, supply.Burner},
@@ -94,32 +104,40 @@ var (
 
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
+
 	ModuleBasics.RegisterCodec(cdc)
 	ixo.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	codec.RegisterEvidences(cdc)
+
 	return cdc
 }
 
+// Extended ABCI application
 type ixoApp struct {
 	*bam.BaseApp
-	cdc            *codec.Codec
+	cdc *codec.Codec
+
 	invCheckPeriod uint
 
+	// keys to access the substores
 	keys  map[string]*sdk.KVStoreKey
-	tKeys map[string]*sdk.TransientStoreKey
+	tkeys map[string]*sdk.TransientStoreKey
 
-	accountKeeper      auth.AccountKeeper
-	bankKeeper         bank.Keeper
-	supplyKeeper       supply.Keeper
-	stakingKeeper      staking.Keeper
-	distributionKeeper distribution.Keeper
-	slashingKeeper     slashing.Keeper
-	govKeeper          gov.Keeper
-	mintKeeper         mint.Keeper
-	crisisKeeper       crisis.Keeper
-	paramsKeeper       params.Keeper
+	// Standard Cosmos keepers
+	accountKeeper  auth.AccountKeeper
+	bankKeeper     bank.Keeper
+	supplyKeeper   supply.Keeper
+	stakingKeeper  staking.Keeper
+	slashingKeeper slashing.Keeper
+	mintKeeper     mint.Keeper
+	distrKeeper    distr.Keeper
+	govKeeper      gov.Keeper
+	crisisKeeper   crisis.Keeper
+	paramsKeeper   params.Keeper
 
+	// Custom ixo keepers
 	didKeeper      did.Keeper
 	paymentsKeeper payments.Keeper
 	projectKeeper  project.Keeper
@@ -127,9 +145,11 @@ type ixoApp struct {
 	oraclesKeeper  oracles.Keeper
 	treasuryKeeper treasury.Keeper
 
+	// the module manager
 	mm *module.Manager
 }
 
+// NewIxoApp returns a reference to an initialized IxoApp.
 func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp)) *ixoApp {
 
@@ -138,75 +158,101 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 
-	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, mint.StoreKey, distribution.StoreKey, slashing.StoreKey,
-		gov.StoreKey, params.StoreKey, did.StoreKey, payments.StoreKey,
-		project.StoreKey, bonds.StoreKey, treasury.StoreKey, oracles.StoreKey)
+	keys := sdk.NewKVStoreKeys(
+		// Standard Cosmos store keys
+		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
+		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
+		gov.StoreKey, params.StoreKey,
 
-	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
+		// Custom ixo store keys
+		did.StoreKey, payments.StoreKey,
+		project.StoreKey, bonds.StoreKey, treasury.StoreKey, oracles.StoreKey,
+	)
+
+	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	app := &ixoApp{
 		BaseApp:        bApp,
 		cdc:            cdc,
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
-		tKeys:          tKeys,
+		tkeys:          tkeys,
 	}
 
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tKeys[params.TStoreKey], params.DefaultCodespace)
+	// init params keeper and subspaces (for standard Cosmos modules)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	mintSubspace := app.paramsKeeper.Subspace(mint.DefaultParamspace)
-	distrSubspace := app.paramsKeeper.Subspace(distribution.DefaultParamspace)
+	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
 	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace)
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
+
+	// init params keeper and subspaces (for custom ixo modules)
 	paymentsSubspace := app.paramsKeeper.Subspace(payments.DefaultParamspace)
 	projectSubspace := app.paramsKeeper.Subspace(project.DefaultParamspace)
 
+	// add keepers (for standard Cosmos modules)
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
 	app.bankKeeper = bank.NewBaseKeeper(app.accountKeeper, bankSubspace, bank.DefaultCodespace, app.ModuleAccountAddrs())
 	app.supplyKeeper = supply.NewKeeper(app.cdc, keys[supply.StoreKey], app.accountKeeper, app.bankKeeper, maccPerms)
-	stakingKeeper := staking.NewKeeper(app.cdc, keys[staking.StoreKey], tKeys[staking.TStoreKey],
-		app.supplyKeeper, stakingSubspace, staking.DefaultCodespace)
+	stakingKeeper := staking.NewKeeper(
+		app.cdc, keys[staking.StoreKey], tkeys[staking.TStoreKey],
+		app.supplyKeeper, stakingSubspace, staking.DefaultCodespace,
+	)
 	app.mintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], mintSubspace, &stakingKeeper, app.supplyKeeper, auth.FeeCollectorName)
-	app.distributionKeeper = distribution.NewKeeper(app.cdc, keys[distribution.StoreKey], distrSubspace, &stakingKeeper,
-		app.supplyKeeper, distribution.DefaultCodespace, auth.FeeCollectorName, app.ModuleAccountAddrs())
-	app.slashingKeeper = slashing.NewKeeper(app.cdc, keys[slashing.StoreKey], &stakingKeeper,
-		slashingSubspace, slashing.DefaultCodespace)
+	app.distrKeeper = distr.NewKeeper(app.cdc, keys[distr.StoreKey], distrSubspace, &stakingKeeper,
+		app.supplyKeeper, distr.DefaultCodespace, auth.FeeCollectorName, app.ModuleAccountAddrs())
+	app.slashingKeeper = slashing.NewKeeper(
+		app.cdc, keys[slashing.StoreKey], &stakingKeeper, slashingSubspace, slashing.DefaultCodespace,
+	)
 	app.crisisKeeper = crisis.NewKeeper(crisisSubspace, invCheckPeriod, app.supplyKeeper, auth.FeeCollectorName)
 
+	// add keepers (for custom ixo modules)
+	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
+	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace,
+		app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
+	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
+		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
+	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
+		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], app.cdc)
+	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
+	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
+		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
+
+	// register the proposal types
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
 		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
-		AddRoute(distribution.RouterKey, distribution.NewCommunityPoolSpendProposalHandler(app.distributionKeeper))
-	app.govKeeper = gov.NewKeeper(app.cdc, keys[gov.StoreKey], app.paramsKeeper, govSubspace,
-		app.supplyKeeper, &stakingKeeper, gov.DefaultCodespace, govRouter)
+		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper))
+	app.govKeeper = gov.NewKeeper(
+		app.cdc, keys[gov.StoreKey], app.paramsKeeper, govSubspace,
+		app.supplyKeeper, &stakingKeeper, gov.DefaultCodespace, govRouter,
+	)
 
-	app.stakingKeeper = *stakingKeeper.SetHooks(staking.NewMultiStakingHooks(app.distributionKeeper.Hooks(),
-		app.slashingKeeper.Hooks()))
-
-	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace, app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
-	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace, app.accountKeeper, app.didKeeper, app.paymentsKeeper)
-	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper, app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], app.cdc)
-	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
-	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper, app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
+	// register the staking hooks
+	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
+	app.stakingKeeper = *stakingKeeper.SetHooks(
+		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
+	)
 
 	app.mm = module.NewManager(
+		// Standard Cosmos appmodules
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
 		crisis.NewAppModule(&app.crisisKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-		distribution.NewAppModule(app.distributionKeeper, app.supplyKeeper),
+		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		gov.NewAppModule(app.govKeeper, app.supplyKeeper),
 		mint.NewAppModule(app.mintKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
-		staking.NewAppModule(app.stakingKeeper, app.distributionKeeper, app.accountKeeper, app.supplyKeeper),
+		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 
+		// Custom ixo AppModules
 		did.NewAppModule(app.didKeeper),
 		payments.NewAppModule(app.paymentsKeeper, app.bankKeeper),
 		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.bankKeeper),
@@ -215,21 +261,41 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		oracles.NewAppModule(app.oraclesKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(mint.ModuleName, distribution.ModuleName, slashing.ModuleName, bonds.ModuleName)
-	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName, bonds.ModuleName, payments.ModuleName)
+	// During begin block slashing happens after distr.BeginBlocker so that
+	// there is nothing left over in the validator fee pool, so as to keep the
+	// CanWithdrawInvariant invariant.
+	app.mm.SetOrderBeginBlockers(
+		// Standard Cosmos modules
+		mint.ModuleName, distr.ModuleName, slashing.ModuleName,
+		// Custom ixo modules
+		bonds.ModuleName,
+	)
 
-	app.mm.SetOrderInitGenesis(genaccounts.ModuleName, distribution.ModuleName,
-		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
-		gov.ModuleName, mint.ModuleName, supply.ModuleName, crisis.ModuleName,
-		genutil.ModuleName, did.ModuleName, project.ModuleName, payments.ModuleName,
-		bonds.ModuleName, treasury.ModuleName, oracles.ModuleName)
+	app.mm.SetOrderEndBlockers(
+		// Standard Cosmos modules
+		crisis.ModuleName, gov.ModuleName, staking.ModuleName,
+		// Custom ixo modules
+		bonds.ModuleName, payments.ModuleName,
+	)
+
+	app.mm.SetOrderInitGenesis(
+		// Standard Cosmos modules
+		genaccounts.ModuleName, distr.ModuleName, staking.ModuleName,
+		auth.ModuleName, bank.ModuleName, slashing.ModuleName, gov.ModuleName,
+		mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
+		// Custom ixo modules
+		did.ModuleName, project.ModuleName, payments.ModuleName,
+		bonds.ModuleName, treasury.ModuleName, oracles.ModuleName,
+	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
 
+	// initialize stores
 	app.MountKVStores(keys)
-	app.MountTransientStores(tKeys)
+	app.MountTransientStores(tkeys)
 
+	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(NewIxoAnteHandler(app))
@@ -245,14 +311,17 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	return app
 }
 
+// application updates every begin block
 func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
+// application updates every end block
 func (app *ixoApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
+// application update at chain initialization
 func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState map[string]json.RawMessage
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -260,10 +329,12 @@ func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
+// load a particular height
 func (app *ixoApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
+// ModuleAccountAddrs returns all the app's module account addresses.
 func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
@@ -271,21 +342,6 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 	}
 
 	return modAccAddrs
-}
-
-func (app *ixoApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string) (appState json.RawMessage,
-	validators []tmtypes.GenesisValidator, err error) {
-
-	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})
-	genState := app.mm.ExportGenesis(ctx)
-	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	validators = staking.WriteValidators(ctx, app.stakingKeeper)
-
-	return appState, validators, nil
 }
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
