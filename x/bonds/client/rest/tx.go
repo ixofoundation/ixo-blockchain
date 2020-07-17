@@ -123,7 +123,7 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// parse sanity rate
+		// Parse sanity rate
 		sanityRate, err := sdk.NewDecFromStr(req.SanityRate)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

@@ -98,7 +98,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			// parse sanity rate
+			// Parse sanity rate
 			sanityRate, err := sdk.NewDecFromStr(_sanityRate)
 			if err != nil {
 				return fmt.Errorf(err.Error())
