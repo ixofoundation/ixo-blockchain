@@ -178,6 +178,11 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 			return newCtx, err.Result(), true
 		}
 
+		// Number of messages in the tx must be 1
+		if len(tx.GetMsgs()) != 1 {
+			return ctx, sdk.ErrInternal("number of messages must be 1").Result(), true
+		}
+
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
 		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
