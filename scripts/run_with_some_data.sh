@@ -24,15 +24,24 @@ FROM="\"ixo_did\": \"\""
 TO="\"ixo_did\": \"$IXO_DID\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
-# Set staking token
+# Set staking token (both bond_denom and mint_denom)
 STAKING_TOKEN="uixos"
 FROM="\"bond_denom\": \"stake\""
 TO="\"bond_denom\": \"$STAKING_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+FROM="\"mint_denom\": \"stake\""
+TO="\"mint_denom\": \"$STAKING_TOKEN\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
-# Set min-gas-prices
+# Set fee token (both for gov min deposit and crisis constant fee)
+FEE_TOKEN="uixo"
+FROM="\"stake\""
+TO="\"$FEE_TOKEN\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
+# Set min-gas-prices (using fee token)
 FROM="minimum-gas-prices = \"\""
-TO="minimum-gas-prices = \"\""
+TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 ixocli config chain-id pandora-1
