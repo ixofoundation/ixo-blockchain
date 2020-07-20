@@ -90,7 +90,6 @@ func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc auth.Account
 func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 	bk bank.Keeper, didKeeper did.Keeper,
 	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
-	// TODO: ensure in all ante handlers not allowing multiple messages
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
 	) (newCtx sdk.Context, res sdk.Result, abort bool) {
@@ -115,6 +114,11 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		if err := tx.ValidateBasic(); err != nil {
 			return newCtx, err.Result(), true
+		}
+
+		// Number of messages in the tx must be 1
+		if len(tx.GetMsgs()) != 1 {
+			return ctx, sdk.ErrInternal("number of messages must be 1").Result(), true
 		}
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
