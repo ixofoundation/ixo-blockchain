@@ -24,4 +24,5 @@ const (
 	AttributeKeySenderDid         = "sender_did"
 	AttributeKeyRecipient         = "recipient"
 	AttributeKeyHolder            = "holder"
+	AttributeValueCategory        = ModuleName
 )
