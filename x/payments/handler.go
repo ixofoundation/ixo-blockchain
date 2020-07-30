@@ -101,7 +101,6 @@ func handleMsgSetPaymentContractAuthorisation(ctx sdk.Context, k Keeper, msg Msg
 			types.EventTypePaymentContractAuthorisation,
 			sdk.NewAttribute(types.AttributeKeyPayerDid, msg.PayerDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
-			//sdk.NewAttribute(types.AttributeKeyAuthorised, msg.Authorised),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
