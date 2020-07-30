@@ -101,7 +101,7 @@ func handleMsgSetPaymentContractAuthorisation(ctx sdk.Context, k Keeper, msg Msg
 			types.EventTypePaymentContractAuthorisation,
 			sdk.NewAttribute(types.AttributeKeyPayerDid, msg.PayerDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
-			sdk.NewAttribute(types.AttributeKeyAuthorised, msg.Authorised),
+			//sdk.NewAttribute(types.AttributeKeyAuthorised, msg.Authorise),
 		),
 	})
 
@@ -142,7 +142,7 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 		sdk.NewEvent(
 			types.EventTypeCreatePaymentTemplate,
 			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
-			sdk.NewAttribute(types.AttributeKeyPaymentTemplate, msg.PaymentTemplate),
+			//sdk.NewAttribute(types.AttributeKeyPaymentTemplate, msg.PaymentTemplate),
 		),
 	})
 
@@ -198,9 +198,9 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentTemplateId, msg.PaymentTemplateId),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
-			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer),
-			sdk.NewAttribute(types.AttributeKeyDeAuthorise, msg.CanDeauthorise),
-			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId),
+			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer.String()),
+			//sdk.NewAttribute(types.AttributeKeyDeAuthorise, msg.CanDeauthorise),
+			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
 		),
 	})
 
@@ -254,9 +254,9 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper,
 		sdk.NewEvent(
 			types.EventTypeCreateSubscription,
 			sdk.NewAttribute(types.AttributeKeySubscriptionId, msg.SubscriptionId),
-			sdk.NewAttribute(types.AttributeKeyPPaymentContractId, msg.PaymentContractId),
-			sdk.NewAttribute(types.AttributeKeyMaxPeriods, msg.MaxPeriods),
-			sdk.NewAttribute(types.AttributeKeyPeriod, msg.Period),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyMaxPeriods, msg.MaxPeriods.String()),
+			sdk.NewAttribute(types.AttributeKeyPeriod, msg.Period.GetPeriodUnit()),
 		),
 	})
 
@@ -303,8 +303,8 @@ func handleMsgGrantDiscount(ctx sdk.Context, k Keeper, msg MsgGrantDiscount) sdk
 			types.EventTypeGrantDiscount,
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
-			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId),
-			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
+			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient.String()),
 		),
 	})
 
@@ -342,7 +342,7 @@ func handleMsgRevokeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeDiscount) s
 			types.EventTypeRevokeDiscount,
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
-			sdk.NewAttribute(types.AttributeKeyHolder, msg.Holder),
+			sdk.NewAttribute(types.AttributeKeyHolder, msg.Holder.String()),
 		),
 	})
 
