@@ -27,7 +27,15 @@ func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) s
 	if err != nil {
 		return err.Result()
 	}
-	return sdk.Result{}
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeAddDidDoc,
+			sdk.NewAttribute(types.AttributeKeyDid, msg.Did),
+			sdk.NewAttribute(types.AttributeKeyPubKey, msg.PubKey),
+		),
+	})
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCredential) sdk.Result {
@@ -35,6 +43,14 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 	if err != nil {
 		return err.Result()
 	}
-
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeAddCredential,
+			sdk.NewAttribute(types.AttributeKeyCredType, msg.DidCredential.CredType),
+			sdk.NewAttribute(types.AttributeKeyIssuer, msg.DidCredential.Issuer),
+			sdk.NewAttribute(types.AttributeKeyIssued, msg.DidCredential.Issued),
+			sdk.NewAttribute(types.AttributeKeyClaim, msg.DidCredential.Claim),
+		),
+	})
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
