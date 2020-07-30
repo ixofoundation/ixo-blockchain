@@ -46,10 +46,10 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeAddCredential,
-			sdk.NewAttribute(types.AttributeKeyCredType, msg.DidCredential.CredType),
+			sdk.NewAttribute(types.AttributeKeyCredType, msg.DidCredential.CredType[0]),
 			sdk.NewAttribute(types.AttributeKeyIssuer, msg.DidCredential.Issuer),
 			sdk.NewAttribute(types.AttributeKeyIssued, msg.DidCredential.Issued),
-			sdk.NewAttribute(types.AttributeKeyClaim, msg.DidCredential.Claim),
+			sdk.NewAttribute(types.AttributeKeyClaimID, msg.DidCredential.Claim.Id),
 		),
 	})
 	return sdk.Result{Events: ctx.EventManager().Events()}

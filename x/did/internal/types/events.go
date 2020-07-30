@@ -9,5 +9,5 @@ const (
 	AttributeKeyCredType = "credType"
 	AttributeKeyIssuer   = "issuer"
 	AttributeKeyIssued   = "issued"
-	AttributeKeyClaim    = "claim"
+	AttributeKeyClaimID  = "claim"
 )
