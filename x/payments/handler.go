@@ -412,6 +412,5 @@ func handleMsgEffectPayment(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgEf
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
 	})
-
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
