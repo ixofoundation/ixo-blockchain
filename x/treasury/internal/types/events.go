@@ -1,7 +1,10 @@
 package types
 
 const (
-	EventTypeMsgSend = "msg_send"
+	EventTypeSend           = "send"
+	EventTypeOracleBurn     = "oracle_burn"
+	EventTypeOracleMint     = "oracle_mint"
+	EventTypeOracleTransfer = "oracle_transfer"
 
 	AttributeKeyTxHashFromDid = "from_did"
 	AttributeKeyToDidOrAddr   = "to_did_or_addr"

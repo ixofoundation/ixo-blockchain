@@ -1,7 +1,9 @@
 package did
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strconv"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
@@ -50,10 +52,11 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeAddCredential,
-			sdk.NewAttribute(types.AttributeKeyCredType, msg.DidCredential.CredType[0]),
+			sdk.NewAttribute(types.AttributeKeyCredType, fmt.Sprint(msg.DidCredential.CredType)),
 			sdk.NewAttribute(types.AttributeKeyIssuer, msg.DidCredential.Issuer),
 			sdk.NewAttribute(types.AttributeKeyIssued, msg.DidCredential.Issued),
 			sdk.NewAttribute(types.AttributeKeyClaimID, msg.DidCredential.Claim.Id),
+			sdk.NewAttribute(strconv.FormatBool(types.AttributeKeyKYCValidated), strconv.FormatBool(msg.DidCredential.Claim.KYCValidated)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

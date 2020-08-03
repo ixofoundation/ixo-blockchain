@@ -7,6 +7,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"strconv"
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
@@ -101,6 +102,7 @@ func handleMsgSetPaymentContractAuthorisation(ctx sdk.Context, k Keeper, msg Msg
 			types.EventTypePaymentContractAuthorisation,
 			sdk.NewAttribute(types.AttributeKeyPayerDid, msg.PayerDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyAuthorised, strconv.FormatBool(msg.Authorised)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -145,6 +147,12 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 		sdk.NewEvent(
 			types.EventTypeCreatePaymentTemplate,
 			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyAttributeKeyId, msg.PaymentTemplate.Id),
+			sdk.NewAttribute(types.AttributeKeyPaymentAmount, msg.PaymentTemplate.PaymentAmount.String()),
+			sdk.NewAttribute(types.AttributeKeyPaymentMinimum, msg.PaymentTemplate.PaymentMinimum.String()),
+			sdk.NewAttribute(types.AttributeKeyPaymentMaximum, msg.PaymentTemplate.PaymentMaximum.String()),
+			sdk.NewAttribute(types.AttributeKeyDiscounts, fmt.Sprint(msg.PaymentTemplate.Discounts)),
+			sdk.NewAttribute(types.AttributeKeyWalletDistribution, fmt.Sprint(msg.PaymentTemplate.WalletDistribution)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -206,6 +214,7 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer.String()),
 			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
+			sdk.NewAttribute(types.AttributeKeyDeAuthorise, strconv.FormatBool(msg.CanDeauthorise)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -266,6 +275,7 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper,
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyMaxPeriods, msg.MaxPeriods.String()),
 			sdk.NewAttribute(types.AttributeKeyPeriod, msg.Period.GetPeriodUnit()),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

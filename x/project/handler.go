@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -139,7 +140,8 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyData, msg.Data.EthFundingTxnID),
+			sdk.NewAttribute(types.AttributeKeyEthFundingTxnID, msg.Data.EthFundingTxnID),
+			sdk.NewAttribute(types.AttributeKeyStatus, fmt.Sprint(msg.Data.Status)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -228,7 +230,8 @@ func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCrea
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyData, msg.Data.AgentDid),
+			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
+			sdk.NewAttribute(types.AttributeKeyRole, msg.Data.Role),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -274,7 +277,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk payments.Keeper,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyData, msg.Data.ClaimID),
+			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -313,7 +316,8 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk payments.Keeper, bk
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyData, msg.Data.ClaimID),
+			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
+			sdk.NewAttribute(types.AttributeKeyStatus, fmt.Sprint(msg.Data.Status)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -366,6 +370,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyData, msg.Data.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyRecipientDid, msg.Data.RecipientDid),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Data.Amount.String()),
+			sdk.NewAttribute(types.AttributeKeyIsRefund, strconv.FormatBool(msg.Data.IsRefund)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

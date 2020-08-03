@@ -1,14 +1,15 @@
 package types
 
 const (
-	EventTypeAddDidDoc     = "create_did_doc"
-	EventTypeAddCredential = "credential"
+	EventTypeAddDidDoc     = "add_did_doc"
+	EventTypeAddCredential = "add_credential"
 
-	AttributeKeyDid        = "did"
-	AttributeKeyPubKey     = "pub_key"
-	AttributeKeyCredType   = "credType"
-	AttributeKeyIssuer     = "issuer"
-	AttributeKeyIssued     = "issued"
-	AttributeKeyClaimID    = "claim"
-	AttributeValueCategory = ModuleName
+	AttributeKeyDid          = "did"
+	AttributeKeyPubKey       = "pub_key"
+	AttributeKeyCredType     = "cred_type"
+	AttributeKeyIssuer       = "issuer"
+	AttributeKeyIssued       = "issued"
+	AttributeKeyClaimID      = "claim"
+	AttributeKeyKYCValidated = true
+	AttributeValueCategory   = ModuleName
 )

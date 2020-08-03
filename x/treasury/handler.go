@@ -36,7 +36,7 @@ func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) sdk.Resu
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeMsgSend,
+			types.EventTypeSend,
 			sdk.NewAttribute(types.AttributeKeyTxHashFromDid, msg.FromDid),
 			sdk.NewAttribute(types.AttributeKeyToDidOrAddr, msg.ToDidOrAddr),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
@@ -58,7 +58,7 @@ func handleMsgOracleTransfer(ctx sdk.Context, k keeper.Keeper, msg types.MsgOrac
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeMsgSend,
+			types.EventTypeOracleTransfer,
 			sdk.NewAttribute(types.AttributeKeyOracleDid, msg.OracleDid),
 			sdk.NewAttribute(types.AttributeKeyTxHashFromDid, msg.FromDid),
 			sdk.NewAttribute(types.AttributeKeyToDidOrAddr, msg.ToDidOrAddr),
@@ -82,7 +82,7 @@ func handleMsgOracleMint(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleMi
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeMsgSend,
+			types.EventTypeOracleMint,
 			sdk.NewAttribute(types.AttributeKeyOracleDid, msg.OracleDid),
 			sdk.NewAttribute(types.AttributeKeyToDidOrAddr, msg.ToDidOrAddr),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
@@ -105,7 +105,7 @@ func handleMsgOracleBurn(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleBu
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeMsgSend,
+			types.EventTypeOracleBurn,
 			sdk.NewAttribute(types.AttributeKeyTxHashFromDid, msg.FromDid),
 			sdk.NewAttribute(types.AttributeKeyOracleDid, msg.OracleDid),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
