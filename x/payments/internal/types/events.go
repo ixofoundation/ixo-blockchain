@@ -16,7 +16,7 @@ const (
 	AttributeKeyPaymentTemplate    = "payment_template"
 	AttributeKeyPaymentTemplateId  = "payment_template_id"
 	AttributeKeyPayer              = "payer"
-	AttributeKeyDeAuthorise        = "can_deauthorise"
+	AttributeKeyCanDeauthorise     = "can_deauthorise"
 	AttributeKeyDiscountId         = "discount_id"
 	AttributeKeySubscriptionId     = "attribute_key"
 	AttributeKeyMaxPeriods         = "max_periods"
