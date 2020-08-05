@@ -231,7 +231,7 @@ func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCrea
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
-			sdk.NewAttribute(types.AttributeKeyRole, msg.Data.Role),
+			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
