@@ -214,7 +214,7 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer.String()),
 			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
-			sdk.NewAttribute(types.AttributeKeyDeAuthorise, strconv.FormatBool(msg.CanDeauthorise)),
+			sdk.NewAttribute(types.AttributeKeyCanDeauthorise, strconv.FormatBool(msg.CanDeauthorise)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
