@@ -226,7 +226,7 @@ func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCrea
 	}
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeUpdateProjectStatus,
+			types.EventTypeCreateAgent,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
@@ -273,7 +273,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk payments.Keeper,
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeUpdateProjectStatus,
+			types.EventTypeUpdateAgent,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
@@ -312,7 +312,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk payments.Keeper, bk
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeUpdateProjectStatus,
+			types.EventTypeCreateEvaluation,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
@@ -365,7 +365,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeUpdateProjectStatus,
+			types.EventTypeWithdrawFunds,
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyData, msg.Data.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyRecipientDid, msg.Data.RecipientDid),
