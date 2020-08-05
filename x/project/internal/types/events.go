@@ -15,7 +15,7 @@ const (
 	AttributeKeyClaimID         = "claim_iD"
 	AttributeKeyStatus          = "status"
 	AttributeKeyAgentDid        = "agent_did"
-	AttributeKeyRole            = "role"
+	AttributeKeyAgentRole       = "role"
 	AttributeKeyEthFundingTxnID = "eth_funding_txn_id"
 
 	AttributeValueCategory = ModuleName
