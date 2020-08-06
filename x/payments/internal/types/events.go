@@ -13,7 +13,6 @@ const (
 	AttributeKeyPaymentContractId  = "payment_contract-id"
 	AttributeKeyAuthorised         = "authorised"
 	AttributeKeyCreatorDid         = "creator_did"
-	AttributeKeyPaymentTemplate    = "payment_template"
 	AttributeKeyPaymentTemplateId  = "payment_template_id"
 	AttributeKeyPayer              = "payer"
 	AttributeKeyCanDeauthorise     = "can_deauthorise"
