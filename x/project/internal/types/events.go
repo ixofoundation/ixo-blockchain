@@ -12,15 +12,15 @@ const (
 	AttributeKeySenderDid       = "sender_did"
 	AttributeKeyProjectDid      = "project_did"
 	AttributeKeyPubKey          = "pub_key"
-	AttributeKeyData            = "data"
 	AttributeKeyRecipientDid    = "recipient_did"
 	AttributeKeyAmount          = "amount"
 	AttributeKeyIsRefund        = "is_refund"
-	AttributeKeyClaimID         = "claim_iD"
-	AttributeKeyStatus          = "status"
+	AttributeKeyClaimID         = "claim_id"
+	AttributeKeyClaimStatus     = "claim_status"
 	AttributeKeyAgentDid        = "agent_did"
 	AttributeKeyAgentRole       = "role"
 	AttributeKeyEthFundingTxnID = "eth_funding_txn_id"
+	AttributeKeyUpdatedStatus   = "updated_status"
 
 	AttributeValueCategory = ModuleName
 )
