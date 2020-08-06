@@ -56,7 +56,7 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 			sdk.NewAttribute(types.AttributeKeyIssuer, msg.DidCredential.Issuer),
 			sdk.NewAttribute(types.AttributeKeyIssued, msg.DidCredential.Issued),
 			sdk.NewAttribute(types.AttributeKeyClaimID, msg.DidCredential.Claim.Id),
-			sdk.NewAttribute(strconv.FormatBool(types.AttributeKeyKYCValidated), strconv.FormatBool(msg.DidCredential.Claim.KYCValidated)),
+			sdk.NewAttribute(types.AttributeKeyKYCValidated, strconv.FormatBool(msg.DidCredential.Claim.KYCValidated)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

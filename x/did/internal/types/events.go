@@ -10,6 +10,6 @@ const (
 	AttributeKeyIssuer       = "issuer"
 	AttributeKeyIssued       = "issued"
 	AttributeKeyClaimID      = "claim"
-	AttributeKeyKYCValidated = true
+	AttributeKeyKYCValidated = "kyc_validated"
 	AttributeValueCategory   = ModuleName
 )
