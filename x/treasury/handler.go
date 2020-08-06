@@ -7,7 +7,6 @@ import (
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
-
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
@@ -23,7 +22,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 	}
-
 	// TODO: be able to disable sends/mints/burns globally
 	// TODO: be able to blacklist addresses/DIDs
 }
@@ -34,12 +32,18 @@ func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) sdk.Resu
 		return err.Result()
 	}
 
-	ctx.EventManager().EmitEvent(
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeSend,
+			sdk.NewAttribute(types.AttributeKeyTxHashFromDid, msg.FromDid),
+			sdk.NewAttribute(types.AttributeKeyToDidOrAddr, msg.ToDidOrAddr),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
+		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
-	)
+	})
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
@@ -50,12 +54,20 @@ func handleMsgOracleTransfer(ctx sdk.Context, k keeper.Keeper, msg types.MsgOrac
 		return err.Result()
 	}
 
-	ctx.EventManager().EmitEvent(
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeOracleTransfer,
+			sdk.NewAttribute(types.AttributeKeyOracleDid, msg.OracleDid),
+			sdk.NewAttribute(types.AttributeKeyTxHashFromDid, msg.FromDid),
+			sdk.NewAttribute(types.AttributeKeyToDidOrAddr, msg.ToDidOrAddr),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
+			sdk.NewAttribute(types.AttributeKeyProof, msg.Proof),
+		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
-	)
+	})
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
@@ -66,12 +78,19 @@ func handleMsgOracleMint(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleMi
 		return err.Result()
 	}
 
-	ctx.EventManager().EmitEvent(
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeOracleMint,
+			sdk.NewAttribute(types.AttributeKeyOracleDid, msg.OracleDid),
+			sdk.NewAttribute(types.AttributeKeyToDidOrAddr, msg.ToDidOrAddr),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
+			sdk.NewAttribute(types.AttributeKeyProof, msg.Proof),
+		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
-	)
+	})
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }
@@ -82,12 +101,19 @@ func handleMsgOracleBurn(ctx sdk.Context, k keeper.Keeper, msg types.MsgOracleBu
 		return err.Result()
 	}
 
-	ctx.EventManager().EmitEvent(
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeOracleBurn,
+			sdk.NewAttribute(types.AttributeKeyTxHashFromDid, msg.FromDid),
+			sdk.NewAttribute(types.AttributeKeyOracleDid, msg.OracleDid),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
+			sdk.NewAttribute(types.AttributeKeyProof, msg.Proof),
+		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
-	)
+	})
 
 	return sdk.Result{Events: ctx.EventManager().Events()}
 }

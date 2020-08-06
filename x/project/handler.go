@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -21,7 +22,6 @@ const (
 )
 
 func NewHandler(k Keeper, fk payments.Keeper, bk bank.Keeper) sdk.Handler {
-
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
@@ -74,8 +74,21 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 
 	k.SetProjectDoc(ctx, &projectDoc)
 	k.SetProjectWithdrawalTransactions(ctx, msg.ProjectDid, nil)
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateProject,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyPubKey, msg.PubKey),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
 
-	return sdk.Result{}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
@@ -120,7 +133,23 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	projectDoc.SetStatus(newStatus)
 	k.SetProjectDoc(ctx, projectDoc)
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeUpdateProjectStatus,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyEthFundingTxnID, msg.Data.EthFundingTxnID),
+			sdk.NewAttribute(types.AttributeKeyUpdatedStatus, fmt.Sprint(msg.Data.Status)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
+
 }
 
 func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Did) sdk.Result {
@@ -194,8 +223,22 @@ func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCrea
 	if err != nil {
 		err.Result()
 	}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateAgent,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
+			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
 
-	return sdk.Result{}
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpdateAgent) sdk.Result {
@@ -227,7 +270,21 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, fk payments.Keeper,
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeUpdateAgent,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk payments.Keeper, bk bank.Keeper, msg MsgCreateEvaluation) sdk.Result {
@@ -252,7 +309,22 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, fk payments.Keeper, bk
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateEvaluation,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
+			sdk.NewAttribute(types.AttributeKeyClaimStatus, fmt.Sprint(msg.Data.Status)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
@@ -290,7 +362,22 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeWithdrawFunds,
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.Data.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyRecipientDid, msg.Data.RecipientDid),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Data.Amount.String()),
+			sdk.NewAttribute(types.AttributeKeyIsRefund, strconv.FormatBool(msg.Data.IsRefund)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Did,
