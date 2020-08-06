@@ -4,7 +4,7 @@ In this section we describe the processing of the payment messages and the corre
 
 ## MsgCreatePaymentTemplate
 
-Bonds can be created by any address using `MsgAddDid`.
+PaymentTemplate can be created by any address using `MsgCreatePaymentTemplate`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-----------------  |:--------------------------------------------------------------------------------------------------------------|
@@ -18,20 +18,20 @@ type MsgCreatePaymentTemplate struct {
 }
 ```
 
-This message creates and stores the `reatePaymentTemplate` object at appropriate indexes. Note that the sanity rate and sanity margin percentage are only used in the case of the `swapper_function`, but no error is raised if these are set for other function types.
+This message creates and stores the `MsgCreatePaymentTemplate` object at appropriate indexes. 
 
 ## MsgCreatePaymentContract 
 
-The owner of a bond can edit some of the bond's parameters using `MsgAddCredential`.
+The owner of a bond can edit some of the payment's parameters using `MsgCreatePaymentContract`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| CreatorDid             | `did.Did`          | The bond to be edited 
-| PaymentTemplateId      | `string`           | 
-| PaymentContractId      | `string`           | 
-| Payer                  | `sdk.AccAddress`   | 
-| CanDeauthorise         | `bool`             | 
-| DiscountId             | ` sdk.Uint`        | 
+| CreatorDid             | `did.Did`          | Did of the user
+| PaymentTemplateId      | `string`           | ID of the paymentTemplate
+| PaymentContractId      | `string`           | ID of the PaymentContract
+| Payer                  | `sdk.AccAddress`   | Address of the payer
+| CanDeauthorise         | `bool`             | Bool of de_authorise
+| DiscountId             | ` sdk.Uint`        | Any discount given
 
 ```go
 type MsgCreatePaymentContract struct {
@@ -44,21 +44,20 @@ type MsgCreatePaymentContract struct {
 }
 ```
 This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateBond`
+- any editable field violates the restrictions set for the same field in `MsgCreatePaymentContract`
 - all editable fields are `"[do-not-modify]"`
-- signers list is not equal to the bond's signers list
 
 ## MsgCreateSubscription 
 
-The owner of a bond can edit some of the bond's parameters using `MsgAddCredential`.
+The owner of a bond can edit some of the bond's parameters using `MsgCreateSubscription`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| CreatorDid             | `did.Did`          | edited 
-| SubscriptionId         | `string`           | 
-| PaymentContractId      | `string`           | 
+| CreatorDid             | `did.Did`          | Did of the user 
+| SubscriptionId         | `string`           | ID for the subscription
+| PaymentContractId      | `string`           | ID for the paymentContract
 | MaxPeriods             | `sdk.AccAddress`   | 
-| Period                 | `bool`             | 
+| Period                 | `bool`             | IF the periods are allowed or not
 
 
 ```go
@@ -71,9 +70,8 @@ type MsgCreateSubscription struct {
 }
 ```
 This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateBond`
+- any editable field violates the restrictions set for the same field in `MsgCreateSubscription`
 - all editable fields are `"[do-not-modify]"`
-- signers list is not equal to the bond's signers list
 
 ## MsgSetPaymentContractAuthorisation 
 
@@ -81,9 +79,9 @@ The owner of a bond can edit some of the bond's parameters using `MsgSetPaymentC
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| PayerDid               | `did.Did`          | edited 
-| PaymentContractId      | `string`           | 
-| Authorised             | `bool`             | 
+| PayerDid               | `did.Did`          | Payer's DID ID 
+| PaymentContractId      | `string`           | ID of the paymentContract
+| Authorised             | `bool`             | Status of authorisation
 
 
 ```go
@@ -94,20 +92,19 @@ type MsgSetPaymentContractAuthorisation struct {
 }
 ```
 This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateBond`
+- any editable field violates the restrictions set for the same field in `MsgSetPaymentContractAuthorisation`
 - all editable fields are `"[do-not-modify]"`
-- signers list is not equal to the bond's signers list
 
 ## MsgGrantDiscount 
 
-The owner of a bond can edit some of the bond's parameters using `MsgSetPaymentContractAuthorisation`.
+The owner of a bond can edit some of the bond's parameters using `MsgGrantDiscount`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| SenderDid              | `did.Did`          | edited 
-| PaymentContractId      | `string`           | 
-| DiscountId             | `sdk.Uint`         | 
-| Recipient              | `sdk.AccAddress`   |
+| SenderDid              | `did.Did`          | Initiator DID 
+| PaymentContractId      | `string`           | ID for the paymentContract
+| DiscountId             | `sdk.Uint`         | How much is the discount
+| Recipient              | `sdk.AccAddress`   | Who is the recipient 
 
 
 ```go
@@ -119,19 +116,18 @@ type MsgGrantDiscount struct {
 }
 ```
 This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateBond`
+- any editable field violates the restrictions set for the same field in `MsgGrantDiscount`
 - all editable fields are `"[do-not-modify]"`
-- signers list is not equal to the bond's signers list
 
 ## MsgRevokeDiscount 
 
-The owner of a bond can edit some of the bond's parameters using `MsgSetPaymentContractAuthorisation`.
+The owner of a bond can edit some of the bond's parameters using `MsgRevokeDiscount`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| SenderDid              | `did.Did`          | edited 
-| PaymentContractId      | `string`           | 
-| Holder                 | `sdk.AccAddress`   | 
+| SenderDid              | `did.Did`          | Who send the transaction 
+| PaymentContractId      | `string`           | ID of the payment_Contract
+| Holder                 | `sdk.AccAddress`   | Address of who's holds the discount
 
 
 
@@ -144,7 +140,6 @@ type MsgRevokeDiscount struct {
 
 ```
 This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateBond`
+- any editable field violates the restrictions set for the same field in `MsgRevokeDiscount`
 - all editable fields are `"[do-not-modify]"`
-- signers list is not equal to the bond's signers list
 
