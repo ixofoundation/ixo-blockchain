@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
@@ -301,6 +302,15 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 	contract.CurrentRemainder = contract.CurrentRemainder.Add(
 		outputToPayRemainderPool).Sub(inputFromPayRemainderPool)
 	k.SetPaymentContract(ctx, contract)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypeEffectPayment,
+		sdk.NewAttribute(types.AttributeKeyPaymentContractId, contract.Id),
+		sdk.NewAttribute(types.AttributeKeyInputFromPayRemainderPool, inputFromPayRemainderPool.String()),
+		sdk.NewAttribute(types.AttributeKeyInputFromPayer, fmt.Sprint(inputs)),
+		sdk.NewAttribute(types.AttributeKeyOutputToPayRemainderPool, outputToPayRemainderPool.String()),
+		sdk.NewAttribute(types.AttributeKeyOutputToPayees, fmt.Sprint(outputs)),
+	))
 
 	return true, nil
 }
