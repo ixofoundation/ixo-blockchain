@@ -29,5 +29,10 @@ const (
 	AttributeKeyPaymentMaximum     = "payment_maximum"
 	AttributeKeyDiscounts          = "discounts"
 	AttributeKeyWalletDistribution = "wallet_distribution"
-	AttributeValueCategory         = ModuleName
+
+	AttributeKeyInputFromPayRemainderPool = "input_from_pay_remainder_pool"
+	AttributeKeyInputFromPayer            = "input_from_payer"
+	AttributeKeyOutputToPayRemainderPool  = "output_to_pay_remainder_pool"
+	AttributeKeyOutputToPayees            = "output_to_payees"
+	AttributeValueCategory                = ModuleName
 )
