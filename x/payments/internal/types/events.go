@@ -30,9 +30,5 @@ const (
 	AttributeKeyDiscounts          = "discounts"
 	AttributeKeyWalletDistribution = "wallet_distribution"
 
-	AttributeKeyInputFromPayRemainderPool = "input_from_pay_remainder_pool"
-	AttributeKeyInputFromPayer            = "input_from_payer"
-	AttributeKeyOutputToPayRemainderPool  = "output_to_pay_remainder_pool"
-	AttributeKeyOutputToPayees            = "output_to_payees"
-	AttributeValueCategory                = ModuleName
+	AttributeValueCategory = ModuleName
 )

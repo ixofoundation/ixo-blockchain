@@ -416,10 +416,6 @@ func handleMsgEffectPayment(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgEf
 			types.EventTypeEffectPayment,
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
-			sdk.NewAttribute(types.AttributeKeyInputFromPayRemainderPool, msg.OutputToPayRemainderPool),
-			sdk.NewAttribute(types.AttributeKeyInputFromPayer, msg.InputFromPayer),
-			sdk.NewAttribute(types.AttributeKeyOutputToPayRemainderPool, msg.InputFromPayRemainderPool),
-			sdk.NewAttribute(types.AttributeKeyOutputToPayees, msg.OutputToPayees),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

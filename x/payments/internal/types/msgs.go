@@ -314,12 +314,8 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 }
 
 type MsgEffectPayment struct {
-	SenderDid                 did.Did `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId         string  `json:"payment_contract_id" yaml:"payment_contract_id"`
-	InputFromPayRemainderPool string  `json:"input_from_pay_remainder_pool" yaml:"input_from_pay_remainder_pool`
-	InputFromPayer            string  `json:"input_from_payer" yaml:"input_from_payer"`
-	OutputToPayRemainderPool  string  `json:"output_to_pay_remainder_pool" yaml:"output_to_pay_remainder_pool"`
-	OutputToPayees            string  `json:"output_to_payees" yaml:"output_to_payees"`
+	SenderDid         did.Did `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
 }
 
 func (msg MsgEffectPayment) Type() string  { return TypeMsgEffectPayment }
