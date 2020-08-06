@@ -7,7 +7,6 @@ import (
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
-
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
@@ -23,7 +22,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.ErrUnknownRequest("No match for message type.").Result()
 		}
 	}
-
 	// TODO: be able to disable sends/mints/burns globally
 	// TODO: be able to blacklist addresses/DIDs
 }
