@@ -2,7 +2,7 @@
   "id": "payment:template:template1",
   "payment_amount": [
     {
-      "denom": "ixo",
+      "denom": "uixo",
       "amount": "10"
     }
   ],
