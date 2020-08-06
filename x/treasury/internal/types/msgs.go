@@ -25,7 +25,7 @@ var (
 
 type MsgSend struct {
 	FromDid     did.Did   `json:"from_did" yaml:"from_did"`
-	ToDidOrAddr did.Did   `json:"to_did" yaml:"to_did"`
+	ToDidOrAddr did.Did   `json:"to_did_or_addr" yaml:"to_did_or_addr"`
 	Amount      sdk.Coins `json:"amount" yaml:"amount"`
 }
 
@@ -76,7 +76,7 @@ func (msg MsgSend) GetSignBytes() []byte {
 type MsgOracleTransfer struct {
 	OracleDid   did.Did   `json:"oracle_did" yaml:"oracle_did"`
 	FromDid     did.Did   `json:"from_did" yaml:"from_did"`
-	ToDidOrAddr did.Did   `json:"to_did" yaml:"to_did"`
+	ToDidOrAddr did.Did   `json:"to_did_or_addr" yaml:"to_did_or_addr"`
 	Amount      sdk.Coins `json:"amount" yaml:"amount"`
 	Proof       string    `json:"proof" yaml:"proof"`
 }
@@ -133,7 +133,7 @@ func (msg MsgOracleTransfer) GetSignBytes() []byte {
 
 type MsgOracleMint struct {
 	OracleDid   did.Did   `json:"oracle_did" yaml:"oracle_did"`
-	ToDidOrAddr did.Did   `json:"to_did" yaml:"to_did"`
+	ToDidOrAddr did.Did   `json:"to_did_or_addr" yaml:"to_did_or_addr"`
 	Amount      sdk.Coins `json:"amount" yaml:"amount"`
 	Proof       string    `json:"proof" yaml:"proof"`
 }
