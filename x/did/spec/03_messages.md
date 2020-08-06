@@ -1,10 +1,10 @@
 # Messages
 
-In this section we describe the processing of the bonds messages and the corresponding updates to the state. All created/modified state objects specified by each message are defined within the [state](./02_state.md) section.
+In this section we describe the processing of the did messages and the corresponding updates to the state. All created/modified state objects specified by each message are defined within the [state](./02_state.md) section.
 
 ## MsgAddDid
 
-Bonds can be created by any address using `MsgAddDid`.
+Dids can be created by any address using `MsgAddDid`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-----------------  |:--------------------------------------------------------------------------------------------------------------|
@@ -20,26 +20,21 @@ type MsgAddDid struct {
 
 This message is expected to fail if:
 
-- another bond with this token is already registered, the token is the staking token, or the token is not a valid denomination
+- if the same DID id created.
 
-This message creates and stores the `Bond` object at appropriate indexes. Note that the sanity rate and sanity margin percentage are only used in the case of the `swapper_function`, but no error is raised if these are set for other function types.
+This message creates and stores the `did` object at appropriate indexes. 
 
 ## MsgAddCredential 
 
-The owner of a bond can edit some of the bond's parameters using `MsgAddCredential`.
+The owner of a did can edit some of the did's parameters using `MsgAddCredential`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| CredType               | `credType`         | The bond to be edited |
-| Issuer                 | `issuer`           | 
-| Issued                 | `issued`           | 
-| ClaimID                | `did`              | 
-| ClaimKYCValidated      | `true`             | 
+| CredType               | `credType`         | Type of the credential |
+| Issuer                 | `issuer`           | Who is the issuer
+| Issued                 | `issued`           | What is been issued
+| ClaimID                | `did`              | ClaimID supporting to the credential
+| ClaimKYCValidated      | `true`             | Validation of the ClaimID
 
-
-This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateBond`
-- all editable fields are `"[do-not-modify]"`
-- signers list is not equal to the bond's signers list
 
 

@@ -18,11 +18,7 @@ type MsgCreatePaymentTemplate struct {
 }
 ```
 
-This message is expected to fail if:
-
-- another bond with this token is already registered, the token is the staking token, or the token is not a valid denomination
-
-This message creates and stores the `Bond` object at appropriate indexes. Note that the sanity rate and sanity margin percentage are only used in the case of the `swapper_function`, but no error is raised if these are set for other function types.
+This message creates and stores the `reatePaymentTemplate` object at appropriate indexes. Note that the sanity rate and sanity margin percentage are only used in the case of the `swapper_function`, but no error is raised if these are set for other function types.
 
 ## MsgCreatePaymentContract 
 
