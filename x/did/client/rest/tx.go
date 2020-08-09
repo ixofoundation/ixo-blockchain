@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 	"time"
 
@@ -19,22 +20,38 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/credential", addCredentialRequestHandler(cliCtx)).Methods("POST")
 }
 
+type MsgAddDid struct {
+	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Did     exported.Did `json:"did" yaml:"did"`
+	PubKey  string       `json:"pubKey" yaml:"pubKey"`
+}
+
 func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Set("Content-Type", "application/json")
-		didDocParam := r.URL.Query().Get("didDoc")
-		mode := r.URL.Query().Get("mode")
-		cliCtx = cliCtx.WithBroadcastMode(mode)
+		var req MsgAddDid
 
-		ixoDid, err := types.UnmarshalIxoDid(didDocParam)
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		ixoDid, err := types.UnmarshalIxoDid(req.Did)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 
-		msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
+		msg := types.NewMsgAddDid(req.Did, req.PubKey)
+		//They way how cosmosSDK has done in it's master we need to use
+		//"github.com/cosmos/cosmos-sdk/client/tx" module which produce the unsigned tx with StdFormat
+		//tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 
 		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
 		if err != nil {
