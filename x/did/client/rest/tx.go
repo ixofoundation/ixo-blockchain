@@ -19,7 +19,7 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/did/create_did", createDidRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/did/add_did", addDidRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/did/add_credential", addCredentialRequestHandler(cliCtx)).Methods("POST")
 }
 
@@ -29,10 +29,10 @@ type AddDidReq struct {
 	PubKey  string       `json:"pubKey" yaml:"pubKey"`
 }
 
-func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func addDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AddDidReq
-		req.BaseReq.Sanitize()
+		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
