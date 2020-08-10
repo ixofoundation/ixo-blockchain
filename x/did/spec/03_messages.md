@@ -20,7 +20,7 @@ type MsgAddDid struct {
 
 This message is expected to fail if:
 
-- if the same DID id created.
+- if the same DID created.
 
 This message creates and stores the `did` object at appropriate indexes. 
 
@@ -35,6 +35,5 @@ The owner of a did can edit some of the did's parameters using `MsgAddCredential
 | Issued                 | `string`           | What is been issued
 | ClaimID                | `string`           | ClaimID supporting to the credential
 | ClaimKYCValidated      | `bool`             | Validation of the ClaimID
-
 
 
