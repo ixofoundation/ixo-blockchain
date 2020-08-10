@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
@@ -13,6 +14,8 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -35,32 +38,13 @@ func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
-
 		baseReq := req.BaseReq.Sanitize()
 		if !baseReq.ValidateBasic(w) {
 			return
 		}
-
-		ixoDid, err := types.UnmarshalIxoDid(req.Did)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
 		msg := types.NewMsgAddDid(req.Did, req.PubKey)
-		//They way how cosmosSDK has done is that ,It used
-		//"github.com/cosmos/cosmos-sdk/client/tx" module which produce the unsigned tx with StdFormat
-		//tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, output)
+		//this is  referred  from cosmos version v0.37.0
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
