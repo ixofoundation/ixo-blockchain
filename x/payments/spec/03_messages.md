@@ -26,7 +26,7 @@ This will create a PaymentContract using `MsgCreatePaymentContract`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| CreatorDid             | `did.Did`          | Did of the user
+| CreatorDid             | `string`          | Did of the user
 | PaymentTemplateId      | `string`           | ID of the paymentTemplate
 | PaymentContractId      | `string`           | ID of the PaymentContract
 | Payer                  | `sdk.AccAddress`   | Address of the payer
@@ -43,9 +43,6 @@ type MsgCreatePaymentContract struct {
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 ```
-This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreatePaymentContract`
-- all editable fields are `"[do-not-modify]"`
 
 ## MsgCreateSubscription 
 
@@ -53,7 +50,7 @@ The owner of a bond can edit some of the bond's parameters using `MsgCreateSubsc
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| CreatorDid             | `did.Did`          | Did of the user 
+| CreatorDid             | `string`          | Did of the user 
 | SubscriptionId         | `string`           | ID for the subscription
 | PaymentContractId      | `string`           | ID for the paymentContract
 | MaxPeriods             | `sdk.AccAddress`   | 
@@ -72,11 +69,11 @@ type MsgCreateSubscription struct {
 
 ## MsgSetPaymentContractAuthorisation 
 
-The owner of a bond can edit some of the bond's parameters using `MsgSetPaymentContractAuthorisation`.
+
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| PayerDid               | `did.Did`          | Payer's DID 
+| PayerDid               | `string`          | Payer's DID 
 | PaymentContractId      | `string`           | ID of the paymentContract
 | Authorised             | `bool`             | Status of authorisation
 
@@ -91,11 +88,10 @@ type MsgSetPaymentContractAuthorisation struct {
 
 ## MsgGrantDiscount 
 
-The owner of a bond can edit some of the bond's parameters using `MsgGrantDiscount`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| SenderDid              | `did.Did`          | Initiator DID 
+| SenderDid              | `string`          | Initiator DID 
 | PaymentContractId      | `string`           | ID for the paymentContract
 | DiscountId             | `sdk.Uint`         | How much is the discount
 | Recipient              | `sdk.AccAddress`   | Who is the recipient 
@@ -109,9 +105,7 @@ type MsgGrantDiscount struct {
 	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
 }
 ```
-This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgGrantDiscount`
-- all editable fields are `"[do-not-modify]"`
+
 
 ## MsgRevokeDiscount 
 
@@ -119,7 +113,7 @@ The owner of a bond can edit some of the bond's parameters using `MsgRevokeDisco
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| SenderDid              | `did.Did`          | Who send the transaction 
+| SenderDid              | `string`          | Who send the transaction 
 | PaymentContractId      | `string`           | ID of the payment_Contract
 | Holder                 | `sdk.AccAddress`   | Address of who's holds the discount
 
