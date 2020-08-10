@@ -19,11 +19,11 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/did", createDidRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/credential", addCredentialRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/did/create_did", createDidRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/did/add_credential", addCredentialRequestHandler(cliCtx)).Methods("POST")
 }
 
-type MsgAddDid struct {
+type AddDidReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 	Did     exported.Did `json:"did" yaml:"did"`
 	PubKey  string       `json:"pubKey" yaml:"pubKey"`
@@ -31,19 +31,12 @@ type MsgAddDid struct {
 
 func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		var req MsgAddDid
-
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
-		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
+		var req AddDidReq
+		req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 		msg := types.NewMsgAddDid(req.Did, req.PubKey)
-		//this is  referred  from cosmos version v0.37.0
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
