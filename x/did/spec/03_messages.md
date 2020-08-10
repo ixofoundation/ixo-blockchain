@@ -37,4 +37,3 @@ The owner of a did can edit some of the did's parameters using `MsgAddCredential
 | ClaimKYCValidated      | `bool`             | Validation of the ClaimID
 
 
-
