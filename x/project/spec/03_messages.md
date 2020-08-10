@@ -67,8 +67,6 @@ This message stores the updated `MsgUpdateProjectStatus` object.
 | ProjectDid             | `did.Did`          | Sender's Project DID
 | Data                   | `UpdateAgentDoc`   | AgentDoc data
 
- 
-
 ```go
 type MsgUpdateAgent struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
@@ -77,7 +75,6 @@ type MsgUpdateAgent struct {
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 ```
-
 This message update the project  to new agent.
 
 ## MsgCreateClaim

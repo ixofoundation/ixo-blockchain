@@ -2,18 +2,12 @@
 
 The Payment module emits the following events:
 
-## EndBlocker
-
+## Endblocker
 | Type                            | Attribute Key            | Attribute Value       |
 |---------------------------------|--------------------------|-----------------------|
-| payment_contract_authorisation  | payer-did                | {payer-did}           |
-| payment_contract_authorisation  | payment_contract_id      | {payment_contract_id} |
-| payment_contract_authorisation  | authorised               | {authorised}          |
-| create_subscription             | subscription_id          | {subscription_id}     | 
-| create_subscription             | payment_contract_id      | {payment_contract_id} |
-| create_subscription             | max_periods              | {max_periods}         |
-| create_subscription             | key_period               | {key_period}          |
-| create_subscription             | creator_did              | {creator_did}         |
+| effect_payment                  | sender_did               | {sender_did}          |
+| effect_payment                  | payment_contract_id      | {payment_contract_id} |
+
 
 ## Handler
 
@@ -45,6 +39,22 @@ The Payment module emits the following events:
 | grant_discount                  | payment_contract_id      | {payment_contract_id} |
 | grant_discount                  | discount_id              | {discount_id}         |
 | grant_discount                  | Recipient                | {Recipient}           |
+
+## MsgSetPaymentContractAuthorisation
+| Type                            | Attribute Key            | Attribute Value       |
+|---------------------------------|--------------------------|-----------------------|
+| payment_contract_authorisation  | payer-did                | {payer-did}           |
+| payment_contract_authorisation  | payment_contract_id      | {payment_contract_id} |
+| payment_contract_authorisation  | authorised               | {authorised}          |
+
+## MsgCreateSubscription
+| Type                            | Attribute Key            | Attribute Value       |
+|---------------------------------|--------------------------|-----------------------|
+| create_subscription             | subscription_id          | {subscription_id}     | 
+| create_subscription             | payment_contract_id      | {payment_contract_id} |
+| create_subscription             | max_periods              | {max_periods}         |
+| create_subscription             | key_period               | {key_period}          |
+| create_subscription             | creator_did              | {creator_did}         |
 
 ## MsgRevokeDiscount
 | Type                            | Attribute Key            | Attribute Value       |

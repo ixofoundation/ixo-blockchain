@@ -1,7 +1,5 @@
 # Project module specification
 
-## Abstract
-
 ## Contents
 
 1. **[Concepts](01_concepts.md)**

@@ -2,9 +2,6 @@
 
 The treasury module emits the following events:
 
-## EndBlocker
-
-
 ## Handler
 
 ## MsgSend

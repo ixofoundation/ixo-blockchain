@@ -2,9 +2,6 @@
 
 The did module emits the following events:
 
-## EndBlocker
-
-
 ## Handlers
 
 ## MsgAddDidDoc
