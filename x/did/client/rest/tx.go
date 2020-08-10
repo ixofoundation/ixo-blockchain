@@ -49,7 +49,7 @@ func createDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgAddDid(req.Did, req.PubKey)
-		//They way how cosmosSDK has done in it's master we need to use
+		//They way how cosmosSDK has done is that ,It used
 		//"github.com/cosmos/cosmos-sdk/client/tx" module which produce the unsigned tx with StdFormat
 		//tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 
