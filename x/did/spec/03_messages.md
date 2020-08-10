@@ -20,7 +20,7 @@ type MsgAddDid struct {
 
 This message is expected to fail if:
 
-- if the same DID id created.
+- if the same DID created.
 
 This message creates and stores the `did` object at appropriate indexes. 
 
