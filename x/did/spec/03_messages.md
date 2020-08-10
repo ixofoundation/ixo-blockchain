@@ -30,11 +30,11 @@ The owner of a did can edit some of the did's parameters using `MsgAddCredential
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| CredType               | `credType`         | Type of the credential |
-| Issuer                 | `issuer`           | Who is the issuer
-| Issued                 | `issued`           | What is been issued
-| ClaimID                | `did`              | ClaimID supporting to the credential
-| ClaimKYCValidated      | `true`             | Validation of the ClaimID
+| CredType               | `string`           | Type of the credential |
+| Issuer                 | `string`           | Who is the issuer
+| Issued                 | `string`           | What is been issued
+| ClaimID                | `string`           | ClaimID supporting to the credential
+| ClaimKYCValidated      | `bool`             | Validation of the ClaimID
 
 
 

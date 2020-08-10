@@ -1,6 +1,6 @@
 # Events
 
-The bonds module emits the following events:
+The treasury module emits the following events:
 
 ## EndBlocker
 

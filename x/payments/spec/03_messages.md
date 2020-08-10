@@ -8,8 +8,8 @@ PaymentTemplate can be created by any address using `MsgCreatePaymentTemplate`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-----------------  |:--------------------------------------------------------------------------------------------------------------|
-| CreatorDid             | `did.DID`          | 
-| PaymentTemplate        | `PaymentTemplate`  | 
+| CreatorDid             | `string`          | 
+| PaymentTemplate        | `string`  | 
 
 ```go
 type MsgCreatePaymentTemplate struct {
@@ -22,7 +22,7 @@ This message creates and stores the `MsgCreatePaymentTemplate` object at appropr
 
 ## MsgCreatePaymentContract 
 
-The owner of a bond can edit some of the payment's parameters using `MsgCreatePaymentContract`.
+This will create a PaymentContract using `MsgCreatePaymentContract`.
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
@@ -69,9 +69,6 @@ type MsgCreateSubscription struct {
 	Period            Period   `json:"period" yaml:"period"`
 }
 ```
-This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgCreateSubscription`
-- all editable fields are `"[do-not-modify]"`
 
 ## MsgSetPaymentContractAuthorisation 
 
@@ -79,7 +76,7 @@ The owner of a bond can edit some of the bond's parameters using `MsgSetPaymentC
 
 | **Field**              | **Type**           | **Description**                                                                                               |
 |:-----------------------|:-------------------|:--------------------------------------------------------------------------------------------------------------|
-| PayerDid               | `did.Did`          | Payer's DID ID 
+| PayerDid               | `did.Did`          | Payer's DID 
 | PaymentContractId      | `string`           | ID of the paymentContract
 | Authorised             | `bool`             | Status of authorisation
 
@@ -91,9 +88,6 @@ type MsgSetPaymentContractAuthorisation struct {
 	Authorised        bool    `json:"authorised" yaml:"authorised"`
 }
 ```
-This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgSetPaymentContractAuthorisation`
-- all editable fields are `"[do-not-modify]"`
 
 ## MsgGrantDiscount 
 
@@ -139,7 +133,4 @@ type MsgRevokeDiscount struct {
 }
 
 ```
-This message is expected to fail if:
-- any editable field violates the restrictions set for the same field in `MsgRevokeDiscount`
-- all editable fields are `"[do-not-modify]"`
 
