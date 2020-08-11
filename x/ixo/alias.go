@@ -22,6 +22,7 @@ var (
 	GenerateOrBroadcastMsgs          = types.GenerateOrBroadcastMsgs
 	CompleteAndBroadcastTxRest       = types.CompleteAndBroadcastTxRest
 	SignAndBroadcastTxFromStdSignMsg = types.SignAndBroadcastTxFromStdSignMsg
+	IxoSigVerificationGasConsumer    = types.IxoSigVerificationGasConsumer
 
 	// Types
 	IxoDecimals = types.IxoDecimals

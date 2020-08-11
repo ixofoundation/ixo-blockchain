@@ -2,12 +2,7 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles"
-	"github.com/tendermint/tendermint/crypto"
-	"github.com/tendermint/tendermint/crypto/ed25519"
-	"github.com/tendermint/tendermint/crypto/multisig"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"io"
 	"os"
 
@@ -351,45 +346,6 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// Identical to DefaultSigVerificationGasConsumer, but with ed25519 allowed
-func IxoSigVerificationGasConsumer(
-	meter sdk.GasMeter, sig []byte, pubkey crypto.PubKey, params auth.Params,
-) sdk.Result {
-	switch pubkey := pubkey.(type) {
-	case ed25519.PubKeyEd25519:
-		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
-		return sdk.Result{}
-
-	case secp256k1.PubKeySecp256k1:
-		meter.ConsumeGas(params.SigVerifyCostSecp256k1, "ante verify: secp256k1")
-		return sdk.Result{}
-
-	case multisig.PubKeyMultisigThreshold:
-		var multisignature multisig.Multisignature
-		codec.Cdc.MustUnmarshalBinaryBare(sig, &multisignature)
-
-		consumeMultisignatureVerificationGas(meter, multisignature, pubkey, params)
-		return sdk.Result{}
-
-	default:
-		return sdk.ErrInvalidPubKey(fmt.Sprintf("unrecognized public key type: %T", pubkey)).Result()
-	}
-}
-
-func consumeMultisignatureVerificationGas(meter sdk.GasMeter,
-	sig multisig.Multisignature, pubkey multisig.PubKeyMultisigThreshold,
-	params auth.Params) {
-
-	size := sig.BitArray.Size()
-	sigIndex := 0
-	for i := 0; i < size; i++ {
-		if sig.BitArray.GetIndex(i) {
-			IxoSigVerificationGasConsumer(meter, sig.Sigs[sigIndex], pubkey.PubKeys[i], params)
-			sigIndex++
-		}
-	}
-}
-
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
 	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
@@ -403,7 +359,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
 		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, IxoSigVerificationGasConsumer)
+		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
