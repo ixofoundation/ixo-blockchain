@@ -47,5 +47,7 @@ var (
 	// variable aliases
 	ModuleCdc = types.ModuleCdc
 
-	ErrorInvalidDid = types.ErrorInvalidDid
+	ErrorInvalidDid        = types.ErrorInvalidDid
+	ErrorInvalidPubKey     = types.ErrorInvalidPubKey
+	ErrorDidPubKeyMismatch = types.ErrorDidPubKeyMismatch
 )
