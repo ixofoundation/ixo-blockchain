@@ -359,7 +359,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
 		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
+		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
