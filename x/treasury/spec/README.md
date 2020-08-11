@@ -2,14 +2,10 @@
 
 ## Contents
 
-1. **[Concepts](01_concepts.md)**
-2. **[State](02_state.md)**
-3. **[Messages](03_messages.md)**
-    - [MsgSend](03_messages.md#MsgSend)
-    - [MsgOracleTransfer](03_messages.md#MsgOracleTransfer)
-    - [MsgOracleMint](03_messages.md#MsgOracleMint)
-    - [MsgOracleBurn](03_messages.md#MsgOracleBurn)
-5. **[Events](05_events.md)**
-    - [Handlers](05_events.md#handlers)
-
-
+1. **[Messages](01_messages.md)**
+    - [MsgSend](01_messages.md#MsgSend)
+    - [MsgOracleTransfer](01_messages.md#MsgOracleTransfer)
+    - [MsgOracleMint](01_messages.md#MsgOracleMint)
+    - [MsgOracleBurn](01_messages.md#MsgOracleBurn)
+1. **[Events](02_events.md)**
+    - [Handlers](02_events.md#handlers)

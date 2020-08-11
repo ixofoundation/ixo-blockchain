@@ -4,19 +4,19 @@ The bonds module emits the following events:
 
 ## EndBlocker
 
-| Type          | Attribute Key            | Attribute Value       |
-|---------------|--------------------------|-----------------------|
-| order_cancel  | bond                     | {token}               |
-| order_cancel  | order_type               | {orderType}           |
-| order_cancel  | address                  | {address}             |
-| order_cancel  | cancel_reason            | {cancelReason}        |
-| order_fulfill | bond                     | {token}               |
-| order_fulfill | order_type               | {orderType}           |
-| order_fulfill | address                  | {address}             |
-| order_fulfill | tokensMinted             | {tokensMinted}        |
-| order_fulfill | chargedPrices            | {chargedPrices}       |
-| order_fulfill | chargedFees              | {chargedFees}         |
-| order_fulfill | returnedToAddress        | {returnedToAddress}   |
+| Type          | Attribute Key     | Attribute Value     |
+|---------------|-------------------|---------------------|
+| order_cancel  | bond              | {token}             |
+| order_cancel  | order_type        | {orderType}         |
+| order_cancel  | address           | {address}           |
+| order_cancel  | cancel_reason     | {cancelReason}      |
+| order_fulfill | bond              | {token}             |
+| order_fulfill | order_type        | {orderType}         |
+| order_fulfill | address           | {address}           |
+| order_fulfill | tokensMinted      | {tokensMinted}      |
+| order_fulfill | chargedPrices     | {chargedPrices}     |
+| order_fulfill | chargedFees       | {chargedFees}       |
+| order_fulfill | returnedToAddress | {returnedToAddress} |
 
 ## Handlers
 
@@ -67,48 +67,48 @@ The bonds module emits the following events:
 
 #### First Buy for Swapper Function Bond
 
-| Type         | Attribute Key  | Attribute Value    |
-|--------------|----------------|--------------------|
-| init_swapper | bond           | {token}            |
-| init_swapper | amount         | {amount}           |
-| init_swapper | charged_prices | {chargedPrices}    |
-| message      | module         | bonds              |
-| message      | action         | buy                |
-| message      | sender         | {senderAddress}    |
+| Type         | Attribute Key  | Attribute Value |
+|--------------|----------------|-----------------|
+| init_swapper | bond           | {token}         |
+| init_swapper | amount         | {amount}        |
+| init_swapper | charged_prices | {chargedPrices} |
+| message      | module         | bonds           |
+| message      | action         | buy             |
+| message      | sender         | {senderAddress} |
 
 #### Otherwise
 
-| Type          | Attribute Key | Attribute Value    |
-|---------------|---------------|--------------------|
-| buy           | bond          | {token}            |
-| buy           | amount        | {amount}           |
-| buy           | max_prices    | {maxPrices}        |
-| order_cancel  | bond          | {token}            |
-| order_cancel  | order_type    | {orderType}        |
-| order_cancel  | address       | {address}          |
-| order_cancel  | cancel_reason | {cancelReason}     |
-| message       | module        | bonds              |
-| message       | action        | buy                |
-| message       | sender        | {senderAddress}    |
+| Type          | Attribute Key | Attribute Value |
+|---------------|---------------|-----------------|
+| buy           | bond          | {token}         |
+| buy           | amount        | {amount}        |
+| buy           | max_prices    | {maxPrices}     |
+| order_cancel  | bond          | {token}         |
+| order_cancel  | order_type    | {orderType}     |
+| order_cancel  | address       | {address}       |
+| order_cancel  | cancel_reason | {cancelReason}  |
+| message       | module        | bonds           |
+| message       | action        | buy             |
+| message       | sender        | {senderAddress} |
 
 ### MsgSell
 
-| Type    | Attribute Key | Attribute Value    |
-|---------|---------------|--------------------|
-| sell    | bond          | {token}            |
-| sell    | amount        | {amount}           |
-| message | module        | bonds              |
-| message | action        | buy                |
-| message | sender        | {senderAddress}    |
+| Type    | Attribute Key | Attribute Value |
+|---------|---------------|-----------------|
+| sell    | bond          | {token}         |
+| sell    | amount        | {amount}        |
+| message | module        | bonds           |
+| message | action        | buy             |
+| message | sender        | {senderAddress} |
 
 ### MsgSwap
 
-| Type    | Attribute Key | Attribute Value    |
-|---------|---------------|--------------------|
-| swap    | bond          | {token}            |
-| swap    | amount        | {amount}           |
-| swap    | from_token    | {fromToken}        |
-| swap    | to_token      | {toToken}          |
-| message | module        | bonds              |
-| message | action        | swap               |
-| message | sender        | {senderAddress}    |
+| Type    | Attribute Key | Attribute Value |
+|---------|---------------|-----------------|
+| swap    | bond          | {token}         |
+| swap    | amount        | {amount}        |
+| swap    | from_token    | {fromToken}     |
+| swap    | to_token      | {toToken}       |
+| message | module        | bonds           |
+| message | action        | swap            |
+| message | sender        | {senderAddress} |

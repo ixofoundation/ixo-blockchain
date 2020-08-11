@@ -2,16 +2,13 @@
 
 ## Contents
 
-1. **[Concepts](01_concepts.md)**
-2. **[State](02_state.md)**
-3. **[Messages](03_messages.md)**
-    - [MsgUpdateProjectStatus](03_messages.md#MsgUpdateProjectStatus)
-    - [MsgUpdateAgent](03_messages.md#MsgUpdateAgent)
-    - [MsgCreateClaim](03_messages.md#MsgCreateClaim)
-    - [MsgCreateEvaluation](03_messages.md#MsgCreateEvaluation)
-    - [MsgWithdrawFunds](03_messages.md#MsgGrantDiscount)
-5. **[Events](05_events.md)**
-    - [EndBlocker](05_events.md#endblocker)
-    - [Handlers](05_events.md#handlers)
-
-
+1. **[State](01_state.md)**
+1. **[Messages](02_messages.md)**
+    - [MsgCreateProject](02_messages.md#MsgCreateProject)
+    - [MsgUpdateProjectStatus](02_messages.md#MsgUpdateProjectStatus)
+    - [MsgUpdateAgent](02_messages.md#MsgUpdateAgent)
+    - [MsgCreateClaim](02_messages.md#MsgCreateClaim)
+    - [MsgCreateEvaluation](02_messages.md#MsgCreateEvaluation)
+    - [MsgWithdrawFunds](02_messages.md#MsgWithdrawFunds)
+1. **[Events](03_events.md)**
+    - [Handlers](03_events.md#handlers)
