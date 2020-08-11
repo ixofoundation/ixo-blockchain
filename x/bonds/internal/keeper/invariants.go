@@ -44,8 +44,8 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 		iterator := k.GetBondIterator(ctx)
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
-			batch := k.MustGetBatch(ctx, bond.BondDid)
 			denom := bond.Token
+			batch := k.MustGetBatch(ctx, bond.BondDid)
 			did := bond.BondDid
 
 			// Add bond current supply
@@ -54,7 +54,7 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 			// Subtract amount to be burned (this amount was already burned
 			// in handleMsgSell but is still a part of bond's CurrentSupply)
 			for _, s := range batch.Sells {
-				if s.Cancelled == types.FALSE {
+				if !s.Cancelled {
 					supplyInBondsAndBatches = supplyInBondsAndBatches.Sub(
 						s.Amount)
 				}
@@ -89,11 +89,12 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 			denom := bond.Token
 			did := bond.BondDid
 
-			if bond.FunctionType == types.SwapperFunction {
-				continue // Check does not apply to swapper function
+			if bond.FunctionType == types.AugmentedFunction ||
+				bond.FunctionType == types.SwapperFunction {
+				continue // Check does not apply to augmented/swapper functions
 			}
 
-			expectedReserve := bond.CurveIntegral(bond.CurrentSupply.Amount)
+			expectedReserve := bond.ReserveAtSupply(bond.CurrentSupply.Amount)
 			expectedRounded := expectedReserve.Ceil().TruncateInt()
 			actualReserve := k.GetReserveBalances(ctx, did)
 

@@ -73,9 +73,62 @@ func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid did.Did) {
 	store.Set(types.GetBondDidsKey(bondToken), k.cdc.MustMarshalBinaryBare(bondDid))
 }
 
-func (k Keeper) GetReserveBalances(ctx sdk.Context, bondDid did.Did) sdk.Coins {
+func (k Keeper) DepositReserve(ctx sdk.Context, bondDid did.Did,
+	from sdk.AccAddress, amount sdk.Coins) sdk.Error {
+
+	// Send tokens to bonds reserve account
+	err := k.SupplyKeeper.SendCoinsFromAccountToModule(
+		ctx, from, types.BondsReserveAccount, amount)
+	if err != nil {
+		return err
+	}
+
+	// Update bond reserve
+	k.setReserveBalances(ctx, bondDid,
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount))
+	return nil
+}
+
+func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid did.Did,
+	fromModule string, amount sdk.Coins) sdk.Error {
+
+	// Send tokens to bonds reserve account
+	err := k.SupplyKeeper.SendCoinsFromModuleToModule(
+		ctx, fromModule, types.BondsReserveAccount, amount)
+	if err != nil {
+		return err
+	}
+
+	// Update bond reserve
+	k.setReserveBalances(ctx, bondDid,
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount))
+	return nil
+}
+
+func (k Keeper) WithdrawReserve(ctx sdk.Context, bondDid did.Did,
+	to sdk.AccAddress, amount sdk.Coins) sdk.Error {
+
+	// Send tokens from bonds reserve account
+	err := k.SupplyKeeper.SendCoinsFromModuleToAccount(
+		ctx, types.BondsReserveAccount, to, amount)
+	if err != nil {
+		return err
+	}
+
+	// Update bond reserve
+	k.setReserveBalances(ctx, bondDid,
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Sub(amount))
+	return nil
+}
+
+func (k Keeper) setReserveBalances(ctx sdk.Context, bondDid did.Did, balance sdk.Coins) {
 	bond := k.MustGetBond(ctx, bondDid)
-	return k.BankKeeper.GetCoins(ctx, bond.ReserveAddress)
+	bond.CurrentReserve = balance
+	k.SetBond(ctx, bondDid, bond)
+}
+
+func (k Keeper) GetReserveBalances(ctx sdk.Context, bondDid did.Did) sdk.Coins {
+	return k.MustGetBond(ctx, bondDid).CurrentReserve
 }
 
 func (k Keeper) GetSupplyAdjustedForBuy(ctx sdk.Context, bondDid did.Did) sdk.Coin {
@@ -99,4 +152,21 @@ func (k Keeper) SetCurrentSupply(ctx sdk.Context, bondDid did.Did, currentSupply
 	bond := k.MustGetBond(ctx, bondDid)
 	bond.CurrentSupply = currentSupply
 	k.SetBond(ctx, bondDid, bond)
+}
+
+func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState string) {
+	bond := k.MustGetBond(ctx, bondDid)
+	previousState := bond.State
+	bond.State = newState
+	k.SetBond(ctx, bondDid, bond)
+
+	logger := k.Logger(ctx)
+	logger.Info(fmt.Sprintf("updated state for %s from %s to %s", bond.Token, previousState, newState))
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypeStateChange,
+		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+		sdk.NewAttribute(types.AttributeKeyOldState, previousState),
+		sdk.NewAttribute(types.AttributeKeyNewState, newState),
+	))
 }

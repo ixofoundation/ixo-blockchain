@@ -89,8 +89,8 @@ func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid did.Did, so types.SwapOrde
 func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch types.Batch) (buyPricesPT, sellPricesPT sdk.DecCoins, err sdk.Error) {
 	bond := k.MustGetBond(ctx, bondDid)
 
-	buyAmountDec := sdk.NewDecFromInt(batch.TotalBuyAmount.Amount)
-	sellAmountDec := sdk.NewDecFromInt(batch.TotalSellAmount.Amount)
+	buyAmountDec := batch.TotalBuyAmount.Amount.ToDec()
+	sellAmountDec := batch.TotalSellAmount.Amount.ToDec()
 
 	reserveBalances := k.GetReserveBalances(ctx, bondDid)
 	currentPricesPT, err := bond.GetCurrentPricesPT(reserveBalances)
@@ -143,8 +143,25 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 
 	// Max supply cannot be less than supply (max supply >= supply)
 	adjustedSupply := k.GetSupplyAdjustedForBuy(ctx, bondDid)
-	if bond.MaxSupply.IsLT(adjustedSupply.Add(bo.Amount)) {
+	adjustedSupplyWithBuy := adjustedSupply.Add(bo.Amount)
+	if bond.MaxSupply.IsLT(adjustedSupplyWithBuy) {
 		return nil, nil, types.ErrCannotMintMoreThanMaxSupply(types.DefaultCodespace)
+	}
+
+	// If augmented in hatch phase and adjusted supply exceeds S0, disallow buy
+	// since it is not allowed for a batch to cross over to the open phase.
+	//
+	// S0 is rounded to ceil for the case that it has a decimal, otherwise it
+	// cannot be reached without being exceeded, when using integer buy amounts
+	// (e.g. if supply is 100 and S0=100.5, we cannot reach S0 by performing
+	// the minimum buy of 1 token [101>100.5], so S0 is rounded to ceil; S0=101)
+	if bond.FunctionType == types.AugmentedFunction &&
+		bond.State == types.HatchState {
+		args := bond.FunctionParameters.AsMap()
+		if adjustedSupplyWithBuy.Amount.ToDec().GT(args["S0"].Ceil()) {
+			return nil, nil, sdk.ErrInvalidCoins(
+				"Buy exceeds initial supply S0. Consider buying less tokens.")
+		}
 	}
 
 	// Simulate buy by bumping up total buy amount
@@ -183,6 +200,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did,
 
 func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) (err sdk.Error) {
 	bond := k.MustGetBond(ctx, bondDid)
+	var extraEventAttributes []sdk.Attribute
 
 	// Get buyer address
 	buyerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, bo.AccountDid)
@@ -214,12 +232,66 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 		return types.ErrMaxPriceExceeded(types.DefaultCodespace, totalPrices, bo.MaxPrices)
 	}
 
-	// Add new reserve to reserve address (reservePricesRounded should never be zero)
+	// Add new reserve to reserve (reservePricesRounded should never be zero)
 	// TODO: investigate possibility of zero reservePricesRounded
-	err = k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
-		types.BatchesIntermediaryAccount, bond.ReserveAddress, reservePricesRounded)
-	if err != nil {
-		return err
+	if bond.FunctionType == types.AugmentedFunction &&
+		bond.State == types.HatchState {
+		args := bond.FunctionParameters.AsMap()
+		theta := args["theta"]
+
+		// Get current reserve
+		var currentReserve sdk.Int
+		if bond.CurrentReserve.Empty() {
+			currentReserve = sdk.ZeroInt()
+		} else {
+			// Reserve balances should all be equal given that we are always
+			// applying the same additions/subtractions to all reserve balances.
+			// Thus we can pick the first reserve balance as the global balance.
+			currentReserve = k.GetReserveBalances(ctx, bondDid)[0].Amount
+		}
+
+		// Calculate expected new reserve (as fraction 1-theta of new total raise)
+		newSupply := bond.CurrentSupply.Add(bo.Amount).Amount
+		newTotalRaise := args["p0"].Mul(newSupply.ToDec())
+		newReserve := newTotalRaise.Mul(
+			sdk.OneDec().Sub(theta)).Ceil().TruncateInt()
+
+		// Calculate amount that should go into initial reserve
+		toInitialReserve := newReserve.Sub(currentReserve)
+		if reservePricesRounded[0].Amount.LT(toInitialReserve) {
+			// Reserve supplied by buyer is insufficient
+			return types.ErrInsufficientReserveToBuy(types.DefaultCodespace)
+		}
+		coinsToInitialReserve, _ := bond.GetNewReserveDecCoins(
+			toInitialReserve.ToDec()).TruncateDecimal()
+
+		// Calculate amount that should go into funding pool
+		coinsToFundingPool := reservePricesRounded.Sub(coinsToInitialReserve)
+
+		// Send reserve tokens to initial reserve
+		err = k.DepositReserveFromModule(ctx, bond.BondDid,
+			types.BatchesIntermediaryAccount, coinsToInitialReserve)
+		if err != nil {
+			return err
+		}
+
+		// Send reserve tokens to funding pool
+		err = k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
+			types.BatchesIntermediaryAccount, bond.FeeAddress, coinsToFundingPool)
+		if err != nil {
+			return err
+		}
+
+		extraEventAttributes = append(extraEventAttributes,
+			sdk.NewAttribute(types.AttributeKeyChargedPricesReserve, toInitialReserve.String()),
+			sdk.NewAttribute(types.AttributeKeyChargedPricesFunding, coinsToFundingPool.String()),
+		)
+	} else {
+		err = k.DepositReserveFromModule(
+			ctx, bond.BondDid, types.BatchesIntermediaryAccount, reservePricesRounded)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Add charged fee to fee address
@@ -250,7 +322,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	// Get new bond token balance
 	bondTokenBalance := k.BankKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
 
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
+	event := sdk.NewEvent(
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
@@ -260,7 +332,11 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, returnToBuyer.String()),
 		sdk.NewAttribute(types.AttributeKeyNewBondTokenBalance, bondTokenBalance.String()),
-	))
+	)
+	if len(extraEventAttributes) > 0 {
+		event = event.AppendAttributes(extraEventAttributes...)
+	}
+	ctx.EventManager().EmitEvent(event)
 
 	return nil
 }
@@ -285,14 +361,14 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.Se
 
 	// Send total returns to seller (totalReturns should never be zero)
 	// TODO: investigate possibility of zero totalReturns
-	err = k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, sellerAddr, totalReturns)
+	err = k.WithdrawReserve(ctx, bond.BondDid, sellerAddr, totalReturns)
 	if err != nil {
 		return err
 	}
 
 	// Send total fee to fee address
 	if !totalFees.IsZero() {
-		err := k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, bond.FeeAddress, totalFees)
+		err = k.WithdrawReserve(ctx, bond.BondDid, bond.FeeAddress, totalFees)
 		if err != nil {
 			return err
 		}
@@ -348,14 +424,14 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder
 	}
 
 	// Give resultant tokens to swapper (reserveReturns should never be zero)
-	err = k.BankKeeper.SendCoins(ctx, bond.ReserveAddress, swapperAddr, reserveReturns)
+	err = k.WithdrawReserve(ctx, bond.BondDid, swapperAddr, reserveReturns)
 	if err != nil {
 		return err, false
 	}
 
 	// Add fee-reduced coins to be swapped to reserve (adjustedInput should never be zero)
-	err = k.SupplyKeeper.SendCoinsFromModuleToAccount(ctx,
-		types.BatchesIntermediaryAccount, bond.ReserveAddress, sdk.Coins{adjustedInput})
+	err = k.DepositReserveFromModule(
+		ctx, bond.BondDid, types.BatchesIntermediaryAccount, sdk.Coins{adjustedInput})
 	if err != nil {
 		return err, false
 	}
@@ -435,7 +511,7 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid did.Did) {
 			err, ok := k.PerformSwap(ctx, bondDid, so)
 			if err != nil {
 				if ok {
-					batch.Swaps[i].Cancelled = types.TRUE
+					batch.Swaps[i].Cancelled = true
 					batch.Swaps[i].CancelReason = err.Error()
 
 					logger.Info(fmt.Sprintf("cancelled swap order for %s to %s from %s", so.Amount.String(), so.ToToken, so.AccountDid))
@@ -493,7 +569,7 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid did.Did) (cance
 			err := k.CheckIfBuyOrderFulfillableAtPrice(ctx, bondDid, bo, batch.BuyPrices)
 			if err != nil {
 				// Cancel (important to use batch.Buys[i] and not bo!)
-				batch.Buys[i].Cancelled = types.TRUE
+				batch.Buys[i].Cancelled = true
 				batch.Buys[i].CancelReason = err.Error()
 				batch.TotalBuyAmount = batch.TotalBuyAmount.Sub(bo.Amount)
 				cancelledOrders += 1

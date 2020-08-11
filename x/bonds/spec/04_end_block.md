@@ -7,6 +7,8 @@ At the end of each block, any batch of orders that has reached the end of its li
 
 Since the buy and sell prices are pre-calculated from when the buy and sell orders were added to the batch, there is no additional cancellations of buys or sells that will take place at this stage. However, swaps are processed on a first come first served basis and a swap is cancelled if it violates the sanity rates.
 
+In the case of `augmented_function` bonds, if the new bond supply after performing all orders is greater or equal to the initial supply (`supply >= S0`), the bond's state gets updated from `HATCH` to `OPEN` and sells are enabled (`AllowSells=true`).
+
 ## Buys
 
 Using the buy price stored in the batch, the following steps are followed for each buy order:
@@ -14,7 +16,7 @@ Using the buy price stored in the batch, the following steps are followed for ea
 2. Calculate total price`total = r + f` in reserve tokens
    1. `r` is the price of buying `n` bond tokens
    2. `f` is the transactional fee based on `r`
-3. Send `r` to the reserve address
+3. Send `r` to the reserve
 4. Send `f` to the fee address
 5. Send unused reserve tokens (`maxPrices-total`) back to buyer
 6. Increase bond's current supply by `n`
@@ -42,7 +44,7 @@ The following steps are followed for each swap order:
    1. Calculate the new reserve balances as a result of the swap
    2. Cancel the swap if the new balances violate the sanity rate
 4. Send `t2` to the swapper
-5. Send `t1-f` to the reserve address
+5. Send `t1-f` to the reserve
 6. Send `f` to the fee address
 
 Note: the `t1` reserve tokens were locked upon submitting the swap order. If a swap order is cancelled, the `t1` tokens are immediately returned back to the swapper.

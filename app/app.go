@@ -94,6 +94,7 @@ var (
 		// Custom ixo module accounts
 		bonds.BondsMintBurnAccount:       {supply.Minter, supply.Burner},
 		bonds.BatchesIntermediaryAccount: nil,
+		bonds.BondsReserveAccount:        nil,
 		treasury.ModuleName:              {supply.Minter, supply.Burner},
 		payments.PayRemainderPool:        nil,
 	}
