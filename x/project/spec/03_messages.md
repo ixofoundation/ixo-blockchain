@@ -75,7 +75,7 @@ type MsgUpdateAgent struct {
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 ```
-This message update the project  to new agent.
+This message update the project to new agent.
 
 ## MsgCreateClaim
 

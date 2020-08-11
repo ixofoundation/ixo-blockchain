@@ -2,8 +2,6 @@
 
 The project module emits the following events:
 
-## EndBlocker
-
 ## Handler
 
 ## MsgCreateProject

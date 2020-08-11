@@ -4,8 +4,6 @@
 
 1. **[Concepts](01_concepts.md)**
 2. **[State](02_state.md)**
-    - [TOADD](02_state.md#bonds)
-    - [TOADD](02_state.md#batches)
 3. **[Messages](03_messages.md)**
     - [MsgUpdateProjectStatus](03_messages.md#MsgUpdateProjectStatus)
     - [MsgUpdateAgent](03_messages.md#MsgUpdateAgent)
