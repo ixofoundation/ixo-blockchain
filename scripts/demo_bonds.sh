@@ -38,12 +38,6 @@ ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices
 echo "Ledgering DID 2/2..."
 ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# Fund accounts
-echo "Funding account 1/2..."
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$MIGUEL_ADDR" 1000000000uixo,1000000res,1000000rez --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Funding account 2/2..."
-yes $PASSWORD | ixocli tx send "$(ixocli keys show francesco -a)" "$FRANCESCO_ADDR" 1000000000uixo,1000000res,1000000rez --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-
 echo "Creating bond..."
 ixocli tx bonds create-bond \
   --token=abc \
