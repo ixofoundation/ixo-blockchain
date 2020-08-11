@@ -75,6 +75,8 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 		case project.TypeMsgCreateProject:
 			stdSignMsg = ixoMsg.(project.MsgCreateProject).ToStdSignMsg(
 				project.MsgCreateProjectFee)
+		case did.TypeMsgAddDid:
+			stdSignMsg = ixoMsg.(did.MsgAddDid).ToStdSignMsg()
 		default:
 			// Deduce and set signer address
 			signerAddress := did.VerifyKeyToAddr(req.PubKey)
