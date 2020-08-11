@@ -21,10 +21,11 @@ Bonds can be created by any address using `MsgCreateBond`.
 | MaxSupply              | `sdk.Coin`         | The maximum number of bond tokens that can be minted
 | OrderQuantityLimits    | `sdk.Coins`        | The maximum number of tokens that one can buy/sell/swap in a single order (e.g. `100abc,200res,300rez`)
 | SanityRate             | `sdk.Dec`          | For a swapper, restricts conversion rate (`r1/r2`) to `sanity rate ± sanity margin percentage`. `0` for no sanity checks.
-| SanityMarginPercentage | `sdk.Dec`          | Used as described above. `0` for no sanity checks.
-| AllowSells             | `string`           | Whether or not selling is allowed (`"true"/"false"`)
+| SanityMarginPercentage | `sdk.Dec`          | Used as described above. `0` for no sanity checks
+| AllowSells             | `bool`             | Whether or not selling is allowed
 | Signers                | `[]sdk.AccAddress` | The addresses of the accounts that must sign this message and any future message that edits the bond's parameters.
-| BatchBlocks            | `sdk.Uint`         | The lifespan of each orders batch in blocks.
+| BatchBlocks            | `sdk.Uint`         | The lifespan of each orders batch in blocks
+| OutcomePayment         | `sdk.Coins`        | The payment required to be made in order to transition a bond from OPEN to SETTLE
 
 ```go
 type MsgCreateBond struct {
@@ -42,36 +43,44 @@ type MsgCreateBond struct {
 	OrderQuantityLimits    sdk.Coins
 	SanityRate             sdk.Dec
 	SanityMarginPercentage sdk.Dec
-	AllowSells             string
+	AllowSells             bool
 	Signers                []sdk.AccAddress
 	BatchBlocks            sdk.Uint
+	OutcomePayment         sdk.Coins
 }
 ```
 
 This message is expected to fail if:
 - another bond with this token is already registered, the token is the staking token, or the token is not a valid denomination
 - name or description is an empty string
-- function type is not one of the defined function types (`power_function`, `sigmoid_function`, `swapper_function`)
+- function type is not one of the defined function types (`power_function`, `sigmoid_function`, `swapper_function`, `augmented_function`)
 - function parameters are negative or invalid for the selected function type:
-  - Valid example for `power_function`: `"m:12,n:2,c:100"`
-  - Valid example for `sigmoid_function`: `"a:3,b:5,c:1"`
+  - Valid example for `power_function`: `"m:12.5,n:2,c:100.12"` \
+    (i.e. `m=12`, `n=2`, `n=100.12`)
+  - Valid example for `sigmoid_function`: `"a:3.5,b:5.4,c:1.3"` \
+    (i.e. `a=3.5`, `b=5.4`, `c=1.3`)
+  - Valid example for `augmented_function`: `"d0:500.0,p0:0.01,theta:0.4,kappa:3.0"` \
+    (i.e. `d0=500.0`, `p0=0.01`, `theta=0.4`, `kappa=3.0`)
   - For `swapper_function`: `""` (no parameters)
 - function parameters do not satisfy the extra parameter restrictions
-  - Function parameter `c` for `sigmoid_function` cannot be zero
+  - `power_function`: `n` must be an integer
+  - `sigmoid_function`: `c != 0`
+  - `augmented_function`:
+    - `d0 != 0` and must be an integer
+    - `p0 != 0`
+    - `0 <= theta < 1`
+    - `kappa != 0` and must be an integer
 - reserve tokens list is invalid. Valid inputs are:
   - For `swapper_function`: two valid comma-separated denominations, e.g. `res,rez`
   - Otherwise: one or more valid comma-separated denominations, e.g. `res,rez,rex`
-- for `power_function` or `sigmoid_function`, reserve address is the fee address
 - tx or exit fee percentage is negative
 - sum of tx and exit fee percentages exceeds 100%
-- for `power_function` or `sigmoid_function`, fee address is the reserve address
 - order quantity limits is not one or more valid comma-separated amount
   - Valid example: `"100res,200rez"`
 - max supply value is not in the bond token denomination
 - sanity rate is neither an empty string nor a valid decimal
 - sanity margin percentage is neither an empty string nor a valid decimal
 - sanity rate is not an empty string and sanity margin percentage is an empty string (in other words, sanity rate is defined but sanity margin percentage is not)
-- allow sells is not one of `"true"` or `"false"`
 - signers is not one or more valid comma-separated account addresses
 - any field is empty, except for order quantity limits, sanity rate, sanity margin percentage, and function parameters for `swapper_function`
 
@@ -84,14 +93,14 @@ The owner of a bond can edit some of the bond's parameters using `MsgEditBond`.
 | **Field**              | **Type**           | **Description** |
 |:-----------------------|:-------------------|:----------------|
 | Token                  | `string`           | The bond to be edited
-| Name                   | `string`           |
-| Description            | `string`           |
-| FunctionType           | `string`           |
-| OrderQuantityLimits    | `sdk.Coins`        |
-| SanityRate             | `sdk.Dec`          |
-| SanityMarginPercentage | `sdk.Dec`          |
+| Name                   | `string`           | Refer to MsgCreateBond
+| Description            | `string`           | Refer to MsgCreateBond
+| FunctionType           | `string`           | Refer to MsgCreateBond
+| OrderQuantityLimits    | `sdk.Coins`        | Refer to MsgCreateBond
+| SanityRate             | `sdk.Dec`          | Refer to MsgCreateBond
+| SanityMarginPercentage | `sdk.Dec`          | Refer to MsgCreateBond
 | Editor                 | `sdk.AccAddress`   | The account address of the user editing the bond
-| Signers                | `[]sdk.AccAddress` |
+| Signers                | `[]sdk.AccAddress` | Refer to MsgCreateBond
 
 This message is expected to fail if:
 - any editable field violates the restrictions set for the same field in `MsgCreateBond`
@@ -119,6 +128,8 @@ Any address that holds tokens that a bond uses as its reserve can buy tokens fro
 
 A buy order is cancelled if the max prices are exceeded at any point during the lifespan of the batch. Otherwise, the buy order is fulfilled. The number of tokens requested are minted on the fly and any remaining tokens from the locked `MaxPrices`, minus the transaction fee specified by the bond, are returned to the user. The actual price in reserve tokens charged to the address is determined from the bond function, but is also influenced by any other buys and sells in the same orders batch, as a means to prevent front-running.
 
+In the case of `augmented_function` bonds, if the bond state is `HATCH`, a fixed price-per-token `p0` is used. This value (`p0`) is one of the function parameters required for this function type.
+
 | **Field** | **Type**         | **Description** |
 |:----------|:-----------------|:----------------|
 | Buyer     | `sdk.AccAddress` | The account address of the user buying the tokens
@@ -127,6 +138,7 @@ A buy order is cancelled if the max prices are exceeded at any point during the 
 
 This message is expected to fail if:
 - amount is not an amount of an existing bond
+- bond state is not HATCH or OPEN
 - max prices is greater than the balance of the buyer
 - max prices are not amounts of the bond's reserve tokens
 - denominations in max prices are not the bond's reserve tokens
@@ -169,10 +181,12 @@ In general, but especially in the case of swapper function bonds, buying tokens 
 
 This message is expected to fail if:
 - amount is not an amount of an existing bond
+- bond state is not OPEN
 - amount is greater than the balance of the seller
 - amount is greater than the bond's current supply
 - amount causes the bond's batch-adjusted current supply to become negative
 - amount violates an order quantity limit defined by the bond
+- bond function type is `augmented_function` and bond state is `HATCH`
 
 The batch-adjusted current supply in the case of sells is the current supply of the bond minus any uncancelled sell amounts in the current batch.
 
@@ -199,7 +213,7 @@ Once the swap order is fulfilled,
 | ToToken   | `string`         | The token denomination that will be given in return
 
 This message is expected to fail if:
-- bond does not exist or is not swapper function
+- bond does not exist, is not swapper function, or bond state is not OPEN
 - from amount is greater than the balance of the swapper
 - from and to tokens are the same token
 - from and to tokens are not the swapper function's reserve tokens
@@ -215,3 +229,50 @@ type MsgSwap struct {
 ```
 
 This message adds the swap order to the current batch.
+
+## MsgMakeOutcomePayment
+
+If a bond was created with an outcome payment field, then any token holder can make an outcome payment to the bond. If the token holder has enough tokens to pay the outcome payment, the tokens are sent to the bond's reserve and the bond's state gets set to SETTLE. The only action possible by bond token holders after the outcome payment has been made is a share withdrawal (using [MsgWithdrawShare](#MsgWithdrawShare)).
+
+| **Field** | **Type**         | **Description**                                                                                               |
+|:----------|:-----------------|:--------------------------------------------------------------------------------------------------------------|
+| Sender    | `sdk.AccAddress` | The account address of the user making the outcome payment |
+| BondToken | `string`         | The bond to make the outcome payment to                    |
+
+This message is expected to fail if:
+- bond does not exist or bond state is not OPEN
+- bond outcome payment is empty (meaning the feature is disabled)
+- bond outcome payment is greater than the balance of the sender
+
+```go
+type MsgMakeOutcomePayment struct {
+	Sender    sdk.AccAddress
+	BondToken string
+}
+```
+
+## MsgWithdrawShare
+
+If a bond's outcome payment was paid, any bond token holder can use this message to get their share of the reserve. The amount owed to the bond token holder is calculated by considering the percentage of bond tokens owned as a fraction of the _remaining_ bond token supply. Examples:
+
+- If the bond token holder owns 100% of all bond tokens and the reserve has 1000 reserve tokens, then the bond token holder gets all 1000 reserve tokens.
+- If three bond token holders each own 1/3 of all bond tokens and the reserve has 1000 reserve tokens, then:
+  - The first token holder to withdraw gets `1000/3 = 333 tokens` (notice the rounding down from 333.33)
+  - The second token holder to withdraw gets `667/2 = 333 tokens` (notice the current supply is now 2)
+  - The third token holder to withdraw gets `334/1 = 334 tokens` (because of rounding, the last holder got an extra token)
+
+| **Field** | **Type**         | **Description**                                                                                               |
+|:----------|:-----------------|:--------------------------------------------------------------------------------------------------------------|
+| Recipient | `sdk.AccAddress` | The account address of the user withdrawing their share |
+| BondToken | `string`         | The bond to withdraw the share from                     |
+
+This message is expected to fail if:
+- bond does not exist or bond state is not SETTLE
+- recipient does not own any bond tokens
+
+```go
+type MsgWithdrawShare struct {
+	Recipient sdk.AccAddress
+	BondToken string
+}
+```

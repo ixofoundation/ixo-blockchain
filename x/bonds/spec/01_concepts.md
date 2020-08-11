@@ -37,7 +37,7 @@ External parameters, such as market supply and demand, are complex and typically
 
 Pricing is defined by the function type and function parameters, which can define either the pricing function of the bond as a function of the supply, or simply indicate that the bond is a token swapper, where pricing is instead defined by the first buyer and any swaps performed thereafter.
 
-A bond may also specify non-zero fees, which are calculated based on the size of an order and sent to the specified fee address, order quantity limits to limit the size of orders, disable the ability to sell tokens, specify multiple signers that will need to sign for any editing of the bond details, and in the case of swapper bonds, sanity values to set a range of valid exchange rate between the two reserve tokens.
+A bond may also specify non-zero fees, which are calculated based on the size of an order and sent to the specified fee address, order quantity limits to limit the size of orders, disable the ability to sell tokens, specify multiple signers that will need to sign for any editing of the bond details, and in the case of swapper bonds, sanity values to set a range of valid exchange rate between the two reserve tokens. Lastly, a bond has a string state value, which in most cases is _open_, but in certain function types it has more meaning, such as for augmented bonding curves, in which case it can be _open_ \[for open phase\] and _hatch_ \[for hatch phase\]. This state is _not_ specified by the creator during bond creation.
 
 ```go
 type Bond struct {
@@ -48,7 +48,6 @@ type Bond struct {
 	FunctionType           string
 	FunctionParameters     FunctionParams
 	ReserveTokens          []string
-	ReserveAddress         sdk.AccAddress
 	TxFeePercentage        sdk.Dec
 	ExitFeePercentage      sdk.Dec
 	FeeAddress             sdk.AccAddress
@@ -57,9 +56,12 @@ type Bond struct {
 	SanityRate             sdk.Dec
 	SanityMarginPercentage sdk.Dec
 	CurrentSupply          sdk.Coin
-	AllowSells             string
+	CurrentReserve         sdk.Coins
+	AllowSells             bool
 	Signers                []sdk.AccAddress
 	BatchBlocks            sdk.Uint
+	OutcomePayment         sdk.Coins
+	State                  string
 }
 ```
 

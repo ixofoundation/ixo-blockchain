@@ -33,7 +33,7 @@ func NewBatch(bondDid did.Did, token string, blocks sdk.Uint) Batch {
 type BaseOrder struct {
 	AccountDid   did.Did  `json:"sender_did" yaml:"sender_did"`
 	Amount       sdk.Coin `json:"amount" yaml:"amount"`
-	Cancelled    string   `json:"cancelled" yaml:"cancelled"`
+	Cancelled    bool     `json:"cancelled" yaml:"cancelled"`
 	CancelReason string   `json:"cancel_reason" yaml:"cancel_reason"`
 }
 
@@ -41,13 +41,13 @@ func NewBaseOrder(accountDid did.Did, amount sdk.Coin) BaseOrder {
 	return BaseOrder{
 		AccountDid:   accountDid,
 		Amount:       amount,
-		Cancelled:    FALSE,
+		Cancelled:    false,
 		CancelReason: "",
 	}
 }
 
 func (bo BaseOrder) IsCancelled() bool {
-	return bo.Cancelled == TRUE
+	return bo.Cancelled == true
 }
 
 type BuyOrder struct {

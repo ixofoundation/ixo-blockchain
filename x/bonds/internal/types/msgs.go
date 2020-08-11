@@ -8,11 +8,13 @@ import (
 )
 
 const (
-	TypeMsgCreateBond = "create_bond"
-	TypeMsgEditBond   = "edit_bond"
-	TypeMsgBuy        = "buy"
-	TypeMsgSell       = "sell"
-	TypeMsgSwap       = "swap"
+	TypeMsgCreateBond         = "create_bond"
+	TypeMsgEditBond           = "edit_bond"
+	TypeMsgBuy                = "buy"
+	TypeMsgSell               = "sell"
+	TypeMsgSwap               = "swap"
+	TypeMsgMakeOutcomePayment = "make_outcome_payment"
+	TypeMsgWithdrawShare      = "withdraw_share"
 )
 
 var (
@@ -39,15 +41,16 @@ type MsgCreateBond struct {
 	OrderQuantityLimits    sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
 	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	AllowSells             string         `json:"allow_sells" yaml:"allow_sells"`
+	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
+	OutcomePayment         sdk.Coins      `json:"outcome_payment" yaml:"outcome_payment"`
 }
 
 func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell string, batchBlocks sdk.Uint, bondDid did.Did) MsgCreateBond {
+	allowSell bool, batchBlocks sdk.Uint, outcomePayment sdk.Coins, bondDid did.Did) MsgCreateBond {
 	return MsgCreateBond{
 		BondDid:                bondDid,
 		Token:                  token,
@@ -64,8 +67,9 @@ func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 		OrderQuantityLimits:    orderQuantityLimits,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
-		AllowSells:             strings.ToLower(allowSell),
+		AllowSells:             allowSell,
 		BatchBlocks:            batchBlocks,
+		OutcomePayment:         outcomePayment,
 	}
 }
 
@@ -87,8 +91,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Fee address")
 	} else if strings.TrimSpace(msg.FunctionType) == "" {
 		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Function type")
-	} else if strings.TrimSpace(msg.AllowSells) == "" {
-		return ErrArgumentCannotBeEmpty(DefaultCodespace, "AllowSells")
 	}
 	// Note: FunctionParameters can be empty
 
@@ -112,9 +114,11 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 
 	// Validate coins
 	if !msg.MaxSupply.IsValid() {
-		return sdk.ErrInternal("max supply is invalid")
+		return sdk.ErrInvalidCoins("max supply is invalid")
 	} else if !msg.OrderQuantityLimits.IsValid() {
-		return sdk.ErrInternal("order quantity limits are invalid")
+		return sdk.ErrInvalidCoins("order quantity limits are invalid")
+	} else if !msg.OutcomePayment.IsValid() {
+		return sdk.ErrInvalidCoins("outcome payment is invalid")
 	}
 
 	// Check that max supply denom matches token denom
@@ -127,11 +131,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentCannotBeNegative(DefaultCodespace, "SanityRate")
 	} else if msg.SanityMarginPercentage.IsNegative() {
 		return ErrArgumentCannotBeNegative(DefaultCodespace, "SanityMarginPercentage")
-	}
-
-	// Check that true or false
-	if msg.AllowSells != TRUE && msg.AllowSells != FALSE {
-		return ErrArgumentMissingOrNonBoolean(DefaultCodespace, "AllowSells")
 	}
 
 	// Check FeePercentages not negative and don't add up to 100
@@ -187,7 +186,7 @@ type MsgEditBond struct {
 }
 
 func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editorDid did.Did, bondDid did.Did) MsgEditBond {
+	sanityMarginPercentage string, editorDid, bondDid did.Did) MsgEditBond {
 	return MsgEditBond{
 		BondDid:                bondDid,
 		Token:                  token,
@@ -286,14 +285,14 @@ func (msg MsgBuy) ValidateBasic() sdk.Error {
 
 	// Check that amount valid and non zero
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInternal("amount is invalid")
+		return sdk.ErrInvalidCoins("amount is invalid")
 	} else if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
 	}
 
 	// Check that maxPrices valid
 	if !msg.MaxPrices.IsValid() {
-		return sdk.ErrInternal("maxprices is invalid")
+		return sdk.ErrInvalidCoins("maxprices is invalid")
 	}
 
 	// Check that DIDs valid
@@ -343,7 +342,7 @@ func (msg MsgSell) ValidateBasic() sdk.Error {
 
 	// Check that amount valid and non zero
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInternal("amount is invalid")
+		return sdk.ErrInvalidCoins("amount is invalid")
 	} else if msg.Amount.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "Amount")
 	}
@@ -400,7 +399,7 @@ func (msg MsgSwap) ValidateBasic() sdk.Error {
 
 	// Validate from amount
 	if !msg.From.IsValid() {
-		return sdk.ErrInternal("from amount is invalid")
+		return sdk.ErrInvalidCoins("from amount is invalid")
 	}
 
 	// Validate to token
@@ -443,3 +442,89 @@ func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return TypeMsgSwap }
+
+type MsgMakeOutcomePayment struct {
+	SenderDid did.Did `json:"sender_did" yaml:"sender_did"`
+	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
+}
+
+func NewMsgMakeOutcomePayment(senderDid, bondDid did.Did) MsgMakeOutcomePayment {
+	return MsgMakeOutcomePayment{
+		SenderDid: senderDid,
+		BondDid:   bondDid,
+	}
+}
+
+func (msg MsgMakeOutcomePayment) ValidateBasic() sdk.Error {
+	// Check if empty
+	if strings.TrimSpace(msg.SenderDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "SenderDid")
+	} else if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	}
+
+	// Check that DIDs valid
+	if !did.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !did.IsValidDid(msg.SenderDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	}
+
+	return nil
+}
+
+func (msg MsgMakeOutcomePayment) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgMakeOutcomePayment) GetSignerDid() did.Did { return msg.SenderDid }
+func (msg MsgMakeOutcomePayment) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+}
+
+func (msg MsgMakeOutcomePayment) Route() string { return RouterKey }
+
+func (msg MsgMakeOutcomePayment) Type() string { return TypeMsgMakeOutcomePayment }
+
+type MsgWithdrawShare struct {
+	RecipientDid did.Did `json:"recipient_did" yaml:"recipient_did"`
+	BondDid      did.Did `json:"bond_did" yaml:"bond_did"`
+}
+
+func NewMsgWithdrawShare(recipientDid, bondDid did.Did) MsgWithdrawShare {
+	return MsgWithdrawShare{
+		RecipientDid: recipientDid,
+		BondDid:      bondDid,
+	}
+}
+
+func (msg MsgWithdrawShare) ValidateBasic() sdk.Error {
+	// Check if empty
+	if strings.TrimSpace(msg.RecipientDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "RecipientDid")
+	} else if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	}
+
+	// Check that DIDs valid
+	if !did.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !did.IsValidDid(msg.RecipientDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "recipient did is invalid")
+	}
+
+	return nil
+}
+
+func (msg MsgWithdrawShare) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgWithdrawShare) GetSignerDid() did.Did { return msg.RecipientDid }
+func (msg MsgWithdrawShare) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+}
+
+func (msg MsgWithdrawShare) Route() string { return RouterKey }
+
+func (msg MsgWithdrawShare) Type() string { return TypeMsgWithdrawShare }
