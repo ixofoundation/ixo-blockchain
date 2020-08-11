@@ -19,7 +19,7 @@ Sending of tokens between two addresses identified by DIDs and signed by the sen
 | PubKey    | string    | PubKey of the message signer
 | FromDid   | did.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | ToDid     | did.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200uixos`)
+| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200abc`)
 
 ```go
 type MsgSend struct {
@@ -40,7 +40,7 @@ Sending of tokens between two addresses identified by DIDs and signed by an orac
 | OracleDid | did.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | FromDid   | did.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | ToDid     | did.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200uixos`)
+| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200abc`)
 | Proof     | string    | Arbitrary proof backing up this operation (presently unused)
 
 ```go
@@ -63,7 +63,7 @@ Minting of tokens to an address identified by a DID and signed by an oracle is d
 | PubKey    | string    | PubKey of the message signer
 | OracleDid | did.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | ToDid     | did.Did   | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200uixos`)
+| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200abc`)
 | Proof     | string    | Arbitrary proof backing up this operation (presently unused)
 
 ```go
@@ -85,7 +85,7 @@ Burning of tokens from an address identified by a DID and signed by an oracle is
 | PubKey    | string    | PubKey of the message signer
 | OracleDid | did.Did   | DID of the oracle (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | FromDid   | did.Did   | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200uixos`)
+| Amount    | sdk.Coins | The tokens being sent (e.g. `100uixo,200abc`)
 | Proof     | string    | Arbitrary proof backing up this operation (presently unused)
 
 ```go

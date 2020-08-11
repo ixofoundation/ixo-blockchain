@@ -1,12 +1,22 @@
 package exported
 
 import (
+	"bytes"
+	cryptoRand "crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/cosmos/go-bip39"
+	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
+	"golang.org/x/crypto/ed25519"
+	naclBox "golang.org/x/crypto/nacl/box"
+	"io"
 )
+
+var DidPrefix = "did:ixo:"
 
 type Did = string
 
@@ -22,6 +32,20 @@ type Secret struct {
 	Seed                 string `json:"seed" yaml:"seed"`
 	SignKey              string `json:"signKey" yaml:"signKey"`
 	EncryptionPrivateKey string `json:"encryptionPrivateKey" yaml:"encryptionPrivateKey"`
+}
+
+func NewSecret(seed, signKey, encryptionPrivateKey string) Secret {
+	return Secret{
+		Seed:                 seed,
+		SignKey:              signKey,
+		EncryptionPrivateKey: encryptionPrivateKey,
+	}
+}
+
+func (s Secret) Equals(other Secret) bool {
+	return s.Seed == other.Seed &&
+		s.SignKey == other.SignKey &&
+		s.EncryptionPrivateKey == other.EncryptionPrivateKey
 }
 
 func (s Secret) String() string {
@@ -54,6 +78,22 @@ type IxoDid struct {
 //    }
 // }
 
+func NewIxoDid(did, verifyKey, encryptionPublicKey string, secret Secret) IxoDid {
+	return IxoDid{
+		Did:                 did,
+		VerifyKey:           verifyKey,
+		EncryptionPublicKey: encryptionPublicKey,
+		Secret:              secret,
+	}
+}
+
+func (id IxoDid) Equals(other IxoDid) bool {
+	return id.Did == other.Did &&
+		id.VerifyKey == other.VerifyKey &&
+		id.EncryptionPublicKey == other.EncryptionPublicKey &&
+		id.Secret.Equals(other.Secret)
+}
+
 func (id IxoDid) String() string {
 	output, err := json.MarshalIndent(id, "", "  ")
 	if err != nil {
@@ -64,13 +104,79 @@ func (id IxoDid) String() string {
 }
 
 func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
-	var pubKey ed25519.PubKeyEd25519
+	var pubKey ed25519tm.PubKeyEd25519
 	copy(pubKey[:], base58.Decode(verifyKey))
 	return sdk.AccAddress(pubKey.Address())
 }
 
 func (id IxoDid) Address() sdk.AccAddress {
 	return VerifyKeyToAddr(id.VerifyKey)
+}
+
+func GenerateMnemonic() (string, error) {
+	entropy, err := bip39.NewEntropy(128)
+	if err != nil {
+		return "", err
+	}
+	return bip39.NewMnemonic(entropy)
+}
+
+func FromMnemonic(mnemonic string) (IxoDid, error) {
+	seed := sha256.New()
+	seed.Write([]byte(mnemonic))
+
+	var seed32 [32]byte
+	copy(seed32[:], seed.Sum(nil)[:32])
+
+	return FromSeed(seed32)
+}
+
+func Gen() (IxoDid, error) {
+	var seed [32]byte
+	_, err := io.ReadFull(cryptoRand.Reader, seed[:])
+	if err != nil {
+		return IxoDid{}, err
+	}
+	return FromSeed(seed)
+}
+
+func FromSeed(seed [32]byte) (IxoDid, error) {
+	publicKeyBytes, privateKeyBytes, err := ed25519.GenerateKey(bytes.NewReader(seed[0:32]))
+	if err != nil {
+		return IxoDid{}, err
+	}
+	publicKey := []byte(publicKeyBytes)
+	privateKey := []byte(privateKeyBytes)
+
+	signKey := base58.Encode(privateKey[:32])
+	keyPairPublicKey, keyPairPrivateKey, err := naclBox.GenerateKey(bytes.NewReader(privateKey[:]))
+	if err != nil {
+		return IxoDid{}, err
+	}
+
+	return IxoDid{
+		Did:                 DidPrefix + base58.Encode(publicKey[:16]),
+		VerifyKey:           base58.Encode(publicKey),
+		EncryptionPublicKey: base58.Encode(keyPairPublicKey[:]),
+		Secret: Secret{
+			Seed:                 hex.EncodeToString(seed[0:32]),
+			SignKey:              signKey,
+			EncryptionPrivateKey: base58.Encode(keyPairPrivateKey[:]),
+		},
+	}, nil
+}
+
+func (id IxoDid) SignMessage(msg []byte) ([]byte, error) {
+	var privateKey ed25519tm.PrivKeyEd25519
+	copy(privateKey[:], base58.Decode(id.Secret.SignKey))
+	copy(privateKey[32:], base58.Decode(id.VerifyKey))
+	return privateKey.Sign(msg)
+}
+
+func (id IxoDid) VerifySignedMessage(msg []byte, sig []byte) bool {
+	var publicKey ed25519tm.PubKeyEd25519
+	copy(publicKey[:], base58.Decode(id.VerifyKey))
+	return publicKey.VerifyBytes(msg, sig)
 }
 
 type Claim struct {

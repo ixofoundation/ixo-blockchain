@@ -8,8 +8,8 @@ Bonds can be created by any address using `MsgCreateBond`.
 
 | **Field**              | **Type**           | **Description** |
 |:-----------------------|:-------------------|:----------------|
-| Token                  | `string`           | The denomination of the bond's tokens
-| Name                   | `string`           | A friendly name as a title for the bond
+| Token                  | `string`           | The denomination of the bond's tokens (e.g. `abc`, `mytoken1`)
+| Name                   | `string`           | A friendly name as a title for the bond (e.g. `A B C`, `My Token`)
 | Description            | `string`           | A description of what the bond represents or its purpose
 | FunctionType           | `string`           | The type of function that will define the bonding curve (`power_function`, `sigmoid_function`, or `swapper_function`)
 | FunctionParameters     | `FunctionParams`   | The parameters of the function defining the bonding curve (e.g. `m:12,n:2,c:100`)
