@@ -48,9 +48,20 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 		return ErrorInvalidPubKey(DefaultCodespace, "pubKey should not be empty")
 	}
 
-	// Check that DID valid
+	// Check that DID and PubKey valid
 	if !IsValidDid(msg.Did) {
 		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
+	} else if !IsValidPubKey(msg.PubKey) {
+		return ErrorInvalidPubKey(DefaultCodespace, "pubKey is invalid")
+	}
+
+	// Check that DID matches the PubKey
+	unprefixedDid := exported.UnprefixedDid(msg.Did)
+	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
+	if unprefixedDid != expectedUnprefixedDid {
+		return ErrorDidPubKeyMismatch(DefaultCodespace, fmt.Sprintf(
+			"did not deducable from pubKey; expected: %s received: %s",
+			expectedUnprefixedDid, unprefixedDid))
 	}
 
 	return nil

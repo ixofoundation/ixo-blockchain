@@ -20,6 +20,18 @@ var DidPrefix = "did:ixo:"
 
 type Did = string
 
+func UnprefixedDid(did Did) string {
+	// Assumes that DID is valid (check IsValidDid regex)
+	// Removes 8 characters (for did:ixo: or did:sov:)
+	return did[8:]
+}
+
+func UnprefixedDidFromPubKey(pubKey string) string {
+	// Since result is not prefixed (did:ixo:), string returned rather than DID
+	pubKeyBz := base58.Decode(pubKey)
+	return base58.Encode(pubKeyBz[:16])
+}
+
 type DidDoc interface {
 	SetDid(did Did) error
 	GetDid() Did
