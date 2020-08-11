@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"strconv"
 )
 
@@ -81,14 +80,14 @@ type UpdateProjectStatusDoc struct {
 
 type ProjectDoc struct {
 	TxHash     string          `json:"txHash" yaml:"txHash"`
-	ProjectDid exported.Did    `json:"projectDid" yaml:"projectDid"`
-	SenderDid  exported.Did    `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
 	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 	Status     ProjectStatus   `json:"status" yaml:"status"`
 	Data       json.RawMessage `json:"data" yaml:"data"`
 }
 
-func NewProjectDoc(txHash string, projectDid, senderDid exported.Did,
+func NewProjectDoc(txHash string, projectDid, senderDid did.Did,
 	pubKey string, status ProjectStatus, data json.RawMessage) ProjectDoc {
 	return ProjectDoc{
 		TxHash:     txHash,

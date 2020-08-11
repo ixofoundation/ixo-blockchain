@@ -19,9 +19,10 @@ type (
 	Keeper       = keeper.Keeper
 	GenesisState = types.GenesisState
 
-	Did    = exported.Did
-	DidDoc = exported.DidDoc
-	IxoDid = exported.IxoDid
+	Did           = exported.Did
+	DidCredential = exported.DidCredential
+	DidDoc        = exported.DidDoc
+	IxoDid        = exported.IxoDid
 
 	MsgAddDid        = types.MsgAddDid
 	MsgAddCredential = types.MsgAddCredential
@@ -37,12 +38,16 @@ var (
 	DefaultGenesisState = types.DefaultGenesisState
 	ValidateGenesis     = types.ValidateGenesis
 
-	// variable aliases
-	ModuleCdc = types.ModuleCdc
-
-	ErrorInvalidDid = types.ErrorInvalidDid
+	VerifyKeyToAddr = exported.VerifyKeyToAddr
 
 	IsValidDid      = types.IsValidDid
 	IsValidPubKey   = types.IsValidPubKey
 	UnmarshalIxoDid = types.UnmarshalIxoDid
+
+	// variable aliases
+	ModuleCdc = types.ModuleCdc
+
+	ErrorInvalidDid        = types.ErrorInvalidDid
+	ErrorInvalidPubKey     = types.ErrorInvalidPubKey
+	ErrorDidPubKeyMismatch = types.ErrorDidPubKeyMismatch
 )

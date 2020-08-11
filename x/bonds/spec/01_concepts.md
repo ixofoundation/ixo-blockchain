@@ -17,7 +17,7 @@ In an Alpha-Bond, tokens can give holders the rights to future outcomes payments
 
 ## Token Bonds Module
 
-The Token Bonds Cosmos SDK Module enables applications that use token bondong curves to be created on-the-fly. 
+The Token Bonds Cosmos SDK Module enables applications that use token bonding curves to be created on-the-fly. 
 Each new Token B instance declares a new token denomination in the application, with a set of parameters.
 The module stores the current state of all tokens that have been created using this module.
 Changes in state occur through transactions that are instructed by valid *buy, sell, and swap* messages.
@@ -28,7 +28,7 @@ Changes in state occur through transactions that are instructed by valid *buy, s
 
 Bond Tokens trade against pairings in their Bond Reserve.
 
-The bondong curve forms an interface between the reserve token quantity and the bond token price (in the Reserve currency).
+The bonding curve forms an interface between the reserve token quantity and the bond token price (in the Reserve currency).
 
 Bonding curves are defined by their mathematical properties. This is determined by the type of curve function and by the function parameters that are set. Generally these parameters are chosen to best-fit empiricially-observed market dynamics of supply and demand. 
 External parameters, such as market supply and demand, are complex and typically hard to predict. 

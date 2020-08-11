@@ -2,9 +2,11 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
 	"strconv"
 
@@ -95,11 +97,22 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 		return sdk.ErrInternal("evaluatorPayPerClaim should be an integer")
 	}
 
-	// Check that DIDs valid
+	// Check that DIDs and PubKey valid
 	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+	} else if !did.IsValidPubKey(msg.PubKey) {
+		return did.ErrorInvalidPubKey(DefaultCodespace, "pubKey is invalid")
+	}
+
+	// Check that project DID matches the PubKey
+	unprefixedDid := exported.UnprefixedDid(msg.ProjectDid)
+	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
+	if unprefixedDid != expectedUnprefixedDid {
+		return did.ErrorDidPubKeyMismatch(DefaultCodespace, fmt.Sprintf(
+			"did not deducable from pubKey; expected: %s received: %s",
+			expectedUnprefixedDid, unprefixedDid))
 	}
 
 	return nil

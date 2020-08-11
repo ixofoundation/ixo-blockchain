@@ -13,33 +13,21 @@ const (
 )
 
 func ErrorInvalidDid(codeSpace sdk.CodespaceType, msg string) sdk.Error {
-	if msg != "" {
-		return sdk.NewError(codeSpace, CodeInvalidDid, msg)
-	}
-
-	return sdk.NewError(codeSpace, CodeInvalidDid, "Invalid did")
+	return sdk.NewError(codeSpace, CodeInvalidDid, msg)
 }
 
 func ErrorInvalidPubKey(codeSpace sdk.CodespaceType, msg string) sdk.Error {
-	if msg != "" {
-		return sdk.NewError(codeSpace, CodeInvalidPubKey, msg)
-	}
+	return sdk.NewError(codeSpace, CodeInvalidPubKey, msg)
+}
 
-	return sdk.NewError(codeSpace, CodeInvalidPubKey, "Invalid pubKey")
+func ErrorDidPubKeyMismatch(codeSpace sdk.CodespaceType, msg string) sdk.Error {
+	return sdk.NewError(codeSpace, CodeInvalidDid, msg)
 }
 
 func ErrorInvalidIssuer(codeSpace sdk.CodespaceType, msg string) sdk.Error {
-	if msg != "" {
-		return sdk.NewError(codeSpace, CodeInvalidIssuer, msg)
-	}
-
-	return sdk.NewError(codeSpace, CodeInvalidIssuer, "Invalid issuer")
+	return sdk.NewError(codeSpace, CodeInvalidIssuer, msg)
 }
 
 func ErrorInvalidCredentials(codeSpace sdk.CodespaceType, msg string) sdk.Error {
-	if msg != "" {
-		return sdk.NewError(codeSpace, CodeInvalidCredentials, msg)
-	}
-
-	return sdk.NewError(codeSpace, CodeInvalidCredentials, "Data already exist")
+	return sdk.NewError(codeSpace, CodeInvalidCredentials, msg)
 }

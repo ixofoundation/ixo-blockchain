@@ -24,6 +24,29 @@ var (
 	// Note: validIxoDid deduced from validMnemonic
 )
 
+func TestUnprefixedDid(t *testing.T) {
+	expectedResult := "U7GK8p8rVhJMKhBVRCJJ8c"
+
+	did1 := "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+	did2 := "did:sov:U7GK8p8rVhJMKhBVRCJJ8c"
+
+	result1 := UnprefixedDid(did1)
+	result2 := UnprefixedDid(did2)
+
+	require.Equal(t, expectedResult, result1)
+	require.Equal(t, expectedResult, result2)
+}
+
+func TestDidFromPubKey(t *testing.T) {
+	expectedDid := "U7GK8p8rVhJMKhBVRCJJ8c"
+	// equivalent to UnprefixedDid("U7GK8p8rVhJMKhBVRCJJ8c")
+
+	pubKey := "FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW"
+	did := UnprefixedDidFromPubKey(pubKey)
+
+	require.Equal(t, expectedDid, did)
+}
+
 func TestIxoDid_Equals(t *testing.T) {
 	ixoDid := NewIxoDid(
 		validIxoDid.Did, validIxoDid.VerifyKey,
