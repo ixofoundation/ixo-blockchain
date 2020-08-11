@@ -6,10 +6,10 @@ In this section we describe the processing of the DID messages and the correspon
 
 This message is used to create a DID with an associated PubKey.
 
-| **Field** | **Type**    | **Description** |
-|:----------|:------------|:----------------|
-| Did       | `did.DID`   | The DID being added 
-| PubKey    | `publicKey` | The PubKey to be associated with the DID
+| **Field** | **Type**       | **Description** |
+|:----------|:---------------|:----------------|
+| Did       | `exported.DID` | The DID being added 
+| PubKey    | `publicKey`    | The PubKey to be associated with the DID
 
 ```go
 type MsgAddDid struct {

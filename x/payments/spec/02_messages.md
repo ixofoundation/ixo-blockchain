@@ -24,12 +24,12 @@ This message creates and stores the payment contract at appropriate indexes.
 
 | **Field**         | **Type**         | **Description** |
 |:------------------|:-----------------|:----------------|
-| CreatorDid        | `string`         | Did of the user
+| CreatorDid        | `did.Did`        | Did of the user
 | PaymentTemplateId | `string`         | ID of the paymentTemplate
 | PaymentContractId | `string`         | ID of the PaymentContract
 | Payer             | `sdk.AccAddress` | Address of the payer
 | CanDeauthorise    | `bool`           | Bool of de_authorise
-| DiscountId        | ` sdk.Uint`      | Any discount given
+| DiscountId        | `sdk.Uint`       | Any discount given
 
 ```go
 type MsgCreatePaymentContract struct {
@@ -46,13 +46,13 @@ type MsgCreatePaymentContract struct {
 
 This message creates and stores the subscription at appropriate indexes.
 
-| **Field**         | **Type**         | **Description** |
-|:------------------|:-----------------|:----------------|
-| CreatorDid        | `string`         | Did of the user
-| SubscriptionId    | `string`         | ID for the subscription
-| PaymentContractId | `string`         | ID for the paymentContract
-| MaxPeriods        | `sdk.AccAddress` | Maximum number of times chargeable
-| Period            | `bool`           | IF the periods are allowed or not
+| **Field**         | **Type**   | **Description** |
+|:------------------|:-----------|:----------------|
+| CreatorDid        | `did.Did`  | Did of the user
+| SubscriptionId    | `string`   | ID for the subscription
+| PaymentContractId | `string`   | ID for the paymentContract
+| MaxPeriods        | `sdk.Uint` | Maximum number of times chargeable
+| Period            | `Period`   | IF the periods are allowed or not
 
 ```go
 type MsgCreateSubscription struct {
@@ -68,11 +68,11 @@ type MsgCreateSubscription struct {
 
 This message authorises or deauthorises a payment contract, in order to enable or disable effecting of the payment contract.
 
-| **Field**         | **Type** | **Description** |
-|:------------------|:---------|:----------------|
-| PayerDid          | `string` | Payer's DID
-| PaymentContractId | `string` | ID of the paymentContract
-| Authorised        | `bool`   | Status of authorisation
+| **Field**         | **Type**  | **Description** |
+|:------------------|:----------|:----------------|
+| PayerDid          | `did.Did` | Payer's DID
+| PaymentContractId | `string`  | ID of the paymentContract
+| Authorised        | `bool`    | Status of authorisation
 
 ```go
 type MsgSetPaymentContractAuthorisation struct {
@@ -88,7 +88,7 @@ This message grants a discount to a recipient for a particular payment contract.
 
 | **Field**         | **Type**         | **Description** |
 |:------------------|:-----------------|:----------------|
-| SenderDid         | `string`         | Initiator DID 
+| SenderDid         | `did.Did`        | Initiator DID 
 | PaymentContractId | `string`         | ID for the paymentContract
 | DiscountId        | `sdk.Uint`       | How much is the discount
 | Recipient         | `sdk.AccAddress` | Who is the recipient 
@@ -108,7 +108,7 @@ This message revokes a discount of a discount holder for a particular payment co
 
 | **Field**         | **Type**         | **Description** |
 |:------------------|:-----------------|:----------------|
-| SenderDid         | `string`         | Who send the transaction 
+| SenderDid         | `did.Did`        | Who send the transaction 
 | PaymentContractId | `string`         | ID of the payment_Contract
 | Holder            | `sdk.AccAddress` | Address of who's holds the discount
 
