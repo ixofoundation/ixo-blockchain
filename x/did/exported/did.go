@@ -27,6 +27,7 @@ func UnprefixedDid(did Did) string {
 }
 
 func UnprefixedDidFromPubKey(pubKey string) string {
+	// Assumes that PubKey is valid (check IsValidPubKey regex)
 	// Since result is not prefixed (did:ixo:), string returned rather than DID
 	pubKeyBz := base58.Decode(pubKey)
 	return base58.Encode(pubKeyBz[:16])
