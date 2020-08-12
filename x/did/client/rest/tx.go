@@ -26,7 +26,13 @@ type AddDidReq struct {
 func addDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AddDidReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
@@ -44,7 +50,13 @@ type AddCredentialReq struct {
 func addCredentialRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AddCredentialReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}

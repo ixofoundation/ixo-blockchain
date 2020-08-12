@@ -15,9 +15,9 @@ import (
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/payments/create_payment_template", addPaymentTemplateHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/create_payment_contract", addPaymentContractHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/create-subscription", addSubscriptionHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/create_payment_template", createPaymentTemplateHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/create_payment_contract", createPaymentContractHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/create_subscription", createSubscriptionHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/payments/set_payment_contract_authorisation", setPaymentContractAuthorisationHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/payments/grant_discount", grantDiscountHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/payments/revoke_discount", revokeDiscountHandler(cliCtx)).Methods("POST")
@@ -47,10 +47,16 @@ type CreatePaymentTemplateReq struct {
 	PaymentTemplate types.PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 }
 
-func addPaymentTemplateHandler(ctx context.CLIContext) http.HandlerFunc {
+func createPaymentTemplateHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreatePaymentTemplateReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgCreatePaymentTemplate(req.PaymentTemplate, req.CreatorDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -70,10 +76,16 @@ type CreatePaymentContractReq struct {
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
-func addPaymentContractHandler(ctx context.CLIContext) http.HandlerFunc {
+func createPaymentContractHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreatePaymentContractReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgCreatePaymentContract(req.PaymentTemplateId, req.PaymentContractId,
 			req.Payer, req.CanDeauthorise, req.DiscountId, req.CreatorDid)
 		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
@@ -89,10 +101,16 @@ type CreateSubscriptionReq struct {
 	Period            types.Period `json:"period" yaml:"period"`
 }
 
-func addSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
+func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreateSubscriptionReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgCreateSubscription(req.SubscriptionId, req.PaymentContractId,
 			req.MaxPeriods, req.Period, req.CreatorDid)
 		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
@@ -109,7 +127,13 @@ type SetPaymentContractAuthorisationReq struct {
 func setPaymentContractAuthorisationHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req SetPaymentContractAuthorisationReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgSetPaymentContractAuthorisation(req.PaymentContractId,
 			req.Authorised, req.PayerDid)
 		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
@@ -127,7 +151,13 @@ type GrantDiscountReq struct {
 func grantDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req GrantDiscountReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgGrantDiscount(req.PaymentContractId, req.DiscountId,
 			req.Recipient, req.SenderDid)
 		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
@@ -144,7 +174,13 @@ type RevokeDiscountReq struct {
 func revokeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req RevokeDiscountReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgRevokeDiscount(req.PaymentContractId, req.Holder, req.SenderDid)
 		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
@@ -159,7 +195,13 @@ type EffectPaymentReq struct {
 func effectPaymentHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req EffectPaymentReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgEffectPayment(req.PaymentContractId, req.SenderDid)
 		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}

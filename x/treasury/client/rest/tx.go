@@ -29,7 +29,13 @@ type SendReq struct {
 func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req SendReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgSend(req.ToDidOrAddr, req.Amount, req.FromDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -51,7 +57,13 @@ type OracleTransferReq struct {
 func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req OracleTransferReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgOracleTransfer(req.FromDid, req.ToDidOrAddr, req.Amount, req.OracleDid, req.Proof)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -72,7 +84,13 @@ type OracleMintReq struct {
 func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req OracleMintReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgOracleMint(
 			req.ToDidOrAddr, req.Amount, req.OracleDid, req.Proof)
 		if err := msg.ValidateBasic(); err != nil {
@@ -94,7 +112,13 @@ type OracleBurnReq struct {
 func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req OracleBurnReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
 		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
 		msg := types.NewMsgOracleBurn(req.FromDid, req.Amount, req.OracleDid, req.Proof)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
