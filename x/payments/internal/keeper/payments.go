@@ -302,5 +302,14 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 		outputToPayRemainderPool).Sub(inputFromPayRemainderPool)
 	k.SetPaymentContract(ctx, contract)
 
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypeEffectPayment,
+		sdk.NewAttribute(types.AttributeKeyPaymentContractId, contract.Id),
+		sdk.NewAttribute(types.AttributeKeyInputFromPayRemainderPool, inputFromPayRemainderPool.String()),
+		sdk.NewAttribute(types.AttributeKeyInputFromPayer, pay.String()),
+		sdk.NewAttribute(types.AttributeKeyOutputToPayRemainderPool, outputToPayRemainderPool.String()),
+		sdk.NewAttribute(types.AttributeKeyOutputToPayees, outputToPayees.String()),
+	))
+
 	return true, nil
 }

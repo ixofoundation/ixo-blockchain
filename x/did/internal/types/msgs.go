@@ -2,8 +2,11 @@ package types
 
 import (
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/spf13/viper"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,6 +25,22 @@ var (
 type MsgAddDid struct {
 	Did    exported.Did `json:"did" yaml:"did"`
 	PubKey string       `json:"pubKey" yaml:"pubKey"`
+}
+
+func (msg MsgAddDid) ToStdSignMsg() auth.StdSignMsg {
+	chainID := viper.GetString(flags.FlagChainID)
+	accNum, accSeq := uint64(0), uint64(0)
+	stdFee := auth.NewStdFee(0, nil)
+	memo := viper.GetString(flags.FlagMemo)
+
+	return auth.StdSignMsg{
+		ChainID:       chainID,
+		AccountNumber: accNum,
+		Sequence:      accSeq,
+		Fee:           stdFee,
+		Msgs:          []sdk.Msg{msg},
+		Memo:          memo,
+	}
 }
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
@@ -48,9 +67,20 @@ func (msg MsgAddDid) ValidateBasic() sdk.Error {
 		return ErrorInvalidPubKey(DefaultCodespace, "pubKey should not be empty")
 	}
 
-	// Check that DID valid
+	// Check that DID and PubKey valid
 	if !IsValidDid(msg.Did) {
 		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
+	} else if !IsValidPubKey(msg.PubKey) {
+		return ErrorInvalidPubKey(DefaultCodespace, "pubKey is invalid")
+	}
+
+	// Check that DID matches the PubKey
+	unprefixedDid := exported.UnprefixedDid(msg.Did)
+	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
+	if unprefixedDid != expectedUnprefixedDid {
+		return ErrorDidPubKeyMismatch(DefaultCodespace, fmt.Sprintf(
+			"did not deducable from pubKey; expected: %s received: %s",
+			expectedUnprefixedDid, unprefixedDid))
 	}
 
 	return nil

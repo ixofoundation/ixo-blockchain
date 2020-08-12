@@ -178,7 +178,7 @@ func GetCmdCurrentPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out sdk.Coins
+			var out sdk.DecCoins
 			err = cdc.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err
@@ -256,7 +256,7 @@ func GetCmdCustomPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 
-			var out sdk.Coins
+			var out sdk.DecCoins
 			err = cdc.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err

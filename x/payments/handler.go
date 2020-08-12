@@ -7,6 +7,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"strconv"
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
@@ -96,7 +97,20 @@ func handleMsgSetPaymentContractAuthorisation(ctx sdk.Context, k Keeper, msg Msg
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypePaymentContractAuthorisation,
+			sdk.NewAttribute(types.AttributeKeyPayerDid, msg.PayerDid),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyAuthorised, strconv.FormatBool(msg.Authorised)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreatePaymentTemplate) sdk.Result {
@@ -129,7 +143,24 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 	// Submit payment template
 	k.SetPaymentTemplate(ctx, msg.PaymentTemplate)
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreatePaymentTemplate,
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyAttributeKeyId, msg.PaymentTemplate.Id),
+			sdk.NewAttribute(types.AttributeKeyPaymentAmount, msg.PaymentTemplate.PaymentAmount.String()),
+			sdk.NewAttribute(types.AttributeKeyPaymentMinimum, msg.PaymentTemplate.PaymentMinimum.String()),
+			sdk.NewAttribute(types.AttributeKeyPaymentMaximum, msg.PaymentTemplate.PaymentMaximum.String()),
+			sdk.NewAttribute(types.AttributeKeyDiscounts, fmt.Sprint(msg.PaymentTemplate.Discounts)),
+			sdk.NewAttribute(types.AttributeKeyWalletDistribution, fmt.Sprint(msg.PaymentTemplate.WalletDistribution)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
@@ -175,7 +206,23 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	// Submit payment contract
 	k.SetPaymentContract(ctx, contract)
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreatePaymentContract,
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyPaymentTemplateId, msg.PaymentTemplateId),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer.String()),
+			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
+			sdk.NewAttribute(types.AttributeKeyCanDeauthorise, strconv.FormatBool(msg.CanDeauthorise)),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgCreateSubscription(ctx sdk.Context, k Keeper,
@@ -221,7 +268,22 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper,
 	// Submit subscription
 	k.SetSubscription(ctx, subscription)
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeCreateSubscription,
+			sdk.NewAttribute(types.AttributeKeySubscriptionId, msg.SubscriptionId),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyMaxPeriods, msg.MaxPeriods.String()),
+			sdk.NewAttribute(types.AttributeKeyPeriod, msg.Period.GetPeriodUnit()),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgGrantDiscount(ctx sdk.Context, k Keeper, msg MsgGrantDiscount) sdk.Result {
@@ -259,7 +321,21 @@ func handleMsgGrantDiscount(ctx sdk.Context, k Keeper, msg MsgGrantDiscount) sdk
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeGrantDiscount,
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
+			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient.String()),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgRevokeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeDiscount) sdk.Result {
@@ -288,7 +364,20 @@ func handleMsgRevokeDiscount(ctx sdk.Context, k Keeper, msg MsgRevokeDiscount) s
 		return err.Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeRevokeDiscount,
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+			sdk.NewAttribute(types.AttributeKeyHolder, msg.Holder.String()),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }
 
 func handleMsgEffectPayment(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgEffectPayment) sdk.Result {
@@ -322,5 +411,17 @@ func handleMsgEffectPayment(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgEf
 		return sdk.ErrInternal("payment not effected due to unknown reason").Result()
 	}
 
-	return sdk.Result{}
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeEffectPayment,
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
 }

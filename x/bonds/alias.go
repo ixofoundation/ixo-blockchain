@@ -11,6 +11,7 @@ const (
 
 	BondsMintBurnAccount       = types.BondsMintBurnAccount
 	BatchesIntermediaryAccount = types.BatchesIntermediaryAccount
+	BondsReserveAccount        = types.BondsReserveAccount
 
 	ModuleName   = types.ModuleName
 	StoreKey     = types.StoreKey

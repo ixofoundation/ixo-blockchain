@@ -1,21 +1,78 @@
 package types
 
 import (
+	"errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"math/big"
 	"strings"
 )
 
-func SquareRootDec(d sdk.Dec) sdk.Dec {
-	// To find square root of Dec, find square root of big.Int
-	// The precision P is divided by 2 since √(10^P) = 10^(P/2)
-	ans := &big.Int{}
-	ans.Sqrt(d.Int)
-	return sdk.NewDecFromBigIntWithPrec(ans, sdk.Precision/2)
+// NOTE: copied off of more recent versions of Cosmos SDK
+// ApproxRoot returns an approximate estimation of a Dec's positive real nth root
+// using Newton's method (where n is positive). The algorithm starts with some guess and
+// computes the sequence of improved guesses until an answer converges to an
+// approximate answer.  It returns `|d|.ApproxRoot() * -1` if input is negative.
+func ApproxRoot(d sdk.Dec, root uint64) (guess sdk.Dec, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			err, ok = r.(error)
+			if !ok {
+				err = errors.New("out of bounds")
+			}
+		}
+	}()
+
+	if d.IsNegative() {
+		absRoot, err := ApproxRoot(d.MulInt64(-1), root)
+		return absRoot.MulInt64(-1), err
+	}
+
+	if root == 1 || d.IsZero() || d.Equal(sdk.OneDec()) {
+		return d, nil
+	}
+
+	if root == 0 {
+		return sdk.OneDec(), nil
+	}
+
+	temp := big.NewInt(0)
+	temp.SetUint64(root)
+	rootInt := sdk.NewIntFromBigInt(temp)
+	guess, delta := sdk.OneDec(), sdk.OneDec()
+
+	for delta.Abs().GT(sdk.SmallestDec()) {
+		prev := Power(guess, root-1)
+		if prev.IsZero() {
+			prev = sdk.SmallestDec()
+		}
+		delta = d.Quo(prev)
+		delta = delta.Sub(guess)
+		delta = delta.QuoInt(rootInt)
+
+		guess = guess.Add(delta)
+	}
+
+	return guess, nil
 }
 
-func SquareRootInt(i sdk.Int) sdk.Dec {
-	return SquareRootDec(sdk.NewDecFromInt(i))
+// NOTE: copied off of more recent versions of Cosmos SDK
+// Power returns a the result of raising to a positive integer power
+func Power(d sdk.Dec, power uint64) sdk.Dec {
+	if power == 0 {
+		return sdk.OneDec()
+	}
+	tmp := sdk.OneDec()
+	for i := power; i > 1; {
+		if i%2 == 0 {
+			i /= 2
+		} else {
+			tmp = tmp.Mul(d)
+			i = (i - 1) / 2
+		}
+		d = d.Mul(d)
+	}
+	return d.Mul(tmp)
 }
 
 func RoundReservePrice(p sdk.DecCoin) sdk.Coin {

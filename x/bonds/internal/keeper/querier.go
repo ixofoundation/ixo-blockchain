@@ -7,7 +7,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"strings"
 )
 
 const (
@@ -58,6 +57,17 @@ func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins
 		zeroes, _ := bond.GetNewReserveDecCoins(sdk.OneDec()).TruncateDecimal()
 		for i := range zeroes {
 			zeroes[i].Amount = sdk.ZeroInt()
+		}
+		reserveCoins = zeroes
+	}
+	return reserveCoins
+}
+
+func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk.DecCoins {
+	if reserveCoins.IsZero() {
+		zeroes := bond.GetNewReserveDecCoins(sdk.OneDec())
+		for i := range zeroes {
+			zeroes[i].Amount = sdk.ZeroDec()
 		}
 		reserveCoins = zeroes
 	}
@@ -144,10 +154,9 @@ func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byt
 	if err != nil {
 		return nil, err
 	}
-	reservePriceRounded := types.RoundReservePrices(reservePrices)
-	reservePriceRounded = zeroReserveTokensIfEmpty(reservePriceRounded, bond)
+	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reservePriceRounded)
+	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
 	if err2 != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -163,8 +172,7 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []b
 		return nil, sdk.ErrUnknownRequest(fmt.Sprintf("bond '%s' does not exist", bondDid))
 	}
 
-	reserveBalances := keeper.BankKeeper.GetCoins(ctx, bond.ReserveAddress)
-	reserveBalances = zeroReserveTokensIfEmpty(reserveBalances, bond)
+	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reserveBalances)
 	if err2 != nil {
 		panic("could not marshal result to JSON")
@@ -184,17 +192,16 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 
 	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
-		return nil, sdk.ErrInternal(err2.Error())
+		return nil, sdk.ErrInvalidCoins(err2.Error())
 	}
 
 	reservePrices, err := bond.GetPricesAtSupply(bondCoin.Amount)
 	if err != nil {
 		return nil, err
 	}
-	reservePricesRounded := types.RoundReservePrices(reservePrices)
-	reservePricesRounded = zeroReserveTokensIfEmpty(reservePricesRounded, bond)
+	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reservePricesRounded)
+	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
 	if err2 != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -213,7 +220,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 
 	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
-		return nil, sdk.ErrInternal(err2.Error())
+		return nil, sdk.ErrInvalidCoins(err2.Error())
 	}
 
 	// Max supply cannot be less than supply (max supply >= supply)
@@ -256,10 +263,10 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 
 	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
-		return nil, sdk.ErrInternal(err2.Error())
+		return nil, sdk.ErrInvalidCoins(err2.Error())
 	}
 
-	if strings.ToLower(bond.AllowSells) == types.FALSE {
+	if !bond.AllowSells {
 		return nil, types.ErrBondDoesNotAllowSelling(types.DefaultCodespace)
 	}
 
@@ -301,7 +308,7 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 
 	fromCoin, err2 := client.ParseTwoPartCoin(fromAmount, fromToken)
 	if err2 != nil {
-		return nil, sdk.ErrInternal(err2.Error())
+		return nil, sdk.ErrInvalidCoins(err2.Error())
 	}
 
 	bond, found := keeper.GetBond(ctx, bondDid)

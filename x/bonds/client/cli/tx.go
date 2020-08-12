@@ -10,7 +10,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"strings"
@@ -31,6 +30,8 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		GetCmdBuy(cdc),
 		GetCmdSell(cdc),
 		GetCmdSwap(cdc),
+		GetCmdMakeOutcomePayment(cdc),
+		GetCmdWithdrawShare(cdc),
 	)...)
 
 	return bondsTxCmd
@@ -54,8 +55,9 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
 			_sanityRate := viper.GetString(FlagSanityRate)
 			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
-			_allowSells := viper.GetString(FlagAllowSells)
+			_allowSells := viper.GetBool(FlagAllowSells)
 			_batchBlocks := viper.GetString(FlagBatchBlocks)
+			_outcomePayment := viper.GetString(FlagOutcomePayment)
 			_bondDid := viper.GetString(FlagBondDid)
 			_creatorDid := viper.GetString(FlagCreatorDid)
 
@@ -118,6 +120,9 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			// Parse creator's ixo DID
 			creatorDid, err := did.UnmarshalIxoDid(_creatorDid)
+
+			// Parse order quantity limits
+			outcomePayment, err := sdk.ParseCoins(_outcomePayment)
 			if err != nil {
 				return err
 			}
@@ -129,7 +134,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				creatorDid.Did, _functionType, functionParams, reserveTokens,
 				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
 				orderQuantityLimits, sanityRate, sanityMarginPercentage,
-				_allowSells, batchBlocks, _bondDid)
+				_allowSells, batchBlocks, outcomePayment, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
 		},
@@ -151,8 +156,8 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagOrderQuantityLimits)
 	_ = cmd.MarkFlagRequired(FlagSanityRate)
 	_ = cmd.MarkFlagRequired(FlagSanityMarginPercentage)
-	_ = cmd.MarkFlagRequired(FlagAllowSells)
 	_ = cmd.MarkFlagRequired(FlagBatchBlocks)
+	// _ = cmd.MarkFlagRequired(FlagOutcomePayment) // Optional
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagCreatorDid)
 
@@ -185,7 +190,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgEditBond(
 				_token, _name, _description, _orderQuantityLimits, _sanityRate,
 				_sanityMarginPercentage, editorDid.Did, _bondDid)
-
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
 	}
@@ -209,6 +213,7 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 		Short: "Buy from a bond",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			bondCoinWithAmount, err := sdk.ParseCoin(args[0])
 			if err != nil {
 				return err
@@ -244,6 +249,7 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 		Short:   "Sell from a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			bondCoinWithAmount, err := sdk.ParseCoin(args[0])
 			if err != nil {
 				return err
@@ -275,6 +281,7 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 		Short: "Perform a swap between two tokens",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			// Check that from amount and token can be parsed to a coin
 			from, err := client2.ParseTwoPartCoin(args[0], args[1])
 			if err != nil {
@@ -293,6 +300,56 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3])
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, swapperDid)
+		},
+	}
+	return cmd
+}
+
+func GetCmdMakeOutcomePayment(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "make-outcome-payment [bond-did] [sender-did]",
+		Example: "make-outcome-payment U7GK8p8rVhJMKhBVRCJJ8c <sender-ixo-did>",
+		Short:   "Make an outcome payment to a bond",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			// Parse sender's ixo DID
+			sender, err := did.UnmarshalIxoDid(args[1])
+			if err != nil {
+				return err
+			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(sender.Address())
+
+			msg := types.NewMsgMakeOutcomePayment(sender.Did, args[0])
+
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sender)
+		},
+	}
+	return cmd
+}
+
+func GetCmdWithdrawShare(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "withdraw-share [bond-did] [recipient-did]",
+		Example: "withdraw-share U7GK8p8rVhJMKhBVRCJJ8c <recipient-ixo-did>",
+		Short:   "Withdraw share from a bond that is in settlement state",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			// Parse recipient's ixo DID
+			recipientDid, err := did.UnmarshalIxoDid(args[1])
+			if err != nil {
+				return err
+			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(recipientDid.Address())
+
+			msg := types.NewMsgWithdrawShare(recipientDid.Did, args[0])
+
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, recipientDid)
 		},
 	}
 	return cmd

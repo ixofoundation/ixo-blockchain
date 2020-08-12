@@ -17,6 +17,8 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgBuy{}, "bonds/MsgBuy", nil)
 	cdc.RegisterConcrete(MsgSell{}, "bonds/MsgSell", nil)
 	cdc.RegisterConcrete(MsgSwap{}, "bonds/MsgSwap", nil)
+	cdc.RegisterConcrete(MsgMakeOutcomePayment{}, "bonds/MsgMakeOutcomePayment", nil)
+	cdc.RegisterConcrete(MsgWithdrawShare{}, "bonds/MsgWithdrawShare", nil)
 }
 
 // ModuleCdc is the codec for the module

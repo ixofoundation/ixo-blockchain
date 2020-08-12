@@ -15,6 +15,9 @@ const (
 	// BatchesIntermediaryAccount the root string for the batches account address
 	BatchesIntermediaryAccount = "batches_intermediary_account"
 
+	// BondsReserveAccount the root string for the bonds reserve account address
+	BondsReserveAccount = "bonds_reserve_account"
+
 	// QuerierRoute is the querier route for this module's store.
 	QuerierRoute = ModuleName
 

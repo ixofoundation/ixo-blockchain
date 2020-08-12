@@ -17,35 +17,39 @@ const (
 	CodeArgumentInvalid                CodeType = 301
 	CodeArgumentMissingOrIncorrectType CodeType = 302
 	CodeIncorrectNumberOfValues        CodeType = 303
+	CodeActionInvalid                  CodeType = 304
 
 	// Bonds
-	CodeBondDoesNotExist        CodeType = 304
-	CodeBondAlreadyExists       CodeType = 305
-	CodeBondDoesNotAllowSelling CodeType = 306
-	CodeDidNotEditAnything      CodeType = 307
-	CodeInvalidSwapper          CodeType = 308
-	CodeInvalidBond             CodeType = 309
+	CodeBondDoesNotExist        CodeType = 305
+	CodeBondAlreadyExists       CodeType = 306
+	CodeBondDoesNotAllowSelling CodeType = 307
+	CodeDidNotEditAnything      CodeType = 308
+	CodeInvalidSwapper          CodeType = 309
+	CodeInvalidBond             CodeType = 310
+	CodeInvalidState            CodeType = 311
 
 	// Function types and function parameters
-	CodeUnrecognizedFunctionType             CodeType = 310
-	CodeInvalidFunctionParameter             CodeType = 311
-	CodeFunctionNotAvailableForFunctionType  CodeType = 312
-	CodeFunctionRequiresNonZeroCurrentSupply CodeType = 313
+	CodeUnrecognizedFunctionType             CodeType = 312
+	CodeInvalidFunctionParameter             CodeType = 313
+	CodeFunctionNotAvailableForFunctionType  CodeType = 314
+	CodeFunctionRequiresNonZeroCurrentSupply CodeType = 315
 
 	// Token/coin names
-	CodeReserveTokenInvalid     CodeType = 314
-	CodeMaxSupplyDenomInvalid   CodeType = 315
-	CodeBondTokenInvalid        CodeType = 316
-	CodeReserveDenomsMismatch   CodeType = 317
-	CodeInvalidCoinDenomination CodeType = 318
+	CodeReserveTokenInvalid     CodeType = 316
+	CodeMaxSupplyDenomInvalid   CodeType = 317
+	CodeBondTokenInvalid        CodeType = 318
+	CodeReserveDenomsMismatch   CodeType = 319
+	CodeInvalidCoinDenomination CodeType = 320
 
 	// Amounts and fees
-	CodeInvalidResultantSupply CodeType = 319
-	CodeMaxPriceExceeded       CodeType = 320
-	CodeSwapAmountInvalid      CodeType = 321
-	CodeOrderLimitExceeded     CodeType = 322
-	CodeSanityRateViolated     CodeType = 323
-	CodeFeeTooLarge            CodeType = 324
+	CodeInvalidResultantSupply     CodeType = 321
+	CodeMaxPriceExceeded           CodeType = 322
+	CodeSwapAmountInvalid          CodeType = 323
+	CodeOrderQuantityLimitExceeded CodeType = 324
+	CodeSanityRateViolated         CodeType = 325
+	CodeFeeTooLarge                CodeType = 326
+	CodeNoBondTokensOwned          CodeType = 327
+	CodeInsufficientReserveToBuy   CodeType = 328
 )
 
 func ErrArgumentCannotBeEmpty(codespace sdk.CodespaceType, argument string) sdk.Error {
@@ -63,18 +67,23 @@ func ErrArgumentMustBePositive(codespace sdk.CodespaceType, arg string) sdk.Erro
 	return sdk.NewError(codespace, CodeArgumentInvalid, errMsg)
 }
 
-func ErrFunctionParameterMissingOrNonInteger(codespace sdk.CodespaceType, param string) sdk.Error {
-	errMsg := fmt.Sprintf("%s parameter is missing or is not an integer", param)
+func ErrArgumentMustBeInteger(codespace sdk.CodespaceType, arg string) sdk.Error {
+	errMsg := fmt.Sprintf("%s argument must be an integer value", arg)
+	return sdk.NewError(codespace, CodeArgumentInvalid, errMsg)
+}
+
+func ErrArgumentMustBeBetween(codespace sdk.CodespaceType, arg string, a, b string) sdk.Error {
+	errMsg := fmt.Sprintf("%s argument must be between %s and %s", arg, a, b)
+	return sdk.NewError(codespace, CodeArgumentInvalid, errMsg)
+}
+
+func ErrFunctionParameterMissingOrNonFloat(codespace sdk.CodespaceType, param string) sdk.Error {
+	errMsg := fmt.Sprintf("%s parameter is missing or is not a float", param)
 	return sdk.NewError(codespace, CodeArgumentMissingOrIncorrectType, errMsg)
 }
 
 func ErrArgumentMissingOrNonFloat(codespace sdk.CodespaceType, arg string) sdk.Error {
 	errMsg := fmt.Sprintf("%s argument is missing or is not a float", arg)
-	return sdk.NewError(codespace, CodeArgumentMissingOrIncorrectType, errMsg)
-}
-
-func ErrArgumentMissingOrNonInteger(codespace sdk.CodespaceType, arg string) sdk.Error {
-	errMsg := fmt.Sprintf("%s argument is missing or is not an integer", arg)
 	return sdk.NewError(codespace, CodeArgumentMissingOrIncorrectType, errMsg)
 }
 
@@ -114,7 +123,7 @@ func ErrBondTokenIsTaken(codespace sdk.CodespaceType, bondToken string) sdk.Erro
 }
 
 func ErrBondDoesNotAllowSelling(codespace sdk.CodespaceType) sdk.Error {
-	errMsg := "Bond does not allow selling."
+	errMsg := "Bond does not allow selling at the moment."
 	return sdk.NewError(codespace, CodeBondDoesNotAllowSelling, errMsg)
 }
 
@@ -133,6 +142,11 @@ func ErrDuplicateReserveToken(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidBond, errMsg)
 }
 
+func ErrInvalidStateForAction(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := "Cannot perform that action at the current state"
+	return sdk.NewError(codespace, CodeInvalidState, errMsg)
+}
+
 func ErrUnrecognizedFunctionType(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Unrecognized function type"
 	return sdk.NewError(codespace, CodeUnrecognizedFunctionType, errMsg)
@@ -146,6 +160,11 @@ func ErrInvalidFunctionParameter(codespace sdk.CodespaceType, parameter string) 
 func ErrFunctionNotAvailableForFunctionType(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Function is not available for the function type"
 	return sdk.NewError(codespace, CodeFunctionNotAvailableForFunctionType, errMsg)
+}
+
+func ErrCannotMakeZeroOutcomePayment(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := "Cannot make outcome payment because outcome payment is set to nil"
+	return sdk.NewError(codespace, CodeActionInvalid, errMsg)
 }
 
 func ErrFunctionRequiresNonZeroCurrentSupply(codespace sdk.CodespaceType) sdk.Error {
@@ -215,7 +234,7 @@ func ErrSwapAmountCausesReserveDepletion(codespace sdk.CodespaceType, fromToken,
 
 func ErrOrderQuantityLimitExceeded(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Order quantity limits exceeded"
-	return sdk.NewError(codespace, CodeOrderLimitExceeded, errMsg)
+	return sdk.NewError(codespace, CodeOrderQuantityLimitExceeded, errMsg)
 }
 
 func ErrValuesViolateSanityRate(codespace sdk.CodespaceType) sdk.Error {
@@ -226,4 +245,14 @@ func ErrValuesViolateSanityRate(codespace sdk.CodespaceType) sdk.Error {
 func ErrFeesCannotBeOrExceed100Percent(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Sum of fees is or exceeds 100 percent"
 	return sdk.NewError(codespace, CodeFeeTooLarge, errMsg)
+}
+
+func ErrNoBondTokensOwned(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := "No bond tokens of this bond are owned"
+	return sdk.NewError(codespace, CodeNoBondTokensOwned, errMsg)
+}
+
+func ErrInsufficientReserveToBuy(codespace sdk.CodespaceType) sdk.Error {
+	errMsg := "Insufficient reserve was supplied to perform buy order"
+	return sdk.NewError(codespace, CodeInsufficientReserveToBuy, errMsg)
 }

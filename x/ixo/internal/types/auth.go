@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
@@ -18,6 +19,7 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/multisig"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"os"
 )
 
@@ -429,4 +431,43 @@ func MakeSignature(signBytes []byte,
 		PubKey:    privateKey.PubKey(),
 		Signature: sig,
 	}, nil
+}
+
+// Identical to DefaultSigVerificationGasConsumer, but with ed25519 allowed
+func IxoSigVerificationGasConsumer(
+	meter sdk.GasMeter, sig []byte, pubkey crypto.PubKey, params auth.Params,
+) sdk.Result {
+	switch pubkey := pubkey.(type) {
+	case ed25519tm.PubKeyEd25519:
+		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
+		return sdk.Result{}
+
+	case secp256k1.PubKeySecp256k1:
+		meter.ConsumeGas(params.SigVerifyCostSecp256k1, "ante verify: secp256k1")
+		return sdk.Result{}
+
+	case multisig.PubKeyMultisigThreshold:
+		var multisignature multisig.Multisignature
+		codec.Cdc.MustUnmarshalBinaryBare(sig, &multisignature)
+
+		consumeMultisignatureVerificationGas(meter, multisignature, pubkey, params)
+		return sdk.Result{}
+
+	default:
+		return sdk.ErrInvalidPubKey(fmt.Sprintf("unrecognized public key type: %T", pubkey)).Result()
+	}
+}
+
+func consumeMultisignatureVerificationGas(meter sdk.GasMeter,
+	sig multisig.Multisignature, pubkey multisig.PubKeyMultisigThreshold,
+	params auth.Params) {
+
+	size := sig.BitArray.Size()
+	sigIndex := 0
+	for i := 0; i < size; i++ {
+		if sig.BitArray.GetIndex(i) {
+			IxoSigVerificationGasConsumer(meter, sig.Sigs[sigIndex], pubkey.PubKeys[i], params)
+			sigIndex++
+		}
+	}
 }

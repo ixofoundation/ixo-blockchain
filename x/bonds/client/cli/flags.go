@@ -21,6 +21,7 @@ const (
 	FlagSanityMarginPercentage = "sanity-margin-percentage"
 	FlagAllowSells             = "allow-sells"
 	FlagBatchBlocks            = "batch-blocks"
+	FlagOutcomePayment         = "outcome-payment"
 	FlagBondDid                = "bond-did"
 	FlagCreatorDid             = "creator-did"
 	FlagEditorDid              = "editor-did"
@@ -48,8 +49,9 @@ func init() {
 	fsBondCreate.String(FlagOrderQuantityLimits, "", "The max number of tokens bought/sold/swapped per order")
 	fsBondCreate.String(FlagSanityRate, "", "For swappers, this is the typical t1 per t2 rate")
 	fsBondCreate.String(FlagSanityMarginPercentage, "", "For swappers, this is the acceptable deviation from the sanity rate")
-	fsBondCreate.String(FlagAllowSells, "", "Whether or not sells will be allowed")
+	fsBondCreate.Bool(FlagAllowSells, false, "Whether or not sells will be allowed")
 	fsBondCreate.String(FlagBatchBlocks, "", "The duration in terms of blocks of each orders batch")
+	fsBondCreate.String(FlagOutcomePayment, "", "The payment that would be required to transition the bond to settlement")
 	fsBondCreate.String(FlagBondDid, "", "Bond's DID")
 	fsBondCreate.String(FlagCreatorDid, "", "Bond creator's DID")
 

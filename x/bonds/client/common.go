@@ -30,11 +30,11 @@ func paramsListToMap(paramValuePairs []string) (paramsFieldMap map[string]string
 
 func paramsMapToObj(paramsFieldMap map[string]string) (functionParams types.FunctionParams, err sdk.Error) {
 	for p, v := range paramsFieldMap {
-		vInt, ok := sdk.NewIntFromString(v)
-		if !ok {
-			return nil, types.ErrArgumentMissingOrNonInteger(types.DefaultCodespace, p)
+		vDec, err := sdk.NewDecFromStr(v)
+		if err != nil {
+			return nil, types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, p)
 		} else {
-			functionParams = append(functionParams, types.NewFunctionParam(p, vInt))
+			functionParams = append(functionParams, types.NewFunctionParam(p, vDec))
 		}
 	}
 	return functionParams, nil
@@ -50,7 +50,7 @@ func ParseFunctionParams(fnParamsStr string) (fnParams types.FunctionParams, err
 		return nil, err
 	}
 
-	// Parse parameters into integers
+	// Parse parameters into floats
 	functionParams, err := paramsMapToObj(paramsFieldMap)
 	if err != nil {
 		return nil, err
