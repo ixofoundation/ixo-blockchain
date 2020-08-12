@@ -30,7 +30,7 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(
-				senderDid, json.RawMessage(projectDataStr), ixoDid)
+				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
 			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectFee)
 
 			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)
@@ -76,7 +76,7 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid)
+			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
@@ -111,7 +111,7 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid)
+			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
@@ -148,7 +148,7 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid)
+			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
@@ -176,7 +176,7 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid)
+			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
@@ -211,7 +211,7 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid)
+			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
