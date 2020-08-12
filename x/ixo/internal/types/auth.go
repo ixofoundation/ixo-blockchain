@@ -368,41 +368,6 @@ func CompleteAndBroadcastTxCLI(txBldr auth.TxBuilder, cliCtx context.CLIContext,
 	return cliCtx.PrintOutput(res)
 }
 
-func CompleteAndBroadcastTxRest(cliCtx context.CLIContext, msg sdk.Msg,
-	ixoDid exported.IxoDid) (sdk.TxResponse, error) {
-
-	// TODO: implement using txBldr or just remove function completely (ref: #123)
-
-	// Construct dummy tx and approximate and set fee
-	tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, nil, "")
-	chainId := viper.GetString(flags.FlagChainID)
-	fee, err := ApproximateFeeForTx(cliCtx, tx, chainId)
-	if err != nil {
-		return sdk.TxResponse{}, err
-	}
-
-	// Construct sign message
-	stdSignMsg := auth.StdSignMsg{
-		Fee:  fee,
-		Msgs: []sdk.Msg{msg},
-		Memo: "",
-	}
-
-	// sign the transaction
-	txBytes, err := Sign(cliCtx, stdSignMsg, ixoDid)
-	if err != nil {
-		return sdk.TxResponse{}, err
-	}
-
-	// broadcast to a Tendermint node
-	res, err := cliCtx.BroadcastTx(txBytes)
-	if err != nil {
-		return sdk.TxResponse{}, err
-	}
-
-	return res, nil
-}
-
 func SignAndBroadcastTxFromStdSignMsg(cliCtx context.CLIContext,
 	msg auth.StdSignMsg, ixoDid exported.IxoDid) (sdk.TxResponse, error) {
 
