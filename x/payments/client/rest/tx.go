@@ -50,7 +50,6 @@ type CreatePaymentTemplateReq struct {
 func addPaymentTemplateHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreatePaymentTemplateReq
-
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgCreatePaymentTemplate(req.PaymentTemplate, req.CreatorDid)
 		if err := msg.ValidateBasic(); err != nil {
@@ -73,7 +72,6 @@ type CreatePaymentContractReq struct {
 
 func addPaymentContractHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req CreatePaymentContractReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgCreatePaymentContract(req.PaymentTemplateId, req.PaymentContractId,
@@ -93,7 +91,6 @@ type CreateSubscriptionReq struct {
 
 func addSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req CreateSubscriptionReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgCreateSubscription(req.SubscriptionId, req.PaymentContractId,
@@ -129,7 +126,6 @@ type GrantDiscountReq struct {
 
 func grantDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req GrantDiscountReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgGrantDiscount(req.PaymentContractId, req.DiscountId,
@@ -147,7 +143,6 @@ type RevokeDiscountReq struct {
 
 func revokeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req RevokeDiscountReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgRevokeDiscount(req.PaymentContractId, req.Holder, req.SenderDid)
@@ -163,7 +158,6 @@ type EffectPaymentReq struct {
 
 func effectPaymentHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req EffectPaymentReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgEffectPayment(req.PaymentContractId, req.SenderDid)

@@ -28,7 +28,6 @@ type SendReq struct {
 
 func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req SendReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgSend(req.ToDidOrAddr, req.Amount, req.FromDid)
@@ -51,7 +50,6 @@ type OracleTransferReq struct {
 
 func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req OracleTransferReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgOracleTransfer(req.FromDid, req.ToDidOrAddr, req.Amount, req.OracleDid, req.Proof)
@@ -73,7 +71,6 @@ type OracleMintReq struct {
 
 func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req OracleMintReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgOracleMint(

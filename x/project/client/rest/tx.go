@@ -34,7 +34,6 @@ type CreateProjectReq struct {
 
 func addProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req CreateProjectReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
@@ -89,7 +88,6 @@ type CreateAgentReq struct {
 
 func addAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req CreateAgentReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
@@ -170,7 +168,6 @@ type WithdrawFundsReq struct {
 
 func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var req WithdrawFundsReq
 		req.BaseReq = req.BaseReq.Sanitize()
 		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data)
