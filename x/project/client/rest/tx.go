@@ -18,6 +18,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/project/project", createProjectRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/project/update_project_status", updateProjectStatusRequestHandler(cliCtx)).Methods("PUT")
 	r.HandleFunc("/project/create_agent", createAgentRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/update_agent", updateAgentRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/project/create_claim", createClaimRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/project/create_evaluation", createEvaluationRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/project/withdraw_funds", withdrawFundsRequestHandler(cliCtx)).Methods("POST")
@@ -115,6 +116,39 @@ func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, ProjectDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
+
+type UpdateAgentReq struct {
+	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
+	TxHash     string               `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	Data       types.UpdateAgentDoc `json:"data" yaml:"data"`
+}
+
+func updateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req UpdateAgentReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
