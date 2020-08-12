@@ -115,3 +115,24 @@ The bonds module emits the following events:
 | message | module        | bonds           |
 | message | action        | swap            |
 | message | sender        | {senderAddress} |
+
+### MsgMakeOutcomePayment
+
+| Type                 | Attribute Key | Attribute Value      |
+|----------------------|---------------|----------------------|
+| make_outcome_payment | bond          | {token}              |
+| make_outcome_payment | address       | {senderAddress}      |
+| message              | module        | bonds                |
+| message              | action        | make_outcome_payment |
+| message              | sender        | {senderAddress}      |
+
+### MsgWithdrawShare
+
+| Type           | Attribute Key | Attribute Value    |
+|----------------|---------------|--------------------|
+| withdraw_share | bond          | {token}            |
+| withdraw_share | address       | {recipientAddress} |
+| withdraw_share | amount        | {reserveOwed}      |
+| message        | module        | bonds              |
+| message        | action        | withdraw_share     |
+| message        | sender        | {recipientAddress} |

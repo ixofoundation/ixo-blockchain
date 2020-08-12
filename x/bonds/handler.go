@@ -529,7 +529,7 @@ func handleMsgMakeOutcomePayment(ctx sdk.Context, keeper keeper.Keeper, msg type
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeOutcomePayment,
+			types.EventTypeMakeOutcomePayment,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(types.AttributeKeyAddress, senderAddr.String()),
 		),

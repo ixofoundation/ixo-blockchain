@@ -1,17 +1,17 @@
 package types
 
 const (
-	EventTypeCreateBond     = "create_bond"
-	EventTypeEditBond       = "edit_bond"
-	EventTypeInitSwapper    = "init_swapper"
-	EventTypeBuy            = "buy"
-	EventTypeSell           = "sell"
-	EventTypeSwap           = "swap"
-	EventTypeOutcomePayment = "outcome_payment"
-	EventTypeWithdrawShare  = "withdraw_share"
-	EventTypeOrderCancel    = "order_cancel"
-	EventTypeOrderFulfill   = "order_fulfill"
-	EventTypeStateChange    = "state_change"
+	EventTypeCreateBond         = "create_bond"
+	EventTypeEditBond           = "edit_bond"
+	EventTypeInitSwapper        = "init_swapper"
+	EventTypeBuy                = "buy"
+	EventTypeSell               = "sell"
+	EventTypeSwap               = "swap"
+	EventTypeMakeOutcomePayment = "make_outcome_payment"
+	EventTypeWithdrawShare      = "withdraw_share"
+	EventTypeOrderCancel        = "order_cancel"
+	EventTypeOrderFulfill       = "order_fulfill"
+	EventTypeStateChange        = "state_change"
 
 	AttributeKeyBondDid                = "bond_did"
 	AttributeKeyToken                  = "token"
