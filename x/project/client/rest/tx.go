@@ -24,7 +24,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/project/withdraw_funds", withdrawFundsRequestHandler(cliCtx)).Methods("POST")
 }
 
-type CreateProjectReq struct {
+type createProjectReq struct {
 	BaseReq    rest.BaseReq    `json:"base_req" yaml:"base_req"`
 	TxHash     string          `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
@@ -35,30 +35,27 @@ type CreateProjectReq struct {
 
 func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req CreateProjectReq
+		var req createProjectReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
-		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, ProjectDid)
+
+		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type UpdateProjectStatusReq struct {
+type updateProjectStatusReq struct {
 	BaseReq    rest.BaseReq                 `json:"base_req" yaml:"base_req"`
 	TxHash     string                       `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did                      `json:"senderDid" yaml:"senderDid"`
@@ -68,30 +65,27 @@ type UpdateProjectStatusReq struct {
 
 func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req UpdateProjectStatusReq
+		var req updateProjectStatusReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
-		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, ProjectDid)
+
+		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type CreateAgentReq struct {
+type createAgentReq struct {
 	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
 	TxHash     string               `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
@@ -101,30 +95,27 @@ type CreateAgentReq struct {
 
 func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req CreateAgentReq
+		var req createAgentReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
-		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, ProjectDid)
+
+		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type UpdateAgentReq struct {
+type updateAgentReq struct {
 	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
 	TxHash     string               `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
@@ -134,30 +125,27 @@ type UpdateAgentReq struct {
 
 func updateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req UpdateAgentReq
+		var req updateAgentReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
-		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, ProjectDid)
+
+		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type CreateClaimReq struct {
+type createClaimReq struct {
 	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
 	TxHash     string               `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
@@ -167,31 +155,28 @@ type CreateClaimReq struct {
 
 func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req CreateClaimReq
+		var req createClaimReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
-		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, ProjectDid)
+
+		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 
 	}
 }
 
-type CreateEvaluationReq struct {
+type createEvaluationReq struct {
 	BaseReq    rest.BaseReq              `json:"base_req" yaml:"base_req"`
 	TxHash     string                    `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did                   `json:"senderDid" yaml:"senderDid"`
@@ -201,30 +186,27 @@ type CreateEvaluationReq struct {
 
 func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req CreateEvaluationReq
+		var req createEvaluationReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
-		ProjectDid, err := did.UnmarshalIxoDid(req.ProjectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, ProjectDid)
+
+		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type WithdrawFundsReq struct {
+type withdrawFundsReq struct {
 	BaseReq   rest.BaseReq           `json:"base_req" yaml:"base_req"`
 	SenderDid did.Did                `json:"senderDid" yaml:"senderDid"`
 	Data      types.WithdrawFundsDoc `json:"data" yaml:"data"`
@@ -232,19 +214,22 @@ type WithdrawFundsReq struct {
 
 func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req WithdrawFundsReq
+		var req withdrawFundsReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
+
 		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }

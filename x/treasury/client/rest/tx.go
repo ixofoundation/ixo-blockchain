@@ -19,7 +19,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/treasury/oracle_burn", oracleBurnRequestHandler(cliCtx)).Methods("POST")
 }
 
-type SendReq struct {
+type sendReq struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
 	FromDid     did.Did      `json:"from_did" yaml:"from_did"`
 	ToDidOrAddr did.Did      `json:"to_did" yaml:"to_did"`
@@ -28,24 +28,27 @@ type SendReq struct {
 
 func sendRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req SendReq
+		var req sendReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
+
 		msg := types.NewMsgSend(req.ToDidOrAddr, req.Amount, req.FromDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type OracleTransferReq struct {
+type oracleTransferReq struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
 	OracleDid   did.Did      `json:"oracle_did" yaml:"oracle_did"`
 	FromDid     did.Did      `json:"from_did" yaml:"from_did"`
@@ -56,24 +59,27 @@ type OracleTransferReq struct {
 
 func oracleTransferRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req OracleTransferReq
+		var req oracleTransferReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
+
 		msg := types.NewMsgOracleTransfer(req.FromDid, req.ToDidOrAddr, req.Amount, req.OracleDid, req.Proof)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type OracleMintReq struct {
+type oracleMintReq struct {
 	BaseReq     rest.BaseReq `json:"base_req" yaml:"base_req"`
 	OracleDid   did.Did      `json:"oracle_did" yaml:"oracle_did"`
 	ToDidOrAddr did.Did      `json:"to_did" yaml:"to_did"`
@@ -83,25 +89,28 @@ type OracleMintReq struct {
 
 func oracleMintRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req OracleMintReq
+		var req oracleMintReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
+
 		msg := types.NewMsgOracleMint(
 			req.ToDidOrAddr, req.Amount, req.OracleDid, req.Proof)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-type OracleBurnReq struct {
+type oracleBurnReq struct {
 	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
 	OracleDid did.Did      `json:"oracle_did" yaml:"oracle_did"`
 	FromDid   did.Did      `json:"from_did" yaml:"from_did"`
@@ -111,19 +120,22 @@ type OracleBurnReq struct {
 
 func oracleBurnRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req OracleBurnReq
+		var req oracleBurnReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
+
 		req.BaseReq = req.BaseReq.Sanitize()
 		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
+
 		msg := types.NewMsgOracleBurn(req.FromDid, req.Amount, req.OracleDid, req.Proof)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
+
 		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
