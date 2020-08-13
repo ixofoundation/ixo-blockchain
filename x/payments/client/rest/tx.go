@@ -1,339 +1,233 @@
 package rest
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"net/http"
-	"strings"
-
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
+	"net/http"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/payments/createPaymentTemplate", createPaymentTemplateHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/createPaymentContract", createPaymentContractHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/createSubscription", createSubscriptionHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/setPaymentContractAuthorisation", setPaymentContractAuthorisationHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/grantDiscount", grantDiscountHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/revokeDiscount", revokeDiscountHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/payments/effectPayment", effectPaymentHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/create_payment_template", createPaymentTemplateRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/create_payment_contract", createPaymentContractRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/create_subscription", createSubscriptionRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/set_payment_contract_authorisation", setPaymentContractAuthorisationRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/grant_discount", grantDiscountRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/revoke_discount", revokeDiscountRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/payments/effect_payment", effectPaymentRequestHandler(cliCtx)).Methods("POST")
 }
 
-const (
-	TRUE  = "true"
-	FALSE = "false"
-)
+type createPaymentTemplateReq struct {
+	BaseReq         rest.BaseReq          `json:"base_req" yaml:"base_req"`
+	CreatorDid      did.Did               `json:"creator_did" yaml:"creator_did"`
+	PaymentTemplate types.PaymentTemplate `json:"payment_template" yaml:"payment_template"`
+}
 
-func parseBool(boolStr, boolName string) (bool, error) {
-	boolStr = strings.ToLower(strings.TrimSpace(boolStr))
-	if boolStr == TRUE {
-		return true, nil
-	} else if boolStr == FALSE {
-		return false, nil
-	} else {
-		return false, types.ErrInvalidArgument(types.DefaultCodespace, ""+
-			fmt.Sprintf("%s is not a valid bool (true/false)", boolName))
+func createPaymentTemplateRequestHandler(ctx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req createPaymentTemplateReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		msg := types.NewMsgCreatePaymentTemplate(req.PaymentTemplate, req.CreatorDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func createPaymentTemplateHandler(ctx context.CLIContext) http.HandlerFunc {
+type createPaymentContractReq struct {
+	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
+	CreatorDid        did.Did        `json:"creator_did" yaml:"creator_did"`
+	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
+	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
+	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
+	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
+	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+}
+
+func createPaymentContractRequestHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		templateJsonParam := r.URL.Query().Get("paymentTemplateJson")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		var template types.PaymentTemplate
-		err := ctx.Codec.UnmarshalJSON([]byte(templateJsonParam), &template)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req createPaymentContractReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
 			return
 		}
 
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgCreatePaymentContract(req.PaymentTemplateId, req.PaymentContractId,
+			req.Payer, req.CanDeauthorise, req.DiscountId, req.CreatorDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, ctx, output)
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func createPaymentContractHandler(ctx context.CLIContext) http.HandlerFunc {
+type createSubscriptionReq struct {
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
+	CreatorDid        did.Did      `json:"creator_did" yaml:"creator_did"`
+	SubscriptionId    string       `json:"subscription_id" yaml:"subscription_id"`
+	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
+	MaxPeriods        sdk.Uint     `json:"max_periods" yaml:"max_periods"`
+	Period            types.Period `json:"period" yaml:"period"`
+}
+
+func createSubscriptionRequestHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		contractIdParam := r.URL.Query().Get("paymentContractId")
-		templateIdParam := r.URL.Query().Get("paymentTemplateId")
-		payerAddrParam := r.URL.Query().Get("payerAddr")
-		canDeauthoriseParam := r.URL.Query().Get("canDeauthorise")
-		discountIdParam := r.URL.Query().Get("discountId")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		payerAddr, err := sdk.AccAddressFromBech32(payerAddrParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req createSubscriptionReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
 			return
 		}
 
-		canDeauthorise, err := parseBool(canDeauthoriseParam, "canDeauthorise")
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		discountId, err := sdk.ParseUint(discountIdParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgCreateSubscription(req.SubscriptionId, req.PaymentContractId,
+			req.MaxPeriods, req.Period, req.CreatorDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		msg := types.NewMsgCreatePaymentContract(templateIdParam, contractIdParam,
-			payerAddr, canDeauthorise, discountId, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, ctx, output)
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func createSubscriptionHandler(ctx context.CLIContext) http.HandlerFunc {
+type setPaymentContractAuthorisationReq struct {
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
+	PayerDid          did.Did      `json:"payer_did" yaml:"payer_did"`
+	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
+	Authorised        bool         `json:"authorised" yaml:"authorised"`
+}
+
+func setPaymentContractAuthorisationRequestHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		subIdParam := r.URL.Query().Get("subId")
-		contractIdParam := r.URL.Query().Get("paymentContractId")
-		maxPeriodsParam := r.URL.Query().Get("maxPeriods")
-		periodParam := r.URL.Query().Get("period")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		maxPeriods, err := sdk.ParseUint(maxPeriodsParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req setPaymentContractAuthorisationReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
 			return
 		}
 
-		var period types.Period
-		err = ctx.Codec.UnmarshalJSON([]byte(periodParam), &period)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgSetPaymentContractAuthorisation(req.PaymentContractId,
+			req.Authorised, req.PayerDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgCreateSubscription(subIdParam, contractIdParam,
-			maxPeriods, period, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, ctx, output)
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func setPaymentContractAuthorisationHandler(ctx context.CLIContext) http.HandlerFunc {
+type grantDiscountReq struct {
+	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
+	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
+	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
+}
+
+func grantDiscountRequestHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		contractIdParam := r.URL.Query().Get("paymentContractId")
-		authorisedParam := r.URL.Query().Get("authorised")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		authorised, err := parseBool(authorisedParam, "authorised")
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req grantDiscountReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
 			return
 		}
 
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		msg := types.NewMsgSetPaymentContractAuthorisation(contractIdParam,
-			authorised, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgGrantDiscount(req.PaymentContractId, req.DiscountId,
+			req.Recipient, req.SenderDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, ctx, output)
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func grantDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
+type revokeDiscountReq struct {
+	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
+	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
+	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
+}
+
+func revokeDiscountRequestHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		contractIdParam := r.URL.Query().Get("paymentContractId")
-		discountIdParam := r.URL.Query().Get("discountId")
-		recipientAddrParam := r.URL.Query().Get("recipientAddr")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		discountId, err := sdk.ParseUint(discountIdParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req revokeDiscountReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
 			return
 		}
 
-		recipientAddr, err := sdk.AccAddressFromBech32(recipientAddrParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgRevokeDiscount(req.PaymentContractId, req.Holder, req.SenderDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgGrantDiscount(contractIdParam, discountId,
-			recipientAddr, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, ctx, output)
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
-func revokeDiscountHandler(ctx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		contractIdParam := r.URL.Query().Get("paymentContractId")
-		holderAddrParam := r.URL.Query().Get("holderAddr")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		holderAddr, err := sdk.AccAddressFromBech32(holderAddrParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		msg := types.NewMsgRevokeDiscount(contractIdParam, holderAddr, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, ctx, output)
-	}
+type effectPaymentReq struct {
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
+	SenderDid         did.Did      `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
 }
 
-func effectPaymentHandler(ctx context.CLIContext) http.HandlerFunc {
+func effectPaymentRequestHandler(ctx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		contractIdParam := r.URL.Query().Get("paymentContractId")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-
-		mode := r.URL.Query().Get("mode")
-		ctx = ctx.WithBroadcastMode(mode)
-
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req effectPaymentReq
+		if !rest.ReadRESTReq(w, r, ctx.Codec, &req) {
 			return
 		}
 
-		msg := types.NewMsgEffectPayment(contractIdParam, ixoDid.Did)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(ctx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		rest.PostProcessResponse(w, ctx, output)
+		msg := types.NewMsgEffectPayment(req.PaymentContractId, req.SenderDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, ctx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
