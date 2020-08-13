@@ -59,7 +59,7 @@ ixocli tx bonds create-bond \
   --order-quantity-limits="10abc,5000res,5000rez" \
   --sanity-rate="0.5" \
   --sanity-margin-percentage="20" \
-  --allow-sells=true \
+  --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \

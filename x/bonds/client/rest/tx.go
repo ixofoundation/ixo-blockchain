@@ -4,41 +4,22 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-
 	"net/http"
 	"strings"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc(
-		"/bonds/create_bond",
-		createBondHandler(cliCtx),
-	).Methods("POST")
-
-	r.HandleFunc(
-		"/bonds/edit_bond",
-		editBondHandler(cliCtx),
-	).Methods("POST")
-
-	r.HandleFunc(
-		"/bonds/buy",
-		buyHandler(cliCtx),
-	).Methods("POST")
-
-	r.HandleFunc(
-		"/bonds/sell",
-		sellHandler(cliCtx),
-	).Methods("POST")
-
-	r.HandleFunc(
-		"/bonds/swap",
-		swapHandler(cliCtx),
-	).Methods("POST")
+	r.HandleFunc("/bonds/create_bond", createBondRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/edit_bond", editBondRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/buy", buyRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/sell", sellRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/swap", swapRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/make_outcome_payment", makeOutcomePaymentRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/withdraw_share", withdrawShareRequestHandler(cliCtx)).Methods("POST")
 }
 
 type createBondReq struct {
@@ -58,16 +39,15 @@ type createBondReq struct {
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
+	OutcomePayment         string       `json:"outcome_payment" yaml:"outcome_payment"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 	CreatorDid             string       `json:"creator_did" yaml:"creator_did"`
 }
 
-func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createBondReq
-
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
 
@@ -137,6 +117,19 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Parse allowSells
+		var allowSells bool
+		allowSellsStrLower := strings.ToLower(req.AllowSells)
+		if allowSellsStrLower == "true" {
+			allowSells = true
+		} else if allowSellsStrLower == "false" {
+			allowSells = false
+		} else {
+			err := types.ErrArgumentMissingOrNonBoolean(types.DefaultCodespace, "allow_sells")
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		// Parse batch blocks
 		batchBlocks, err2 := sdk.ParseUint(req.BatchBlocks)
 		if err2 != nil {
@@ -145,27 +138,24 @@ func createBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse creator's ixo DID
-		creatorDid, err2 := did.UnmarshalIxoDid(req.CreatorDid)
+		// Parse outcome payment
+		outcomePayment, err2 := sdk.ParseCoins(req.OutcomePayment)
 		if err2 != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
 			return
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			creatorDid.Did, req.FunctionType, functionParams, reserveTokens,
+			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			req.AllowSells, batchBlocks, req.BondDid)
-
-		output, err2 := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, creatorDid)
-		if err2 != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err2.Error()))
+			allowSells, batchBlocks, outcomePayment, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
@@ -181,12 +171,10 @@ type editBondReq struct {
 	EditorDid              string       `json:"editor_did" yaml:"editor_did"`
 }
 
-func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func editBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req editBondReq
-
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
 
@@ -195,25 +183,15 @@ func editBondHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse editor's ixo DID
-		editorDid, err := did.UnmarshalIxoDid(req.EditorDid)
-		if err != nil {
+		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
+			req.OrderQuantityLimits, req.SanityRate,
+			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
-			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, editorDid.Did, req.BondDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, editorDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
@@ -226,12 +204,10 @@ type buyReq struct {
 	BuyerDid   string       `json:"buyer_did" yaml:"buyer_did"`
 }
 
-func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func buyRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req buyReq
-
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
 
@@ -252,23 +228,13 @@ func buyHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse buyer's ixo DID
-		buyerDid, err := did.UnmarshalIxoDid(req.BuyerDid)
-		if err != nil {
+		msg := types.NewMsgBuy(req.BuyerDid, bondCoin, maxPrices, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgBuy(buyerDid.Did, bondCoin, maxPrices, req.BondDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, buyerDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
@@ -280,12 +246,10 @@ type sellReq struct {
 	SellerDid  string       `json:"seller_did" yaml:"seller_did"`
 }
 
-func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func sellRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req sellReq
-
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
 
@@ -300,23 +264,13 @@ func sellHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse seller's ixo DID
-		sellerDid, err := did.UnmarshalIxoDid(req.SellerDid)
-		if err != nil {
+		msg := types.NewMsgSell(req.SellerDid, bondCoin, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgSell(sellerDid.Did, bondCoin, req.BondDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, sellerDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
 
@@ -329,12 +283,10 @@ type swapReq struct {
 	SwapperDid string       `json:"swapper_did" yaml:"swapper_did"`
 }
 
-func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func swapRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req swapReq
-
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
 
@@ -350,23 +302,68 @@ func swapHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// Parse swapper's ixo DID
-		swapperDid, err := did.UnmarshalIxoDid(req.SwapperDid)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgSwap(req.SwapperDid, fromCoin, req.ToToken, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		msg := types.NewMsgSwap(swapperDid.Did, fromCoin, req.ToToken, req.BondDid)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
 
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, swapperDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+type makeOutcomePaymentReq struct {
+	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+	SenderDid string       `json:"sender_did" yaml:"sender_did"`
+}
+
+func makeOutcomePaymentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req makeOutcomePaymentReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
+
+type withdrawShareReq struct {
+	BaseReq      rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid      string       `json:"bond_did" yaml:"bond_did"`
+	RecipientDid string       `json:"recipient_did" yaml:"recipient_did"`
+}
+
+func withdrawShareRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req withdrawShareReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		msg := types.NewMsgWithdrawShare(req.RecipientDid, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }

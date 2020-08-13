@@ -90,7 +90,7 @@ ixocli tx bonds create-bond \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
-  --allow-sells=true \
+  --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND1_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -111,7 +111,7 @@ ixocli tx bonds create-bond \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
-  --allow-sells=true \
+  --allow-sells \
   --batch-blocks=3 \
   --bond-did="$BOND2_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -132,7 +132,7 @@ ixocli tx bonds create-bond \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
-  --allow-sells=true \
+  --allow-sells \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -153,7 +153,7 @@ ixocli tx bonds create-bond \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
-  --allow-sells=true \
+  --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND4_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

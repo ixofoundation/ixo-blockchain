@@ -4,11 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const (
-	TRUE  = "true"
-	FALSE = "false"
-)
-
 func CheckReserveTokenNames(resTokens []string, token string) sdk.Error {
 	// Check that no token is the same as the main token, no token
 	// is duplicate, and that the token is a valid denomination

@@ -8,55 +8,55 @@ import (
 )
 
 func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
-	projectDid did.IxoDid) MsgCreateProject {
+	projectDid did.Did, pubKey string) MsgCreateProject {
 	return MsgCreateProject{
 		TxHash:     "",
 		SenderDid:  senderDid,
-		ProjectDid: projectDid.Did,
-		PubKey:     projectDid.VerifyKey,
+		ProjectDid: projectDid,
+		PubKey:     pubKey,
 		Data:       projectData,
 	}
 }
 
-func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.IxoDid) MsgUpdateProjectStatus {
+func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.Did) MsgUpdateProjectStatus {
 	return MsgUpdateProjectStatus{
 		TxHash:     "",
 		SenderDid:  senderDid,
-		ProjectDid: projectDid.Did,
+		ProjectDid: projectDid,
 		Data:       updateProjectStatusDoc,
 	}
 }
 
-func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.IxoDid) MsgCreateAgent {
+func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.Did) MsgCreateAgent {
 	return MsgCreateAgent{
-		ProjectDid: projectDid.Did,
+		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
 		Data:       createAgentDoc,
 	}
 }
 
-func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.IxoDid) MsgUpdateAgent {
+func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.Did) MsgUpdateAgent {
 	return MsgUpdateAgent{
-		ProjectDid: projectDid.Did,
+		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
 		Data:       updateAgentDoc,
 	}
 }
 
-func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.IxoDid) MsgCreateClaim {
+func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.Did) MsgCreateClaim {
 	return MsgCreateClaim{
-		ProjectDid: projectDid.Did,
+		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
 		Data:       createClaimDoc,
 	}
 }
 
-func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.IxoDid) MsgCreateEvaluation {
+func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.Did) MsgCreateEvaluation {
 	return MsgCreateEvaluation{
-		ProjectDid: projectDid.Did,
+		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
 		Data:       createEvaluationDoc,
