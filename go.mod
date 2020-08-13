@@ -4,13 +4,14 @@ go 1.12
 
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
-	github.com/btcsuite/btcutil v0.0.0-20180706230648-ab6388e0c60a
+	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
 	github.com/cosmos/cosmos-sdk v0.37.0 // latest
-	github.com/cosmos/go-bip39 v0.0.0-20180618194314-52158e4697b8
+	github.com/cosmos/gaia v1.0.0
+	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
 	github.com/gorilla/mux v1.7.3
-	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/onsi/ginkgo v1.9.0 // indirect
 	github.com/onsi/gomega v1.6.0 // indirect
+	github.com/otiai10/copy v1.2.0
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
