@@ -106,7 +106,7 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		ak.SetAccount(ctx, signerAcc)
 
 		// check signature, return account with incremented nonce
-		ixoSig := stdTx.GetSignatures()[0]
+		ixoSig := auth.StdSignature{PubKey: didPubKey, Signature: stdTx.GetSignatures()[0].Signature[:]}
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getAddDidSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
 		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
