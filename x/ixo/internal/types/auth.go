@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/cosmos-sdk/x/supply"
@@ -39,19 +40,19 @@ func init() {
 	copy(simEd25519Pubkey[:], bz)
 }
 
-type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, sdk.Result)
+type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
 
 func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
-	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
+	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, res error) {
 
 		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
 		if err != nil {
-			return pubKey, err.Result()
+			return pubKey, err
 		}
 
 		var pubKeyRaw ed25519tm.PubKeyEd25519
 		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
-		return pubKeyRaw, sdk.Result{}
+		return pubKeyRaw, nil
 	}
 }
 
@@ -75,7 +76,7 @@ func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdS
 
 func ProcessSig(
 	ctx sdk.Context, acc auth.Account, sig auth.StdSignature, signBytes []byte, simulate bool, params auth.Params,
-) (updatedAcc auth.Account, res sdk.Result) {
+) (updatedAcc auth.Account, res error) {
 
 	pubKey, res := auth.ProcessPubKey(acc, sig, simulate)
 	if !res.IsOK() {

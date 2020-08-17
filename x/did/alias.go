@@ -13,8 +13,6 @@ const (
 	StoreKey     = types.StoreKey
 
 	TypeMsgAddDid = types.TypeMsgAddDid
-
-	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

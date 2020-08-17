@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res error) {
 
 		// Get signer PubKey
 		var pubKeyEd25519 ed25519.PubKeyEd25519
@@ -23,15 +26,16 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 			// For the remaining messages, the did is the signer
 			didDoc, _ := keeper.GetDidDoc(ctx, msg.GetSignerDid())
 			if didDoc == nil {
-				return pubKey, sdk.ErrUnauthorized("Issuer did not found").Result()
+				return pubKey, sdkerrors.Wrap(types.ErrUnauthorized, "Issuer did not found")
+
 			}
 			copy(pubKeyEd25519[:], base58.Decode(didDoc.GetPubKey()))
 		}
-		return pubKeyEd25519, sdk.Result{}
+		return pubKeyEd25519, nil
 	}
 }
 
-func getAddDidSignBytes(chainID string, tx auth.StdTx, acc auth.Account, genesis bool) []byte {
+func getAddDidSignBytes(chainID string, tx auth.StdTx, genesis bool, acc exported.Account) []byte {
 	var accNum uint64
 	if !genesis {
 		// Fixed account number used so that sign bytes do not depend on it
@@ -47,7 +51,7 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res sdk.Result, abort bool) {
+	) (newCtx sdk.Context, res error, abort bool) {
 
 		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
 			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
@@ -59,7 +63,7 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 			// during runTx.
 			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdk.ErrInternal("tx must be auth.StdTx").Result(), true
+			return newCtx, sdkerrors.Wrap(types.ErrInternal, "tx must be auth.StdTx"), true
 		}
 
 		params := ak.GetParams(ctx)
@@ -68,37 +72,37 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
 		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err.Result(), true
+			return newCtx, err, true
 		}
 
 		// Number of messages in the tx must be 1
 		if len(tx.GetMsgs()) != 1 {
-			return ctx, sdk.ErrInternal("number of messages must be 1").Result(), true
+			return ctx, sdkerrors.Wrap(types.ErrInternal, "number of messages must be 1"), true
 		}
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
-			return newCtx, res, true
-		}
+		//if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
+		//	return newCtx, res, true
+		//}
 
 		// message must be of type MsgAddDid
 		msg, ok := stdTx.GetMsgs()[0].(MsgAddDid)
 		if !ok {
-			return newCtx, sdk.ErrInternal("msg must be MsgCreateProject").Result(), true
+			return newCtx, sdkerrors.Wrap(types.ErrInternal, "msg must be MsgCreateProject"), true
 		}
 
 		// Get did pubKey
 		didPubKey, res := pubKeyGetter(ctx, msg)
-		if !res.IsOK() {
+		if res != nil {
 			return newCtx, res, true
 		}
 
 		// Fetch signer (account underlying DID ). Account expected to not exist
 		signerAddr := sdk.AccAddress(didPubKey.Address())
 		_, res = auth.GetSignerAcc(newCtx, ak, signerAddr)
-		if res.IsOK() {
-			return newCtx, sdk.ErrInternal("expected account underlying DID to not exist").Result(), true
+		if res != nil {
+			return newCtx, sdkerrors.Wrap(types.ErrInternal, "expected account underlying DID to not exist"), true
 		}
 
 		// Create signer's account
@@ -106,16 +110,18 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		ak.SetAccount(ctx, signerAcc)
 
 		// check signature, return account with incremented nonce
-		ixoSig := stdTx.GetSignatures()[0]
+		//check here
+		ixoSig := auth.StdSignature{PubKey: didPubKey, Signature: stdTx.GetSignatures()[0]}
 		isGenesis := ctx.BlockHeight() == 0
-		signBytes := getAddDidSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
+		signBytes := getAddDidSignBytes(newCtx.ChainID(), stdTx, isGenesis, signerAcc)
 		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
-		if !res.IsOK() {
+		if res != nil {
 			return newCtx, res, true
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
-
-		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
+		//
+		return newCtx, sdkerrors.ErrOutOfGas, false // continue...
+		//return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
 	}
 }
