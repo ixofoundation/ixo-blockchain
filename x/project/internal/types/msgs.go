@@ -26,6 +26,7 @@ const (
 
 	MsgCreateProjectTotalFee       = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
+	// Project funding will be totalFee - transactionFee = 990000
 )
 
 var (
