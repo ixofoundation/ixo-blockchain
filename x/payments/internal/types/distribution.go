@@ -10,7 +10,7 @@ func NewDistribution(shares ...DistributionShare) Distribution {
 	return Distribution(shares)
 }
 
-func (d Distribution) Validate() sdk.Error {
+func (d Distribution) Validate() error {
 	// Shares must add up to 100% (no shares means 0%)
 	if len(d) == 0 {
 		return ErrDistributionPercentagesNot100(DefaultCodespace, sdk.ZeroDec())

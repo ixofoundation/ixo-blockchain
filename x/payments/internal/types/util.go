@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"strings"
 )
@@ -73,9 +74,9 @@ func NewMsgEffectPayment(contractId string, creatorDid did.Did) MsgEffectPayment
 	}
 }
 
-func CheckNotEmpty(value string, name string) (valid bool, err sdk.Error) {
+func CheckNotEmpty(value string, name string) (valid bool, err error) {
 	if strings.TrimSpace(value) == "" {
-		return false, sdk.ErrUnknownRequest(name + " is empty.")
+		return false, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "name + \" is empty.\"")
 	} else {
 		return true, nil
 	}

@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -34,7 +34,7 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper bank.Keeper,
 	}
 }
 
-func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amount sdk.Coins) sdk.Error {
+func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amount sdk.Coins) error {
 	// Get from address
 	fromDidDoc, err := k.didKeeper.GetDidDoc(ctx, fromDid)
 	if err != nil {
@@ -53,7 +53,7 @@ func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amoun
 	} else {
 		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
 		if err != nil {
-			return sdk.ErrInternal(err.Error())
+			return sdkerrors.Wrap(types.ErrInternal, "send amount is invalid")
 		}
 		toAddress = parsedAddr
 	}
@@ -67,26 +67,25 @@ func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amoun
 }
 
 func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid did.Did,
-	toDidOrAddr string, oracleDid did.Did, amount sdk.Coins) sdk.Error {
+	toDidOrAddr string, oracleDid did.Did, amount sdk.Coins) error {
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
-		return sdk.ErrInternal("oracle specified is not a registered oracle")
+		return sdkerrors.Wrap(types.ErrInternal, "oracle specified is not a registered oracle")
 	}
 
 	// Confirm that oracle has the required capabilities
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdk.ErrInternal(fmt.Sprintf(
-				"oracle does not have capability to send %s", c.Denom))
+			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to send")
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.TransferCap) {
-			return sdk.ErrInternal(fmt.Sprintf(
-				"oracle does not have capability to send %s", c.Denom))
+			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to send")
+
 		}
 	}
 
@@ -94,7 +93,7 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid did.Did,
 	return k.Send(ctx, fromDid, toDidOrAddr, amount)
 }
 
-func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr string, amount sdk.Coins) sdk.Error {
+func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr string, amount sdk.Coins) error {
 	// Get to address
 	var toAddress sdk.AccAddress
 	if did.IsValidDid(toDidOrAddr) {
@@ -106,29 +105,27 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr strin
 	} else {
 		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
 		if err != nil {
-			return sdk.ErrInternal(err.Error())
+			return sdkerrors.Wrap(types.ErrInternal, "")
 		}
 		toAddress = parsedAddr
 	}
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
-		return sdk.ErrInternal("oracle specified is not a registered oracle")
+		return sdkerrors.Wrap(types.ErrInternal, "oracle specified is not a registered oracle")
 	}
 
 	// Confirm that oracle has the required capabilities
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdk.ErrInternal(fmt.Sprintf(
-				"oracle does not have capability to mint %s", c.Denom))
+			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to mint")
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.MintCap) {
-			return sdk.ErrInternal(fmt.Sprintf(
-				"oracle does not have capability to mint %s", c.Denom))
+			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to mint")
 		}
 	}
 
@@ -148,7 +145,7 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr strin
 	return nil
 }
 
-func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount sdk.Coins) sdk.Error {
+func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount sdk.Coins) error {
 	// Get from address
 	fromDidDoc, err := k.didKeeper.GetDidDoc(ctx, fromDid)
 	if err != nil {
@@ -158,22 +155,20 @@ func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount s
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
-		return sdk.ErrInternal("oracle specified is not a registered oracle")
+		return sdkerrors.Wrap(types.ErrInternal, "oracle specified is not a registered oracle")
 	}
 
 	// Confirm that oracle has the required capabilities
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdk.ErrInternal(fmt.Sprintf(
-				"oracle does not have capability to burn %s", c.Denom))
+			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to burn")
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.BurnCap) {
-			return sdk.ErrInternal(fmt.Sprintf(
-				"oracle does not have capability to burn %s", c.Denom))
+			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to burn")
 		}
 	}
 

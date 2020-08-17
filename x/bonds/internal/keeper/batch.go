@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -86,7 +87,7 @@ func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid did.Did, so types.SwapOrde
 	logger.Info(fmt.Sprintf("added swap order for %s to %s from %s", so.Amount.String(), so.ToToken, so.AccountDid))
 }
 
-func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch types.Batch) (buyPricesPT, sellPricesPT sdk.DecCoins, err sdk.Error) {
+func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch types.Batch) (buyPricesPT, sellPricesPT sdk.DecCoins, err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	buyAmountDec := batch.TotalBuyAmount.Amount.ToDec()
@@ -137,7 +138,7 @@ func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch typ
 	return buyPricesPT, sellPricesPT, nil
 }
 
-func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder) (buyPrices, sellPrices sdk.DecCoins, err sdk.Error) {
+func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder) (buyPrices, sellPrices sdk.DecCoins, err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
 
@@ -145,7 +146,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 	adjustedSupply := k.GetSupplyAdjustedForBuy(ctx, bondDid)
 	adjustedSupplyWithBuy := adjustedSupply.Add(bo.Amount)
 	if bond.MaxSupply.IsLT(adjustedSupplyWithBuy) {
-		return nil, nil, types.ErrCannotMintMoreThanMaxSupply(types.DefaultCodespace)
+		return nil, nil, sdkerrors.Wrap(types.ErrCannotMintMoreThanMaxSupply, "")
 	}
 
 	// If augmented in hatch phase and adjusted supply exceeds S0, disallow buy
@@ -159,8 +160,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 		bond.State == types.HatchState {
 		args := bond.FunctionParameters.AsMap()
 		if adjustedSupplyWithBuy.Amount.ToDec().GT(args["S0"].Ceil()) {
-			return nil, nil, sdk.ErrInvalidCoins(
-				"Buy exceeds initial supply S0. Consider buying less tokens.")
+			return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "Buy exceeds initial supply S0. Consider buying less tokens.")
 		}
 	}
 
@@ -179,13 +179,13 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 	return buyPrices, sellPrices, nil
 }
 
-func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did, so types.SellOrder) (buyPrices, sellPrices sdk.DecCoins, err sdk.Error) {
+func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did, so types.SellOrder) (buyPrices, sellPrices sdk.DecCoins, err error) {
 	batch := k.MustGetBatch(ctx, bondDid)
 
 	// Cannot burn more tokens than what exists
 	adjustedSupply := k.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(so.Amount) {
-		return nil, nil, types.ErrCannotBurnMoreThanSupply(types.DefaultCodespace)
+		return nil, nil, sdkerrors.Wrap(types.ErrCannotBurnMoreThanSupply, "")
 	}
 
 	// Simulate sell by bumping up total sell amount
@@ -198,7 +198,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did,
 	return buyPrices, sellPrices, nil
 }
 
-func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) (err sdk.Error) {
+func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) (err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 	var extraEventAttributes []sdk.Attribute
 
@@ -229,7 +229,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	totalPrices := reservePricesRounded.Add(txFees)
 
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
-		return types.ErrMaxPriceExceeded(types.DefaultCodespace, totalPrices, bo.MaxPrices)
+		return sdkerrors.Wrap(types.ErrMaxPriceExceeded, "")
 	}
 
 	// Add new reserve to reserve (reservePricesRounded should never be zero)
@@ -260,7 +260,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 		toInitialReserve := newReserve.Sub(currentReserve)
 		if reservePricesRounded[0].Amount.LT(toInitialReserve) {
 			// Reserve supplied by buyer is insufficient
-			return types.ErrInsufficientReserveToBuy(types.DefaultCodespace)
+			return sdkerrors.Wrap(types.ErrInsufficientReserveToBuy, "")
 		}
 		coinsToInitialReserve, _ := bond.GetNewReserveDecCoins(
 			toInitialReserve.ToDec()).TruncateDecimal()
@@ -341,7 +341,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	return nil
 }
 
-func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.SellOrder, prices sdk.DecCoins) (err sdk.Error) {
+func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.SellOrder, prices sdk.DecCoins) (err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// Get seller address
@@ -397,7 +397,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.Se
 	return nil
 }
 
-func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder) (err sdk.Error, ok bool) {
+func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder) (err error, ok bool) {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// WARNING: do not return ok=true if money has already been transferred when error occurs
@@ -420,7 +420,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder
 	// Check if new rates violate sanity rate
 	newReserveBalances := reserveBalances.Add(sdk.Coins{adjustedInput}).Sub(reserveReturns)
 	if bond.ReservesViolateSanityRate(newReserveBalances) {
-		return types.ErrValuesViolateSanityRate(types.DefaultCodespace), true
+		return sdkerrors.Wrap(types.ErrValuesViolateSanityRate, ""), true
 	}
 
 	// Give resultant tokens to swapper (reserveReturns should never be zero)
@@ -543,7 +543,7 @@ func (k Keeper) PerformOrders(ctx sdk.Context, bondDid did.Did) {
 	k.PerformSwapOrders(ctx, bondDid)
 }
 
-func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) sdk.Error {
+func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) error {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	reservePrices := types.MultiplyDecCoinsByInt(prices, bo.Amount.Amount)
@@ -553,7 +553,7 @@ func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.D
 
 	// Check that max prices not exceeded
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
-		return types.ErrMaxPriceExceeded(types.DefaultCodespace, totalPrices, bo.MaxPrices)
+		return sdkerrors.Wrap(types.ErrMaxPriceExceeded, "")
 	}
 
 	return nil

@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res error) {
 
 		// Get signer PubKey
 		var pubKeyEd25519 ed25519.PubKeyEd25519
@@ -25,54 +27,50 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			signerDid := msg.GetSignerDid()
 			signerDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
 			if signerDoc == nil {
-				return pubKey, sdk.ErrUnauthorized("signer did not found").Result()
+				return pubKey, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "signer did not found")
 			}
 			copy(pubKeyEd25519[:], base58.Decode(signerDoc.GetPubKey()))
 		default:
 			// For the remaining messages, the project is the signer
 			projectDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
 			if err != nil {
-				return pubKey, sdk.ErrInternal("project did not found").Result()
+				return pubKey, sdkerrors.Wrap(types.ErrInternal, "project did not found")
 			}
 			copy(pubKeyEd25519[:], base58.Decode(projectDoc.GetPubKey()))
 		}
-		return pubKeyEd25519, sdk.Result{}
+		return pubKeyEd25519, nil
 	}
 }
 
 // Identical to Cosmos DeductFees function, but tokens sent to project account
 func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
-	acc auth.Account, projectAddr sdk.AccAddress, fees sdk.Coins) sdk.Result {
+	acc auth.Account, projectAddr sdk.AccAddress, fees sdk.Coins) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
 	if !fees.IsValid() {
-		return sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee amount: %s", fees)).Result()
+		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFee, "invalid fee amount")
 	}
 
 	// verify the account has enough funds to pay for fees
 	_, hasNeg := coins.SafeSub(fees)
 	if hasNeg {
-		return sdk.ErrInsufficientFunds(
-			fmt.Sprintf("insufficient funds to pay for fees; %s < %s", coins, fees),
-		).Result()
+		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees")
 	}
 
 	// Validate the account has enough "spendable" coins as this will cover cases
 	// such as vesting accounts.
 	spendableCoins := acc.SpendableCoins(blockTime)
 	if _, hasNeg := spendableCoins.SafeSub(fees); hasNeg {
-		return sdk.ErrInsufficientFunds(
-			fmt.Sprintf("insufficient funds to pay for fees; %s < %s", spendableCoins, fees),
-		).Result()
+		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees")
 	}
 
 	err := bankKeeper.SendCoins(ctx, acc.GetAddress(), projectAddr, fees)
 	if err != nil {
-		return err.Result()
+		return err
 	}
 
-	return sdk.Result{}
+	return nil
 }
 
 func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc auth.Account, genesis bool) []byte {
@@ -92,7 +90,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res sdk.Result, abort bool) {
+	) (newCtx sdk.Context, res error, abort bool) {
 
 		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
 			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
@@ -104,7 +102,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 			// during runTx.
 			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdk.ErrInternal("tx must be auth.StdTx").Result(), true
+			return newCtx, sdkerrors.Wrap(types.ErrInternal, "tx must be auth.StdTx"), true
 		}
 
 		params := ak.GetParams(ctx)
@@ -113,12 +111,13 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 
 		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err.Result(), true
+			return newCtx, err, true
 		}
 
 		// Number of messages in the tx must be 1
 		if len(tx.GetMsgs()) != 1 {
-			return ctx, sdk.ErrInternal("number of messages must be 1").Result(), true
+			return ctx, sdkerrors.Wrap(types.ErrInternal, "number of messages must be 1"), true
+
 		}
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
@@ -130,7 +129,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		// message must be of type MsgCreateProject
 		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)
 		if !ok {
-			return newCtx, sdk.ErrInternal("msg must be MsgCreateProject").Result(), true
+			sdkerrors.Wrap(types.ErrInternal, "msg must be MsgCreateProject")
 		}
 
 		// Get project pubKey
@@ -143,14 +142,16 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		signerAddr := sdk.AccAddress(projectPubKey.Address())
 		_, res = auth.GetSignerAcc(newCtx, ak, signerAddr)
 		if res.IsOK() {
-			return newCtx, sdk.ErrInternal("expected project account to not exist").Result(), true
+			return newCtx, sdkerrors.Wrap(types.ErrInternal, "expected project account to not exist"), true
+
 		}
 
 		// confirm that fee is the exact amount expected
 		expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
 			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectFee)))
 		if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
-			return newCtx, sdk.ErrInvalidCoins("invalid fee").Result(), true
+			return newCtx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee"), true
+
 		}
 
 		// Calculate transaction fee and project funding
@@ -162,7 +163,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 			// fetch fee payer account
 			feePayerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.SenderDid)
 			if err != nil {
-				return newCtx, err.Result(), true
+				return newCtx, err, true
 			}
 			feePayerAcc, res := auth.GetSignerAcc(ctx, ak, feePayerDidDoc.Address())
 			if !res.IsOK() {

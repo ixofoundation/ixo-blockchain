@@ -53,7 +53,7 @@ func (k Keeper) SetSubscription(ctx sdk.Context, subscription types.Subscription
 
 // -------------------------------------------------------- Subscriptions Payment
 
-func (k Keeper) EffectSubscriptionPayment(ctx sdk.Context, subscriptionId string) sdk.Error {
+func (k Keeper) EffectSubscriptionPayment(ctx sdk.Context, subscriptionId string) error {
 
 	subscription, err := k.GetSubscription(ctx, subscriptionId)
 	if err != nil {

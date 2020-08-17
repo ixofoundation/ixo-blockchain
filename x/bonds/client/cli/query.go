@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -20,7 +21,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	bondsQueryCmd.AddCommand(client.GetCommands(
+	bondsQueryCmd.AddCommand(flags.GetCommands(
 		GetCmdBonds(storeKey, cdc),
 		GetCmdBond(storeKey, cdc),
 		GetCmdBatch(storeKey, cdc),

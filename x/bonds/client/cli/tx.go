@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
@@ -24,7 +25,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	bondsTxCmd.AddCommand(client.PostCommands(
+	bondsTxCmd.AddCommand(flags.PostCommands(
 		GetCmdCreateBond(cdc),
 		GetCmdEditBond(cdc),
 		GetCmdBuy(cdc),

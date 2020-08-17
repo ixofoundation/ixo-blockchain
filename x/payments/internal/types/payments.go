@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 type PaymentTemplate struct {
 	Id                 string       `json:"id" yaml:"id"`
@@ -23,19 +26,19 @@ func NewPaymentTemplate(id string, paymentAmount, paymentMinimum, paymentMaximum
 	}
 }
 
-func (pt PaymentTemplate) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, sdk.Error) {
+func (pt PaymentTemplate) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, error) {
 	for _, discount := range pt.Discounts {
 		if discount.Id.Equal(discountId) {
 			return discount.Percent, nil
 		}
 	}
-	return sdk.Dec{}, ErrDiscountIdIsNotInTemplate(DefaultCodespace)
+	return sdk.Dec{}, sdkerrors.Wrap(ErrDiscountIdIsNotInTemplate, "discount ID specified is not one of the template's discounts")
 }
 
-func (pt PaymentTemplate) Validate() sdk.Error {
+func (pt PaymentTemplate) Validate() error {
 	// Validate ID
 	if !IsValidPaymentTemplateId(pt.Id) {
-		return ErrInvalidId(DefaultCodespace, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template id invalid")
 	}
 
 	// Validate payment amount, minimum, maximum
@@ -43,17 +46,17 @@ func (pt PaymentTemplate) Validate() sdk.Error {
 	min := &pt.PaymentMinimum
 	max := &pt.PaymentMaximum
 	if !amt.IsValid() {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "PaymentAmount coins invalid")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "PaymentAmount coins invalid")
 	} else if !min.IsValid() {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "PaymentMinimum coins invalid")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "PaymentMinimum coins invalid")
 	} else if !max.IsValid() {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "PaymentMaximum coins invalid")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "PaymentMaximum coins invalid")
 	} else if min.IsAnyGT(*max) {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "min pay includes value greater than max pay")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "min pay includes value greater than max pay")
 	} else if !min.DenomsSubsetOf(*amt) {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "min pay includes denom not in pay amount")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "min pay includes denom not in pay amount")
 	} else if !max.DenomsSubsetOf(*amt) {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "max pay includes denom not in pay amount")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "max pay includes denom not in pay amount")
 	}
 
 	// Validate discounts
@@ -104,29 +107,29 @@ func NewPaymentContractNoDiscount(id, templateId string, creator,
 	)
 }
 
-func (pc PaymentContract) Validate() sdk.Error {
+func (pc PaymentContract) Validate() error {
 	// Validate ID
 	if !IsValidPaymentContractId(pc.Id) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
 	}
 
 	// Validate coins
 	if !pc.CumulativePay.IsValid() {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "CumulativePay coins invalid")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "CumulativePay coins invalid")
 	} else if !pc.CurrentRemainder.IsValid() {
-		return ErrInvalidPaymentTemplate(DefaultCodespace, "CurrentRemainder coins invalid")
+		return sdkerrors.Wrap(ErrInvalidPaymentTemplate, "CurrentRemainder coins invalid")
 	}
 
 	// Validate addresses
 	if pc.Creator.Empty() {
-		return sdk.ErrInvalidAddress("empty creator address")
+		return sdkerrors.Wrap(ErrInvalidAddress, "empty creator address")
 	} else if pc.Payer.Empty() {
-		return sdk.ErrInvalidAddress("empty payer address")
+		return sdkerrors.Wrap(ErrInvalidAddress, "empty payer address")
 	}
 
 	// Validate IDs
 	if !IsValidPaymentTemplateId(pc.PaymentTemplateId) {
-		return ErrInvalidId(DefaultCodespace, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "empty payer address")
 	}
 
 	return nil

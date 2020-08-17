@@ -115,7 +115,7 @@ func Test_CreateEvaluation(t *testing.T) {
 		Data:       projectDoc.Data,
 	}
 
-	var err sdk.Error
+	var err error
 	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
 	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InternalAccountID(msg.ProjectDid))
@@ -181,7 +181,7 @@ func Test_WithdrawFunds(t *testing.T) {
 		Data:       projectDoc.Data,
 	}
 
-	var err sdk.Error
+	var err error
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, InternalAccountID(msg1.ProjectDid))

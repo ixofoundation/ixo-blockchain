@@ -10,7 +10,7 @@ func NewDiscounts(discounts ...Discount) Discounts {
 	return Discounts(discounts)
 }
 
-func (ds Discounts) Validate() sdk.Error {
+func (ds Discounts) Validate() error {
 	if len(ds) == 0 {
 		return nil
 	}

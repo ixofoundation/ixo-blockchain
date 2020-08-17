@@ -1,9 +1,8 @@
 package types
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
+import sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-const (
-	DefaultCodespace sdk.CodespaceType = ModuleName
+var (
+	DefaultCodespace = ModuleName
+	ErrInternal      = sdkErrors.Register(DefaultCodespace, 101, "not allowed format")
 )

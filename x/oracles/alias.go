@@ -14,8 +14,6 @@ const (
 	MintCap     = types.MintCap
 	BurnCap     = types.BurnCap
 	TransferCap = types.TransferCap
-
-	DefaultCodespace = types.DefaultCodespace
 )
 
 type (

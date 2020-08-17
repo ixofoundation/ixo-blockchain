@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
@@ -32,13 +33,13 @@ func (k Keeper) PaymentTemplateExists(ctx sdk.Context, templateId string) bool {
 	return store.Has(types.GetPaymentTemplateKey(templateId))
 }
 
-func (k Keeper) GetPaymentTemplate(ctx sdk.Context, templateId string) (types.PaymentTemplate, sdk.Error) {
+func (k Keeper) GetPaymentTemplate(ctx sdk.Context, templateId string) (types.PaymentTemplate, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentTemplateKey(templateId)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types.PaymentTemplate{}, sdk.ErrInternal("invalid payment template")
+		return types.PaymentTemplate{}, sdkerrors.Wrap(types.ErrInternal, "invalid payment template")
 	}
 
 	var template types.PaymentTemplate
@@ -53,7 +54,7 @@ func (k Keeper) SetPaymentTemplate(ctx sdk.Context, template types.PaymentTempla
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(template))
 }
 
-func (k Keeper) DiscountIdExists(ctx sdk.Context, templateId string, discountId sdk.Uint) (bool, sdk.Error) {
+func (k Keeper) DiscountIdExists(ctx sdk.Context, templateId string, discountId sdk.Uint) (bool, error) {
 	// Get payment template
 	template, err := k.GetPaymentTemplate(ctx, templateId)
 	if err != nil {
@@ -94,7 +95,7 @@ func (k Keeper) PaymentContractExists(ctx sdk.Context, contractId string) bool {
 	return store.Has(types.GetPaymentContractKey(contractId))
 }
 
-func (k Keeper) GetPaymentContract(ctx sdk.Context, contractId string) (types.PaymentContract, sdk.Error) {
+func (k Keeper) GetPaymentContract(ctx sdk.Context, contractId string) (types.PaymentContract, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentContractKey(contractId)
 
@@ -116,7 +117,7 @@ func (k Keeper) SetPaymentContract(ctx sdk.Context, contract types.PaymentContra
 }
 
 func (k Keeper) SetPaymentContractAuthorised(ctx sdk.Context, contractId string,
-	authorised bool) sdk.Error {
+	authorised bool) error {
 	contract, err := k.GetPaymentContract(ctx, contractId)
 	if err != nil {
 		return err
@@ -134,7 +135,7 @@ func (k Keeper) SetPaymentContractAuthorised(ctx sdk.Context, contractId string,
 	return nil
 }
 
-func (k Keeper) GrantDiscount(ctx sdk.Context, contractId string, discountId sdk.Uint) sdk.Error {
+func (k Keeper) GrantDiscount(ctx sdk.Context, contractId string, discountId sdk.Uint) error {
 	// Get payment contract
 	contract, err := k.GetPaymentContract(ctx, contractId)
 	if err != nil {
@@ -147,7 +148,7 @@ func (k Keeper) GrantDiscount(ctx sdk.Context, contractId string, discountId sdk
 	return nil
 }
 
-func (k Keeper) RevokeDiscount(ctx sdk.Context, contractId string) sdk.Error {
+func (k Keeper) RevokeDiscount(ctx sdk.Context, contractId string) error {
 	// Get payment contract
 	contract, err := k.GetPaymentContract(ctx, contractId)
 	if err != nil {
@@ -163,7 +164,7 @@ func (k Keeper) RevokeDiscount(ctx sdk.Context, contractId string) sdk.Error {
 // -------------------------------------------------------- PaymentContracts payment
 
 func applyDiscount(template types.PaymentTemplate, contract types.PaymentContract,
-	payAmount sdk.Coins) (sdk.Coins, sdk.Error) {
+	payAmount sdk.Coins) (sdk.Coins, error) {
 
 	// No discounts held
 	if contract.DiscountId.IsZero() {
@@ -214,7 +215,7 @@ func adjustForMaximums(template types.PaymentTemplate, cumulative sdk.Coins) {
 }
 
 func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
-	contractId string) (effected bool, err sdk.Error) {
+	contractId string) (effected bool, err error) {
 
 	contract, err := k.GetPaymentContract(ctx, contractId)
 	if err != nil {

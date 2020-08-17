@@ -69,7 +69,7 @@ func (k Keeper) ProjectDocExists(ctx sdk.Context, projectDid did.Did) bool {
 	return store.Has(types.GetProjectPrefixKey(projectDid))
 }
 
-func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.StoredProjectDoc, sdk.Error) {
+func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.StoredProjectDoc, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectPrefixKey(projectDid)
 
@@ -137,7 +137,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
-	accountId types.InternalAccountID) (auth.Account, sdk.Error) {
+	accountId types.InternalAccountID) (auth.Account, error) {
 	address := supply.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {

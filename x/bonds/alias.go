@@ -7,8 +7,6 @@ import (
 
 //noinspection GoNameStartsWithPackageName
 const (
-	DefaultCodespace = types.DefaultCodespace
-
 	BondsMintBurnAccount       = types.BondsMintBurnAccount
 	BatchesIntermediaryAccount = types.BatchesIntermediaryAccount
 	BondsReserveAccount        = types.BondsReserveAccount

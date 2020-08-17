@@ -2,6 +2,7 @@ package payments
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -61,7 +62,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	paymentsTxCmd.AddCommand(client.PostCommands(
+	paymentsTxCmd.AddCommand(flags.PostCommands(
 		cli.GetCmdCreatePaymentTemplate(cdc),
 		cli.GetCmdCreatePaymentContract(cdc),
 		cli.GetCmdCreateSubscription(cdc),
@@ -83,7 +84,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	paymentsQueryCmd.AddCommand(client.GetCommands(
+	paymentsQueryCmd.AddCommand(flags.GetCommands(
 		cli.GetParamsRequestHandler(cdc),
 		cli.GetCmdPaymentTemplate(cdc),
 		cli.GetCmdPaymentContract(cdc),
