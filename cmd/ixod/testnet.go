@@ -46,7 +46,7 @@ func testnetCmd(ctx *server.Context, cdc *codec.Codec,
 
 	cmd := &cobra.Command{
 		Use:   "testnet",
-		Short: "Initialize files for a ixod testnet",
+		Short: "Initialize files for an ixod testnet",
 		Long: `testnet will create "v" number of directories and populate each with
 necessary files (private validator, genesis, config, etc.).
 Note, strict routability for addresses is turned off in the config file.
