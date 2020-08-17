@@ -2,7 +2,8 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
@@ -10,249 +11,225 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/project", createProjectRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/updateProjectStatus", updateProjectStatusRequestHandler(cliCtx)).Methods("PUT")
-	r.HandleFunc("/createAgent", createAgentRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/createClaim", createClaimRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/createEvaluation", createEvaluationRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/withdrawFunds", withdrawFundsRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/project", createProjectRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/update_project_status", updateProjectStatusRequestHandler(cliCtx)).Methods("PUT")
+	r.HandleFunc("/project/create_agent", createAgentRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/update_agent", updateAgentRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/create_claim", createClaimRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/create_evaluation", createEvaluationRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/project/withdraw_funds", withdrawFundsRequestHandler(cliCtx)).Methods("POST")
+}
+
+type createProjectReq struct {
+	BaseReq    rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	TxHash     string          `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	PubKey     string          `json:"pubKey" yaml:"pubKey"`
+	Data       json.RawMessage `json:"data" yaml:"data"`
 }
 
 func createProjectRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		senderDid := r.URL.Query().Get("senderDid")
-		projectDocParam := r.URL.Query().Get("projectDoc")
-		didDocParam := r.URL.Query().Get("didDoc")
-		mode := r.URL.Query().Get("mode")
-
-		didDoc, err := did.UnmarshalIxoDid(didDocParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req createProjectReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		cliCtx = cliCtx.WithBroadcastMode(mode)
-		msg := types.NewMsgCreateProject(
-			senderDid, json.RawMessage(projectDocParam), didDoc)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, didDoc)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
+}
+
+type updateProjectStatusReq struct {
+	BaseReq    rest.BaseReq                 `json:"base_req" yaml:"base_req"`
+	TxHash     string                       `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did                      `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did                      `json:"projectDid" yaml:"projectDid"`
+	Data       types.UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
 func updateProjectStatusRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		senderDid := r.URL.Query().Get("senderDid")
-		status := r.URL.Query().Get("status")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-		mode := r.URL.Query().Get("mode")
-
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req updateProjectStatusReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		cliCtx = cliCtx.WithBroadcastMode(mode)
-
-		projectStatus := types.ProjectStatus(status)
-		if projectStatus != types.CreatedProject &&
-			projectStatus != types.PendingStatus &&
-			projectStatus != types.FundedStatus &&
-			projectStatus != types.StartedStatus &&
-			projectStatus != types.StoppedStatus &&
-			projectStatus != types.PaidoutStatus {
-			_, _ = w.Write([]byte("The status must be one of 'CREATED', " +
-				"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'"))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		updateProjectStatusDoc := types.UpdateProjectStatusDoc{
-			Status: projectStatus,
-		}
-
-		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
+}
+
+type createAgentReq struct {
+	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
+	TxHash     string               `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	Data       types.CreateAgentDoc `json:"data" yaml:"data"`
 }
 
 func createAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		txHash := r.URL.Query().Get("txHash")
-		senderDid := r.URL.Query().Get("senderDid")
-		agentDid := r.URL.Query().Get("agentDid")
-		role := r.URL.Query().Get("role")
-		projectDidParam := r.URL.Query().Get("projectDid")
-		mode := r.URL.Query().Get("mode")
-
-		projectDid, err := did.UnmarshalIxoDid(projectDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req createAgentReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		cliCtx = cliCtx.WithBroadcastMode(mode)
-
-		if role != "SA" && role != "EA" && role != "IA" {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "The role must be one of 'SA', 'EA' or 'IA'")
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		createAgentDoc := types.CreateAgentDoc{
-			AgentDid: agentDid,
-			Role:     role,
-		}
-
-		msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, projectDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, projectDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
+}
+
+type updateAgentReq struct {
+	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
+	TxHash     string               `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	Data       types.UpdateAgentDoc `json:"data" yaml:"data"`
+}
+
+func updateAgentRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req updateAgentReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
+
+type createClaimReq struct {
+	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
+	TxHash     string               `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	Data       types.CreateClaimDoc `json:"data" yaml:"data"`
 }
 
 func createClaimRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		txHash := r.URL.Query().Get("txHash")
-		senderDid := r.URL.Query().Get("senderDid")
-		claimId := r.URL.Query().Get("claimId")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-		mode := r.URL.Query().Get("mode")
-
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req createClaimReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		createClaimDoc := types.CreateClaimDoc{
-			ClaimID: claimId,
-		}
-
-		cliCtx = cliCtx.WithBroadcastMode(mode)
-
-		msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+
 	}
+}
+
+type createEvaluationReq struct {
+	BaseReq    rest.BaseReq              `json:"base_req" yaml:"base_req"`
+	TxHash     string                    `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did                   `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did                   `json:"projectDid" yaml:"projectDid"`
+	Data       types.CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
 func createEvaluationRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		txHash := r.URL.Query().Get("txHash")
-		senderDid := r.URL.Query().Get("senderDid")
-		claimDid := r.URL.Query().Get("claimDid")
-		status := r.URL.Query().Get("status")
-		ixoDidParam := r.URL.Query().Get("ixoDid")
-		mode := r.URL.Query().Get("mode")
-
-		ixoDid, err := did.UnmarshalIxoDid(ixoDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req createEvaluationReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		cliCtx = cliCtx.WithBroadcastMode(mode)
-
-		claimStatus := types.ClaimStatus(status)
-		if claimStatus != types.PendingClaim && claimStatus != types.ApprovedClaim && claimStatus != types.RejectedClaim {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "The status must be one of '0' (Pending), '1' (Approved) or '2' (Rejected)")
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		createEvaluationDoc := types.CreateEvaluationDoc{
-			ClaimID: claimDid,
-			Status:  claimStatus,
-		}
-
-		msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, ixoDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
+}
+
+type withdrawFundsReq struct {
+	BaseReq   rest.BaseReq           `json:"base_req" yaml:"base_req"`
+	SenderDid did.Did                `json:"senderDid" yaml:"senderDid"`
+	Data      types.WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
 func withdrawFundsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		senderDidParam := r.URL.Query().Get("senderDid")
-		dataParam := r.URL.Query().Get("data")
-		mode := r.URL.Query().Get("mode")
-
-		senderDid, err := did.UnmarshalIxoDid(senderDidParam)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(err.Error()))
+		var req withdrawFundsReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			return
 		}
 
-		var data types.WithdrawFundsDoc
-		err = json.Unmarshal([]byte(dataParam), &data)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte(fmt.Sprintf("Could not unmarshall data into struct. Error: %s", err.Error())))
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
 			return
 		}
 
-		cliCtx = cliCtx.WithBroadcastMode(mode)
-
-		msg := types.NewMsgWithdrawFunds(senderDid.Did, data)
-
-		output, err := ixo.CompleteAndBroadcastTxRest(cliCtx, msg, senderDid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(err.Error()))
+		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, output)
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 	}
 }
