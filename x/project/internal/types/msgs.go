@@ -24,7 +24,7 @@ const (
 	TypeMsgCreateEvaluation    = "create-evaluation"
 	TypeMsgWithdrawFunds       = "withdraw-funds"
 
-	MsgCreateProjectFee            = int64(1000000)
+	MsgCreateProjectTotalFee       = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
 )
 
