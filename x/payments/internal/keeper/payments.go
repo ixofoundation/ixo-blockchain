@@ -101,7 +101,7 @@ func (k Keeper) GetPaymentContract(ctx sdk.Context, contractId string) (types.Pa
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types.PaymentContract{}, sdk.ErrInternal("invalid payment contract")
+		return types.PaymentContract{}, sdkerrors.Wrap(types.ErrInternal, "invalid payment contract")
 	}
 
 	var contract types.PaymentContract
@@ -125,7 +125,7 @@ func (k Keeper) SetPaymentContractAuthorised(ctx sdk.Context, contractId string,
 
 	// If de-authorising, check if can be de-authorised
 	if !authorised && !contract.CanDeauthorise {
-		return types.ErrPaymentContractCannotBeDeauthorised(types.DefaultCodespace)
+		return sdkerrors.Wrap(types.ErrPaymentContractCannotBeDeauthorised, "")
 	}
 
 	// Set authorised state
@@ -182,7 +182,7 @@ func applyDiscount(template types.PaymentTemplate, contract types.PaymentContrac
 
 	// Confirm that discount is not greater than the payAmount
 	if discountAmt.IsAnyGT(payAmount) {
-		return nil, types.ErrDiscountPercentageGreaterThan100(types.DefaultCodespace)
+		return nil, sdkerrors.Wrap(types.ErrDiscountPercentageGreaterThan100, "")
 	}
 
 	// Return payAmount with discount deducted

@@ -129,7 +129,7 @@ func getSignBytes(chainID string, tx auth.StdTx, acc authexported.Account, genes
 func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res error, abort bool) {
+	) (newCtx sdk.Context, res error) {
 
 		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
 			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
@@ -141,7 +141,7 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 			// during runTx.
 			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "tx must be auth.StdTx"), true
+			return newCtx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "tx must be auth.StdTx")
 		}
 
 		params := ak.GetParams(ctx)
@@ -183,45 +183,45 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 		}()
 
 		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err, true
+			return newCtx, err
 		}
 
 		// Number of messages in the tx must be 1
 		if len(tx.GetMsgs()) != 1 {
-			return ctx, sdkerrors.Wrap(ErrInternal, "number of messages must be 1"), true
+			return ctx, sdkerrors.Wrap(ErrInternal, "number of messages must be 1")
 		}
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
 		//need to check
 		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
-			return newCtx, res, true
+			return newCtx, res
 		}
 
 		// all messages must be of type IxoMsg
 		msg, ok := stdTx.GetMsgs()[0].(IxoMsg)
 		if !ok {
-			return newCtx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg"), true
+			return newCtx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
 		}
 
 		// Get pubKey
 		pubKey, res := pubKeyGetter(ctx, msg)
 		if !res.IsOK() {
-			return newCtx, res, true
+			return newCtx, res
 		}
 
 		// fetch first (and only) signer, who's going to pay the fees
 		signerAddr := sdk.AccAddress(pubKey.Address())
 		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
 		if !res.IsOK() {
-			return newCtx, res, true
+			return newCtx, res
 		}
 
 		// deduct the fees
 		if !stdTx.Fee.Amount.IsZero() {
 			res = auth.DeductFees(sk, newCtx, signerAcc, stdTx.Fee.Amount)
 			if !res.IsOK() {
-				return newCtx, res, true
+				return newCtx, res
 			}
 
 			// reload the account as fees have been deducted
@@ -234,12 +234,12 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 		signBytes := getSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
 		signerAcc, res = ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if !res.IsOK() {
-			return newCtx, res, true
+			return newCtx, res
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
 
-		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
+		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas} // continue...
 	}
 }
 

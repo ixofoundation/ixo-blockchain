@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 )
 
@@ -30,13 +31,13 @@ func (k Keeper) SubscriptionExists(ctx sdk.Context, subscriptionId string) bool 
 	return store.Has(types.GetSubscriptionKey(subscriptionId))
 }
 
-func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.Subscription, sdk.Error) {
+func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.Subscription, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetSubscriptionKey(subscriptionId)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types.Subscription{}, sdk.ErrInternal("invalid subscription")
+		return types.Subscription{}, sdkerrors.Wrap(types.ErrInternal, "invalid subscription")
 	}
 
 	var subscription types.Subscription
@@ -62,7 +63,7 @@ func (k Keeper) EffectSubscriptionPayment(ctx sdk.Context, subscriptionId string
 
 	// Check if should effect
 	if !subscription.ShouldEffect(ctx) {
-		return types.ErrTriedToEffectSubscriptionPaymentWhenShouldnt(types.DefaultCodespace)
+		return sdkerrors.Wrap(types.ErrTriedToEffectSubscriptionPaymentWhenShouldnt, types.DefaultCodespace)
 	}
 
 	// Effect payment

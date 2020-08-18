@@ -66,7 +66,7 @@ var (
 		templateCreatorAddr, payerAddr, false, true)
 )
 
-func ValidateVariables() sdk.Error {
+func ValidateVariables() error {
 	err := validDiscounts.Validate()
 	if err != nil {
 		return err
@@ -123,11 +123,11 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	keyParams := sdk.NewKVStoreKey("subspace")
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
-	pk1 := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
+	pk1 := params.NewKeeper(cdc, keyParams, tkeyParams)
 	paymentsSubspace := pk1.Subspace(types.DefaultParamspace)
 
 	accountKeeper := auth.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
-	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), nil)
 	didKeeper := did.NewKeeper(cdc, keyDid)
 	keeper := NewKeeper(cdc, storeKey, paymentsSubspace, bankKeeper, didKeeper, nil)
 

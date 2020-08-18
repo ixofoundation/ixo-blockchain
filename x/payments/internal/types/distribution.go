@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 var oneHundred = sdk.NewDec(100)
 
@@ -13,7 +16,7 @@ func NewDistribution(shares ...DistributionShare) Distribution {
 func (d Distribution) Validate() error {
 	// Shares must add up to 100% (no shares means 0%)
 	if len(d) == 0 {
-		return ErrDistributionPercentagesNot100(DefaultCodespace, sdk.ZeroDec())
+		return sdkerrors.Wrap(ErrDistributionPercentagesNot100, "")
 	}
 
 	// Validate shares and calculate total
@@ -27,7 +30,7 @@ func (d Distribution) Validate() error {
 
 	// Shares must add up to 100%
 	if !total.Equal(sdk.NewDec(100)) {
-		return ErrDistributionPercentagesNot100(DefaultCodespace, total)
+		return sdkerrors.Wrap(ErrDistributionPercentagesNot100, "")
 	}
 
 	return nil
@@ -64,11 +67,11 @@ func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) Distributi
 	}
 }
 
-func (d DistributionShare) Validate() sdk.Error {
+func (d DistributionShare) Validate() error {
 	if !d.Percentage.IsPositive() {
-		return ErrNegativeSharePercentage(DefaultCodespace)
+		return sdkerrors.Wrap(ErrNegativeSharePercentage, "")
 	} else if d.Address.Empty() {
-		return sdk.ErrInvalidAddress("empty distribution share address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty distribution share address")
 	}
 
 	return nil

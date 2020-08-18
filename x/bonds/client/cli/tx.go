@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -74,13 +75,13 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			// Parse tx fee percentage
 			txFeePercentage, err := sdk.NewDecFromStr(_txFeePercentage)
 			if err != nil {
-				return fmt.Errorf(types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, "tx fee percentage").Error())
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "tx fee percentage")
 			}
 
 			// Parse exit fee percentage
 			exitFeePercentage, err := sdk.NewDecFromStr(_exitFeePercentage)
 			if err != nil {
-				return fmt.Errorf(types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, "exit fee percentage").Error())
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "exit fee percentage")
 			}
 
 			// Parse fee address
@@ -116,7 +117,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			// Parse batch blocks
 			batchBlocks, err := sdk.ParseUint(_batchBlocks)
 			if err != nil {
-				return types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, types.DefaultCodespace)
 			}
 
 			// Parse creator's ixo DID

@@ -38,6 +38,5 @@ var (
 
 type (
 	Keeper       = keeper.Keeper
-	CodeType     = types.CodeType
 	GenesisState = types.GenesisState
 )
