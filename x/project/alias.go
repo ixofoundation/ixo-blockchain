@@ -18,7 +18,7 @@ const (
 
 	TypeMsgCreateProject = types.TypeMsgCreateProject
 
-	MsgCreateProjectFee            = types.MsgCreateProjectFee
+	MsgCreateProjectTotalFee       = types.MsgCreateProjectTotalFee
 	MsgCreateProjectTransactionFee = types.MsgCreateProjectTransactionFee
 )
 
