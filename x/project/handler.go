@@ -34,7 +34,7 @@ func NewHandler(k Keeper, pk payments.Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgUpdateAgent:
 			return handleMsgUpdateAgent(ctx, k, bk, msg)
 		case MsgCreateClaim:
-			return handleMsgCreateClaim(ctx, k, fk, bk, msg)
+			return handleMsgCreateClaim(ctx, k, pk, bk, msg)
 		case MsgCreateEvaluation:
 			return handleMsgCreateEvaluation(ctx, k, pk, bk, msg)
 		case MsgWithdrawFunds:
