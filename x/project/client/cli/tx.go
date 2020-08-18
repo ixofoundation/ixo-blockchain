@@ -31,7 +31,7 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateProject(
 				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
-			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectFee)
+			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectTotalFee)
 
 			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)
 			if err != nil {

@@ -31,9 +31,9 @@ func NewHandler(k Keeper, fk payments.Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgUpdateProjectStatus:
 			return handleMsgUpdateProjectStatus(ctx, k, bk, msg)
 		case MsgCreateAgent:
-			return handleMsgCreateAgent(ctx, k, bk, msg)
+			return handleMsgCreateAgent(ctx, k, msg)
 		case MsgUpdateAgent:
-			return handleMsgUpdateAgent(ctx, k, bk, msg)
+			return handleMsgUpdateAgent(ctx, k, msg)
 		case MsgCreateClaim:
 			return handleMsgCreateClaim(ctx, k, fk, bk, msg)
 		case MsgCreateEvaluation:
@@ -125,7 +125,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	if newStatus == PaidoutStatus {
 		result, res := payoutFees(ctx, k, bk, projectDoc.GetProjectDid())
-		if res.Code != sdk.CodeOK {
+		if res != nil {
 			return result, res
 		}
 	}
@@ -210,7 +210,7 @@ func getIxoAmount(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Did,
 	return sdk.NewCoin(ixo.IxoNativeToken, sdk.ZeroInt())
 }
 
-func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCreateAgent) (*sdk.Result, error) {
+func handleMsgCreateAgent(ctx sdk.Context, k Keeper, msg MsgCreateAgent) (*sdk.Result, error) {
 
 	// Check if project exists
 	_, err := k.GetProjectDoc(ctx, msg.ProjectDid)
@@ -241,7 +241,7 @@ func handleMsgCreateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgCrea
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
-func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpdateAgent) (*sdk.Result, error) {
+func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, msg MsgUpdateAgent) (*sdk.Result, error) {
 
 	// Check if project exists
 	_, err := k.GetProjectDoc(ctx, msg.ProjectDid)

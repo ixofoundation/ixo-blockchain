@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
@@ -64,7 +65,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 		// all messages must be of type ixo.IxoMsg
 		ixoMsg, ok := msg.(ixo.IxoMsg)
 		if !ok {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, sdk.ErrInternal("msg must be ixo.IxoMsg").Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "msg must be ixo.IxoMsg")
 			return
 		}
 		msgs := []sdk.Msg{ixoMsg}
@@ -74,7 +75,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 		switch ixoMsg.Type() {
 		case project.TypeMsgCreateProject:
 			stdSignMsg = ixoMsg.(project.MsgCreateProject).ToStdSignMsg(
-				project.MsgCreateProjectFee)
+				project.MsgCreateProjectTotalFee)
 		case did.TypeMsgAddDid:
 			stdSignMsg = ixoMsg.(did.MsgAddDid).ToStdSignMsg()
 		default:
