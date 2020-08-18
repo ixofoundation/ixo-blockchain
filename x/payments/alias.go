@@ -68,6 +68,7 @@ var (
 	NewPaymentContractNoDiscount = types.NewPaymentContractNoDiscount
 	NewDistribution              = types.NewDistribution
 	NewDistributionShare         = types.NewDistributionShare
+	NewFullDistributionShare     = types.NewFullDistributionShare
 
 	NewDiscount  = types.NewDiscount
 	NewDiscounts = types.NewDiscounts

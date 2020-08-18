@@ -25,6 +25,7 @@ func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
 }
 
 type StoredProjectDoc interface {
+	GetClaimerPay() sdk.Coins
 	GetEvaluatorPay() int64
 	GetProjectDid() did.Did
 	GetSenderDid() did.Did
@@ -113,6 +114,26 @@ func (pd ProjectDoc) GetProjectData() ProjectDataMap {
 	return dataMap
 }
 
+func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
+	claimerPayPerClaimBz, found := pd.GetProjectData()["claimerPayPerClaim"]
+	if !found {
+		panic("claimerPayPerClaim not found")
+	}
+
+	var claimerPayPerClaimStr string
+	err := json.Unmarshal(claimerPayPerClaimBz, &claimerPayPerClaimStr)
+	if err != nil {
+		panic(err)
+	}
+
+	claimerPayPerClaimCoins, err := sdk.ParseCoins(claimerPayPerClaimStr)
+	if err != nil {
+		panic(err)
+	}
+
+	return claimerPayPerClaimCoins
+}
+
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
 	evaluatorPayPerClaimBz, found := pd.GetProjectData()["evaluatorPayPerClaim"]
 	if !found {
@@ -125,12 +146,13 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 		panic(err)
 	}
 
-	i, err := strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
+	evaluatorPayPerClaimInt, err := strconv.ParseInt(
+		evaluatorPayPerClaimStr, 10, 64)
 	if err != nil {
 		panic(err)
 	}
 
-	return i
+	return evaluatorPayPerClaimInt
 }
 
 type CreateAgentDoc struct {

@@ -98,6 +98,21 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 		return sdk.ErrInternal("evaluatorPayPerClaim should be an integer")
 	}
 
+	// Check that evaluatorPayPerClaim is present and is a valid coins value
+	claimerPayPerClaimBz, found := dataMap["claimerPayPerClaim"]
+	if !found {
+		return sdk.ErrInternal("missing claimerPayPerClaim in project doc")
+	}
+	var claimerPayPerClaimStr string
+	err = json.Unmarshal(claimerPayPerClaimBz, &claimerPayPerClaimStr)
+	if err != nil {
+		return sdk.ErrInternal(err.Error())
+	}
+	_, err = sdk.ParseCoins(claimerPayPerClaimStr)
+	if err != nil {
+		return sdk.ErrInternal("claimerPayPerClaim should be valid coins")
+	}
+
 	// Check that DIDs and PubKey valid
 	if !did.IsValidDid(msg.ProjectDid) {
 		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
