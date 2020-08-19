@@ -125,7 +125,7 @@ func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch typ
 
 	// If buys > sells, totalValues is the total buy prices
 	// If sells > buys, totalValues is the total sell returns
-	totalValues := matchedValues.Add(curvedValues)
+	totalValues := matchedValues.Add(curvedValues...)
 
 	// Calculate buy and sell prices per token
 	if batch.MoreBuysThanSells() {
@@ -226,7 +226,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	reservePrices := types.MultiplyDecCoinsByInt(prices, bo.Amount.Amount)
 	reservePricesRounded := types.RoundReservePrices(reservePrices)
 	txFees := bond.GetTxFees(reservePrices)
-	totalPrices := reservePricesRounded.Add(txFees)
+	totalPrices := reservePricesRounded.Add(txFees...)
 
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
 		return sdkerrors.Wrap(types.ErrMaxPriceExceeded, "")
@@ -356,8 +356,8 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.Se
 	txFees := bond.GetTxFees(reserveReturns)
 	exitFees := bond.GetExitFees(reserveReturns)
 
-	totalFees := types.AdjustFees(txFees.Add(exitFees), reserveReturnsRounded) // calculate actual total fees
-	totalReturns := reserveReturnsRounded.Sub(totalFees)                       // calculate actual reserveReturns
+	totalFees := types.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded) // calculate actual total fees
+	totalReturns := reserveReturnsRounded.Sub(totalFees)                          // calculate actual reserveReturns
 
 	// Send total returns to seller (totalReturns should never be zero)
 	// TODO: investigate possibility of zero totalReturns
@@ -418,7 +418,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder
 	adjustedInput := so.Amount.Sub(txFee) // same as during GetReturnsForSwap
 
 	// Check if new rates violate sanity rate
-	newReserveBalances := reserveBalances.Add(sdk.Coins{adjustedInput}).Sub(reserveReturns)
+	newReserveBalances := reserveBalances.Add(sdk.Coins{adjustedInput}...).Sub(reserveReturns)
 	if bond.ReservesViolateSanityRate(newReserveBalances) {
 		return sdkerrors.Wrap(types.ErrValuesViolateSanityRate, ""), true
 	}
@@ -549,7 +549,7 @@ func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.D
 	reservePrices := types.MultiplyDecCoinsByInt(prices, bo.Amount.Amount)
 	reserveRounded := types.RoundReservePrices(reservePrices)
 	txFees := bond.GetTxFees(reservePrices)
-	totalPrices := reserveRounded.Add(txFees)
+	totalPrices := reserveRounded.Add(txFees...)
 
 	// Check that max prices not exceeded
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
