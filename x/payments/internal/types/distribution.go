@@ -37,7 +37,7 @@ func (d Distribution) Validate() error {
 }
 
 func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
-	decAmount := sdk.NewDecCoins(amount...)
+	decAmount := sdk.NewDecCoinsFromCoins(amount...)
 	distributions := make([]sdk.DecCoins, len(d))
 
 	// Calculate distribution amount for each share of the distribution

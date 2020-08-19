@@ -581,7 +581,7 @@ func handleMsgWithdrawShare(ctx sdk.Context, keeper keeper.Keeper, msg types.Msg
 	// Calculate amount owned
 	remainingReserve := keeper.GetReserveBalances(ctx, bond.BondDid)
 	bondTokensShare := bondTokensOwnedAmount.ToDec().QuoInt(bond.CurrentSupply.Amount)
-	reserveOwedDec := sdk.NewDecCoins(remainingReserve).MulDec(bondTokensShare)
+	reserveOwedDec := sdk.NewDecCoinsFromCoins(remainingReserve...).MulDec(bondTokensShare)
 	reserveOwed, _ := reserveOwedDec.TruncateDecimal()
 
 	// Send coins owed to recipient
