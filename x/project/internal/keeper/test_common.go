@@ -38,7 +38,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
 	cdc := MakeTestCodec()
 
-	pk1 := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
+	pk1 := params.NewKeeper(cdc, keyParams, tkeyParams)
 	accountKeeper := auth.NewAccountKeeper(
 		cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount,
 	)
@@ -46,7 +46,7 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 	paymentsSubspace := pk1.Subspace(payments.DefaultParamspace)
 	projectSubspace := pk1.Subspace(types.DefaultParamspace)
 
-	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
+	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), nil)
 	didKeeper := did.NewKeeper(cdc, keyDid)
 	paymentsKeeper := payments.NewKeeper(cdc, keyPayments, paymentsSubspace, bankKeeper, didKeeper, nil)
 	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, didKeeper, paymentsKeeper)

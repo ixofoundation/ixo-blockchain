@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/json"
-	"fmt"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ty "github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 
