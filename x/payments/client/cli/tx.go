@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"strings"
@@ -19,15 +19,14 @@ const (
 	FALSE = "false"
 )
 
-func parseBool(boolStr, boolName string) (bool, sdk.Error) {
+func parseBool(boolStr, boolName string) (bool, error) {
 	boolStr = strings.ToLower(strings.TrimSpace(boolStr))
 	if boolStr == TRUE {
 		return true, nil
 	} else if boolStr == FALSE {
 		return false, nil
 	} else {
-		return false, types.ErrInvalidArgument(types.DefaultCodespace, ""+
-			fmt.Sprintf("%s is not a valid bool (true/false)", boolName))
+		return false, sdkerrors.Wrap(types.ErrInvalidArgument, "not a valid bool")
 	}
 }
 
