@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -59,10 +60,18 @@ func (p Params) String() string {
 `, p.ProjectMinimumInitialFunding, p.IxoDid)
 }
 
+func validateAccessConfig(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyIxoDid, &p.IxoDid},
-		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding},
+		{KeyIxoDid, &p.IxoDid, validateAccessConfig},
+		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding, validateAccessConfig},
 	}
 }

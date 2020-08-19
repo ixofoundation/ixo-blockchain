@@ -34,7 +34,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
 	}
 
-	res := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, projectMsg)
+	res, _ := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, projectMsg)
 	require.NotNil(t, res)
 }
 
@@ -45,11 +45,11 @@ func TestHandler_ProjectMsg(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	res := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
-	require.True(t, res.IsOK())
+	res, _ := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
+	require.True(t, res != nil)
 
-	res = handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
-	require.False(t, res.IsOK())
+	res, _ = handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
+	require.False(t, res != nil)
 
 }
 func Test_CreateEvaluation(t *testing.T) {
@@ -124,7 +124,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	require.False(t, k.ProjectDocExists(ctx, msg.ProjectDid))
 	k.SetProjectDoc(ctx, &projectDoc)
 
-	res := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
+	res, _ := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
 	require.NotNil(t, res)
 }
 
@@ -190,6 +190,6 @@ func Test_WithdrawFunds(t *testing.T) {
 	require.False(t, k.ProjectDocExists(ctx, msg1.ProjectDid))
 	k.SetProjectDoc(ctx, &projectDoc)
 
-	res := handleMsgWithdrawFunds(ctx, k, bk, msg)
+	res, _ := handleMsgWithdrawFunds(ctx, k, bk, msg)
 	require.NotNil(t, res)
 }

@@ -58,7 +58,6 @@ var (
 	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
 		// Standard Cosmos modules
-		//genaccounts.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
 		bank.AppModuleBasic{},
@@ -239,7 +238,6 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	// must be passed by reference here.
 	app.mm = module.NewManager(
 		// Standard Cosmos appmodules
-		//genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
@@ -279,7 +277,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	app.mm.SetOrderInitGenesis(
 		// Standard Cosmos modules
-		//genaccounts.ModuleName, distr.ModuleName, staking.ModuleName,
+		distr.ModuleName, staking.ModuleName,
 		auth.ModuleName, bank.ModuleName, slashing.ModuleName, gov.ModuleName,
 		mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
 		// Custom ixo modules
@@ -363,7 +361,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
 		app.didKeeper, projectPubKeyGetter)
 
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, _ sdk.Result, abort bool) {
+	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, res error) {
 		// Route message based on ixo module router key
 		// Otherwise, route to Cosmos ante handler
 		msg := tx.GetMsgs()[0]

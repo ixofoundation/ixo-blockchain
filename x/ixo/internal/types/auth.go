@@ -91,6 +91,10 @@ func ProcessSig(
 
 	var pubKey crypto.PubKey
 	pubKey = acc.GetPubKey()
+	err := acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, sdkerrors.Wrap(ErrInternal, "setting PubKey on signer's account")
+	}
 
 	if simulate {
 		// Simulated txs should not contain a signature and are not required to
@@ -171,11 +175,7 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 						"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
 						rType.Descriptor, stdTx.Fee.Gas, newCtx.GasMeter().GasConsumed(),
 					)
-					res = sdk.ErrOutOfGas(log).Result()
-
-					res.GasWanted = stdTx.Fee.Gas
-					res.GasUsed = newCtx.GasMeter().GasConsumed()
-					abort = true
+					res = sdkerrors.Wrap(sdkerrors.ErrOutOfGas, log)
 				default:
 					panic(r)
 				}
@@ -193,11 +193,6 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		//need to check
-		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
-			return newCtx, res
-		}
-
 		// all messages must be of type IxoMsg
 		msg, ok := stdTx.GetMsgs()[0].(IxoMsg)
 		if !ok {
@@ -206,21 +201,21 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 
 		// Get pubKey
 		pubKey, res := pubKeyGetter(ctx, msg)
-		if !res.IsOK() {
+		if res != nil {
 			return newCtx, res
 		}
 
 		// fetch first (and only) signer, who's going to pay the fees
 		signerAddr := sdk.AccAddress(pubKey.Address())
 		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
-		if !res.IsOK() {
+		if res != nil {
 			return newCtx, res
 		}
 
 		// deduct the fees
 		if !stdTx.Fee.Amount.IsZero() {
 			res = auth.DeductFees(sk, newCtx, signerAcc, stdTx.Fee.Amount)
-			if !res.IsOK() {
+			if res != nil {
 				return newCtx, res
 			}
 
@@ -233,13 +228,13 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
 		signerAcc, res = ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
-		if !res.IsOK() {
+		if res != nil {
 			return newCtx, res
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
 
-		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas} // continue...
+		return newCtx, nil // continue...
 	}
 }
 

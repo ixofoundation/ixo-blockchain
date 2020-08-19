@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -44,7 +45,7 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 
 // Identical to Cosmos DeductFees function, but tokens sent to project account
 func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
-	acc auth.Account, projectAddr sdk.AccAddress, fees sdk.Coins) error {
+	acc exported.Account, projectAddr sdk.AccAddress, fees sdk.Coins) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
@@ -73,7 +74,7 @@ func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
 	return nil
 }
 
-func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc auth.Account, genesis bool) []byte {
+func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc exported.Account, genesis bool) []byte {
 	var accNum uint64
 	if !genesis {
 		// Fixed account number used so that sign bytes do not depend on it
@@ -122,9 +123,9 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); res != nil {
-			return newCtx, res
-		}
+		//if res := exported.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); res != nil {
+		//	return newCtx, res
+		//}
 
 		// message must be of type MsgCreateProject
 		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)

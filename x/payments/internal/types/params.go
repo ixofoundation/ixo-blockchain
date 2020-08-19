@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
@@ -133,18 +134,26 @@ func (p Params) String() string {
 	)
 }
 
+func validateAccessConfig(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyIxoFactor, &p.IxoFactor},
-		{KeyInitiationFeeAmount, &p.InitiationFeeAmount},
-		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage},
-		{KeyClaimFeeAmount, &p.ClaimFeeAmount},
-		{KeyEvaluationFeeAmount, &p.EvaluationFeeAmount},
-		{KeyServiceAgentRegistrationFeeAmount, &p.ServiceAgentRegistrationFeeAmount},
-		{KeyEvaluationAgentRegistrationFeeAmount, &p.EvaluationAgentRegistrationFeeAmount},
-		{KeyNodeFeePercentage, &p.NodeFeePercentage},
-		{KeyEvaluationPayFeePercentage, &p.EvaluationPayFeePercentage},
-		{KeyEvaluationPayNodeFeePercentage, &p.EvaluationPayNodeFeePercentage},
+		{KeyIxoFactor, &p.IxoFactor, validateAccessConfig},
+		{KeyInitiationFeeAmount, &p.InitiationFeeAmount, validateAccessConfig},
+		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage, validateAccessConfig},
+		{KeyClaimFeeAmount, &p.ClaimFeeAmount, validateAccessConfig},
+		{KeyEvaluationFeeAmount, &p.EvaluationFeeAmount, validateAccessConfig},
+		{KeyServiceAgentRegistrationFeeAmount, &p.ServiceAgentRegistrationFeeAmount, validateAccessConfig},
+		{KeyEvaluationAgentRegistrationFeeAmount, &p.EvaluationAgentRegistrationFeeAmount, validateAccessConfig},
+		{KeyNodeFeePercentage, &p.NodeFeePercentage, validateAccessConfig},
+		{KeyEvaluationPayFeePercentage, &p.EvaluationPayFeePercentage, validateAccessConfig},
+		{KeyEvaluationPayNodeFeePercentage, &p.EvaluationPayNodeFeePercentage, validateAccessConfig},
 	}
 }
