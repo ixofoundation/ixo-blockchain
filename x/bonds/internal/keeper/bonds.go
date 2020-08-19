@@ -85,7 +85,7 @@ func (k Keeper) DepositReserve(ctx sdk.Context, bondDid did.Did,
 
 	// Update bond reserve
 	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount))
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount...))
 	return nil
 }
 
@@ -101,7 +101,7 @@ func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid did.Did,
 
 	// Update bond reserve
 	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount))
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount...))
 	return nil
 }
 
