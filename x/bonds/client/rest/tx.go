@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
@@ -69,7 +70,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		// Parse tx fee percentage
 		txFeePercentageDec, err := sdk.NewDecFromStr(req.TxFeePercentage)
 		if err != nil {
-			err = types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, "tx fee percentage")
+			err = sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "tx fee percentage")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -77,7 +78,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		// Parse exit fee percentage
 		exitFeePercentageDec, err := sdk.NewDecFromStr(req.ExitFeePercentage)
 		if err != nil {
-			err = types.ErrArgumentMissingOrNonFloat(types.DefaultCodespace, "exit fee percentage")
+			err = sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "exit fee percentage")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -125,7 +126,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		} else if allowSellsStrLower == "false" {
 			allowSells = false
 		} else {
-			err := types.ErrArgumentMissingOrNonBoolean(types.DefaultCodespace, "allow_sells")
+			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBooleant, "allow_sells")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -133,7 +134,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		// Parse batch blocks
 		batchBlocks, err2 := sdk.ParseUint(req.BatchBlocks)
 		if err2 != nil {
-			err := types.ErrArgumentMissingOrNonUInteger(types.DefaultCodespace, "max batch blocks")
+			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, "max batch blocks")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
