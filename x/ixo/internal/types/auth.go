@@ -150,16 +150,6 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 
 		params := ak.GetParams(ctx)
 
-		// Ensure that the provided fees meet a minimum threshold for the validator,
-		// if this is a CheckTx. This is only for local mempool purposes, and thus
-		// is only ran on check tx.
-		//if ctx.IsCheckTx() && !simulate {
-		//	res := auth.EnsureSufficientMempoolFees(ctx, stdTx.Fee)
-		//	if !res.IsOK() {
-		//		return newCtx, res, true
-		//	}
-		//}
-
 		newCtx = auth.SetGasMeter(simulate, ctx, stdTx.Fee.Gas)
 
 		// AnteHandlers must have their own defer/recover in order for the BaseApp
@@ -264,7 +254,7 @@ func ApproximateFeeForTx(cliCtx context.CLIContext, tx auth.StdTx, chainId strin
 
 func GenerateOrBroadcastMsgs(cliCtx context.CLIContext, msg sdk.Msg, ixoDid exported.IxoDid) error {
 	msgs := []sdk.Msg{msg}
-	txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cliCtx.Codec))
+	txBldr := auth.NewTxBuilderFromCLI(cliCtx.Input).WithTxEncoder(utils.GetTxEncoder(cliCtx.Codec))
 
 	if cliCtx.GenerateOnly {
 		return utils.PrintUnsignedStdTx(txBldr, cliCtx, msgs)
