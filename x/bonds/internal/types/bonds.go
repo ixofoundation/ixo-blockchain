@@ -244,7 +244,7 @@ func NewBond(token, name, description string, creatorDid did.Did,
 //noinspection GoNilness
 func (bond Bond) GetNewReserveDecCoins(amount sdk.Dec) (coins sdk.DecCoins) {
 	for _, r := range bond.ReserveTokens {
-		coins = coins.Add(sdk.DecCoins{sdk.NewDecCoinFromDec(r, amount)})
+		coins = coins.Add(sdk.NewDecCoinFromDec(r, amount))
 	}
 	return coins
 }
@@ -572,7 +572,7 @@ func (bond Bond) GetExitFee(reserveAmount sdk.DecCoin) sdk.Coin {
 
 func (bond Bond) GetFees(reserveAmounts sdk.DecCoins, percentage sdk.Dec) (fees sdk.Coins) {
 	for _, r := range reserveAmounts {
-		fees = fees.Add(sdk.Coins{bond.GetFee(r, percentage)})
+		fees = fees.Add(bond.GetFee(r, percentage))
 	}
 	return fees
 }
