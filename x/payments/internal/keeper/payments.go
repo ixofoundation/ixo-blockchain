@@ -178,7 +178,7 @@ func applyDiscount(template types.PaymentTemplate, contract types.PaymentContrac
 		return nil, err
 	}
 	discountPercentDec := discountPercent.Quo(sdk.NewDec(100)) // 50 -> 0.5
-	discountAmt, _ := sdk.NewDecCoins(payAmount).MulDec(discountPercentDec).TruncateDecimal()
+	discountAmt, _ := sdk.NewDecCoinsFromCoins(payAmount...).MulDec(discountPercentDec).TruncateDecimal()
 
 	// Confirm that discount is not greater than the payAmount
 	if discountAmt.IsAnyGT(payAmount) {
@@ -239,7 +239,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 	if err != nil {
 		return false, err
 	}
-	cumulative := contract.CumulativePay.Add(payAmount)
+	cumulative := contract.CumulativePay.Add(payAmount...)
 
 	// In-place cumulative adjustments (i.e. considering minimums and maximums)
 	adjustForMinimums(template, contract, cumulative)
@@ -258,7 +258,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 
 	// Total input is pay plus current remainder in PayRemainderPool
 	inputFromPayRemainderPool := contract.CurrentRemainder
-	totalInputAmount := pay.Add(inputFromPayRemainderPool)
+	totalInputAmount := pay.Add(inputFromPayRemainderPool...)
 
 	// Calculate list of outputs and calculate the total output to payees based
 	// on the calculated wallet distributions
@@ -271,7 +271,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 
 		// If amount not zero, update total and add as output
 		if !outputAmt.IsZero() {
-			outputToPayees = outputToPayees.Add(outputAmt)
+			outputToPayees = outputToPayees.Add(outputAmt...)
 			address := template.WalletDistribution[i].Address
 			outputs = append(outputs, bank.NewOutput(address, outputAmt))
 		}
@@ -298,9 +298,9 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 	}
 
 	// Update and save payment contract
-	contract.CumulativePay = contract.CumulativePay.Add(pay)
+	contract.CumulativePay = contract.CumulativePay.Add(pay...)
 	contract.CurrentRemainder = contract.CurrentRemainder.Add(
-		outputToPayRemainderPool).Sub(inputFromPayRemainderPool)
+		outputToPayRemainderPool...).Sub(inputFromPayRemainderPool)
 	k.SetPaymentContract(ctx, contract)
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
