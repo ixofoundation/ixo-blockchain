@@ -7,12 +7,12 @@ import (
 var (
 	DefaultCodespace = ModuleName
 
-	ErrArgumentCannotBeEmpty                = sdkErrors.Register(DefaultCodespace, 341, " argument cannot be empty")
-	ErrArgumentCannotBeNegative             = sdkErrors.Register(DefaultCodespace, 341, "argument cannot be negative")
-	ErrArgumentMustBePositive               = sdkErrors.Register(DefaultCodespace, 341, "argument must be a positive value")
-	ErrArgumentMustBeInteger                = sdkErrors.Register(DefaultCodespace, 341, "argument must be an integer value")
-	ErrArgumentMustBeBetween                = sdkErrors.Register(DefaultCodespace, 341, "\"%s argument must be between %s and %s\", arg, a, b")
-	ErrFunctionParameterMissingOrNonFloat   = sdkErrors.Register(DefaultCodespace, 341, "parameter is missing or is not a float")
+	ErrArgumentCannotBeEmpty                = sdkErrors.Register(DefaultCodespace, 348, " argument cannot be empty")
+	ErrArgumentCannotBeNegative             = sdkErrors.Register(DefaultCodespace, 348, "argument cannot be negative")
+	ErrArgumentMustBePositive               = sdkErrors.Register(DefaultCodespace, 348, "argument must be a positive value")
+	ErrArgumentMustBeInteger                = sdkErrors.Register(DefaultCodespace, 348, "argument must be an integer value")
+	ErrArgumentMustBeBetween                = sdkErrors.Register(DefaultCodespace, 348, "\"%s argument must be between %s and %s\", arg, a, b")
+	ErrFunctionParameterMissingOrNonFloat   = sdkErrors.Register(DefaultCodespace, 348, "parameter is missing or is not a float")
 	ErrArgumentMissingOrNonFloat            = sdkErrors.Register(DefaultCodespace, 302, "argument is missing or is not a float")
 	ErrArgumentMissingOrNonUInteger         = sdkErrors.Register(DefaultCodespace, 302, " argument is missing or is not an unsigned integer")
 	ErrArgumentMissingOrNonBoolean          = sdkErrors.Register(DefaultCodespace, 302, "argument is missing or is not true or false")
