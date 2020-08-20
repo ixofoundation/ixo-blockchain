@@ -123,12 +123,14 @@ SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
 ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# Expected InitiatingNodePayFees:  100000000
-# Expected IxoFees:                 50000000
-# Expected IxoPayFees:             400000000
-# Expected ValidatingNodeSetFees:   50000000
-# Expected evaluator (Miguel):    4500000000
-# Expected project:               4900000000
+# Expected project account balances:
+# - InitiatingNodePayFees:  100000000
+# - IxoFees:                 50000000
+# - IxoPayFees:             400000000
+# - ValidatingNodeSetFees:   50000000
+# - project:               4900000000
+# Expected external account balances:
+# - Miguel:                4500000000 (+ original 10000000000 = 14500000000)
 
 # Progress project status to PAIDOUT
 SENDER_DID="$SHAUN_DID"
@@ -139,12 +141,16 @@ ixocli tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL
 echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
-# Expected InitiatingNodePayFees:          0
-# Expected IxoFees:                        0
-# Expected IxoPayFees:                     0
-# Expected ValidatingNodeSetFees:          0
-# Expected evaluator (Miguel):    4500000000
-# Expected project:               4900000000
+# Expected withdrawals:
+# - 600000000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# Expected project account balances:
+# - InitiatingNodePayFees:          0
+# - IxoFees:                        0
+# - IxoPayFees:                     0
+# - ValidatingNodeSetFees:          0
+# - project:               4900000000
+# Expected external account balances:
+# - Miguel:                4500000000 (+ original 10000000000 = 14500000000)
 
 echo "InitiatingNodePayFees"
 ixocli q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
@@ -154,24 +160,10 @@ echo "IxoPayFees"
 ixocli q auth account "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
 echo "ValidatingNodeSetFees"
 ixocli q auth account "ixo16dxuhf9hzqtfks2s0azwetl59ldwp5tl5kcxa4"
-echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-ixocli q auth account "ixo1545vwm70g6tws43a3epakzwyhpj7hxcs7qgpcv"
 echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixocli q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
-
-# Withdraw funds (from miguel's project account, i.e. as non-refund)
-echo "Withdraw funds as Miguel..."
-DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":false}"
-ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Project withdrawals query..."
-ixocli q project get-project-txs $PROJECT_DID
-
-# Expected InitiatingNodePayFees:          0
-# Expected IxoFees:                        0
-# Expected IxoPayFees:                     0
-# Expected ValidatingNodeSetFees:          0
-# Expected evaluator (Miguel):    4400000000
-# Expected project:               4900000000
+echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+ixocli q auth account "$(ixocli q did get-address-from-did $MIGUEL_DID)"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
@@ -181,6 +173,9 @@ ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode blo
 echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
+# Expected external account balances:
+# - Miguel:                4500000000 (+ original 10000000000 - 5000 fee = 14499995000)
+
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
 echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
@@ -189,9 +184,12 @@ ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode bloc
 echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
-# Expected InitiatingNodePayFees:          0
-# Expected IxoFees:                        0
-# Expected IxoPayFees:                     0
-# Expected ValidatingNodeSetFees:          0
-# Expected evaluator (Miguel):    4400000000
-# Expected project:               4800000000
+# Expected withdrawals:
+# - 600000000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 10000000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# Expected project account balances:
+# - InitiatingNodePayFees:          0
+# - IxoFees:                        0
+# - IxoPayFees:                     0
+# - ValidatingNodeSetFees:          0
+# - project:               4800000000
