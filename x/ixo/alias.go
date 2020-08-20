@@ -3,7 +3,7 @@ package ixo
 import "github.com/ixofoundation/ixo-blockchain/x/ixo/internal/types"
 
 const (
-	IxoNativeToken = types.IxoNativeToken
+	IxoNativeToken = "uixo"
 )
 
 type (
@@ -22,7 +22,4 @@ var (
 	GenerateOrBroadcastMsgs          = types.GenerateOrBroadcastMsgs
 	SignAndBroadcastTxFromStdSignMsg = types.SignAndBroadcastTxFromStdSignMsg
 	IxoSigVerificationGasConsumer    = types.IxoSigVerificationGasConsumer
-
-	// Types
-	IxoDecimals = types.IxoDecimals
 )

@@ -25,7 +25,8 @@ func TestHandler_CreateClaim(t *testing.T) {
 	params := paymentsKeeper.GetParams(ctx)
 	params.IxoFactor = sdk.OneDec()
 	params.NodeFeePercentage = sdk.ZeroDec()
-	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
+	params.ClaimFeeAmount = sdk.NewCoins(
+		sdk.NewInt64Coin(ixo.IxoNativeToken, 60000000))
 	paymentsKeeper.SetParams(ctx, params)
 	projectMsg := types.MsgCreateClaim{
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
@@ -63,8 +64,10 @@ func Test_CreateEvaluation(t *testing.T) {
 	params := fk.GetParams(ctx)
 	params.IxoFactor = sdk.OneDec()
 	params.NodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
-	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
-	params.EvaluationFeeAmount = sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals) // 0.4
+	params.ClaimFeeAmount = sdk.NewCoins(
+		sdk.NewInt64Coin(ixo.IxoNativeToken, 60000000))
+	params.EvaluationFeeAmount = sdk.NewCoins(
+		sdk.NewInt64Coin(ixo.IxoNativeToken, 40000000))
 	params.EvaluationPayFeePercentage = sdk.ZeroDec()
 	params.EvaluationPayNodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
 	fk.SetParams(ctx, params)

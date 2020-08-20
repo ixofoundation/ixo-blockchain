@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
-	"strconv"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
@@ -93,9 +91,9 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	if err != nil {
 		return sdk.ErrInternal(err.Error())
 	}
-	_, err = strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
+	_, err = sdk.ParseCoins(evaluatorPayPerClaimStr)
 	if err != nil {
-		return sdk.ErrInternal("evaluatorPayPerClaim should be an integer")
+		return sdk.ErrInternal("evaluatorPayPerClaim should be valid coins")
 	}
 
 	// Check that evaluatorPayPerClaim is present and is a valid coins value

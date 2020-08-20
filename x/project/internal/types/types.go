@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"strconv"
 )
 
 var (
@@ -26,7 +25,7 @@ func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
 
 type StoredProjectDoc interface {
 	GetClaimerPay() sdk.Coins
-	GetEvaluatorPay() int64
+	GetEvaluatorPay() sdk.Coins
 	GetProjectDid() did.Did
 	GetSenderDid() did.Did
 	GetPubKey() string
@@ -134,7 +133,7 @@ func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
 	return claimerPayPerClaimCoins
 }
 
-func (pd ProjectDoc) GetEvaluatorPay() int64 {
+func (pd ProjectDoc) GetEvaluatorPay() sdk.Coins {
 	evaluatorPayPerClaimBz, found := pd.GetProjectData()["evaluatorPayPerClaim"]
 	if !found {
 		panic("evaluatorPayPerClaim not found")
@@ -146,13 +145,12 @@ func (pd ProjectDoc) GetEvaluatorPay() int64 {
 		panic(err)
 	}
 
-	evaluatorPayPerClaimInt, err := strconv.ParseInt(
-		evaluatorPayPerClaimStr, 10, 64)
+	evaluatorPayPerClaimCoins, err := sdk.ParseCoins(evaluatorPayPerClaimStr)
 	if err != nil {
 		panic(err)
 	}
 
-	return evaluatorPayPerClaimInt
+	return evaluatorPayPerClaimCoins
 }
 
 type CreateAgentDoc struct {

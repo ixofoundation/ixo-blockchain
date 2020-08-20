@@ -19,12 +19,12 @@ var (
 
 // payments parameters
 type Params struct {
-	IxoFactor                      sdk.Dec `json:"ixo_factor" yaml:"ixo_factor"`
-	ClaimFeeAmount                 sdk.Dec `json:"claim_fee_amount" yaml:"claim_fee_amount"`
-	EvaluationFeeAmount            sdk.Dec `json:"evaluation_fee_amount" yaml:"evaluation_fee_amount"`
-	NodeFeePercentage              sdk.Dec `json:"node_fee_percentage" yaml:"node_fee_percentage"`
-	EvaluationPayFeePercentage     sdk.Dec `json:"evaluation_pay_fee_percentage" yaml:"evaluation_pay_fee_percentage"`
-	EvaluationPayNodeFeePercentage sdk.Dec `json:"evaluation_pay_node_fee_percentage" yaml:"evaluation_pay_node_fee_percentage"`
+	IxoFactor                      sdk.Dec   `json:"ixo_factor" yaml:"ixo_factor"`
+	ClaimFeeAmount                 sdk.Coins `json:"claim_fee_amount" yaml:"claim_fee_amount"`
+	EvaluationFeeAmount            sdk.Coins `json:"evaluation_fee_amount" yaml:"evaluation_fee_amount"`
+	NodeFeePercentage              sdk.Dec   `json:"node_fee_percentage" yaml:"node_fee_percentage"`
+	EvaluationPayFeePercentage     sdk.Dec   `json:"evaluation_pay_fee_percentage" yaml:"evaluation_pay_fee_percentage"`
+	EvaluationPayNodeFeePercentage sdk.Dec   `json:"evaluation_pay_node_fee_percentage" yaml:"evaluation_pay_node_fee_percentage"`
 }
 
 // ParamTable for payments module.
@@ -32,7 +32,7 @@ func ParamKeyTable() params.KeyTable {
 	return params.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(ixoFactor, claimFeeAmount, evaluationFeeAmount,
+func NewParams(ixoFactor sdk.Dec, claimFeeAmount, evaluationFeeAmount sdk.Coins,
 	nodeFeePercentage, evaluationPayFeePercentage,
 	evaluationPayNodeFeePercentage sdk.Dec) Params {
 
@@ -50,12 +50,12 @@ func NewParams(ixoFactor, claimFeeAmount, evaluationFeeAmount,
 // default payments module parameters
 func DefaultParams() Params {
 	return Params{
-		IxoFactor:                      sdk.OneDec(),                                  // 1
-		ClaimFeeAmount:                 sdk.NewDecWithPrec(6, 1).Mul(ixo.IxoDecimals), // 0.6 * 1e8 = 60000000
-		EvaluationFeeAmount:            sdk.NewDecWithPrec(4, 1).Mul(ixo.IxoDecimals), // 0.4 * 1e8 = 40000000
-		NodeFeePercentage:              sdk.NewDecWithPrec(5, 1),                      // 0.5
-		EvaluationPayFeePercentage:     sdk.NewDecWithPrec(1, 1),                      // 0.1
-		EvaluationPayNodeFeePercentage: sdk.NewDecWithPrec(2, 1),                      // 0.2
+		IxoFactor:                      sdk.OneDec(), // 1.0
+		ClaimFeeAmount:                 sdk.NewCoins(sdk.NewInt64Coin(ixo.IxoNativeToken, 60000000)),
+		EvaluationFeeAmount:            sdk.NewCoins(sdk.NewInt64Coin(ixo.IxoNativeToken, 40000000)),
+		NodeFeePercentage:              sdk.NewDecWithPrec(5, 1), // 0.5
+		EvaluationPayFeePercentage:     sdk.NewDecWithPrec(1, 1), // 0.1
+		EvaluationPayNodeFeePercentage: sdk.NewDecWithPrec(2, 1), // 0.2
 	}
 }
 
@@ -64,10 +64,10 @@ func ValidateParams(params Params) error {
 	if params.IxoFactor.LT(sdk.ZeroDec()) {
 		return fmt.Errorf("payments parameter IxoFactor should be positive, is %s ", params.IxoFactor.String())
 	}
-	if params.ClaimFeeAmount.LT(sdk.ZeroDec()) {
+	if params.ClaimFeeAmount.IsAnyNegative() {
 		return fmt.Errorf("payments parameter ClaimFeeAmount should be positive, is %s ", params.ClaimFeeAmount.String())
 	}
-	if params.EvaluationFeeAmount.LT(sdk.ZeroDec()) {
+	if params.EvaluationFeeAmount.IsAnyNegative() {
 		return fmt.Errorf("payments parameter EvaluationFeeAmount should be positive, is %s ", params.EvaluationFeeAmount.String())
 	}
 	if params.NodeFeePercentage.LT(sdk.ZeroDec()) {
