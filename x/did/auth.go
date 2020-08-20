@@ -15,7 +15,7 @@ import (
 )
 
 func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res error) {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, err error) {
 
 		// Get signer PubKey
 		var pubKeyEd25519 ed25519.PubKeyEd25519
@@ -51,7 +51,7 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res error) {
+	) (newCtx sdk.Context, err error) {
 
 		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
 			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
