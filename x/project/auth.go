@@ -195,11 +195,10 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		}
 
 		// check signature, return account with incremented nonce
-		ixoSig := stdTx.GetSignatures()[0]
-		ixoPub := stdTx.GetPubKeys()[0]
+		ixoSig := stdTx.Signatures[0]
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
-		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, auth.StdSignature{ixoPub, ixoSig}, signBytes, simulate, params)
+		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if res != nil {
 			return newCtx, res
 		}
