@@ -44,7 +44,7 @@ func init() {
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
 
 func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
-	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, res error) {
+	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, err error) {
 
 		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
 		if err != nil {
@@ -77,11 +77,11 @@ func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdS
 
 func ProcessSig(
 	ctx sdk.Context, acc authexported.Account, sig auth.StdSignature, signBytes []byte, simulate bool, params auth.Params,
-) (updatedAcc authexported.Account, res error) {
+) (updatedAcc authexported.Account, err error) {
 
 	var pubKey crypto.PubKey
 	pubKey = acc.GetPubKey()
-	err := acc.SetPubKey(pubKey)
+	err = acc.SetPubKey(pubKey)
 	if err != nil {
 		return nil, sdkerrors.Wrap(ErrInternal, "setting PubKey on signer's account")
 	}
@@ -106,7 +106,7 @@ func ProcessSig(
 		panic(err)
 	}
 
-	return acc, res
+	return acc, err
 }
 
 func getSignBytes(chainID string, tx auth.StdTx, acc authexported.Account, genesis bool) []byte {
@@ -123,7 +123,7 @@ func getSignBytes(chainID string, tx auth.StdTx, acc authexported.Account, genes
 func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
 	return func(
 		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res error) {
+	) (newCtx sdk.Context, err error) {
 
 		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
 			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
@@ -155,7 +155,7 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 						"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
 						rType.Descriptor, stdTx.Fee.Gas, newCtx.GasMeter().GasConsumed(),
 					)
-					res = sdkerrors.Wrap(sdkerrors.ErrOutOfGas, log)
+					err = sdkerrors.Wrap(sdkerrors.ErrOutOfGas, log)
 				default:
 					panic(r)
 				}

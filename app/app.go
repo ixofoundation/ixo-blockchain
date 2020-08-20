@@ -361,7 +361,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
 		app.didKeeper, projectPubKeyGetter)
 
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, res error) {
+	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
 		// Route message based on ixo module router key
 		// Otherwise, route to Cosmos ante handler
 		msg := tx.GetMsgs()[0]
