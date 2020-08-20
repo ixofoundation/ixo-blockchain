@@ -6,7 +6,7 @@ import (
 
 var (
 	DefaultCodeSpace        = ModuleName
-	ErrorInvalidDid         = sdkErrors.Register(DefaultCodeSpace, 201, "code invalid did")
+	ErrorInvalidDid         = sdkErrors.Register(DefaultCodeSpace, 208, "code invalid did")
 	ErrorInvalidPubKey      = sdkErrors.Register(DefaultCodeSpace, 202, "code invalid pubKey")
 	ErrorDidPubKeyMismatch  = sdkErrors.Register(DefaultCodeSpace, 201, "code invalid did")
 	ErrorInvalidIssuer      = sdkErrors.Register(DefaultCodeSpace, 203, "code invalid issuer")
