@@ -123,10 +123,6 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		//if res := exported.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); res != nil {
-		//	return newCtx, res
-		//}
-
 		// message must be of type MsgCreateProject
 		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)
 		if !ok {

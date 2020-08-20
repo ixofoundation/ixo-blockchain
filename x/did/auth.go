@@ -82,10 +82,6 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
 
-		//if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
-		//	return newCtx, res, true
-		//}
-
 		// message must be of type MsgAddDid
 		msg, ok := stdTx.GetMsgs()[0].(MsgAddDid)
 		if !ok {
@@ -120,8 +116,6 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
-		//
 		return newCtx, sdkerrors.ErrOutOfGas // continue...
-		//return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
 	}
 }

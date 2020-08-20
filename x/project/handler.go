@@ -536,8 +536,7 @@ func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Di
 
 	k.AddAccountToProjectAccounts(ctx, projectDid, accountId, acc)
 
-	//return acc.GetAddress(), nil
-	return nil, nil
+	return acc.GetAddress(), nil
 }
 
 func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,

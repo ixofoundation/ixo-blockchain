@@ -79,16 +79,6 @@ func ProcessSig(
 	ctx sdk.Context, acc authexported.Account, sig auth.StdSignature, signBytes []byte, simulate bool, params auth.Params,
 ) (updatedAcc authexported.Account, res error) {
 
-	//pubKey, res := auth.ProcessPubKey(acc, sig, simulate)
-	//if !res.IsOK() {
-	//	return nil, res
-	//}
-
-	//err := acc.SetPubKey(pubKey)
-	//if err != nil {
-	//	return nil, sdk.ErrInternal("setting PubKey on signer's account").Result()
-	//}
-
 	var pubKey crypto.PubKey
 	pubKey = acc.GetPubKey()
 	err := acc.SetPubKey(pubKey)
