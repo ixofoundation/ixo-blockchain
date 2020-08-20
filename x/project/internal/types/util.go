@@ -72,7 +72,7 @@ func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) MsgWithdrawFu
 
 func CheckNotEmpty(value string, name string) (valid bool, err error) {
 	if strings.TrimSpace(value) == "" {
-		return false, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "name is empty")
+		return false, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, name+"is empty")
 	} else {
 		return true, nil
 	}
