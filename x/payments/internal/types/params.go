@@ -50,12 +50,12 @@ func NewParams(ixoFactor, claimFeeAmount, evaluationFeeAmount,
 // default payments module parameters
 func DefaultParams() Params {
 	return Params{
-		IxoFactor:                      sdk.OneDec(),                                           // 1
-		ClaimFeeAmount:                 sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals), // 0.6 * 1e8 = 60000000
-		EvaluationFeeAmount:            sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals), // 0.4 * 1e8 = 40000000
-		NodeFeePercentage:              sdk.NewDec(5).Quo(sdk.NewDec(10)),                      // 0.5
-		EvaluationPayFeePercentage:     sdk.NewDec(1).Quo(sdk.NewDec(10)),                      // 0.1
-		EvaluationPayNodeFeePercentage: sdk.NewDec(2).Quo(sdk.NewDec(10)),                      // 0.2
+		IxoFactor:                      sdk.OneDec(),                                  // 1
+		ClaimFeeAmount:                 sdk.NewDecWithPrec(6, 1).Mul(ixo.IxoDecimals), // 0.6 * 1e8 = 60000000
+		EvaluationFeeAmount:            sdk.NewDecWithPrec(4, 1).Mul(ixo.IxoDecimals), // 0.4 * 1e8 = 40000000
+		NodeFeePercentage:              sdk.NewDecWithPrec(5, 1),                      // 0.5
+		EvaluationPayFeePercentage:     sdk.NewDecWithPrec(1, 1),                      // 0.1
+		EvaluationPayNodeFeePercentage: sdk.NewDecWithPrec(2, 1),                      // 0.2
 	}
 }
 
