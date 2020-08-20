@@ -171,7 +171,7 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Did) (
 
 	ixoDid := k.GetParams(ctx).IxoDid
 	amount := getIxoAmount(ctx, k, bk, projectDid, IxoAccountFeesId)
-	_, err = payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid, amount)
+	err = payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid, amount)
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +359,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 
 	amountCoin := sdk.NewCoin(ixo.IxoNativeToken, amount)
-	_, err = payoutAndRecon(ctx, k, bk, projectDid, fromAccountId, recipientDid, amountCoin)
+	err = payoutAndRecon(ctx, k, bk, projectDid, fromAccountId, recipientDid, amountCoin)
 	if err != nil {
 		return nil, err
 	}
@@ -383,28 +383,28 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 }
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Did,
-	fromAccountId InternalAccountID, recipientDid did.Did, amount sdk.Coin) (*sdk.Result, error) {
+	fromAccountId InternalAccountID, recipientDid did.Did, amount sdk.Coin) error {
 
 	ixoBalance := getIxoAmount(ctx, k, bk, projectDid, fromAccountId)
 	if ixoBalance.IsLT(amount) {
-		return nil, sdkerrors.Wrap(types.ErrInternal, "insufficient funds in specified account")
+		return sdkerrors.Wrap(types.ErrInternal, "insufficient funds in specified account")
 	}
 
 	fromAccount, err := getAccountInProjectAccounts(ctx, k, projectDid, fromAccountId)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Get recipient address
 	recipientDidDoc, err := k.DidKeeper.GetDidDoc(ctx, recipientDid)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	recipientAddr := recipientDidDoc.Address()
 
 	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{amount})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var actionId [32]byte
@@ -412,7 +412,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 	copy(actionId[:], dec.Bytes())
 
 	addProjectWithdrawalTransaction(ctx, k, projectDid, actionId, recipientDid, amount)
-	return &sdk.Result{}, nil
+	return nil
 }
 
 func processFees(ctx sdk.Context, k Keeper, fk payments.Keeper, bk bank.Keeper,

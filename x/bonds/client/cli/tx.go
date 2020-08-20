@@ -117,7 +117,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			// Parse batch blocks
 			batchBlocks, err := sdk.ParseUint(_batchBlocks)
 			if err != nil {
-				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, types.DefaultCodespace)
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, "max batch blocks")
 			}
 
 			// Parse creator's ixo DID

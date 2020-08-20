@@ -126,7 +126,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		} else if allowSellsStrLower == "false" {
 			allowSells = false
 		} else {
-			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBooleant, "allow_sells")
+			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBoolean, "allow_sells")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}

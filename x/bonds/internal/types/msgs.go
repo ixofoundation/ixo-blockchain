@@ -77,7 +77,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 func (msg MsgCreateBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond_did cannot be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond_did can't be empty")
 	} else if strings.TrimSpace(msg.Token) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token can't be empty")
 	} else if strings.TrimSpace(msg.Name) == "" {
@@ -145,9 +145,9 @@ func (msg MsgCreateBond) ValidateBasic() error {
 
 	// Check that not zero
 	if msg.BatchBlocks.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "BatchBlocks")
 	} else if msg.MaxSupply.Amount.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "MaxSupply")
 	}
 
 	// Note: uniqueness of reserve tokens checked when parsing

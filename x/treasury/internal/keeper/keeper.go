@@ -78,7 +78,7 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid did.Did,
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to send")
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to send %s", c.Denom)
 		}
 
 		// Get capability by token name

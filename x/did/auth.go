@@ -35,7 +35,7 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 	}
 }
 
-func getAddDidSignBytes(chainID string, tx auth.StdTx, genesis bool, acc exported.Account) []byte {
+func getAddDidSignBytes(chainID string, tx auth.StdTx, acc exported.Account, genesis bool) []byte {
 	var accNum uint64
 	if !genesis {
 		// Fixed account number used so that sign bytes do not depend on it
@@ -81,6 +81,9 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		}
 
 		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
+		//if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
+		//	return newCtx, res, true
+		//}
 
 		// message must be of type MsgAddDid
 		msg, ok := stdTx.GetMsgs()[0].(MsgAddDid)
@@ -89,9 +92,9 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		}
 
 		// Get did pubKey
-		didPubKey, res := pubKeyGetter(ctx, msg)
-		if res != nil {
-			return newCtx, res
+		didPubKey, err := pubKeyGetter(ctx, msg)
+		if err != nil {
+			return newCtx, err
 		}
 
 		// Fetch signer (account underlying DID ). Account expected to not exist
@@ -109,7 +112,7 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		//check here
 		ixoSig := auth.StdSignature{PubKey: didPubKey, Signature: stdTx.GetSignatures()[0]}
 		isGenesis := ctx.BlockHeight() == 0
-		signBytes := getAddDidSignBytes(newCtx.ChainID(), stdTx, isGenesis, signerAcc)
+		signBytes := getAddDidSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
 		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
 		if res != nil {
 			return newCtx, res

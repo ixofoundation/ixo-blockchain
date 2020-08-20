@@ -49,5 +49,4 @@ var (
 	ErrInsufficientReserveToBuy             = sdkErrors.Register(DefaultCodespace, 328, "Insufficient reserve was supplied to perform buy order")
 	ErrInternal                             = sdkErrors.Register(DefaultCodespace, 329, "internal error")
 	ErrBondTokenDoesNotMatchBond            = sdkErrors.Register(DefaultCodespace, 330, "bond doesn't match")
-	ErrArgumentMissingOrNonBooleant         = sdkErrors.Register(DefaultCodespace, 331, "allow_sells")
 )

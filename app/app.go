@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"io"
 	"os"
@@ -18,7 +19,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
@@ -354,7 +354,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
 		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
+		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
 	addDidAnteHandler := did.NewAddDidAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(

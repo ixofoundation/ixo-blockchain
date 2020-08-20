@@ -63,7 +63,7 @@ func (k Keeper) EffectSubscriptionPayment(ctx sdk.Context, subscriptionId string
 
 	// Check if should effect
 	if !subscription.ShouldEffect(ctx) {
-		return sdkerrors.Wrap(types.ErrTriedToEffectSubscriptionPaymentWhenShouldnt, types.DefaultCodespace)
+		return types.ErrTriedToEffectSubscriptionPaymentWhenShouldnt
 	}
 
 	// Effect payment

@@ -180,9 +180,9 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 		}
 
 		// Get pubKey
-		pubKey, res := pubKeyGetter(ctx, msg)
-		if res != nil {
-			return newCtx, res
+		pubKey, err := pubKeyGetter(ctx, msg)
+		if err != nil {
+			return newCtx, err
 		}
 
 		// fetch first (and only) signer, who's going to pay the fees
@@ -213,8 +213,7 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
-
-		return newCtx, nil // continue...
+		return newCtx, sdkerrors.Wrap(ErrInternal, fmt.Sprint(stdTx.Fee.Gas)) // continue...
 	}
 }
 

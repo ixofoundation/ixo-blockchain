@@ -81,7 +81,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 
 func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCreateBond) (*sdk.Result, error) {
 	if keeper.BankKeeper.BlacklistedAddr(msg.FeeAddress) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
 	}
 
 	if keeper.BondExists(ctx, msg.BondDid) {
@@ -89,7 +89,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 	} else if keeper.BondDidExists(ctx, msg.Token) {
 		return nil, sdkerrors.Wrap(types.ErrBondTokenIsTaken, msg.Token)
 	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
-		return nil, sdkerrors.Wrap(types.ErrBondTokenCannotBeStakingToken, "")
+		return nil, types.ErrBondTokenCannotBeStakingToken
 	}
 
 	// Set state to open by default (overridden below if augmented function)
@@ -263,9 +263,9 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) (*sdk
 
 	// Check current state is HATCH/OPEN, max prices, order quantity limits
 	if bond.State != types.OpenState && bond.State != types.HatchState {
-		return nil, sdkerrors.Wrap(types.ErrInvalidStateForAction, "")
+		return nil, types.ErrInvalidStateForAction
 	} else if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
-		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, "denoms mismatch")
+		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
 		return nil, sdkerrors.Wrap(types.ErrOrderQuantityLimitExceeded, "")
 	}
@@ -460,9 +460,9 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) (*s
 
 	// Check that from and to use reserve token names
 	fromAndTo := sdk.NewCoins(msg.From, sdk.NewCoin(msg.ToToken, sdk.OneInt()))
-	//fromAndToDenoms := msg.From.Denom + "," + msg.ToToken
+	fromAndToDenoms := msg.From.Denom + "," + msg.ToToken
 	if !bond.ReserveDenomsEqualTo(fromAndTo) {
-		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, "")
+		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, fromAndToDenoms)
 	}
 
 	// Check if order quantity limit exceeded

@@ -97,7 +97,7 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err e
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
 		return nil,
-			sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond does not exist")
+			sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, bondDid+"bond does not exist")
 	}
 
 	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, bond)
@@ -129,7 +129,7 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 	bondDid := path[0]
 
 	if !keeper.LastBatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "last batch for  does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for  does not exist", bondDid)
 	}
 
 	batch := keeper.MustGetLastBatch(ctx, bondDid)
@@ -193,7 +193,7 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 
 	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err2 != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "coin is missing")
+		return nil, sdkerrors.ErrInvalidCoins
 	}
 
 	reservePrices, err := bond.GetPricesAtSupply(bondCoin.Amount)

@@ -26,7 +26,7 @@ func parseBool(boolStr, boolName string) (bool, error) {
 	} else if boolStr == FALSE {
 		return false, nil
 	} else {
-		return false, sdkerrors.Wrap(types.ErrInvalidArgument, "not a valid bool")
+		return false, sdkerrors.Wrapf(types.ErrInvalidArgument, "%s is not a valid bool (true/false)", boolName)
 	}
 }
 

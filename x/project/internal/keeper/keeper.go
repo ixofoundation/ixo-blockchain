@@ -77,7 +77,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.Stored
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrap(did.ErrorInvalidDid, "Invalid ProjectDid Addres")
+		return nil, sdkerrors.Wrap(did.ErrorInvalidDid, "Invalid ProjectDid Address")
 	}
 
 	var projectDoc types.ProjectDoc
@@ -143,7 +143,7 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
 	address := supply.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAddress, "Invalid ProjectDid Address")
+		return nil, sdkerrors.Wrap(types.ErrInvalidAddress, "Generate account already exists")
 	}
 
 	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)

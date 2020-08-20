@@ -161,7 +161,7 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorDidPubKeyMismatch, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
 		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
 	}
