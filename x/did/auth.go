@@ -99,8 +99,8 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		// Fetch signer (account underlying DID ). Account expected to not exist
 		signerAddr := sdk.AccAddress(didPubKey.Address())
-		_, res = auth.GetSignerAcc(newCtx, ak, signerAddr)
-		if res != nil {
+		_, err = auth.GetSignerAcc(newCtx, ak, signerAddr)
+		if err != nil {
 			return newCtx, sdkerrors.Wrap(types.ErrInternal, "expected account underlying DID to not exist")
 		}
 
@@ -113,9 +113,9 @@ func NewAddDidAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 		ixoSig := auth.StdSignature{PubKey: didPubKey, Signature: stdTx.GetSignatures()[0]}
 		isGenesis := ctx.BlockHeight() == 0
 		signBytes := getAddDidSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
-		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
-		if res != nil {
-			return newCtx, res
+		signerAcc, err = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
+		if err != nil {
+			return newCtx, err
 		}
 
 		ak.SetAccount(newCtx, signerAcc)
