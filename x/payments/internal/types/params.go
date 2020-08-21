@@ -135,13 +135,23 @@ func (p Params) String() string {
 }
 
 func validateFactor(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("ixo factor must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("ixo factor must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("ixo factor too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateFeeAmount(i interface{}) error {
