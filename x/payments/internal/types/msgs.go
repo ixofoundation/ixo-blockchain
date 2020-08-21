@@ -34,6 +34,14 @@ type MsgCreatePaymentTemplate struct {
 	PaymentTemplate PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 }
 
+func NewMsgCreatePaymentTemplate(template PaymentTemplate,
+	creatorDid did.Did) MsgCreatePaymentTemplate {
+	return MsgCreatePaymentTemplate{
+		CreatorDid:      creatorDid,
+		PaymentTemplate: template,
+	}
+}
+
 func (msg MsgCreatePaymentTemplate) Type() string  { return TypeMsgCreatePaymentTemplate }
 func (msg MsgCreatePaymentTemplate) Route() string { return RouterKey }
 func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
@@ -79,6 +87,19 @@ type MsgCreatePaymentContract struct {
 	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
 	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+}
+
+func NewMsgCreatePaymentContract(templateId, contractId string,
+	payer sdk.AccAddress, canDeauthorise bool, discountId sdk.Uint,
+	creatorDid did.Did) MsgCreatePaymentContract {
+	return MsgCreatePaymentContract{
+		CreatorDid:        creatorDid,
+		PaymentTemplateId: templateId,
+		PaymentContractId: contractId,
+		Payer:             payer,
+		CanDeauthorise:    canDeauthorise,
+		DiscountId:        discountId,
+	}
 }
 
 func (msg MsgCreatePaymentContract) Type() string  { return TypeMsgCreatePaymentContract }
@@ -131,6 +152,17 @@ type MsgCreateSubscription struct {
 	Period            Period   `json:"period" yaml:"period"`
 }
 
+func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
+	period Period, creatorDid did.Did) MsgCreateSubscription {
+	return MsgCreateSubscription{
+		CreatorDid:        creatorDid,
+		SubscriptionId:    subscriptionId,
+		PaymentContractId: contractId,
+		MaxPeriods:        maxPeriods,
+		Period:            period,
+	}
+}
+
 func (msg MsgCreateSubscription) Type() string  { return TypeMsgCreateSubscription }
 func (msg MsgCreateSubscription) Route() string { return RouterKey }
 func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
@@ -180,6 +212,15 @@ type MsgSetPaymentContractAuthorisation struct {
 	Authorised        bool    `json:"authorised" yaml:"authorised"`
 }
 
+func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
+	payerDid did.Did) MsgSetPaymentContractAuthorisation {
+	return MsgSetPaymentContractAuthorisation{
+		PayerDid:          payerDid,
+		PaymentContractId: contractId,
+		Authorised:        authorised,
+	}
+}
+
 func (msg MsgSetPaymentContractAuthorisation) Type() string {
 	return TypeMsgSetPaymentContractAuthorisation
 }
@@ -225,6 +266,16 @@ type MsgGrantDiscount struct {
 	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
+}
+
+func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
+	recipient sdk.AccAddress, creatorDid did.Did) MsgGrantDiscount {
+	return MsgGrantDiscount{
+		SenderDid:         creatorDid,
+		PaymentContractId: contractId,
+		DiscountId:        discountId,
+		Recipient:         recipient,
+	}
 }
 
 func (msg MsgGrantDiscount) Type() string  { return TypeMsgGrantDiscount }
@@ -273,6 +324,15 @@ type MsgRevokeDiscount struct {
 	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
 }
 
+func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
+	creatorDid did.Did) MsgRevokeDiscount {
+	return MsgRevokeDiscount{
+		SenderDid:         creatorDid,
+		PaymentContractId: contractId,
+		Holder:            holder,
+	}
+}
+
 func (msg MsgRevokeDiscount) Type() string  { return TypeMsgRevokeDiscount }
 func (msg MsgRevokeDiscount) Route() string { return RouterKey }
 func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
@@ -316,6 +376,13 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 type MsgEffectPayment struct {
 	SenderDid         did.Did `json:"sender_did" yaml:"sender_did"`
 	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
+}
+
+func NewMsgEffectPayment(contractId string, creatorDid did.Did) MsgEffectPayment {
+	return MsgEffectPayment{
+		SenderDid:         creatorDid,
+		PaymentContractId: contractId,
+	}
 }
 
 func (msg MsgEffectPayment) Type() string  { return TypeMsgEffectPayment }

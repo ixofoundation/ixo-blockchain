@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -113,44 +114,30 @@ func (pd ProjectDoc) GetProjectData() ProjectDataMap {
 	return dataMap
 }
 
-func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
-	claimerPayPerClaimBz, found := pd.GetProjectData()["claimerPayPerClaim"]
+func (pd ProjectDoc) getPay(key string) sdk.Coins {
+	payBz, found := pd.GetProjectData()[key]
 	if !found {
-		panic("claimerPayPerClaim not found")
+		panic(fmt.Sprintf("%s not found", key))
 	}
 
-	var claimerPayPerClaimStr string
-	err := json.Unmarshal(claimerPayPerClaimBz, &claimerPayPerClaimStr)
+	payCoins, err := sdk.ParseCoins(withoutQuotes(string(payBz)))
 	if err != nil {
 		panic(err)
 	}
 
-	claimerPayPerClaimCoins, err := sdk.ParseCoins(claimerPayPerClaimStr)
-	if err != nil {
-		panic(err)
-	}
+	return payCoins
+}
 
-	return claimerPayPerClaimCoins
+func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
+	return pd.getPay("claimerPayPerClaim")
 }
 
 func (pd ProjectDoc) GetEvaluatorPay() sdk.Coins {
-	evaluatorPayPerClaimBz, found := pd.GetProjectData()["evaluatorPayPerClaim"]
-	if !found {
-		panic("evaluatorPayPerClaim not found")
-	}
+	return pd.getPay("evaluatorPayPerClaim")
+}
 
-	var evaluatorPayPerClaimStr string
-	err := json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
-	if err != nil {
-		panic(err)
-	}
-
-	evaluatorPayPerClaimCoins, err := sdk.ParseCoins(evaluatorPayPerClaimStr)
-	if err != nil {
-		panic(err)
-	}
-
-	return evaluatorPayPerClaimCoins
+func (pd ProjectDoc) GetClaimVerifiedPay() sdk.Coins {
+	return pd.getPay("claimerPayPerVerifiedClaim")
 }
 
 type CreateAgentDoc struct {
