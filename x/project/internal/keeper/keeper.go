@@ -51,7 +51,7 @@ func (k Keeper) GetProjectDocIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.ProjectKey)
 }
 
-func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.StoredProjectDoc {
+func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.ProjectDoc {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
 		panic("project doc not found")
@@ -61,7 +61,7 @@ func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.Stored
 	var projectDoc types.ProjectDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
-	return &projectDoc
+	return projectDoc
 }
 
 func (k Keeper) ProjectDocExists(ctx sdk.Context, projectDid did.Did) bool {
@@ -69,24 +69,24 @@ func (k Keeper) ProjectDocExists(ctx sdk.Context, projectDid did.Did) bool {
 	return store.Has(types.GetProjectKey(projectDid))
 }
 
-func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.StoredProjectDoc, sdk.Error) {
+func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.ProjectDoc, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
+		return types.ProjectDoc{}, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
 	}
 
 	var projectDoc types.ProjectDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
-	return &projectDoc, nil
+	return projectDoc, nil
 }
 
-func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.StoredProjectDoc) {
+func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.ProjectDoc) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetProjectKey(projectDoc.GetProjectDid())
+	key := types.GetProjectKey(projectDoc.ProjectDid)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(projectDoc))
 }
 

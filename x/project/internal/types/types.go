@@ -7,10 +7,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
 
-var (
-	_ StoredProjectDoc = (*ProjectDoc)(nil)
-)
-
 type (
 	InternalAccountID          string
 	AccountMap                 map[InternalAccountID]sdk.AccAddress
@@ -22,17 +18,6 @@ type (
 
 func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
 	return projectDid + "/" + string(id)
-}
-
-type StoredProjectDoc interface {
-	GetClaimerPay() sdk.Coins
-	GetClaimApprovedPay() sdk.Coins
-	GetEvaluatorPay() sdk.Coins
-	GetProjectDid() did.Did
-	GetSenderDid() did.Did
-	GetPubKey() string
-	GetStatus() ProjectStatus
-	SetStatus(status ProjectStatus)
 }
 
 const (
@@ -101,11 +86,6 @@ func NewProjectDoc(txHash string, projectDid, senderDid did.Did,
 	}
 }
 
-func (pd ProjectDoc) GetProjectDid() did.Did          { return pd.ProjectDid }
-func (pd ProjectDoc) GetSenderDid() did.Did           { return pd.SenderDid }
-func (pd ProjectDoc) GetPubKey() string               { return pd.PubKey }
-func (pd ProjectDoc) GetStatus() ProjectStatus        { return pd.Status }
-func (pd *ProjectDoc) SetStatus(status ProjectStatus) { pd.Status = status }
 func (pd ProjectDoc) GetProjectData() ProjectDataMap {
 	var dataMap ProjectDataMap
 	err := json.Unmarshal(pd.Data, &dataMap)

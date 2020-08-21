@@ -125,7 +125,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	require.Nil(t, err)
 
 	require.False(t, k.ProjectDocExists(ctx, msg.ProjectDid))
-	k.SetProjectDoc(ctx, &projectDoc)
+	k.SetProjectDoc(ctx, projectDoc)
 
 	res := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
 	require.NotNil(t, res)
@@ -191,7 +191,7 @@ func Test_WithdrawFunds(t *testing.T) {
 	require.Nil(t, err)
 
 	require.False(t, k.ProjectDocExists(ctx, msg1.ProjectDid))
-	k.SetProjectDoc(ctx, &projectDoc)
+	k.SetProjectDoc(ctx, projectDoc)
 
 	res := handleMsgWithdrawFunds(ctx, k, bk, msg)
 	require.NotNil(t, res)

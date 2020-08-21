@@ -13,7 +13,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateEvaluation{}, "project/CreateEvaluation", nil)
 	cdc.RegisterConcrete(MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
 
-	cdc.RegisterInterface((*StoredProjectDoc)(nil), nil)
 	cdc.RegisterConcrete(ProjectDoc{}, "project/ProjectDoc", nil)
 	cdc.RegisterConcrete(AccountMap{}, "project/AccountMap", nil)
 	cdc.RegisterConcrete(WithdrawalInfo{}, "project/WithdrawalInfo", nil)

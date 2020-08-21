@@ -34,7 +34,7 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			if err != nil {
 				return pubKey, sdk.ErrInternal("project did not found").Result()
 			}
-			copy(pubKeyEd25519[:], base58.Decode(projectDoc.GetPubKey()))
+			copy(pubKeyEd25519[:], base58.Decode(projectDoc.PubKey))
 		}
 		return pubKeyEd25519, sdk.Result{}
 	}

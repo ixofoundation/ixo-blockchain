@@ -72,7 +72,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 		msg.TxHash, msg.ProjectDid, msg.SenderDid,
 		msg.PubKey, types.NullStatus, msg.Data)
 
-	k.SetProjectDoc(ctx, &projectDoc)
+	k.SetProjectDoc(ctx, projectDoc)
 	k.SetProjectWithdrawalTransactions(ctx, msg.ProjectDid, nil)
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -101,12 +101,12 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	newStatus := msg.Data.Status
 
-	if !newStatus.IsValidProgressionFrom(projectDoc.GetStatus()) {
+	if !newStatus.IsValidProgressionFrom(projectDoc.Status) {
 		return sdk.ErrUnknownRequest("Invalid Status Progression requested").Result()
 	}
 
 	if newStatus == FundedStatus {
-		projectAddr, err := getProjectAccount(ctx, k, projectDoc.GetProjectDid())
+		projectAddr, err := getProjectAccount(ctx, k, projectDoc.ProjectDid)
 		if err != nil {
 			return err.Result()
 		}
@@ -124,13 +124,13 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 
 	if newStatus == PaidoutStatus {
-		res := payoutFees(ctx, k, bk, projectDoc.GetProjectDid())
+		res := payoutFees(ctx, k, bk, projectDoc.ProjectDid)
 		if res.Code != sdk.CodeOK {
 			return res
 		}
 	}
 
-	projectDoc.SetStatus(newStatus)
+	projectDoc.Status = newStatus
 	k.SetProjectDoc(ctx, projectDoc)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -285,7 +285,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	// Process claimer pay
 	pay := projectDoc.GetClaimerPay()
 	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-	err = processClaimerPay(ctx, k, bk, pk, projectDoc.GetProjectDid(),
+	err = processClaimerPay(ctx, k, bk, pk, projectDoc.ProjectDid,
 		senderAddr, pay, payMax, types.ClaimerPay)
 	if err != nil {
 		return err.Result()
@@ -353,7 +353,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	// Process claimer pay per approved claim, if claim approved
 	pay := projectDoc.GetClaimApprovedPay()
 	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-	err = processClaimerPay(ctx, k, bk, pk, projectDoc.GetProjectDid(),
+	err = processClaimerPay(ctx, k, bk, pk, projectDoc.ProjectDid,
 		senderAddr, pay, payMax, types.ClaimApprovedPay)
 	if err != nil {
 		return err.Result()
@@ -390,7 +390,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
-	if projectDoc.GetStatus() != PaidoutStatus {
+	if projectDoc.Status != PaidoutStatus {
 		return sdk.ErrUnknownRequest("Project not in PAIDOUT Status").Result()
 	}
 
@@ -399,7 +399,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	amount := withdrawFundsDoc.Amount
 
 	// If this is a refund, recipient has to be the project creator
-	if withdrawFundsDoc.IsRefund && (recipientDid != projectDoc.GetSenderDid()) {
+	if withdrawFundsDoc.IsRefund && (recipientDid != projectDoc.SenderDid) {
 		return sdk.ErrUnknownRequest("Only project creator can get a refund").Result()
 	}
 
