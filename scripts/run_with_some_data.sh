@@ -64,5 +64,5 @@ ixod validate-genesis
 #ixod start --pruning "syncable" &
 #ixocli rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg
 
-ixod start --pruning "syncable" &
+ixod start --pruning "everything" &
 ixocli rest-server --chain-id pandora-1 --trust-node && fg
