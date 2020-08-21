@@ -91,7 +91,7 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 		return sdk.ErrInternal(err.Error())
 	}
 
-	// Check that evaluatorPayPerClaim is present and is a string integer
+	// Check that evaluatorPayPerClaim is present and is coins
 	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
 	if !found {
 		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
@@ -101,7 +101,17 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 		return sdk.ErrInternal("evaluatorPayPerClaim should be valid coins")
 	}
 
-	// Check that evaluatorPayPerClaim is present and is a valid coins value
+	// Check that claimerPayPerVerifiedClaim is present and is coins
+	claimerPayPerVerifiedClaimBz, found := dataMap["claimerPayPerVerifiedClaim"]
+	if !found {
+		return sdk.ErrInternal("missing claimerPayPerVerifiedClaim in project doc")
+	}
+	_, err = sdk.ParseCoins(withoutQuotes(string(claimerPayPerVerifiedClaimBz)))
+	if err != nil {
+		return sdk.ErrInternal("claimerPayPerVerifiedClaim should be valid coins")
+	}
+
+	// Check that evaluatorPayPerClaim is present and is coins
 	claimerPayPerClaimBz, found := dataMap["claimerPayPerClaim"]
 	if !found {
 		return sdk.ErrInternal("missing claimerPayPerClaim in project doc")
