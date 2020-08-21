@@ -11,7 +11,7 @@ var (
 	ErrArgumentCannotBeNegative             = sdkErrors.Register(DefaultCodespace, 334, "argument cannot be negative")
 	ErrArgumentMustBePositive               = sdkErrors.Register(DefaultCodespace, 335, "argument must be a positive value")
 	ErrArgumentMustBeInteger                = sdkErrors.Register(DefaultCodespace, 336, "argument must be an integer value")
-	ErrArgumentMustBeBetween                = sdkErrors.Register(DefaultCodespace, 337, "\"%s argument must be between %s and %s\", arg, a, b")
+	ErrArgumentMustBeBetween                = sdkErrors.Register(DefaultCodespace, 337, "argument must be between")
 	ErrFunctionParameterMissingOrNonFloat   = sdkErrors.Register(DefaultCodespace, 338, "parameter is missing or is not a float")
 	ErrArgumentMissingOrNonFloat            = sdkErrors.Register(DefaultCodespace, 341, "argument is missing or is not a float")
 	ErrArgumentMissingOrNonUInteger         = sdkErrors.Register(DefaultCodespace, 342, " argument is missing or is not an unsigned integer")
