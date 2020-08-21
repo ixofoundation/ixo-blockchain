@@ -66,7 +66,7 @@ PROJECT_INFO='{
   "requiredClaims":"500",
   "evaluatorPayPerClaim":"50000000uixo",
   "claimerPayPerClaim":"1000000uxgbp",
-  "claimerPayPerVerifiedClaim":"",
+  "claimerPayPerApprovedClaim":"",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
   "createdBy":"Creator",

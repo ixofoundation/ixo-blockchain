@@ -263,6 +263,11 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
+	// Check if claim already exists
+	if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimID) {
+		return sdk.ErrInternal("claim already exists").Result()
+	}
+
 	// Get sender address
 	senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
 	if err != nil {
@@ -278,11 +283,17 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	}
 
 	// Process claimer pay
+	pay := projectDoc.GetClaimerPay()
+	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
 	err = processClaimerPay(ctx, k, bk, pk, projectDoc.GetProjectDid(),
-		senderAddr, projectDoc.GetClaimerPay())
+		senderAddr, pay, payMax, types.ClaimerPay)
 	if err != nil {
 		return err.Result()
 	}
+
+	// Create and set claim
+	claim := types.NewClaim(msg.Data.ClaimID)
+	k.SetClaim(ctx, msg.ProjectDid, claim)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -310,6 +321,14 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
+	// Get claim and confirm status is pending
+	claim, err := k.GetClaim(ctx, msg.ProjectDid, msg.Data.ClaimID)
+	if err != nil {
+		return err.Result()
+	} else if claim.Status != types.PendingClaim {
+		return sdk.ErrInternal("claim status must be pending").Result()
+	}
+
 	// Get sender address
 	senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
 	if err != nil {
@@ -330,6 +349,19 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	if err != nil {
 		return err.Result()
 	}
+
+	// Process claimer pay per approved claim, if claim approved
+	pay := projectDoc.GetClaimApprovedPay()
+	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
+	err = processClaimerPay(ctx, k, bk, pk, projectDoc.GetProjectDid(),
+		senderAddr, pay, payMax, types.ClaimApprovedPay)
+	if err != nil {
+		return err.Result()
+	}
+
+	// Update and set claim
+	claim.Status = msg.Data.Status
+	k.SetClaim(ctx, msg.ProjectDid, claim)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -549,9 +581,9 @@ func processEvaluatorPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 func processClaimerPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	pk payments.Keeper, projectDid did.Did, senderAddr sdk.AccAddress,
-	claimerPay sdk.Coins) sdk.Error {
+	pay, payMax sdk.Coins, payType types.PayType) sdk.Error {
 
-	if claimerPay.IsZero() {
+	if pay.IsZero() {
 		return nil
 	}
 
@@ -562,10 +594,10 @@ func processClaimerPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		return err
 	}
 
-	contractId := fmt.Sprintf("payment:contract:%s:%s:%s",
-		ModuleName, projectDid, senderAddr.String())
-	templateId := fmt.Sprintf("payment:template:%s:%s:%s",
-		ModuleName, projectDid, senderAddr.String())
+	contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
+		ModuleName, projectDid, senderAddr.String(), payType)
+	templateId := fmt.Sprintf("payment:template:%s:%s:%s:%s",
+		ModuleName, projectDid, senderAddr.String(), payType)
 
 	// Create or get payment template and contract
 	var template payments.PaymentTemplate
@@ -577,14 +609,10 @@ func processClaimerPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		}
 
 		// Create template
-		payAmount := claimerPay
-		payMinimum := claimerPay
-		payMaximum, _ := sdk.NewDecCoins(claimerPay).MulDec(
-			sdk.NewDec(10)).TruncateDecimal()
 		distribution := payments.NewDistribution(
 			payments.NewFullDistributionShare(senderAddr))
 		template = payments.NewPaymentTemplate(
-			templateId, payAmount, payMinimum, payMaximum, nil, distribution)
+			templateId, pay, pay, payMax, nil, distribution)
 		if err := template.Validate(); err != nil {
 			return err
 		}

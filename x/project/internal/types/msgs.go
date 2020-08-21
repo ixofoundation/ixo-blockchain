@@ -92,26 +92,6 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	}
 
 	// Check that evaluatorPayPerClaim is present and is coins
-	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
-	if !found {
-		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
-	}
-	_, err = sdk.ParseCoins(withoutQuotes(string(evaluatorPayPerClaimBz)))
-	if err != nil {
-		return sdk.ErrInternal("evaluatorPayPerClaim should be valid coins")
-	}
-
-	// Check that claimerPayPerVerifiedClaim is present and is coins
-	claimerPayPerVerifiedClaimBz, found := dataMap["claimerPayPerVerifiedClaim"]
-	if !found {
-		return sdk.ErrInternal("missing claimerPayPerVerifiedClaim in project doc")
-	}
-	_, err = sdk.ParseCoins(withoutQuotes(string(claimerPayPerVerifiedClaimBz)))
-	if err != nil {
-		return sdk.ErrInternal("claimerPayPerVerifiedClaim should be valid coins")
-	}
-
-	// Check that evaluatorPayPerClaim is present and is coins
 	claimerPayPerClaimBz, found := dataMap["claimerPayPerClaim"]
 	if !found {
 		return sdk.ErrInternal("missing claimerPayPerClaim in project doc")
@@ -119,6 +99,26 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	_, err = sdk.ParseCoins(withoutQuotes(string(claimerPayPerClaimBz)))
 	if err != nil {
 		return sdk.ErrInternal("claimerPayPerClaim should be valid coins")
+	}
+
+	// Check that claimerPayPerApprovedClaim is present and is coins
+	claimerPayPerApprovedClaimBz, found := dataMap["claimerPayPerApprovedClaim"]
+	if !found {
+		return sdk.ErrInternal("missing claimerPayPerApprovedClaim in project doc")
+	}
+	_, err = sdk.ParseCoins(withoutQuotes(string(claimerPayPerApprovedClaimBz)))
+	if err != nil {
+		return sdk.ErrInternal("claimerPayPerApprovedClaim should be valid coins")
+	}
+
+	// Check that evaluatorPayPerClaim is present and is coins
+	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
+	if !found {
+		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
+	}
+	_, err = sdk.ParseCoins(withoutQuotes(string(evaluatorPayPerClaimBz)))
+	if err != nil {
+		return sdk.ErrInternal("evaluatorPayPerClaim should be valid coins")
 	}
 
 	// Check that DIDs and PubKey valid

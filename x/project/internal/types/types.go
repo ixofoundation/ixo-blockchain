@@ -26,6 +26,7 @@ func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
 
 type StoredProjectDoc interface {
 	GetClaimerPay() sdk.Coins
+	GetClaimApprovedPay() sdk.Coins
 	GetEvaluatorPay() sdk.Coins
 	GetProjectDid() did.Did
 	GetSenderDid() did.Did
@@ -130,13 +131,21 @@ func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
 	return pd.getPay("claimerPayPerClaim")
 }
 
+func (pd ProjectDoc) GetClaimApprovedPay() sdk.Coins {
+	return pd.getPay("claimerPayPerApprovedClaim")
+}
+
 func (pd ProjectDoc) GetEvaluatorPay() sdk.Coins {
 	return pd.getPay("evaluatorPayPerClaim")
 }
 
-func (pd ProjectDoc) GetClaimVerifiedPay() sdk.Coins {
-	return pd.getPay("claimerPayPerVerifiedClaim")
-}
+type PayType = string
+
+const (
+	ClaimerPay       PayType = "claimer_pay"
+	ClaimApprovedPay PayType = "claim_approved_pay"
+	EvaluatorPay     PayType = "evaluator_pay"
+)
 
 type CreateAgentDoc struct {
 	AgentDid did.Did `json:"did" yaml:"did"`
@@ -179,4 +188,16 @@ type WithdrawFundsDoc struct {
 	RecipientDid did.Did `json:"recipientDid" yaml:"recipientDid"`
 	Amount       sdk.Int `json:"amount" yaml:"amount"`
 	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
+}
+
+type Claim struct {
+	Id     string      `json:"id" yaml:"id"`
+	Status ClaimStatus `json:"status" yaml:"status"`
+}
+
+func NewClaim(id string) Claim {
+	return Claim{
+		Id:     id,
+		Status: PendingClaim,
+	}
 }
