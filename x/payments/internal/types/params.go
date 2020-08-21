@@ -134,7 +134,79 @@ func (p Params) String() string {
 	)
 }
 
-func validateAccessConfig(i interface{}) error {
+func validateFactor(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateFeeAmount(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateFeePercentage(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateClaimFeeAmount(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateEvaluationFeeAmount(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateRegistrationFeeAmount(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateAgentRegistrationFeeAmount(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateNodeFeePercentage(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateEvaluationPayFeePercentage(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return sdkerrors.Wrap(ErrInternal, "unknown type")
+}
+
+func validateEvaluationPayNodeFeePercentage(i interface{}) error {
 	ok := i
 	if ok != nil {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -145,15 +217,15 @@ func validateAccessConfig(i interface{}) error {
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyIxoFactor, &p.IxoFactor, validateAccessConfig},
-		{KeyInitiationFeeAmount, &p.InitiationFeeAmount, validateAccessConfig},
-		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage, validateAccessConfig},
-		{KeyClaimFeeAmount, &p.ClaimFeeAmount, validateAccessConfig},
-		{KeyEvaluationFeeAmount, &p.EvaluationFeeAmount, validateAccessConfig},
-		{KeyServiceAgentRegistrationFeeAmount, &p.ServiceAgentRegistrationFeeAmount, validateAccessConfig},
-		{KeyEvaluationAgentRegistrationFeeAmount, &p.EvaluationAgentRegistrationFeeAmount, validateAccessConfig},
-		{KeyNodeFeePercentage, &p.NodeFeePercentage, validateAccessConfig},
-		{KeyEvaluationPayFeePercentage, &p.EvaluationPayFeePercentage, validateAccessConfig},
-		{KeyEvaluationPayNodeFeePercentage, &p.EvaluationPayNodeFeePercentage, validateAccessConfig},
+		{KeyIxoFactor, &p.IxoFactor, validateFactor},
+		{KeyInitiationFeeAmount, &p.InitiationFeeAmount, validateFeeAmount},
+		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage, validateFeePercentage},
+		{KeyClaimFeeAmount, &p.ClaimFeeAmount, validateClaimFeeAmount},
+		{KeyEvaluationFeeAmount, &p.EvaluationFeeAmount, validateEvaluationFeeAmount},
+		{KeyServiceAgentRegistrationFeeAmount, &p.ServiceAgentRegistrationFeeAmount, validateRegistrationFeeAmount},
+		{KeyEvaluationAgentRegistrationFeeAmount, &p.EvaluationAgentRegistrationFeeAmount, validateAgentRegistrationFeeAmount},
+		{KeyNodeFeePercentage, &p.NodeFeePercentage, validateNodeFeePercentage},
+		{KeyEvaluationPayFeePercentage, &p.EvaluationPayFeePercentage, validateEvaluationPayFeePercentage},
+		{KeyEvaluationPayNodeFeePercentage, &p.EvaluationPayNodeFeePercentage, validateEvaluationPayNodeFeePercentage},
 	}
 }
