@@ -76,42 +76,6 @@ func DefaultParams() Params {
 	}
 }
 
-// validate params
-func ValidateParams(params Params) error {
-	if params.IxoFactor.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter IxoFactor should be positive, is %s ", params.IxoFactor.String())
-	}
-	if params.InitiationFeeAmount.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter InitiationFeeAmount should be positive, is %s ", params.InitiationFeeAmount.String())
-	}
-	if params.InitiationNodeFeePercentage.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter InitiationNodeFeePercentage should be positive, is %s ", params.InitiationNodeFeePercentage.String())
-	}
-	if params.ClaimFeeAmount.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter ClaimFeeAmount should be positive, is %s ", params.ClaimFeeAmount.String())
-	}
-	if params.EvaluationFeeAmount.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter EvaluationFeeAmount should be positive, is %s ", params.EvaluationFeeAmount.String())
-	}
-	if params.ServiceAgentRegistrationFeeAmount.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter ServiceAgentRegistrationFeeAmount should be positive, is %s ", params.ServiceAgentRegistrationFeeAmount.String())
-	}
-	if params.EvaluationAgentRegistrationFeeAmount.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter EvaluationAgentRegistrationFeeAmount should be positive, is %s ", params.EvaluationAgentRegistrationFeeAmount.String())
-	}
-	if params.NodeFeePercentage.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter NodeFeePercentage should be positive, is %s ", params.NodeFeePercentage.String())
-	}
-	if params.EvaluationPayFeePercentage.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter EvaluationPayFeePercentage should be positive, is %s ", params.EvaluationPayFeePercentage.String())
-	}
-	if params.EvaluationPayNodeFeePercentage.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("payments parameter EvaluationPayNodeFeePercentage should be positive, is %s ", params.EvaluationPayNodeFeePercentage.String())
-	}
-	// TODO: validate according to param upper limits
-	return nil
-}
-
 func (p Params) String() string {
 	return fmt.Sprintf(`Payments Params:
   Ixo Factor:                               %s
