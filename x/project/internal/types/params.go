@@ -68,10 +68,18 @@ func validateAccessConfig(i interface{}) error {
 	return sdkerrors.Wrap(ErrInternal, "unknown type")
 }
 
+func validateAccessType(i interface{}) error {
+	ok := i
+	if ok != nil {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return nil
+}
+
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
 		{KeyIxoDid, &p.IxoDid, validateAccessConfig},
-		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding, validateAccessConfig},
+		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding, validateAccessType},
 	}
 }
