@@ -85,18 +85,20 @@ type MsgCreatePaymentContract struct {
 	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
 	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
+	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
 	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 }
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
-	payer sdk.AccAddress, canDeauthorise bool, discountId sdk.Uint,
-	creatorDid did.Did) MsgCreatePaymentContract {
+	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
+	discountId sdk.Uint, creatorDid did.Did) MsgCreatePaymentContract {
 	return MsgCreatePaymentContract{
 		CreatorDid:        creatorDid,
 		PaymentTemplateId: templateId,
 		PaymentContractId: contractId,
 		Payer:             payer,
+		Recipients:        recipients,
 		CanDeauthorise:    canDeauthorise,
 		DiscountId:        discountId,
 	}
@@ -122,6 +124,11 @@ func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
 		return ErrInvalidId(DefaultCodespace, "payment template id invalid")
 	} else if !IsValidPaymentContractId(msg.PaymentContractId) {
 		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+	}
+
+	// Validate recipient distribution
+	if err := msg.Recipients.Validate(); err != nil {
+		return err
 	}
 
 	return nil

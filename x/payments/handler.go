@@ -132,14 +132,6 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 		return err.Result()
 	}
 
-	// Ensure no blacklisted address in wallet distribution
-	for _, share := range msg.PaymentTemplate.WalletDistribution {
-		if bk.BlacklistedAddr(share.Address) {
-			return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed "+
-				"to receive transactions", share.Address)).Result()
-		}
-	}
-
 	// Submit payment template
 	k.SetPaymentTemplate(ctx, msg.PaymentTemplate)
 
@@ -152,7 +144,6 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 			sdk.NewAttribute(types.AttributeKeyPaymentMinimum, msg.PaymentTemplate.PaymentMinimum.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentMaximum, msg.PaymentTemplate.PaymentMaximum.String()),
 			sdk.NewAttribute(types.AttributeKeyDiscounts, fmt.Sprint(msg.PaymentTemplate.Discounts)),
-			sdk.NewAttribute(types.AttributeKeyWalletDistribution, fmt.Sprint(msg.PaymentTemplate.WalletDistribution)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -197,10 +188,19 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	creatorAddr := cretorDidDoc.Address()
 
 	// Create payment contract and validate
-	contract := NewPaymentContract(msg.PaymentContractId, msg.PaymentTemplateId,
-		creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
+	contract := NewPaymentContract(
+		msg.PaymentContractId, msg.PaymentTemplateId, creatorAddr, msg.Payer,
+		msg.Recipients, msg.CanDeauthorise, false, msg.DiscountId)
 	if err := contract.Validate(); err != nil {
 		return err.Result()
+	}
+
+	// Ensure no blacklisted address in wallet distribution
+	for _, share := range msg.Recipients {
+		if bk.BlacklistedAddr(share.Address) {
+			return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed "+
+				"to receive transactions", share.Address)).Result()
+		}
 	}
 
 	// Submit payment contract
@@ -213,6 +213,7 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyPaymentTemplateId, msg.PaymentTemplateId),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer.String()),
+			sdk.NewAttribute(types.AttributeKeyRecipients, fmt.Sprint(msg.Recipients)),
 			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
 			sdk.NewAttribute(types.AttributeKeyCanDeauthorise, strconv.FormatBool(msg.CanDeauthorise)),
 		),

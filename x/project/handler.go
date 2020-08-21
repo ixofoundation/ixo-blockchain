@@ -596,43 +596,34 @@ func processClaimerPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
 		ModuleName, projectDid, senderAddr.String(), payType)
-	templateId := fmt.Sprintf("payment:template:%s:%s:%s:%s",
-		ModuleName, projectDid, senderAddr.String(), payType)
+	templateId := fmt.Sprintf("payment:template:%s:%s:%s",
+		ModuleName, projectDid, payType)
 
 	// Create or get payment template and contract
 	var template payments.PaymentTemplate
 	var contract payments.PaymentContract
 	if !pk.PaymentContractExists(ctx, contractId) {
-		// Check template existence
-		if pk.PaymentTemplateExists(ctx, templateId) {
-			panic("expected payment template to not exist")
+		// Create and set template if it does not exist
+		if !pk.PaymentTemplateExists(ctx, templateId) {
+			template = payments.NewPaymentTemplate(
+				templateId, pay, pay, payMax, nil)
+			if err := template.Validate(); err != nil {
+				return err
+			}
+			pk.SetPaymentTemplate(ctx, template)
+		} else {
+			template = pk.MustGetPaymentTemplate(ctx, templateId)
 		}
 
-		// Create template
-		distribution := payments.NewDistribution(
+		// Create and set contract
+		recipients := payments.NewDistribution(
 			payments.NewFullDistributionShare(senderAddr))
-		template = payments.NewPaymentTemplate(
-			templateId, pay, pay, payMax, nil, distribution)
-		if err := template.Validate(); err != nil {
-			return err
-		}
-
-		// Create contract
 		contract = payments.NewPaymentContract(contractId, templateId,
-			projectAddr, projectAddr, false, true, sdk.ZeroUint())
-
-		pk.SetPaymentTemplate(ctx, template)
+			projectAddr, projectAddr, recipients, false, true, sdk.ZeroUint())
 		pk.SetPaymentContract(ctx, contract)
 	} else {
-		var err sdk.Error
-		template, err = pk.GetPaymentTemplate(ctx, templateId)
-		if err != nil {
-			panic("expected payment template to exist")
-		}
-		contract, err = pk.GetPaymentContract(ctx, contractId)
-		if err != nil {
-			panic("expected payment contract to exist")
-		}
+		template = pk.MustGetPaymentTemplate(ctx, templateId)
+		contract = pk.MustGetPaymentContract(ctx, contractId)
 	}
 
 	// Effect payment
