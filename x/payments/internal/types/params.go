@@ -3,7 +3,6 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
@@ -155,93 +154,183 @@ func validateFactor(i interface{}) error {
 }
 
 func validateFeeAmount(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("fee amount type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("fee amount must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("fee amount must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("fee amount too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateFeePercentage(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("fee percentage type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("fee percentag must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("fee percentag must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("fee percentag too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateClaimFeeAmount(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("claim fee amount type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("claim fee amount must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("claim fee amount must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("claim fee amount too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateEvaluationFeeAmount(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("evaluation fee amount type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("evaluation fee amount must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("evaluation fee amount must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("evaluation fee amount too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateRegistrationFeeAmount(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("registration fee amount type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("registration fee amount must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("registration fee amount must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("registration fee amount too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateAgentRegistrationFeeAmount(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("agent registration fee amount type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("agent registration fee amount must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("agent registration fee amount must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("agent registration fee amount too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateNodeFeePercentage(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("invalid node fee percentage type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("node fee percentage must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("node fee percentage must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("node fee percentage too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateEvaluationPayFeePercentage(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("invalid evaluation pay fee percentage type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("evaluation pay fee percentage must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("evaluation pay fee percentage must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("evaluation pay fee percentage too large: %s", v)
+	}
+
+	return nil
 }
 
 func validateEvaluationPayNodeFeePercentage(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("invalid evaluation pay node fee percentage type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("evaluation pay node fee percentage must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("evaluation pay node fee percentage must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("evaluation pay node fee percentage too large: %s", v)
+	}
+
+	return nil
 }
 
 // Implements params.ParamSet
