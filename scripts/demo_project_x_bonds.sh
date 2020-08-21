@@ -64,7 +64,7 @@ PROJECT_DID_FULL='{
 PROJECT_INFO='{
   "nodeDid":"nodeDid",
   "requiredClaims":"500",
-  "evaluatorPayPerClaim":"50",
+  "evaluatorPayPerClaim":"50000000uixo",
   "claimerPayPerClaim":"1000000uxgbp",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
