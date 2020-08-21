@@ -36,7 +36,7 @@ PROJECT_DID_FULL='{
 PROJECT_INFO='{
   "nodeDid":"nodeDid",
   "requiredClaims":"500",
-  "evaluatorPayPerClaim":"50000000uixo",
+  "evaluatorPayPerClaim":"5000000uixo",
   "claimerPayPerClaim":"",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
@@ -88,7 +88,7 @@ ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices=
 
 # Fund DID accounts  # TODO: Remove once DID ledgering fee is no longer 0
 echo "Funding DID accounts..."
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $MIGUEL_DID)" 20000000000uixo --fees=5000uixo --broadcast-mode=block -y
+#yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $MIGUEL_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
 yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $FRANCESCO_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
 yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $SHAUN_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
 
@@ -103,8 +103,8 @@ ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL
 
 # Fund project and progress status to FUNDED
 PROJECT_ADDR=$(ixocli q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
-echo "Funding project at [$PROJECT_ADDR] with uixo (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_ADDR" 10000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Funding project at [$PROJECT_ADDR] with uixo (using treasury 'oracle-transfer' using Francesco oracle)..."
+ixocli tx treasury oracle-mint "$PROJECT_ADDR" 100000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -123,14 +123,24 @@ SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
 ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
+# NodeFeePercentage:              0.5
+# EvaluationPayFeePercentage:     0.1
+# EvaluationPayNodeFeePercentage: 0.2
+
+# Claim fee: 6000000
+# Eval. fee: 4000000
+# Eval. pay: 5000000
+
 # Expected project account balances:
-# - InitiatingNodePayFees:  100000000
-# - IxoFees:                 50000000
-# - IxoPayFees:             400000000
-# - ValidatingNodeSetFees:   50000000
-# - project:               4900000000
+# - InitiatingNodePayFees:   100000  # 0.2 of 0.1 of eval pay
+# - IxoFees:                5000000  # 0.5 of claim+eval fee]
+# - IxoPayFees:              400000  # 0.8 of 0.1 of eval pay]
+# - ValidatingNodeSetFees:  5000000  # 0.5 of claim+eval fee]
+# - project:               85000000  # 100IXO - (6+4+5)IXO
 # Expected external account balances:
-# - Miguel:                4500000000 (+ original 10000000000 = 14500000000)
+# - Miguel:                 4500000  # 0.9 of eval pay
+
+# Sum of fee accounts: 10500000
 
 # Progress project status to PAIDOUT
 SENDER_DID="$SHAUN_DID"
@@ -142,15 +152,15 @@ echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 600000000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 10500000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
-# - InitiatingNodePayFees:          0
-# - IxoFees:                        0
-# - IxoPayFees:                     0
-# - ValidatingNodeSetFees:          0
-# - project:               4900000000
+# - InitiatingNodePayFees:        0
+# - IxoFees:                      0
+# - IxoPayFees:                   0
+# - ValidatingNodeSetFees:        0
+# - project:               85000000
 # Expected external account balances:
-# - Miguel:                4500000000 (+ original 10000000000 = 14500000000)
+# - Miguel:                 4500000
 
 echo "InitiatingNodePayFees"
 ixocli q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
@@ -174,22 +184,24 @@ echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
 # Expected external account balances:
-# - Miguel:                4500000000 (+ original 10000000000 - 5000 fee = 14499995000)
+# - Miguel:                 4495000 (5000uixo tx fee deducted)
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
 echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
-DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
 ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 600000000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
-# - 10000000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 10500000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 1000000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
-# - InitiatingNodePayFees:          0
-# - IxoFees:                        0
-# - IxoPayFees:                     0
-# - ValidatingNodeSetFees:          0
-# - project:               4800000000
+# - InitiatingNodePayFees:        0
+# - IxoFees:                      0
+# - IxoPayFees:                   0
+# - ValidatingNodeSetFees:        0
+# - project:               84000000  # 1000000 has been withdrawn
+# Expected external account balances:
+# - Miguel:                 4495000

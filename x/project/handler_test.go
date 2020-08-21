@@ -63,13 +63,13 @@ func Test_CreateEvaluation(t *testing.T) {
 
 	params := fk.GetParams(ctx)
 	params.IxoFactor = sdk.OneDec()
-	params.NodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
+	params.NodeFeePercentage = sdk.NewDecWithPrec(5, 1)
 	params.ClaimFeeAmount = sdk.NewCoins(
-		sdk.NewInt64Coin(ixo.IxoNativeToken, 60000000))
+		sdk.NewInt64Coin(ixo.IxoNativeToken, 6000000))
 	params.EvaluationFeeAmount = sdk.NewCoins(
-		sdk.NewInt64Coin(ixo.IxoNativeToken, 40000000))
+		sdk.NewInt64Coin(ixo.IxoNativeToken, 4000000))
 	params.EvaluationPayFeePercentage = sdk.ZeroDec()
-	params.EvaluationPayNodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
+	params.EvaluationPayNodeFeePercentage = sdk.NewDecWithPrec(5, 1)
 	fk.SetParams(ctx, params)
 
 	evaluationMsg := types.MsgCreateEvaluation{

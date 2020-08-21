@@ -51,8 +51,8 @@ func NewParams(ixoFactor sdk.Dec, claimFeeAmount, evaluationFeeAmount sdk.Coins,
 func DefaultParams() Params {
 	return Params{
 		IxoFactor:                      sdk.OneDec(), // 1.0
-		ClaimFeeAmount:                 sdk.NewCoins(sdk.NewInt64Coin(ixo.IxoNativeToken, 60000000)),
-		EvaluationFeeAmount:            sdk.NewCoins(sdk.NewInt64Coin(ixo.IxoNativeToken, 40000000)),
+		ClaimFeeAmount:                 sdk.NewCoins(sdk.NewInt64Coin(ixo.IxoNativeToken, 6000000)),
+		EvaluationFeeAmount:            sdk.NewCoins(sdk.NewInt64Coin(ixo.IxoNativeToken, 4000000)),
 		NodeFeePercentage:              sdk.NewDecWithPrec(5, 1), // 0.5
 		EvaluationPayFeePercentage:     sdk.NewDecWithPrec(1, 1), // 0.1
 		EvaluationPayNodeFeePercentage: sdk.NewDecWithPrec(2, 1), // 0.2
