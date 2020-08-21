@@ -119,12 +119,10 @@ func (pd ProjectDoc) getPay(key string) sdk.Coins {
 	if !found {
 		panic(fmt.Sprintf("%s not found", key))
 	}
-
 	payCoins, err := sdk.ParseCoins(withoutQuotes(string(payBz)))
 	if err != nil {
 		panic(err)
 	}
-
 	return payCoins
 }
 
