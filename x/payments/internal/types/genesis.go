@@ -19,10 +19,6 @@ func NewGenesisState(params Params, templates []PaymentTemplate,
 
 func ValidateGenesis(data GenesisState) error {
 	// Validate params
-	err := ValidateParams(data.Params)
-	if err != nil {
-		return err
-	}
 
 	// Validate payment templates
 	for _, pt := range data.PaymentTemplates {
