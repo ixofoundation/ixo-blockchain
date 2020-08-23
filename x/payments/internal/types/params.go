@@ -121,7 +121,7 @@ func validateFeeAmount(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf("fee amount type: %T", i)
+		return fmt.Errorf(" invalid fee amount type: %T", i)
 	}
 
 	if v.IsNil() {
@@ -141,7 +141,7 @@ func validateFeePercentage(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf("fee percentage type: %T", i)
+		return fmt.Errorf("invalid fee percentage type: %T", i)
 	}
 
 	if v.IsNil() {
@@ -161,7 +161,7 @@ func validateClaimFeeAmount(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf("claim fee amount type: %T", i)
+		return fmt.Errorf("invalid claim fee amount type: %T", i)
 	}
 
 	if v.IsNil() {
@@ -181,7 +181,7 @@ func validateEvaluationFeeAmount(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf("evaluation fee amount type: %T", i)
+		return fmt.Errorf("invalid evaluation fee amount type: %T", i)
 	}
 
 	if v.IsNil() {
@@ -201,7 +201,7 @@ func validateRegistrationFeeAmount(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf("registration fee amount type: %T", i)
+		return fmt.Errorf("invalid registration fee amount type: %T", i)
 	}
 
 	if v.IsNil() {
@@ -221,7 +221,7 @@ func validateAgentRegistrationFeeAmount(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf("agent registration fee amount type: %T", i)
+		return fmt.Errorf("invalid agent registration fee amount type: %T", i)
 	}
 
 	if v.IsNil() {

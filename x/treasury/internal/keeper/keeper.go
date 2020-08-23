@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -53,7 +54,7 @@ func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amoun
 	} else {
 		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrInternal, "send amount is invalid")
+			return sdkerrors.Wrap(types.ErrInternal, fmt.Sprintf("%s", err))
 		}
 		toAddress = parsedAddr
 	}

@@ -92,7 +92,7 @@ func (msg MsgCreateProject) ValidateBasic() error {
 	var evaluatorPayPerClaimStr string
 	err = json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInternal, "not allowed")
+		return sdkerrors.Wrap(ErrInternal, fmt.Sprintf("%s", err))
 	}
 	_, err = strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
 	if err != nil {

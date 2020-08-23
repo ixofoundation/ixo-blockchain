@@ -3,7 +3,6 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -60,30 +59,50 @@ func (p Params) String() string {
 `, p.ProjectMinimumInitialFunding, p.IxoDid)
 }
 
-func validateAccessConfig(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
+func validateIxoDid(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-	return sdkerrors.Wrap(ErrInternal, "unknown type")
+
+	if v.IsNil() {
+		return fmt.Errorf("ixo factor must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("ixo factor must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("ixo factor too large: %s", v)
+	}
+
+	return nil
 }
 
-func validateAccessType(i interface{}) error {
-	return nil
-	// TODO
-	ok := i
-	if ok != nil {
-		return fmt.Errorf("invalid parameter type: %T", i)
+func validateProjectMinimumInitialFunding(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+
+	if !ok {
+		return fmt.Errorf("invalid project minimum initial funding type: %T", i)
 	}
+
+	if v.IsNil() {
+		return fmt.Errorf("validate project minimum initial funding must be not nil")
+	}
+	if v.IsNegative() {
+		return fmt.Errorf("validate project minimum initial funding must be positive: %s", v)
+	}
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("validate project minimum initial funding too large: %s", v)
+	}
+
 	return nil
 }
 
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyIxoDid, &p.IxoDid, validateAccessConfig},
-		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding, validateAccessType},
+		{KeyIxoDid, &p.IxoDid, validateIxoDid},
+		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding, validateProjectMinimumInitialFunding},
 	}
 }
