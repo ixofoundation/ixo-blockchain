@@ -121,7 +121,7 @@ func validateFeeAmount(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
 	if !ok {
-		return fmt.Errorf(" invalid fee amount type: %T", i)
+		return fmt.Errorf("invalid fee amount type: %T", i)
 	}
 
 	if v.IsNil() {
