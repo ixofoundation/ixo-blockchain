@@ -12,9 +12,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	//"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
 	"github.com/tendermint/ed25519"
@@ -120,101 +123,117 @@ func getSignBytes(chainID string, tx auth.StdTx, acc authexported.Account, genes
 	)
 }
 
-func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
-	return func(
-		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, err error) {
+//func NewDefaultAnteHandler(ak auth.AccountKeeper, sk supply.Keeper, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
+//	return func(
+//		ctx sdk.Context, tx sdk.Tx, simulate bool,
+//	) (newCtx sdk.Context, err error) {
+//
+//		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
+//			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
+//		}
+//
+//		// all transactions must be of type auth.StdTx
+//		stdTx, ok := tx.(auth.StdTx)
+//		if !ok {
+//			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
+//			// during runTx.
+//			newCtx = auth.SetGasMeter(simulate, ctx, 0)
+//			return newCtx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "tx must be auth.StdTx")
+//		}
+//
+//		params := ak.GetParams(ctx)
+//
+//		newCtx = auth.SetGasMeter(simulate, ctx, stdTx.Fee.Gas)
+//
+//		// AnteHandlers must have their own defer/recover in order for the BaseApp
+//		// to know how much gas was used! This is because the GasMeter is created in
+//		// the AnteHandler, but if it panics the context won't be set properly in
+//		// runTx's recover call.
+//		defer func() {
+//			if r := recover(); r != nil {
+//				switch rType := r.(type) {
+//				//30.0 doesn't have these below mentioned funnctions ..need to check with miguel
+//				case sdk.ErrorOutOfGas:
+//					log := fmt.Sprintf(
+//						"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
+//						rType.Descriptor, stdTx.Fee.Gas, newCtx.GasMeter().GasConsumed(),
+//					)
+//					err = sdkerrors.Wrap(sdkerrors.ErrOutOfGas, log)
+//				default:
+//					panic(r)
+//				}
+//			}
+//		}()
+//
+//		if err := tx.ValidateBasic(); err != nil {
+//			return newCtx, err
+//		}
+//
+//		// Number of messages in the tx must be 1
+//		if len(tx.GetMsgs()) != 1 {
+//			return ctx, sdkerrors.Wrap(ErrInternal, "number of messages must be 1")
+//		}
+//
+//		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
+//
+//		// all messages must be of type IxoMsg
+//		msg, ok := stdTx.GetMsgs()[0].(IxoMsg)
+//		if !ok {
+//			return newCtx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
+//		}
+//
+//		// Get pubKey
+//		pubKey, err := pubKeyGetter(ctx, msg)
+//		if err != nil {
+//			return newCtx, err
+//		}
+//
+//		// fetch first (and only) signer, who's going to pay the fees
+//		signerAddr := sdk.AccAddress(pubKey.Address())
+//		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
+//		if res != nil {
+//			return newCtx, res
+//		}
+//
+//		// deduct the fees
+//		if !stdTx.Fee.Amount.IsZero() {
+//			res = auth.DeductFees(sk, newCtx, signerAcc, stdTx.Fee.Amount)
+//			if res != nil {
+//				return newCtx, res
+//			}
+//
+//			// reload the account as fees have been deducted
+//			signerAcc = ak.GetAccount(newCtx, signerAcc.GetAddress())
+//		}
+//
+//		// check signature, return account with incremented nonce
+//		ixoSig := auth.StdSignature{PubKey: pubKey, Signature: stdTx.GetSignatures()[0]}
+//		isGenesis := ctx.BlockHeight() == 0
+//		signBytes := getSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
+//		signerAcc, res = ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
+//		if res != nil {
+//			return newCtx, res
+//		}
+//
+//		ak.SetAccount(newCtx, signerAcc)
+//		return newCtx, sdkerrors.Wrap(ErrInternal, fmt.Sprint(stdTx.Fee.Gas)) // continue...
+//	}
+//}
 
-		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
-			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
-		}
-
-		// all transactions must be of type auth.StdTx
-		stdTx, ok := tx.(auth.StdTx)
-		if !ok {
-			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
-			// during runTx.
-			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "tx must be auth.StdTx")
-		}
-
-		params := ak.GetParams(ctx)
-
-		newCtx = auth.SetGasMeter(simulate, ctx, stdTx.Fee.Gas)
-
-		// AnteHandlers must have their own defer/recover in order for the BaseApp
-		// to know how much gas was used! This is because the GasMeter is created in
-		// the AnteHandler, but if it panics the context won't be set properly in
-		// runTx's recover call.
-		defer func() {
-			if r := recover(); r != nil {
-				switch rType := r.(type) {
-				//30.0 doesn't have these below mentioned funnctions ..need to check with miguel
-				case sdk.ErrorOutOfGas:
-					log := fmt.Sprintf(
-						"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
-						rType.Descriptor, stdTx.Fee.Gas, newCtx.GasMeter().GasConsumed(),
-					)
-					err = sdkerrors.Wrap(sdkerrors.ErrOutOfGas, log)
-				default:
-					panic(r)
-				}
-			}
-		}()
-
-		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err
-		}
-
-		// Number of messages in the tx must be 1
-		if len(tx.GetMsgs()) != 1 {
-			return ctx, sdkerrors.Wrap(ErrInternal, "number of messages must be 1")
-		}
-
-		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
-
-		// all messages must be of type IxoMsg
-		msg, ok := stdTx.GetMsgs()[0].(IxoMsg)
-		if !ok {
-			return newCtx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
-		}
-
-		// Get pubKey
-		pubKey, err := pubKeyGetter(ctx, msg)
-		if err != nil {
-			return newCtx, err
-		}
-
-		// fetch first (and only) signer, who's going to pay the fees
-		signerAddr := sdk.AccAddress(pubKey.Address())
-		signerAcc, res := auth.GetSignerAcc(newCtx, ak, signerAddr)
-		if res != nil {
-			return newCtx, res
-		}
-
-		// deduct the fees
-		if !stdTx.Fee.Amount.IsZero() {
-			res = auth.DeductFees(sk, newCtx, signerAcc, stdTx.Fee.Amount)
-			if res != nil {
-				return newCtx, res
-			}
-
-			// reload the account as fees have been deducted
-			signerAcc = ak.GetAccount(newCtx, signerAcc.GetAddress())
-		}
-
-		// check signature, return account with incremented nonce
-		ixoSig := auth.StdSignature{PubKey: pubKey, Signature: stdTx.GetSignatures()[0]}
-		isGenesis := ctx.BlockHeight() == 0
-		signBytes := getSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
-		signerAcc, res = ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
-		if res != nil {
-			return newCtx, res
-		}
-
-		ak.SetAccount(newCtx, signerAcc)
-		return newCtx, sdkerrors.Wrap(ErrInternal, fmt.Sprint(stdTx.Fee.Gas)) // continue...
-	}
+func NewDefaultAnteHandler(ak keeper.AccountKeeper, supplyKeeper types.SupplyKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer) sdk.AnteHandler {
+	return sdk.ChainAnteDecorators(
+		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		ante.NewMempoolFeeDecorator(),
+		ante.NewValidateBasicDecorator(),
+		ante.NewValidateMemoDecorator(ak),
+		ante.NewConsumeGasForTxSizeDecorator(ak),
+		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
+		ante.NewValidateSigCountDecorator(ak),
+		ante.NewDeductFeeDecorator(ak, supplyKeeper),
+		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
+		ante.NewSigVerificationDecorator(ak),
+		ante.NewIncrementSequenceDecorator(ak), // innermost AnteDecorator
+	)
 }
 
 func ApproximateFeeForTx(cliCtx context.CLIContext, tx auth.StdTx, chainId string) (auth.StdFee, error) {

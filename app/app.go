@@ -343,16 +343,16 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
-	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
+	//defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
 	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
 
 	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, defaultPubKeyGetter)
+		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 	didAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
+		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, projectPubKeyGetter)
+		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
