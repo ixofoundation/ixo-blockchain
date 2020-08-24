@@ -60,40 +60,20 @@ func (p Params) String() string {
 }
 
 func validateIxoDid(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
-	}
+	v := i.(sdk.Dec)
 
 	if v.IsNil() {
-		return fmt.Errorf("ixo factor must be not nil")
-	}
-	if v.IsNegative() {
-		return fmt.Errorf("ixo factor must be positive: %s", v)
-	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("ixo factor too large: %s", v)
+		return fmt.Errorf("ixo did must be positive: %s", v)
 	}
 
 	return nil
 }
 
 func validateProjectMinimumInitialFunding(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid project minimum initial funding type: %T", i)
-	}
+	v := i.(sdk.Dec)
 
 	if v.IsNil() {
-		return fmt.Errorf("validate project minimum initial funding must be not nil")
-	}
-	if v.IsNegative() {
-		return fmt.Errorf("validate project minimum initial funding must be positive: %s", v)
-	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("validate project minimum initial funding too large: %s", v)
+		return fmt.Errorf("project minimum initial funding must be positive: %s", v)
 	}
 
 	return nil

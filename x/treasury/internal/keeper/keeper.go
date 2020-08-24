@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -54,7 +53,7 @@ func (k Keeper) Send(ctx sdk.Context, fromDid did.Did, toDidOrAddr string, amoun
 	} else {
 		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrInternal, fmt.Sprintf("%s", err))
+			return err
 		}
 		toAddress = parsedAddr
 	}
@@ -85,8 +84,7 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid did.Did,
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.TransferCap) {
-			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to send")
-
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to send %s", c.Denom)
 		}
 	}
 
@@ -106,7 +104,7 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr strin
 	} else {
 		parsedAddr, err := sdk.AccAddressFromBech32(toDidOrAddr)
 		if err != nil {
-			return sdkerrors.Wrap(types.ErrInternal, "")
+			return err
 		}
 		toAddress = parsedAddr
 	}
@@ -120,13 +118,13 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr strin
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to mint")
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to mint %s", c.Denom)
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.MintCap) {
-			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to mint")
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to mint", c.Denom)
 		}
 	}
 

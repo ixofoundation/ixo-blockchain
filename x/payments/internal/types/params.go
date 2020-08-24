@@ -35,7 +35,7 @@ type Params struct {
 	EvaluationPayNodeFeePercentage       sdk.Dec `json:"evaluation_pay_node_fee_percentage" yaml:"evaluation_pay_node_fee_percentage"`
 }
 
-// ParamTable for payments module.
+// ParamTable for payments module.ValidateParams
 func ParamKeyTable() params.KeyTable {
 	return params.NewKeyTable().RegisterParamSet(&Params{})
 }
@@ -98,202 +98,82 @@ func (p Params) String() string {
 }
 
 func validateFactor(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("ixo factor must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("ixo factor must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("ixo factor too large: %s", v)
-	}
-
 	return nil
 }
 
-func validateFeeAmount(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf(" invalid fee amount type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("fee amount must be not nil")
-	}
+func validateInitiationFeeAmount(i interface{}) error {
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
-		return fmt.Errorf("fee amount must be positive: %s", v)
+		return fmt.Errorf("initiation feeAmount must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("fee amount too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateFeePercentage(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid fee percentage type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("fee percentag must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
-		return fmt.Errorf("fee percentag must be positive: %s", v)
+		return fmt.Errorf("fee percentage must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("fee percentag too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateClaimFeeAmount(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid claim fee amount type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("claim fee amount must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("claim fee amount must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("claim fee amount too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateEvaluationFeeAmount(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid evaluation fee amount type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("evaluation fee amount must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("evaluation fee amount must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("evaluation fee amount too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateRegistrationFeeAmount(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid registration fee amount type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("registration fee amount must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("registration fee amount must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("registration fee amount too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateAgentRegistrationFeeAmount(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid agent registration fee amount type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("agent registration fee amount must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("agent registration fee amount must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("agent registration fee amount too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateNodeFeePercentage(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid node fee percentage type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("node fee percentage must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("node fee percentage must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("node fee percentage too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateEvaluationPayFeePercentage(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid evaluation pay fee percentage type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("evaluation pay fee percentage must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("evaluation pay fee percentage must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("evaluation pay fee percentage too large: %s", v)
-	}
-
 	return nil
 }
 
 func validateEvaluationPayNodeFeePercentage(i interface{}) error {
-	v, ok := i.(sdk.Dec)
-
-	if !ok {
-		return fmt.Errorf("invalid evaluation pay node fee percentage type: %T", i)
-	}
-
-	if v.IsNil() {
-		return fmt.Errorf("evaluation pay node fee percentage must be not nil")
-	}
+	v := i.(sdk.Dec)
 	if v.IsNegative() {
 		return fmt.Errorf("evaluation pay node fee percentage must be positive: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("evaluation pay node fee percentage too large: %s", v)
-	}
-
 	return nil
 }
 
@@ -301,7 +181,7 @@ func validateEvaluationPayNodeFeePercentage(i interface{}) error {
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
 		{KeyIxoFactor, &p.IxoFactor, validateFactor},
-		{KeyInitiationFeeAmount, &p.InitiationFeeAmount, validateFeeAmount},
+		{KeyInitiationFeeAmount, &p.InitiationFeeAmount, validateInitiationFeeAmount},
 		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage, validateFeePercentage},
 		{KeyClaimFeeAmount, &p.ClaimFeeAmount, validateClaimFeeAmount},
 		{KeyEvaluationFeeAmount, &p.EvaluationFeeAmount, validateEvaluationFeeAmount},
