@@ -110,6 +110,7 @@ func validateInitiationFeeAmount(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("initiation feeAmount must be positive: %s", v)
 	}
+
 	return nil
 }
 
@@ -118,6 +119,7 @@ func validateFeePercentage(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("fee percentage must be positive: %s", v)
 	}
+
 	return nil
 }
 
