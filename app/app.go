@@ -343,7 +343,6 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
-	//defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
 	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
 
