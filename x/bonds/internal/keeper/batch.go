@@ -160,7 +160,8 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 		bond.State == types.HatchState {
 		args := bond.FunctionParameters.AsMap()
 		if adjustedSupplyWithBuy.Amount.ToDec().GT(args["S0"].Ceil()) {
-			return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "Buy exceeds initial supply S0. Consider buying less tokens.")
+			return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins,
+				"Buy exceeds initial supply S0. Consider buying less tokens.")
 		}
 	}
 
@@ -262,7 +263,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 		toInitialReserve := newReserve.Sub(currentReserve)
 		if reservePricesRounded[0].Amount.LT(toInitialReserve) {
 			// Reserve supplied by buyer is insufficient
-			return sdkerrors.Wrap(types.ErrInsufficientReserveToBuy, "")
+			return types.ErrInsufficientReserveToBuy
 		}
 		coinsToInitialReserve, _ := bond.GetNewReserveDecCoins(
 			toInitialReserve.ToDec()).TruncateDecimal()
