@@ -89,12 +89,12 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
 	} else if msg.Payer.Empty() {
-		return sdkerrors.Wrap(ErrInvalidId, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "payer did is empty")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(ErrInvalidId, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator did is invalid")
 	}
 
 	// Check that IDs valid
@@ -193,7 +193,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.PayerDid) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "payer did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "payer did is invalid")
 
 	}
 
@@ -241,7 +241,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	}
 
 	// Check that IDs valid
@@ -287,7 +287,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	}
 
 	// Check that IDs valid
@@ -330,7 +330,7 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	}
 
 	// Check that IDs valid
