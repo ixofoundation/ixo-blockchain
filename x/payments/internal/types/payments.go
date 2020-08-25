@@ -129,7 +129,7 @@ func (pc PaymentContract) Validate() error {
 
 	// Validate IDs
 	if !IsValidPaymentTemplateId(pc.PaymentTemplateId) {
-		return sdkerrors.Wrap(ErrInvalidId, "empty payer address")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	}
 
 	return nil
