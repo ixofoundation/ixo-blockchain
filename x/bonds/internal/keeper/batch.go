@@ -229,7 +229,9 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	totalPrices := reservePricesRounded.Add(txFees...)
 
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
-		return sdkerrors.Wrap(types.ErrMaxPriceExceeded, "")
+		return sdkerrors.Wrapf(types.ErrMaxPriceExceeded,
+			"actual prices %s exceed max prices %s",
+			totalPrices.String(), bo.MaxPrices.String())
 	}
 
 	// Add new reserve to reserve (reservePricesRounded should never be zero)
@@ -553,7 +555,9 @@ func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.D
 
 	// Check that max prices not exceeded
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
-		return sdkerrors.Wrap(types.ErrMaxPriceExceeded, "")
+		return sdkerrors.Wrapf(types.ErrMaxPriceExceeded,
+			"actual prices %s exceed max prices %s",
+			totalPrices.String(), bo.MaxPrices.String())
 	}
 
 	return nil

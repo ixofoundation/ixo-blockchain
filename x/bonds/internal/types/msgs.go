@@ -98,7 +98,7 @@ func (msg MsgCreateBond) ValidateBasic() error {
 	// Check that bond token is a valid token name
 	err := CheckCoinDenom(msg.Token)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInvalidCoinDenomination, "")
+		return err
 	}
 
 	// Validate function parameters

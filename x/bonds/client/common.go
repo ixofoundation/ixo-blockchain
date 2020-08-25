@@ -65,7 +65,7 @@ func ParseTwoPartCoin(amount, denom string) (coin sdk.Coin, err error) {
 	if err != nil {
 		return sdk.Coin{}, err
 	} else if denom != coin.Denom {
-		return sdk.Coin{}, sdkerrors.Wrap(types.ErrInvalidCoinDenomination, denom)
+		return sdk.Coin{}, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, denom)
 	}
 	return coin, nil
 }

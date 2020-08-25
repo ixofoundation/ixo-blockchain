@@ -164,7 +164,9 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter theta for augmented function")
 	} else if val.LT(sdk.ZeroDec()) || val.GTE(sdk.OneDec()) {
-		return sdkerrors.Wrap(ErrArgumentMustBeBetween, "")
+		return sdkerrors.Wrapf(ErrArgumentMustBeBetween,
+			"argument must be between %s and %s",
+			sdk.ZeroDec().String(), sdk.OneDec().String())
 	}
 
 	// Augmented exception 4.1: kappa must be an integer, since we use it for powers

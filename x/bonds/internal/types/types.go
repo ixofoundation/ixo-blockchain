@@ -49,9 +49,9 @@ func CheckNoOfReserveTokens(resTokens []string, fnType string) error {
 func CheckCoinDenom(denom string) (err error) {
 	coin, err := sdk.ParseCoin("0" + denom)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInternal, "")
+		return err
 	} else if denom != coin.Denom {
-		return sdkerrors.Wrap(ErrInvalidCoinDenomination, "")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, coin.String())
 	}
 	return nil
 }
