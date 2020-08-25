@@ -78,7 +78,7 @@ func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, err := codec.MarshalJSONIndent(k.cdc, params)
 	if err != nil {
-		return nil, sdkerrors.Wrap(ty.ErrInternal, "failed to marshal data")
+		return nil, sdkerrors.Wrapf(ty.ErrInternal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
