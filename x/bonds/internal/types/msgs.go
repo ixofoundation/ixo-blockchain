@@ -336,9 +336,9 @@ func NewMsgSell(sellerDid did.Did, amount sdk.Coin, bondDid did.Did) MsgSell {
 func (msg MsgSell) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.SellerDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "seller DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	}
 
 	// Check that amount valid and non zero
