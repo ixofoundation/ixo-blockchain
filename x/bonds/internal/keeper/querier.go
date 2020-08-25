@@ -314,7 +314,7 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, "")
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)

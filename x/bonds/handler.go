@@ -509,7 +509,7 @@ func handleMsgMakeOutcomePayment(ctx sdk.Context, keeper keeper.Keeper, msg type
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, "")
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Confirm that state is OPEN and that outcome payment is not nil
@@ -549,7 +549,7 @@ func handleMsgWithdrawShare(ctx sdk.Context, keeper keeper.Keeper, msg types.Msg
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, "")
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Check that state is SETTLE
