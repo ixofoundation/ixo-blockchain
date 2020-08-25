@@ -347,9 +347,10 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		payments.NewDistributionShare(senderAddr, oracleShareLessFees))
 
 	// Process evaluator pay
+	pay := projectDoc.GetEvaluatorPay()
+	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
 	err = processPay(ctx, k, bk, pk, msg.ProjectDid, senderAddr,
-		oraclePayRecipients, projectDoc.GetEvaluatorPay(),
-		projectDoc.GetEvaluatorPay(), types.EvaluatorPay)
+		oraclePayRecipients, pay, payMax, types.EvaluatorPay)
 	if err != nil {
 		return err.Result()
 	}
