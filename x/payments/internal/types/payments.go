@@ -32,7 +32,7 @@ func (pt PaymentTemplate) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, erro
 			return discount.Percent, nil
 		}
 	}
-	return sdk.Dec{}, sdkerrors.Wrap(ErrDiscountIdIsNotInTemplate, "discount ID specified is not one of the template's discounts")
+	return sdk.Dec{}, ErrDiscountIdIsNotInTemplate
 }
 
 func (pt PaymentTemplate) Validate() error {
