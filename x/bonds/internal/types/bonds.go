@@ -80,9 +80,9 @@ func (fps FunctionParams) Validate(functionType string) error {
 	for _, p := range expectedParams {
 		val, ok := paramsMap[p]
 		if !ok {
-			return sdkerrors.Wrapf(ErrFunctionParameterMissingOrNonFloat, "%s", paramsMap[p])
+			return sdkerrors.Wrapf(ErrFunctionParameterMissingOrNonFloat, p)
 		} else if val.IsNegative() {
-			return sdkerrors.Wrapf(ErrArgumentCannotBeNegative, "%s", paramsMap[p])
+			return sdkerrors.Wrapf(ErrArgumentCannotBeNegative, p)
 		}
 	}
 
