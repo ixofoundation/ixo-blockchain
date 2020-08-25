@@ -121,7 +121,7 @@ SENDER_DID="$SHAUN_DID"
 ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Creating an evaluation in project..."
 SENDER_DID="$MIGUEL_DID"
-STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)
+STATUS="1" # create-evaluation updates status of claim from 0 to 1
 ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # OracleFeePercentage:  0.1 (10%)
@@ -137,7 +137,8 @@ ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "
 # - IxoPayFees:              450000  # 0.9 of 0.1 of oracle pay
 # - project:               93000000  # 100IXO - (5+1+1)IXO
 # Expected external account balances:
-# - Miguel:                 5500000  # 0.9 of oracle pay + 1.0 of claim approved pay
+# - Miguel:                 4500000  # 0.9 of oracle pay
+# - Shaun:                 11000000  # 1.0 of claim approved pay (+ 10000000 original)
 
 # Sum of fee accounts: 500000
 
@@ -151,14 +152,15 @@ echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 500000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
 # - InitiatingNodePayFees:        0
 # - IxoFees:                      0
 # - IxoPayFees:                   0
 # - project:               93000000
 # Expected external account balances:
-# - Miguel:                 5500000
+# - Miguel:                 4500000
+# - Shaun:                 11500000  # 500000 withdrawal
 
 echo "InitiatingNodePayFees"
 ixocli q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
@@ -170,6 +172,8 @@ echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixocli q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 ixocli q auth account "$(ixocli q did get-address-from-did $MIGUEL_DID)"
+echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+ixocli q auth account "$(ixocli q did get-address-from-did $SHAUN_DID)"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
@@ -180,7 +184,7 @@ echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
 # Expected external account balances:
-# - Miguel:                 5495000 (5000uixo tx fee deducted)
+# - Miguel:                 4495000 (5000uixo tx fee deducted)
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
@@ -191,7 +195,7 @@ echo "Project withdrawals query..."
 ixocli q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 10500000 to ixo DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # - 1000000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
 # - InitiatingNodePayFees:        0
@@ -199,4 +203,5 @@ ixocli q project get-project-txs $PROJECT_DID
 # - IxoPayFees:                   0
 # - project:               92000000  # 1000000 has been withdrawn
 # Expected external account balances:
-# - Miguel:                 5495000
+# - Miguel:                 4495000
+# - Shaun:                 12495000  # 1000000 withdrawal + 5000 fee deducted

@@ -366,7 +366,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 
 		// Get recipients (just the claimer)
 		claimApprovedPayRecipients := payments.NewDistribution(
-			payments.NewFullDistributionShare(senderAddr))
+			payments.NewFullDistributionShare(claimerAddr))
 
 		// Process the payment
 		pay := projectDoc.GetClaimApprovedPay()
