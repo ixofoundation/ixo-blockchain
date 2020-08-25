@@ -96,8 +96,7 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err e
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil,
-			sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, bondDid+"bond does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "%s bond does not exist", bondDid)
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, bond)
