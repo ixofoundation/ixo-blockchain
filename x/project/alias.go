@@ -44,13 +44,12 @@ type (
 
 var (
 	// function aliases
-	NewKeeper      = keeper.NewKeeper
-	NewQuerier     = keeper.NewQuerier
-	ParamKeyTable  = types.ParamKeyTable
-	NewParams      = types.NewParams
-	DefaultParams  = types.DefaultParams
-	ValidateParams = types.ValidateParams
-	RegisterCodec  = types.RegisterCodec
+	NewKeeper     = keeper.NewKeeper
+	NewQuerier    = keeper.NewQuerier
+	ParamKeyTable = types.ParamKeyTable
+	NewParams     = types.NewParams
+	DefaultParams = types.DefaultParams
+	RegisterCodec = types.RegisterCodec
 
 	NewProjectDoc = types.NewProjectDoc
 

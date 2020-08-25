@@ -35,7 +35,7 @@ type Params struct {
 	EvaluationPayNodeFeePercentage       sdk.Dec `json:"evaluation_pay_node_fee_percentage" yaml:"evaluation_pay_node_fee_percentage"`
 }
 
-// ParamTable for payments module.ValidateParams
+// ParamTable for payments module
 func ParamKeyTable() params.KeyTable {
 	return params.NewKeyTable().RegisterParamSet(&Params{})
 }

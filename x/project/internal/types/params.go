@@ -40,17 +40,6 @@ func DefaultParams() Params {
 	}
 }
 
-// validate params
-func ValidateParams(params Params) error {
-	if len(params.IxoDid) == 0 {
-		return fmt.Errorf("ixo did cannot be empty")
-	}
-	if params.ProjectMinimumInitialFunding.LT(sdk.ZeroInt()) {
-		return fmt.Errorf("project parameter ProjectMinimumInitialFunding should be positive, is %s ", params.ProjectMinimumInitialFunding.String())
-	}
-	return nil
-}
-
 func (p Params) String() string {
 	return fmt.Sprintf(`Project Params:
   Ixo Did: %s
