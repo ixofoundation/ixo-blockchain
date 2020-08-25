@@ -72,7 +72,7 @@ func (fps FunctionParams) Validate(functionType string) error {
 
 	// Check that number of params is as expected
 	if len(fps) != len(expectedParams) {
-		return sdkerrors.Wrap(ErrIncorrectNumberOfFunctionParameters, "")
+		return sdkerrors.Wrapf(ErrIncorrectNumberOfFunctionParameters, "expected: %d", len(expectedParams))
 	}
 
 	// Check that params match and all values are non-negative
@@ -80,9 +80,9 @@ func (fps FunctionParams) Validate(functionType string) error {
 	for _, p := range expectedParams {
 		val, ok := paramsMap[p]
 		if !ok {
-			return sdkerrors.Wrap(ErrFunctionParameterMissingOrNonFloat, "")
+			return sdkerrors.Wrapf(ErrFunctionParameterMissingOrNonFloat, "%s", paramsMap[p])
 		} else if val.IsNegative() {
-			return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "")
+			return sdkerrors.Wrapf(ErrArgumentCannotBeNegative, "%s", paramsMap[p])
 		}
 	}
 
