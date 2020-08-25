@@ -77,21 +77,21 @@ func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 func (msg MsgCreateBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond_did can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token")
 	} else if strings.TrimSpace(msg.Name) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Description) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
 	} else if strings.TrimSpace(msg.CreatorDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "creatordid can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "creator DID")
 	} else if len(msg.ReserveTokens) == 0 {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reservetokens can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve tokens")
 	} else if msg.FeeAddress.Empty() {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "fee address can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "fee address")
 	} else if strings.TrimSpace(msg.FunctionType) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "functionType can't be empty")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "function type")
 	}
 	// Note: FunctionParameters can be empty
 
@@ -115,48 +115,48 @@ func (msg MsgCreateBond) ValidateBasic() error {
 
 	// Validate coins
 	if !msg.MaxSupply.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "max supply is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "max supply")
 	} else if !msg.OrderQuantityLimits.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "order quantity limits are invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "order quantity limits")
 	} else if !msg.OutcomePayment.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "outcome payment is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "outcome payment")
 	}
 
 	// Check that max supply denom matches token denom
 	if msg.MaxSupply.Denom != msg.Token {
-		return sdkerrors.Wrap(ErrMaxSupplyDenomDoesNotMatchTokenDenom, "")
+		return ErrMaxSupplyDenomDoesNotMatchTokenDenom
 	}
 
 	// Check that Sanity values not negative
 	if msg.SanityRate.IsNegative() {
-		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "sanity rate")
 	} else if msg.SanityMarginPercentage.IsNegative() {
-		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "sanity margin percentage")
 	}
 
 	// Check FeePercentages not negative and don't add up to 100
 	if msg.TxFeePercentage.IsNegative() {
-		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "tx fee percentage")
 	} else if msg.ExitFeePercentage.IsNegative() {
-		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeNegative, "exit fee percentage")
 	} else if msg.TxFeePercentage.Add(msg.ExitFeePercentage).GTE(sdk.NewDec(100)) {
-		return sdkerrors.Wrap(ErrFeesCannotBeOrExceed100Percent, "")
+		return ErrFeesCannotBeOrExceed100Percent
 	}
 
 	// Check that not zero
 	if msg.BatchBlocks.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "BatchBlocks")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "batch blocks")
 	} else if msg.MaxSupply.Amount.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "MaxSupply")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "max supply")
 	}
 
 	// Note: uniqueness of reserve tokens checked when parsing
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "creator DID")
 	}
 
 	return nil
@@ -203,19 +203,19 @@ func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
 func (msg MsgEditBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Name) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
 	} else if strings.TrimSpace(msg.Description) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity rate")
 	} else if strings.TrimSpace(msg.SanityRate) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity rate")
 	} else if strings.TrimSpace(msg.SanityMarginPercentage) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity margin percentage")
 	} else if strings.TrimSpace(msg.EditorDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "editor DID")
 	}
 	// Note: order quantity limits can be blank
 
@@ -238,9 +238,9 @@ func (msg MsgEditBond) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.EditorDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "editor did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "editor DID")
 	}
 
 	return nil
@@ -279,28 +279,28 @@ func NewMsgBuy(buyerDid did.Did, amount sdk.Coin, maxPrices sdk.Coins,
 func (msg MsgBuy) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BuyerDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "buyer DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	}
 
 	// Check that amount valid and non zero
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "amount is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	} else if msg.Amount.Amount.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "amount")
 	}
 
 	// Check that maxPrices valid
 	if !msg.MaxPrices.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "maxprices is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "max prices")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "buyer did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "buyer DID")
 	} else if !did.IsValidDid(msg.BuyerDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "buyer did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "buyer DID")
 	}
 
 	return nil
@@ -343,16 +343,16 @@ func (msg MsgSell) ValidateBasic() error {
 
 	// Check that amount valid and non zero
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "amount is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	} else if msg.Amount.Amount.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "amount")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.SellerDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "seller did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "seller DID")
 	}
 
 	return nil
@@ -391,16 +391,16 @@ func NewMsgSwap(swapperDid did.Did, from sdk.Coin, toToken string,
 func (msg MsgSwap) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.SwapperDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "swapper DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	} else if strings.TrimSpace(msg.ToToken) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "to token")
 	}
 
 	// Validate from amount
 	if !msg.From.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "from amount is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.From.String())
 	}
 
 	// Validate to token
@@ -411,12 +411,12 @@ func (msg MsgSwap) ValidateBasic() error {
 
 	// Check if from and to the same token
 	if msg.From.Denom == msg.ToToken {
-		return sdkerrors.Wrap(ErrFromAndToCannotBeTheSameToken, "")
+		return ErrFromAndToCannotBeTheSameToken
 	}
 
 	// Check that non zero
 	if msg.From.Amount.IsZero() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "amount")
 	}
 
 	// Note: From denom and amount must be valid since sdk.Coin
@@ -459,16 +459,16 @@ func NewMsgMakeOutcomePayment(senderDid, bondDid did.Did) MsgMakeOutcomePayment 
 func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.SenderDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sender DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender DID")
 	}
 
 	return nil
@@ -502,16 +502,16 @@ func NewMsgWithdrawShare(recipientDid, bondDid did.Did) MsgWithdrawShare {
 func (msg MsgWithdrawShare) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.RecipientDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "recipient DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.RecipientDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "recipient did is invalid")
+		return sdkerrors.Wrap(did.ErrorInvalidDid, "recipient DID")
 	}
 
 	return nil
