@@ -28,12 +28,12 @@ func (s Subscription) Validate() error {
 	if !IsValidSubscriptionId(s.Id) {
 		return sdkerrors.Wrap(ErrInvalidId, "subscription id invalid")
 	} else if !IsValidPaymentContractId(s.PaymentContractId) {
-		return sdkerrors.Wrap(ErrInvalidId, "subscription id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
 	}
 
 	// Verify that periods so far <= max periods
 	if s.PeriodsSoFar.GT(s.MaxPeriods) {
-		return sdkerrors.Wrap(ErrInvalidId, "subscription id invalid")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "periods so far is greater than max periods")
 	}
 
 	// Validate period
