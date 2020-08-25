@@ -45,7 +45,7 @@ func (k Keeper) MustGetDidDoc(ctx sdk.Context, did exported.Did) exported.DidDoc
 func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err error) {
 	existedDidDoc, err := k.GetDidDoc(ctx, did.GetDid())
 	if existedDidDoc != nil {
-		return sdkerrors.Wrap(types.ErrInvalidDid, "Did already exists")
+		return sdkerrors.Wrap(types.ErrInvalidDid, "DID already exists")
 	}
 
 	k.AddDidDoc(ctx, did)
