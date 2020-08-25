@@ -6,9 +6,6 @@ import (
 
 // InitGenesis new payments genesis
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
-	// Init params
-	keeper.SetParams(ctx, data.Params)
-
 	// Init payment templates
 	for _, pt := range data.PaymentTemplates {
 		keeper.SetPaymentTemplate(ctx, pt)
@@ -27,9 +24,6 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
-	// Export params
-	params := keeper.GetParams(ctx)
-
 	// Export payment templates
 	var templates []PaymentTemplate
 	iterator := keeper.GetPaymentTemplateIterator(ctx)
@@ -54,5 +48,5 @@ func ExportGenesis(ctx sdk.Context, keeper Keeper) GenesisState {
 		subscriptions = append(subscriptions, subscription)
 	}
 
-	return NewGenesisState(params, templates, contracts, subscriptions)
+	return NewGenesisState(templates, contracts, subscriptions)
 }

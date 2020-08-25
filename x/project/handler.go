@@ -18,7 +18,6 @@ const (
 	IxoAccountFeesId               InternalAccountID = "IxoFees"
 	IxoAccountPayFeesId            InternalAccountID = "IxoPayFees"
 	InitiatingNodeAccountPayFeesId InternalAccountID = "InitiatingNodePayFees"
-	ValidatingNodeSetAccountFeesId InternalAccountID = "ValidatingNodeSetFees"
 )
 
 func NewHandler(k Keeper, pk payments.Keeper, bk bank.Keeper) sdk.Handler {
@@ -55,9 +54,6 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 		return err.Result()
 	}
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InitiatingNodeAccountPayFeesId); err != nil {
-		return err.Result()
-	}
-	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, ValidatingNodeSetAccountFeesId); err != nil {
 		return err.Result()
 	}
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InternalAccountID(msg.ProjectDid)); err != nil {
@@ -160,11 +156,6 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Did) s
 	}
 
 	_, err = payAllFeesToAddress(ctx, k, bk, projectDid, InitiatingNodeAccountPayFeesId, IxoAccountFeesId)
-	if err != nil {
-		return sdk.ErrInternal("Failed to send coins").Result()
-	}
-
-	_, err = payAllFeesToAddress(ctx, k, bk, projectDid, ValidatingNodeSetAccountFeesId, IxoAccountFeesId)
 	if err != nil {
 		return sdk.ErrInternal("Failed to send coins").Result()
 	}
@@ -275,13 +266,6 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	}
 	senderAddr := senderDidDoc.Address()
 
-	// Process claim fees
-	err = processFees(ctx, k, pk, bk, payments.FeeClaimTransaction,
-		msg.ProjectDid)
-	if err != nil {
-		return err.Result()
-	}
-
 	// Process claimer pay
 	pay := projectDoc.GetClaimerPay()
 	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
@@ -336,16 +320,8 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	}
 	senderAddr := senderDidDoc.Address()
 
-	// Process evaluation fees
-	err = processFees(ctx, k, pk, bk, payments.FeeEvaluationTransaction,
-		msg.ProjectDid)
-	if err != nil {
-		return err.Result()
-	}
-
 	// Process evaluator pay
-	err = processEvaluatorPay(ctx, k, bk, pk, msg.ProjectDid,
-		senderAddr, projectDoc.GetEvaluatorPay())
+	err = processEvaluatorPay(ctx, k, bk, msg.ProjectDid, senderAddr, projectDoc.GetEvaluatorPay())
 	if err != nil {
 		return err.Result()
 	}
@@ -467,59 +443,10 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 	return nil
 }
 
-func processFees(ctx sdk.Context, k Keeper, pk payments.Keeper, bk bank.Keeper,
-	feeType payments.FeeType, projectDid did.Did) sdk.Error {
-
-	projectAddr, _ := getProjectAccount(ctx, k, projectDid)
-
-	validatingNodeSetAddr, err := getAccountInProjectAccounts(ctx, k, projectDid, ValidatingNodeSetAccountFeesId)
-	if err != nil {
-		return err
-	}
-
-	ixoAddr, err := getAccountInProjectAccounts(ctx, k, projectDid, IxoAccountFeesId)
-	if err != nil {
-		return err
-	}
-
-	ixoFactor := pk.GetParams(ctx).IxoFactor
-	nodePercentage := pk.GetParams(ctx).NodeFeePercentage
-
-	var feeAmount sdk.Coins
-	switch feeType {
-	case payments.FeeClaimTransaction:
-		feeAmount = pk.GetParams(ctx).ClaimFeeAmount
-	case payments.FeeEvaluationTransaction:
-		feeAmount = pk.GetParams(ctx).EvaluationFeeAmount
-	default:
-		return sdk.ErrUnknownRequest("Invalid Fee type.")
-	}
-	adjustedFeeAmount := sdk.NewDecCoins(feeAmount).MulDec(ixoFactor)
-
-	nodeAmount := adjustedFeeAmount.MulDec(nodePercentage)
-	ixoAmount := adjustedFeeAmount.Sub(nodeAmount)
-
-	nodeAmountCoins, _ := nodeAmount.TruncateDecimal()
-	ixoAmountCoins, _ := ixoAmount.TruncateDecimal()
-
-	err = bk.SendCoins(ctx, projectAddr, validatingNodeSetAddr, nodeAmountCoins)
-	if err != nil {
-		return err
-	}
-
-	err = bk.SendCoins(ctx, projectAddr, ixoAddr, ixoAmountCoins)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func processEvaluatorPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
-	pk payments.Keeper, projectDid did.Did, senderAddr sdk.AccAddress,
-	evaluatorPay sdk.Coins) sdk.Error {
+	projectDid did.Did, senderAddr sdk.AccAddress, pay sdk.Coins) sdk.Error {
 
-	if evaluatorPay.IsZero() {
+	if pay.IsZero() {
 		return nil
 	}
 
@@ -542,10 +469,10 @@ func processEvaluatorPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		return err
 	}
 
-	feePercentage := pk.GetParams(ctx).EvaluationPayFeePercentage
-	nodeFeePercentage := pk.GetParams(ctx).EvaluationPayNodeFeePercentage
+	feePercentage := k.GetParams(ctx).OracleFeePercentage
+	nodeFeePercentage := k.GetParams(ctx).NodeFeePercentage
 
-	totalEvaluatorPayAmount := sdk.NewDecCoins(evaluatorPay)
+	totalEvaluatorPayAmount := sdk.NewDecCoins(pay)
 	evaluatorPayFeeAmount := totalEvaluatorPayAmount.MulDec(feePercentage)
 	evaluatorPayLessFees := totalEvaluatorPayAmount.Sub(evaluatorPayFeeAmount)
 	nodePayFees := evaluatorPayFeeAmount.MulDec(nodeFeePercentage)

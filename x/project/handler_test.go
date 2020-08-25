@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
@@ -22,12 +21,6 @@ func TestHandler_CreateClaim(t *testing.T) {
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	params := paymentsKeeper.GetParams(ctx)
-	params.IxoFactor = sdk.OneDec()
-	params.NodeFeePercentage = sdk.ZeroDec()
-	params.ClaimFeeAmount = sdk.NewCoins(
-		sdk.NewInt64Coin(ixo.IxoNativeToken, 60000000))
-	paymentsKeeper.SetParams(ctx, params)
 	projectMsg := types.MsgCreateClaim{
 		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
 		TxHash:     "txHash",
@@ -54,23 +47,17 @@ func TestHandler_ProjectMsg(t *testing.T) {
 
 }
 func Test_CreateEvaluation(t *testing.T) {
-	ctx, k, cdc, fk, bk := keeper.CreateTestInput()
+	ctx, k, cdc, pk, bk := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
 	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	params := fk.GetParams(ctx)
-	params.IxoFactor = sdk.OneDec()
+	params := types.DefaultParams()
+	params.OracleFeePercentage = sdk.ZeroDec()
 	params.NodeFeePercentage = sdk.NewDecWithPrec(5, 1)
-	params.ClaimFeeAmount = sdk.NewCoins(
-		sdk.NewInt64Coin(ixo.IxoNativeToken, 6000000))
-	params.EvaluationFeeAmount = sdk.NewCoins(
-		sdk.NewInt64Coin(ixo.IxoNativeToken, 4000000))
-	params.EvaluationPayFeePercentage = sdk.ZeroDec()
-	params.EvaluationPayNodeFeePercentage = sdk.NewDecWithPrec(5, 1)
-	fk.SetParams(ctx, params)
+	k.SetParams(ctx, params)
 
 	evaluationMsg := types.MsgCreateEvaluation{
 		TxHash:     "txHash",
@@ -127,7 +114,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	require.False(t, k.ProjectDocExists(ctx, msg.ProjectDid))
 	k.SetProjectDoc(ctx, projectDoc)
 
-	res := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
+	res := handleMsgCreateEvaluation(ctx, k, pk, bk, evaluationMsg)
 	require.NotNil(t, res)
 }
 
