@@ -45,7 +45,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(ErrInvalidId, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator did is invalid")
 	}
 
 	// Validate PaymentTemplate
@@ -142,7 +142,7 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(ErrInvalidId, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator did is invalid")
 	}
 
 	// Check that IDs valid
