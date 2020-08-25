@@ -423,9 +423,9 @@ func (msg MsgSwap) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID is invalid")
 	} else if !did.IsValidDid(msg.SwapperDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "swapper did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "swapper DID is invalid")
 	}
 
 	return nil

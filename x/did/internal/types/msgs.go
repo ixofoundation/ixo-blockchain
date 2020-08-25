@@ -70,7 +70,7 @@ func (msg MsgAddDid) ValidateBasic() error {
 
 	// Check that DID and PubKey valid
 	if !IsValidDid(msg.Did) {
-		return sdkerrors.Wrap(ErrInvalidDid, "did is invalid")
+		return sdkerrors.Wrap(ErrInvalidDid, "DID is invalid")
 	} else if !IsValidPubKey(msg.PubKey) {
 		return sdkerrors.Wrap(ErrInvalidPubKey, "pubKey is invalid")
 	}
@@ -138,7 +138,7 @@ func (msg MsgAddCredential) ValidateBasic() error {
 
 	// Check that DID valid
 	if !IsValidDid(msg.DidCredential.Issuer) {
-		return sdkerrors.Wrap(ErrInvalidDid, "issuer did is invalid")
+		return sdkerrors.Wrap(ErrInvalidDid, "issuer DID is invalid")
 	}
 
 	return nil

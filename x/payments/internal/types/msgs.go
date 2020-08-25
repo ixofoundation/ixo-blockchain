@@ -45,7 +45,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Validate PaymentTemplate
@@ -94,7 +94,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -142,7 +142,7 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -193,7 +193,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.PayerDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "payer did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "payer DID is invalid")
 
 	}
 
@@ -241,7 +241,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -287,7 +287,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -330,7 +330,7 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid

@@ -100,9 +100,9 @@ func (msg MsgCreateProject) ValidateBasic() error {
 
 	// Check that DIDs and PubKey valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidPubKey(msg.PubKey) {
 		return sdkerrors.Wrap(did.ErrInvalidPubKey, "pubKey is invalid")
 	}
@@ -160,9 +160,9 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// IsValidProgressionFrom checked by the handler
@@ -200,11 +200,11 @@ func (msg MsgCreateAgent) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidDid(msg.Data.AgentDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "agent did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "agent DID is invalid")
 	}
 
 	return nil
@@ -248,11 +248,11 @@ func (msg MsgUpdateAgent) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidDid(msg.Data.Did) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "agent did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "agent DID is invalid")
 	}
 
 	return nil
@@ -298,9 +298,9 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
@@ -346,9 +346,9 @@ func (msg MsgCreateEvaluation) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
@@ -394,11 +394,11 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidDid(msg.Data.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.Data.RecipientDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient DID is invalid")
 	}
 
 	// Check that the sender is also the recipient
