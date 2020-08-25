@@ -188,9 +188,10 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	creatorAddr := cretorDidDoc.Address()
 
 	// Create payment contract and validate
+	authorised := false
 	contract := NewPaymentContract(
 		msg.PaymentContractId, msg.PaymentTemplateId, creatorAddr, msg.Payer,
-		msg.Recipients, msg.CanDeauthorise, false, msg.DiscountId)
+		msg.Recipients, msg.CanDeauthorise, authorised, msg.DiscountId)
 	if err := contract.Validate(); err != nil {
 		return err.Result()
 	}
