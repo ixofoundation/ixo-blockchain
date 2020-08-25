@@ -40,7 +40,7 @@ func CheckNoOfReserveTokens(resTokens []string, fnType string) error {
 
 	// Check that number of reserve tokens is correct (if expecting a specific number of tokens)
 	if expectedNoOfTokens != AnyNumberOfReserveTokens && len(resTokens) != expectedNoOfTokens {
-		return sdkerrors.Wrap(ErrIncorrectNumberOfReserveTokens, "")
+		return sdkerrors.Wrapf(ErrIncorrectNumberOfReserveTokens, "expected: %d", expectedNoOfTokens)
 	}
 
 	return nil
