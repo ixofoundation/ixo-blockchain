@@ -51,7 +51,7 @@ func (msg MsgSend) ValidateBasic() error {
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid %s", msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
@@ -109,7 +109,7 @@ func (msg MsgOracleTransfer) ValidateBasic() error {
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid %s", msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
@@ -162,7 +162,7 @@ func (msg MsgOracleMint) ValidateBasic() error {
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid %s", msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
@@ -213,7 +213,7 @@ func (msg MsgOracleBurn) ValidateBasic() error {
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid %s", msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
