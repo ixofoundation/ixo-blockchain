@@ -89,7 +89,7 @@ func handleMsgSetPaymentContractAuthorisation(ctx sdk.Context, k Keeper, msg Msg
 
 	// Confirm that signer is actually the payer in the payment contract
 	if !payerAddr.Equals(contract.Payer) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 
 	}
 

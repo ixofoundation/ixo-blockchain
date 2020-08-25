@@ -122,9 +122,9 @@ func (pc PaymentContract) Validate() error {
 
 	// Validate addresses
 	if pc.Creator.Empty() {
-		return sdkerrors.Wrap(ErrInvalidAddress, "empty creator address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty creator address")
 	} else if pc.Payer.Empty() {
-		return sdkerrors.Wrap(ErrInvalidAddress, "empty payer address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty payer address")
 	}
 
 	// Validate IDs

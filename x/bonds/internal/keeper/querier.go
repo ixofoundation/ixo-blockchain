@@ -96,7 +96,7 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err e
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond %s does not exist", bondDid)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, bond)
@@ -111,7 +111,7 @@ func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err 
 	bondDid := path[0]
 
 	if !keeper.BatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "batch for %s does not exist", bondDid)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "batch for '%s' does not exist", bondDid)
 	}
 
 	batch := keeper.MustGetBatch(ctx, bondDid)
@@ -128,7 +128,7 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 	bondDid := path[0]
 
 	if !keeper.LastBatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for %s does not exist", bondDid)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for '%s' does not exist", bondDid)
 	}
 
 	batch := keeper.MustGetLastBatch(ctx, bondDid)
@@ -146,7 +146,7 @@ func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byt
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond  does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -259,7 +259,7 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond  does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)

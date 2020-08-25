@@ -236,7 +236,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	} else if msg.Recipient.Empty() {
-		return sdkerrors.Wrap(ErrInvalidAddress, "recipient address is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient address is empty")
 	}
 
 	// Check that DIDs valid
@@ -282,7 +282,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	} else if msg.Holder.Empty() {
-		return sdkerrors.Wrap(ErrInvalidAddress, "holder address is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "holder address is empty")
 	}
 
 	// Check that DIDs valid
