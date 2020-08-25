@@ -16,7 +16,7 @@ func NewDistribution(shares ...DistributionShare) Distribution {
 func (d Distribution) Validate() error {
 	// Shares must add up to 100% (no shares means 0%)
 	if len(d) == 0 {
-		return sdkerrors.Wrap(ErrDistributionPercentagesNot100, "")
+		return ErrDistributionPercentagesNot100
 	}
 
 	// Validate shares and calculate total
@@ -30,7 +30,7 @@ func (d Distribution) Validate() error {
 
 	// Shares must add up to 100%
 	if !total.Equal(sdk.NewDec(100)) {
-		return sdkerrors.Wrap(ErrDistributionPercentagesNot100, "")
+		return ErrDistributionPercentagesNot100
 	}
 
 	return nil
