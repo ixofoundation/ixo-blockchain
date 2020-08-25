@@ -227,7 +227,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	// Max supply cannot be less than supply (max supply >= supply)
 	adjustedSupply := keeper.GetSupplyAdjustedForBuy(ctx, bondDid)
 	if bond.MaxSupply.IsLT(adjustedSupply.Add(bondCoin)) {
-		return nil, sdkerrors.Wrap(types.ErrCannotMintMoreThanMaxSupply, "")
+		return nil, types.ErrCannotMintMoreThanMaxSupply
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)

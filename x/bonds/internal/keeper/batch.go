@@ -146,7 +146,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 	adjustedSupply := k.GetSupplyAdjustedForBuy(ctx, bondDid)
 	adjustedSupplyWithBuy := adjustedSupply.Add(bo.Amount)
 	if bond.MaxSupply.IsLT(adjustedSupplyWithBuy) {
-		return nil, nil, sdkerrors.Wrap(types.ErrCannotMintMoreThanMaxSupply, "")
+		return nil, nil, types.ErrCannotMintMoreThanMaxSupply
 	}
 
 	// If augmented in hatch phase and adjusted supply exceeds S0, disallow buy
