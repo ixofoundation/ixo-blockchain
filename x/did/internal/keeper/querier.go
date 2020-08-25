@@ -39,7 +39,7 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	res, errRes := codec.MarshalJSONIndent(k.cdc, didDoc)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", errRes)
+		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", errRes.Error())
 	}
 
 	return res, nil
