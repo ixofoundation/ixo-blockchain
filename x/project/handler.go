@@ -66,7 +66,7 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) (*s
 	}
 
 	if k.ProjectDocExists(ctx, msg.ProjectDid) {
-		return nil, sdkerrors.Wrap(did.ErrorInvalidDid, "Project already exists")
+		return nil, sdkerrors.Wrap(did.ErrInvalidDid, "Project already exists")
 	}
 
 	projectDoc := NewProjectDoc(

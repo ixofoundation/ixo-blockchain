@@ -100,18 +100,18 @@ func (msg MsgCreateProject) ValidateBasic() error {
 
 	// Check that DIDs and PubKey valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	} else if !did.IsValidPubKey(msg.PubKey) {
-		return sdkerrors.Wrap(did.ErrorInvalidPubKey, "pubKey is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidPubKey, "pubKey is invalid")
 	}
 
 	// Check that project DID matches the PubKey
 	unprefixedDid := exported.UnprefixedDid(msg.ProjectDid)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
-		return sdkerrors.Wrapf(did.ErrorDidPubKeyMismatch,
+		return sdkerrors.Wrapf(did.ErrDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
 			expectedUnprefixedDid, unprefixedDid)
 	}
@@ -160,9 +160,9 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	}
 
 	// IsValidProgressionFrom checked by the handler
@@ -200,11 +200,11 @@ func (msg MsgCreateAgent) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	} else if !did.IsValidDid(msg.Data.AgentDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "agent did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "agent did is invalid")
 	}
 
 	return nil
@@ -248,11 +248,11 @@ func (msg MsgUpdateAgent) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	} else if !did.IsValidDid(msg.Data.Did) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "agent did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "agent did is invalid")
 	}
 
 	return nil
@@ -298,9 +298,9 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	}
 
 	return nil
@@ -346,9 +346,9 @@ func (msg MsgCreateEvaluation) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	}
 
 	return nil
@@ -394,11 +394,11 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did is invalid")
 	} else if !did.IsValidDid(msg.Data.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project did is invalid")
 	} else if !did.IsValidDid(msg.Data.RecipientDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "recipient did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient did is invalid")
 	}
 
 	// Check that the sender is also the recipient

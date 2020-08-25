@@ -154,9 +154,9 @@ func (msg MsgCreateBond) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "creator DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID")
 	}
 
 	return nil
@@ -238,9 +238,9 @@ func (msg MsgEditBond) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.EditorDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "editor DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "editor DID")
 	}
 
 	return nil
@@ -298,9 +298,9 @@ func (msg MsgBuy) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "buyer DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "buyer DID")
 	} else if !did.IsValidDid(msg.BuyerDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "buyer DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "buyer DID")
 	}
 
 	return nil
@@ -350,9 +350,9 @@ func (msg MsgSell) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.SellerDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "seller DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "seller DID")
 	}
 
 	return nil
@@ -423,9 +423,9 @@ func (msg MsgSwap) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
 	} else if !did.IsValidDid(msg.SwapperDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "swapper did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "swapper did is invalid")
 	}
 
 	return nil
@@ -466,9 +466,9 @@ func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "sender DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID")
 	}
 
 	return nil
@@ -509,9 +509,9 @@ func (msg MsgWithdrawShare) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "bond DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.RecipientDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "recipient DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient DID")
 	}
 
 	return nil

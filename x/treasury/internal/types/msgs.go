@@ -42,7 +42,7 @@ func (msg MsgSend) ValidateBasic() error {
 
 	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.FromDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "from did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "from did is invalid")
 	}
 	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
 	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
@@ -98,9 +98,9 @@ func (msg MsgOracleTransfer) ValidateBasic() error {
 
 	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.OracleDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "oracle did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "oracle did is invalid")
 	} else if !did.IsValidDid(msg.FromDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "from did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "from did is invalid")
 	}
 	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
 	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
@@ -153,7 +153,7 @@ func (msg MsgOracleMint) ValidateBasic() error {
 
 	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.OracleDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "oracle did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "oracle did is invalid")
 	}
 	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
 	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
@@ -206,9 +206,9 @@ func (msg MsgOracleBurn) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.OracleDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "oracle did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "oracle did is invalid")
 	} else if !did.IsValidDid(msg.FromDid) {
-		return sdkerrors.Wrap(did.ErrorInvalidDid, "from did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "from did is invalid")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)

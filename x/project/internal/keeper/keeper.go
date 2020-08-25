@@ -77,7 +77,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.Stored
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrap(did.ErrorInvalidDid, projectDid)
+		return nil, sdkerrors.Wrap(did.ErrInvalidDid, projectDid)
 	}
 
 	var projectDoc types.ProjectDoc
@@ -164,7 +164,7 @@ func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, sdkerrors.Wrap(did.ErrorInvalidDid, "project does not exist")
+		return []types.WithdrawalInfo{}, sdkerrors.Wrap(did.ErrInvalidDid, "project does not exist")
 	} else {
 		var txs []types.WithdrawalInfo
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)

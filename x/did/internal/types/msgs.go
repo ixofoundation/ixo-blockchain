@@ -63,23 +63,23 @@ func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 func (msg MsgAddDid) ValidateBasic() error {
 	// Check that not empty
 	if strings.TrimSpace(msg.Did) == "" {
-		return sdkerrors.Wrap(ErrorInvalidDid, "did should not be empty")
+		return sdkerrors.Wrap(ErrInvalidDid, "did should not be empty")
 	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return sdkerrors.Wrap(ErrorInvalidPubKey, "pubKey should not be empty")
+		return sdkerrors.Wrap(ErrInvalidPubKey, "pubKey should not be empty")
 	}
 
 	// Check that DID and PubKey valid
 	if !IsValidDid(msg.Did) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "did is invalid")
+		return sdkerrors.Wrap(ErrInvalidDid, "did is invalid")
 	} else if !IsValidPubKey(msg.PubKey) {
-		return sdkerrors.Wrap(ErrorInvalidPubKey, "pubKey is invalid")
+		return sdkerrors.Wrap(ErrInvalidPubKey, "pubKey is invalid")
 	}
 
 	// Check that DID matches the PubKey
 	unprefixedDid := exported.UnprefixedDid(msg.Did)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
-		return sdkerrors.Wrapf(ErrorDidPubKeyMismatch,
+		return sdkerrors.Wrapf(ErrDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
 			expectedUnprefixedDid, unprefixedDid)
 	}
@@ -131,14 +131,14 @@ func (msg MsgAddCredential) String() string {
 func (msg MsgAddCredential) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.DidCredential.Claim.Id) == "" {
-		return sdkerrors.Wrap(ErrorInvalidDid, "did should not be empty")
+		return sdkerrors.Wrap(ErrInvalidClaimId, "claim ID not be empty")
 	} else if strings.TrimSpace(msg.DidCredential.Issuer) == "" {
-		return sdkerrors.Wrap(ErrorInvalidIssuer, "issuer should not be empty")
+		return sdkerrors.Wrap(ErrInvalidIssuer, "issuer should not be empty")
 	}
 
 	// Check that DID valid
 	if !IsValidDid(msg.DidCredential.Issuer) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "issuer did is invalid")
+		return sdkerrors.Wrap(ErrInvalidDid, "issuer did is invalid")
 	}
 
 	return nil
