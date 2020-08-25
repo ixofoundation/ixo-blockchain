@@ -65,14 +65,14 @@ func (msg MsgAddDid) ValidateBasic() error {
 	if strings.TrimSpace(msg.Did) == "" {
 		return sdkerrors.Wrap(ErrorInvalidDid, "did should not be empty")
 	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return sdkerrors.Wrap(ErrorInvalidDid, "did should not be empty")
+		return sdkerrors.Wrap(ErrorInvalidPubKey, "pubKey should not be empty")
 	}
 
 	// Check that DID and PubKey valid
 	if !IsValidDid(msg.Did) {
 		return sdkerrors.Wrap(ErrorInvalidDid, "did is invalid")
 	} else if !IsValidPubKey(msg.PubKey) {
-		return sdkerrors.Wrap(ErrorInvalidDid, "pubKey is invalid")
+		return sdkerrors.Wrap(ErrorInvalidPubKey, "pubKey is invalid")
 	}
 
 	// Check that DID matches the PubKey
