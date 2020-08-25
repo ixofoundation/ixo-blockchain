@@ -51,9 +51,9 @@ func queryPaymentTemplate(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "payment template '%s' does not exist", templateId)
 	}
 
-	res, err2 := codec.MarshalJSONIndent(k.cdc, template)
-	if err2 != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal JSON", err2.Error())
+	res, err := codec.MarshalJSONIndent(k.cdc, template)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal JSON", err.Error())
 	}
 
 	return res, nil
@@ -67,9 +67,9 @@ func queryPaymentContract(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "payment contract '%s' does not exist", contractId)
 	}
 
-	res, err2 := codec.MarshalJSONIndent(k.cdc, contract)
-	if err2 != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal JSON", err2.Error())
+	res, err := codec.MarshalJSONIndent(k.cdc, contract)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal JSON", err.Error())
 	}
 
 	return res, nil
@@ -83,9 +83,9 @@ func querySubscription(ctx sdk.Context, path []string, k Keeper) ([]byte, error)
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "subscription '%s' does not exist", subscriptionId)
 	}
 
-	res, err2 := codec.MarshalJSONIndent(k.cdc, subscription)
-	if err2 != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal JSON", err2.Error())
+	res, err := codec.MarshalJSONIndent(k.cdc, subscription)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal JSON", err.Error())
 	}
 
 	return res, nil

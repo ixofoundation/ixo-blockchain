@@ -84,23 +84,23 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse fee address
-		feeAddress, err2 := sdk.AccAddressFromBech32(req.FeeAddress)
-		if err2 != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
+		feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// Parse max supply
-		maxSupply, err2 := sdk.ParseCoin(req.MaxSupply)
-		if err2 != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
+		maxSupply, err := sdk.ParseCoin(req.MaxSupply)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// Parse order quantity limits
-		orderQuantityLimits, err2 := sdk.ParseCoins(req.OrderQuantityLimits)
-		if err2 != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
+		orderQuantityLimits, err := sdk.ParseCoins(req.OrderQuantityLimits)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -132,17 +132,17 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse batch blocks
-		batchBlocks, err2 := sdk.ParseUint(req.BatchBlocks)
-		if err2 != nil {
+		batchBlocks, err := sdk.ParseUint(req.BatchBlocks)
+		if err != nil {
 			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, "max batch blocks")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// Parse outcome payment
-		outcomePayment, err2 := sdk.ParseCoins(req.OutcomePayment)
-		if err2 != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
+		outcomePayment, err := sdk.ParseCoins(req.OutcomePayment)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 

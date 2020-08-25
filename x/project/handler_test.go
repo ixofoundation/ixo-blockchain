@@ -46,13 +46,13 @@ func TestHandler_ProjectMsg(t *testing.T) {
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
 	res, _ := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
-	require.True(t, res != nil)
+	require.NotNil(t, res)
 
 	res, _ = handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
-	require.False(t, res != nil)
+	require.Nil(t, res)
 
 }
-func Test_CreateEvaluation(t *testing.T) {
+func TestHandler_CreateEvaluation(t *testing.T) {
 	ctx, k, cdc, fk, bk := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
@@ -103,8 +103,8 @@ func Test_CreateEvaluation(t *testing.T) {
 		Status:     "CREATED",
 		Data:       nil, // marshalled below
 	}
-	projectDocData, err2 := json.Marshal(projectData)
-	require.Nil(t, err2)
+	projectDocData, err := json.Marshal(projectData)
+	require.Nil(t, err)
 	projectDoc.Data = projectDocData
 
 	msg := types.MsgCreateProject{
@@ -115,7 +115,6 @@ func Test_CreateEvaluation(t *testing.T) {
 		Data:       projectDoc.Data,
 	}
 
-	var err error
 	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
 	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InternalAccountID(msg.ProjectDid))
@@ -128,7 +127,7 @@ func Test_CreateEvaluation(t *testing.T) {
 	require.NotNil(t, res)
 }
 
-func Test_WithdrawFunds(t *testing.T) {
+func TestHandler_WithdrawFunds(t *testing.T) {
 	ctx, k, cdc, _, bk := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	types.RegisterCodec(cdc)
@@ -169,8 +168,8 @@ func Test_WithdrawFunds(t *testing.T) {
 		Status:     "PAIDOUT",
 		Data:       nil, // marshalled below
 	}
-	projectDocData, err2 := json.Marshal(projectData)
-	require.Nil(t, err2)
+	projectDocData, err := json.Marshal(projectData)
+	require.Nil(t, err)
 	projectDoc.Data = projectDocData
 
 	msg1 := types.MsgCreateProject{
@@ -181,7 +180,6 @@ func Test_WithdrawFunds(t *testing.T) {
 		Data:       projectDoc.Data,
 	}
 
-	var err error
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
 	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, InternalAccountID(msg1.ProjectDid))

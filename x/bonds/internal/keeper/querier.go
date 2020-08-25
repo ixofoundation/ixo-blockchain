@@ -83,8 +83,8 @@ func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
 		bondsList = append(bondsList, bond.BondDid)
 	}
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, bondsList)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, bondsList)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -100,8 +100,8 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err e
 			sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, bondDid+"bond does not exist")
 	}
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, bond)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, bond)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -117,8 +117,8 @@ func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err 
 
 	batch := keeper.MustGetBatch(ctx, bondDid)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, batch)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, batch)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -134,8 +134,8 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 
 	batch := keeper.MustGetLastBatch(ctx, bondDid)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, batch)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, batch)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -157,8 +157,8 @@ func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byt
 	}
 	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -174,8 +174,8 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []b
 	}
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reserveBalances)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, reserveBalances)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -191,8 +191,8 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond does not exist")
 	}
 
-	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
-	if err2 != nil {
+	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
+	if err != nil {
 		return nil, sdkerrors.ErrInvalidCoins
 	}
 
@@ -202,8 +202,8 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 	}
 	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -219,8 +219,8 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond does not exist")
 	}
 
-	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
-	if err2 != nil {
+	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
+	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "bond does not exist")
 
 	}
@@ -246,8 +246,8 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	result.TotalPrices = zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee...), bond)
 	result.TotalFees = zeroReserveTokensIfEmpty(txFee, bond)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, result)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -263,8 +263,8 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond  does not exist")
 	}
 
-	bondCoin, err2 := client.ParseTwoPartCoin(bondAmount, bond.Token)
-	if err2 != nil {
+	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
+	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "")
 	}
 
@@ -294,8 +294,8 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	result.TotalReturns = zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond)
 	result.TotalFees = zeroReserveTokensIfEmpty(totalFees, bond)
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, result)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 
@@ -308,8 +308,8 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	fromAmount := path[2]
 	toToken := path[3]
 
-	fromCoin, err2 := client.ParseTwoPartCoin(fromAmount, fromToken)
-	if err2 != nil {
+	fromCoin, err := client.ParseTwoPartCoin(fromAmount, fromToken)
+	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "")
 	}
 
@@ -332,8 +332,8 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	result.TotalFees = sdk.Coins{txFee}
 	result.TotalReturns = reserveReturns
 
-	bz, err2 := codec.MarshalJSONIndent(keeper.cdc, result)
-	if err2 != nil {
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 

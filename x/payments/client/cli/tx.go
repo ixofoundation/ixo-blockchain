@@ -162,9 +162,9 @@ func GetCmdSetPaymentContractAuthorisation(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			ixoDid, err2 := did.UnmarshalIxoDid(ixoDidStr)
-			if err2 != nil {
-				return err2
+			ixoDid, err := did.UnmarshalIxoDid(ixoDidStr)
+			if err != nil {
+				return err
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
