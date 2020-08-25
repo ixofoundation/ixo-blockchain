@@ -12,12 +12,12 @@ func CheckReserveTokenNames(resTokens []string, token string) error {
 	for _, r := range resTokens {
 		// Check if same as main token
 		if r == token {
-			return sdkerrors.Wrap(ErrBondTokenCannotAlsoBeReserveToken, DefaultCodespace)
+			return ErrBondTokenCannotAlsoBeReserveToken
 		}
 
 		// Check if duplicate
 		if _, ok := uniqueReserveTokens[r]; ok {
-			return sdkerrors.Wrap(ErrDuplicateReserveToken, DefaultCodespace)
+			return ErrDuplicateReserveToken
 		} else {
 			uniqueReserveTokens[r] = ""
 		}
@@ -59,7 +59,7 @@ func CheckCoinDenom(denom string) (err error) {
 func GetRequiredParamsForFunctionType(fnType string) (fnParams []string, err error) {
 	expectedParams, ok := RequiredParamsForFunctionType[fnType]
 	if !ok {
-		return nil, sdkerrors.Wrap(ErrUnrecognizedFunctionType, DefaultCodespace)
+		return nil, sdkerrors.Wrap(ErrUnrecognizedFunctionType, fnType)
 	}
 	return expectedParams, nil
 }
@@ -67,7 +67,7 @@ func GetRequiredParamsForFunctionType(fnType string) (fnParams []string, err err
 func GetExceptionsForFunctionType(fnType string) (restrictions FunctionParamRestrictions, err error) {
 	restrictions, ok := ExtraParameterRestrictions[fnType]
 	if !ok {
-		return nil, sdkerrors.Wrap(ErrUnrecognizedFunctionType, DefaultCodespace)
+		return nil, sdkerrors.Wrap(ErrUnrecognizedFunctionType, fnType)
 	}
 	return restrictions, nil
 }
