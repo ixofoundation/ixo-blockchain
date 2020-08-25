@@ -89,7 +89,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
 	} else if msg.Payer.Empty() {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "payer did is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "payer address is empty")
 	}
 
 	// Check that DIDs valid
