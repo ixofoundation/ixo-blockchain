@@ -99,9 +99,9 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidPaymentTemplateId(msg.PaymentTemplateId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	} else if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -147,7 +147,7 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidSubscriptionId(msg.SubscriptionId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	}
 
 	// Validate Period
@@ -199,7 +199,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -246,7 +246,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -292,7 +292,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -335,7 +335,7 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil

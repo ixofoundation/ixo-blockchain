@@ -38,7 +38,7 @@ func (pt PaymentTemplate) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, erro
 func (pt PaymentTemplate) Validate() error {
 	// Validate ID
 	if !IsValidPaymentTemplateId(pt.Id) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	}
 
 	// Validate payment amount, minimum, maximum
@@ -110,7 +110,7 @@ func NewPaymentContractNoDiscount(id, templateId string, creator,
 func (pc PaymentContract) Validate() error {
 	// Validate ID
 	if !IsValidPaymentContractId(pc.Id) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	// Validate coins
