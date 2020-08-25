@@ -268,13 +268,13 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	if !bond.AllowSells {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotAllowSelling, "")
+		return nil, types.ErrBondDoesNotAllowSelling
 	}
 
 	// Cannot burn more tokens than what exists
 	adjustedSupply := keeper.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(bondCoin) {
-		return nil, sdkerrors.Wrap(types.ErrCannotBurnMoreThanSupply, "")
+		return nil, types.ErrCannotBurnMoreThanSupply
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)

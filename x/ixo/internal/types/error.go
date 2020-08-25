@@ -1,8 +1,8 @@
 package types
 
-import sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
+import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 var (
 	DefaultCodespace = "ixo"
-	ErrInternal      = sdkErrors.Register(DefaultCodespace, 2, "internal error")
+	ErrInternal      = sdkerrors.Register(DefaultCodespace, 2, "internal error")
 )

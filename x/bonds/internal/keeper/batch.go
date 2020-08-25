@@ -185,7 +185,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did,
 	// Cannot burn more tokens than what exists
 	adjustedSupply := k.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(so.Amount) {
-		return nil, nil, sdkerrors.Wrap(types.ErrCannotBurnMoreThanSupply, "")
+		return nil, nil, types.ErrCannotBurnMoreThanSupply
 	}
 
 	// Simulate sell by bumping up total sell amount
