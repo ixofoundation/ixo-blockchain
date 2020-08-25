@@ -11,6 +11,6 @@ var (
 	ErrorDidPubKeyMismatch  = sdkerrors.Register(DefaultCodeSpace, 4, "invalid did")
 	ErrorInvalidIssuer      = sdkerrors.Register(DefaultCodeSpace, 5, "invalid issuer")
 	ErrorInvalidCredentials = sdkerrors.Register(DefaultCodeSpace, 6, "invalid credentials")
-	ErrInternal             = sdkerrors.Register(DefaultCodeSpace, 7, "invalid data")
+	ErrInternal             = sdkerrors.Register(DefaultCodeSpace, 7, "internal error")
 	ErrUnauthorized         = sdkerrors.Register(DefaultCodeSpace, 8, "unauthorized")
 )

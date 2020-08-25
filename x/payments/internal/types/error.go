@@ -20,5 +20,5 @@ var (
 	ErrInvalidArgument                              = sdkerrors.Register(DefaultCodespace, 13, "invalid argument")
 	ErrAlreadyExists                                = sdkerrors.Register(DefaultCodespace, 14, "already exist")
 	ErrorInvalidDid                                 = sdkerrors.Register(DefaultCodespace, 16, "payer did is invalid")
-	ErrInternal                                     = sdkerrors.Register(DefaultCodespace, 17, "not allowed format")
+	ErrInternal                                     = sdkerrors.Register(DefaultCodespace, 17, "internal error")
 )
