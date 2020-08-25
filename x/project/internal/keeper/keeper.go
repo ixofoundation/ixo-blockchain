@@ -77,7 +77,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.Stored
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrap(did.ErrorInvalidDid, "Invalid ProjectDid Address")
+		return nil, sdkerrors.Wrap(did.ErrorInvalidDid, projectDid)
 	}
 
 	var projectDoc types.ProjectDoc
