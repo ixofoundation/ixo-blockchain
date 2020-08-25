@@ -119,7 +119,7 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 		minimumFunding := k.GetParams(ctx).ProjectMinimumInitialFunding
 		if projectAcc.GetCoins().AmountOf(ixo.IxoNativeToken).LT(minimumFunding) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "Project has not reached minimum funding")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Project has not reached minimum funding %s", minimumFunding)
 		}
 	}
 

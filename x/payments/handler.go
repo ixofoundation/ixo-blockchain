@@ -119,14 +119,14 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 
 	// Ensure that payment template doesn't already exist
 	if k.PaymentTemplateExists(ctx, msg.PaymentTemplate.Id) {
-		return nil, sdkerrors.Wrap(types.ErrAlreadyExists, fmt.Sprintf(
-			"payment template '%s' already exists", msg.PaymentTemplate.Id))
+		return nil, sdkerrors.Wrapf(types.ErrAlreadyExists,
+			"payment template '%s' already exists", msg.PaymentTemplate.Id)
 	}
 
 	// Ensure that payment template ID is not reserved
 	if k.PaymentTemplateIdReserved(msg.PaymentTemplate.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("%s is not allowed as it is "+
-			"using a reserved prefix", msg.PaymentTemplate.Id))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed as it is "+
+			"using a reserved prefix", msg.PaymentTemplate.Id)
 	}
 
 	// Create and validate payment template
@@ -137,8 +137,8 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 	// Ensure no blacklisted address in wallet distribution
 	for _, share := range msg.PaymentTemplate.WalletDistribution {
 		if bk.BlacklistedAddr(share.Address) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("%s is not allowed "+
-				"to receive transactions", share.Address))
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed "+
+				"to receive transactions", share.Address)
 		}
 	}
 
@@ -176,14 +176,14 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	// Ensure that payment contract ID is not reserved
 	if k.PaymentContractIdReserved(msg.PaymentContractId) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("%s is not allowed as it is "+
-			"using a reserved prefix", msg.PaymentContractId))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed as it is "+
+			"using a reserved prefix", msg.PaymentContractId)
 	}
 
 	// Ensure payer is not a blacklisted address
 	if bk.BlacklistedAddr(msg.Payer) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("%s is not allowed "+
-			"to receive transactions", msg.Payer))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed "+
+			"to receive transactions", msg.Payer)
 	}
 
 	// Confirm that payment template exists
@@ -232,14 +232,14 @@ func handleMsgCreateSubscription(ctx sdk.Context, k Keeper,
 
 	// Ensure that subscription doesn't already exist
 	if k.SubscriptionExists(ctx, msg.SubscriptionId) {
-		return nil, sdkerrors.Wrap(types.ErrAlreadyExists, fmt.Sprintf(
-			"subscription '%s' already exists", msg.SubscriptionId))
+		return nil, sdkerrors.Wrapf(types.ErrAlreadyExists,
+			"subscription '%s' already exists", msg.SubscriptionId)
 	}
 
 	// Ensure that subscription ID is not reserved
 	if k.SubscriptionIdReserved(msg.SubscriptionId) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("%s is not allowed as it is "+
-			"using a reserved prefix", msg.SubscriptionId))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed as it is "+
+			"using a reserved prefix", msg.SubscriptionId)
 	}
 
 	// Get payment contract

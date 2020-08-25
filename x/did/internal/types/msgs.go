@@ -79,9 +79,9 @@ func (msg MsgAddDid) ValidateBasic() error {
 	unprefixedDid := exported.UnprefixedDid(msg.Did)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
-		return sdkerrors.Wrap(ErrorDidPubKeyMismatch, fmt.Sprintf(
+		return sdkerrors.Wrapf(ErrorDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
-			expectedUnprefixedDid, unprefixedDid))
+			expectedUnprefixedDid, unprefixedDid)
 	}
 
 	return nil

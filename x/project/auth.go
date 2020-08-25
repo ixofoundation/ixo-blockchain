@@ -50,20 +50,20 @@ func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
 	coins := acc.GetCoins()
 
 	if !fees.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFee, "invalid fee amount")
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount %s", fees)
 	}
 
 	// verify the account has enough funds to pay for fees
 	_, hasNeg := coins.SafeSub(fees)
 	if hasNeg {
-		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees")
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees %s < %s", coins, fees)
 	}
 
 	// Validate the account has enough "spendable" coins as this will cover cases
 	// such as vesting accounts.
 	spendableCoins := acc.SpendableCoins(blockTime)
 	if _, hasNeg := spendableCoins.SafeSub(fees); hasNeg {
-		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees")
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees; %s < %s", spendableCoins, fees)
 	}
 
 	err := bankKeeper.SendCoins(ctx, acc.GetAddress(), projectAddr, fees)

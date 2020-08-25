@@ -42,7 +42,7 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	res, errRes := codec.MarshalJSONIndent(k.cdc, storedDoc)
 	if errRes != nil {
-		return nil, sdkerrors.Wrap(ty.ErrInternal, "failed to marshal data")
+		return nil, sdkerrors.Wrapf(ty.ErrInternal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
@@ -53,7 +53,7 @@ func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)
 	if err != nil {
-		return nil, sdkerrors.Wrap(ty.ErrInternal, "failed to marshal data")
+		return nil, sdkerrors.Wrapf(ty.ErrInternal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
@@ -67,7 +67,7 @@ func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	res, err2 := codec.MarshalJSONIndent(k.cdc, info)
 	if err2 != nil {
-		return nil, sdkerrors.Wrap(ty.ErrInternal, "failed to marshal data")
+		return nil, sdkerrors.Wrapf(ty.ErrInternal, "failed to marshal data %s", err)
 	}
 
 	return res, nil

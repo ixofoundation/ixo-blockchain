@@ -124,7 +124,7 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr strin
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.MintCap) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to mint", c.Denom)
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to mint %s", c.Denom)
 		}
 	}
 
@@ -161,13 +161,13 @@ func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount s
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to burn")
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to burn %s", c.Denom)
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.BurnCap) {
-			return sdkerrors.Wrap(types.ErrInternal, "oracle does not have capability to burn")
+			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to burn %s", c.Denom)
 		}
 	}
 

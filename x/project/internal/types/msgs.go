@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -112,9 +111,9 @@ func (msg MsgCreateProject) ValidateBasic() error {
 	unprefixedDid := exported.UnprefixedDid(msg.ProjectDid)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
-		return sdkerrors.Wrap(did.ErrorDidPubKeyMismatch, fmt.Sprintf(
+		return sdkerrors.Wrapf(did.ErrorDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
-			expectedUnprefixedDid, unprefixedDid))
+			expectedUnprefixedDid, unprefixedDid)
 	}
 
 	return nil
