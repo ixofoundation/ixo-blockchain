@@ -123,7 +123,7 @@ func powerParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter n for power function")
 	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "")
+		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "n")
 	}
 	return nil
 }
@@ -134,7 +134,7 @@ func sigmoidParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter c for sigmoid function")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "c")
 	}
 	return nil
 }
@@ -146,9 +146,9 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter d0 for augmented function")
 	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "")
+		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "d0")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "d0")
 	}
 
 	// Augmented exception 2: p0 != 0, otherwise we run into divisions by zero
@@ -156,7 +156,7 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter p0 for augmented function")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "p0")
 	}
 
 	// Augmented exception 3: theta must be from 0 to 1 (excluding 1)
@@ -165,7 +165,7 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 		panic("did not find parameter theta for augmented function")
 	} else if val.LT(sdk.ZeroDec()) || val.GTE(sdk.OneDec()) {
 		return sdkerrors.Wrapf(ErrArgumentMustBeBetween,
-			"argument must be between %s and %s",
+			"argument theta must be between %s and %s",
 			sdk.ZeroDec().String(), sdk.OneDec().String())
 	}
 
@@ -175,9 +175,9 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter kappa for augmented function")
 	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "")
+		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "kappa")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "")
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "kappa")
 	}
 
 	return nil
@@ -273,7 +273,7 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		temp2 := temp1.Mul(temp1).Add(c)
 		temp3, err := ApproxRoot(temp2, 2)
 		if err != nil {
-			return nil, sdkerrors.Wrap(ErrInternal, "")
+			return nil, err
 		}
 		result = bond.GetNewReserveDecCoins(
 			a.Mul(temp1.Quo(temp3).Add(sdk.OneDec())))
@@ -297,7 +297,7 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 			panic("unrecognized bond state")
 		}
 	case SwapperFunction:
-		return nil, sdkerrors.Wrap(ErrFunctionNotAvailableForFunctionType, "")
+		return nil, ErrFunctionNotAvailableForFunctionType
 	default:
 		panic("unrecognized function type")
 	}
@@ -457,7 +457,7 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 		return bond.GetNewReserveDecCoins(priceToMint), nil
 	case SwapperFunction:
 		if bond.CurrentSupply.Amount.IsZero() {
-			return nil, sdkerrors.Wrap(ErrFunctionRequiresNonZeroCurrentSupply, "")
+			return nil, ErrFunctionRequiresNonZeroCurrentSupply
 		}
 		return bond.GetReserveDeltaForLiquidityDelta(mint, reserveBalances), nil
 	default:
@@ -519,13 +519,13 @@ func (bond Bond) GetReturnsForSwap(from sdk.Coin, toToken string, reserveBalance
 	case SigmoidFunction:
 		fallthrough
 	case AugmentedFunction:
-		return nil, sdk.Coin{}, sdkerrors.Wrap(ErrFunctionNotAvailableForFunctionType, "")
+		return nil, sdk.Coin{}, ErrFunctionNotAvailableForFunctionType
 	case SwapperFunction:
 		// Check that from and to are reserve tokens
 		if from.Denom != bond.ReserveTokens[0] && from.Denom != bond.ReserveTokens[1] {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrTokenIsNotAValidReserveToken, "")
+			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrTokenIsNotAValidReserveToken, from.Denom)
 		} else if toToken != bond.ReserveTokens[0] && toToken != bond.ReserveTokens[1] {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrTokenIsNotAValidReserveToken, "")
+			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrTokenIsNotAValidReserveToken, toToken)
 		}
 
 		inAmt := from.Amount
@@ -538,7 +538,7 @@ func (bond Bond) GetReturnsForSwap(from sdk.Coin, toToken string, reserveBalance
 
 		// Check that at least 1 token is going in
 		if inAmt.IsZero() {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrSwapAmountTooSmallToGiveAnyReturn, "")
+			return nil, sdk.Coin{}, ErrSwapAmountTooSmallToGiveAnyReturn
 		}
 
 		// Calculate output amount using Uniswap formula: Δy = (Δx*y)/(x+Δx)
@@ -546,9 +546,9 @@ func (bond Bond) GetReturnsForSwap(from sdk.Coin, toToken string, reserveBalance
 
 		// Check that not giving out all of the available outRes or nothing at all
 		if outAmt.Equal(outRes) {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrSwapAmountCausesReserveDepletion, "")
+			return nil, sdk.Coin{}, ErrSwapAmountCausesReserveDepletion
 		} else if outAmt.IsZero() {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrSwapAmountCausesReserveDepletion, "")
+			return nil, sdk.Coin{}, ErrSwapAmountCausesReserveDepletion
 		} else if outAmt.IsNegative() {
 			panic(fmt.Sprintf("negative return for swap result for bond %s", bond.Token))
 		}
