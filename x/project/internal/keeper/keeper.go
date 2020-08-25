@@ -164,7 +164,7 @@ func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, sdkerrors.Wrap(did.ErrorInvalidDid, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfo{}, sdkerrors.Wrap(did.ErrorInvalidDid, "project does not exist")
 	} else {
 		var txs []types.WithdrawalInfo
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
