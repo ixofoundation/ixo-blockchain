@@ -46,6 +46,5 @@ var (
 	ErrFeesCannotBeOrExceed100Percent       = sdkerrors.Register(DefaultCodespace, 38, "sum of fees is or exceeds 100 percent")
 	ErrNoBondTokensOwned                    = sdkerrors.Register(DefaultCodespace, 39, "no bond tokens of this bond are owned")
 	ErrInsufficientReserveToBuy             = sdkerrors.Register(DefaultCodespace, 40, "insufficient reserve was supplied to perform buy order")
-	ErrInternal                             = sdkerrors.Register(DefaultCodespace, 41, "internal error")
-	ErrBondTokenDoesNotMatchBond            = sdkerrors.Register(DefaultCodespace, 42, "bond doesn't match")
+	ErrBondTokenDoesNotMatchBond            = sdkerrors.Register(DefaultCodespace, 41, "bond token does not match bond")
 )

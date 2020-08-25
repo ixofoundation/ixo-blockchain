@@ -257,7 +257,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) (*sdk
 
 	// Check that bond token used belongs to this bond
 	if msg.Amount.Denom != bond.Token {
-		return nil, sdkerrors.Wrap(types.ErrBondTokenDoesNotMatchBond, msg.BondDid)
+		return nil, types.ErrBondTokenDoesNotMatchBond
 	}
 
 	// Check current state is HATCH/OPEN, max prices, order quantity limits
@@ -327,7 +327,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 
 	// Check that bond token used belongs to this bond
 	if msg.Amount.Denom != bond.Token {
-		return nil, sdkerrors.Wrap(types.ErrBondTokenDoesNotMatchBond, "")
+		return nil, types.ErrBondTokenDoesNotMatchBond
 	}
 
 	// Check if initial liquidity violates sanity rate
