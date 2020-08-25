@@ -35,7 +35,7 @@ type (
 	MsgWithdrawFunds       = types.MsgWithdrawFunds
 
 	ProjectDoc        = types.ProjectDoc
-	WithdrawalInfo    = types.WithdrawalInfo
+	WithdrawalInfo    = types.WithdrawalInfoDoc
 	AccountMap        = types.AccountMap
 	GenesisAccountMap = types.GenesisAccountMap
 	InternalAccountID = types.InternalAccountID

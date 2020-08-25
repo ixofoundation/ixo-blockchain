@@ -21,14 +21,15 @@ func TestHandler_CreateClaim(t *testing.T) {
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	projectMsg := types.MsgCreateClaim{
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		TxHash:     "txHash",
-		SenderDid:  "senderDid",
-		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
-	}
 
-	res := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, projectMsg)
+	projectDid := "6iftm1hHdaU6LJGKayRMev"
+	txHash := "txHash"
+	senderDid := "senderDid"
+	data := types.NewCreateClaimDoc("claim1")
+
+	msg := types.NewMsgCreateClaim(txHash, senderDid, data, projectDid)
+
+	res := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, msg)
 	require.NotNil(t, res)
 }
 
@@ -59,15 +60,12 @@ func Test_CreateEvaluation(t *testing.T) {
 	params.NodeFeePercentage = sdk.NewDecWithPrec(5, 1)
 	k.SetParams(ctx, params)
 
-	evaluationMsg := types.MsgCreateEvaluation{
-		TxHash:     "txHash",
-		SenderDid:  "senderDid",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		Data: types.CreateEvaluationDoc{
-			ClaimID: "claim1",
-			Status:  types.PendingClaim,
-		},
-	}
+	txHash := "txHash"
+	senderDid := "senderDid"
+	projectDid := "6iftm1hHdaU6LJGKayRMev"
+
+	evaluationMsg := types.NewMsgCreateEvaluation(txHash, senderDid,
+		types.NewCreateEvaluationDoc("claim1", types.PendingClaim), projectDid)
 
 	projectData := struct {
 		NodeDid              string
@@ -85,25 +83,21 @@ func Test_CreateEvaluation(t *testing.T) {
 		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
 	}
 
-	projectDoc := types.ProjectDoc{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Status:     "CREATED",
-		Data:       nil, // marshalled below
-	}
+	txHash = ""
+	senderDid = ""
+	projectDid = "6iftm1hHdaU6LJGKayRMev"
+	pubKey := "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU"
+
+	// Create project doc with data
+	projectDoc := types.NewProjectDoc(
+		txHash, projectDid, senderDid, pubKey, "CREATED", json.RawMessage{})
 	projectDocData, err2 := json.Marshal(projectData)
 	require.Nil(t, err2)
 	projectDoc.Data = projectDocData
 
-	msg := types.MsgCreateProject{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Data:       projectDoc.Data,
-	}
+	// Create project creation message
+	msg := types.NewMsgCreateProject(
+		senderDid, projectDoc.Data, projectDid, pubKey)
 
 	var err sdk.Error
 	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId)
@@ -125,15 +119,14 @@ func Test_WithdrawFunds(t *testing.T) {
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	msg := types.MsgWithdrawFunds{
-		SenderDid: "6iftm1hHdaU6LJGKayRMev",
-		Data: types.WithdrawFundsDoc{
-			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
-			RecipientDid: "6iftm1hHdaU6LJGKayRMev",
-			Amount:       sdk.NewInt(100),
-			IsRefund:     true,
-		},
-	}
+	senderDid := "6iftm1hHdaU6LJGKayRMev"
+	projectDid := senderDid
+	recipientDid := senderDid
+	amount := sdk.NewInt(100)
+	isRefund := true
+
+	msg := types.NewMsgWithdrawFunds(senderDid,
+		types.NewWithdrawFundsDoc(projectDid, recipientDid, amount, isRefund))
 
 	projectData := struct {
 		NodeDid              string
@@ -151,33 +144,29 @@ func Test_WithdrawFunds(t *testing.T) {
 		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
 	}
 
-	projectDoc := types.ProjectDoc{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Status:     "PAIDOUT",
-		Data:       nil, // marshalled below
-	}
+	txHash := ""
+	senderDid = ""
+	projectDid = "6iftm1hHdaU6LJGKayRMev"
+	pubKey := "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU"
+
+	// Create project doc with data
+	projectDoc := types.NewProjectDoc(
+		txHash, projectDid, senderDid, pubKey, "PAIDOUT", json.RawMessage{})
 	projectDocData, err2 := json.Marshal(projectData)
 	require.Nil(t, err2)
 	projectDoc.Data = projectDocData
 
-	msg1 := types.MsgCreateProject{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Data:       projectDoc.Data,
-	}
+	// Create project creation message
+	msg2 := types.NewMsgCreateProject(
+		senderDid, projectDoc.Data, projectDid, pubKey)
 
 	var err sdk.Error
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, IxoAccountFeesId)
+	_, err = createAccountInProjectAccounts(ctx, k, msg2.ProjectDid, IxoAccountFeesId)
 	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, InternalAccountID(msg1.ProjectDid))
+	_, err = createAccountInProjectAccounts(ctx, k, msg2.ProjectDid, InternalAccountID(msg2.ProjectDid))
 	require.Nil(t, err)
 
-	require.False(t, k.ProjectDocExists(ctx, msg1.ProjectDid))
+	require.False(t, k.ProjectDocExists(ctx, msg2.ProjectDid))
 	k.SetProjectDoc(ctx, projectDoc)
 
 	res := handleMsgWithdrawFunds(ctx, k, bk, msg)

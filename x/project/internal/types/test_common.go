@@ -54,8 +54,7 @@ var ValidCreateProjectMsg = MsgCreateProject{
 	Data:       MustMarshalJson(validProjectData),
 }
 
-var ValidWithdrawalInfo = WithdrawalInfo{
-	ActionID:     "1",
+var ValidWithdrawalInfo = WithdrawalInfoDoc{
 	ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
 	RecipientDid: "6iftm1hHdaU6LJGKayRMev",
 	Amount:       sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(10)),

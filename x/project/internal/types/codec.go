@@ -15,7 +15,7 @@ func RegisterCodec(cdc *codec.Codec) {
 
 	cdc.RegisterConcrete(ProjectDoc{}, "project/ProjectDoc", nil)
 	cdc.RegisterConcrete(AccountMap{}, "project/AccountMap", nil)
-	cdc.RegisterConcrete(WithdrawalInfo{}, "project/WithdrawalInfo", nil)
+	cdc.RegisterConcrete(WithdrawalInfoDoc{}, "project/WithdrawalInfo", nil)
 }
 
 // ModuleCdc is the codec for the module

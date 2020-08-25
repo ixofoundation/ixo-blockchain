@@ -150,28 +150,28 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
 	return account, nil
 }
 
-func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did, txs []types.WithdrawalInfo) {
+func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did, txs []types.WithdrawalInfoDoc) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(txs)
 	store.Set(types.GetWithdrawalsKey(projectDid), bz)
 }
 
-func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfo, sdk.Error) {
+func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfoDoc, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetWithdrawalsKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfoDoc{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
 	} else {
-		var txs []types.WithdrawalInfo
+		var txs []types.WithdrawalInfoDoc
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
 
 		return txs, nil
 	}
 }
 
-func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid did.Did, info types.WithdrawalInfo) {
+func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid did.Did, info types.WithdrawalInfoDoc) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetWithdrawalsKey(projectDid)
 

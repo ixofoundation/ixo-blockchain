@@ -96,7 +96,7 @@ func TestQueryTxs(t *testing.T) {
 	res, err := querier(ctx, []string{QueryProjectTx, types.ProjectDid}, query)
 	require.Nil(t, err)
 
-	var txs []types.WithdrawalInfo
+	var txs []types.WithdrawalInfoDoc
 	cdc.MustUnmarshalJSON(res, &txs)
 
 	_, err = querier(ctx, []string{QueryProjectTx, "InvalidDid"}, query)

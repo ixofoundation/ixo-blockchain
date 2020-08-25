@@ -1,7 +1,6 @@
 package project
 
 import (
-	"encoding/hex"
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
@@ -478,11 +477,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 		return err
 	}
 
-	var actionId [32]byte
-	dec := sdk.OneDec() // TODO: should increment with each withdrawal (ref: #113)
-	copy(actionId[:], dec.Bytes())
-
-	addProjectWithdrawalTransaction(ctx, k, projectDid, actionId, recipientDid, amount)
+	addProjectWithdrawalTransaction(ctx, k, projectDid, recipientDid, amount)
 	return nil
 }
 
@@ -569,12 +564,10 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did
 	return found
 }
 
-func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper, projectDid did.Did,
-	actionID [32]byte, recipientDid did.Did, amount sdk.Coin) {
-	actionIDStr := "0x" + hex.EncodeToString(actionID[:])
+func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper,
+	projectDid did.Did, recipientDid did.Did, amount sdk.Coin) {
 
 	withdrawalInfo := WithdrawalInfo{
-		ActionID:     actionIDStr,
 		ProjectDid:   projectDid,
 		RecipientDid: recipientDid,
 		Amount:       amount,

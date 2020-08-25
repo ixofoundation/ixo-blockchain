@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -53,72 +52,6 @@ func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
 	return false
 }
 
-type WithdrawalInfo struct {
-	ActionID     string   `json:"actionID" yaml:"actionID"`
-	ProjectDid   did.Did  `json:"projectDid" yaml:"projectDid"`
-	RecipientDid did.Did  `json:"recipientDid" yaml:"recipientDid"`
-	Amount       sdk.Coin `json:"amount" yaml:"amount"`
-}
-
-type UpdateProjectStatusDoc struct {
-	Status          ProjectStatus `json:"status" yaml:"status"`
-	EthFundingTxnID string        `json:"ethFundingTxnID" yaml:"ethFundingTxnID"`
-}
-
-type ProjectDoc struct {
-	TxHash     string          `json:"txHash" yaml:"txHash"`
-	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
-	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
-	PubKey     string          `json:"pubKey" yaml:"pubKey"`
-	Status     ProjectStatus   `json:"status" yaml:"status"`
-	Data       json.RawMessage `json:"data" yaml:"data"`
-}
-
-func NewProjectDoc(txHash string, projectDid, senderDid did.Did,
-	pubKey string, status ProjectStatus, data json.RawMessage) ProjectDoc {
-	return ProjectDoc{
-		TxHash:     txHash,
-		ProjectDid: projectDid,
-		SenderDid:  senderDid,
-		PubKey:     pubKey,
-		Status:     status,
-		Data:       data,
-	}
-}
-
-func (pd ProjectDoc) GetProjectData() ProjectDataMap {
-	var dataMap ProjectDataMap
-	err := json.Unmarshal(pd.Data, &dataMap)
-	if err != nil {
-		panic(err)
-	}
-	return dataMap
-}
-
-func (pd ProjectDoc) getPay(key string) sdk.Coins {
-	payBz, found := pd.GetProjectData()[key]
-	if !found {
-		panic(fmt.Sprintf("%s not found", key))
-	}
-	payCoins, err := sdk.ParseCoins(withoutQuotes(string(payBz)))
-	if err != nil {
-		panic(err)
-	}
-	return payCoins
-}
-
-func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
-	return pd.getPay("claimerPayPerClaim")
-}
-
-func (pd ProjectDoc) GetClaimApprovedPay() sdk.Coins {
-	return pd.getPay("claimerPayPerApprovedClaim")
-}
-
-func (pd ProjectDoc) GetEvaluatorPay() sdk.Coins {
-	return pd.getPay("evaluatorPayPerClaim")
-}
-
 type PayType = string
 
 const (
@@ -126,11 +59,6 @@ const (
 	ClaimApprovedPay PayType = "claim_approved_pay"
 	EvaluatorPay     PayType = "evaluator_pay"
 )
-
-type CreateAgentDoc struct {
-	AgentDid did.Did `json:"did" yaml:"did"`
-	Role     string  `json:"role" yaml:"role"`
-}
 
 type AgentStatus = string
 
@@ -140,16 +68,6 @@ const (
 	RevokedAgent  AgentStatus = "2"
 )
 
-type UpdateAgentDoc struct {
-	Did    did.Did     `json:"did" yaml:"did"`
-	Status AgentStatus `json:"status" yaml:"status"`
-	Role   string      `json:"role" yaml:"role"`
-}
-
-type CreateClaimDoc struct {
-	ClaimID string `json:"claimID" yaml:"claimID"`
-}
-
 type ClaimStatus string
 
 const (
@@ -157,18 +75,6 @@ const (
 	ApprovedClaim ClaimStatus = "1"
 	RejectedClaim ClaimStatus = "2"
 )
-
-type CreateEvaluationDoc struct {
-	ClaimID string      `json:"claimID" yaml:"claimID"`
-	Status  ClaimStatus `json:"status" yaml:"status"`
-}
-
-type WithdrawFundsDoc struct {
-	ProjectDid   did.Did `json:"projectDid" yaml:"projectDid"`
-	RecipientDid did.Did `json:"recipientDid" yaml:"recipientDid"`
-	Amount       sdk.Int `json:"amount" yaml:"amount"`
-	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
-}
 
 type Claim struct {
 	Id         string      `json:"id" yaml:"id"`
