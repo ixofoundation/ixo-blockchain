@@ -333,7 +333,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper keeper.Keeper, msg t
 
 	// Check if initial liquidity violates sanity rate
 	if bond.ReservesViolateSanityRate(msg.MaxPrices) {
-		return nil, sdkerrors.Wrap(types.ErrValuesViolateSanityRate, "")
+		return nil, types.ErrValuesViolateSanityRate
 	}
 
 	// Use max prices as the amount to send to the liquidity pool (i.e. price)
