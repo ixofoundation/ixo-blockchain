@@ -177,8 +177,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	}
 
 	if bond.CreatorDid != msg.EditorDid {
-		errMsg := fmt.Sprintf("Editor must be the creator of the bond")
-		return nil, sdkerrors.Wrap(types.ErrInternal, errMsg)
+		return nil, fmt.Errorf("editor must be the creator of the bond")
 	}
 
 	if msg.Name != types.DoNotModifyField {
@@ -191,7 +190,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	if msg.OrderQuantityLimits != types.DoNotModifyField {
 		orderQuantityLimits, err := sdk.ParseCoins(msg.OrderQuantityLimits)
 		if err != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, err.Error())
+			return nil, err
 		}
 		bond.OrderQuantityLimits = orderQuantityLimits
 	}
