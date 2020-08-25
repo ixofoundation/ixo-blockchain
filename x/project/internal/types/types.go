@@ -171,13 +171,15 @@ type WithdrawFundsDoc struct {
 }
 
 type Claim struct {
-	Id     string      `json:"id" yaml:"id"`
-	Status ClaimStatus `json:"status" yaml:"status"`
+	Id         string      `json:"id" yaml:"id"`
+	ClaimerDid did.Did     `json:"claimer_did" yaml:"claimer_did"`
+	Status     ClaimStatus `json:"status" yaml:"status"`
 }
 
-func NewClaim(id string) Claim {
+func NewClaim(id string, claimerDid did.Did) Claim {
 	return Claim{
-		Id:     id,
-		Status: PendingClaim,
+		Id:         id,
+		ClaimerDid: claimerDid,
+		Status:     PendingClaim,
 	}
 }

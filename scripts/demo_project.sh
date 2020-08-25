@@ -128,7 +128,7 @@ ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "
 # NodeFeePercentage:    0.1 (10%)
 
 # Claim pay:            1000000 uixo
-# Claim verified pay:   1000000 uixo
+# Claim approved pay:   1000000 uixo
 # Oracle pay:           5000000 uixo
 
 # Expected project account balances:
@@ -137,7 +137,7 @@ ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "
 # - IxoPayFees:              450000  # 0.9 of 0.1 of oracle pay
 # - project:               93000000  # 100IXO - (5+1+1)IXO
 # Expected external account balances:
-# - Miguel:                 5500000  # 0.9 of oracle pay + 1.0 of claim verified pay
+# - Miguel:                 5500000  # 0.9 of oracle pay + 1.0 of claim approved pay
 
 # Sum of fee accounts: 500000
 

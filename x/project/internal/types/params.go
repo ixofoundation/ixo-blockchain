@@ -45,13 +45,13 @@ func DefaultParams() Params {
 	defaultInvalidBlankDid := did.Did("")
 	defaultMinInitFunding := sdk.NewCoins(sdk.NewCoin(
 		ixo.IxoNativeToken, sdk.OneInt()))
-	tenPercentFee := sdk.NewDecWithPrec(1, 1)
+	tenPercentFee := sdk.NewDec(10)
 
 	return Params{
 		IxoDid:                       defaultInvalidBlankDid, // invalid blank
 		ProjectMinimumInitialFunding: defaultMinInitFunding,  // 1uixo
-		OracleFeePercentage:          tenPercentFee,          // 0.1 (10%)
-		NodeFeePercentage:            tenPercentFee,          // 0.1 (10%)
+		OracleFeePercentage:          tenPercentFee,          // 10.0 (10%)
+		NodeFeePercentage:            tenPercentFee,          // 10.0 (10%)
 	}
 }
 
@@ -70,11 +70,11 @@ func ValidateParams(params Params) error {
 	if params.NodeFeePercentage.LT(sdk.ZeroDec()) {
 		return fmt.Errorf("project parameter NodeFeePercentage should be >= 0.0, is %s ", params.NodeFeePercentage.String())
 	}
-	if params.OracleFeePercentage.GT(sdk.OneDec()) {
-		return fmt.Errorf("project parameter OracleFeePercentage should be <= 1.0, is %s ", params.OracleFeePercentage.String())
+	if params.OracleFeePercentage.GT(sdk.NewDec(100)) {
+		return fmt.Errorf("project parameter OracleFeePercentage should be <= 100, is %s ", params.OracleFeePercentage.String())
 	}
-	if params.NodeFeePercentage.GT(sdk.OneDec()) {
-		return fmt.Errorf("project parameter NodeFeePercentage should be <= 1.0, is %s ", params.NodeFeePercentage.String())
+	if params.NodeFeePercentage.GT(sdk.NewDec(100)) {
+		return fmt.Errorf("project parameter NodeFeePercentage should be <= 100, is %s ", params.NodeFeePercentage.String())
 	}
 	return nil
 }

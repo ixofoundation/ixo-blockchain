@@ -265,18 +265,20 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		return err.Result()
 	}
 	senderAddr := senderDidDoc.Address()
+	recipients := payments.NewDistribution(
+		payments.NewFullDistributionShare(senderAddr))
 
 	// Process claimer pay
 	pay := projectDoc.GetClaimerPay()
 	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-	err = processClaimerPay(ctx, k, bk, pk, projectDoc.ProjectDid,
-		senderAddr, pay, payMax, types.ClaimerPay)
+	err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid,
+		senderAddr, recipients, pay, payMax, types.ClaimerPay)
 	if err != nil {
 		return err.Result()
 	}
 
 	// Create and set claim
-	claim := types.NewClaim(msg.Data.ClaimID)
+	claim := types.NewClaim(msg.Data.ClaimID, msg.SenderDid)
 	k.SetClaim(ctx, msg.ProjectDid, claim)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -313,26 +315,66 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		return sdk.ErrInternal("claim status must be pending").Result()
 	}
 
-	// Get sender address
+	// Get ixo address
+	ixoAddr, err := getAccountInProjectAccounts(ctx, k, msg.ProjectDid,
+		IxoAccountPayFeesId)
+	if err != nil {
+		return err.Result()
+	}
+
+	// Get node (relayer) address
+	nodeAddr, err := getAccountInProjectAccounts(ctx, k, msg.ProjectDid,
+		InitiatingNodeAccountPayFeesId)
+	if err != nil {
+		return err.Result()
+	}
+
+	// Get sender (oracle) address
 	senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
 	if err != nil {
 		return err.Result()
 	}
 	senderAddr := senderDidDoc.Address()
 
+	// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
+	feePercentage := k.GetParams(ctx).OracleFeePercentage
+	nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
+	ixoFeeShare := feePercentage.Sub(nodeFeeShare)
+	oracleShareLessFees := sdk.NewDec(100).Sub(feePercentage)
+	oraclePayRecipients := payments.NewDistribution(
+		payments.NewDistributionShare(ixoAddr, ixoFeeShare),
+		payments.NewDistributionShare(nodeAddr, nodeFeeShare),
+		payments.NewDistributionShare(senderAddr, oracleShareLessFees))
+
 	// Process evaluator pay
-	err = processEvaluatorPay(ctx, k, bk, msg.ProjectDid, senderAddr, projectDoc.GetEvaluatorPay())
+	err = processPay(ctx, k, bk, pk, msg.ProjectDid, senderAddr,
+		oraclePayRecipients, projectDoc.GetEvaluatorPay(),
+		projectDoc.GetEvaluatorPay(), types.EvaluatorPay)
 	if err != nil {
 		return err.Result()
 	}
 
 	// Process claimer pay per approved claim, if claim approved
-	pay := projectDoc.GetClaimApprovedPay()
-	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-	err = processClaimerPay(ctx, k, bk, pk, projectDoc.ProjectDid,
-		senderAddr, pay, payMax, types.ClaimApprovedPay)
-	if err != nil {
-		return err.Result()
+	if msg.Data.Status == types.ApprovedClaim {
+		// Get claimer address
+		claimerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, claim.ClaimerDid)
+		if err != nil {
+			return err.Result()
+		}
+		claimerAddr := claimerDidDoc.Address()
+
+		// Get recipients (just the claimer)
+		claimApprovedPayRecipients := payments.NewDistribution(
+			payments.NewFullDistributionShare(senderAddr))
+
+		// Process the payment
+		pay := projectDoc.GetClaimApprovedPay()
+		payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
+		err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid,
+			claimerAddr, claimApprovedPayRecipients, pay, payMax, types.ClaimApprovedPay)
+		if err != nil {
+			return err.Result()
+		}
 	}
 
 	// Update and set claim
@@ -443,75 +485,20 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 	return nil
 }
 
-func processEvaluatorPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
-	projectDid did.Did, senderAddr sdk.AccAddress, pay sdk.Coins) sdk.Error {
-
-	if pay.IsZero() {
-		return nil
-	}
-
-	// Get project address
-	projectAddr, err := getAccountInProjectAccounts(
-		ctx, k, projectDid, InternalAccountID(projectDid))
-	if err != nil {
-		return err
-	}
-
-	nodeAddr, err := getAccountInProjectAccounts(ctx, k, projectDid,
-		InitiatingNodeAccountPayFeesId)
-	if err != nil {
-		return err
-	}
-
-	ixoAddr, err := getAccountInProjectAccounts(ctx, k, projectDid,
-		IxoAccountPayFeesId)
-	if err != nil {
-		return err
-	}
-
-	feePercentage := k.GetParams(ctx).OracleFeePercentage
-	nodeFeePercentage := k.GetParams(ctx).NodeFeePercentage
-
-	totalEvaluatorPayAmount := sdk.NewDecCoins(pay)
-	evaluatorPayFeeAmount := totalEvaluatorPayAmount.MulDec(feePercentage)
-	evaluatorPayLessFees := totalEvaluatorPayAmount.Sub(evaluatorPayFeeAmount)
-	nodePayFees := evaluatorPayFeeAmount.MulDec(nodeFeePercentage)
-	ixoPayFees := evaluatorPayFeeAmount.Sub(nodePayFees)
-
-	evaluatorPayLessFeesCoins, _ := evaluatorPayLessFees.TruncateDecimal()
-	nodePayFeesCoins, _ := nodePayFees.TruncateDecimal()
-	ixoPayFeesCoins, _ := ixoPayFees.TruncateDecimal()
-
-	if !evaluatorPayLessFeesCoins.IsZero() {
-		err = bk.SendCoins(ctx, projectAddr, senderAddr, evaluatorPayLessFeesCoins)
-		if err != nil {
-			return err
-		}
-	}
-
-	if !nodePayFeesCoins.IsZero() {
-		err = bk.SendCoins(ctx, projectAddr, nodeAddr, nodePayFeesCoins)
-		if err != nil {
-			return err
-		}
-	}
-
-	if !ixoPayFeesCoins.IsZero() {
-		err = bk.SendCoins(ctx, projectAddr, ixoAddr, ixoPayFeesCoins)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func processClaimerPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
+func processPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	pk payments.Keeper, projectDid did.Did, senderAddr sdk.AccAddress,
-	pay, payMax sdk.Coins, payType types.PayType) sdk.Error {
+	recipients payments.Distribution, pay, payMax sdk.Coins,
+	payType types.PayType) sdk.Error {
 
+	// Return immediately if pay is zero
 	if pay.IsZero() {
 		return nil
+	}
+
+	// Validate recipients
+	err := recipients.Validate()
+	if err != nil {
+		return err
 	}
 
 	// Get project address
@@ -543,8 +530,6 @@ func processClaimerPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		}
 
 		// Create and set contract
-		recipients := payments.NewDistribution(
-			payments.NewFullDistributionShare(senderAddr))
 		contract = payments.NewPaymentContract(contractId, templateId,
 			projectAddr, projectAddr, recipients, false, true, sdk.ZeroUint())
 		pk.SetPaymentContract(ctx, contract)
