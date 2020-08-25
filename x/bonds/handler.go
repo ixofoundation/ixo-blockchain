@@ -266,7 +266,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) (*sdk
 	} else if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
 		return nil, sdkerrors.Wrapf(types.ErrReserveDenomsMismatch, msg.MaxPrices.String(), bond.ReserveTokens)
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
-		return nil, sdkerrors.Wrap(types.ErrOrderQuantityLimitExceeded, "")
+		return nil, types.ErrOrderQuantityLimitExceeded
 	}
 
 	// For the swapper, the first buy is the initialisation of the reserves
@@ -389,12 +389,12 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) (*s
 	} else if bond.State != types.OpenState {
 		return nil, sdkerrors.Wrap(types.ErrInvalidStateForAction, "")
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
-		return nil, sdkerrors.Wrap(types.ErrOrderQuantityLimitExceeded, "")
+		return nil, types.ErrOrderQuantityLimitExceeded
 	}
 
 	// Check that bond token used belongs to this bond
 	if msg.Amount.Denom != bond.Token {
-		return nil, sdkerrors.Wrap(types.ErrBondTokenDoesNotMatchBond, "")
+		return nil, types.ErrBondTokenDoesNotMatchBond
 	}
 
 	// Send coins to be burned from seller (enforces sellAmount <= balance)
@@ -466,7 +466,7 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) (*s
 
 	// Check if order quantity limit exceeded
 	if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.From}) {
-		return nil, sdkerrors.Wrap(types.ErrOrderQuantityLimitExceeded, "")
+		return nil, types.ErrOrderQuantityLimitExceeded
 	}
 
 	// Take coins to be swapped from swapper (enforces swapAmount <= balance)
