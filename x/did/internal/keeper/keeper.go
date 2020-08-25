@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -26,7 +25,7 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, e
 	key := types.GetDidPrefixKey(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, sdkerrors.Wrap(types.ErrorInvalidDid, fmt.Sprintf("Invalid Did Address %s", did))
+		return nil, sdkerrors.Wrap(types.ErrorInvalidDid, did)
 	}
 
 	var didDoc types.BaseDidDoc
