@@ -80,7 +80,7 @@ func (msg MsgCreateProject) ValidateBasic() error {
 	var dataMap ProjectDataMap
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInternal, "not allowed")
+		return sdkerrors.Wrap(ErrInternal, "failed to unmarshal project data map")
 	}
 
 	// Check that evaluatorPayPerClaim is present and is a string integer
