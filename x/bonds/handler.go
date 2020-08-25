@@ -264,7 +264,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) (*sdk
 	if bond.State != types.OpenState && bond.State != types.HatchState {
 		return nil, types.ErrInvalidStateForAction
 	} else if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
-		return nil, sdkerrors.Wrapf(types.ErrReserveDenomsMismatch, msg.MaxPrices.String(), bond.ReserveTokens)
+		return nil, sdkerrors.Wrapf(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
 		return nil, types.ErrOrderQuantityLimitExceeded
 	}

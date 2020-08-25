@@ -35,7 +35,7 @@ var (
 	ErrMaxSupplyDenomDoesNotMatchTokenDenom = sdkerrors.Register(DefaultCodespace, 27, "token is not a valid reserve token")
 	ErrBondTokenCannotAlsoBeReserveToken    = sdkerrors.Register(DefaultCodespace, 28, "token cannot also be a reserve token")
 	ErrBondTokenCannotBeStakingToken        = sdkerrors.Register(DefaultCodespace, 29, "bond token cannot be staking token")
-	ErrReserveDenomsMismatch                = sdkerrors.Register(DefaultCodespace, 30, "denoms in do not match reserve denoms")
+	ErrReserveDenomsMismatch                = sdkerrors.Register(DefaultCodespace, 30, "denoms do not match reserve denoms")
 	ErrCannotMintMoreThanMaxSupply          = sdkerrors.Register(DefaultCodespace, 31, "cannot mint more tokens than the max supply")
 	ErrCannotBurnMoreThanSupply             = sdkerrors.Register(DefaultCodespace, 32, "cannot burn more tokens than the current supply")
 	ErrMaxPriceExceeded                     = sdkerrors.Register(DefaultCodespace, 33, "actual prices exceed max prices")
