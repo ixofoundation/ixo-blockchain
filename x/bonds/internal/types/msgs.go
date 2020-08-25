@@ -298,7 +298,7 @@ func (msg MsgBuy) ValidateBasic() error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "buyer DID")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
 	} else if !did.IsValidDid(msg.BuyerDid) {
 		return sdkerrors.Wrap(did.ErrInvalidDid, "buyer DID")
 	}
