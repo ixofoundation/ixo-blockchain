@@ -143,7 +143,7 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
 	address := supply.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "Generate account already exists")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
 	}
 
 	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
