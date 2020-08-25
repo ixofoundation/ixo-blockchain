@@ -112,7 +112,7 @@ func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err 
 	bondDid := path[0]
 
 	if !keeper.BatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "batch for  does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "batch for %s does not exist", bondDid)
 	}
 
 	batch := keeper.MustGetBatch(ctx, bondDid)
@@ -129,7 +129,7 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 	bondDid := path[0]
 
 	if !keeper.LastBatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for  does not exist", bondDid)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for %s does not exist", bondDid)
 	}
 
 	batch := keeper.MustGetLastBatch(ctx, bondDid)
