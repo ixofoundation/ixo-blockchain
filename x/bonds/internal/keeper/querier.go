@@ -169,7 +169,7 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []b
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
@@ -187,7 +187,7 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
@@ -215,7 +215,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "bond does not exist")
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
