@@ -67,7 +67,8 @@ func NewHandler(k Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgEffectPayment:
 			return handleMsgEffectPayment(ctx, k, bk, msg)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "No match for message type.")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+				"unrecognized payments Msg type: %v", msg.Type())
 		}
 	}
 }

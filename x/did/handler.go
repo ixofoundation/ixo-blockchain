@@ -19,7 +19,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case types.MsgAddCredential:
 			return handleMsgAddCredential(ctx, k, msg)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "No match for message type.")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+				"unrecognized did Msg type: %v", msg.Type())
 		}
 	}
 }

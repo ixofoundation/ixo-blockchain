@@ -30,8 +30,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 		case types.MsgWithdrawShare:
 			return handleMsgWithdrawShare(ctx, keeper, msg)
 		default:
-			errMsg := fmt.Sprintf("Unrecognized bonds Msg type: %v", msg.Type())
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+				"unrecognized bonds Msg type: %v", msg.Type())
 		}
 	}
 }
@@ -177,7 +177,8 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	}
 
 	if bond.CreatorDid != msg.EditorDid {
-		return nil, fmt.Errorf("editor must be the creator of the bond")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"editor must be the creator of the bond")
 	}
 
 	if msg.Name != types.DoNotModifyField {
@@ -264,7 +265,7 @@ func handleMsgBuy(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgBuy) (*sdk
 	if bond.State != types.OpenState && bond.State != types.HatchState {
 		return nil, types.ErrInvalidStateForAction
 	} else if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
-		return nil, sdkerrors.Wrapf(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
+		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
 		return nil, types.ErrOrderQuantityLimitExceeded
 	}
@@ -387,7 +388,7 @@ func handleMsgSell(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSell) (*s
 	if !bond.AllowSells {
 		return nil, sdkerrors.Wrap(types.ErrBondDoesNotAllowSelling, msg.BondDid)
 	} else if bond.State != types.OpenState {
-		return nil, sdkerrors.Wrap(types.ErrInvalidStateForAction, "")
+		return nil, types.ErrInvalidStateForAction
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
 		return nil, types.ErrOrderQuantityLimitExceeded
 	}
@@ -452,9 +453,9 @@ func handleMsgSwap(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSwap) (*s
 
 	// Confirm that function type is swapper_function and state is OPEN
 	if bond.FunctionType != types.SwapperFunction {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "")
+		return nil, types.ErrFunctionNotAvailableForFunctionType
 	} else if bond.State != types.OpenState {
-		return nil, sdkerrors.Wrap(types.ErrInvalidStateForAction, "")
+		return nil, types.ErrInvalidStateForAction
 	}
 
 	// Check that from and to use reserve token names
@@ -513,9 +514,9 @@ func handleMsgMakeOutcomePayment(ctx sdk.Context, keeper keeper.Keeper, msg type
 
 	// Confirm that state is OPEN and that outcome payment is not nil
 	if bond.State != types.OpenState {
-		return nil, sdkerrors.Wrap(types.ErrInvalidStateForAction, "")
+		return nil, types.ErrInvalidStateForAction
 	} else if bond.OutcomePayment.Empty() {
-		return nil, sdkerrors.Wrap(types.ErrCannotMakeZeroOutcomePayment, "")
+		return nil, types.ErrCannotMakeZeroOutcomePayment
 	}
 
 	// Send outcome payment to reserve
@@ -553,13 +554,13 @@ func handleMsgWithdrawShare(ctx sdk.Context, keeper keeper.Keeper, msg types.Msg
 
 	// Check that state is SETTLE
 	if bond.State != types.SettleState {
-		return nil, sdkerrors.Wrap(types.ErrInvalidStateForAction, "")
+		return nil, types.ErrInvalidStateForAction
 	}
 
 	// Get number of bond tokens owned by the recipient
 	bondTokensOwnedAmount := keeper.BankKeeper.GetCoins(ctx, recipientAddr).AmountOf(bond.Token)
 	if bondTokensOwnedAmount.IsZero() {
-		return nil, sdkerrors.Wrap(types.ErrNoBondTokensOwned, "")
+		return nil, types.ErrNoBondTokensOwned
 	}
 	bondTokensOwned := sdk.NewCoin(bond.Token, bondTokensOwnedAmount)
 

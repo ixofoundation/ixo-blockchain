@@ -26,7 +26,7 @@ func GetPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 			// For the remaining messages, the did is the signer
 			didDoc, _ := keeper.GetDidDoc(ctx, msg.GetSignerDid())
 			if didDoc == nil {
-				return pubKey, sdkerrors.Wrap(types.ErrUnauthorized, "Issuer did not found")
+				return pubKey, sdkerrors.Wrap(ErrInvalidDid, "issuer did not found")
 
 			}
 			copy(pubKeyEd25519[:], base58.Decode(didDoc.GetPubKey()))

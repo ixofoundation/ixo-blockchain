@@ -20,7 +20,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case MsgOracleBurn:
 			return handleMsgOracleBurn(ctx, k, msg)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "No match for message type.")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+				"unrecognized treasury Msg type: %v", msg.Type())
 		}
 	}
 	// TODO: be able to disable sends/mints/burns globally
