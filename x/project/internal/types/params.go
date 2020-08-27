@@ -49,20 +49,27 @@ func (p Params) String() string {
 }
 
 func validateIxoDid(i interface{}) error {
-	v := i.(sdk.Dec)
+	v, ok := i.(did.Did)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
 
-	if v.IsNil() {
-		return fmt.Errorf("ixo did must be positive: %s", v)
+	if len(v) == 0 {
+		return fmt.Errorf("ixo did cannot be empty")
 	}
 
 	return nil
 }
 
 func validateProjectMinimumInitialFunding(i interface{}) error {
-	v := i.(sdk.Dec)
+	v, ok := i.(sdk.Int)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
 
-	if v.IsNil() {
-		return fmt.Errorf("project minimum initial funding must be positive: %s", v)
+	if v.LT(sdk.ZeroInt()) {
+		return fmt.Errorf("invalid project minimum initial "+
+			"funding should be positive, is %s ", v.String())
 	}
 
 	return nil

@@ -97,98 +97,146 @@ func (p Params) String() string {
 	)
 }
 
-func validateFactor(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("ixo factor must be positive: %s", v)
+func validateIxoFactor(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("ixo factor should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
 func validateInitiationFeeAmount(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("initiation feeAmount must be positive: %s", v)
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("initiation fee amount should be positive, is %s ", v.String())
 	}
 
 	return nil
 }
 
-func validateFeePercentage(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("fee percentage must be positive: %s", v)
+func validateInitiationNodeFeePercentage(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("initiation node fee percentage should be positive, is %s ", v.String())
 	}
 
 	return nil
 }
 
 func validateClaimFeeAmount(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("claim fee amount must be positive: %s", v)
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("claim fee amount should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
 func validateEvaluationFeeAmount(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("evaluation fee amount must be positive: %s", v)
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("evaluation fee amount should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
-func validateRegistrationFeeAmount(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("registration fee amount must be positive: %s", v)
+func validateServiceAgentRegistrationFeeAmount(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("service agent registration fee amount should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
-func validateAgentRegistrationFeeAmount(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("agent registration fee amount must be positive: %s", v)
+func validateEvaluationAgentRegistrationFeeAmount(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("evaluation agent registration fee amount should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
 func validateNodeFeePercentage(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("node fee percentage must be positive: %s", v)
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("node fee percentage should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
 func validateEvaluationPayFeePercentage(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("evaluation pay fee percentage must be positive: %s", v)
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("evaluation pay fee percentage should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
 func validateEvaluationPayNodeFeePercentage(i interface{}) error {
-	v := i.(sdk.Dec)
-	if v.IsNegative() {
-		return fmt.Errorf("evaluation pay node fee percentage must be positive: %s", v)
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
 	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("evaluation pay node fee percentage should be positive, is %s ", v.String())
+	}
+
 	return nil
 }
 
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyIxoFactor, &p.IxoFactor, validateFactor},
+		{KeyIxoFactor, &p.IxoFactor, validateIxoFactor},
 		{KeyInitiationFeeAmount, &p.InitiationFeeAmount, validateInitiationFeeAmount},
-		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage, validateFeePercentage},
+		{KeyInitiationNodeFeePercentage, &p.InitiationNodeFeePercentage, validateInitiationNodeFeePercentage},
 		{KeyClaimFeeAmount, &p.ClaimFeeAmount, validateClaimFeeAmount},
 		{KeyEvaluationFeeAmount, &p.EvaluationFeeAmount, validateEvaluationFeeAmount},
-		{KeyServiceAgentRegistrationFeeAmount, &p.ServiceAgentRegistrationFeeAmount, validateRegistrationFeeAmount},
-		{KeyEvaluationAgentRegistrationFeeAmount, &p.EvaluationAgentRegistrationFeeAmount, validateAgentRegistrationFeeAmount},
+		{KeyServiceAgentRegistrationFeeAmount, &p.ServiceAgentRegistrationFeeAmount, validateServiceAgentRegistrationFeeAmount},
+		{KeyEvaluationAgentRegistrationFeeAmount, &p.EvaluationAgentRegistrationFeeAmount, validateEvaluationAgentRegistrationFeeAmount},
 		{KeyNodeFeePercentage, &p.NodeFeePercentage, validateNodeFeePercentage},
 		{KeyEvaluationPayFeePercentage, &p.EvaluationPayFeePercentage, validateEvaluationPayFeePercentage},
 		{KeyEvaluationPayNodeFeePercentage, &p.EvaluationPayNodeFeePercentage, validateEvaluationPayNodeFeePercentage},
