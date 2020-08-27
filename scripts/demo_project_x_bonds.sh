@@ -118,6 +118,8 @@ yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did g
 
 # Fund DID accounts
 echo "Funding DID accounts..."
+# The DID accounts would most probably be funded by oracle-transfer rather than
+# oracle-mint where the uixo tokens would be found in a central IXO account.
 ixocli tx treasury oracle-mint "$DID_1" 10000000uixo "$ORACLE_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 ixocli tx treasury oracle-mint "$DID_2" 10000000uixo "$ORACLE_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 ixocli tx treasury oracle-mint "$DID_3" 10000000uixo "$ORACLE_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
