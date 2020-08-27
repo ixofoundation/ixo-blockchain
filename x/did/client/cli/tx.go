@@ -27,7 +27,14 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			stdSignMsg := msg.ToStdSignMsg()
+
+			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)
+			if err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(res)
 		},
 	}
 }

@@ -14,9 +14,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
+	"github.com/tendermint/ed25519"
 	"github.com/tendermint/tendermint/crypto"
 	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/multisig"
@@ -29,8 +31,9 @@ var (
 	approximationGasAdjustment = float64(1.5)
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 
-	// simulation pubkey to estimate gas consumption
+	// simulation signature values used to estimate gas consumption
 	simEd25519Pubkey ed25519tm.PubKeyEd25519
+	simEd25519Sig    [ed25519.SignatureSize]byte
 )
 
 func init() {
@@ -245,4 +248,56 @@ func IxoSigVerificationGasConsumer(
 	default:
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidPubKey, "unrecognized public key type: %T", pubkey)
 	}
+}
+
+func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdSignature, params auth.Params) {
+	simSig := auth.StdSignature{PubKey: pubkey}
+	if len(sig.Signature) == 0 {
+		simSig.Signature = simEd25519Sig[:]
+	}
+
+	sigBz := ModuleCdc.MustMarshalBinaryLengthPrefixed(simSig)
+	cost := sdk.Gas(len(sigBz) + 6)
+
+	// If the pubkey is a multi-signature pubkey, then we estimate for the maximum
+	// number of signers.
+	if _, ok := pubkey.(multisig.PubKeyMultisigThreshold); ok {
+		cost *= params.TxSigLimit
+	}
+
+	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
+}
+
+func ProcessSig(
+	ctx sdk.Context, acc authexported.Account, sig auth.StdSignature, signBytes []byte, simulate bool, params auth.Params,
+) (updatedAcc authexported.Account, err error) {
+
+	var pubKey crypto.PubKey
+	pubKey = acc.GetPubKey()
+	err = acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, sdkerrors.Wrap(ErrInternal, "setting PubKey on signer's account")
+	}
+
+	if simulate {
+		// Simulated txs should not contain a signature and are not required to
+		// contain a pubkey, so we must account for tx size of including a
+		// StdSignature (Amino encoding) and simulate gas consumption
+		// (assuming an ED25519 simulation key).
+		consumeSimSigGas(ctx.GasMeter(), pubKey, sig, params)
+	}
+
+	// Consume signature gas
+	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
+
+	// Verify signature
+	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Signature Verification failed")
+	}
+
+	if err := acc.SetSequence(acc.GetSequence() + 1); err != nil {
+		panic(err)
+	}
+
+	return acc, err
 }

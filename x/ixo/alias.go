@@ -17,6 +17,12 @@ var (
 	// Auth
 	NewDefaultPubKeyGetter           = types.NewDefaultPubKeyGetter
 	NewDefaultAnteHandler            = types.NewDefaultAnteHandler
+	ProcessSig                       = types.ProcessSig
+	NewSetPubKeyDecorator            = types.NewSetPubKeyDecorator
+	NewDeductFeeDecorator            = types.NewDeductFeeDecorator
+	NewSigGasConsumeDecorator        = types.NewSigGasConsumeDecorator
+	NewSigVerificationDecorator      = types.NewSigVerificationDecorator
+	NewIncrementSequenceDecorator    = types.NewIncrementSequenceDecorator
 	ApproximateFeeForTx              = types.ApproximateFeeForTx
 	GenerateOrBroadcastMsgs          = types.GenerateOrBroadcastMsgs
 	SignAndBroadcastTxFromStdSignMsg = types.SignAndBroadcastTxFromStdSignMsg
