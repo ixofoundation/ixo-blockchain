@@ -357,9 +357,9 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
 	addDidAnteHandler := did.NewAddDidAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
-	//projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-	//	app.accountKeeper, app.supplyKeeper, app.bankKeeper,
-	//	app.didKeeper, projectPubKeyGetter)
+	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
+		app.didKeeper, projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
@@ -375,8 +375,8 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 			}
 		case project.RouterKey:
 			switch msg.Type() {
-			//case project.TypeMsgCreateProject:
-			//	return projectCreationAnteHandler(ctx, tx, simulate)
+			case project.TypeMsgCreateProject:
+				return projectCreationAnteHandler(ctx, tx, simulate)
 			default:
 				return projectAnteHandler(ctx, tx, simulate)
 			}

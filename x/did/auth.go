@@ -129,7 +129,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	// message must be of type MsgAddDid
 	msg, ok := tx.GetMsgs()[0].(MsgAddDid)
 	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.IxoMsg")
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.MsgAddDid")
 	}
 
 	// Get did pubKey
@@ -141,7 +141,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	// Fetch signer (account underlying DID). Account expected to not exist
 	signerAddr := sdk.AccAddress(pubKey.Address())
 	_, err = auth.GetSignerAcc(ctx, spkd.ak, signerAddr)
-	if err != nil {
+	if err == nil {
 		return ctx, fmt.Errorf("expected account underlying DID to not exist")
 	}
 
@@ -214,7 +214,7 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	// message must be of type MsgAddDid
 	msg, ok := tx.GetMsgs()[0].(MsgAddDid)
 	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.IxoMsg")
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.MsgAddDid")
 	}
 
 	// Get did pubKey
