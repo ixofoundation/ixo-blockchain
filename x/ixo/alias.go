@@ -16,7 +16,6 @@ var (
 
 	// Auth
 	NewDefaultPubKeyGetter           = types.NewDefaultPubKeyGetter
-	ProcessSig                       = types.ProcessSig
 	NewDefaultAnteHandler            = types.NewDefaultAnteHandler
 	ApproximateFeeForTx              = types.ApproximateFeeForTx
 	GenerateOrBroadcastMsgs          = types.GenerateOrBroadcastMsgs

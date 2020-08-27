@@ -343,22 +343,23 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
+	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
 	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
 
 	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
+		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer, defaultPubKeyGetter)
 	didAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
+		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer, didPubKeyGetter)
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer)
+		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer, projectPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
-	addDidAnteHandler := did.NewAddDidAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
-	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
-		app.didKeeper, projectPubKeyGetter)
+	//addDidAnteHandler := did.NewAddDidAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
+	//projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+	//	app.accountKeeper, app.supplyKeeper, app.bankKeeper,
+	//	app.didKeeper, projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
@@ -367,15 +368,15 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		switch msg.Route() {
 		case did.RouterKey:
 			switch msg.Type() {
-			case did.TypeMsgAddDid:
-				return addDidAnteHandler(ctx, tx, simulate)
+			//case did.TypeMsgAddDid:
+			//	return addDidAnteHandler(ctx, tx, simulate)
 			default:
 				return didAnteHandler(ctx, tx, simulate)
 			}
 		case project.RouterKey:
 			switch msg.Type() {
-			case project.TypeMsgCreateProject:
-				return projectCreationAnteHandler(ctx, tx, simulate)
+			//case project.TypeMsgCreateProject:
+			//	return projectCreationAnteHandler(ctx, tx, simulate)
 			default:
 				return projectAnteHandler(ctx, tx, simulate)
 			}

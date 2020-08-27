@@ -1,14 +1,12 @@
 package project
 
 import (
-	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
@@ -86,121 +84,121 @@ func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc exported.Acc
 	)
 }
 
-func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
-	bk bank.Keeper, didKeeper did.Keeper,
-	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
-	return func(
-		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, err error) {
-
-		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
-			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
-		}
-
-		// all transactions must be of type auth.StdTx
-		stdTx, ok := tx.(auth.StdTx)
-		if !ok {
-			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
-			// during runTx.
-			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdkerrors.Wrap(types.ErrInternal, "tx must be auth.StdTx")
-		}
-
-		params := ak.GetParams(ctx)
-
-		// Project creation uses an infinite gas meter
-		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
-
-		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err
-		}
-
-		// Number of messages in the tx must be 1
-		if len(tx.GetMsgs()) != 1 {
-			return ctx, sdkerrors.Wrap(types.ErrInternal, "number of messages must be 1")
-
-		}
-
-		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
-
-		// message must be of type MsgCreateProject
-		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)
-		if !ok {
-			return newCtx, sdkerrors.Wrap(types.ErrInternal, "msg must be MsgCreateProject")
-		}
-
-		// Get project pubKey
-		projectPubKey, res := pubKeyGetter(ctx, msg)
-		if res != nil {
-			return newCtx, res
-		}
-
-		// Fetch signer (project itself). Account expected to not exist
-		signerAddr := sdk.AccAddress(projectPubKey.Address())
-		_, res = auth.GetSignerAcc(newCtx, ak, signerAddr)
-		if res != nil {
-			return newCtx, sdkerrors.Wrap(types.ErrInternal, "expected project account to not exist")
-
-		}
-
-		// confirm that fee is the exact amount expected
-		expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
-			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTotalFee)))
-		if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
-			return newCtx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee")
-
-		}
-
-		// Calculate transaction fee and project funding
-		transactionFee := sdk.NewCoins(sdk.NewCoin(
-			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTransactionFee)))
-		projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
-
-		// deduct the fees
-		if !stdTx.Fee.Amount.IsZero() {
-			// fetch fee payer account
-			feePayerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.SenderDid)
-			if err != nil {
-				return newCtx, err
-			}
-			feePayerAcc, res := auth.GetSignerAcc(ctx, ak, feePayerDidDoc.Address())
-			if res != nil {
-				return newCtx, res
-			}
-
-			res = auth.DeductFees(sk, newCtx, feePayerAcc, transactionFee)
-			if res != nil {
-				return newCtx, res
-			}
-
-			projectAddr := sdk.AccAddress(projectPubKey.Address())
-			res = deductProjectFundingFees(bk, newCtx, feePayerAcc, projectAddr, projectFunding)
-			if res != nil {
-				return newCtx, res
-			}
-
-			// reload the account as fees have been deducted
-			feePayerAcc = ak.GetAccount(newCtx, feePayerAcc.GetAddress())
-		}
-
-		// Fetch signer account (project itself); create if it does not exist
-		signerAcc, res := auth.GetSignerAcc(ctx, ak, signerAddr)
-		if res != nil {
-			signerAcc = ak.NewAccountWithAddress(ctx, signerAddr)
-			ak.SetAccount(ctx, signerAcc)
-		}
-
-		// check signature, return account with incremented nonce
-		ixoSig := stdTx.Signatures[0]
-		isGenesis := ctx.BlockHeight() == 0
-		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
-		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
-		if res != nil {
-			return newCtx, res
-		}
-
-		ak.SetAccount(newCtx, signerAcc)
-
-		return newCtx, nil // continue...
-	}
-}
+//func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
+//	bk bank.Keeper, didKeeper did.Keeper,
+//	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
+//	return func(
+//		ctx sdk.Context, tx sdk.Tx, simulate bool,
+//	) (newCtx sdk.Context, err error) {
+//
+//		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
+//			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
+//		}
+//
+//		// all transactions must be of type auth.StdTx
+//		stdTx, ok := tx.(auth.StdTx)
+//		if !ok {
+//			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
+//			// during runTx.
+//			newCtx = auth.SetGasMeter(simulate, ctx, 0)
+//			return newCtx, sdkerrors.Wrap(types.ErrInternal, "tx must be auth.StdTx")
+//		}
+//
+//		params := ak.GetParams(ctx)
+//
+//		// Project creation uses an infinite gas meter
+//		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+//
+//		if err := tx.ValidateBasic(); err != nil {
+//			return newCtx, err
+//		}
+//
+//		// Number of messages in the tx must be 1
+//		if len(tx.GetMsgs()) != 1 {
+//			return ctx, sdkerrors.Wrap(types.ErrInternal, "number of messages must be 1")
+//
+//		}
+//
+//		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
+//
+//		// message must be of type MsgCreateProject
+//		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)
+//		if !ok {
+//			return newCtx, sdkerrors.Wrap(types.ErrInternal, "msg must be MsgCreateProject")
+//		}
+//
+//		// Get project pubKey
+//		projectPubKey, res := pubKeyGetter(ctx, msg)
+//		if res != nil {
+//			return newCtx, res
+//		}
+//
+//		// Fetch signer (project itself). Account expected to not exist
+//		signerAddr := sdk.AccAddress(projectPubKey.Address())
+//		_, res = auth.GetSignerAcc(newCtx, ak, signerAddr)
+//		if res != nil {
+//			return newCtx, sdkerrors.Wrap(types.ErrInternal, "expected project account to not exist")
+//
+//		}
+//
+//		// confirm that fee is the exact amount expected
+//		expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
+//			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTotalFee)))
+//		if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
+//			return newCtx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee")
+//
+//		}
+//
+//		// Calculate transaction fee and project funding
+//		transactionFee := sdk.NewCoins(sdk.NewCoin(
+//			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTransactionFee)))
+//		projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
+//
+//		// deduct the fees
+//		if !stdTx.Fee.Amount.IsZero() {
+//			// fetch fee payer account
+//			feePayerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.SenderDid)
+//			if err != nil {
+//				return newCtx, err
+//			}
+//			feePayerAcc, res := auth.GetSignerAcc(ctx, ak, feePayerDidDoc.Address())
+//			if res != nil {
+//				return newCtx, res
+//			}
+//
+//			res = auth.DeductFees(sk, newCtx, feePayerAcc, transactionFee)
+//			if res != nil {
+//				return newCtx, res
+//			}
+//
+//			projectAddr := sdk.AccAddress(projectPubKey.Address())
+//			res = deductProjectFundingFees(bk, newCtx, feePayerAcc, projectAddr, projectFunding)
+//			if res != nil {
+//				return newCtx, res
+//			}
+//
+//			// reload the account as fees have been deducted
+//			feePayerAcc = ak.GetAccount(newCtx, feePayerAcc.GetAddress())
+//		}
+//
+//		// Fetch signer account (project itself); create if it does not exist
+//		signerAcc, res := auth.GetSignerAcc(ctx, ak, signerAddr)
+//		if res != nil {
+//			signerAcc = ak.NewAccountWithAddress(ctx, signerAddr)
+//			ak.SetAccount(ctx, signerAcc)
+//		}
+//
+//		// check signature, return account with incremented nonce
+//		ixoSig := stdTx.Signatures[0]
+//		isGenesis := ctx.BlockHeight() == 0
+//		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
+//		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
+//		if res != nil {
+//			return newCtx, res
+//		}
+//
+//		ak.SetAccount(newCtx, signerAcc)
+//
+//		return newCtx, nil // continue...
+//	}
+//}
