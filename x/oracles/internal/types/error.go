@@ -2,7 +2,10 @@ package types
 
 import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-var (
+const (
 	DefaultCodespace = ModuleName
-	ErrInternal      = sdkerrors.Register(DefaultCodespace, 2, "internal error")
+)
+
+var (
+	ErrInternal = sdkerrors.Register(DefaultCodespace, 2, "internal error")
 )

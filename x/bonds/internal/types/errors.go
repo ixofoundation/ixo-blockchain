@@ -4,9 +4,11 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var (
+const (
 	DefaultCodespace = ModuleName
+)
 
+var (
 	ErrArgumentCannotBeEmpty                = sdkerrors.Register(DefaultCodespace, 2, "argument cannot be empty")
 	ErrArgumentCannotBeNegative             = sdkerrors.Register(DefaultCodespace, 3, "argument cannot be negative")
 	ErrArgumentMustBePositive               = sdkerrors.Register(DefaultCodespace, 4, "argument must be a positive value")

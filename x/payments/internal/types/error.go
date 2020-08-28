@@ -4,9 +4,11 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var (
+const (
 	DefaultCodespace = ModuleName
+)
 
+var (
 	ErrNegativeSharePercentage                      = sdkerrors.Register(DefaultCodespace, 2, "payment distribution share percentage must be positive")
 	ErrDistributionPercentagesNot100                = sdkerrors.Register(DefaultCodespace, 3, "payment distribution percentages should add up to 100")
 	ErrInvalidPeriod                                = sdkerrors.Register(DefaultCodespace, 4, "period is invalid")
