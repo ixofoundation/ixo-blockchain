@@ -253,6 +253,11 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
 	}
 
+	// Check that project status is STARTED
+	if projectDoc.Status != types.StartedStatus {
+		return sdk.ErrUnauthorized("project not in STARTED status").Result()
+	}
+
 	// Check if claim already exists
 	if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimID) {
 		return sdk.ErrInternal("claim already exists").Result()
@@ -304,6 +309,11 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
 	if err != nil {
 		return sdk.ErrUnknownRequest("Could not find Project").Result()
+	}
+
+	// Check that project status is STARTED
+	if projectDoc.Status != types.StartedStatus {
+		return sdk.ErrUnauthorized("project not in STARTED status").Result()
 	}
 
 	// Get claim and confirm status is pending
