@@ -20,8 +20,12 @@ if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
 fi
 
 GAS_PRICES="0.025uixo"
+PASSWORD="12345678"
 
+MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
+SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+
 MIGUEL_DID_FULL='{
   "did":"did:ixo:4XJLBfGtWSGKSz4BeRxdun",
   "verifyKey":"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt",
@@ -52,14 +56,26 @@ SHAUN_DID_FULL='{
     "encryptionPrivateKey":"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR"
   }
 }'
+PAYMENT_RECIPIENTS='[
+  {
+    "address": "ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx",
+    "percentage": "100"
+  }
+]'
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering Francesco DID..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering Shaun DID..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+# Fund DID accounts  # TODO: Remove once DID ledgering fee is no longer 0
+echo "Funding DID accounts..."
+yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $MIGUEL_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
+yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $FRANCESCO_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
+yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $SHAUN_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
 
 # Create payment template
 echo "Creating payment template..."
@@ -74,7 +90,7 @@ PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
 PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
-ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Authorise payment contract
 echo "Authorising payment contract..."
