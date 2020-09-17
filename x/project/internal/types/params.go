@@ -81,10 +81,10 @@ func ValidateParams(params Params) error {
 
 func (p Params) String() string {
 	return fmt.Sprintf(`Project Params:
-  Ixo Did: 							%s
-  Project Minimum Initial Funding: 	%s
-  Oracle Fee Percentage:			%s
-  Node Fee Percentage:				%s
+  Ixo Did:                         %s
+  Project Minimum Initial Funding: %s
+  Oracle Fee Percentage:           %s
+  Node Fee Percentage:             %s
 
 `,
 		p.ProjectMinimumInitialFunding, p.IxoDid,
