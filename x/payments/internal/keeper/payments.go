@@ -32,6 +32,14 @@ func (k Keeper) PaymentTemplateExists(ctx sdk.Context, templateId string) bool {
 	return store.Has(types.GetPaymentTemplateKey(templateId))
 }
 
+func (k Keeper) MustGetPaymentTemplate(ctx sdk.Context, templateId string) types.PaymentTemplate {
+	template, err := k.GetPaymentTemplate(ctx, templateId)
+	if err != nil {
+		panic(err)
+	}
+	return template
+}
+
 func (k Keeper) GetPaymentTemplate(ctx sdk.Context, templateId string) (types.PaymentTemplate, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentTemplateKey(templateId)
@@ -92,6 +100,14 @@ func (k Keeper) MustGetPaymentContractByKey(ctx sdk.Context, key []byte) types.P
 func (k Keeper) PaymentContractExists(ctx sdk.Context, contractId string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetPaymentContractKey(contractId))
+}
+
+func (k Keeper) MustGetPaymentContract(ctx sdk.Context, contractId string) types.PaymentContract {
+	contract, err := k.GetPaymentContract(ctx, contractId)
+	if err != nil {
+		panic(err)
+	}
+	return contract
 }
 
 func (k Keeper) GetPaymentContract(ctx sdk.Context, contractId string) (types.PaymentContract, sdk.Error) {
@@ -263,7 +279,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 	// on the calculated wallet distributions
 	var outputToPayees sdk.Coins
 	var outputs []bank.Output
-	distributions := template.WalletDistribution.GetDistributionsFor(totalInputAmount)
+	distributions := contract.Recipients.GetDistributionsFor(totalInputAmount)
 	for i, share := range distributions {
 		// Get integer output
 		outputAmt, _ := share.TruncateDecimal()
@@ -271,7 +287,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bank.Keeper,
 		// If amount not zero, update total and add as output
 		if !outputAmt.IsZero() {
 			outputToPayees = outputToPayees.Add(outputAmt)
-			address := template.WalletDistribution[i].Address
+			address := contract.Recipients[i].Address
 			outputs = append(outputs, bank.NewOutput(address, outputAmt))
 		}
 	}

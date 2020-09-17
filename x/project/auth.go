@@ -34,7 +34,7 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			if err != nil {
 				return pubKey, sdk.ErrInternal("project did not found").Result()
 			}
-			copy(pubKeyEd25519[:], base58.Decode(projectDoc.GetPubKey()))
+			copy(pubKeyEd25519[:], base58.Decode(projectDoc.PubKey))
 		}
 		return pubKeyEd25519, sdk.Result{}
 	}
@@ -148,13 +148,14 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
 
 		// confirm that fee is the exact amount expected
 		expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
-			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectFee)))
+			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTotalFee)))
 		if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
 			return newCtx, sdk.ErrInvalidCoins("invalid fee").Result(), true
 		}
 
 		// Calculate transaction fee and project funding
-		transactionFee := sdk.NewCoins(sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTransactionFee)))
+		transactionFee := sdk.NewCoins(sdk.NewCoin(
+			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTransactionFee)))
 		projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
 
 		// deduct the fees

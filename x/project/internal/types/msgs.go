@@ -4,15 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/spf13/viper"
-	"strconv"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -24,8 +21,9 @@ const (
 	TypeMsgCreateEvaluation    = "create-evaluation"
 	TypeMsgWithdrawFunds       = "withdraw-funds"
 
-	MsgCreateProjectFee            = int64(1000000)
+	MsgCreateProjectTotalFee       = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
+	// Project funding will be totalFee - transactionFee = 990000
 )
 
 var (
@@ -44,6 +42,17 @@ type MsgCreateProject struct {
 	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
 	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 	Data       json.RawMessage `json:"data" yaml:"data"`
+}
+
+func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
+	projectDid did.Did, pubKey string) MsgCreateProject {
+	return MsgCreateProject{
+		TxHash:     "",
+		SenderDid:  senderDid,
+		ProjectDid: projectDid,
+		PubKey:     pubKey,
+		Data:       projectData,
+	}
 }
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) auth.StdSignMsg {
@@ -69,9 +78,9 @@ func (msg MsgCreateProject) Route() string { return RouterKey }
 
 func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
+	if valid, err := checkNotEmpty(msg.PubKey, "PubKey"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
 	}
 
@@ -80,30 +89,6 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
 		return sdk.ErrInternal(err.Error())
-	}
-
-	// Check that evaluatorPayPerClaim is present and is a string integer
-	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
-	if !found {
-		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
-	}
-	var evaluatorPayPerClaimStr string
-	err = json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
-	if err != nil {
-		return sdk.ErrInternal(err.Error())
-	}
-	_, err = strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
-	if err != nil {
-		return sdk.ErrInternal("evaluatorPayPerClaim should be an integer")
-	}
-
-	// Check that DIDs and PubKey valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !did.IsValidPubKey(msg.PubKey) {
-		return did.ErrorInvalidPubKey(DefaultCodespace, "pubKey is invalid")
 	}
 
 	// Check that project DID matches the PubKey
@@ -144,14 +129,23 @@ type MsgUpdateProjectStatus struct {
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.Did) MsgUpdateProjectStatus {
+	return MsgUpdateProjectStatus{
+		TxHash:     "",
+		SenderDid:  senderDid,
+		ProjectDid: projectDid,
+		Data:       updateProjectStatusDoc,
+	}
+}
+
 func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
 func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
 
 func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -185,13 +179,22 @@ type MsgCreateAgent struct {
 	Data       CreateAgentDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.Did) MsgCreateAgent {
+	return MsgCreateAgent{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       createAgentDoc,
+	}
+}
+
 func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
 func (msg MsgCreateAgent) Route() string { return RouterKey }
 func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -233,13 +236,22 @@ type MsgUpdateAgent struct {
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.Did) MsgUpdateAgent {
+	return MsgUpdateAgent{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       updateAgentDoc,
+	}
+}
+
 func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
 func (msg MsgUpdateAgent) Route() string { return RouterKey }
 func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -282,14 +294,23 @@ type MsgCreateClaim struct {
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.Did) MsgCreateClaim {
+	return MsgCreateClaim{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       createClaimDoc,
+	}
+}
+
 func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
 func (msg MsgCreateClaim) Route() string { return RouterKey }
 
 func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -330,14 +351,23 @@ type MsgCreateEvaluation struct {
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.Did) MsgCreateEvaluation {
+	return MsgCreateEvaluation{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       createEvaluationDoc,
+	}
+}
+
 func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
 func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
 func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -376,16 +406,23 @@ type MsgWithdrawFunds struct {
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) MsgWithdrawFunds {
+	return MsgWithdrawFunds{
+		SenderDid: senderDid,
+		Data:      data,
+	}
+}
+
 func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
 func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
 func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.ProjectDid, "ProjectDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.Data.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.RecipientDid, "RecipientDid"); !valid {
+	} else if valid, err := checkNotEmpty(msg.Data.RecipientDid, "RecipientDid"); !valid {
 		return err
 	}
 

@@ -11,7 +11,7 @@ import (
 
 var (
 	ValidDid      = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
-	ValidPubKey   = regexp.MustCompile(`^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]{44}$`)
+	ValidPubKey   = regexp.MustCompile(`^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]{43,44}$`)
 	IsValidDid    = ValidDid.MatchString
 	IsValidPubKey = ValidPubKey.MatchString
 	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html

@@ -20,7 +20,7 @@ func TestQueryProjectDoc(t *testing.T) {
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
-	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
+	k.SetProjectDoc(ctx, types.ValidProjectDoc)
 
 	query := abci.RequestQuery{
 		Path: "",
@@ -46,7 +46,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
-	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
+	k.SetProjectDoc(ctx, types.ValidProjectDoc)
 
 	query := abci.RequestQuery{
 		Path: "",
@@ -82,7 +82,7 @@ func TestQueryTxs(t *testing.T) {
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
-	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
+	k.SetProjectDoc(ctx, types.ValidProjectDoc)
 
 	k.AddProjectWithdrawalTransaction(ctx, types.ProjectDid, types.ValidWithdrawalInfo)
 	k.AddProjectWithdrawalTransaction(ctx, types.ProjectDid, types.ValidWithdrawalInfo)
@@ -96,7 +96,7 @@ func TestQueryTxs(t *testing.T) {
 	res, err := querier(ctx, []string{QueryProjectTx, types.ProjectDid}, query)
 	require.Nil(t, err)
 
-	var txs []types.WithdrawalInfo
+	var txs []types.WithdrawalInfoDoc
 	cdc.MustUnmarshalJSON(res, &txs)
 
 	_, err = querier(ctx, []string{QueryProjectTx, "InvalidDid"}, query)

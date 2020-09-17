@@ -15,18 +15,18 @@ func TestProjectDoc(t *testing.T) {
 	ctx, k, _, _, _ := CreateTestInput()
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
-	k.SetProjectDoc(ctx, &types.ValidProjectDoc)
+	k.SetProjectDoc(ctx, types.ValidProjectDoc)
 
 	doc, err := k.GetProjectDoc(ctx, types.ProjectDid)
 	require.Nil(t, err)
-	require.Equal(t, &types.ValidProjectDoc, doc)
+	require.Equal(t, types.ValidProjectDoc, doc)
 
-	k.SetProjectDoc(ctx, &types.ValidUpdatedProjectDoc)
+	k.SetProjectDoc(ctx, types.ValidUpdatedProjectDoc)
 	require.Nil(t, err)
 
 	docUpdated, err := k.GetProjectDoc(ctx, types.ProjectDid)
 	require.Nil(t, err)
-	require.Equal(t, &types.ValidProjectDoc, doc)
+	require.Equal(t, types.ValidProjectDoc, doc)
 
 	expected, err := k.GetProjectDoc(ctx, types.ValidUpdatedProjectDoc.ProjectDid)
 	require.Equal(t, docUpdated, expected)

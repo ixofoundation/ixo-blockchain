@@ -31,7 +31,7 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 
 			msg := types.NewMsgCreateProject(
 				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
-			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectFee)
+			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectTotalFee)
 
 			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)
 			if err != nil {
@@ -69,9 +69,8 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 					"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
 			}
 
-			updateProjectStatusDoc := types.UpdateProjectStatusDoc{
-				Status: projectStatus,
-			}
+			updateProjectStatusDoc := types.NewUpdateProjectStatusDoc(
+				projectStatus, "")
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
@@ -98,10 +97,7 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 				return errors.New("The role must be one of 'SA', 'EA' or 'IA'")
 			}
 
-			createAgentDoc := types.CreateAgentDoc{
-				AgentDid: agentDid,
-				Role:     role,
-			}
+			createAgentDoc := types.NewCreateAgentDoc(agentDid, role)
 
 			ixoDid, err := did.UnmarshalIxoDid(args[4])
 			if err != nil {
@@ -134,11 +130,8 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 				return errors.New("The status must be one of '0' (Pending), '1' (Approved) or '2' (Revoked)")
 			}
 
-			updateAgentDoc := types.UpdateAgentDoc{
-				Did:    agentDid,
-				Status: agentStatus,
-				Role:   agentRole,
-			}
+			updateAgentDoc := types.NewUpdateAgentDoc(
+				agentDid, agentStatus, agentRole)
 
 			ixoDid, err := did.UnmarshalIxoDid(args[5])
 			if err != nil {
@@ -164,9 +157,7 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 			txHash := args[0]
 			senderDid := args[1]
 			claimId := args[2]
-			createClaimDoc := types.CreateClaimDoc{
-				ClaimID: claimId,
-			}
+			createClaimDoc := types.NewCreateClaimDoc(claimId)
 
 			ixoDid, err := did.UnmarshalIxoDid(args[3])
 			if err != nil {
@@ -198,10 +189,8 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 				return errors.New("The status must be one of '0' (Pending), '1' (Approved) or '2' (Rejected)")
 			}
 
-			createEvaluationDoc := types.CreateEvaluationDoc{
-				ClaimID: claimId,
-				Status:  claimStatus,
-			}
+			createEvaluationDoc := types.NewCreateEvaluationDoc(
+				claimId, claimStatus)
 
 			ixoDid, err := did.UnmarshalIxoDid(args[4])
 			if err != nil {

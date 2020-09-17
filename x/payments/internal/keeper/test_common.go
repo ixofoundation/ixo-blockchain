@@ -41,7 +41,7 @@ var (
 	tenPercentOffId   = validDiscounts[0].Id
 	fiftyPercentOffId = validDiscounts[1].Id
 
-	validDistribution = types.NewDistribution(
+	validRecipients = types.NewDistribution(
 		types.NewDistributionShare(shareAddr1, sdk.NewDec(50)),
 		types.NewDistributionShare(shareAddr2, sdk.NewDec(50)))
 
@@ -50,20 +50,18 @@ var (
 		validPaymentAmount,
 		validPaymentMinimum,
 		validPaymentMaximum,
-		validDiscounts,
-		validDistribution)
+		validDiscounts)
 
 	validDoublePayTemplate = types.NewPaymentTemplate(
 		validTemplateId1,
 		validDoubledPaymentAmount,
 		validPaymentMinimum,
 		validPaymentMaximum,
-		validDiscounts,
-		validDistribution)
+		validDiscounts)
 
 	validContract = types.NewPaymentContractNoDiscount(
-		validPaymentContractId1, validTemplateId1,
-		templateCreatorAddr, payerAddr, false, true)
+		validPaymentContractId1, validTemplateId1, templateCreatorAddr,
+		payerAddr, validRecipients, false, true)
 )
 
 func ValidateVariables() sdk.Error {
@@ -72,7 +70,7 @@ func ValidateVariables() sdk.Error {
 		return err
 	}
 
-	err = validDistribution.Validate()
+	err = validRecipients.Validate()
 	if err != nil {
 		return err
 	}

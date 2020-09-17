@@ -51,7 +51,7 @@ func (k Keeper) GetProjectDocIterator(ctx sdk.Context) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(store, types.ProjectKey)
 }
 
-func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.StoredProjectDoc {
+func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.ProjectDoc {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
 		panic("project doc not found")
@@ -61,32 +61,42 @@ func (k Keeper) MustGetProjectDocByKey(ctx sdk.Context, key []byte) types.Stored
 	var projectDoc types.ProjectDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
-	return &projectDoc
+	return projectDoc
 }
 
 func (k Keeper) ProjectDocExists(ctx sdk.Context, projectDid did.Did) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.GetProjectPrefixKey(projectDid))
+	return store.Has(types.GetProjectKey(projectDid))
 }
 
-func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.StoredProjectDoc, sdk.Error) {
+func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.ProjectDoc, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetProjectPrefixKey(projectDid)
+	key := types.GetProjectKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
+		return types.ProjectDoc{}, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
 	}
 
 	var projectDoc types.ProjectDoc
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &projectDoc)
 
-	return &projectDoc, nil
+	return projectDoc, nil
 }
 
-func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.StoredProjectDoc) {
+func (k Keeper) ValidateProjectFeesMap(ctx sdk.Context, projectFeesMap types.ProjectFeesMap) sdk.Error {
+	for _, v := range projectFeesMap.Items {
+		_, err := k.paymentsKeeper.GetPaymentTemplate(ctx, v.PaymentTemplateId)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.ProjectDoc) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetProjectPrefixKey(projectDoc.GetProjectDid())
+	key := types.GetProjectKey(projectDoc.ProjectDid)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(projectDoc))
 }
 
@@ -96,12 +106,12 @@ func (k Keeper) SetAccountMap(ctx sdk.Context, projectDid did.Did, accountMap ty
 	if err != nil {
 		panic(err)
 	}
-	store.Set(types.GetAccountPrefixKey(projectDid), bz)
+	store.Set(types.GetAccountMapKey(projectDid), bz)
 }
 
 func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid did.Did) types.AccountMap {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetAccountPrefixKey(projectDid)
+	key := types.GetAccountMapKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
@@ -125,7 +135,7 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetAccountPrefixKey(projectDid)
+	key := types.GetAccountMapKey(projectDid)
 	accountMap[accountId] = account.GetAddress()
 
 	bz, err := json.Marshal(accountMap)
@@ -150,33 +160,77 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
 	return account, nil
 }
 
-func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did, txs []types.WithdrawalInfo) {
+func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did, txs []types.WithdrawalInfoDoc) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(txs)
-	store.Set(types.GetWithdrawalPrefixKey(projectDid), bz)
+	store.Set(types.GetWithdrawalsKey(projectDid), bz)
 }
 
-func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfo, sdk.Error) {
+func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfoDoc, sdk.Error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetWithdrawalPrefixKey(projectDid)
+	key := types.GetWithdrawalsKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfo{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfoDoc{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
 	} else {
-		var txs []types.WithdrawalInfo
+		var txs []types.WithdrawalInfoDoc
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
 
 		return txs, nil
 	}
 }
 
-func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid did.Did, info types.WithdrawalInfo) {
+func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid did.Did, info types.WithdrawalInfoDoc) {
 	store := ctx.KVStore(k.storeKey)
-	key := types.GetWithdrawalPrefixKey(projectDid)
+	key := types.GetWithdrawalsKey(projectDid)
 
 	txs, _ := k.GetProjectWithdrawalTransactions(ctx, projectDid)
 	txs = append(txs, info)
 
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(txs))
+}
+
+func (k Keeper) GetClaimIterator(ctx sdk.Context, projectDid did.Did) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.GetClaimsKey(projectDid))
+}
+
+func (k Keeper) MustGetClaimByKey(ctx sdk.Context, key []byte) types.Claim {
+	store := ctx.KVStore(k.storeKey)
+	if !store.Has(key) {
+		panic("claim not found")
+	}
+
+	bz := store.Get(key)
+	var claim types.Claim
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &claim)
+
+	return claim
+}
+
+func (k Keeper) ClaimExists(ctx sdk.Context, projectDid did.Did, claimId string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.GetClaimKey(projectDid, claimId))
+}
+
+func (k Keeper) GetClaim(ctx sdk.Context, projectDid did.Did, claimId string) (types.Claim, sdk.Error) {
+	store := ctx.KVStore(k.storeKey)
+	key := types.GetClaimKey(projectDid, claimId)
+
+	bz := store.Get(key)
+	if bz == nil {
+		return types.Claim{}, did.ErrorInvalidDid(types.DefaultCodespace, "claim not found")
+	}
+
+	var claim types.Claim
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &claim)
+
+	return claim, nil
+}
+
+func (k Keeper) SetClaim(ctx sdk.Context, projectDid did.Did, claim types.Claim) {
+	store := ctx.KVStore(k.storeKey)
+	key := types.GetClaimKey(projectDid, claim.Id)
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(claim))
 }

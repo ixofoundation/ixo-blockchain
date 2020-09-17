@@ -74,7 +74,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 		switch ixoMsg.Type() {
 		case project.TypeMsgCreateProject:
 			stdSignMsg = ixoMsg.(project.MsgCreateProject).ToStdSignMsg(
-				project.MsgCreateProjectFee)
+				project.MsgCreateProjectTotalFee)
 		case did.TypeMsgAddDid:
 			stdSignMsg = ixoMsg.(did.MsgAddDid).ToStdSignMsg()
 		default:

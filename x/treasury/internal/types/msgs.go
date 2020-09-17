@@ -29,6 +29,14 @@ type MsgSend struct {
 	Amount      sdk.Coins `json:"amount" yaml:"amount"`
 }
 
+func NewMsgSend(toDidOrAddr string, amount sdk.Coins, senderDid did.Did) MsgSend {
+	return MsgSend{
+		FromDid:     senderDid,
+		ToDidOrAddr: toDidOrAddr,
+		Amount:      amount,
+	}
+}
+
 func (msg MsgSend) Type() string  { return TypeMsgSend }
 func (msg MsgSend) Route() string { return RouterKey }
 func (msg MsgSend) ValidateBasic() sdk.Error {
@@ -79,6 +87,17 @@ type MsgOracleTransfer struct {
 	ToDidOrAddr did.Did   `json:"to_did_or_addr" yaml:"to_did_or_addr"`
 	Amount      sdk.Coins `json:"amount" yaml:"amount"`
 	Proof       string    `json:"proof" yaml:"proof"`
+}
+
+func NewMsgOracleTransfer(fromDid did.Did, toDidOrAddr string, amount sdk.Coins,
+	oracleDid did.Did, proof string) MsgOracleTransfer {
+	return MsgOracleTransfer{
+		OracleDid:   oracleDid,
+		FromDid:     fromDid,
+		ToDidOrAddr: toDidOrAddr,
+		Amount:      amount,
+		Proof:       proof,
+	}
 }
 
 func (msg MsgOracleTransfer) Type() string  { return TypeMsgOracleTransfer }
@@ -138,6 +157,16 @@ type MsgOracleMint struct {
 	Proof       string    `json:"proof" yaml:"proof"`
 }
 
+func NewMsgOracleMint(toDidOrAddr string, amount sdk.Coins,
+	oracleDid did.Did, proof string) MsgOracleMint {
+	return MsgOracleMint{
+		OracleDid:   oracleDid,
+		ToDidOrAddr: toDidOrAddr,
+		Amount:      amount,
+		Proof:       proof,
+	}
+}
+
 func (msg MsgOracleMint) Type() string  { return TypeMsgOracleMint }
 func (msg MsgOracleMint) Route() string { return RouterKey }
 func (msg MsgOracleMint) ValidateBasic() sdk.Error {
@@ -189,6 +218,16 @@ type MsgOracleBurn struct {
 	FromDid   did.Did   `json:"from_did" yaml:"from_did"`
 	Amount    sdk.Coins `json:"amount" yaml:"amount"`
 	Proof     string    `json:"proof" yaml:"proof"`
+}
+
+func NewMsgOracleBurn(fromDid did.Did, amount sdk.Coins,
+	oracleDid did.Did, proof string) MsgOracleBurn {
+	return MsgOracleBurn{
+		OracleDid: oracleDid,
+		FromDid:   fromDid,
+		Amount:    amount,
+		Proof:     proof,
+	}
 }
 
 func (msg MsgOracleBurn) Type() string  { return TypeMsgOracleBurn }
