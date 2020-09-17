@@ -91,45 +91,6 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 		return sdk.ErrInternal(err.Error())
 	}
 
-	// Check that evaluatorPayPerClaim is present and is coins
-	claimerPayPerClaimBz, found := dataMap["claimerPayPerClaim"]
-	if !found {
-		return sdk.ErrInternal("missing claimerPayPerClaim in project doc")
-	}
-	_, err = sdk.ParseCoins(withoutQuotes(string(claimerPayPerClaimBz)))
-	if err != nil {
-		return sdk.ErrInternal("claimerPayPerClaim should be valid coins")
-	}
-
-	// Check that claimerPayPerApprovedClaim is present and is coins
-	claimerPayPerApprovedClaimBz, found := dataMap["claimerPayPerApprovedClaim"]
-	if !found {
-		return sdk.ErrInternal("missing claimerPayPerApprovedClaim in project doc")
-	}
-	_, err = sdk.ParseCoins(withoutQuotes(string(claimerPayPerApprovedClaimBz)))
-	if err != nil {
-		return sdk.ErrInternal("claimerPayPerApprovedClaim should be valid coins")
-	}
-
-	// Check that evaluatorPayPerClaim is present and is coins
-	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
-	if !found {
-		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
-	}
-	_, err = sdk.ParseCoins(withoutQuotes(string(evaluatorPayPerClaimBz)))
-	if err != nil {
-		return sdk.ErrInternal("evaluatorPayPerClaim should be valid coins")
-	}
-
-	// Check that DIDs and PubKey valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
-	} else if !did.IsValidPubKey(msg.PubKey) {
-		return did.ErrorInvalidPubKey(DefaultCodespace, "pubKey is invalid")
-	}
-
 	// Check that project DID matches the PubKey
 	unprefixedDid := exported.UnprefixedDid(msg.ProjectDid)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)

@@ -32,7 +32,7 @@ func NewHandler(k Keeper, pk payments.Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgUpdateAgent:
 			return handleMsgUpdateAgent(ctx, k, bk, msg)
 		case MsgCreateClaim:
-			return handleMsgCreateClaim(ctx, k, pk, bk, msg)
+			return handleMsgCreateClaim(ctx, k, msg)
 		case MsgCreateEvaluation:
 			return handleMsgCreateEvaluation(ctx, k, pk, bk, msg)
 		case MsgWithdrawFunds:
@@ -45,7 +45,23 @@ func NewHandler(k Keeper, pk payments.Keeper, bk bank.Keeper) sdk.Handler {
 
 func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk.Result {
 
+	if k.ProjectDocExists(ctx, msg.ProjectDid) {
+		return did.ErrorInvalidDid(types.DefaultCodespace, fmt.Sprintf("Project already exists")).Result()
+	}
+
+	// Create project doc
+	projectDoc := NewProjectDoc(
+		msg.TxHash, msg.ProjectDid, msg.SenderDid,
+		msg.PubKey, types.NullStatus, msg.Data)
+
+	// Get and validate project fees map
 	var err sdk.Error
+	err = k.ValidateProjectFeesMap(ctx, projectDoc.GetProjectFeesMap())
+	if err != nil {
+		return err.Result()
+	}
+
+	// Create all necessary initial project accounts
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId); err != nil {
 		return err.Result()
 	}
@@ -59,16 +75,10 @@ func handleMsgCreateProject(ctx sdk.Context, k Keeper, msg MsgCreateProject) sdk
 		err.Result()
 	}
 
-	if k.ProjectDocExists(ctx, msg.ProjectDid) {
-		return did.ErrorInvalidDid(types.DefaultCodespace, fmt.Sprintf("Project already exists")).Result()
-	}
-
-	projectDoc := NewProjectDoc(
-		msg.TxHash, msg.ProjectDid, msg.SenderDid,
-		msg.PubKey, types.NullStatus, msg.Data)
-
+	// Set project doc and initialise list of withdrawal transactions
 	k.SetProjectDoc(ctx, projectDoc)
 	k.SetProjectWithdrawalTransactions(ctx, msg.ProjectDid, nil)
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreateProject,
@@ -244,8 +254,7 @@ func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgUpda
 	return sdk.Result{}
 }
 
-func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
-	bk bank.Keeper, msg MsgCreateClaim) sdk.Result {
+func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) sdk.Result {
 
 	// Check if project exists
 	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
@@ -261,24 +270,6 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, pk payments.Keeper,
 	// Check if claim already exists
 	if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimID) {
 		return sdk.ErrInternal("claim already exists").Result()
-	}
-
-	// Get sender address
-	senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-	if err != nil {
-		return err.Result()
-	}
-	senderAddr := senderDidDoc.Address()
-	recipients := payments.NewDistribution(
-		payments.NewFullDistributionShare(senderAddr))
-
-	// Process claimer pay
-	pay := projectDoc.GetClaimerPay()
-	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-	err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid,
-		senderAddr, recipients, pay, payMax, types.ClaimerPay)
-	if err != nil {
-		return err.Result()
 	}
 
 	// Create and set claim
@@ -324,48 +315,55 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 		return sdk.ErrInternal("claim status must be pending").Result()
 	}
 
-	// Get ixo address
-	ixoAddr, err := getAccountInProjectAccounts(ctx, k, msg.ProjectDid,
-		IxoAccountPayFeesId)
-	if err != nil {
-		return err.Result()
+	// Get project fees map
+	feesMap := projectDoc.GetProjectFeesMap()
+
+	// If oracle fee present in project fees map, proceed with oracle pay
+	templateId, err := feesMap.GetPayTemplateId(types.OracleFee)
+	if err == nil {
+		// Get ixo address
+		ixoAddr, err := getAccountInProjectAccounts(ctx, k, msg.ProjectDid,
+			IxoAccountPayFeesId)
+		if err != nil {
+			return err.Result()
+		}
+
+		// Get node (relayer) address
+		nodeAddr, err := getAccountInProjectAccounts(ctx, k, msg.ProjectDid,
+			InitiatingNodeAccountPayFeesId)
+		if err != nil {
+			return err.Result()
+		}
+
+		// Get sender (oracle) address
+		senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
+		if err != nil {
+			return err.Result()
+		}
+		senderAddr := senderDidDoc.Address()
+
+		// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
+		feePercentage := k.GetParams(ctx).OracleFeePercentage
+		nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
+		ixoFeeShare := feePercentage.Sub(nodeFeeShare)
+		oracleShareLessFees := sdk.NewDec(100).Sub(feePercentage)
+		oraclePayRecipients := payments.NewDistribution(
+			payments.NewDistributionShare(ixoAddr, ixoFeeShare),
+			payments.NewDistributionShare(nodeAddr, nodeFeeShare),
+			payments.NewDistributionShare(senderAddr, oracleShareLessFees))
+
+		// Process oracle pay
+		err = processPay(ctx, k, bk, pk, msg.ProjectDid, senderAddr,
+			oraclePayRecipients, types.EvaluatorPay, templateId)
+		if err != nil {
+			return err.Result()
+		}
 	}
 
-	// Get node (relayer) address
-	nodeAddr, err := getAccountInProjectAccounts(ctx, k, msg.ProjectDid,
-		InitiatingNodeAccountPayFeesId)
-	if err != nil {
-		return err.Result()
-	}
-
-	// Get sender (oracle) address
-	senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-	if err != nil {
-		return err.Result()
-	}
-	senderAddr := senderDidDoc.Address()
-
-	// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
-	feePercentage := k.GetParams(ctx).OracleFeePercentage
-	nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
-	ixoFeeShare := feePercentage.Sub(nodeFeeShare)
-	oracleShareLessFees := sdk.NewDec(100).Sub(feePercentage)
-	oraclePayRecipients := payments.NewDistribution(
-		payments.NewDistributionShare(ixoAddr, ixoFeeShare),
-		payments.NewDistributionShare(nodeAddr, nodeFeeShare),
-		payments.NewDistributionShare(senderAddr, oracleShareLessFees))
-
-	// Process evaluator pay
-	pay := projectDoc.GetEvaluatorPay()
-	payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-	err = processPay(ctx, k, bk, pk, msg.ProjectDid, senderAddr,
-		oraclePayRecipients, pay, payMax, types.EvaluatorPay)
-	if err != nil {
-		return err.Result()
-	}
-
-	// Process claimer pay per approved claim, if claim approved
-	if msg.Data.Status == types.ApprovedClaim {
+	// If fee for service present in project fees map and if
+	// claim approved, proceed with fee-for-service payment
+	templateId, err = feesMap.GetPayTemplateId(types.FeeForService)
+	if err == nil && msg.Data.Status == types.ApprovedClaim {
 		// Get claimer address
 		claimerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, claim.ClaimerDid)
 		if err != nil {
@@ -378,10 +376,8 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 			payments.NewFullDistributionShare(claimerAddr))
 
 		// Process the payment
-		pay := projectDoc.GetClaimApprovedPay()
-		payMax, _ := sdk.NewDecCoins(pay).MulDec(sdk.NewDec(10)).TruncateDecimal()
-		err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid,
-			claimerAddr, claimApprovedPayRecipients, pay, payMax, types.ClaimApprovedPay)
+		err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid, claimerAddr,
+			claimApprovedPayRecipients, types.ClaimApprovedPay, templateId)
 		if err != nil {
 			return err.Result()
 		}
@@ -491,15 +487,9 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 	return nil
 }
 
-func processPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
-	pk payments.Keeper, projectDid did.Did, senderAddr sdk.AccAddress,
-	recipients payments.Distribution, pay, payMax sdk.Coins,
-	payType types.PayType) sdk.Error {
-
-	// Return immediately if pay is zero
-	if pay.IsZero() {
-		return nil
-	}
+func processPay(ctx sdk.Context, k Keeper, bk bank.Keeper, pk payments.Keeper,
+	projectDid did.Did, senderAddr sdk.AccAddress, recipients payments.Distribution,
+	payType types.PayType, paymentTemplateId string) sdk.Error {
 
 	// Validate recipients
 	err := recipients.Validate()
@@ -514,37 +504,22 @@ func processPay(ctx sdk.Context, k Keeper, bk bank.Keeper,
 		return err
 	}
 
+	// Get payment template
+	template := pk.MustGetPaymentTemplate(ctx, paymentTemplateId)
+
+	// Create or get payment contract
 	contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
 		ModuleName, projectDid, senderAddr.String(), payType)
-	templateId := fmt.Sprintf("payment:template:%s:%s:%s",
-		ModuleName, projectDid, payType)
-
-	// Create or get payment template and contract
-	var template payments.PaymentTemplate
 	var contract payments.PaymentContract
 	if !pk.PaymentContractExists(ctx, contractId) {
-		// Create and set template if it does not exist
-		if !pk.PaymentTemplateExists(ctx, templateId) {
-			template = payments.NewPaymentTemplate(
-				templateId, pay, pay, payMax, nil)
-			if err := template.Validate(); err != nil {
-				return err
-			}
-			pk.SetPaymentTemplate(ctx, template)
-		} else {
-			template = pk.MustGetPaymentTemplate(ctx, templateId)
-		}
-
-		// Create and set contract
-		contract = payments.NewPaymentContract(contractId, templateId,
+		contract = payments.NewPaymentContract(contractId, paymentTemplateId,
 			projectAddr, projectAddr, recipients, false, true, sdk.ZeroUint())
 		pk.SetPaymentContract(ctx, contract)
 	} else {
-		template = pk.MustGetPaymentTemplate(ctx, templateId)
 		contract = pk.MustGetPaymentContract(ctx, contractId)
 	}
 
-	// Effect payment
+	// Effect payment if can effect
 	if contract.CanEffectPayment(template) {
 		// Check that project has enough tokens to effect contract payment
 		// (assume no effect from PaymentMin, PaymentMax, Discounts)

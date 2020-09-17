@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -28,8 +27,7 @@ func NewProjectDoc(txHash string, projectDid, senderDid did.Did,
 	}
 }
 
-func (pd ProjectDoc) GetProjectData() ProjectDataMap {
-	var dataMap ProjectDataMap
+func (pd ProjectDoc) GetProjectData() (dataMap ProjectDataMap) {
 	err := json.Unmarshal(pd.Data, &dataMap)
 	if err != nil {
 		panic(err)
@@ -37,28 +35,13 @@ func (pd ProjectDoc) GetProjectData() ProjectDataMap {
 	return dataMap
 }
 
-func (pd ProjectDoc) getPay(key string) sdk.Coins {
-	payBz, found := pd.GetProjectData()[key]
-	if !found {
-		panic(fmt.Sprintf("%s not found", key))
-	}
-	payCoins, err := sdk.ParseCoins(withoutQuotes(string(payBz)))
+func (pd ProjectDoc) GetProjectFeesMap() (feesMap ProjectFeesMap) {
+	feesMapRaw := pd.GetProjectData()["fees"]
+	err := json.Unmarshal(feesMapRaw, &feesMap)
 	if err != nil {
 		panic(err)
 	}
-	return payCoins
-}
-
-func (pd ProjectDoc) GetClaimerPay() sdk.Coins {
-	return pd.getPay("claimerPayPerClaim")
-}
-
-func (pd ProjectDoc) GetClaimApprovedPay() sdk.Coins {
-	return pd.getPay("claimerPayPerApprovedClaim")
-}
-
-func (pd ProjectDoc) GetEvaluatorPay() sdk.Coins {
-	return pd.getPay("evaluatorPayPerClaim")
+	return feesMap
 }
 
 type UpdateProjectStatusDoc struct {

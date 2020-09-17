@@ -75,13 +75,25 @@ PROJECT_DID_FULL='{
 PROJECT_INFO='{
   "nodeDid":"nodeDid",
   "requiredClaims":"500",
-  "evaluatorPayPerClaim":"50000000uixo",
-  "claimerPayPerClaim":"",
-  "claimerPayPerApprovedClaim":"1000000uxgbp",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
   "createdBy":"Creator",
   "status":""
+}'
+
+ORACLE_FEE_PAYMENT_TEMPLATE='{
+  "id": "payment:template:oracle-fee",
+  "payment_amount": [{"denom":"uixo", "amount":"5000000"}],
+  "payment_minimum": [{"denom":"uixo", "amount":"5000000"}],
+  "payment_maximum": [{"denom":"uixo", "amount":"50000000"}],
+  "discounts": []
+}'
+FEE_FOR_SERVICE_PAYMENT_TEMPLATE='{
+  "id": "payment:template:fee-for-service",
+  "payment_amount": [{"denom":"uxgbp", "amount":"1000000"}],
+  "payment_minimum": [{"denom":"uxgbp", "amount":"1000000"}],
+  "payment_maximum": [{"denom":"uxgbp", "amount":"10000000"}],
+  "discounts": []
 }'
 
 OWNER_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"
@@ -174,6 +186,16 @@ ixocli tx bonds create-bond \
   --bond-did="$BOND_DID" \
   --creator-did="$OWNER_DID_FULL" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+# Create oracle fee payment template
+echo "Creating oracle fee payment template..."
+CREATOR="$IXO_DID_FULL"
+ixocli tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+# Create fee-for-service payment template
+echo "Creating fee-for-service payment template..."
+CREATOR="$IXO_DID_FULL"
+ixocli tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Create project and progress status to PENDING
 SENDER_DID="$OWNER_DID"

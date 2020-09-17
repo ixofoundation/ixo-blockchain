@@ -36,13 +36,32 @@ PROJECT_DID_FULL='{
 PROJECT_INFO='{
   "nodeDid":"nodeDid",
   "requiredClaims":"500",
-  "evaluatorPayPerClaim":"5000000uixo",
-  "claimerPayPerClaim":"1000000uixo",
-  "claimerPayPerApprovedClaim":"1000000uixo",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
   "createdBy":"Creator",
-  "status":""
+  "status":"",
+  "fees":{
+    "@context": "",
+    "items": [
+      {"type": "OracleFee", "id": "payment:template:oracle-fee"},
+      {"type": "FeeForService", "id": "payment:template:fee-for-service"}
+    ]
+  }
+}'
+
+ORACLE_FEE_PAYMENT_TEMPLATE='{
+  "id": "payment:template:oracle-fee",
+  "payment_amount": [{"denom":"uixo", "amount":"5000000"}],
+  "payment_minimum": [{"denom":"uixo", "amount":"5000000"}],
+  "payment_maximum": [{"denom":"uixo", "amount":"50000000"}],
+  "discounts": []
+}'
+FEE_FOR_SERVICE_PAYMENT_TEMPLATE='{
+  "id": "payment:template:fee-for-service",
+  "payment_amount": [{"denom":"uixo", "amount":"2000000"}],
+  "payment_minimum": [{"denom":"uixo", "amount":"2000000"}],
+  "payment_maximum": [{"denom":"uixo", "amount":"20000000"}],
+  "discounts": []
 }'
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
@@ -93,6 +112,16 @@ echo "Funding DID accounts..."
 yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $FRANCESCO_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
 yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $SHAUN_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
 
+# Create oracle fee payment template
+echo "Creating oracle fee payment template..."
+CREATOR="$FRANCESCO_DID_FULL"
+ixocli tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+# Create fee-for-service payment template
+echo "Creating fee-for-service payment template..."
+CREATOR="$FRANCESCO_DID_FULL"
+ixocli tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
 echo "Creating project..."
@@ -127,18 +156,17 @@ ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "
 # OracleFeePercentage:  0.1 (10%)
 # NodeFeePercentage:    0.1 (10%)
 
-# Claim pay:            1000000 uixo
-# Claim approved pay:   1000000 uixo
-# Oracle pay:           5000000 uixo
+# Fee for service:   2000000 uixo
+# Oracle pay:        5000000 uixo
 
 # Expected project account balances:
 # - InitiatingNodePayFees:    50000  # 0.1 of 0.1 of oracle pay
 # - IxoFees:                      0
 # - IxoPayFees:              450000  # 0.9 of 0.1 of oracle pay
-# - project:               93000000  # 100IXO - (5+1+1)IXO
+# - project:               93000000  # 100IXO - (5+2)IXO
 # Expected external account balances:
 # - Miguel:                 4500000  # 0.9 of oracle pay
-# - Shaun:                 11000000  # 1.0 of claim approved pay (+ 10000000 original)
+# - Shaun:                 11000000  # 1.0 of fee-for-service (+ 10000000 original - 1000000 project creation fee)
 
 # Sum of fee accounts: 500000
 

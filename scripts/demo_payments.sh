@@ -79,7 +79,18 @@ yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did g
 
 # Create payment template
 echo "Creating payment template..."
-PAYMENT_TEMPLATE="$(sed 's/"/\"/g' samples/payment_template.json | tr -d '\n' | tr -d '[:blank:]')"
+PAYMENT_TEMPLATE='{
+  "id": "payment:template:template1",
+  "payment_amount": [
+    {
+      "denom": "uixo",
+      "amount": "10"
+    }
+  ],
+  "payment_minimum": [],
+  "payment_maximum": [],
+  "discounts": []
+}'
 CREATOR="$MIGUEL_DID_FULL"
 ixocli tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
@@ -100,7 +111,13 @@ ixocli tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" Tru
 # Create subscription (with block period)
 echo "Creating subscription 1/2 (with block period)..."
 SUBSCRIPTION_ID="payment:subscription:subscription1"
-PERIOD="$(sed 's/"/\"/g' samples/period_block.json | tr -d '\n' | tr -d '[:blank:]')"
+PERIOD='{
+  "type": "payments/BlockPeriod",
+  "value": {
+    "period_length": "3",
+    "period_start_block": "5"
+  }
+}'
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
 ixocli tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -119,7 +136,13 @@ echo ""
 # Create subscription (with time period)
 echo "Creating subscription 2/2 (with time-period)..."
 SUBSCRIPTION_ID="payment:subscription:subscription2"
-PERIOD="$(sed 's/"/\"/g' samples/period_time.json | tr -d '\n' | tr -d '[:blank:]')"
+PERIOD='{
+  "type": "payments/TimePeriod",
+  "value": {
+    "period_duration_ns": "6000000000",
+    "period_start_time": "2020-06-03T13:00:00.00Z"
+  }
+}'
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
 ixocli tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

@@ -84,6 +84,16 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.Projec
 	return projectDoc, nil
 }
 
+func (k Keeper) ValidateProjectFeesMap(ctx sdk.Context, projectFeesMap types.ProjectFeesMap) sdk.Error {
+	for _, v := range projectFeesMap.Items {
+		_, err := k.paymentsKeeper.GetPaymentTemplate(ctx, v.PaymentTemplateId)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.ProjectDoc) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectKey(projectDoc.ProjectDid)

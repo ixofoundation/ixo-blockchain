@@ -13,19 +13,17 @@ var (
 )
 
 var validProjectData = struct {
-	NodeDid              string
-	RequiredClaims       string
-	EvaluatorPayPerClaim string
-	ServiceEndpoint      string
-	CreatedOn            string
-	CreatedBy            string
+	NodeDid         string
+	RequiredClaims  string
+	ServiceEndpoint string
+	CreatedOn       string
+	CreatedBy       string
 }{
-	NodeDid:              "nodeDid",
-	RequiredClaims:       "3",
-	EvaluatorPayPerClaim: "2",
-	ServiceEndpoint:      "https://google.co.in",
-	CreatedOn:            "time1",
-	CreatedBy:            "time2",
+	NodeDid:         "nodeDid",
+	RequiredClaims:  "3",
+	ServiceEndpoint: "https://google.co.in",
+	CreatedOn:       "time1",
+	CreatedBy:       "time2",
 }
 
 var ValidProjectDoc = ProjectDoc{

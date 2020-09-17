@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
@@ -13,7 +14,36 @@ type (
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
 	ProjectDataMap             map[string]json.RawMessage
+	ProjectFeesMap             struct {
+		Context string `json:"@context" yaml:"@context"`
+		Items   []struct {
+			Type              FeeType `json:"type" yaml:"type"`
+			PaymentTemplateId string  `json:"id" yaml:"id"`
+		}
+	}
+	FeeType string
 )
+
+const (
+	FeeForService      FeeType = "FeeForService"
+	OracleFee          FeeType = "OracleFee"
+	Subscription       FeeType = "Subscription"
+	RentalFee          FeeType = "RentalFee"
+	OutcomePayment     FeeType = "OutcomePayment"
+	InterestRepayment  FeeType = "InterestRepayment"
+	LoanRepayment      FeeType = "LoanRepayment"
+	IncomeDistribution FeeType = "IncomeDistribution"
+	DisputeSettlement  FeeType = "DisputeSettlement"
+)
+
+func (pfm ProjectFeesMap) GetPayTemplateId(feeType FeeType) (string, sdk.Error) {
+	for _, v := range pfm.Items {
+		if v.Type == feeType {
+			return v.PaymentTemplateId, nil
+		}
+	}
+	return "", sdk.ErrInternal(fmt.Sprintf("fee '%s' not found in fees map", feeType))
+}
 
 func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
 	return projectDid + "/" + string(id)

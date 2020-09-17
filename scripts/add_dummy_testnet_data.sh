@@ -97,9 +97,6 @@ PROJECT2_DID_FULL='{
 PROJECT1_INFO='{
   "nodeDid":"nodeDid",
   "requiredClaims":"500",
-  "evaluatorPayPerClaim":"50000000uixo",
-  "claimerPayPerClaim":"",
-  "claimerPayPerApprovedClaim":"",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
   "createdBy":"Miguel",
@@ -108,9 +105,6 @@ PROJECT1_INFO='{
 PROJECT2_INFO='{
   "nodeDid":"nodeDid",
   "requiredClaims":"100",
-  "evaluatorPayPerClaim":"10000000uixo",
-  "claimerPayPerClaim":"",
-  "claimerPayPerApprovedClaim":"",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-02-02T02:02:02.000Z",
   "createdBy":"Francesco",
@@ -327,7 +321,18 @@ ixocli tx project create-agent "tx_hash" "$SENDER_DID" "$AGENT_DID" "$ROLE" "$PR
 # ----------------------------------------------------------------------------------------- payments
 # Create payment
 echo "Creating payment template..."
-PAYMENT_TEMPLATE="$(sed 's/"/\"/g' samples/payment_template.json | tr -d '\n' | tr -d '[:blank:]')"
+PAYMENT_TEMPLATE='{
+  "id": "payment:template:template1",
+  "payment_amount": [
+    {
+      "denom": "uixo",
+      "amount": "10"
+    }
+  ],
+  "payment_minimum": [],
+  "payment_maximum": [],
+  "discounts": []
+}'
 CREATOR="$MIGUEL_DID_FULL"
 ixocli tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 

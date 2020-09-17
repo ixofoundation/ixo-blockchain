@@ -16,7 +16,7 @@ import (
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, k, cdc, paymentsKeeper, bankKeeper := keeper.CreateTestInput()
+	ctx, k, cdc, _, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
@@ -29,7 +29,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 
 	msg := types.NewMsgCreateClaim(txHash, senderDid, data, projectDid)
 
-	res := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, msg)
+	res := handleMsgCreateClaim(ctx, k, msg)
 	require.NotNil(t, res)
 }
 
@@ -68,19 +68,17 @@ func Test_CreateEvaluation(t *testing.T) {
 		types.NewCreateEvaluationDoc("claim1", types.PendingClaim), projectDid)
 
 	projectData := struct {
-		NodeDid              string
-		RequiredClaims       string
-		EvaluatorPayPerClaim string
-		ServiceEndpoint      string
-		CreatedOn            string
-		CreatedBy            string
+		NodeDid         string
+		RequiredClaims  string
+		ServiceEndpoint string
+		CreatedOn       string
+		CreatedBy       string
 	}{
-		NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
-		RequiredClaims:       "requireClaims1",
-		EvaluatorPayPerClaim: "10",
-		ServiceEndpoint:      "https://togo.pds.ixo.network",
-		CreatedOn:            "2018-05-21T15:53:18.484Z",
-		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
+		NodeDid:         "Tu2QWRHuDufywDALbBQ2r",
+		RequiredClaims:  "requireClaims1",
+		ServiceEndpoint: "https://togo.pds.ixo.network",
+		CreatedOn:       "2018-05-21T15:53:18.484Z",
+		CreatedBy:       "6Fu7FbbGoCJ8tX3vMMCss9",
 	}
 
 	txHash = ""
@@ -129,19 +127,17 @@ func Test_WithdrawFunds(t *testing.T) {
 		types.NewWithdrawFundsDoc(projectDid, recipientDid, amount, isRefund))
 
 	projectData := struct {
-		NodeDid              string
-		RequiredClaims       string
-		EvaluatorPayPerClaim string
-		ServiceEndpoint      string
-		CreatedOn            string
-		CreatedBy            string
+		NodeDid         string
+		RequiredClaims  string
+		ServiceEndpoint string
+		CreatedOn       string
+		CreatedBy       string
 	}{
-		NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
-		RequiredClaims:       "requireClaims1",
-		EvaluatorPayPerClaim: "10",
-		ServiceEndpoint:      "https://togo.pds.ixo.network",
-		CreatedOn:            "2018-05-21T15:53:18.484Z",
-		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
+		NodeDid:         "Tu2QWRHuDufywDALbBQ2r",
+		RequiredClaims:  "requireClaims1",
+		ServiceEndpoint: "https://togo.pds.ixo.network",
+		CreatedOn:       "2018-05-21T15:53:18.484Z",
+		CreatedBy:       "6Fu7FbbGoCJ8tX3vMMCss9",
 	}
 
 	txHash := ""
