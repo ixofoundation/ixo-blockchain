@@ -28,6 +28,7 @@ This message creates and stores the payment contract at appropriate indexes.
 | PaymentTemplateId | `string`         | ID of the paymentTemplate
 | PaymentContractId | `string`         | ID of the PaymentContract
 | Payer             | `sdk.AccAddress` | Address of the payer
+| Recipients        | `Distribution`   | List of recipients with percentage shares
 | CanDeauthorise    | `bool`           | Bool of de_authorise
 | DiscountId        | `sdk.Uint`       | Any discount given
 
@@ -37,6 +38,7 @@ type MsgCreatePaymentContract struct {
 	PaymentTemplateId string
 	PaymentContractId string
 	Payer             sdk.AccAddress
+	Recipients        Distribution
 	CanDeauthorise    bool
 	DiscountId        sdk.Uint
 }

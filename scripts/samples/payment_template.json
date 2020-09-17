@@ -8,11 +8,5 @@
   ],
   "payment_minimum": [],
   "payment_maximum": [],
-  "discounts": [],
-  "wallet_distribution": [
-    {
-      "address": "ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx",
-      "percentage": "100"
-    }
-  ]
+  "discounts": []
 }

@@ -51,8 +51,6 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 	paymentsKeeper := payments.NewKeeper(cdc, keyPayments, paymentsSubspace, bankKeeper, didKeeper, nil)
 	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, didKeeper, paymentsKeeper)
 
-	paymentsKeeper.SetParams(ctx, payments.DefaultParams())
-
 	return ctx, keeper, cdc, paymentsKeeper, bankKeeper
 }
 

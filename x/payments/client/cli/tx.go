@@ -64,16 +64,17 @@ func GetCmdCreatePaymentTemplate(cdc *codec.Codec) *cobra.Command {
 func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use: "create-payment-contract [payment-contract-id] [payment-template-id] " +
-			"[payer-addr] [can-deauthorise] [discount-id] [creator-ixo-did]",
+			"[payer-addr] [recipients] [can-deauthorise] [discount-id] [creator-ixo-did]",
 		Short: "Create and sign a create-payment-contract tx using DIDs",
-		Args:  cobra.ExactArgs(6),
+		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			contractIdStr := args[0]
 			templateIdStr := args[1]
 			payerAddrStr := args[2]
-			canDeauthoriseStr := args[3]
-			discountIdStr := args[4]
-			ixoDidStr := args[5]
+			recipientsStr := args[3]
+			canDeauthoriseStr := args[4]
+			discountIdStr := args[5]
+			ixoDidStr := args[6]
 
 			payerAddr, err := sdk.AccAddressFromBech32(payerAddrStr)
 			if err != nil {
@@ -95,12 +96,18 @@ func GetCmdCreatePaymentContract(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
+			var recipients types.Distribution
+			err = cdc.UnmarshalJSON([]byte(recipientsStr), &recipients)
+			if err != nil {
+				return err
+			}
+
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreatePaymentContract(
-				templateIdStr, contractIdStr, payerAddr,
-				canDeauthorise, discountId, ixoDid.Did)
+			msg := types.NewMsgCreatePaymentContract(templateIdStr,
+				contractIdStr, payerAddr, recipients, canDeauthorise,
+				discountId, ixoDid.Did)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
