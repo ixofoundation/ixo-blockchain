@@ -17,7 +17,7 @@ type (
 	ProjectFeesMap             struct {
 		Context string `json:"@context" yaml:"@context"`
 		Items   []struct {
-			Type              FeeType `json:"type" yaml:"type"`
+			Type              FeeType `json:"@type" yaml:"@type"`
 			PaymentTemplateId string  `json:"id" yaml:"id"`
 		}
 	}

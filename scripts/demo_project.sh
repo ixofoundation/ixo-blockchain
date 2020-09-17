@@ -41,10 +41,10 @@ PROJECT_INFO='{
   "createdBy":"Creator",
   "status":"",
   "fees":{
-    "@context": "",
+    "@context":"",
     "items": [
-      {"type": "OracleFee", "id": "payment:template:oracle-fee"},
-      {"type": "FeeForService", "id": "payment:template:fee-for-service"}
+      {"@type":"OracleFee", "id":"payment:template:oracle-fee"},
+      {"@type":"FeeForService", "id":"payment:template:fee-for-service"}
     ]
   }
 }'
