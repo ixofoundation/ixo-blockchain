@@ -82,14 +82,6 @@ func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
 	return false
 }
 
-type PayType = string
-
-const (
-	ClaimerPay       PayType = "claimer_pay"
-	ClaimApprovedPay PayType = "claim_approved_pay"
-	EvaluatorPay     PayType = "evaluator_pay"
-)
-
 type AgentStatus = string
 
 const (

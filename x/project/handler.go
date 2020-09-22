@@ -354,7 +354,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 
 		// Process oracle pay
 		err = processPay(ctx, k, bk, pk, msg.ProjectDid, senderAddr,
-			oraclePayRecipients, types.EvaluatorPay, templateId)
+			oraclePayRecipients, types.OracleFee, templateId)
 		if err != nil {
 			return err.Result()
 		}
@@ -377,7 +377,7 @@ func handleMsgCreateEvaluation(ctx sdk.Context, k Keeper, pk payments.Keeper,
 
 		// Process the payment
 		err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid, claimerAddr,
-			claimApprovedPayRecipients, types.ClaimApprovedPay, templateId)
+			claimApprovedPayRecipients, types.FeeForService, templateId)
 		if err != nil {
 			return err.Result()
 		}
@@ -489,7 +489,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bank.Keeper, projectDid did.Di
 
 func processPay(ctx sdk.Context, k Keeper, bk bank.Keeper, pk payments.Keeper,
 	projectDid did.Did, senderAddr sdk.AccAddress, recipients payments.Distribution,
-	payType types.PayType, paymentTemplateId string) sdk.Error {
+	feeType types.FeeType, paymentTemplateId string) sdk.Error {
 
 	// Validate recipients
 	err := recipients.Validate()
@@ -509,7 +509,7 @@ func processPay(ctx sdk.Context, k Keeper, bk bank.Keeper, pk payments.Keeper,
 
 	// Create or get payment contract
 	contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
-		ModuleName, projectDid, senderAddr.String(), payType)
+		ModuleName, projectDid, senderAddr.String(), feeType)
 	var contract payments.PaymentContract
 	if !pk.PaymentContractExists(ctx, contractId) {
 		contract = payments.NewPaymentContract(contractId, paymentTemplateId,
