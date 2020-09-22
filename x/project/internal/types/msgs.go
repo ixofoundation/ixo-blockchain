@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
-	"strconv"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
@@ -80,21 +78,6 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
 		return sdk.ErrInternal(err.Error())
-	}
-
-	// Check that evaluatorPayPerClaim is present and is a string integer
-	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
-	if !found {
-		return sdk.ErrInternal("missing evaluatorPayPerClaim in project doc")
-	}
-	var evaluatorPayPerClaimStr string
-	err = json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
-	if err != nil {
-		return sdk.ErrInternal(err.Error())
-	}
-	_, err = strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
-	if err != nil {
-		return sdk.ErrInternal("evaluatorPayPerClaim should be an integer")
 	}
 
 	// Check that DIDs and PubKey valid

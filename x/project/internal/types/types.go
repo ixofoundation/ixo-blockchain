@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"strconv"
 )
 
 var (
@@ -114,23 +113,7 @@ func (pd ProjectDoc) GetProjectData() ProjectDataMap {
 }
 
 func (pd ProjectDoc) GetEvaluatorPay() int64 {
-	evaluatorPayPerClaimBz, found := pd.GetProjectData()["evaluatorPayPerClaim"]
-	if !found {
-		panic("evaluatorPayPerClaim not found")
-	}
-
-	var evaluatorPayPerClaimStr string
-	err := json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
-	if err != nil {
-		panic(err)
-	}
-
-	i, err := strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-
-	return i
+	return 10
 }
 
 type CreateAgentDoc struct {
