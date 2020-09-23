@@ -12,31 +12,32 @@ This is the official repository for the Sustainability Hub (ixo-Hub)
 - Guide for setting up a Relayer on the Pandora Test Network: [here](https://github.com/ixofoundation/docs/blob/master/developer-tools/test-networks/join-a-test-network.md)
 - Blockchain Module Specifications can be found under `x/<module>/spec`
 
-## Scripts
-Quick-start:
+## Building and Running
+
+**Note**: Requires [Go 1.13+](https://golang.org/dl/)
+
+To build and run the application:
+
 ```bash
-cd ixo-blockchain/
-bash ./scripts/clean_build.sh && bash ./scripts/run_with_some_data.sh  # Option 1
-bash ./scripts/clean_build.sh && bash ./scripts/run_with_all_data.sh   # Option 2
+make run
 ```
 
-To run without resetting data:
+To build and run the application with some preset accounts:
+
 ```bash
-cd ixo-blockchain/
-bash ./scripts/run_only.sh
+make run_with_some_data  # Option 1
+make run_with_all_data   # Option 2
 ```
 
 (Optional) Once the chain has started, run one of the following:
 
 - Add more data and activity:
 ```bash
-cd ixo-blockchain/
 bash ./scripts/add_dummy_testnet_data.sh
 ```
 
 - Demos:
 ```bash
-cd ixo-blockchain/
 bash ./scripts/demo_bonds.sh     # Option 1
 bash ./scripts/demo_payments.sh  # Option 2
 bash ./scripts/demo_project.sh   # Option 3
