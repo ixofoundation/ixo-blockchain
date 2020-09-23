@@ -389,9 +389,9 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 				return projectAnteHandler(ctx, tx, simulate)
 			}
 		case bonds.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
+			fallthrough
 		case treasury.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
+			fallthrough
 		case payments.RouterKey:
 			return defaultIxoAnteHandler(ctx, tx, simulate)
 		default:
