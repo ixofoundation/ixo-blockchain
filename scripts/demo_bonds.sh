@@ -21,8 +21,6 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-yes $PASSWORD | ixocli keys delete fee --force  # TODO: Remove once DID ledgering fee is no longer 0
-yes $PASSWORD | ixocli keys add fee             # TODO: Remove once DID ledgering fee is no longer 0
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -66,11 +64,6 @@ echo "Ledgering DID 1/2..."
 ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 2/2..."
 ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-
-# Fund DID accounts  # TODO: Remove once DID ledgering fee is no longer 0
-echo "Funding DID accounts..."
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$MIGUEL_ADDR" 100000uixo,1000000res --fees=5000uixo --broadcast-mode=block -y
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$FRANCESCO_ADDR" 100000uixo,1000000res --fees=5000uixo --broadcast-mode=block -y
 
 echo "Creating bond..."
 ixocli tx bonds create-bond \

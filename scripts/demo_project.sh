@@ -106,12 +106,6 @@ ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-pri
 echo "Ledgering Shaun DID..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# Fund DID accounts  # TODO: Remove once DID ledgering fee is no longer 0
-echo "Funding DID accounts..."
-#yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $MIGUEL_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $FRANCESCO_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $SHAUN_DID)" 10000000uixo --fees=5000uixo --broadcast-mode=block -y
-
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$FRANCESCO_DID_FULL"

@@ -364,7 +364,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
-	addDidAnteHandler := did.NewAddDidAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
 		app.didKeeper, projectPubKeyGetter)
@@ -375,12 +374,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		msg := tx.GetMsgs()[0]
 		switch msg.Route() {
 		case did.RouterKey:
-			switch msg.Type() {
-			case did.TypeMsgAddDid:
-				return addDidAnteHandler(ctx, tx, simulate)
-			default:
-				return didAnteHandler(ctx, tx, simulate)
-			}
+			return didAnteHandler(ctx, tx, simulate)
 		case project.RouterKey:
 			switch msg.Type() {
 			case project.TypeMsgCreateProject:
