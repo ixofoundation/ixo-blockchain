@@ -71,3 +71,18 @@ draw-deps:
 	@goviz -i github.com/ixofoundation/ixo-blockchain/cmd/ixod -d 2 | dot -Tpng -o dependency-graph.png
 
 .PHONY: all install go-mod-cache draw-deps build
+
+########################################
+### Run
+
+run:
+	./scripts/clean_build.sh
+	./scripts/run_only.sh
+
+run_with_some_data:
+	./scripts/clean_build.sh
+	./scripts/run_with_some_data.sh
+
+run_with_all_data:
+	./scripts/clean_build.sh
+	./scripts/run_with_all_data.sh
