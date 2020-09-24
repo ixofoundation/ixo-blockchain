@@ -9,6 +9,9 @@ const (
 	// StoreKey is the default store key for this module
 	StoreKey = ModuleName
 
+	// DefaultParamspace is the default param space for this module
+	DefaultParamspace = ModuleName
+
 	// BondsMintBurnAccount the root string for the bonds mint burn account address
 	BondsMintBurnAccount = "bonds_mint_burn_account"
 
