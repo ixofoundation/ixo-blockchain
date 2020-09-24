@@ -18,12 +18,17 @@ var validProjectData = struct {
 	ServiceEndpoint string
 	CreatedOn       string
 	CreatedBy       string
+	Fees            ProjectFeesMap `json:"fees" yaml:"fees"`
 }{
 	NodeDid:         "nodeDid",
 	RequiredClaims:  "3",
 	ServiceEndpoint: "https://google.co.in",
 	CreatedOn:       "time1",
 	CreatedBy:       "time2",
+	Fees: ProjectFeesMap{
+		Context: "",
+		Items:   nil,
+	},
 }
 
 var ValidProjectDoc = ProjectDoc{

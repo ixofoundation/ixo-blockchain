@@ -19,7 +19,6 @@ func NewGenesisState(projectDocs []ProjectDoc, accountMaps []GenesisAccountMap,
 	}
 }
 
-//noinspection GoUnusedParameter
 func ValidateGenesis(data GenesisState) error {
 	err := ValidateParams(data.Params)
 	if err != nil {
