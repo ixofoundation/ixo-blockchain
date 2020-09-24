@@ -122,12 +122,11 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
 	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 
 	pk1 := params.NewKeeper(cdc, keyParams, tkeyParams, params.DefaultCodespace)
-	paymentsSubspace := pk1.Subspace(types.DefaultParamspace)
 
 	accountKeeper := auth.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
 	didKeeper := did.NewKeeper(cdc, keyDid)
-	keeper := NewKeeper(cdc, storeKey, paymentsSubspace, bankKeeper, didKeeper, nil)
+	keeper := NewKeeper(cdc, storeKey, bankKeeper, didKeeper, nil)
 
 	return ctx, keeper, cdc
 }

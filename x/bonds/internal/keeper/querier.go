@@ -20,6 +20,7 @@ const (
 	QueryBuyPrice       = "buy_price"
 	QuerySellReturn     = "sell_return"
 	QuerySwapReturn     = "swap_return"
+	QueryParams         = "params"
 )
 
 // NewQuerier is the module level router for state queries
@@ -46,6 +47,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 			return querySellReturn(ctx, path[1:], keeper)
 		case QuerySwapReturn:
 			return querySwapReturn(ctx, path[1:], keeper)
+		case QueryParams:
+			return queryParams(ctx, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown bonds query endpoint")
 		}
@@ -336,4 +339,15 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	return bz, nil
+}
+
+func queryParams(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+	params := k.GetParams(ctx)
+
+	res, err := codec.MarshalJSONIndent(k.cdc, params)
+	if err != nil {
+		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err.Error()))
+	}
+
+	return res, nil
 }

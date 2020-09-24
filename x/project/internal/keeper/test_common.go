@@ -43,12 +43,11 @@ func CreateTestInput() (sdk.Context, Keeper, *codec.Codec,
 		cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount,
 	)
 
-	paymentsSubspace := pk1.Subspace(payments.DefaultParamspace)
 	projectSubspace := pk1.Subspace(types.DefaultParamspace)
 
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, nil)
 	didKeeper := did.NewKeeper(cdc, keyDid)
-	paymentsKeeper := payments.NewKeeper(cdc, keyPayments, paymentsSubspace, bankKeeper, didKeeper, nil)
+	paymentsKeeper := payments.NewKeeper(cdc, keyPayments, bankKeeper, didKeeper, nil)
 	keeper := NewKeeper(cdc, storeKey, projectSubspace, accountKeeper, didKeeper, paymentsKeeper)
 
 	return ctx, keeper, cdc, paymentsKeeper, bankKeeper
