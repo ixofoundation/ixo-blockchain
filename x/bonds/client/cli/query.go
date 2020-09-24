@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -31,6 +32,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBuyPrice(storeKey, cdc),
 		GetCmdSellReturn(storeKey, cdc),
 		GetCmdSwapReturn(storeKey, cdc),
+		GetParamsRequestHandler(cdc),
 	)...)
 
 	return bondsQueryCmd
@@ -398,6 +400,30 @@ func GetCmdSwapReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			fmt.Println(string(output))
+			return nil
+		},
+	}
+}
+
+func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "params",
+		Short: "Query params",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s",
+				types.QuerierRoute, keeper.QueryParams), nil)
+			if err != nil {
+				return err
+			}
+
+			var params types.Params
+			if err := cdc.UnmarshalJSON(bz, &params); err != nil {
+				return err
+			}
+
+			fmt.Println(string(bz))
 			return nil
 		},
 	}

@@ -13,10 +13,11 @@ const (
 	BatchesIntermediaryAccount = types.BatchesIntermediaryAccount
 	BondsReserveAccount        = types.BondsReserveAccount
 
-	ModuleName   = types.ModuleName
-	StoreKey     = types.StoreKey
-	QuerierRoute = types.QuerierRoute
-	RouterKey    = types.RouterKey
+	ModuleName        = types.ModuleName
+	DefaultParamspace = types.DefaultParamspace
+	StoreKey          = types.StoreKey
+	QuerierRoute      = types.QuerierRoute
+	RouterKey         = types.RouterKey
 )
 
 //noinspection GoNameStartsWithPackageName

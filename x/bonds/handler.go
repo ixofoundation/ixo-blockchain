@@ -83,12 +83,16 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		return sdk.ErrUnauthorized(fmt.Sprintf("%s is not allowed to receive transactions", msg.FeeAddress)).Result()
 	}
 
+	// Check that bond and bond DID do not already exist
 	if keeper.BondExists(ctx, msg.BondDid) {
 		return types.ErrBondAlreadyExists(DefaultCodespace, msg.BondDid).Result()
 	} else if keeper.BondDidExists(ctx, msg.Token) {
 		return types.ErrBondTokenIsTaken(DefaultCodespace, msg.Token).Result()
-	} else if msg.Token == keeper.StakingKeeper.GetParams(ctx).BondDenom {
-		return types.ErrBondTokenCannotBeStakingToken(DefaultCodespace).Result()
+	}
+
+	// Check that bond token not reserved
+	if keeper.ReservedBondToken(ctx, msg.Token) {
+		return types.ErrReservedBondToken(DefaultCodespace, msg.Token).Result()
 	}
 
 	// Set state to open by default (overridden below if augmented function)

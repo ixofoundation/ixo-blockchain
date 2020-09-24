@@ -194,8 +194,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 
 	// init params keeper and subspaces (for custom ixo modules)
-	paymentsSubspace := app.paramsKeeper.Subspace(payments.DefaultParamspace)
 	projectSubspace := app.paramsKeeper.Subspace(project.DefaultParamspace)
+	bondsSubspace := app.paramsKeeper.Subspace(bonds.DefaultParamspace)
 
 	// add keepers (for standard Cosmos modules)
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -231,12 +231,12 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	// add keepers (for custom ixo modules)
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace,
+	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey],
 		app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
 		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
-		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], app.cdc)
+		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], bondsSubspace, app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
 	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
 		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)

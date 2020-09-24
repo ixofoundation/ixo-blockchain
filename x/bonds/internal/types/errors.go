@@ -142,6 +142,11 @@ func ErrDuplicateReserveToken(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeInvalidBond, errMsg)
 }
 
+func ErrReservedBondToken(codespace sdk.CodespaceType, bondToken string) sdk.Error {
+	errMsg := fmt.Sprintf("bond token '%s' is reserved", bondToken)
+	return sdk.NewError(codespace, CodeInvalidBond, errMsg)
+}
+
 func ErrInvalidStateForAction(codespace sdk.CodespaceType) sdk.Error {
 	errMsg := "Cannot perform that action at the current state"
 	return sdk.NewError(codespace, CodeInvalidState, errMsg)

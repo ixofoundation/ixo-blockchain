@@ -6,6 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"net/http"
 )
 
@@ -57,6 +59,11 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute st
 	r.HandleFunc(
 		fmt.Sprintf("/bonds/{%s}/swap_return/{%s}/{%s}", RestBondDid, RestFromTokenWithAmount, RestToToken),
 		querySwapReturnHandler(cliCtx, queryRoute),
+	).Methods("GET")
+
+	r.HandleFunc(
+		"/bonds/params",
+		queryParamsRequestHandler(cliCtx),
 	).Methods("GET")
 }
 
@@ -234,5 +241,27 @@ func querySwapReturnHandler(cliCtx context.CLIContext, queryRoute string) http.H
 		}
 
 		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
+			keeper.QueryParams), nil)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			return
+		}
+
+		var params types.Params
+		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, params)
 	}
 }

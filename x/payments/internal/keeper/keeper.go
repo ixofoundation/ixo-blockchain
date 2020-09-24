@@ -19,8 +19,7 @@ type Keeper struct {
 	reservedIdPrefixes []string
 }
 
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey,
-	paramSpace params.Subspace, bankKeeper bank.Keeper,
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper,
 	didKeeper did.Keeper, reservedIdPrefixes []string) Keeper {
 	return Keeper{
 		cdc:                cdc,
