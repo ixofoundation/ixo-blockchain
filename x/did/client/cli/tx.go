@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
 
@@ -28,16 +27,7 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
-			stdSignMsg := msg.ToStdSignMsg()
-
-			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(res.String())
-			fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
-			return nil
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }

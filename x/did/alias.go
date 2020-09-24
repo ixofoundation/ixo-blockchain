@@ -12,8 +12,6 @@ const (
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
 
-	TypeMsgAddDid = types.TypeMsgAddDid
-
 	DefaultCodespace = types.DefaultCodespace
 )
 
