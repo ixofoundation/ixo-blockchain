@@ -16,6 +16,9 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	for _, b := range data.Batches {
 		keeper.SetBatch(ctx, b.BondDid, b)
 	}
+
+	// Initialise params
+	keeper.SetParams(ctx, data.Params)
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
@@ -30,8 +33,12 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		batches = append(batches, batch)
 	}
 
+	// Export params
+	params := k.GetParams(ctx)
+
 	return GenesisState{
 		Bonds:   bonds,
 		Batches: batches,
+		Params:  params,
 	}
 }

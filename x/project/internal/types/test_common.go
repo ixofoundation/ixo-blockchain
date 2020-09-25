@@ -13,19 +13,22 @@ var (
 )
 
 var validProjectData = struct {
-	NodeDid              string
-	RequiredClaims       string
-	EvaluatorPayPerClaim string
-	ServiceEndpoint      string
-	CreatedOn            string
-	CreatedBy            string
+	NodeDid         string
+	RequiredClaims  string
+	ServiceEndpoint string
+	CreatedOn       string
+	CreatedBy       string
+	Fees            ProjectFeesMap `json:"fees" yaml:"fees"`
 }{
-	NodeDid:              "nodeDid",
-	RequiredClaims:       "3",
-	EvaluatorPayPerClaim: "2",
-	ServiceEndpoint:      "https://google.co.in",
-	CreatedOn:            "time1",
-	CreatedBy:            "time2",
+	NodeDid:         "nodeDid",
+	RequiredClaims:  "3",
+	ServiceEndpoint: "https://google.co.in",
+	CreatedOn:       "time1",
+	CreatedBy:       "time2",
+	Fees: ProjectFeesMap{
+		Context: "",
+		Items:   nil,
+	},
 }
 
 var ValidProjectDoc = ProjectDoc{
@@ -54,8 +57,7 @@ var ValidCreateProjectMsg = MsgCreateProject{
 	Data:       MustMarshalJson(validProjectData),
 }
 
-var ValidWithdrawalInfo = WithdrawalInfo{
-	ActionID:     "1",
+var ValidWithdrawalInfo = WithdrawalInfoDoc{
 	ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
 	RecipientDid: "6iftm1hHdaU6LJGKayRMev",
 	Amount:       sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(10)),

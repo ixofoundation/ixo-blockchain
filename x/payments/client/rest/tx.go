@@ -50,13 +50,14 @@ func createPaymentTemplateRequestHandler(ctx context.CLIContext) http.HandlerFun
 }
 
 type createPaymentContractReq struct {
-	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
-	CreatorDid        did.Did        `json:"creator_did" yaml:"creator_did"`
-	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
-	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
-	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
-	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+	BaseReq           rest.BaseReq       `json:"base_req" yaml:"base_req"`
+	CreatorDid        did.Did            `json:"creator_did" yaml:"creator_did"`
+	PaymentTemplateId string             `json:"payment_template_id" yaml:"payment_template_id"`
+	PaymentContractId string             `json:"payment_contract_id" yaml:"payment_contract_id"`
+	Payer             sdk.AccAddress     `json:"payer" yaml:"payer"`
+	Recipients        types.Distribution `json:"recipients" yaml:"recipients"`
+	CanDeauthorise    bool               `json:"can_deauthorise" yaml:"can_deauthorise"`
+	DiscountId        sdk.Uint           `json:"discount_id" yaml:"discount_id"`
 }
 
 func createPaymentContractRequestHandler(ctx context.CLIContext) http.HandlerFunc {
@@ -71,8 +72,9 @@ func createPaymentContractRequestHandler(ctx context.CLIContext) http.HandlerFun
 			return
 		}
 
-		msg := types.NewMsgCreatePaymentContract(req.PaymentTemplateId, req.PaymentContractId,
-			req.Payer, req.CanDeauthorise, req.DiscountId, req.CreatorDid)
+		msg := types.NewMsgCreatePaymentContract(req.PaymentTemplateId,
+			req.PaymentContractId, req.Payer, req.Recipients,
+			req.CanDeauthorise, req.DiscountId, req.CreatorDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

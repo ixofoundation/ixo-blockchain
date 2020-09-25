@@ -33,22 +33,17 @@ type (
 	MsgCreateEvaluation    = types.MsgCreateEvaluation
 	MsgWithdrawFunds       = types.MsgWithdrawFunds
 
-	ProjectDoc       = types.ProjectDoc
-	StoredProjectDoc = types.StoredProjectDoc
-
-	WithdrawalInfo    = types.WithdrawalInfo
+	ProjectDoc        = types.ProjectDoc
+	WithdrawalInfo    = types.WithdrawalInfoDoc
 	AccountMap        = types.AccountMap
 	GenesisAccountMap = types.GenesisAccountMap
 	InternalAccountID = types.InternalAccountID
+	Claim             = types.Claim
 )
 
 var (
 	// function aliases
 	NewKeeper     = keeper.NewKeeper
-	NewQuerier    = keeper.NewQuerier
-	ParamKeyTable = types.ParamKeyTable
-	NewParams     = types.NewParams
-	DefaultParams = types.DefaultParams
 	RegisterCodec = types.RegisterCodec
 
 	NewProjectDoc = types.NewProjectDoc

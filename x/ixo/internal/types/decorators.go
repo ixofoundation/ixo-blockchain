@@ -33,7 +33,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	// all messages must be of type IxoMsg
 	msg, ok := tx.GetMsgs()[0].(IxoMsg)
 	if !ok {
-		return ctx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
+		return ctx, fmt.Errorf("msg must be ixo.IxoMsg")
 	}
 
 	// Get pubKey
@@ -111,7 +111,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	// all messages must be of type IxoMsg
 	msg, ok := tx.GetMsgs()[0].(IxoMsg)
 	if !ok {
-		return ctx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
+		return ctx, fmt.Errorf("msg must be ixo.IxoMsg")
 	}
 
 	// Get pubKey
@@ -169,7 +169,7 @@ func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 	// all messages must be of type IxoMsg
 	msg, ok := tx.GetMsgs()[0].(IxoMsg)
 	if !ok {
-		return ctx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
+		return ctx, fmt.Errorf("msg must be ixo.IxoMsg")
 	}
 
 	// Get pubKey
@@ -240,7 +240,7 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	// all messages must be of type IxoMsg
 	msg, ok := tx.GetMsgs()[0].(IxoMsg)
 	if !ok {
-		return ctx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
+		return ctx, fmt.Errorf("msg must be ixo.IxoMsg")
 	}
 
 	// Get pubKey
@@ -312,7 +312,7 @@ func (isd IncrementSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 	// all messages must be of type IxoMsg
 	msg, ok := tx.GetMsgs()[0].(IxoMsg)
 	if !ok {
-		return ctx, sdkerrors.Wrap(ErrInternal, "msg must be ixo.IxoMsg")
+		return ctx, fmt.Errorf("msg must be ixo.IxoMsg")
 	}
 
 	// Get pubKey

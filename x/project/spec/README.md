@@ -12,3 +12,6 @@
     - [MsgWithdrawFunds](02_messages.md#MsgWithdrawFunds)
 1. **[Events](03_events.md)**
     - [Handlers](03_events.md#handlers)
+1. **[Fees](04_fees.md)**
+    - [General Approach](04_fees.md#general-approach)
+    - [Specific Fees](04_fees.md#specific-fees)

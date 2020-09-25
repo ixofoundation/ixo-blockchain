@@ -1,8 +1,8 @@
 package keeper
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 )
 
@@ -37,7 +37,7 @@ func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.S
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types.Subscription{}, sdkerrors.Wrap(types.ErrInternal, "invalid subscription")
+		return types.Subscription{}, fmt.Errorf("invalid subscription")
 	}
 
 	var subscription types.Subscription

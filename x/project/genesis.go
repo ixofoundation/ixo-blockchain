@@ -17,14 +17,20 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 		panic(err)
 	}
 
-	// Initialise project docs, account maps, project withdrawals, params
+	// Initialise project docs, account maps, project withdrawals, claims
 	for i := range data.ProjectDocs {
-		keeper.SetProjectDoc(ctx, &data.ProjectDocs[i])
+		keeper.SetProjectDoc(ctx, data.ProjectDocs[i])
 		keeper.SetAccountMap(ctx,
-			data.ProjectDocs[i].GetProjectDid(), accountMaps[i])
+			data.ProjectDocs[i].ProjectDid, accountMaps[i])
 		keeper.SetProjectWithdrawalTransactions(ctx,
-			data.ProjectDocs[i].GetProjectDid(), data.WithdrawalsInfos[i])
+			data.ProjectDocs[i].ProjectDid, data.WithdrawalsInfos[i])
+		for j := range data.Claims {
+			keeper.SetClaim(ctx,
+				data.ProjectDocs[i].ProjectDid, data.Claims[i][j])
+		}
 	}
+
+	// Initialise params
 	keeper.SetParams(ctx, data.Params)
 }
 
@@ -33,16 +39,25 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	var projectDocs []ProjectDoc
 	var accountMaps []AccountMap
 	var withdrawalInfos [][]WithdrawalInfo
+	var claims [][]Claim
 
 	iterator := k.GetProjectDocIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		projectDoc := k.MustGetProjectDocByKey(ctx, iterator.Key())
-		accountMap := k.GetAccountMap(ctx, projectDoc.GetProjectDid())
-		withdrawalInfo, _ := k.GetProjectWithdrawalTransactions(ctx, projectDoc.GetProjectDid())
+		accountMap := k.GetAccountMap(ctx, projectDoc.ProjectDid)
+		withdrawalInfo, _ := k.GetProjectWithdrawalTransactions(ctx, projectDoc.ProjectDid)
 
-		projectDocs = append(projectDocs, *projectDoc.(*ProjectDoc))
+		var subClaims []Claim
+		claimIter := k.GetClaimIterator(ctx, projectDoc.ProjectDid)
+		for ; claimIter.Valid(); claimIter.Next() {
+			claim := k.MustGetClaimByKey(ctx, claimIter.Key())
+			subClaims = append(subClaims, claim)
+		}
+
+		projectDocs = append(projectDocs, projectDoc)
 		accountMaps = append(accountMaps, accountMap)
 		withdrawalInfos = append(withdrawalInfos, withdrawalInfo)
+		claims = append(claims, subClaims)
 	}
 
 	params := k.GetParams(ctx)
@@ -62,6 +77,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		ProjectDocs:      projectDocs,
 		AccountMaps:      genesisAccountMaps,
 		WithdrawalsInfos: withdrawalInfos,
+		Claims:           claims,
 		Params:           params,
 	}
 }

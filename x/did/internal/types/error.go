@@ -15,5 +15,4 @@ var (
 	ErrInvalidIssuer      = sdkerrors.Register(DefaultCodespace, 5, "invalid issuer")
 	ErrInvalidCredentials = sdkerrors.Register(DefaultCodespace, 6, "invalid credentials")
 	ErrInvalidClaimId     = sdkerrors.Register(DefaultCodespace, 7, "invalid claim ID")
-	ErrInternal           = sdkerrors.Register(DefaultCodespace, 8, "internal error")
 )

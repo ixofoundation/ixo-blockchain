@@ -4,7 +4,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/oracles/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -28,7 +27,7 @@ func queryOracles(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, err := codec.MarshalJSONIndent(k.cdc, oracles)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrInternal, "failed to marshal JSON")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, "failed to marshal JSON")
 	}
 	return res, nil
 }

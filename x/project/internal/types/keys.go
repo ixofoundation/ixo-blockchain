@@ -11,19 +11,29 @@ const (
 )
 
 var (
-	ProjectKey    = []byte{0x01}
-	AccountKey    = []byte{0x02}
-	WithdrawalKey = []byte{0x03}
+	ProjectKey     = []byte{0x01}
+	DocKey         = []byte{0x02}
+	AccountMapKey  = []byte{0x03}
+	WithdrawalsKey = []byte{0x04}
+	ClaimsKey      = []byte{0x05}
 )
 
-func GetProjectPrefixKey(did did.Did) []byte {
-	return append(ProjectKey, []byte(did)...)
+func GetProjectKey(projectDid did.Did) []byte {
+	return append(ProjectKey, []byte(projectDid)...)
 }
 
-func GetAccountPrefixKey(did did.Did) []byte {
-	return append(AccountKey, []byte(did)...)
+func GetAccountMapKey(projectDid did.Did) []byte {
+	return append(AccountMapKey, []byte(projectDid)...)
 }
 
-func GetWithdrawalPrefixKey(did did.Did) []byte {
-	return append(WithdrawalKey, []byte(did)...)
+func GetWithdrawalsKey(projectDid did.Did) []byte {
+	return append(WithdrawalsKey, []byte(projectDid)...)
+}
+
+func GetClaimsKey(projectDid did.Did) []byte {
+	return append(ClaimsKey, []byte(projectDid)...)
+}
+
+func GetClaimKey(projectDid did.Did, claimId string) []byte {
+	return append(GetClaimsKey(projectDid), []byte(claimId)...)
 }

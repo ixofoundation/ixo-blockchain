@@ -67,6 +67,13 @@ func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) Distributi
 	}
 }
 
+func NewFullDistributionShare(address sdk.AccAddress) DistributionShare {
+	return DistributionShare{
+		Address:    address,
+		Percentage: sdk.NewDec(100),
+	}
+}
+
 func (d DistributionShare) Validate() error {
 	if !d.Percentage.IsPositive() {
 		return sdkerrors.Wrap(ErrNegativeSharePercentage, "")

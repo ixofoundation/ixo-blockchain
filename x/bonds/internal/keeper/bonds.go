@@ -170,3 +170,13 @@ func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState string) 
 		sdk.NewAttribute(types.AttributeKeyNewState, newState),
 	))
 }
+
+func (k Keeper) ReservedBondToken(ctx sdk.Context, bondToken string) bool {
+	reservedBondTokens := k.GetParams(ctx).ReservedBondTokens
+	for _, rbt := range reservedBondTokens {
+		if bondToken == rbt {
+			return true
+		}
+	}
+	return false
+}

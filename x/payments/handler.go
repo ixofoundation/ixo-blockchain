@@ -135,14 +135,6 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 		return nil, err
 	}
 
-	// Ensure no blacklisted address in wallet distribution
-	for _, share := range msg.PaymentTemplate.WalletDistribution {
-		if bk.BlacklistedAddr(share.Address) {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed "+
-				"to receive transactions", share.Address)
-		}
-	}
-
 	// Submit payment template
 	k.SetPaymentTemplate(ctx, msg.PaymentTemplate)
 
@@ -155,7 +147,6 @@ func handleMsgCreatePaymentTemplate(ctx sdk.Context, k Keeper, bk bank.Keeper, m
 			sdk.NewAttribute(types.AttributeKeyPaymentMinimum, msg.PaymentTemplate.PaymentMinimum.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentMaximum, msg.PaymentTemplate.PaymentMaximum.String()),
 			sdk.NewAttribute(types.AttributeKeyDiscounts, fmt.Sprint(msg.PaymentTemplate.Discounts)),
-			sdk.NewAttribute(types.AttributeKeyWalletDistribution, fmt.Sprint(msg.PaymentTemplate.WalletDistribution)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -189,7 +180,7 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	// Confirm that payment template exists
 	if !k.PaymentTemplateExists(ctx, msg.PaymentTemplateId) {
-		return nil, sdkerrors.Wrap(types.ErrInternal, "invalid payment template")
+		return nil, fmt.Errorf("invalid payment template")
 	}
 
 	// Get creator address
@@ -200,10 +191,20 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	creatorAddr := cretorDidDoc.Address()
 
 	// Create payment contract and validate
-	contract := NewPaymentContract(msg.PaymentContractId, msg.PaymentTemplateId,
-		creatorAddr, msg.Payer, msg.CanDeauthorise, false, msg.DiscountId)
+	authorised := false
+	contract := NewPaymentContract(
+		msg.PaymentContractId, msg.PaymentTemplateId, creatorAddr, msg.Payer,
+		msg.Recipients, msg.CanDeauthorise, authorised, msg.DiscountId)
 	if err := contract.Validate(); err != nil {
 		return nil, err
+	}
+
+	// Ensure no blacklisted address in wallet distribution
+	for _, share := range msg.Recipients {
+		if bk.BlacklistedAddr(share.Address) {
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed "+
+				"to receive transactions", share.Address)
+		}
 	}
 
 	// Submit payment contract
@@ -216,6 +217,7 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 			sdk.NewAttribute(types.AttributeKeyPaymentTemplateId, msg.PaymentTemplateId),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer.String()),
+			sdk.NewAttribute(types.AttributeKeyRecipients, fmt.Sprint(msg.Recipients)),
 			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
 			sdk.NewAttribute(types.AttributeKeyCanDeauthorise, strconv.FormatBool(msg.CanDeauthorise)),
 		),
@@ -412,7 +414,7 @@ func handleMsgEffectPayment(ctx sdk.Context, k Keeper, bk bank.Keeper, msg MsgEf
 
 	// Payment not effected but no error, meaning that payment should have been effected
 	if !effected {
-		return nil, sdkerrors.Wrap(types.ErrInternal, "payment not effected due to unknown reason")
+		return nil, fmt.Errorf("payment not effected due to unknown reason")
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{

@@ -10,30 +10,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 )
 
-func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "params",
-		Short: "Query params",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
-				keeper.QueryParams), nil)
-			if err != nil {
-				return err
-			}
-
-			var params types.Params
-			if err := cdc.UnmarshalJSON(bz, &params); err != nil {
-				return err
-			}
-
-			fmt.Println(string(bz))
-			return nil
-		},
-	}
-}
-
 func GetCmdPaymentTemplate(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "payment-template [payment-template-id]",

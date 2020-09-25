@@ -6,23 +6,21 @@ import (
 )
 
 type PaymentTemplate struct {
-	Id                 string       `json:"id" yaml:"id"`
-	PaymentAmount      sdk.Coins    `json:"payment_amount" yaml:"payment_amount"`
-	PaymentMinimum     sdk.Coins    `json:"payment_minimum" yaml:"payment_minimum"`
-	PaymentMaximum     sdk.Coins    `json:"payment_maximum" yaml:"payment_maximum"`
-	Discounts          Discounts    `json:"discounts" yaml:"discounts"`
-	WalletDistribution Distribution `json:"wallet_distribution" yaml:"wallet_distribution"`
+	Id             string    `json:"id" yaml:"id"`
+	PaymentAmount  sdk.Coins `json:"payment_amount" yaml:"payment_amount"`
+	PaymentMinimum sdk.Coins `json:"payment_minimum" yaml:"payment_minimum"`
+	PaymentMaximum sdk.Coins `json:"payment_maximum" yaml:"payment_maximum"`
+	Discounts      Discounts `json:"discounts" yaml:"discounts"`
 }
 
-func NewPaymentTemplate(id string, paymentAmount, paymentMinimum, paymentMaximum sdk.Coins,
-	discounts Discounts, walletDistribution Distribution) PaymentTemplate {
+func NewPaymentTemplate(id string, paymentAmount, paymentMinimum,
+	paymentMaximum sdk.Coins, discounts Discounts) PaymentTemplate {
 	return PaymentTemplate{
-		Id:                 id,
-		PaymentAmount:      paymentAmount,
-		PaymentMinimum:     paymentMinimum,
-		PaymentMaximum:     paymentMaximum,
-		Discounts:          discounts,
-		WalletDistribution: walletDistribution,
+		Id:             id,
+		PaymentAmount:  paymentAmount,
+		PaymentMinimum: paymentMinimum,
+		PaymentMaximum: paymentMaximum,
+		Discounts:      discounts,
 	}
 }
 
@@ -64,11 +62,6 @@ func (pt PaymentTemplate) Validate() error {
 		return err
 	}
 
-	// Validate wallet distribution
-	if err := pt.WalletDistribution.Validate(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -77,6 +70,7 @@ type PaymentContract struct {
 	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
 	Creator           sdk.AccAddress `json:"creator" yaml:"creator"`
 	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
+	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
 	CumulativePay     sdk.Coins      `json:"cumulative_pay" yaml:"cumulative_pay"`
 	CurrentRemainder  sdk.Coins      `json:"current_remainder" yaml:"current_remainder"`
 	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
@@ -85,12 +79,14 @@ type PaymentContract struct {
 }
 
 func NewPaymentContract(id, templateId string, creator, payer sdk.AccAddress,
-	canDeauthorise, authorised bool, discountId sdk.Uint) PaymentContract {
+	recipients Distribution, canDeauthorise, authorised bool,
+	discountId sdk.Uint) PaymentContract {
 	return PaymentContract{
 		Id:                id,
 		PaymentTemplateId: templateId,
 		Creator:           creator,
 		Payer:             payer,
+		Recipients:        recipients,
 		CumulativePay:     sdk.NewCoins(),
 		CurrentRemainder:  sdk.NewCoins(),
 		CanDeauthorise:    canDeauthorise,
@@ -100,10 +96,11 @@ func NewPaymentContract(id, templateId string, creator, payer sdk.AccAddress,
 }
 
 func NewPaymentContractNoDiscount(id, templateId string, creator,
-	payer sdk.AccAddress, canDeauthorise, authorised bool) PaymentContract {
+	payer sdk.AccAddress, recipients Distribution, canDeauthorise,
+	authorised bool) PaymentContract {
 	return NewPaymentContract(
-		id, templateId, creator, payer, canDeauthorise,
-		authorised, sdk.ZeroUint(),
+		id, templateId, creator, payer, recipients,
+		canDeauthorise, authorised, sdk.ZeroUint(),
 	)
 }
 
@@ -130,6 +127,11 @@ func (pc PaymentContract) Validate() error {
 	// Validate IDs
 	if !IsValidPaymentTemplateId(pc.PaymentTemplateId) {
 		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
+	}
+
+	// Validate recipient distribution
+	if err := pc.Recipients.Validate(); err != nil {
+		return err
 	}
 
 	return nil

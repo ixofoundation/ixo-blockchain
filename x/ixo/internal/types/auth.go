@@ -276,7 +276,7 @@ func ProcessSig(
 	pubKey = acc.GetPubKey()
 	err = acc.SetPubKey(pubKey)
 	if err != nil {
-		return nil, sdkerrors.Wrap(ErrInternal, "setting PubKey on signer's account")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, err.Error())
 	}
 
 	if simulate {

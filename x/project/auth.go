@@ -12,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )
@@ -47,9 +46,9 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			// For the remaining messages, the project is the signer
 			projectDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
 			if err != nil {
-				return pubKey, sdkerrors.Wrap(types.ErrInternal, "project did not found")
+				return pubKey, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "project did not found")
 			}
-			copy(pubKeyEd25519[:], base58.Decode(projectDoc.GetPubKey()))
+			copy(pubKeyEd25519[:], base58.Decode(projectDoc.PubKey))
 		}
 		return pubKeyEd25519, nil
 	}

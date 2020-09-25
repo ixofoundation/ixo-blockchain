@@ -3,7 +3,6 @@ package keeper
 import (
 	"encoding/json"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -42,7 +41,7 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	res, errRes := codec.MarshalJSONIndent(k.cdc, storedDoc)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data: %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data: %s", err)
 	}
 
 	return res, nil
@@ -53,7 +52,7 @@ func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
@@ -67,7 +66,7 @@ func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	res, err := codec.MarshalJSONIndent(k.cdc, info)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
@@ -78,7 +77,7 @@ func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, err := codec.MarshalJSONIndent(k.cdc, params)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
 	return res, nil

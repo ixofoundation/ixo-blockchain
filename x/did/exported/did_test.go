@@ -2,6 +2,8 @@ package exported
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -23,6 +25,30 @@ var (
 	}
 	// Note: validIxoDid deduced from validMnemonic
 )
+
+const (
+	Bech32MainPrefix     = "ixo"
+	Bech32PrefixAccAddr  = Bech32MainPrefix
+	Bech32PrefixAccPub   = Bech32MainPrefix + sdk.PrefixPublic
+	Bech32PrefixValAddr  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator
+	Bech32PrefixValPub   = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
+	Bech32PrefixConsAddr = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus
+	Bech32PrefixConsPub  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
+)
+
+func TestVerifyKeyToAddr(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(Bech32PrefixAccAddr, Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(Bech32PrefixValAddr, Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(Bech32PrefixConsAddr, Bech32PrefixConsPub)
+	config.Seal()
+
+	verifyKey := validIxoDid.VerifyKey
+	expectedAddress := "ixo19h3lqj50uhzdrv8mkafnp55nqmz4ghc2sd3m48"
+	actualAddress := VerifyKeyToAddr(verifyKey).String()
+
+	require.Equal(t, expectedAddress, actualAddress)
+}
 
 func TestUnprefixedDid(t *testing.T) {
 	expectedResult := "U7GK8p8rVhJMKhBVRCJJ8c"
@@ -141,6 +167,16 @@ func TestSignAndVerify(t *testing.T) {
 	sig1, err := validIxoDid.SignMessage(bz1) // "correct" signature
 	require.Nil(t, err)
 	sig2 := append(sig1, byte(0)) // "incorrect" signature
+
+	// Check signature 1
+	expectedSig1B64 := "vzWqSM2JMDMZYs8T4NQhXq6oZXbToqJIAflD27KFgd8ZF8khmIYQwaVrAnVxQK9oIwtn6q0xELfv5AA8Ggd4BA=="
+	actualSig1B64 := base64.StdEncoding.EncodeToString(sig1)
+	require.Equal(t, expectedSig1B64, actualSig1B64)
+
+	// Check signature 2
+	expectedSig2B64 := "vzWqSM2JMDMZYs8T4NQhXq6oZXbToqJIAflD27KFgd8ZF8khmIYQwaVrAnVxQK9oIwtn6q0xELfv5AA8Ggd4BAA="
+	actualSig2B64 := base64.StdEncoding.EncodeToString(sig2)
+	require.Equal(t, expectedSig2B64, actualSig2B64)
 
 	// Correct signature and correct/incorrect msg
 	require.True(t, validIxoDid.VerifySignedMessage(bz1, sig1))

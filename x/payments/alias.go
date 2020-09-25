@@ -57,7 +57,6 @@ var (
 	NewKeeper     = keeper.NewKeeper
 	NewQuerier    = keeper.NewQuerier
 	RegisterCodec = types.RegisterCodec
-	DefaultParams = types.DefaultParams
 
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState
@@ -68,6 +67,7 @@ var (
 	NewPaymentContractNoDiscount = types.NewPaymentContractNoDiscount
 	NewDistribution              = types.NewDistribution
 	NewDistributionShare         = types.NewDistributionShare
+	NewFullDistributionShare     = types.NewFullDistributionShare
 
 	NewDiscount  = types.NewDiscount
 	NewDiscounts = types.NewDiscounts

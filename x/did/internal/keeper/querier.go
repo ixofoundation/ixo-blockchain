@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -39,7 +38,7 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	res, errRes := codec.MarshalJSONIndent(k.cdc, didDoc)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", errRes.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONUnmarshal, "failed to marshal data %s", errRes.Error())
 	}
 
 	return res, nil
@@ -50,7 +49,7 @@ func queryAllDids(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, errRes := json.Marshal(allDids)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", errRes.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONUnmarshal, "failed to marshal data %s", errRes.Error())
 	}
 
 	return res, nil
@@ -62,7 +61,7 @@ func queryAllDidDocs(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, errRes := json.Marshal(didDocs)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(types.ErrInternal, "failed to marshal data %s", errRes.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", errRes.Error())
 	}
 
 	return res, nil

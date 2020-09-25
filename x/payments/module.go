@@ -85,7 +85,6 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	}
 
 	paymentsQueryCmd.AddCommand(flags.GetCommands(
-		cli.GetParamsRequestHandler(cdc),
 		cli.GetCmdPaymentTemplate(cdc),
 		cli.GetCmdPaymentContract(cdc),
 		cli.GetCmdSubscription(cdc),

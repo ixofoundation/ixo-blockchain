@@ -1,7 +1,6 @@
 package project
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -10,31 +9,36 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, k, cdc, paymentsKeeper, bankKeeper := keeper.CreateTestInput()
+	ctx, k, cdc, _, _ := keeper.CreateTestInput()
 	codec.RegisterCrypto(cdc)
 	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
-	params := paymentsKeeper.GetParams(ctx)
-	params.IxoFactor = sdk.OneDec()
-	params.NodeFeePercentage = sdk.ZeroDec()
-	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
-	paymentsKeeper.SetParams(ctx, params)
-	projectMsg := types.MsgCreateClaim{
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		TxHash:     "txHash",
-		SenderDid:  "senderDid",
-		Data:       types.CreateClaimDoc{ClaimID: "claim1"},
-	}
 
-	res, _ := handleMsgCreateClaim(ctx, k, paymentsKeeper, bankKeeper, projectMsg)
+	projectDid := types.ValidCreateProjectMsg.ProjectDid
+	txHash := "txHash"
+	senderDid := "senderDid"
+	data := types.NewCreateClaimDoc("claim1")
+
+	res, _ := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
+	require.NotNil(t, res)
+
+	// Set status to STARTED
+	project, err := k.GetProjectDoc(ctx, projectDid)
+	require.NoError(t, err)
+	project.Status = types.StartedStatus
+	k.SetProjectDoc(ctx, project)
+
+	msg := types.NewMsgCreateClaim(txHash, senderDid, data, projectDid)
+
+	res, err = handleMsgCreateClaim(ctx, k, msg)
+	require.NoError(t, err)
 	require.NotNil(t, res)
 }
 
@@ -53,141 +57,41 @@ func TestHandler_ProjectMsg(t *testing.T) {
 
 }
 func TestHandler_CreateEvaluation(t *testing.T) {
-	ctx, k, cdc, fk, bk := keeper.CreateTestInput()
+	ctx, k, cdc, pk, bk := keeper.CreateTestInput()
 
 	codec.RegisterCrypto(cdc)
 	types.RegisterCodec(cdc)
 	cdc.RegisterInterface((*exported.Account)(nil), nil)
 	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
 
-	params := fk.GetParams(ctx)
-	params.IxoFactor = sdk.OneDec()
-	params.NodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
-	params.ClaimFeeAmount = sdk.NewDec(6).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals)
-	params.EvaluationFeeAmount = sdk.NewDec(4).Quo(sdk.NewDec(10)).Mul(ixo.IxoDecimals) // 0.4
-	params.EvaluationPayFeePercentage = sdk.ZeroDec()
-	params.EvaluationPayNodeFeePercentage = sdk.NewDec(5).Quo(sdk.NewDec(10))
-	fk.SetParams(ctx, params)
+	params := types.DefaultParams()
+	params.IxoDid = "blank"
+	params.OracleFeePercentage = sdk.ZeroDec()
+	params.NodeFeePercentage = sdk.NewDecWithPrec(5, 1)
+	k.SetParams(ctx, params)
 
-	evaluationMsg := types.MsgCreateEvaluation{
-		TxHash:     "txHash",
-		SenderDid:  "senderDid",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		Data: types.CreateEvaluationDoc{
-			ClaimID: "claim1",
-			Status:  types.PendingClaim,
-		},
-	}
+	projectDid := types.ValidCreateProjectMsg.ProjectDid
+	txHash := "txHash"
+	senderDid := "senderDid"
 
-	projectData := struct {
-		NodeDid              string
-		RequiredClaims       string
-		EvaluatorPayPerClaim string
-		ServiceEndpoint      string
-		CreatedOn            string
-		CreatedBy            string
-	}{
-		NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
-		RequiredClaims:       "requireClaims1",
-		EvaluatorPayPerClaim: "10",
-		ServiceEndpoint:      "https://togo.pds.ixo.network",
-		CreatedOn:            "2018-05-21T15:53:18.484Z",
-		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
-	}
+	evaluationMsg := types.NewMsgCreateEvaluation(txHash, senderDid,
+		types.NewCreateEvaluationDoc("claim1", types.PendingClaim), projectDid)
 
-	projectDoc := types.ProjectDoc{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Status:     "CREATED",
-		Data:       nil, // marshalled below
-	}
-	projectDocData, err := json.Marshal(projectData)
-	require.Nil(t, err)
-	projectDoc.Data = projectDocData
-
-	msg := types.MsgCreateProject{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Data:       projectDoc.Data,
-	}
-
-	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId)
-	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InternalAccountID(msg.ProjectDid))
-	require.Nil(t, err)
-
-	require.False(t, k.ProjectDocExists(ctx, msg.ProjectDid))
-	k.SetProjectDoc(ctx, &projectDoc)
-
-	res, _ := handleMsgCreateEvaluation(ctx, k, fk, bk, evaluationMsg)
+	res, _ := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
 	require.NotNil(t, res)
-}
 
-func TestHandler_WithdrawFunds(t *testing.T) {
-	ctx, k, cdc, _, bk := keeper.CreateTestInput()
-	codec.RegisterCrypto(cdc)
-	types.RegisterCodec(cdc)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
+	// Set status to STARTED
+	project, err := k.GetProjectDoc(ctx, projectDid)
+	require.NoError(t, err)
+	project.Status = types.StartedStatus
+	k.SetProjectDoc(ctx, project)
 
-	msg := types.MsgWithdrawFunds{
-		SenderDid: "6iftm1hHdaU6LJGKayRMev",
-		Data: types.WithdrawFundsDoc{
-			ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
-			RecipientDid: "6iftm1hHdaU6LJGKayRMev",
-			Amount:       sdk.NewInt(100),
-			IsRefund:     true,
-		},
-	}
+	msg2 := types.NewMsgCreateClaim(txHash, senderDid, types.NewCreateClaimDoc("claim1"), projectDid)
+	res, err = handleMsgCreateClaim(ctx, k, msg2)
+	require.NoError(t, err)
+	require.NotNil(t, res)
 
-	projectData := struct {
-		NodeDid              string
-		RequiredClaims       string
-		EvaluatorPayPerClaim string
-		ServiceEndpoint      string
-		CreatedOn            string
-		CreatedBy            string
-	}{
-		NodeDid:              "Tu2QWRHuDufywDALbBQ2r",
-		RequiredClaims:       "requireClaims1",
-		EvaluatorPayPerClaim: "10",
-		ServiceEndpoint:      "https://togo.pds.ixo.network",
-		CreatedOn:            "2018-05-21T15:53:18.484Z",
-		CreatedBy:            "6Fu7FbbGoCJ8tX3vMMCss9",
-	}
-
-	projectDoc := types.ProjectDoc{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Status:     "PAIDOUT",
-		Data:       nil, // marshalled below
-	}
-	projectDocData, err := json.Marshal(projectData)
+	res, err = handleMsgCreateEvaluation(ctx, k, pk, bk, evaluationMsg)
 	require.Nil(t, err)
-	projectDoc.Data = projectDocData
-
-	msg1 := types.MsgCreateProject{
-		TxHash:     "",
-		SenderDid:  "",
-		ProjectDid: "6iftm1hHdaU6LJGKayRMev",
-		PubKey:     "47mm6LCDAyJmqkbUbqGoZKZkBixjBgvDFRMwQRF9HWMU",
-		Data:       projectDoc.Data,
-	}
-
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, IxoAccountFeesId)
-	require.Nil(t, err)
-	_, err = createAccountInProjectAccounts(ctx, k, msg1.ProjectDid, InternalAccountID(msg1.ProjectDid))
-	require.Nil(t, err)
-
-	require.False(t, k.ProjectDocExists(ctx, msg1.ProjectDid))
-	k.SetProjectDoc(ctx, &projectDoc)
-
-	res, _ := handleMsgWithdrawFunds(ctx, k, bk, msg)
 	require.NotNil(t, res)
 }

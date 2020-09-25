@@ -71,20 +71,20 @@ func (k Keeper) OracleTransfer(ctx sdk.Context, fromDid did.Did,
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
-		return sdkerrors.Wrap(types.ErrInternal, "oracle specified is not a registered oracle")
+		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "oracle specified is not a registered oracle")
 	}
 
 	// Confirm that oracle has the required capabilities
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to send %s", c.Denom)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "oracle does not have capability to send %s", c.Denom)
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.TransferCap) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to send %s", c.Denom)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "oracle does not have capability to send %s", c.Denom)
 		}
 	}
 
@@ -111,20 +111,20 @@ func (k Keeper) OracleMint(ctx sdk.Context, oracleDid did.Did, toDidOrAddr strin
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
-		return sdkerrors.Wrap(types.ErrInternal, "oracle specified is not a registered oracle")
+		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "oracle specified is not a registered oracle")
 	}
 
 	// Confirm that oracle has the required capabilities
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to mint %s", c.Denom)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "oracle does not have capability to mint %s", c.Denom)
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.MintCap) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to mint %s", c.Denom)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "oracle does not have capability to mint %s", c.Denom)
 		}
 	}
 
@@ -154,20 +154,20 @@ func (k Keeper) OracleBurn(ctx sdk.Context, oracleDid, fromDid did.Did, amount s
 
 	// Check if oracle exists
 	if !k.oraclesKeeper.OracleExists(ctx, oracleDid) {
-		return sdkerrors.Wrap(types.ErrInternal, "oracle specified is not a registered oracle")
+		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "oracle specified is not a registered oracle")
 	}
 
 	// Confirm that oracle has the required capabilities
 	oracle := k.oraclesKeeper.MustGetOracle(ctx, oracleDid)
 	for _, c := range amount {
 		if !oracle.Capabilities.Includes(c.Denom) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to burn %s", c.Denom)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "oracle does not have capability to burn %s", c.Denom)
 		}
 
 		// Get capability by token name
 		capability := oracle.Capabilities.MustGet(c.Denom)
 		if !capability.Capabilities.Includes(oracles.BurnCap) {
-			return sdkerrors.Wrapf(types.ErrInternal, "oracle does not have capability to burn %s", c.Denom)
+			return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "oracle does not have capability to burn %s", c.Denom)
 		}
 	}
 

@@ -19,28 +19,15 @@ type Keeper struct {
 	reservedIdPrefixes []string
 }
 
-func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey,
-	paramSpace params.Subspace, bankKeeper bank.Keeper,
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, bankKeeper bank.Keeper,
 	didKeeper did.Keeper, reservedIdPrefixes []string) Keeper {
 	return Keeper{
 		cdc:                cdc,
 		storeKey:           storeKey,
-		paramSpace:         paramSpace.WithKeyTable(types.ParamKeyTable()),
 		bankKeeper:         bankKeeper,
 		DidKeeper:          didKeeper,
 		reservedIdPrefixes: reservedIdPrefixes,
 	}
-}
-
-// GetParams returns the total set of payments parameters.
-func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
-}
-
-// SetParams sets the total set of payments parameters.
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
 }
 
 // idReserved checks if the id (from a template, contract, or subscription)

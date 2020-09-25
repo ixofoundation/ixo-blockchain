@@ -28,7 +28,52 @@ This message is expected to fail if:
 - senderDid is incorrect
 - PubKey is incorrect
 
-This message creates and stores the `Project` object at appropriate indexes. 
+This message creates and stores the `Project` object at appropriate indexes.
+
+### Non-Arbitrary Project Data
+
+Despite being mostly arbitrary, a project's `Data ("data")` field is in some cases expected to follow concrete formats. Currently, there is only one such case, which is when we want to specify payment templates to be used when charging project-related fees.
+
+The two (optional) project-related fees currently supported are:
+- Oracle Fee (`OracleFee`)
+- Fee for Service (`FeeForService`)
+
+The following is an example where both an `OracleFee` and `FeeForService` are specified:
+```json
+"data": {
+    ...
+    "fees": {
+        "@context": "...",
+        "items": [
+            {
+                "@type": "OracleFee",
+                "id":"payment:template:oracle-fee-template-1"
+            },
+            {
+                "@type": "FeeForService", 
+                "id":"payment:template:fee-for-service-template-1"
+            }
+        ]
+    }
+    ...
+}
+```
+
+If we do not specify fees, a blank `items` array is required:
+```json
+"data": {
+    ...
+    "fees": {
+        "@context": "...",
+        "items": []
+    }
+    ...
+}
+```
+
+The payment templates (e.g. `payment:template:oracle-fee-template-1`) are expected to exist before the project is created (refer to payments module for payment template creation).
+
+For information around how these payment templates are used, refer to the [Fees page](04_fees.md) of this module's spec.
 
 ## MsgUpdateProjectStatus
 

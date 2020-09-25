@@ -13,9 +13,6 @@ import (
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/payments/params",
-		queryParamsHandler(cliCtx)).Methods("GET")
-
 	r.HandleFunc(fmt.Sprintf("/payments/templates/{%s}", RestPaymentTemplateId),
 		queryPaymentTemplateHandler(cliCtx)).Methods("GET")
 
@@ -24,28 +21,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 
 	r.HandleFunc(fmt.Sprintf("/payments/subscriptions/{%s}", RestSubscriptionId),
 		querySubscriptionHandler(cliCtx)).Methods("GET")
-}
-
-func queryParamsHandler(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s",
-			types.QuerierRoute, keeper.QueryParams), nil)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
-			return
-		}
-
-		var params types.Params
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, params)
-	}
 }
 
 func queryPaymentTemplateHandler(cliCtx context.CLIContext) http.HandlerFunc {

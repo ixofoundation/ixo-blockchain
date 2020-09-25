@@ -49,4 +49,5 @@ var (
 	ErrNoBondTokensOwned                    = sdkerrors.Register(DefaultCodespace, 39, "no bond tokens of this bond are owned")
 	ErrInsufficientReserveToBuy             = sdkerrors.Register(DefaultCodespace, 40, "insufficient reserve was supplied to perform buy order")
 	ErrBondTokenDoesNotMatchBond            = sdkerrors.Register(DefaultCodespace, 41, "bond token does not match bond")
+	ErrReservedBondToken                    = sdkerrors.Register(DefaultCodespace, 42, "bond token is reserved")
 )

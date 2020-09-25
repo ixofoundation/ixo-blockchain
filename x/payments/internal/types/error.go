@@ -22,5 +22,4 @@ var (
 	ErrInvalidId                                    = sdkerrors.Register(DefaultCodespace, 12, "id is invalid")
 	ErrInvalidArgument                              = sdkerrors.Register(DefaultCodespace, 13, "invalid argument")
 	ErrAlreadyExists                                = sdkerrors.Register(DefaultCodespace, 14, "already exist")
-	ErrInternal                                     = sdkerrors.Register(DefaultCodespace, 15, "internal error")
 )

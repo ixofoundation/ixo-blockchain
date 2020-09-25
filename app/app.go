@@ -98,7 +98,9 @@ var (
 	}
 
 	// Reserved payments module ID prefixes
-	paymentsReservedIdPrefixes = []string{}
+	paymentsReservedIdPrefixes = []string{
+		project.ModuleName,
+	}
 )
 
 func MakeCodec() *codec.Codec {
@@ -190,8 +192,8 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 
 	// init params keeper and subspaces (for custom ixo modules)
-	paymentsSubspace := app.paramsKeeper.Subspace(payments.DefaultParamspace)
 	projectSubspace := app.paramsKeeper.Subspace(project.DefaultParamspace)
+	bondsSubspace := app.paramsKeeper.Subspace(bonds.DefaultParamspace)
 
 	// add keepers (for standard Cosmos modules)
 	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
@@ -224,12 +226,12 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 
 	// add keepers (for custom ixo modules)
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
-	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey], paymentsSubspace,
+	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey],
 		app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
 		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
-		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], app.cdc)
+		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], bondsSubspace, app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
 	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
 		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
@@ -356,7 +358,6 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
-	addDidAnteHandler := did.NewAddDidAnteHandler(app.accountKeeper, app.supplyKeeper, didPubKeyGetter)
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
 		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
 		app.didKeeper, projectPubKeyGetter)
@@ -367,12 +368,7 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		msg := tx.GetMsgs()[0]
 		switch msg.Route() {
 		case did.RouterKey:
-			switch msg.Type() {
-			case did.TypeMsgAddDid:
-				return addDidAnteHandler(ctx, tx, simulate)
-			default:
-				return didAnteHandler(ctx, tx, simulate)
-			}
+			return didAnteHandler(ctx, tx, simulate)
 		case project.RouterKey:
 			switch msg.Type() {
 			case project.TypeMsgCreateProject:
@@ -381,9 +377,9 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 				return projectAnteHandler(ctx, tx, simulate)
 			}
 		case bonds.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
+			fallthrough
 		case treasury.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
+			fallthrough
 		case payments.RouterKey:
 			return defaultIxoAnteHandler(ctx, tx, simulate)
 		default:

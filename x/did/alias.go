@@ -11,8 +11,6 @@ const (
 	QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
-
-	TypeMsgAddDid = types.TypeMsgAddDid
 )
 
 type (

@@ -3,16 +3,13 @@ package types
 import (
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/spf13/viper"
-	"strconv"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -45,6 +42,17 @@ type MsgCreateProject struct {
 	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
 	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 	Data       json.RawMessage `json:"data" yaml:"data"`
+}
+
+func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
+	projectDid did.Did, pubKey string) MsgCreateProject {
+	return MsgCreateProject{
+		TxHash:     "",
+		SenderDid:  senderDid,
+		ProjectDid: projectDid,
+		PubKey:     pubKey,
+		Data:       projectData,
+	}
 }
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) auth.StdSignMsg {
@@ -80,31 +88,7 @@ func (msg MsgCreateProject) ValidateBasic() error {
 	var dataMap ProjectDataMap
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
-		return sdkerrors.Wrap(ErrInternal, "failed to unmarshal project data map")
-	}
-
-	// Check that evaluatorPayPerClaim is present and is a string integer
-	evaluatorPayPerClaimBz, found := dataMap["evaluatorPayPerClaim"]
-	if !found {
-		return sdkerrors.Wrap(ErrInternal, "missing evaluatorPayPerClaim in project doc")
-	}
-	var evaluatorPayPerClaimStr string
-	err = json.Unmarshal(evaluatorPayPerClaimBz, &evaluatorPayPerClaimStr)
-	if err != nil {
-		return err
-	}
-	_, err = strconv.ParseInt(evaluatorPayPerClaimStr, 10, 64)
-	if err != nil {
-		return sdkerrors.Wrap(ErrInternal, "evaluatorPayPerClaim should be an integer")
-	}
-
-	// Check that DIDs and PubKey valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
-	} else if !did.IsValidPubKey(msg.PubKey) {
-		return sdkerrors.Wrap(did.ErrInvalidPubKey, "pubKey is invalid")
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project data map")
 	}
 
 	// Check that project DID matches the PubKey
@@ -143,6 +127,15 @@ type MsgUpdateProjectStatus struct {
 	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
 	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
+}
+
+func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.Did) MsgUpdateProjectStatus {
+	return MsgUpdateProjectStatus{
+		TxHash:     "",
+		SenderDid:  senderDid,
+		ProjectDid: projectDid,
+		Data:       updateProjectStatusDoc,
+	}
 }
 
 func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
@@ -184,6 +177,15 @@ type MsgCreateAgent struct {
 	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
 	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       CreateAgentDoc `json:"data" yaml:"data"`
+}
+
+func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.Did) MsgCreateAgent {
+	return MsgCreateAgent{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       createAgentDoc,
+	}
 }
 
 func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
@@ -232,6 +234,15 @@ type MsgUpdateAgent struct {
 	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
 	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
+}
+
+func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.Did) MsgUpdateAgent {
+	return MsgUpdateAgent{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       updateAgentDoc,
+	}
 }
 
 func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
@@ -283,6 +294,15 @@ type MsgCreateClaim struct {
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.Did) MsgCreateClaim {
+	return MsgCreateClaim{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       createClaimDoc,
+	}
+}
+
 func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
 func (msg MsgCreateClaim) Route() string { return RouterKey }
 
@@ -331,6 +351,15 @@ type MsgCreateEvaluation struct {
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.Did) MsgCreateEvaluation {
+	return MsgCreateEvaluation{
+		ProjectDid: projectDid,
+		TxHash:     txHash,
+		SenderDid:  senderDid,
+		Data:       createEvaluationDoc,
+	}
+}
+
 func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
 func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
@@ -377,6 +406,13 @@ type MsgWithdrawFunds struct {
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
+func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) MsgWithdrawFunds {
+	return MsgWithdrawFunds{
+		SenderDid: senderDid,
+		Data:      data,
+	}
+}
+
 func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
 func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
@@ -403,12 +439,12 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 
 	// Check that the sender is also the recipient
 	if msg.SenderDid != msg.Data.RecipientDid {
-		return sdkerrors.Wrap(ErrInternal, "sender did must match recipient did")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did must match recipient did")
 	}
 
 	// Check that amount is positive
 	if !msg.Data.Amount.IsPositive() {
-		return sdkerrors.Wrap(ErrInternal, "amount should be positive")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "amount should be positive")
 	}
 
 	return nil
