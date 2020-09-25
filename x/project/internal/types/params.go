@@ -101,9 +101,9 @@ func validateOracleFeePercentage(i interface{}) error {
 	}
 
 	if v.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("project parameter OracleFeePercentage should be >= 0.0, is %s ", v.String())
+		return fmt.Errorf("invalid parameter oracle fee percentage; should be >= 0.0, is %s ", v.String())
 	} else if v.GT(sdk.NewDec(100)) {
-		return fmt.Errorf("project parameter OracleFeePercentage should be <= 100, is %s ", v.String())
+		return fmt.Errorf("invalid parameter oracle fee percentage; should be <= 100, is %s ", v.String())
 	}
 
 	return nil
@@ -116,9 +116,9 @@ func validateNodeFeePercentage(i interface{}) error {
 	}
 
 	if v.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("project parameter NodeFeePercentage should be >= 0.0, is %s ", v.String())
+		return fmt.Errorf("invalid parameter node fee percentage; should be >= 0.0, is %s ", v.String())
 	} else if v.GT(sdk.NewDec(100)) {
-		return fmt.Errorf("project parameter NodeFeePercentage should be <= 100, is %s ", v.String())
+		return fmt.Errorf("invalid parameter node fee percentage; should be <= 100, is %s ", v.String())
 	}
 
 	return nil
