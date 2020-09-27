@@ -27,12 +27,12 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"github.com/ixofoundation/ixo-blockchain/x/treasury"
+	"github.com/ixoworld/bonds/x/bonds"
 )
 
 const (
@@ -231,7 +231,7 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
 		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
 	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
-		app.stakingKeeper, app.didKeeper, keys[bonds.StoreKey], bondsSubspace, app.cdc)
+		app.stakingKeeper, keys[bonds.StoreKey], bondsSubspace, app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
 	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
 		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
