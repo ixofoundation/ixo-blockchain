@@ -3,10 +3,7 @@ package project
 import (
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
@@ -15,11 +12,7 @@ import (
 
 func TestHandler_CreateClaim(t *testing.T) {
 
-	ctx, k, cdc, _, _ := keeper.CreateTestInput()
-	codec.RegisterCrypto(cdc)
-	cdc.RegisterConcrete(types.MsgCreateProject{}, "project/CreateProject", nil)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
+	ctx, k, _, _ := keeper.CreateTestInput(t, false)
 
 	projectDid := types.ValidCreateProjectMsg.ProjectDid
 	txHash := "txHash"
@@ -43,11 +36,7 @@ func TestHandler_CreateClaim(t *testing.T) {
 }
 
 func TestHandler_ProjectMsg(t *testing.T) {
-	ctx, k, cdc, _, _ := keeper.CreateTestInput()
-	codec.RegisterCrypto(cdc)
-	types.RegisterCodec(cdc)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
+	ctx, k, _, _ := keeper.CreateTestInput(t, false)
 
 	res, _ := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
 	require.NotNil(t, res)
@@ -57,12 +46,7 @@ func TestHandler_ProjectMsg(t *testing.T) {
 
 }
 func TestHandler_CreateEvaluation(t *testing.T) {
-	ctx, k, cdc, pk, bk := keeper.CreateTestInput()
-
-	codec.RegisterCrypto(cdc)
-	types.RegisterCodec(cdc)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "cosmos-sdk/Account", nil)
+	ctx, k, pk, bk := keeper.CreateTestInput(t, false)
 
 	params := types.DefaultParams()
 	params.IxoDid = "blank"
