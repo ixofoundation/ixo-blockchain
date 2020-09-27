@@ -556,7 +556,7 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did
 func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper,
 	projectDid did.Did, recipientDid did.Did, amount sdk.Coin) {
 
-	withdrawalInfo := WithdrawalInfo{
+	withdrawalInfo := WithdrawalInfoDoc{
 		ProjectDid:   projectDid,
 		RecipientDid: recipientDid,
 		Amount:       amount,
