@@ -100,7 +100,11 @@ PROJECT1_INFO='{
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
   "createdBy":"Miguel",
-  "status":""
+  "status":"",
+  "fees":{
+    "@context":"",
+    "items": []
+  }
 }'
 PROJECT2_INFO='{
   "nodeDid":"nodeDid",
@@ -108,7 +112,11 @@ PROJECT2_INFO='{
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-02-02T02:02:02.000Z",
   "createdBy":"Francesco",
-  "status":""
+  "status":"",
+  "fees":{
+    "@context":"",
+    "items": []
+  }
 }'
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
@@ -144,6 +152,13 @@ SHAUN_DID_FULL='{
     "encryptionPrivateKey":"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR"
   }
 }'
+
+PAYMENT_RECIPIENTS='[
+  {
+    "address": "ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx",
+    "percentage": "100"
+  }
+]'
 
 # ----------------------------------------------------------------------------------------- dids
 # Ledger DIDs
@@ -301,6 +316,9 @@ ixocli tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_2_ADDR" 5000000000uix
 echo "Updating project 2 to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Updating project 2 to STARTED..."
+SENDER_DID="$SHAUN_DID"
+ixocli tx project update-project-status "$SENDER_DID" STARTED "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding a claim and evaluation
 echo "Creating a claim in project 2..."
@@ -343,4 +361,4 @@ PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
 PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
-ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
