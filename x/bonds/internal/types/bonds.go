@@ -199,7 +199,7 @@ type Bond struct {
 	CurrentReserve         sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
 	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-	OutcomePayment         sdk.Coins      `json:"outcome_payment" yaml:"outcome_payment"`
+	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 	State                  string         `json:"state" yaml:"state"`
 	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
 }
@@ -209,7 +209,7 @@ func NewBond(token, name, description string, creatorDid did.Did,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
 	sanityMarginPercentage sdk.Dec, allowSells bool, batchBlocks sdk.Uint,
-	outcomePayment sdk.Coins, state string, bondDid did.Did) Bond {
+	outcomePayment sdk.Int, state string, bondDid did.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -240,8 +240,16 @@ func NewBond(token, name, description string, creatorDid did.Did,
 	}
 }
 
-//noinspection GoNilness
+func (bond Bond) GetNewReserveCoins(amount sdk.Int) (coins sdk.Coins) {
+	coins = sdk.Coins{}
+	for _, r := range bond.ReserveTokens {
+		coins = coins.Add(sdk.Coins{sdk.NewCoin(r, amount)})
+	}
+	return coins
+}
+
 func (bond Bond) GetNewReserveDecCoins(amount sdk.Dec) (coins sdk.DecCoins) {
+	coins = sdk.DecCoins{}
 	for _, r := range bond.ReserveTokens {
 		coins = coins.Add(sdk.DecCoins{sdk.NewDecCoinFromDec(r, amount)})
 	}

@@ -120,11 +120,14 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			// Parse creator's ixo DID
 			creatorDid, err := did.UnmarshalIxoDid(_creatorDid)
-
-			// Parse order quantity limits
-			outcomePayment, err := sdk.ParseCoins(_outcomePayment)
 			if err != nil {
 				return err
+			}
+
+			// Parse outcome payment
+			outcomePayment, ok := sdk.NewIntFromString(_outcomePayment)
+			if !ok {
+				return types.ErrArgumentMustBeInteger(types.DefaultCodespace, "outcome payment")
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).

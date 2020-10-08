@@ -518,12 +518,13 @@ func handleMsgMakeOutcomePayment(ctx sdk.Context, keeper keeper.Keeper, msg type
 	// Confirm that state is OPEN and that outcome payment is not nil
 	if bond.State != types.OpenState {
 		return types.ErrInvalidStateForAction(types.DefaultCodespace).Result()
-	} else if bond.OutcomePayment.Empty() {
+	} else if bond.OutcomePayment.IsZero() {
 		return types.ErrCannotMakeZeroOutcomePayment(types.DefaultCodespace).Result()
 	}
 
 	// Send outcome payment to reserve
-	err := keeper.DepositReserve(ctx, bond.BondDid, senderAddr, bond.OutcomePayment)
+	outcomePayment := bond.GetNewReserveCoins(bond.OutcomePayment)
+	err := keeper.DepositReserve(ctx, bond.BondDid, senderAddr, outcomePayment)
 	if err != nil {
 		return err.Result()
 	}

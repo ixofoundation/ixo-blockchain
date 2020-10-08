@@ -139,9 +139,10 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse outcome payment
-		outcomePayment, err2 := sdk.ParseCoins(req.OutcomePayment)
-		if err2 != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err2.Error())
+		outcomePayment, ok := sdk.NewIntFromString(req.OutcomePayment)
+		if !ok {
+			err := types.ErrArgumentMustBeInteger(types.DefaultCodespace, "outcome payment")
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 

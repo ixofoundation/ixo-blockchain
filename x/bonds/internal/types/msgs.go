@@ -43,14 +43,14 @@ type MsgCreateBond struct {
 	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-	OutcomePayment         sdk.Coins      `json:"outcome_payment" yaml:"outcome_payment"`
+	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 }
 
 func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell bool, batchBlocks sdk.Uint, outcomePayment sdk.Coins, bondDid did.Did) MsgCreateBond {
+	allowSell bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid did.Did) MsgCreateBond {
 	return MsgCreateBond{
 		BondDid:                bondDid,
 		Token:                  token,
@@ -117,8 +117,6 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return sdk.ErrInvalidCoins("max supply is invalid")
 	} else if !msg.OrderQuantityLimits.IsValid() {
 		return sdk.ErrInvalidCoins("order quantity limits are invalid")
-	} else if !msg.OutcomePayment.IsValid() {
-		return sdk.ErrInvalidCoins("outcome payment is invalid")
 	}
 
 	// Check that max supply denom matches token denom
@@ -147,6 +145,11 @@ func (msg MsgCreateBond) ValidateBasic() sdk.Error {
 		return ErrArgumentMustBePositive(DefaultCodespace, "BatchBlocks")
 	} else if msg.MaxSupply.Amount.IsZero() {
 		return ErrArgumentMustBePositive(DefaultCodespace, "MaxSupply")
+	}
+
+	// Check that outcome payment not negative
+	if msg.OutcomePayment.IsNegative() {
+		return ErrArgumentMustBePositive(DefaultCodespace, "OutcomePayment")
 	}
 
 	// Note: uniqueness of reserve tokens checked when parsing

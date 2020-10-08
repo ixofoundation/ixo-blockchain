@@ -189,7 +189,7 @@ ixocli tx bonds create-bond \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
   --batch-blocks=1 \
-  --outcome-payment="300000000uxgbp" \
+  --outcome-payment="300000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$OWNER_DID_FULL" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y
