@@ -74,7 +74,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		panic(err)
 	}
 	return app.NewIxoApp(
-		logger, db, traceStore, true, invCheckPeriod,
+		logger, db, traceStore, true, map[int64]bool{}, invCheckPeriod,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
 		baseapp.SetHaltHeight(uint64(viper.GetInt(server.FlagHaltHeight))),
@@ -86,13 +86,13 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		ixoApp := app.NewIxoApp(logger, db, traceStore, false, uint(1))
+		ixoApp := app.NewIxoApp(logger, db, traceStore, false, map[int64]bool{}, uint(1))
 		err := ixoApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
 		}
 		return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
-	ixoApp := app.NewIxoApp(logger, db, traceStore, true, uint(1))
+	ixoApp := app.NewIxoApp(logger, db, traceStore, true, map[int64]bool{}, uint(1))
 	return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

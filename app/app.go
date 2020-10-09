@@ -1,8 +1,13 @@
 package app
 
 import (
-	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	"github.com/cosmos/cosmos-sdk/x/evidence"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
+	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"io"
 	"os"
@@ -58,17 +63,21 @@ var (
 	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
 		// Standard Cosmos modules
-		genutil.AppModuleBasic{},
 		auth.AppModuleBasic{},
+		supply.AppModuleBasic{},
+		genutil.AppModuleBasic{},
 		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
-		gov.NewAppModuleBasic(paramsclient.ProposalHandler, distr.ProposalHandler),
+		gov.NewAppModuleBasic(
+			paramsclient.ProposalHandler, distr.ProposalHandler, upgradeclient.ProposalHandler,
+		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
-		supply.AppModuleBasic{},
+		upgrade.AppModuleBasic{},
+		evidence.AppModuleBasic{},
 
 		// Custom ixo modules
 		did.AppModuleBasic{},
@@ -97,23 +106,36 @@ var (
 		payments.PayRemainderPool:        nil,
 	}
 
+	// module accounts that are allowed to receive tokens
+	allowedReceivingModAcc = map[string]bool{
+		distr.ModuleName: true,
+	}
+
 	// Reserved payments module ID prefixes
 	paymentsReservedIdPrefixes = []string{
 		project.ModuleName,
 	}
 )
 
+// MakeCodec - custom tx codec
 func MakeCodec() *codec.Codec {
 	var cdc = codec.New()
 
+	// Register standard Cosmos codecs
 	ModuleBasics.RegisterCodec(cdc)
-	ixo.RegisterCodec(cdc)
+	vesting.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
-	codec.RegisterEvidences(cdc)
+	//codec.RegisterEvidences(cdc)
+
+	// Register ixo codec
+	ixo.RegisterCodec(cdc)
 
 	return cdc
 }
+
+// Verify app interface at compile time
+var _ simapp.App = (*ixoApp)(nil)
 
 // Extended ABCI application
 type ixoApp struct {
@@ -126,17 +148,22 @@ type ixoApp struct {
 	keys  map[string]*sdk.KVStoreKey
 	tkeys map[string]*sdk.TransientStoreKey
 
+	// subspaces
+	subspaces map[string]params.Subspace
+
 	// Standard Cosmos keepers
-	accountKeeper  auth.AccountKeeper
-	bankKeeper     bank.Keeper
-	supplyKeeper   supply.Keeper
-	stakingKeeper  staking.Keeper
-	slashingKeeper slashing.Keeper
-	mintKeeper     mint.Keeper
-	distrKeeper    distr.Keeper
-	govKeeper      gov.Keeper
-	crisisKeeper   crisis.Keeper
-	paramsKeeper   params.Keeper
+	AccountKeeper  auth.AccountKeeper
+	BankKeeper     bank.Keeper
+	SupplyKeeper   supply.Keeper
+	StakingKeeper  staking.Keeper
+	SlashingKeeper slashing.Keeper
+	MintKeeper     mint.Keeper
+	DistrKeeper    distr.Keeper
+	GovKeeper      gov.Keeper
+	CrisisKeeper   crisis.Keeper
+	UpgradeKeeper  upgrade.Keeper
+	ParamsKeeper   params.Keeper
+	EvidenceKeeper evidence.Keeper
 
 	// Custom ixo keepers
 	didKeeper      did.Keeper
@@ -148,29 +175,34 @@ type ixoApp struct {
 
 	// the module manager
 	mm *module.Manager
+
+	// simulation manager
+	sm *module.SimulationManager
 }
 
 // NewIxoApp returns a reference to an initialized IxoApp.
-func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
-	invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp)) *ixoApp {
+func NewIxoApp(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
+	invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp),
+) *ixoApp {
 
 	cdc := MakeCodec()
 
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
+	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(
 		// Standard Cosmos store keys
 		bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
-		gov.StoreKey, params.StoreKey,
+		gov.StoreKey, params.StoreKey, upgrade.StoreKey, evidence.StoreKey,
 
 		// Custom ixo store keys
 		did.StoreKey, payments.StoreKey,
 		project.StoreKey, bonds.StoreKey, treasury.StoreKey, oracles.StoreKey,
 	)
-
-	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
+	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
 	app := &ixoApp{
 		BaseApp:        bApp,
@@ -178,84 +210,114 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
 		tkeys:          tkeys,
+		subspaces:      make(map[string]params.Subspace),
 	}
 
 	// init params keeper and subspaces (for standard Cosmos modules)
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
-	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
-	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
-	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
-	mintSubspace := app.paramsKeeper.Subspace(mint.DefaultParamspace)
-	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
-	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
-	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
-	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
+	app.ParamsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
+	app.subspaces[auth.ModuleName] = app.ParamsKeeper.Subspace(auth.DefaultParamspace)
+	app.subspaces[bank.ModuleName] = app.ParamsKeeper.Subspace(bank.DefaultParamspace)
+	app.subspaces[staking.ModuleName] = app.ParamsKeeper.Subspace(staking.DefaultParamspace)
+	app.subspaces[mint.ModuleName] = app.ParamsKeeper.Subspace(mint.DefaultParamspace)
+	app.subspaces[distr.ModuleName] = app.ParamsKeeper.Subspace(distr.DefaultParamspace)
+	app.subspaces[slashing.ModuleName] = app.ParamsKeeper.Subspace(slashing.DefaultParamspace)
+	app.subspaces[gov.ModuleName] = app.ParamsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
+	app.subspaces[crisis.ModuleName] = app.ParamsKeeper.Subspace(crisis.DefaultParamspace)
+	app.subspaces[evidence.ModuleName] = app.ParamsKeeper.Subspace(evidence.DefaultParamspace)
 
 	// init params keeper and subspaces (for custom ixo modules)
-	projectSubspace := app.paramsKeeper.Subspace(project.DefaultParamspace)
-	bondsSubspace := app.paramsKeeper.Subspace(bonds.DefaultParamspace)
+	app.subspaces[project.ModuleName] = app.ParamsKeeper.Subspace(project.DefaultParamspace)
+	app.subspaces[bonds.ModuleName] = app.ParamsKeeper.Subspace(bonds.DefaultParamspace)
 
 	// add keepers (for standard Cosmos modules)
-	app.accountKeeper = auth.NewAccountKeeper(app.cdc, keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
-	app.bankKeeper = bank.NewBaseKeeper(app.accountKeeper, bankSubspace, app.ModuleAccountAddrs())
-	app.supplyKeeper = supply.NewKeeper(app.cdc, keys[supply.StoreKey], app.accountKeeper, app.bankKeeper, maccPerms)
-	stakingKeeper := staking.NewKeeper(app.cdc, keys[staking.StoreKey], app.supplyKeeper, stakingSubspace)
-	app.mintKeeper = mint.NewKeeper(app.cdc, keys[mint.StoreKey], mintSubspace, &stakingKeeper, app.supplyKeeper, auth.FeeCollectorName)
-	app.distrKeeper = distr.NewKeeper(app.cdc, keys[distr.StoreKey], distrSubspace, &stakingKeeper,
-		app.supplyKeeper, auth.FeeCollectorName, app.ModuleAccountAddrs())
-	app.slashingKeeper = slashing.NewKeeper(
-		app.cdc, keys[slashing.StoreKey], &stakingKeeper, slashingSubspace,
+	app.AccountKeeper = auth.NewAccountKeeper(
+		app.cdc, keys[auth.StoreKey], app.subspaces[auth.ModuleName], auth.ProtoBaseAccount,
 	)
-	app.crisisKeeper = crisis.NewKeeper(crisisSubspace, invCheckPeriod, app.supplyKeeper, auth.FeeCollectorName)
+	app.BankKeeper = bank.NewBaseKeeper(
+		app.AccountKeeper, app.subspaces[bank.ModuleName], app.BlacklistedAccAddrs(),
+	)
+	app.SupplyKeeper = supply.NewKeeper(
+		app.cdc, keys[supply.StoreKey], app.AccountKeeper, app.BankKeeper, maccPerms,
+	)
+	stakingKeeper := staking.NewKeeper(
+		app.cdc, keys[staking.StoreKey], app.SupplyKeeper, app.subspaces[staking.ModuleName],
+	)
+	app.MintKeeper = mint.NewKeeper(
+		app.cdc, keys[mint.StoreKey], app.subspaces[mint.ModuleName], &stakingKeeper,
+		app.SupplyKeeper, auth.FeeCollectorName,
+	)
+	app.DistrKeeper = distr.NewKeeper(
+		app.cdc, keys[distr.StoreKey], app.subspaces[distr.ModuleName], &stakingKeeper,
+		app.SupplyKeeper, auth.FeeCollectorName, app.ModuleAccountAddrs(),
+	)
+	app.SlashingKeeper = slashing.NewKeeper(
+		app.cdc, keys[slashing.StoreKey], &stakingKeeper, app.subspaces[slashing.ModuleName],
+	)
+	app.CrisisKeeper = crisis.NewKeeper(
+		app.subspaces[crisis.ModuleName], invCheckPeriod, app.SupplyKeeper, auth.FeeCollectorName,
+	)
+	app.UpgradeKeeper = upgrade.NewKeeper(skipUpgradeHeights, keys[upgrade.StoreKey], app.cdc)
+
+	// create evidence keeper with router
+	evidenceKeeper := evidence.NewKeeper(
+		app.cdc, keys[evidence.StoreKey], app.subspaces[evidence.ModuleName], &app.StakingKeeper, app.SlashingKeeper,
+	)
+	evidenceRouter := evidence.NewRouter()
+	// TODO: Register evidence routes.
+	evidenceKeeper.SetRouter(evidenceRouter)
+	app.EvidenceKeeper = *evidenceKeeper
 
 	// register the proposal types
 	govRouter := gov.NewRouter()
 	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
-		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
-		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper))
-	app.govKeeper = gov.NewKeeper(
-		app.cdc, keys[gov.StoreKey], govSubspace,
-		app.supplyKeeper, &stakingKeeper, govRouter,
+		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
+		AddRoute(upgrade.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper))
+	app.GovKeeper = gov.NewKeeper(
+		app.cdc, keys[gov.StoreKey], app.subspaces[gov.ModuleName], app.SupplyKeeper,
+		&stakingKeeper, govRouter,
 	)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
-	app.stakingKeeper = *stakingKeeper.SetHooks(
-		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
+	app.StakingKeeper = *stakingKeeper.SetHooks(
+		staking.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
 
 	// add keepers (for custom ixo modules)
 	app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
 	app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey],
-		app.bankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
-	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], projectSubspace,
-		app.accountKeeper, app.didKeeper, app.paymentsKeeper)
-	app.bondsKeeper = bonds.NewKeeper(app.bankKeeper, app.supplyKeeper, app.accountKeeper,
-		app.stakingKeeper, keys[bonds.StoreKey], bondsSubspace, app.cdc)
+		app.BankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
+	app.projectKeeper = project.NewKeeper(app.cdc, keys[project.StoreKey], app.subspaces[project.ModuleName],
+		app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
+	app.bondsKeeper = bonds.NewKeeper(app.BankKeeper, app.SupplyKeeper, app.AccountKeeper,
+		app.StakingKeeper, keys[bonds.StoreKey], app.subspaces[bonds.ModuleName], app.cdc)
 	app.oraclesKeeper = oracles.NewKeeper(app.cdc, keys[oracles.StoreKey])
-	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.bankKeeper,
-		app.oraclesKeeper, app.supplyKeeper, app.didKeeper)
+	app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.BankKeeper,
+		app.oraclesKeeper, app.SupplyKeeper, app.didKeeper)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
 		// Standard Cosmos appmodules
-		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
-		auth.NewAppModule(app.accountKeeper),
-		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		crisis.NewAppModule(&app.crisisKeeper),
-		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
-		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
-		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
-		mint.NewAppModule(app.mintKeeper),
-		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
-		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
+		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx),
+		auth.NewAppModule(app.AccountKeeper),
+		bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
+		crisis.NewAppModule(&app.CrisisKeeper),
+		supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
+		gov.NewAppModule(app.GovKeeper, app.AccountKeeper, app.SupplyKeeper),
+		mint.NewAppModule(app.MintKeeper),
+		slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
+		distr.NewAppModule(app.DistrKeeper, app.AccountKeeper, app.SupplyKeeper, app.StakingKeeper),
+		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
+		upgrade.NewAppModule(app.UpgradeKeeper),
+		evidence.NewAppModule(app.EvidenceKeeper),
 
 		// Custom ixo AppModules
 		did.NewAppModule(app.didKeeper),
-		payments.NewAppModule(app.paymentsKeeper, app.bankKeeper),
-		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.bankKeeper),
-		bonds.NewAppModule(app.bondsKeeper, app.accountKeeper),
+		payments.NewAppModule(app.paymentsKeeper, app.BankKeeper),
+		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.BankKeeper),
+		bonds.NewAppModule(app.bondsKeeper, app.AccountKeeper),
 		treasury.NewAppModule(app.treasuryKeeper),
 		oracles.NewAppModule(app.oraclesKeeper),
 	)
@@ -265,11 +327,10 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	// CanWithdrawInvariant invariant.
 	app.mm.SetOrderBeginBlockers(
 		// Standard Cosmos modules
-		mint.ModuleName, distr.ModuleName, slashing.ModuleName,
+		upgrade.ModuleName, mint.ModuleName, distr.ModuleName, slashing.ModuleName, evidence.ModuleName,
 		// Custom ixo modules
 		bonds.ModuleName,
 	)
-
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
 		crisis.ModuleName, gov.ModuleName, staking.ModuleName,
@@ -277,18 +338,38 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 		bonds.ModuleName, payments.ModuleName,
 	)
 
+	// NOTE: The genutils moodule must occur after staking so that pools are
+	// properly initialized with tokens from genesis accounts.
 	app.mm.SetOrderInitGenesis(
 		// Standard Cosmos modules
-		distr.ModuleName, staking.ModuleName,
-		auth.ModuleName, bank.ModuleName, slashing.ModuleName, gov.ModuleName,
-		mint.ModuleName, supply.ModuleName, crisis.ModuleName, genutil.ModuleName,
+		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
+		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
+		crisis.ModuleName, genutil.ModuleName, evidence.ModuleName,
 		// Custom ixo modules
 		did.ModuleName, project.ModuleName, payments.ModuleName,
 		bonds.ModuleName, treasury.ModuleName, oracles.ModuleName,
 	)
 
-	app.mm.RegisterInvariants(&app.crisisKeeper)
+	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
+
+	// create the simulation manager and define the order of the modules for deterministic simulations
+	//
+	// NOTE: this is not required apps that don't use the simulator for fuzz testing
+	// transactions
+	app.sm = module.NewSimulationManager(
+		auth.NewAppModule(app.AccountKeeper),
+		bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
+		supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
+		gov.NewAppModule(app.GovKeeper, app.AccountKeeper, app.SupplyKeeper),
+		mint.NewAppModule(app.MintKeeper),
+		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
+		distr.NewAppModule(app.DistrKeeper, app.AccountKeeper, app.SupplyKeeper, app.StakingKeeper),
+		slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
+		params.NewAppModule(), // NOTE: only used for simulation to generate randomized param change proposals
+	)
+
+	app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -310,25 +391,27 @@ func NewIxoApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	return app
 }
 
-// application updates every begin block
+// Name returns the name of the App
+func (app *ixoApp) Name() string { return app.BaseApp.Name() }
+
+// BeginBlocker application updates every begin block
 func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
-// application updates every end block
+// EndBlocker application updates every end block
 func (app *ixoApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
-// application update at chain initialization
+// InitChainer application update at chain initialization
 func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	var genesisState map[string]json.RawMessage
+	var genesisState GenesisState
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
-
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
-// load a particular height
+// LoadHeight loads a particular height
 func (app *ixoApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
@@ -343,6 +426,59 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
+// BlacklistedAccAddrs returns all the app's module account addresses black listed for receiving tokens.
+func (app *ixoApp) BlacklistedAccAddrs() map[string]bool {
+	blacklistedAddrs := make(map[string]bool)
+	for acc := range maccPerms {
+		blacklistedAddrs[supply.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
+	}
+
+	return blacklistedAddrs
+}
+
+// Codec returns SimApp's codec.
+//
+// NOTE: This is solely to be used for testing purposes as it may be desirable
+// for modules to register their own custom testing types.
+func (app *ixoApp) Codec() *codec.Codec {
+	return app.cdc
+}
+
+// GetKey returns the KVStoreKey for the provided store key.
+//
+// NOTE: This is solely to be used for testing purposes.
+func (app *ixoApp) GetKey(storeKey string) *sdk.KVStoreKey {
+	return app.keys[storeKey]
+}
+
+// GetTKey returns the TransientStoreKey for the provided store key.
+//
+// NOTE: This is solely to be used for testing purposes.
+func (app *ixoApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
+	return app.tkeys[storeKey]
+}
+
+// GetSubspace returns a param subspace for a given module name.
+//
+// NOTE: This is solely to be used for testing purposes.
+func (app *ixoApp) GetSubspace(moduleName string) params.Subspace {
+	return app.subspaces[moduleName]
+}
+
+// SimulationManager implements the SimulationApp interface
+func (app *ixoApp) SimulationManager() *module.SimulationManager {
+	return app.sm
+}
+
+// GetMaccPerms returns a copy of the module account permissions
+func GetMaccPerms() map[string][]string {
+	dupMaccPerms := make(map[string][]string)
+	for k, v := range maccPerms {
+		dupMaccPerms[k] = v
+	}
+	return dupMaccPerms
+}
+
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
 	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
@@ -350,16 +486,16 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
 
 	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer, defaultPubKeyGetter)
+		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, defaultPubKeyGetter)
 	didAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer, didPubKeyGetter)
+		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, didPubKeyGetter)
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
-		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer, projectPubKeyGetter)
+		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, projectPubKeyGetter)
 	cosmosAnteHandler := auth.NewAnteHandler(
-		app.accountKeeper, app.supplyKeeper, ixo.IxoSigVerificationGasConsumer)
+		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.accountKeeper, app.supplyKeeper, app.bankKeeper,
+		app.AccountKeeper, app.SupplyKeeper, app.BankKeeper,
 		app.didKeeper, projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {

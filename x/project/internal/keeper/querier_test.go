@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -14,10 +11,7 @@ import (
 )
 
 func TestQueryProjectDoc(t *testing.T) {
-	ctx, k, cdc, _, _ := CreateTestInput()
-	codec.RegisterCrypto(cdc)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
+	ctx, k, _, _ := CreateTestInput(t, false)
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
 	k.SetProjectDoc(ctx, types.ValidProjectDoc)
@@ -35,15 +29,12 @@ func TestQueryProjectDoc(t *testing.T) {
 	require.Nil(t, emptyRes)
 	require.NotNil(t, err)
 
-	var projectDoc types.MsgCreateProject
-	cdc.MustUnmarshalJSON(res, &projectDoc)
+	var projectDoc types.ProjectDoc
+	k.cdc.MustUnmarshalJSON(res, &projectDoc)
 }
 
 func TestQueryProjectAccounts(t *testing.T) {
-	ctx, k, cdc, _, _ := CreateTestInput()
-	codec.RegisterCrypto(cdc)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
+	ctx, k, _, _ := CreateTestInput(t, false)
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
 	k.SetProjectDoc(ctx, types.ValidProjectDoc)
@@ -76,10 +67,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 }
 
 func TestQueryTxs(t *testing.T) {
-	ctx, k, cdc, _, _ := CreateTestInput()
-	codec.RegisterCrypto(cdc)
-	cdc.RegisterInterface((*exported.Account)(nil), nil)
-	cdc.RegisterConcrete(&auth.BaseAccount{}, "", nil)
+	ctx, k, _, _ := CreateTestInput(t, false)
 
 	require.False(t, k.ProjectDocExists(ctx, types.ProjectDid))
 	k.SetProjectDoc(ctx, types.ValidProjectDoc)
@@ -97,7 +85,7 @@ func TestQueryTxs(t *testing.T) {
 	require.Nil(t, err)
 
 	var txs []types.WithdrawalInfoDoc
-	cdc.MustUnmarshalJSON(res, &txs)
+	k.cdc.MustUnmarshalJSON(res, &txs)
 
 	_, err = querier(ctx, []string{QueryProjectTx, "InvalidDid"}, query)
 	require.NotNil(t, err)

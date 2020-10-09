@@ -42,16 +42,16 @@ func NewParams(projectMinimumInitialFunding sdk.Coins, ixoDid did.Did,
 
 // default project module parameters
 func DefaultParams() Params {
-	defaultInvalidBlankDid := did.Did("")
+	defaultIxoDid := did.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
 	defaultMinInitFunding := sdk.NewCoins(sdk.NewCoin(
 		ixo.IxoNativeToken, sdk.OneInt()))
 	tenPercentFee := sdk.NewDec(10)
 
 	return Params{
-		IxoDid:                       defaultInvalidBlankDid, // invalid blank
-		ProjectMinimumInitialFunding: defaultMinInitFunding,  // 1uixo
-		OracleFeePercentage:          tenPercentFee,          // 10.0 (10%)
-		NodeFeePercentage:            tenPercentFee,          // 10.0 (10%)
+		IxoDid:                       defaultIxoDid,         // invalid blank
+		ProjectMinimumInitialFunding: defaultMinInitFunding, // 1uixo
+		OracleFeePercentage:          tenPercentFee,         // 10.0 (10%)
+		NodeFeePercentage:            tenPercentFee,         // 10.0 (10%)
 	}
 }
 
