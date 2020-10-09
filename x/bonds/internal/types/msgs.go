@@ -10,6 +10,7 @@ import (
 const (
 	TypeMsgCreateBond         = "create_bond"
 	TypeMsgEditBond           = "edit_bond"
+	TypeMsgEditKappa          = "edit_kappa"
 	TypeMsgBuy                = "buy"
 	TypeMsgSell               = "sell"
 	TypeMsgSwap               = "swap"
@@ -20,6 +21,7 @@ const (
 var (
 	_ ixo.IxoMsg = MsgCreateBond{}
 	_ ixo.IxoMsg = MsgEditBond{}
+	_ ixo.IxoMsg = MsgEditKappa{}
 	_ ixo.IxoMsg = MsgBuy{}
 	_ ixo.IxoMsg = MsgSell{}
 	_ ixo.IxoMsg = MsgSwap{}
@@ -260,6 +262,60 @@ func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
+
+type MsgEditKappa struct {
+	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
+	Token     string  `json:"token" yaml:"token"`
+	Kappa     sdk.Int `json:"kappa" yaml:"kappa"`
+	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
+}
+
+func NewMsgEditKappa(token string, kappa sdk.Int, editorDid, bondDid did.Did) MsgEditKappa {
+	return MsgEditKappa{
+		BondDid:   bondDid,
+		Token:     token,
+		Kappa:     kappa,
+		EditorDid: editorDid,
+	}
+}
+
+func (msg MsgEditKappa) ValidateBasic() sdk.Error {
+	// Check if empty
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "BondDid")
+	} else if strings.TrimSpace(msg.Token) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "Token")
+	} else if strings.TrimSpace(msg.EditorDid) == "" {
+		return ErrArgumentCannotBeEmpty(DefaultCodespace, "EditorDid")
+	}
+
+	// Check that kappa is positive
+	if !msg.Kappa.IsPositive() {
+		return ErrArgumentMustBePositive(DefaultCodespace, "kappa")
+	}
+
+	// Check that DIDs valid
+	if !did.IsValidDid(msg.BondDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "bond did is invalid")
+	} else if !did.IsValidDid(msg.EditorDid) {
+		return did.ErrorInvalidDid(DefaultCodespace, "editor did is invalid")
+	}
+
+	return nil
+}
+
+func (msg MsgEditKappa) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgEditKappa) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgEditKappa) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+}
+
+func (msg MsgEditKappa) Route() string { return RouterKey }
+
+func (msg MsgEditKappa) Type() string { return TypeMsgEditKappa }
 
 type MsgBuy struct {
 	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`

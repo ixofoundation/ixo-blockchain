@@ -18,6 +18,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgCreateBond(ctx, keeper, msg)
 		case types.MsgEditBond:
 			return handleMsgEditBond(ctx, keeper, msg)
+		case types.MsgEditKappa:
+			return handleMsgEditKappa(ctx, keeper, msg)
 		case types.MsgBuy:
 			return handleMsgBuy(ctx, keeper, msg)
 		case types.MsgSell:
@@ -224,11 +226,11 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 		bond.SanityMarginPercentage = sanityMarginPercentage
 	}
 
+	keeper.SetBond(ctx, bond.BondDid, bond)
+
 	logger := keeper.Logger(ctx)
 	logger.Info(fmt.Sprintf("bond %s edited by %s",
 		msg.BondDid, msg.EditorDid))
-
-	keeper.SetBond(ctx, bond.BondDid, bond)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
@@ -240,6 +242,71 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits),
 			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate),
 			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+		),
+	})
+
+	return sdk.Result{Events: ctx.EventManager().Events()}
+}
+
+func handleMsgEditKappa(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditKappa) sdk.Result {
+
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
+	if !found {
+		return types.ErrBondDoesNotExist(types.DefaultCodespace, msg.BondDid).Result()
+	}
+
+	if bond.FunctionType != types.AugmentedFunction {
+		return types.ErrFunctionNotAvailableForFunctionType(types.DefaultCodespace).Result()
+	} else if bond.State != types.OpenState {
+		return types.ErrInvalidStateForAction(types.DefaultCodespace).Result()
+	}
+
+	if bond.CreatorDid != msg.EditorDid {
+		errMsg := fmt.Sprintf("Editor must be the creator of the bond")
+		return sdk.ErrInternal(errMsg).Result()
+	}
+
+	// Get reserve and supply
+	R := bond.CurrentReserve[0].Amount // common reserve balance
+	S := bond.CurrentSupply.Amount
+
+	// Get parameters (with new kappa and recalculated V0)
+	paramsMap := bond.FunctionParameters.AsMap()
+	d0, _ := paramsMap["d0"]
+	p0, _ := paramsMap["p0"]
+	theta, _ := paramsMap["theta"]
+	kappa := msg.Kappa.ToDec()
+	R0, _ := paramsMap["R0"]
+	S0, _ := paramsMap["S0"]
+	V0 := types.Invariant(R.ToDec(), S.ToDec(), kappa.TruncateInt64())
+
+	// Set new function parameters
+	bond.FunctionParameters = types.FunctionParams{
+		types.NewFunctionParam("d0", d0),
+		types.NewFunctionParam("p0", p0),
+		types.NewFunctionParam("theta", theta),
+		types.NewFunctionParam("kappa", kappa),
+		types.NewFunctionParam("R0", R0),
+		types.NewFunctionParam("S0", S0),
+		types.NewFunctionParam("V0", V0),
+	}
+	keeper.SetBond(ctx, bond.BondDid, bond)
+
+	logger := keeper.Logger(ctx)
+	logger.Info(fmt.Sprintf("bond %s kappa edited by %s",
+		msg.BondDid, msg.EditorDid))
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeEditKappa,
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
+			sdk.NewAttribute(types.AttributeKeyKappa, msg.Kappa.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

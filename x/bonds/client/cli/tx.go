@@ -27,6 +27,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	bondsTxCmd.AddCommand(client.PostCommands(
 		GetCmdCreateBond(cdc),
 		GetCmdEditBond(cdc),
+		GetCmdEditKappa(cdc),
 		GetCmdBuy(cdc),
 		GetCmdSell(cdc),
 		GetCmdSwap(cdc),
@@ -204,6 +205,41 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagEditorDid)
 
+	return cmd
+}
+
+func GetCmdEditKappa(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "edit-kappa [bond-token] [kappa] [bond-did] [editor-did]",
+		Example: "edit-kappa abc 4 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Short:   "Edit a bond's kappa parameter",
+		Args:    cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_bondToken := args[0]
+			_kappa := args[1]
+			_bondDid := args[2]
+			_editorDid := args[3]
+
+			// Parse kappa
+			kappa, ok := sdk.NewIntFromString(_kappa)
+			if !ok {
+				return types.ErrArgumentMustBeInteger(types.DefaultCodespace, "kappa")
+			}
+
+			// Parse editor's ixo DID
+			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+			if err != nil {
+				return err
+			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(editorDid.Address())
+
+			msg := types.NewMsgEditKappa(_bondToken, kappa, editorDid.Did, _bondDid)
+
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+		},
+	}
 	return cmd
 }
 

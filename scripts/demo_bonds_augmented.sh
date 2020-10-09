@@ -138,6 +138,17 @@ ixocli q auth account "$SHAUN_ADDR"
 echo "Bond state is now open..."  # since 50000 (S0) reached
 ixocli q bonds bond "$BOND_DID"
 
+echo "Current price is 0.018..."
+ixocli q bonds current-price "$BOND_DID"
+echo "Changing kappa 3->2..."
+ixocli tx bonds edit-kappa abc "2" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is now 0.012..."
+ixocli q bonds current-price "$BOND_DID"
+echo "Changing kappa 2->4..."
+ixocli tx bonds edit-kappa abc "4" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is now 0.024..."
+ixocli q bonds current-price "$BOND_DID"
+
 echo "Miguel sells 20000abc..."
 ixocli tx bonds sell 20000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
