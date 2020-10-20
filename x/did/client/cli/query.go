@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -9,6 +10,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 func GetCmdAddressFromBase58Pubkey() *cobra.Command {
@@ -57,6 +59,32 @@ func GetCmdAddressFromDid(cdc *codec.Codec) *cobra.Command {
 			addressFromDid := didDoc.Address()
 
 			fmt.Println(addressFromDid.String())
+			return nil
+		},
+	}
+}
+
+func GetCmdIxoDidFromMnemonic() *cobra.Command {
+	return &cobra.Command{
+		Use:   "get-ixo-did-from-mnemonic [mnemonic]",
+		Short: "Get an ixo DID from a 12-word secret mnemonic",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(strings.Split(args[0], " ")) != 12 {
+				return errors.New("input is not a 12-word mnemonic")
+			}
+
+			ixoDid, err := exported.FromMnemonic(args[0])
+			if err != nil {
+				return err
+			}
+
+			output, err := json.Marshal(ixoDid)
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Println(fmt.Sprintf("%v", string(output)))
 			return nil
 		},
 	}
