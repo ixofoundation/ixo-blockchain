@@ -2,6 +2,15 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
+// Idea 1: change MsgEditKappa to MsgEditAlpha
+// If alpha < 0.5, kappa = 2
+// If alpha = 0.5, kappa = 3
+// If alpha > 0.5, kappa = 4
+// This way we can have alpha being used in the system and be able to show it.
+
+// Idea 2: calculate alpha from kappa (rather than the other way round)
+// This way we can display an alpha, but this will not match the actual alpha.
+
 func Alpha(S0, S1, R, C sdk.Int) sdk.Dec {
 	// S0/S1: negative and positive attestations, measured in bond tokens
 	// C: outcome payment
@@ -39,3 +48,62 @@ func InvariantIAlt(C sdk.Int, alpha sdk.Dec, R sdk.Int) sdk.Dec {
 
 	return alpha.MulInt(C).Add(sdk.NewDecFromInt(R))
 }
+
+//func (bond *Bond) UpdateOnBurnOrMint() {
+//	paramsMap := bond.FunctionParameters.AsMap()
+//	d0, _ := paramsMap["d0"]
+//	p0, _ := paramsMap["p0"]
+//	theta, _ := paramsMap["theta"]
+//	kappa, _ := paramsMap["kappa"]
+//	alpha, _ := paramsMap["alpha"]
+//	R0, _ := paramsMap["R0"]
+//	S0, _ := paramsMap["S0"]
+//	V0, _ := paramsMap["V0"]
+//
+//	commonReserveBalance := bond.CurrentReserve[0].Amount
+//	I := InvariantIAlt(bond.OutcomePayment, alpha, commonReserveBalance)
+//	kappa = Kappa(I, bond.OutcomePayment, alpha)
+//
+//	bond.FunctionParameters = FunctionParams{
+//		NewFunctionParam("d0", d0),
+//		NewFunctionParam("p0", p0),
+//		NewFunctionParam("theta", theta),
+//		NewFunctionParam("kappa", kappa),
+//		NewFunctionParam("alpha", alpha),
+//		NewFunctionParam("R0", R0),
+//		NewFunctionParam("S0", S0),
+//		NewFunctionParam("V0", V0),
+//		NewFunctionParam("I", I),
+//	}
+//}
+//
+//func (bond *Bond) UpdateOnAttestation() {
+//	paramsMap := bond.FunctionParameters.AsMap()
+//	d0, _ := paramsMap["d0"]
+//	p0, _ := paramsMap["p0"]
+//	theta, _ := paramsMap["theta"]
+//	//kappa, _ := paramsMap["kappa"]
+//	alpha, _ := paramsMap["alpha"]
+//	R0, _ := paramsMap["R0"]
+//	S0, _ := paramsMap["S0"]
+//	//V0, _ := paramsMap["V0"]
+//
+//	commonReserveBalance := bond.CurrentReserve[0].Amount
+//	I := InvariantIAlt(bond.OutcomePayment, alpha, commonReserveBalance)
+//	kappa := Kappa(I, bond.OutcomePayment, alpha)
+//	RDec := sdk.NewDecFromInt(commonReserveBalance)
+//	SDec := sdk.NewDecFromInt(bond.CurrentSupply.Amount)
+//	V0 := Invariant(RDec, SDec, kappa)
+//
+//	bond.FunctionParameters = FunctionParams{
+//		NewFunctionParam("d0", d0),
+//		NewFunctionParam("p0", p0),
+//		NewFunctionParam("theta", theta),
+//		NewFunctionParam("kappa", kappa),
+//		NewFunctionParam("alpha", alpha),
+//		NewFunctionParam("R0", R0),
+//		NewFunctionParam("S0", S0),
+//		NewFunctionParam("V0", V0),
+//		NewFunctionParam("I", I),
+//	}
+//}
