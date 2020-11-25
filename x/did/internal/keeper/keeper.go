@@ -26,7 +26,7 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, s
 	bz := store.Get(key)
 	if bz == nil {
 		return nil, types.ErrorInvalidDid(
-			types.DefaultCodespace, fmt.Sprintf("Invalid Did Address %s", did))
+			types.DefaultCodespace, fmt.Sprintf("DID %s does not exist", did))
 	}
 
 	var didDoc types.BaseDidDoc
