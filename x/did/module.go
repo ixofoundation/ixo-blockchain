@@ -78,6 +78,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	didQueryCmd.AddCommand(client.GetCommands(
 		cli.GetCmdAddressFromBase58Pubkey(),
 		cli.GetCmdAddressFromDid(cdc),
+		cli.GetCmdIxoDidFromMnemonic(),
 		cli.GetCmdDidDoc(cdc),
 		cli.GetCmdAllDids(cdc),
 		cli.GetCmdAllDidDocs(cdc),

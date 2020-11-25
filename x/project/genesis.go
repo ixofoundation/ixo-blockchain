@@ -38,7 +38,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	// Export project docs, account maps, project withdrawals
 	var projectDocs []ProjectDoc
 	var accountMaps []AccountMap
-	var withdrawalInfos [][]WithdrawalInfo
+	var withdrawalInfos [][]WithdrawalInfoDoc
 	var claims [][]Claim
 
 	iterator := k.GetProjectDocIterator(ctx)
