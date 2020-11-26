@@ -25,22 +25,11 @@ yes $PASSWORD | ixocli keys delete fee --force
 yes $PASSWORD | ixocli keys add fee
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
-OWNER_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
 IXO_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 ORACLE_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 
-OWNER_DID_FULL='{
-  "did":"did:ixo:U4tSpzzv91HHqWW1YmFkHJ",
-  "verifyKey":"FkeDue5it82taeheMprdaPrctfK3DeVV9NnEPYDgwwRG",
-  "encryptionPublicKey":"DtdGbZB2nSQvwhs6QoN5Cd8JTxWgfVRAGVKfxj8LA15i",
-  "secret":{
-    "seed":"6ef0002659d260a0bbad194d1aa28650ccea6c6862f994dfdbd48648e1a05c5e",
-    "signKey":"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR",
-    "encryptionPrivateKey":"8U474VrG2QiUFKfeNnS84CAsqHdmVRjEx4vQje122ycR"
-  }
-}'
 IXO_DID_FULL='{
   "did":"did:ixo:4XJLBfGtWSGKSz4BeRxdun",
   "verifyKey":"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt",
@@ -103,8 +92,6 @@ FEE_FOR_SERVICE_PAYMENT_TEMPLATE='{
   "discounts": []
 }'
 
-OWNER_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"
-
 # Generate DIDs
 DID_1_FULL=$(node utils/did_gen.js)
 DID_2_FULL=$(node utils/did_gen.js)
@@ -116,6 +103,7 @@ DID_7_FULL=$(node utils/did_gen.js)
 DID_8_FULL=$(node utils/did_gen.js)
 DID_9_FULL=$(node utils/did_gen.js)
 DID_10_FULL=$(node utils/did_gen.js)
+OWNER_DID_FULL=$(node utils/did_gen.js)
 DID_1=$(echo "$DID_1_FULL" | cut -d \" -f 4)
 DID_2=$(echo "$DID_2_FULL" | cut -d \" -f 4)
 DID_3=$(echo "$DID_3_FULL" | cut -d \" -f 4)
@@ -126,8 +114,33 @@ DID_7=$(echo "$DID_7_FULL" | cut -d \" -f 4)
 DID_8=$(echo "$DID_8_FULL" | cut -d \" -f 4)
 DID_9=$(echo "$DID_9_FULL" | cut -d \" -f 4)
 DID_10=$(echo "$DID_10_FULL" | cut -d \" -f 4)
+OWNER_DID=$(echo "$OWNER_DID_FULL" | cut -d \" -f 4)
 
-# Ledger the 10 DIDs, oracle, ixo, and owner DIDs
+# Ledger oracle and ixo DIDs 
+ixocli tx did add-did-doc "$ORACLE_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx did add-did-doc "$IXO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+
+# Fund DID and owner accounts using ixo DID for gas fees
+echo "Funding DID and owner accounts..."
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_2_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_3_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_4_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_5_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_6_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_7_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_8_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_9_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_10_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+
+# Each DID including the owner now has 10IXO for gas fees 
+DID_1_ADDR=$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
+ixocli q account $DID_1_ADDR
+OWNER_ADDR=$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
+ixocli q account $OWNER_ADDR
+
+# Ledger the 10 DIDs and owner DID
 echo "Ledgering DIDs..."
 ixocli tx did add-did-doc "$DID_1_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
 ixocli tx did add-did-doc "$DID_2_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
@@ -139,37 +152,19 @@ ixocli tx did add-did-doc "$DID_7_FULL" --gas-prices="$GAS_PRICES" -y > /dev/nul
 ixocli tx did add-did-doc "$DID_8_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
 ixocli tx did add-did-doc "$DID_9_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
 ixocli tx did add-did-doc "$DID_10_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx did add-did-doc "$ORACLE_DID_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx did add-did-doc "$IXO_DID_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx did add-did-doc "$OWNER_DID_FULL" --gas-prices="$GAS_PRICES" -y --broadcast-mode block > /dev/null
+ixocli tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
-# Fund oracle for gas fees and ixo DID for funding and gas fees
-echo "Funding oracle and ixo DID..."
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $ORACLE_DID)" 1000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
-yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $IXO_DID)" 10000000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
-
-# Fund DID accounts using ixo DID for gas fees
-echo "Funding DID accounts..."
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_1" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_2" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_3" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_4" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_5" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_6" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_7" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_8" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_9" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$DID_10" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx treasury oracle-transfer "$IXO_DID" "$OWNER_DID" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-
-# Each DID now has 10IXO for gas fees
-ixocli q account "$(ixocli q did get-address-from-did $DID_1)"
+# Fund oracle and ixo DID for gas fees (commented out since oracle and ixo DID are funded at genesis)
+# echo "Funding oracle and ixo DID..."
+# yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $ORACLE_DID)" 1000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
+# yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $IXO_DID)" 10000000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
 
 # Fund Owner with 300xGBP (300000000uxgbp)
 echo "Funding Owner DID with 300xGBP (using treasury 'oracle-mint' using oracle)..."
 ixocli tx treasury oracle-mint "$OWNER_ADDR" 300000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
-# Owner now has 10IXO and 300xGBP
+# Owner now has 300xGBP to use in the project
+# Side note: we can now query the account using just the DID instead of using get_pubkey.js, since the DID has been registered.
 ixocli q account "$(ixocli q did get-address-from-did $OWNER_DID)"
 
 # Create bond
