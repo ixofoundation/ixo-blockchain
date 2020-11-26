@@ -154,7 +154,7 @@ ixocli tx did add-did-doc "$DID_9_FULL" --gas-prices="$GAS_PRICES" -y > /dev/nul
 ixocli tx did add-did-doc "$DID_10_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
 ixocli tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
-# Fund oracle for gas fees (commented out since ORACLE_DID and IXO_DID are funded at genesis)
+# Fund oracle and ixo DID for gas fees (commented out since oracle and ixo DID are funded at genesis)
 # echo "Funding oracle and ixo DID..."
 # yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $ORACLE_DID)" 1000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
 # yes $PASSWORD | ixocli tx send "$(ixocli keys show miguel -a)" "$(ixocli q did get-address-from-did $IXO_DID)" 10000000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
