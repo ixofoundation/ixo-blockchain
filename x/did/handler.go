@@ -2,9 +2,10 @@ package did
 
 import (
 	"fmt"
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strconv"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
@@ -19,7 +20,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case types.MsgAddCredential:
 			return handleMsgAddCredential(ctx, k, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
 				"unrecognized did Msg type: %v", msg.Type())
 		}
 	}

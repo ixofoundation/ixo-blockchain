@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
+	"strings"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -112,7 +113,7 @@ func (msg MsgAddCredential) String() string {
 func (msg MsgAddCredential) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.DidCredential.Claim.Id) == "" {
-		return sdkerrors.Wrap(ErrInvalidClaimId, "claim ID not be empty")
+		return sdkerrors.Wrap(ErrInvalidClaimId, "claim ID should not be empty")
 	} else if strings.TrimSpace(msg.DidCredential.Issuer) == "" {
 		return sdkerrors.Wrap(ErrInvalidIssuer, "issuer should not be empty")
 	}

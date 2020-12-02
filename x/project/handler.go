@@ -2,10 +2,11 @@ package project
 
 import (
 	"fmt"
+	"strconv"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -39,7 +40,7 @@ func NewHandler(k Keeper, pk payments.Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgWithdrawFunds:
 			return handleMsgWithdrawFunds(ctx, k, bk, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
 				"unrecognized project Msg type: %v", msg.Type())
 		}
 	}

@@ -2,13 +2,14 @@ package payments
 
 import (
 	"fmt"
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"strconv"
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
@@ -67,7 +68,7 @@ func NewHandler(k Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgEffectPayment:
 			return handleMsgEffectPayment(ctx, k, bk, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
 				"unrecognized payments Msg type: %v", msg.Type())
 		}
 	}

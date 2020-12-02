@@ -2,13 +2,14 @@ package bonds
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	"strconv"
-	"strings"
 )
 
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
@@ -30,7 +31,7 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 		case types.MsgWithdrawShare:
 			return handleMsgWithdrawShare(ctx, keeper, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
 				"unrecognized bonds Msg type: %v", msg.Type())
 		}
 	}

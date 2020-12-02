@@ -20,7 +20,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case MsgOracleBurn:
 			return handleMsgOracleBurn(ctx, k, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
 				"unrecognized treasury Msg type: %v", msg.Type())
 		}
 	}
