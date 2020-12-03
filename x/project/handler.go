@@ -418,7 +418,7 @@ func handleMsgWithdrawFunds(ctx sdk.Context, k Keeper, bk bank.Keeper,
 	}
 
 	if projectDoc.Status != PaidoutStatus {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest,
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
 			"project not in PAIDOUT status")
 	}
 
