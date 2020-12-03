@@ -49,22 +49,3 @@ func TestGetMaccPerms(t *testing.T) {
 	dup := GetMaccPerms()
 	require.Equal(t, maccPerms, dup, "duplicated module account permissions differed from actual module account permissions")
 }
-
-func setGenesis(ixoApp *ixoApp) error {
-
-	genesisState := ModuleBasics.DefaultGenesis() // TODO: set to simapp.DefaultGenesisState() once simapp added
-	stateBytes, err := codec.MarshalJSONIndent(ixoApp.cdc, genesisState)
-	if err != nil {
-		return err
-	}
-
-	// Initialize the chain
-	ixoApp.InitChain(
-		abci.RequestInitChain{
-			Validators:    []abci.ValidatorUpdate{},
-			AppStateBytes: stateBytes,
-		},
-	)
-	ixoApp.Commit()
-	return nil
-}
