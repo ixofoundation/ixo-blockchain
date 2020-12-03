@@ -40,7 +40,7 @@ func NewHandler(k Keeper, pk payments.Keeper, bk bank.Keeper) sdk.Handler {
 		case MsgWithdrawFunds:
 			return handleMsgWithdrawFunds(ctx, k, bk, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
 				"unrecognized project Msg type: %v", msg.Type())
 		}
 	}
