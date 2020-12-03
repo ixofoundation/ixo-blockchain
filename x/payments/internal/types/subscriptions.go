@@ -132,7 +132,7 @@ func (p BlockPeriod) Validate() error {
 
 	// Validate period-related values
 	if p.PeriodStartBlock > p.periodEndBlock() {
-		return sdkerrors.Wrap(ErrInvalidId, "start time is after end time")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "start time is after end time")
 	} else if p.PeriodLength <= 0 {
 		return sdkerrors.Wrap(ErrInvalidPeriod, "period length must be greater than zero")
 	}

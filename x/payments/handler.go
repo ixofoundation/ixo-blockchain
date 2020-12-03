@@ -163,8 +163,8 @@ func handleMsgCreatePaymentContract(ctx sdk.Context, k Keeper, bk bank.Keeper,
 
 	// Ensure that payment contract doesn't already exist
 	if k.PaymentContractExists(ctx, msg.PaymentContractId) {
-		return nil, sdkerrors.Wrap(types.ErrAlreadyExists, fmt.Sprintf(
-			"payment contract '%s' already exists", msg.PaymentContractId))
+		return nil, sdkerrors.Wrapf(types.ErrAlreadyExists,
+			"payment contract '%s' already exists", msg.PaymentContractId)
 	}
 
 	// Ensure that payment contract ID is not reserved
@@ -309,7 +309,8 @@ func handleMsgGrantDiscount(ctx sdk.Context, k Keeper, msg MsgGrantDiscount) (*s
 
 	// Confirm that signer is actually the creator of the payment contract
 	if !creatorAddr.Equals(contract.Creator) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract creator")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress,
+			"signer must be payment contract creator")
 
 	}
 
@@ -318,7 +319,8 @@ func handleMsgGrantDiscount(ctx sdk.Context, k Keeper, msg MsgGrantDiscount) (*s
 	if err != nil {
 		return nil, err
 	} else if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "discount ID not in payment template's discount list")
+		return nil, sdkerrors.Wrap(types.ErrInvalidId,
+			"discount ID not in payment template's discount list")
 	}
 
 	// Grant the discount
