@@ -35,7 +35,7 @@ func CheckNoOfReserveTokens(resTokens []string, fnType string) error {
 	// Come up with number of expected reserve tokens
 	expectedNoOfTokens, ok := NoOfReserveTokensForFunctionType[fnType]
 	if !ok {
-		return sdkerrors.Wrap(ErrUnrecognizedFunctionType, DefaultCodespace)
+		return sdkerrors.Wrap(ErrUnrecognizedFunctionType, fnType)
 	}
 
 	// Check that number of reserve tokens is correct (if expecting a specific number of tokens)

@@ -205,11 +205,11 @@ func (msg MsgEditBond) ValidateBasic() error {
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
 	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token")
 	} else if strings.TrimSpace(msg.Name) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Description) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity rate")
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
 	} else if strings.TrimSpace(msg.SanityRate) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity rate")
 	} else if strings.TrimSpace(msg.SanityMarginPercentage) == "" {
