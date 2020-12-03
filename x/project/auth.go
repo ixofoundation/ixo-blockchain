@@ -46,7 +46,7 @@ func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
 			// For the remaining messages, the project is the signer
 			projectDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
 			if err != nil {
-				return pubKey, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "project did not found")
+				return pubKey, sdkerrors.Wrap(did.ErrInvalidDid, "project did not found")
 			}
 			copy(pubKeyEd25519[:], base58.Decode(projectDoc.PubKey))
 		}
