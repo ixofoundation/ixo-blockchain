@@ -34,7 +34,7 @@ var (
 	ErrCannotMakeZeroOutcomePayment         = sdkerrors.Register(DefaultCodespace, 24, "cannot make outcome payment because outcome payment is set to nil")
 	ErrFunctionRequiresNonZeroCurrentSupply = sdkerrors.Register(DefaultCodespace, 25, "function requires the current supply to be non zero")
 	ErrTokenIsNotAValidReserveToken         = sdkerrors.Register(DefaultCodespace, 26, "token is not a valid reserve token")
-	ErrMaxSupplyDenomDoesNotMatchTokenDenom = sdkerrors.Register(DefaultCodespace, 27, "token is not a valid reserve token")
+	ErrMaxSupplyDenomDoesNotMatchTokenDenom = sdkerrors.Register(DefaultCodespace, 27, "max supply denom does not match token denom")
 	ErrBondTokenCannotAlsoBeReserveToken    = sdkerrors.Register(DefaultCodespace, 28, "token cannot also be a reserve token")
 	ErrBondTokenCannotBeStakingToken        = sdkerrors.Register(DefaultCodespace, 29, "bond token cannot be staking token")
 	ErrReserveDenomsMismatch                = sdkerrors.Register(DefaultCodespace, 30, "denoms do not match reserve denoms")
