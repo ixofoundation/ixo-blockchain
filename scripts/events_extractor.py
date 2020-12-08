@@ -25,8 +25,13 @@ def print_events(events: List[Dict]):
 for height in range(1, 100):
     # Block events
     res = requests.get("{}/block_results?height={}".format(URL, height)).json()
-    sections = ['begin_block_events', 'end_block_events']
-    for section in sections:
+
+    if 'error' in res and 'must be less than or equal to the current ' \
+                          'blockchain height' in res['error']['data']:
+        print('\nReached last height; stopping!')
+        break
+
+    for section in ['begin_block_events', 'end_block_events']:
         if res['result'][section]:
             print_events(res['result'][section])
 
