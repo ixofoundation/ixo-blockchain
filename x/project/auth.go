@@ -27,28 +27,35 @@ func init() {
 	copy(simEd25519Pubkey[:], bz)
 }
 
-func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
+func NewDefaultPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, err error) {
 
-		// Get signer PubKey
+		projectDidDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
+		if err != nil {
+			return pubKey, sdkerrors.Wrap(did.ErrInvalidDid, "project DID not found")
+		}
+
+		var pubKeyRaw ed25519.PubKeyEd25519
+		copy(pubKeyRaw[:], base58.Decode(projectDidDoc.PubKey))
+		return pubKeyRaw, nil
+	}
+}
+
+func NewModulePubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, err error) {
+
+		// MsgCreateProject: pubkey from msg since project does not exist yet
+		// MsgWithdrawFunds: signer is user DID, so get pubkey from did module
+		// Other: signer is project DID, so get pubkey from project module
+
 		var pubKeyEd25519 ed25519.PubKeyEd25519
 		switch msg := msg.(type) {
 		case MsgCreateProject:
 			copy(pubKeyEd25519[:], base58.Decode(msg.GetPubKey()))
 		case MsgWithdrawFunds:
-			signerDid := msg.GetSignerDid()
-			signerDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
-			if signerDoc == nil {
-				return pubKey, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "signer did not found")
-			}
-			copy(pubKeyEd25519[:], base58.Decode(signerDoc.GetPubKey()))
+			return did.NewDefaultPubKeyGetter(didKeeper)(ctx, msg)
 		default:
-			// For the remaining messages, the project is the signer
-			projectDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
-			if err != nil {
-				return pubKey, sdkerrors.Wrap(did.ErrInvalidDid, "project did not found")
-			}
-			copy(pubKeyEd25519[:], base58.Decode(projectDoc.PubKey))
+			return NewDefaultPubKeyGetter(keeper)(ctx, msg)
 		}
 		return pubKeyEd25519, nil
 	}

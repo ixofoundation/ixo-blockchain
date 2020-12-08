@@ -44,20 +44,6 @@ func init() {
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
 
-func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
-	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, err error) {
-
-		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
-		if err != nil {
-			return pubKey, err
-		}
-
-		var pubKeyRaw ed25519tm.PubKeyEd25519
-		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
-		return pubKeyRaw, nil
-	}
-}
-
 func NewDefaultAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first

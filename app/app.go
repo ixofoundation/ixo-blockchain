@@ -481,9 +481,41 @@ func GetMaccPerms() map[string][]string {
 
 func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 
-	defaultPubKeyGetter := ixo.NewDefaultPubKeyGetter(app.didKeeper)
-	didPubKeyGetter := did.GetPubKeyGetter(app.didKeeper)
-	projectPubKeyGetter := project.GetPubKeyGetter(app.projectKeeper, app.didKeeper)
+	// The AnteHandler needs to get the signer's pubkey to verify signatures,
+	// charge gas fees (to the corresponding address), and for other purposes.
+	//
+	// The default Cosmos AnteHandler fetches a signer address' pubkey from the
+	// GetPubKey() function after querying the account from the account keeper.
+	//
+	// In the case of ixo, since signers are DIDs rather than addresses, we get
+	// the DID Doc containing the pubkey from the did/project module (depending
+	// if signer is a user or a project, respectively).
+	//
+	// This is what PubKeyGetters achieve.
+	//
+	// To get a pubkey from the did/project, the did/project must have been
+	// created. But during the did/project creation, we also need the pubkeys,
+	// which we cannot get because the did/project does not even exist yet.
+	// For this purpose, a special didPubKeyGetter and projectPubkeyGetter were
+	// created, which get the pubkey from the did/project creation msg itself,
+	// given that the pubkey is one of the parameters in such messages.
+	//
+	// - did module msgs are signed by did module DIDs
+	// - project module msgs are signed by project module DIDs (a.k.a projects)
+	// - [[default]] remaining ixo module msgs are signed by did module DIDs
+	//
+	// A special case in the project module is the MsgWithdrawFunds message,
+	// which is a project module message signed by a did module DID (instead
+	// of a project DID). The project module PubKeyGetter deals with this
+	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
+
+	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.didKeeper)
+	didPubKeyGetter := did.NewModulePubKeyGetter(app.didKeeper)
+	projectPubKeyGetter := project.NewModulePubKeyGetter(app.projectKeeper, app.didKeeper)
+
+	// Since we have parameterised pubkey getters, we can use the same default
+	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
+	// instead of having to implement three unique AnteHandlers.
 
 	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
 		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, defaultPubKeyGetter)
@@ -491,8 +523,30 @@ func NewIxoAnteHandler(app *ixoApp) sdk.AnteHandler {
 		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, didPubKeyGetter)
 	projectAnteHandler := ixo.NewDefaultAnteHandler(
 		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, projectPubKeyGetter)
+
+	// The default Cosmos AnteHandler is still used for standard Cosmos messages
+	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
+	// is that we use an IxoSigVerificationGasConsumer instead of the default
+	// one, since the default does not allow ED25519 signatures. Thus, like this
+	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
+
 	cosmosAnteHandler := auth.NewAnteHandler(
 		app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer)
+
+	// In the case of project creation, besides having a custom pubkey getter,
+	// we also have to use a custom project creation AnteHandler. Recall that
+	// one of the purposes of getting the pubkey is to charge gas fees. So we
+	// expect the signer to have enough tokens to pay for gas fees. Typically,
+	// these are sent to the signer before the signer signs their first message.
+	//
+	// However, in the case of a project, we cannot send tokens to it before its
+	// creation since we do not know the project DID (and thus where to send the
+	// tokens) until exactly before its creation (when project creation is done
+	// through ixo-cellnode). The project however does have an original creator!
+	//
+	// Thus, the gas fees in the case of project creation are instead charged
+	// to the original creator, which is pointed out in the project doc. For
+	// this purpose, a custom project creation AnteHandler had to be created.
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
 		app.AccountKeeper, app.SupplyKeeper, app.BankKeeper,
