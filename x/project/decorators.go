@@ -174,7 +174,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	// all messages must be of type MsgCreateProject
 	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
 	if !ok {
-		return ctx, fmt.Errorf("msg must be MsgCreateProject")
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
 
 	// Get pubKey
@@ -267,7 +267,7 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	// message must be of type MsgCreateProject
 	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
 	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.MsgCreateProject")
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
 
 	// Get did pubKey
