@@ -21,8 +21,8 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-yes $PASSWORD | ixocli keys delete fee --force
-yes $PASSWORD | ixocli keys add fee
+yes $PASSWORD | ixocli keys delete fee --force > /dev/null 2>&1
+yes $PASSWORD | ixocli keys add fee > /dev/null 2>&1
 FEE=$(yes $PASSWORD | ixocli keys show fee -a)
 
 IXO_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
@@ -135,10 +135,10 @@ ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-p
 ixocli tx treasury oracle-transfer "$IXO_DID" "$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Each DID including the owner now has 10IXO for gas fees 
-DID_1_ADDR=$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
-ixocli q account $DID_1_ADDR
-OWNER_ADDR=$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
-ixocli q account $OWNER_ADDR
+# DID_1_ADDR=$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
+# ixocli q account $DID_1_ADDR
+# OWNER_ADDR=$(ixocli q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
+# ixocli q account $OWNER_ADDR
 
 # Ledger the 10 DIDs and owner DID
 echo "Ledgering DIDs..."
@@ -165,7 +165,7 @@ ixocli tx treasury oracle-mint "$OWNER_ADDR" 300000000uxgbp "$ORACLE_DID_FULL" "
 
 # Owner now has 300xGBP to use in the project
 # Side note: we can now query the account using just the DID instead of using get_pubkey.js, since the DID has been registered.
-ixocli q account "$(ixocli q did get-address-from-did $OWNER_DID)"
+# ixocli q account "$(ixocli q did get-address-from-did $OWNER_DID)"
 
 # Create bond
 echo "Creating bond..."
@@ -187,17 +187,17 @@ ixocli tx bonds create-bond \
   --outcome-payment="300000000uxgbp" \
   --bond-did="$BOND_DID" \
   --creator-did="$OWNER_DID_FULL" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+  --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$IXO_DID_FULL"
-ixocli tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Create fee-for-service payment template
 echo "Creating fee-for-service payment template..."
 CREATOR="$IXO_DID_FULL"
-ixocli tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Create project and progress status to PENDING
 SENDER_DID="$OWNER_DID"
@@ -249,7 +249,7 @@ ixocli tx project create-evaluation "tx_hash" "$DID_9" "claim9" "$STATUS" "$PROJ
 ixocli tx project create-evaluation "tx_hash" "$DID_10" "claim10" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Each of the 10 DIDs now has 1xGBP (1000000uxgbp)
-ixocli q account "$(ixocli q did get-address-from-did "$DID_1")"
+# ixocli q account "$(ixocli q did get-address-from-did "$DID_1")"
 
 # Perform bond buys
 echo "DID 1 buys 1ABC..."
