@@ -16,7 +16,6 @@ var (
 
 	// Auth
 	NewDefaultAnteHandler            = types.NewDefaultAnteHandler
-	ProcessSig                       = types.ProcessSig
 	NewSetPubKeyDecorator            = types.NewSetPubKeyDecorator
 	NewDeductFeeDecorator            = types.NewDeductFeeDecorator
 	NewSigGasConsumeDecorator        = types.NewSigGasConsumeDecorator

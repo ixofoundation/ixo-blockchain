@@ -92,7 +92,9 @@ func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
 	return nil
 }
 
-func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc exported.Account, genesis bool) []byte {
+func getProjectCreationSignBytes(ctx sdk.Context, tx auth.StdTx, acc exported.Account) []byte {
+	genesis := ctx.BlockHeight() == 0
+	chainID := ctx.ChainID()
 	var accNum uint64
 	if !genesis {
 		// Fixed account number used so that sign bytes do not depend on it

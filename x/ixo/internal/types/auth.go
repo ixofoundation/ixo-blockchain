@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
@@ -289,38 +288,4 @@ func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdS
 	}
 
 	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
-}
-
-func ProcessSig(
-	ctx sdk.Context, acc authexported.Account, sig auth.StdSignature, signBytes []byte, simulate bool, params auth.Params,
-) (updatedAcc authexported.Account, err error) {
-
-	var pubKey crypto.PubKey
-	pubKey = acc.GetPubKey()
-	err = acc.SetPubKey(pubKey)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, err.Error())
-	}
-
-	if simulate {
-		// Simulated txs should not contain a signature and are not required to
-		// contain a pubkey, so we must account for tx size of including a
-		// StdSignature (Amino encoding) and simulate gas consumption
-		// (assuming an ED25519 simulation key).
-		consumeSimSigGas(ctx.GasMeter(), pubKey, sig, params)
-	}
-
-	// Consume signature gas
-	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
-
-	// Verify signature
-	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Signature Verification failed")
-	}
-
-	if err := acc.SetSequence(acc.GetSequence() + 1); err != nil {
-		panic(err)
-	}
-
-	return acc, err
 }
