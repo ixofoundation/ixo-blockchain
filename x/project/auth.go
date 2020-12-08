@@ -106,6 +106,58 @@ func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc exported.Acc
 
 func NewProjectCreationAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper,
 	bk bank.Keeper, didKeeper did.Keeper, pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
+
+	// Refer to inline documentation in app/app.go for introduction to why we
+	// need a custom ixo AnteHandler, and especially a custom AnteHandler for
+	// project creation. Below, we will discuss the differences between the
+	// custom ixo AnteHandler and the project creation AnteHandler.
+	//
+	// It is clear below that our custom AnteHandler is not completely custom.
+	// It uses various functions from the Cosmos ante module. However, it also
+	// uses customised decorators, disables some decorators,
+	//
+	// In general:
+	// - Sometimes enforces messages to be of type MsgCreateProject, especially
+	//   if the decorator specifically needs to use the project creator DID.
+	//
+	// NewSetUpContextDecorator:
+	// (Note: default ixo AnteHandler uses the Cosmos NewSetUpContextDecorator)
+	// - Uses an infinite gas meter since we do not care about gas limits. This
+	//   reduces the likelihood that a project creation message fails.
+	//
+	// NewMempoolFeeDecorator [[DISABLED]]:
+	// - Disabled since we do not need to check that the provided fees meet a
+	//   minimum threshold for the validator, given that we use a fixed fee.
+	//
+	// NewSetPubKeyDecorator:
+	// - Enforces that the signer's account (the project) does not exist yet.
+	// - Creates the signer's account (in the default ixo AnteHandler, this is
+	//   only done if the signer does not yet exist, such as during MsgAddDid)
+	//
+	// NewDeductFeeDecorator:
+	// - Enforces and charges a fixed MsgCreateProjectTotalFee instead of using
+	//   the fee from the signed tx. This total fee is partly a transaction
+	//   fee and partly funding for the project, so that it can sign future
+	//   transactions (and pay gas fees) independently for a number of txs.
+	// - Deducts any fees from the project creator rather than the message
+	//   signer, since the message signer is actually the project.
+	//
+	// NewSigGasConsumeDecorator [[DISABLED]]:
+	// - Similar to NewSetUpContextDecorator, we do not care about gas limits,
+	//   so we do not need to consume signature-related gas.
+	//
+	// NewSigVerificationDecorator
+	// - Project creation sign bytes are different from standard StdTx sign
+	//   bytes, so one of this decorator's jobs is to construct this different
+	//   sign bytes (difference discussed in next points) so that it is then
+	//   able to verify the sign bytes correctly.
+	// - The account number in project creation sign bytes is 0, because when
+	//   the transaction is being signed, the project's account does not exist
+	//   yet, so we cannot know what the account number will be. As another
+	//   example, when signing a MsgAddDid, we do know the account number
+	//   because we expect the account underlying the DID to have been created.
+	//   Account creation typically happens by someone sending tokens to it.
+
 	return sdk.ChainAnteDecorators(
 		NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		//ante.NewMempoolFeeDecorator(),

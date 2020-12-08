@@ -45,6 +45,43 @@ func init() {
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
 
 func NewDefaultAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
+
+	// Refer to inline documentation in app/app.go for introduction to why we
+	// need a custom ixo AnteHandler. Below, we will discuss the differences
+	// between the default Cosmos AnteHandler and our custom ixo AnteHandler.
+	//
+	// It is clear below that our custom AnteHandler is not completely custom.
+	// It uses various functions from the Cosmos ante module. However, it also
+	// uses customised decorators, without adding completely new decorators.
+	// Below we present the differences in the customised decorators.
+	//
+	// In general:
+	// - Enforces messages to be of type IxoMsg, to be used with pubKeyGetter.
+	// - Does not allow for multiple messages (to be added in the future).
+	// - Does not allow for multiple signatures (to be added in the future).
+	//
+	// NewSetPubKeyDecorator: as opposed to the Cosmos version...
+	// - Gets signer pubkey from pubKeyGetter argument instead of tx signatures.
+	// - Gets signer address from pubkey instead of the messages' GetSigners().
+	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
+	//
+	// NewDeductFeeDecorator:
+	// - Gets fee payer address from the pubkey obtained from pubKeyGetter
+	//   instead of from the first message's GetSigners() function.
+	//
+	// NewSigGasConsumeDecorator:
+	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
+	//   instead of from the messages' GetSigners() function.
+	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
+	//
+	// NewSigVerificationDecorator:
+	// - Gets the only signer address and account from the pubkey obtained from
+	//   pubKeyGetter instead of from the messages' GetSigners() function.
+	//
+	// NewIncrementSequenceDecorator:
+	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
+	//   instead of from the messages' GetSigners() function.
+
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewMempoolFeeDecorator(),
