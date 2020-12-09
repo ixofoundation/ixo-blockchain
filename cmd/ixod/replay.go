@@ -10,8 +10,9 @@ import (
 	cpm "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
 
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	abci "github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
+	cmn "github.com/tendermint/tendermint/libs/os"
 	"github.com/tendermint/tendermint/proxy"
 	tmsm "github.com/tendermint/tendermint/state"
 	tmstore "github.com/tendermint/tendermint/store"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -93,8 +93,8 @@ func replayTxs(rootDir string) error {
 	// Application
 	fmt.Fprintln(os.Stderr, "Creating application")
 	myapp := app.NewIxoApp(
-		ctx.Logger, appDB, traceStoreWriter, true, uint(1),
-		baseapp.SetPruning(store.PruneEverything), // nothing
+		ctx.Logger, appDB, traceStoreWriter, true, map[int64]bool{}, uint(1),
+		baseapp.SetPruning(storetypes.PruneEverything), // nothing
 	)
 
 	// Genesis
@@ -175,7 +175,7 @@ func replayTxs(rootDir string) error {
 
 		t2 := time.Now()
 
-		state, err = blockExec.ApplyBlock(state, blockmeta.BlockID, block)
+		state, _, err = blockExec.ApplyBlock(state, blockmeta.BlockID, block)
 		if err != nil {
 			return err
 		}

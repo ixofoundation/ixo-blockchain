@@ -47,9 +47,17 @@ func (p Params) String() string {
 		p.ReservedBondTokens)
 }
 
+func validateReservedBondTokens(i interface{}) error {
+	_, ok := i.([]string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return nil
+}
+
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyReservedBondTokens, &p.ReservedBondTokens},
+		{KeyReservedBondTokens, &p.ReservedBondTokens, validateReservedBondTokens},
 	}
 }

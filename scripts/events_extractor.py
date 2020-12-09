@@ -1,12 +1,11 @@
+import requests
 from base64 import b64decode
 from typing import List, Dict
 from urllib.parse import quote
 
-import requests
-
 URL = "http://localhost:26657"
 IGNORED_EVENTS = \
-    ["message", "transfer", "commission", "rewards", "proposer_reward"]
+    ["message", "transfer", "commission", "rewards", "proposer_reward", "mint"]
 
 
 def print_events(events: List[Dict]):
@@ -26,15 +25,23 @@ def print_events(events: List[Dict]):
 for height in range(1, 100):
     # Block events
     res = requests.get("{}/block_results?height={}".format(URL, height)).json()
-    sections = ['begin_block', 'end_block']
-    for section in sections:
-        res_section = res['result']['results'][section]
-        if 'events' in res_section:
-            print_events(res_section['events'])
+
+    if 'error' in res and 'must be less than or equal to the current ' \
+                          'blockchain height' in res['error']['data']:
+        print('\nReached last height; stopping!')
+        break
+
+    for section in ['begin_block_events', 'end_block_events']:
+        if res['result'][section]:
+            print_events(res['result'][section])
 
     # Transaction events
     query = quote("\"tx.height={}\"".format(height))
-    params = "query=" + query + "&prove=true&page=1&per_page=30&order_by=asc"
+    params = "query={}&" \
+             "\"prove=true\"&" \
+             "\"page=1\"&" \
+             "\"per_page=30\"&" \
+             "\"order_by=asc\"".format(query)
     res = requests.get("{}/tx_search?{}".format(URL, params)).json()
     for tx in res['result']['txs']:
         print_events(tx['tx_result']['events'])

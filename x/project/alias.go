@@ -12,9 +12,8 @@ const (
 	RouterKey         = types.RouterKey
 	StoreKey          = types.StoreKey
 
-	DefaultCodespace = types.DefaultCodespace
-	PaidoutStatus    = types.PaidoutStatus
-	FundedStatus     = types.FundedStatus
+	PaidoutStatus = types.PaidoutStatus
+	FundedStatus  = types.FundedStatus
 
 	TypeMsgCreateProject = types.TypeMsgCreateProject
 

@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -38,9 +37,7 @@ func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			fmt.Println(res.String())
-			fmt.Printf("Committed at block %d. Hash: %s\n", res.Height, res.TxHash)
-			return nil
+			return cliCtx.PrintOutput(res)
 		},
 	}
 }

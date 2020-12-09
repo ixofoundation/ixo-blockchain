@@ -2,9 +2,9 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
@@ -76,11 +76,11 @@ func (msg MsgCreateProject) Type() string { return TypeMsgCreateProject }
 
 func (msg MsgCreateProject) Route() string { return RouterKey }
 
-func (msg MsgCreateProject) ValidateBasic() sdk.Error {
+func (msg MsgCreateProject) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.PubKey, "PubKey"); !valid {
+	if valid, err := CheckNotEmpty(msg.PubKey, "PubKey"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
 	}
 
@@ -88,16 +88,16 @@ func (msg MsgCreateProject) ValidateBasic() sdk.Error {
 	var dataMap ProjectDataMap
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
-		return sdk.ErrInternal(err.Error())
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project data map")
 	}
 
 	// Check that project DID matches the PubKey
 	unprefixedDid := exported.UnprefixedDid(msg.ProjectDid)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
-		return did.ErrorDidPubKeyMismatch(DefaultCodespace, fmt.Sprintf(
+		return sdkerrors.Wrapf(did.ErrDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
-			expectedUnprefixedDid, unprefixedDid))
+			expectedUnprefixedDid, unprefixedDid)
 	}
 
 	return nil
@@ -141,11 +141,11 @@ func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateP
 func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
 func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
 
-func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
+func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -153,9 +153,9 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// IsValidProgressionFrom checked by the handler
@@ -190,11 +190,11 @@ func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAg
 
 func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
 func (msg MsgCreateAgent) Route() string { return RouterKey }
-func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
+func (msg MsgCreateAgent) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -202,11 +202,11 @@ func (msg MsgCreateAgent) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidDid(msg.Data.AgentDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "agent DID is invalid")
 	}
 
 	return nil
@@ -247,11 +247,11 @@ func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAg
 
 func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
 func (msg MsgUpdateAgent) Route() string { return RouterKey }
-func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
+func (msg MsgUpdateAgent) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -259,11 +259,11 @@ func (msg MsgUpdateAgent) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidDid(msg.Data.Did) {
-		return did.ErrorInvalidDid(DefaultCodespace, "agent did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "agent DID is invalid")
 	}
 
 	return nil
@@ -306,11 +306,11 @@ func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateCl
 func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
 func (msg MsgCreateClaim) Route() string { return RouterKey }
 
-func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
+func (msg MsgCreateClaim) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -318,9 +318,9 @@ func (msg MsgCreateClaim) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
@@ -363,11 +363,11 @@ func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDo
 func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
 func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
-func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
+func (msg MsgCreateEvaluation) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	}
 
@@ -375,9 +375,9 @@ func (msg MsgCreateEvaluation) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
@@ -416,13 +416,13 @@ func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) MsgWithdrawFu
 func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
 func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
-func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
+func (msg MsgWithdrawFunds) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := checkNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.Data.ProjectDid, "ProjectDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.Data.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := checkNotEmpty(msg.Data.RecipientDid, "RecipientDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.Data.RecipientDid, "RecipientDid"); !valid {
 		return err
 	}
 
@@ -430,21 +430,21 @@ func (msg MsgWithdrawFunds) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	} else if !did.IsValidDid(msg.Data.ProjectDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "project did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
 	} else if !did.IsValidDid(msg.Data.RecipientDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "recipient did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient DID is invalid")
 	}
 
 	// Check that the sender is also the recipient
 	if msg.SenderDid != msg.Data.RecipientDid {
-		return sdk.ErrInternal("sender did must match recipient did")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did must match recipient did")
 	}
 
 	// Check that amount is positive
 	if !msg.Data.Amount.IsPositive() {
-		return sdk.ErrInternal("amount should be positive")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "amount should be positive")
 	}
 
 	return nil

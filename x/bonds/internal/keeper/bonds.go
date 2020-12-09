@@ -74,7 +74,7 @@ func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid did.Did) {
 }
 
 func (k Keeper) DepositReserve(ctx sdk.Context, bondDid did.Did,
-	from sdk.AccAddress, amount sdk.Coins) sdk.Error {
+	from sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens to bonds reserve account
 	err := k.SupplyKeeper.SendCoinsFromAccountToModule(
@@ -85,12 +85,12 @@ func (k Keeper) DepositReserve(ctx sdk.Context, bondDid did.Did,
 
 	// Update bond reserve
 	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount))
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount...))
 	return nil
 }
 
 func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid did.Did,
-	fromModule string, amount sdk.Coins) sdk.Error {
+	fromModule string, amount sdk.Coins) error {
 
 	// Send tokens to bonds reserve account
 	err := k.SupplyKeeper.SendCoinsFromModuleToModule(
@@ -101,12 +101,12 @@ func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid did.Did,
 
 	// Update bond reserve
 	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount))
+		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount...))
 	return nil
 }
 
 func (k Keeper) WithdrawReserve(ctx sdk.Context, bondDid did.Did,
-	to sdk.AccAddress, amount sdk.Coins) sdk.Error {
+	to sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens from bonds reserve account
 	err := k.SupplyKeeper.SendCoinsFromModuleToAccount(

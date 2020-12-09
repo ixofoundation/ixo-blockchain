@@ -15,9 +15,12 @@ var (
 	RegisterCodec = types.RegisterCodec
 
 	// Auth
-	NewDefaultPubKeyGetter           = types.NewDefaultPubKeyGetter
-	ProcessSig                       = types.ProcessSig
 	NewDefaultAnteHandler            = types.NewDefaultAnteHandler
+	NewSetPubKeyDecorator            = types.NewSetPubKeyDecorator
+	NewDeductFeeDecorator            = types.NewDeductFeeDecorator
+	NewSigGasConsumeDecorator        = types.NewSigGasConsumeDecorator
+	NewSigVerificationDecorator      = types.NewSigVerificationDecorator
+	NewIncrementSequenceDecorator    = types.NewIncrementSequenceDecorator
 	ApproximateFeeForTx              = types.ApproximateFeeForTx
 	GenerateOrBroadcastMsgs          = types.GenerateOrBroadcastMsgs
 	SignAndBroadcastTxFromStdSignMsg = types.SignAndBroadcastTxFromStdSignMsg

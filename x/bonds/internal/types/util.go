@@ -96,7 +96,7 @@ func RoundFee(f sdk.DecCoin) sdk.Coin {
 //noinspection GoNilness
 func RoundReservePrices(ps sdk.DecCoins) (rounded sdk.Coins) {
 	for _, p := range ps {
-		rounded = rounded.Add(sdk.Coins{RoundReservePrice(p)})
+		rounded = rounded.Add(RoundReservePrice(p))
 	}
 	return rounded
 }
@@ -104,7 +104,7 @@ func RoundReservePrices(ps sdk.DecCoins) (rounded sdk.Coins) {
 //noinspection GoNilness
 func RoundReserveReturns(rs sdk.DecCoins) (rounded sdk.Coins) {
 	for _, r := range rs {
-		rounded = rounded.Add(sdk.Coins{RoundReserveReturn(r)})
+		rounded = rounded.Add(RoundReserveReturn(r))
 	}
 	return rounded
 }
@@ -116,7 +116,7 @@ func MultiplyDecCoinByInt(dc sdk.DecCoin, scale sdk.Int) sdk.DecCoin {
 //noinspection GoNilness
 func MultiplyDecCoinsByInt(dcs sdk.DecCoins, scale sdk.Int) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
-		scaled = scaled.Add(sdk.DecCoins{MultiplyDecCoinByInt(dc, scale)})
+		scaled = scaled.Add(MultiplyDecCoinByInt(dc, scale))
 	}
 	return scaled
 }
@@ -128,7 +128,7 @@ func MultiplyDecCoinByDec(dc sdk.DecCoin, scale sdk.Dec) sdk.DecCoin {
 //noinspection GoNilness
 func MultiplyDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
-		scaled = scaled.Add(sdk.DecCoins{MultiplyDecCoinByDec(dc, scale)})
+		scaled = scaled.Add(MultiplyDecCoinByDec(dc, scale))
 	}
 	return scaled
 }
@@ -140,7 +140,7 @@ func DivideDecCoinByDec(dc sdk.DecCoin, scale sdk.Dec) sdk.DecCoin {
 //noinspection GoNilness
 func DivideDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
-		scaled = scaled.Add(sdk.DecCoins{DivideDecCoinByDec(dc, scale)})
+		scaled = scaled.Add(DivideDecCoinByDec(dc, scale))
 	}
 	return scaled
 }
@@ -155,8 +155,7 @@ func AdjustFees(fees sdk.Coins, maxFees sdk.Coins) sdk.Coins {
 		maxFee := maxFees.AmountOf(f.Denom)
 		if f.Amount.GT(maxFee) {
 			extraFee := f.Amount.Sub(maxFee)
-			extraFees = extraFees.Add(sdk.Coins{
-				sdk.NewCoin(f.Denom, extraFee)})
+			extraFees = extraFees.Add(sdk.NewCoin(f.Denom, extraFee))
 		}
 	}
 	return fees.Sub(extraFees)

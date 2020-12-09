@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -39,7 +40,7 @@ func NewMsgSend(toDidOrAddr string, amount sdk.Coins, senderDid did.Did) MsgSend
 
 func (msg MsgSend) Type() string  { return TypeMsgSend }
 func (msg MsgSend) Route() string { return RouterKey }
-func (msg MsgSend) ValidateBasic() sdk.Error {
+func (msg MsgSend) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.FromDid, "FromDid"); !valid {
 		return err
@@ -49,16 +50,16 @@ func (msg MsgSend) ValidateBasic() sdk.Error {
 
 	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.FromDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "from DID is invalid")
 	}
 	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
 	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
-		return sdk.ErrInvalidAddress("recipient is neither a did nor an address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient is neither a did nor an address")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
@@ -102,7 +103,7 @@ func NewMsgOracleTransfer(fromDid did.Did, toDidOrAddr string, amount sdk.Coins,
 
 func (msg MsgOracleTransfer) Type() string  { return TypeMsgOracleTransfer }
 func (msg MsgOracleTransfer) Route() string { return RouterKey }
-func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
+func (msg MsgOracleTransfer) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
@@ -116,18 +117,18 @@ func (msg MsgOracleTransfer) ValidateBasic() sdk.Error {
 
 	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.OracleDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "oracle DID is invalid")
 	} else if !did.IsValidDid(msg.FromDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "from DID is invalid")
 	}
 	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
 	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
-		return sdk.ErrInvalidAddress("recipient is neither a did nor an address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient is neither a did nor an address")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
@@ -169,7 +170,7 @@ func NewMsgOracleMint(toDidOrAddr string, amount sdk.Coins,
 
 func (msg MsgOracleMint) Type() string  { return TypeMsgOracleMint }
 func (msg MsgOracleMint) Route() string { return RouterKey }
-func (msg MsgOracleMint) ValidateBasic() sdk.Error {
+func (msg MsgOracleMint) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
@@ -181,16 +182,16 @@ func (msg MsgOracleMint) ValidateBasic() sdk.Error {
 
 	// Check that DIDs/addresses valid
 	if !did.IsValidDid(msg.OracleDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "oracle DID is invalid")
 	}
 	_, err := sdk.AccAddressFromBech32(msg.ToDidOrAddr)
 	if err != nil && !did.IsValidDid(msg.ToDidOrAddr) {
-		return sdk.ErrInvalidAddress("recipient is neither a did nor an address")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient is neither a did nor an address")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil
@@ -232,7 +233,7 @@ func NewMsgOracleBurn(fromDid did.Did, amount sdk.Coins,
 
 func (msg MsgOracleBurn) Type() string  { return TypeMsgOracleBurn }
 func (msg MsgOracleBurn) Route() string { return RouterKey }
-func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
+func (msg MsgOracleBurn) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.OracleDid, "OracleDid"); !valid {
 		return err
@@ -244,14 +245,14 @@ func (msg MsgOracleBurn) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.OracleDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "oracle did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "oracle DID is invalid")
 	} else if !did.IsValidDid(msg.FromDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "from did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "from DID is invalid")
 	}
 
 	// Check amount (note: validity also checks that coins are positive)
 	if !msg.Amount.IsValid() {
-		return sdk.ErrInvalidCoins("send amount is invalid: " + msg.Amount.String())
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "send amount is invalid: %s", msg.Amount.String())
 	}
 
 	return nil

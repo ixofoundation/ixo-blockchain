@@ -135,9 +135,9 @@ func TestKeeperEffectPayment(t *testing.T) {
 	k.SetPaymentContract(ctx, contract)
 
 	// Set payer balance
-	balance, err2 := sdk.ParseCoins("10uixo,10res")
-	require.Nil(t, err2)
-	err := k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+	balance, err := sdk.ParseCoins("10uixo,10res")
+	require.Nil(t, err)
+	err = k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
 	require.Nil(t, err)
 
 	// At this point, cumulative: /
@@ -154,8 +154,8 @@ func TestKeeperEffectPayment(t *testing.T) {
 
 	// Check balance
 	newBalance := k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 := sdk.ParseCoins("9uixo,7res")
-	require.Nil(t, err2)
+	expected, err := sdk.ParseCoins("9uixo,7res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// At this point, cumulative: 1uixo, 3res
@@ -172,8 +172,8 @@ func TestKeeperEffectPayment(t *testing.T) {
 
 	// Check balance
 	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 = sdk.ParseCoins("8uixo,5res")
-	require.Nil(t, err2)
+	expected, err = sdk.ParseCoins("8uixo,5res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// At this point, cumulative: 2uixo, 5res
@@ -187,8 +187,8 @@ func TestKeeperEffectPayment(t *testing.T) {
 
 	// Check balance
 	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 = sdk.ParseCoins("7uixo,3res")
-	require.Nil(t, err2)
+	expected, err = sdk.ParseCoins("7uixo,3res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// Two more payments will cause an error
@@ -210,9 +210,9 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 	k.SetPaymentContract(ctx, contract)
 
 	// Set payer balance
-	balance, err2 := sdk.ParseCoins("10uixo,10res")
-	require.Nil(t, err2)
-	err := k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+	balance, err := sdk.ParseCoins("10uixo,10res")
+	require.Nil(t, err)
+	err = k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
 	require.Nil(t, err)
 
 	// Set discount
@@ -233,8 +233,8 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 
 	// Check balance
 	newBalance := k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 := sdk.ParseCoins("9uixo,7res")
-	require.Nil(t, err2)
+	expected, err := sdk.ParseCoins("9uixo,7res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// At this point, cumulative: 1uixo, 3res
@@ -251,8 +251,8 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 
 	// Check balance
 	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 = sdk.ParseCoins("8uixo,5res")
-	require.Nil(t, err2)
+	expected, err = sdk.ParseCoins("8uixo,5res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// At this point, cumulative: 2uixo, 5res
@@ -266,8 +266,8 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 
 	// Check balance
 	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 = sdk.ParseCoins("7uixo,3res")
-	require.Nil(t, err2)
+	expected, err = sdk.ParseCoins("7uixo,3res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// Two more payments will cause an error
@@ -295,9 +295,9 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 	k.SetSubscription(ctx, testSubscription)
 
 	// Set payer balance
-	balance, err2 := sdk.ParseCoins("10uixo,10res")
-	require.Nil(t, err2)
-	err := k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+	balance, err := sdk.ParseCoins("10uixo,10res")
+	require.Nil(t, err)
+	err = k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
 	require.Nil(t, err)
 
 	// At this point, cumulative: /
@@ -313,8 +313,8 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 
 	// Check balance
 	newBalance := k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 := sdk.ParseCoins("9uixo,7res")
-	require.Nil(t, err2)
+	expected, err := sdk.ParseCoins("9uixo,7res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// At this point, cumulative: 1uixo, 3res
@@ -330,8 +330,8 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 
 	// Check balance
 	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 = sdk.ParseCoins("8uixo,5res")
-	require.Nil(t, err2)
+	expected, err = sdk.ParseCoins("8uixo,5res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// At this point, cumulative: 2uixo, 5res
@@ -344,8 +344,8 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 
 	// Check balance
 	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
-	expected, err2 = sdk.ParseCoins("7uixo,3res")
-	require.Nil(t, err2)
+	expected, err = sdk.ParseCoins("7uixo,3res")
+	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
 
 	// Two more payments will cause an error

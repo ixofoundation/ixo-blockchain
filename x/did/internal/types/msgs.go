@@ -2,9 +2,11 @@ package types
 
 import (
 	"fmt"
+	"strings"
+
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -40,28 +42,28 @@ func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
-func (msg MsgAddDid) ValidateBasic() sdk.Error {
+func (msg MsgAddDid) ValidateBasic() error {
 	// Check that not empty
 	if strings.TrimSpace(msg.Did) == "" {
-		return ErrorInvalidDid(DefaultCodespace, "did should not be empty")
+		return sdkerrors.Wrap(ErrInvalidDid, "did should not be empty")
 	} else if strings.TrimSpace(msg.PubKey) == "" {
-		return ErrorInvalidPubKey(DefaultCodespace, "pubKey should not be empty")
+		return sdkerrors.Wrap(ErrInvalidPubKey, "pubKey should not be empty")
 	}
 
 	// Check that DID and PubKey valid
 	if !IsValidDid(msg.Did) {
-		return ErrorInvalidDid(DefaultCodespace, "did is invalid")
+		return sdkerrors.Wrap(ErrInvalidDid, "DID is invalid")
 	} else if !IsValidPubKey(msg.PubKey) {
-		return ErrorInvalidPubKey(DefaultCodespace, "pubKey is invalid")
+		return sdkerrors.Wrap(ErrInvalidPubKey, "pubKey is invalid")
 	}
 
 	// Check that DID matches the PubKey
 	unprefixedDid := exported.UnprefixedDid(msg.Did)
 	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
-		return ErrorDidPubKeyMismatch(DefaultCodespace, fmt.Sprintf(
+		return sdkerrors.Wrapf(ErrDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
-			expectedUnprefixedDid, unprefixedDid))
+			expectedUnprefixedDid, unprefixedDid)
 	}
 
 	return nil
@@ -108,17 +110,17 @@ func (msg MsgAddCredential) String() string {
 		string(msg.DidCredential.Claim.Id), msg.DidCredential.CredType, string(msg.DidCredential.Issuer))
 }
 
-func (msg MsgAddCredential) ValidateBasic() sdk.Error {
+func (msg MsgAddCredential) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.DidCredential.Claim.Id) == "" {
-		return ErrorInvalidDid(DefaultCodespace, "claim id should not be empty")
+		return sdkerrors.Wrap(ErrInvalidClaimId, "claim ID should not be empty")
 	} else if strings.TrimSpace(msg.DidCredential.Issuer) == "" {
-		return ErrorInvalidIssuer(DefaultCodespace, "issuer should not be empty")
+		return sdkerrors.Wrap(ErrInvalidIssuer, "issuer should not be empty")
 	}
 
 	// Check that DID valid
 	if !IsValidDid(msg.DidCredential.Issuer) {
-		return ErrorInvalidDid(DefaultCodespace, "issuer did is invalid")
+		return sdkerrors.Wrap(ErrInvalidDid, "issuer DID is invalid")
 	}
 
 	return nil

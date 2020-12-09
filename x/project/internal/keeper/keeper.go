@@ -2,9 +2,12 @@ package keeper
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
@@ -69,13 +72,13 @@ func (k Keeper) ProjectDocExists(ctx sdk.Context, projectDid did.Did) bool {
 	return store.Has(types.GetProjectKey(projectDid))
 }
 
-func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.ProjectDoc, sdk.Error) {
+func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.ProjectDoc, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types.ProjectDoc{}, did.ErrorInvalidDid(types.DefaultCodespace, "Invalid ProjectDid Address")
+		return types.ProjectDoc{}, sdkerrors.Wrap(did.ErrInvalidDid, projectDid)
 	}
 
 	var projectDoc types.ProjectDoc
@@ -84,7 +87,7 @@ func (k Keeper) GetProjectDoc(ctx sdk.Context, projectDid did.Did) (types.Projec
 	return projectDoc, nil
 }
 
-func (k Keeper) ValidateProjectFeesMap(ctx sdk.Context, projectFeesMap types.ProjectFeesMap) sdk.Error {
+func (k Keeper) ValidateProjectFeesMap(ctx sdk.Context, projectFeesMap types.ProjectFeesMap) error {
 	for _, v := range projectFeesMap.Items {
 		_, err := k.paymentsKeeper.GetPaymentTemplate(ctx, v.PaymentTemplateId)
 		if err != nil {
@@ -127,7 +130,7 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid did.Did) types.Account
 }
 
 func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
-	accountId types.InternalAccountID, account auth.Account) {
+	accountId types.InternalAccountID, account exported.Account) {
 	accountMap := k.GetAccountMap(ctx, projectDid)
 	_, found := accountMap[accountId]
 	if found {
@@ -147,11 +150,11 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
-	accountId types.InternalAccountID) (auth.Account, sdk.Error) {
+	accountId types.InternalAccountID) (exported.Account, error) {
 	address := supply.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
-		return nil, sdk.ErrInvalidAddress("Generate account already exists")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
 	}
 
 	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
@@ -166,13 +169,13 @@ func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did
 	store.Set(types.GetWithdrawalsKey(projectDid), bz)
 }
 
-func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfoDoc, sdk.Error) {
+func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfoDoc, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetWithdrawalsKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfoDoc{}, did.ErrorInvalidDid(types.DefaultCodespace, "ProjectDoc doesn't exist")
+		return []types.WithdrawalInfoDoc{}, sdkerrors.Wrap(did.ErrInvalidDid, "project does not exist")
 	} else {
 		var txs []types.WithdrawalInfoDoc
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
@@ -214,13 +217,13 @@ func (k Keeper) ClaimExists(ctx sdk.Context, projectDid did.Did, claimId string)
 	return store.Has(types.GetClaimKey(projectDid, claimId))
 }
 
-func (k Keeper) GetClaim(ctx sdk.Context, projectDid did.Did, claimId string) (types.Claim, sdk.Error) {
+func (k Keeper) GetClaim(ctx sdk.Context, projectDid did.Did, claimId string) (types.Claim, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetClaimKey(projectDid, claimId)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types.Claim{}, did.ErrorInvalidDid(types.DefaultCodespace, "claim not found")
+		return types.Claim{}, fmt.Errorf("claim not found")
 	}
 
 	var claim types.Claim

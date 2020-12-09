@@ -20,11 +20,6 @@ func NewGenesisState(projectDocs []ProjectDoc, accountMaps []GenesisAccountMap,
 }
 
 func ValidateGenesis(data GenesisState) error {
-	err := ValidateParams(data.Params)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 

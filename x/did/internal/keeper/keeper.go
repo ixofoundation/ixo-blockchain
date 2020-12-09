@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
@@ -20,13 +20,12 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
 	}
 }
 
-func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, sdk.Error) {
+func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetDidPrefixKey(did)
 	bz := store.Get(key)
 	if bz == nil {
-		return nil, types.ErrorInvalidDid(
-			types.DefaultCodespace, fmt.Sprintf("DID %s does not exist", did))
+		return nil, sdkerrors.Wrap(types.ErrInvalidDid, did)
 	}
 
 	var didDoc types.BaseDidDoc
@@ -43,10 +42,10 @@ func (k Keeper) MustGetDidDoc(ctx sdk.Context, did exported.Did) exported.DidDoc
 	return didDoc
 }
 
-func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err sdk.Error) {
+func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err error) {
 	existedDidDoc, err := k.GetDidDoc(ctx, did.GetDid())
 	if existedDidDoc != nil {
-		return types.ErrorInvalidDid(types.DefaultCodespace, "Did already exists")
+		return sdkerrors.Wrap(types.ErrInvalidDid, "DID already exists")
 	}
 
 	k.AddDidDoc(ctx, did)
@@ -59,7 +58,7 @@ func (k Keeper) AddDidDoc(ctx sdk.Context, did exported.DidDoc) {
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(did))
 }
 
-func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exported.DidCredential) (err sdk.Error) {
+func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exported.DidCredential) (err error) {
 	existedDid, err := k.GetDidDoc(ctx, did)
 	if err != nil {
 		return err
@@ -70,7 +69,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exp
 
 	for _, data := range credentials {
 		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] && data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
-			return types.ErrorInvalidCredentials(types.DefaultCodespace, "credentials already exist")
+			return sdkerrors.Wrap(types.ErrInvalidCredentials, "credentials already exist")
 		}
 	}
 

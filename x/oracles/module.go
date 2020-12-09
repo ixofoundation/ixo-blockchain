@@ -8,6 +8,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/oracles/client/cli"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -59,7 +60,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	oraclesQueryCmd.AddCommand(client.GetCommands(
+	oraclesQueryCmd.AddCommand(flags.GetCommands(
 		cli.GetOraclesRequestHandler(cdc),
 	)...)
 

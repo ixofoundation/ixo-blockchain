@@ -2,11 +2,11 @@ package keeper
 
 import (
 	"encoding/json"
-	"fmt"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/abci/types"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req types.RequestQuery) (res []byte, err sdk.Error) {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryProjectDoc:
 			return queryProjectDoc(ctx, path[1:], k)
@@ -28,12 +28,12 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case QueryParams:
 			return queryParams(ctx, k)
 		default:
-			return nil, sdk.ErrUnknownRequest("Unknown project query endpoint")
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Unknown project query endpoint")
 		}
 	}
 }
 
-func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 	storedDoc, err := k.GetProjectDoc(ctx, path[0])
 	if err != nil {
 		return nil, err
@@ -41,43 +41,43 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Erro
 
 	res, errRes := codec.MarshalJSONIndent(k.cdc, storedDoc)
 	if errRes != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data: %s", err)
 	}
 
 	return res, nil
 }
 
-func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)
 	if err != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err.Error()))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
 }
 
-func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, sdk.Error) {
+func queryProjectTx(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 	info, err := k.GetProjectWithdrawalTransactions(ctx, path[0])
 	if err != nil {
 		return nil, err
 	}
 
-	res, err2 := codec.MarshalJSONIndent(k.cdc, info)
-	if err2 != nil {
-		return nil, sdk.ErrInternal(fmt.Sprintf("failed to marshal data %s", err2.Error()))
+	res, err := codec.MarshalJSONIndent(k.cdc, info)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
 	return res, nil
 }
 
-func queryParams(ctx sdk.Context, k Keeper) ([]byte, sdk.Error) {
+func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
 	params := k.GetParams(ctx)
 
 	res, err := codec.MarshalJSONIndent(k.cdc, params)
 	if err != nil {
-		return nil, sdk.ErrInternal(sdk.AppendMsgToErr("failed to marshal JSON", err.Error()))
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
 	return res, nil

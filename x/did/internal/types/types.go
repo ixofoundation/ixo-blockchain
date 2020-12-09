@@ -79,7 +79,7 @@ func fromJsonString(jsonIxoDid string) (exported.IxoDid, error) {
 	var did exported.IxoDid
 	err := json.Unmarshal([]byte(jsonIxoDid), &did)
 	if err != nil {
-		err := fmt.Errorf("Could not unmarshal did into struct. Error: %s", err.Error())
+		err := fmt.Errorf("could not unmarshal did into struct due to error: %s", err.Error())
 		return exported.IxoDid{}, err
 	}
 

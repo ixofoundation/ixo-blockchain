@@ -39,7 +39,7 @@ func AddGenesisOracleCmd(ctx *server.Context, cdc *codec.Codec,
 
 			// Check that oracle DID is valid
 			if !did.IsValidDid(oracleDid) {
-				return fmt.Errorf("oracle did is invalid")
+				return fmt.Errorf("oracle DID is invalid")
 			}
 
 			oracle := types.NewOracle(oracleDid, capabilities)

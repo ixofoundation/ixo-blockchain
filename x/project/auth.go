@@ -1,10 +1,13 @@
 package project
 
 import (
-	"fmt"
+	"encoding/hex"
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -13,69 +16,85 @@ import (
 	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
-func GetPubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, res sdk.Result) {
+var (
+	// simulation pubkey to estimate gas consumption
+	simEd25519Pubkey ed25519.PubKeyEd25519
+)
 
-		// Get signer PubKey
+func init() {
+	// This decodes a valid hex string into a ed25519Pubkey for use in transaction simulation
+	bz, _ := hex.DecodeString("035AD6810A47F073553FF30D2FCC7E0D3B1C0B74B61A1AAA2582344037151E14")
+	copy(simEd25519Pubkey[:], bz)
+}
+
+func NewDefaultPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, err error) {
+
+		projectDidDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
+		if err != nil {
+			return pubKey, sdkerrors.Wrap(did.ErrInvalidDid, "project DID not found")
+		}
+
+		var pubKeyRaw ed25519.PubKeyEd25519
+		copy(pubKeyRaw[:], base58.Decode(projectDidDoc.PubKey))
+		return pubKeyRaw, nil
+	}
+}
+
+func NewModulePubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey crypto.PubKey, err error) {
+
+		// MsgCreateProject: pubkey from msg since project does not exist yet
+		// MsgWithdrawFunds: signer is user DID, so get pubkey from did module
+		// Other: signer is project DID, so get pubkey from project module
+
 		var pubKeyEd25519 ed25519.PubKeyEd25519
 		switch msg := msg.(type) {
 		case MsgCreateProject:
 			copy(pubKeyEd25519[:], base58.Decode(msg.GetPubKey()))
 		case MsgWithdrawFunds:
-			signerDid := msg.GetSignerDid()
-			signerDoc, _ := didKeeper.GetDidDoc(ctx, signerDid)
-			if signerDoc == nil {
-				return pubKey, sdk.ErrUnauthorized("signer did not found").Result()
-			}
-			copy(pubKeyEd25519[:], base58.Decode(signerDoc.GetPubKey()))
+			return did.NewDefaultPubKeyGetter(didKeeper)(ctx, msg)
 		default:
-			// For the remaining messages, the project is the signer
-			projectDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
-			if err != nil {
-				return pubKey, sdk.ErrInternal("project did not found").Result()
-			}
-			copy(pubKeyEd25519[:], base58.Decode(projectDoc.PubKey))
+			return NewDefaultPubKeyGetter(keeper)(ctx, msg)
 		}
-		return pubKeyEd25519, sdk.Result{}
+		return pubKeyEd25519, nil
 	}
 }
 
 // Identical to Cosmos DeductFees function, but tokens sent to project account
 func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
-	acc auth.Account, projectAddr sdk.AccAddress, fees sdk.Coins) sdk.Result {
+	acc exported.Account, projectAddr sdk.AccAddress, fees sdk.Coins) error {
 	blockTime := ctx.BlockHeader().Time
 	coins := acc.GetCoins()
 
 	if !fees.IsValid() {
-		return sdk.ErrInsufficientFee(fmt.Sprintf("invalid fee amount: %s", fees)).Result()
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount %s", fees)
 	}
 
 	// verify the account has enough funds to pay for fees
 	_, hasNeg := coins.SafeSub(fees)
 	if hasNeg {
-		return sdk.ErrInsufficientFunds(
-			fmt.Sprintf("insufficient funds to pay for fees; %s < %s", coins, fees),
-		).Result()
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees %s < %s", coins, fees)
 	}
 
 	// Validate the account has enough "spendable" coins as this will cover cases
 	// such as vesting accounts.
 	spendableCoins := acc.SpendableCoins(blockTime)
 	if _, hasNeg := spendableCoins.SafeSub(fees); hasNeg {
-		return sdk.ErrInsufficientFunds(
-			fmt.Sprintf("insufficient funds to pay for fees; %s < %s", spendableCoins, fees),
-		).Result()
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees; %s < %s", spendableCoins, fees)
 	}
 
 	err := bankKeeper.SendCoins(ctx, acc.GetAddress(), projectAddr, fees)
 	if err != nil {
-		return err.Result()
+		return err
 	}
 
-	return sdk.Result{}
+	return nil
 }
 
-func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc auth.Account, genesis bool) []byte {
+func getProjectCreationSignBytes(ctx sdk.Context, tx auth.StdTx, acc exported.Account) []byte {
+	genesis := ctx.BlockHeight() == 0
+	chainID := ctx.ChainID()
 	var accNum uint64
 	if !genesis {
 		// Fixed account number used so that sign bytes do not depend on it
@@ -87,122 +106,71 @@ func getProjectCreationSignBytes(chainID string, tx auth.StdTx, acc auth.Account
 	)
 }
 
-func NewProjectCreationAnteHandler(ak auth.AccountKeeper, sk supply.Keeper,
-	bk bank.Keeper, didKeeper did.Keeper,
-	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
-	return func(
-		ctx sdk.Context, tx sdk.Tx, simulate bool,
-	) (newCtx sdk.Context, res sdk.Result, abort bool) {
+func NewProjectCreationAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper,
+	bk bank.Keeper, didKeeper did.Keeper, pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
 
-		if addr := sk.GetModuleAddress(auth.FeeCollectorName); addr == nil {
-			panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
-		}
+	// Refer to inline documentation in app/app.go for introduction to why we
+	// need a custom ixo AnteHandler, and especially a custom AnteHandler for
+	// project creation. Below, we will discuss the differences between the
+	// custom ixo AnteHandler and the project creation AnteHandler.
+	//
+	// It is clear below that our custom AnteHandler is not completely custom.
+	// It uses various functions from the Cosmos ante module. However, it also
+	// uses customised decorators, disables some decorators,
+	//
+	// In general:
+	// - Sometimes enforces messages to be of type MsgCreateProject, especially
+	//   if the decorator specifically needs to use the project creator DID.
+	//
+	// NewSetUpContextDecorator:
+	// (Note: default ixo AnteHandler uses the Cosmos NewSetUpContextDecorator)
+	// - Uses an infinite gas meter since we do not care about gas limits. This
+	//   reduces the likelihood that a project creation message fails.
+	//
+	// NewMempoolFeeDecorator [[DISABLED]]:
+	// - Disabled since we do not need to check that the provided fees meet a
+	//   minimum threshold for the validator, given that we use a fixed fee.
+	//
+	// NewSetPubKeyDecorator:
+	// - Enforces that the signer's account (the project) does not exist yet.
+	// - Creates the signer's account (in the default ixo AnteHandler, this is
+	//   only done if the signer does not yet exist, such as during MsgAddDid)
+	//
+	// NewDeductFeeDecorator:
+	// - Enforces and charges a fixed MsgCreateProjectTotalFee instead of using
+	//   the fee from the signed tx. This total fee is partly a transaction
+	//   fee and partly funding for the project, so that it can sign future
+	//   transactions (and pay gas fees) independently for a number of txs.
+	// - Deducts any fees from the project creator rather than the message
+	//   signer, since the message signer is actually the project.
+	//
+	// NewSigGasConsumeDecorator [[DISABLED]]:
+	// - Similar to NewSetUpContextDecorator, we do not care about gas limits,
+	//   so we do not need to consume signature-related gas.
+	//
+	// NewSigVerificationDecorator
+	// - Project creation sign bytes are different from standard StdTx sign
+	//   bytes, so one of this decorator's jobs is to construct this different
+	//   sign bytes (difference discussed in next points) so that it is then
+	//   able to verify the sign bytes correctly.
+	// - The account number in project creation sign bytes is 0, because when
+	//   the transaction is being signed, the project's account does not exist
+	//   yet, so we cannot know what the account number will be. As another
+	//   example, when signing a MsgAddDid, we do know the account number
+	//   because we expect the account underlying the DID to have been created.
+	//   Account creation typically happens by someone sending tokens to it.
 
-		// all transactions must be of type auth.StdTx
-		stdTx, ok := tx.(auth.StdTx)
-		if !ok {
-			// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
-			// during runTx.
-			newCtx = auth.SetGasMeter(simulate, ctx, 0)
-			return newCtx, sdk.ErrInternal("tx must be auth.StdTx").Result(), true
-		}
-
-		params := ak.GetParams(ctx)
-
-		// Project creation uses an infinite gas meter
-		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
-
-		if err := tx.ValidateBasic(); err != nil {
-			return newCtx, err.Result(), true
-		}
-
-		// Number of messages in the tx must be 1
-		if len(tx.GetMsgs()) != 1 {
-			return ctx, sdk.ErrInternal("number of messages must be 1").Result(), true
-		}
-
-		newCtx.GasMeter().ConsumeGas(params.TxSizeCostPerByte*sdk.Gas(len(newCtx.TxBytes())), "txSize")
-
-		if res := auth.ValidateMemo(auth.StdTx{Memo: stdTx.Memo}, params); !res.IsOK() {
-			return newCtx, res, true
-		}
-
-		// message must be of type MsgCreateProject
-		msg, ok := stdTx.GetMsgs()[0].(MsgCreateProject)
-		if !ok {
-			return newCtx, sdk.ErrInternal("msg must be MsgCreateProject").Result(), true
-		}
-
-		// Get project pubKey
-		projectPubKey, res := pubKeyGetter(ctx, msg)
-		if !res.IsOK() {
-			return newCtx, res, true
-		}
-
-		// Fetch signer (project itself). Account expected to not exist
-		signerAddr := sdk.AccAddress(projectPubKey.Address())
-		_, res = auth.GetSignerAcc(newCtx, ak, signerAddr)
-		if res.IsOK() {
-			return newCtx, sdk.ErrInternal("expected project account to not exist").Result(), true
-		}
-
-		// confirm that fee is the exact amount expected
-		expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
-			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTotalFee)))
-		if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
-			return newCtx, sdk.ErrInvalidCoins("invalid fee").Result(), true
-		}
-
-		// Calculate transaction fee and project funding
-		transactionFee := sdk.NewCoins(sdk.NewCoin(
-			ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTransactionFee)))
-		projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
-
-		// deduct the fees
-		if !stdTx.Fee.Amount.IsZero() {
-			// fetch fee payer account
-			feePayerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.SenderDid)
-			if err != nil {
-				return newCtx, err.Result(), true
-			}
-			feePayerAcc, res := auth.GetSignerAcc(ctx, ak, feePayerDidDoc.Address())
-			if !res.IsOK() {
-				return newCtx, res, true
-			}
-
-			res = auth.DeductFees(sk, newCtx, feePayerAcc, transactionFee)
-			if !res.IsOK() {
-				return newCtx, res, true
-			}
-
-			projectAddr := sdk.AccAddress(projectPubKey.Address())
-			res = deductProjectFundingFees(bk, newCtx, feePayerAcc, projectAddr, projectFunding)
-			if !res.IsOK() {
-				return newCtx, res, true
-			}
-
-			// reload the account as fees have been deducted
-			feePayerAcc = ak.GetAccount(newCtx, feePayerAcc.GetAddress())
-		}
-
-		// Fetch signer account (project itself); create if it does not exist
-		signerAcc, res := auth.GetSignerAcc(ctx, ak, signerAddr)
-		if !res.IsOK() {
-			signerAcc = ak.NewAccountWithAddress(ctx, signerAddr)
-			ak.SetAccount(ctx, signerAcc)
-		}
-
-		// check signature, return account with incremented nonce
-		ixoSig := stdTx.GetSignatures()[0]
-		isGenesis := ctx.BlockHeight() == 0
-		signBytes := getProjectCreationSignBytes(newCtx.ChainID(), stdTx, signerAcc, isGenesis)
-		signerAcc, res = ixo.ProcessSig(newCtx, signerAcc, ixoSig, signBytes, simulate, params)
-		if !res.IsOK() {
-			return newCtx, res, true
-		}
-
-		ak.SetAccount(newCtx, signerAcc)
-
-		return newCtx, sdk.Result{GasWanted: stdTx.Fee.Gas}, false // continue...
-	}
+	return sdk.ChainAnteDecorators(
+		NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		//ante.NewMempoolFeeDecorator(),
+		ante.NewValidateBasicDecorator(),
+		ante.NewValidateMemoDecorator(ak),
+		ante.NewConsumeGasForTxSizeDecorator(ak),
+		NewSetPubKeyDecorator(ak, pubKeyGetter), // SetPubKeyDecorator must be called before all signature verification decorators
+		ante.NewValidateSigCountDecorator(ak),
+		NewDeductFeeDecorator(ak, supplyKeeper, bk, didKeeper, pubKeyGetter),
+		//ixo.NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
+		NewSigVerificationDecorator(ak, pubKeyGetter),
+		ixo.NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator
+	)
 }

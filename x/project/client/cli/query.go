@@ -65,7 +65,7 @@ func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
 			}
 
 			if len(res) == 0 {
-				return errors.New("Project does not exist")
+				return errors.New("project does not exist")
 			}
 
 			var f interface{}

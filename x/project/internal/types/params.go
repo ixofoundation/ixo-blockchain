@@ -42,41 +42,17 @@ func NewParams(projectMinimumInitialFunding sdk.Coins, ixoDid did.Did,
 
 // default project module parameters
 func DefaultParams() Params {
-	defaultInvalidBlankDid := did.Did("")
+	defaultIxoDid := did.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
 	defaultMinInitFunding := sdk.NewCoins(sdk.NewCoin(
 		ixo.IxoNativeToken, sdk.OneInt()))
 	tenPercentFee := sdk.NewDec(10)
 
 	return Params{
-		IxoDid:                       defaultInvalidBlankDid, // invalid blank
-		ProjectMinimumInitialFunding: defaultMinInitFunding,  // 1uixo
-		OracleFeePercentage:          tenPercentFee,          // 10.0 (10%)
-		NodeFeePercentage:            tenPercentFee,          // 10.0 (10%)
+		IxoDid:                       defaultIxoDid,         // invalid blank
+		ProjectMinimumInitialFunding: defaultMinInitFunding, // 1uixo
+		OracleFeePercentage:          tenPercentFee,         // 10.0 (10%)
+		NodeFeePercentage:            tenPercentFee,         // 10.0 (10%)
 	}
-}
-
-// validate params
-func ValidateParams(params Params) error {
-	if len(params.IxoDid) == 0 {
-		return fmt.Errorf("ixo did cannot be empty")
-	}
-	if params.ProjectMinimumInitialFunding.IsAnyNegative() {
-		return fmt.Errorf("project parameter ProjectMinimumInitialFunding should "+
-			"be positive, is %s ", params.ProjectMinimumInitialFunding.String())
-	}
-	if params.OracleFeePercentage.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("project parameter OracleFeePercentage should be >= 0.0, is %s ", params.OracleFeePercentage.String())
-	}
-	if params.NodeFeePercentage.LT(sdk.ZeroDec()) {
-		return fmt.Errorf("project parameter NodeFeePercentage should be >= 0.0, is %s ", params.NodeFeePercentage.String())
-	}
-	if params.OracleFeePercentage.GT(sdk.NewDec(100)) {
-		return fmt.Errorf("project parameter OracleFeePercentage should be <= 100, is %s ", params.OracleFeePercentage.String())
-	}
-	if params.NodeFeePercentage.GT(sdk.NewDec(100)) {
-		return fmt.Errorf("project parameter NodeFeePercentage should be <= 100, is %s ", params.NodeFeePercentage.String())
-	}
-	return nil
 }
 
 func (p Params) String() string {
@@ -91,12 +67,69 @@ func (p Params) String() string {
 		p.OracleFeePercentage, p.NodeFeePercentage)
 }
 
+func validateIxoDid(i interface{}) error {
+	v, ok := i.(did.Did)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if len(v) == 0 {
+		return fmt.Errorf("ixo did cannot be empty")
+	}
+
+	return nil
+}
+
+func validateProjectMinimumInitialFunding(i interface{}) error {
+	v, ok := i.(sdk.Coins)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.IsAnyNegative() {
+		return fmt.Errorf("invalid project minimum initial "+
+			"funding should be positive, is %s ", v.String())
+	}
+
+	return nil
+}
+
+func validateOracleFeePercentage(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("invalid parameter oracle fee percentage; should be >= 0.0, is %s ", v.String())
+	} else if v.GT(sdk.NewDec(100)) {
+		return fmt.Errorf("invalid parameter oracle fee percentage; should be <= 100, is %s ", v.String())
+	}
+
+	return nil
+}
+
+func validateNodeFeePercentage(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.LT(sdk.ZeroDec()) {
+		return fmt.Errorf("invalid parameter node fee percentage; should be >= 0.0, is %s ", v.String())
+	} else if v.GT(sdk.NewDec(100)) {
+		return fmt.Errorf("invalid parameter node fee percentage; should be <= 100, is %s ", v.String())
+	}
+
+	return nil
+}
+
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		{KeyIxoDid, &p.IxoDid},
-		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding},
-		{KeyOracleFeePercentage, &p.OracleFeePercentage},
-		{KeyNodeFeePercentage, &p.NodeFeePercentage},
+		{KeyIxoDid, &p.IxoDid, validateIxoDid},
+		{KeyProjectMinimumInitialFunding, &p.ProjectMinimumInitialFunding, validateProjectMinimumInitialFunding},
+		{KeyOracleFeePercentage, &p.OracleFeePercentage, validateOracleFeePercentage},
+		{KeyNodeFeePercentage, &p.NodeFeePercentage, validateNodeFeePercentage},
 	}
 }
