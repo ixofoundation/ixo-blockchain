@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
@@ -44,21 +43,44 @@ func init() {
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
 
-func NewDefaultPubKeyGetter(didKeeper DidKeeper) PubKeyGetter {
-	return func(ctx sdk.Context, msg IxoMsg) (pubKey crypto.PubKey, err error) {
-
-		signerDidDoc, err := didKeeper.GetDidDoc(ctx, msg.GetSignerDid())
-		if err != nil {
-			return pubKey, err
-		}
-
-		var pubKeyRaw ed25519tm.PubKeyEd25519
-		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
-		return pubKeyRaw, nil
-	}
-}
-
 func NewDefaultAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
+
+	// Refer to inline documentation in app/app.go for introduction to why we
+	// need a custom ixo AnteHandler. Below, we will discuss the differences
+	// between the default Cosmos AnteHandler and our custom ixo AnteHandler.
+	//
+	// It is clear below that our custom AnteHandler is not completely custom.
+	// It uses various functions from the Cosmos ante module. However, it also
+	// uses customised decorators, without adding completely new decorators.
+	// Below we present the differences in the customised decorators.
+	//
+	// In general:
+	// - Enforces messages to be of type IxoMsg, to be used with pubKeyGetter.
+	// - Does not allow for multiple messages (to be added in the future).
+	// - Does not allow for multiple signatures (to be added in the future).
+	//
+	// NewSetPubKeyDecorator: as opposed to the Cosmos version...
+	// - Gets signer pubkey from pubKeyGetter argument instead of tx signatures.
+	// - Gets signer address from pubkey instead of the messages' GetSigners().
+	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
+	//
+	// NewDeductFeeDecorator:
+	// - Gets fee payer address from the pubkey obtained from pubKeyGetter
+	//   instead of from the first message's GetSigners() function.
+	//
+	// NewSigGasConsumeDecorator:
+	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
+	//   instead of from the messages' GetSigners() function.
+	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
+	//
+	// NewSigVerificationDecorator:
+	// - Gets the only signer address and account from the pubkey obtained from
+	//   pubKeyGetter instead of from the messages' GetSigners() function.
+	//
+	// NewIncrementSequenceDecorator:
+	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
+	//   instead of from the messages' GetSigners() function.
+
 	return sdk.ChainAnteDecorators(
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewMempoolFeeDecorator(),
@@ -266,38 +288,4 @@ func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdS
 	}
 
 	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
-}
-
-func ProcessSig(
-	ctx sdk.Context, acc authexported.Account, sig auth.StdSignature, signBytes []byte, simulate bool, params auth.Params,
-) (updatedAcc authexported.Account, err error) {
-
-	var pubKey crypto.PubKey
-	pubKey = acc.GetPubKey()
-	err = acc.SetPubKey(pubKey)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, err.Error())
-	}
-
-	if simulate {
-		// Simulated txs should not contain a signature and are not required to
-		// contain a pubkey, so we must account for tx size of including a
-		// StdSignature (Amino encoding) and simulate gas consumption
-		// (assuming an ED25519 simulation key).
-		consumeSimSigGas(ctx.GasMeter(), pubKey, sig, params)
-	}
-
-	// Consume signature gas
-	ctx.GasMeter().ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
-
-	// Verify signature
-	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Signature Verification failed")
-	}
-
-	if err := acc.SetSequence(acc.GetSequence() + 1); err != nil {
-		panic(err)
-	}
-
-	return acc, err
 }

@@ -7,6 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
@@ -174,7 +175,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	// all messages must be of type MsgCreateProject
 	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
 	if !ok {
-		return ctx, fmt.Errorf("msg must be MsgCreateProject")
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
 
 	// Get pubKey
@@ -229,9 +230,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		if err != nil {
 			return ctx, err
 		}
-
-		// reload the account as fees have been deducted
-		feePayerAcc = dfd.ak.GetAccount(ctx, feePayerAcc.GetAddress())
 	}
 
 	return next(ctx, tx, simulate)
@@ -264,10 +262,14 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
 	}
 
+	// stdSigs contains the sequence number, account number, and signatures.
+	// When simulating, this would just be a 0-length slice.
+	sigs := sigTx.GetSignatures()
+
 	// message must be of type MsgCreateProject
 	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
 	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.MsgCreateProject")
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
 
 	// Get did pubKey
@@ -277,27 +279,40 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	}
 
 	// Fetch signer (account underlying DID). Account expected to not exist
-	signerAddr := sdk.AccAddress(pubKey.Address())
-	signerAcc, err := ante.GetSignerAcc(ctx, svd.ak, signerAddr)
-	if err != nil {
-		return ctx, err
+	signerAddrs := []sdk.AccAddress{sdk.AccAddress(pubKey.Address())}
+	signerAccs := make([]authexported.Account, len(signerAddrs))
+
+	// check that signer length and signature length are the same
+	if len(sigs) != len(signerAddrs) {
+		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "invalid number of signer;  expected: %d, got %d", len(signerAddrs), len(sigs))
 	}
 
-	// check signature, return account with incremented nonce
-	stdTx, ok := tx.(auth.StdTx)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-	}
-	ixoSig := auth.StdSignature{PubKey: pubKey, Signature: sigTx.GetSignatures()[0]}
-	isGenesis := ctx.BlockHeight() == 0
-	params := svd.ak.GetParams(ctx)
-	signBytes := getProjectCreationSignBytes(ctx.ChainID(), stdTx, signerAcc, isGenesis)
-	signerAcc, err = ixo.ProcessSig(ctx, signerAcc, ixoSig, signBytes, simulate, params)
-	if err != nil {
-		return ctx, err
-	}
+	for i, sig := range sigs {
+		signerAccs[i], err = ante.GetSignerAcc(ctx, svd.ak, signerAddrs[i])
+		if err != nil {
+			return ctx, err
+		}
 
-	svd.ak.SetAccount(ctx, signerAcc)
+		// check signature, return account with incremented nonce
+		stdTx, ok := tx.(auth.StdTx)
+		if !ok {
+			return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
+		}
+
+		// retrieve signBytes of tx
+		signBytes := getProjectCreationSignBytes(ctx, stdTx, signerAccs[i])
+
+		// retrieve pubkey
+		pubKey := signerAccs[i].GetPubKey()
+		if !simulate && pubKey == nil {
+			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "pubkey on account is not set")
+		}
+
+		// verify signature
+		if !simulate && !pubKey.VerifyBytes(signBytes, sig) {
+			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "signature verification failed; verify correct account sequence and chain-id")
+		}
+	}
 
 	return next(ctx, tx, simulate)
 }

@@ -15,9 +15,7 @@ var (
 	RegisterCodec = types.RegisterCodec
 
 	// Auth
-	NewDefaultPubKeyGetter           = types.NewDefaultPubKeyGetter
 	NewDefaultAnteHandler            = types.NewDefaultAnteHandler
-	ProcessSig                       = types.ProcessSig
 	NewSetPubKeyDecorator            = types.NewSetPubKeyDecorator
 	NewDeductFeeDecorator            = types.NewDeductFeeDecorator
 	NewSigGasConsumeDecorator        = types.NewSigGasConsumeDecorator
