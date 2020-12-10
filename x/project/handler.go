@@ -125,8 +125,14 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 				"could not find project's account with address %s", projectAddr)
 		}
 
+		// Two conditions for minimum funding not reached:
+		// - Either minimumFunding has some denom that is not in the projectAcc
+		//   coins, indicating that the projectAcc has zero of this denom
+		// - Or minimumFunding has some denom with a larger value than the projectAcc
+		//   coins, indicating that the projectAcc has less than the minimum
 		minimumFunding := k.GetParams(ctx).ProjectMinimumInitialFunding
-		if minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
+		if !minimumFunding.DenomsSubsetOf(projectAcc.GetCoins()) ||
+			minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"project has not reached minimum funding %s", minimumFunding)
 		}
