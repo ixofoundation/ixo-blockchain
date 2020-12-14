@@ -86,3 +86,7 @@ run_with_some_data:
 run_with_all_data:
 	./scripts/clean_build.sh
 	./scripts/run_with_all_data.sh
+
+run_with_all_data_dev:
+	./scripts/clean_build.sh
+	./scripts/run_with_all_data_dev.sh
