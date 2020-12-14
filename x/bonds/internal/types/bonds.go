@@ -246,7 +246,7 @@ func NewBond(token, name, description string, creatorDid did.Did,
 func (bond Bond) GetNewReserveCoins(amount sdk.Int) (coins sdk.Coins) {
 	coins = sdk.Coins{}
 	for _, r := range bond.ReserveTokens {
-		coins = coins.Add(sdk.Coins{sdk.NewCoin(r, amount)})
+		coins = coins.Add(sdk.NewCoin(r, amount))
 	}
 	return coins
 }
