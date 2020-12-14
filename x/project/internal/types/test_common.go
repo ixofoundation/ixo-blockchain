@@ -7,24 +7,23 @@ import (
 )
 
 var (
-	ProjectDid       = "ProjectDid"
+	ProjectDid    = "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+	UserDid       = "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+	ProjectPubKey = "FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW"
+
 	ValidAddress1, _ = sdk.AccAddressFromHex("0F6A8D732716BA24B213D7C28984FBE1248D009D")
 	ValidAccId1      = InternalAccountID(ValidAddress1.String())
 )
 
 var validProjectData = struct {
-	NodeDid         string
-	RequiredClaims  string
-	ServiceEndpoint string
-	CreatedOn       string
-	CreatedBy       string
-	Fees            ProjectFeesMap `json:"fees" yaml:"fees"`
+	Field1 string
+	Field2 string
+	FieldN string
+	Fees   ProjectFeesMap `json:"fees" yaml:"fees"`
 }{
-	NodeDid:         "nodeDid",
-	RequiredClaims:  "3",
-	ServiceEndpoint: "https://google.co.in",
-	CreatedOn:       "time1",
-	CreatedBy:       "time2",
+	Field1: "field 1 value",
+	Field2: "field 2 value",
+	FieldN: "field N value",
 	Fees: ProjectFeesMap{
 		Context: "",
 		Items:   nil,
@@ -32,34 +31,34 @@ var validProjectData = struct {
 }
 
 var ValidProjectDoc = ProjectDoc{
-	TxHash:     "SampleTxHash",
-	SenderDid:  "SenderDid",
+	TxHash:     "DummyTxHash",
+	SenderDid:  UserDid,
 	ProjectDid: ProjectDid,
-	PubKey:     "PubKey",
-	Status:     "CREATED",
+	PubKey:     ProjectPubKey,
+	Status:     CreatedProject,
 	Data:       MustMarshalJson(validProjectData),
 }
 
 var ValidUpdatedProjectDoc = ProjectDoc{
-	TxHash:     "SampleTxHash",
-	SenderDid:  "SenderDid",
+	TxHash:     "DummyTxHash",
+	SenderDid:  UserDid,
 	ProjectDid: ProjectDid,
-	PubKey:     "PubKey",
-	Status:     "PENDING", // Updated
+	PubKey:     ProjectPubKey,
+	Status:     PendingStatus,
 	Data:       MustMarshalJson(validProjectData),
 }
 
 var ValidCreateProjectMsg = MsgCreateProject{
-	TxHash:     "SampleTxBytes",
-	SenderDid:  "SenderDid",
+	TxHash:     "DummyTxHash",
+	SenderDid:  UserDid,
 	ProjectDid: ProjectDid,
-	PubKey:     "PubKey",
+	PubKey:     ProjectPubKey,
 	Data:       MustMarshalJson(validProjectData),
 }
 
 var ValidWithdrawalInfo = WithdrawalInfoDoc{
-	ProjectDid:   "6iftm1hHdaU6LJGKayRMev",
-	RecipientDid: "6iftm1hHdaU6LJGKayRMev",
+	ProjectDid:   ProjectDid,
+	RecipientDid: UserDid,
 	Amount:       sdk.NewCoin(ixo.IxoNativeToken, sdk.NewInt(10)),
 }
 

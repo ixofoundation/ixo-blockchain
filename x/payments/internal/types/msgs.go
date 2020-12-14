@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -44,7 +45,7 @@ func NewMsgCreatePaymentTemplate(template PaymentTemplate,
 
 func (msg MsgCreatePaymentTemplate) Type() string  { return TypeMsgCreatePaymentTemplate }
 func (msg MsgCreatePaymentTemplate) Route() string { return RouterKey }
-func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
+func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
@@ -52,7 +53,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Validate PaymentTemplate
@@ -106,24 +107,24 @@ func NewMsgCreatePaymentContract(templateId, contractId string,
 
 func (msg MsgCreatePaymentContract) Type() string  { return TypeMsgCreatePaymentContract }
 func (msg MsgCreatePaymentContract) Route() string { return RouterKey }
-func (msg MsgCreatePaymentContract) ValidateBasic() sdk.Error {
+func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
 	} else if msg.Payer.Empty() {
-		return sdk.ErrInvalidAddress("payer address is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "payer address is empty")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Check that IDs valid
 	if !IsValidPaymentTemplateId(msg.PaymentTemplateId) {
-		return ErrInvalidId(DefaultCodespace, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	} else if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	// Validate recipient distribution
@@ -172,7 +173,7 @@ func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.
 
 func (msg MsgCreateSubscription) Type() string  { return TypeMsgCreateSubscription }
 func (msg MsgCreateSubscription) Route() string { return RouterKey }
-func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
+func (msg MsgCreateSubscription) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
@@ -180,12 +181,12 @@ func (msg MsgCreateSubscription) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.CreatorDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "creator did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Check that IDs valid
 	if !IsValidSubscriptionId(msg.SubscriptionId) {
-		return ErrInvalidId(DefaultCodespace, "payment template id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	}
 
 	// Validate Period
@@ -232,7 +233,7 @@ func (msg MsgSetPaymentContractAuthorisation) Type() string {
 	return TypeMsgSetPaymentContractAuthorisation
 }
 func (msg MsgSetPaymentContractAuthorisation) Route() string { return RouterKey }
-func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
+func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.PayerDid, "PayerDid"); !valid {
 		return err
@@ -240,12 +241,13 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.PayerDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "payer did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "payer DID is invalid")
+
 	}
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -287,22 +289,22 @@ func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
 
 func (msg MsgGrantDiscount) Type() string  { return TypeMsgGrantDiscount }
 func (msg MsgGrantDiscount) Route() string { return RouterKey }
-func (msg MsgGrantDiscount) ValidateBasic() sdk.Error {
+func (msg MsgGrantDiscount) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	} else if msg.Recipient.Empty() {
-		return sdk.ErrInvalidAddress("recipient address is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient address is empty")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -342,22 +344,22 @@ func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
 
 func (msg MsgRevokeDiscount) Type() string  { return TypeMsgRevokeDiscount }
 func (msg MsgRevokeDiscount) Route() string { return RouterKey }
-func (msg MsgRevokeDiscount) ValidateBasic() sdk.Error {
+func (msg MsgRevokeDiscount) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
 	} else if msg.Holder.Empty() {
-		return sdk.ErrInvalidAddress("holder address is empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "holder address is empty")
 	}
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil
@@ -394,7 +396,7 @@ func NewMsgEffectPayment(contractId string, creatorDid did.Did) MsgEffectPayment
 
 func (msg MsgEffectPayment) Type() string  { return TypeMsgEffectPayment }
 func (msg MsgEffectPayment) Route() string { return RouterKey }
-func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
+func (msg MsgEffectPayment) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
@@ -402,12 +404,12 @@ func (msg MsgEffectPayment) ValidateBasic() sdk.Error {
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.SenderDid) {
-		return did.ErrorInvalidDid(DefaultCodespace, "sender did is invalid")
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
 	if !IsValidPaymentContractId(msg.PaymentContractId) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	return nil

@@ -64,7 +64,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 		// all messages must be of type ixo.IxoMsg
 		ixoMsg, ok := msg.(ixo.IxoMsg)
 		if !ok {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, sdk.ErrInternal("msg must be ixo.IxoMsg").Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "msg must be ixo.IxoMsg")
 			return
 		}
 		msgs := []sdk.Msg{ixoMsg}
@@ -80,7 +80,7 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			signerAddress := did.VerifyKeyToAddr(req.PubKey)
 			cliCtx = cliCtx.WithFromAddress(signerAddress)
 
-			txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(), cliCtx)
+			txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(cliCtx.Input), cliCtx)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return

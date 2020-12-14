@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"time"
 )
 
@@ -21,18 +22,18 @@ type Subscription struct {
 	Period             Period   `json:"period" yaml:"period"`
 }
 
-func (s Subscription) Validate() sdk.Error {
+func (s Subscription) Validate() error {
 
 	// Validate IDs
 	if !IsValidSubscriptionId(s.Id) {
-		return ErrInvalidId(DefaultCodespace, "subscription id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "subscription ID invalid")
 	} else if !IsValidPaymentContractId(s.PaymentContractId) {
-		return ErrInvalidId(DefaultCodespace, "payment contract id invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	// Verify that periods so far <= max periods
 	if s.PeriodsSoFar.GT(s.MaxPeriods) {
-		return ErrInvalidPeriod(DefaultCodespace, "periods so far is greater than max periods")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "periods so far is greater than max periods")
 	}
 
 	// Validate period
@@ -97,7 +98,7 @@ func (s Subscription) IsComplete() bool {
 
 type Period interface {
 	GetPeriodUnit() string
-	Validate() sdk.Error
+	Validate() error
 	periodStarted(ctx sdk.Context) bool
 	periodEnded(ctx sdk.Context) bool
 	nextPeriod() Period
@@ -127,13 +128,13 @@ func (p BlockPeriod) GetPeriodUnit() string {
 	return BlockPeriodUnit
 }
 
-func (p BlockPeriod) Validate() sdk.Error {
+func (p BlockPeriod) Validate() error {
 
 	// Validate period-related values
 	if p.PeriodStartBlock > p.periodEndBlock() {
-		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "start time is after end time")
 	} else if p.PeriodLength <= 0 {
-		return ErrInvalidPeriod(DefaultCodespace, "period length must be greater than zero")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "period length must be greater than zero")
 	}
 
 	return nil
@@ -176,13 +177,13 @@ func (p TimePeriod) GetPeriodUnit() string {
 	return TimePeriodUnit
 }
 
-func (p TimePeriod) Validate() sdk.Error {
+func (p TimePeriod) Validate() error {
 
 	// Validate period-related values
 	if p.PeriodStartTime.After(p.periodEndTime()) {
-		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "start time is after end time")
 	} else if p.PeriodDurationNs <= 0 {
-		return ErrInvalidPeriod(DefaultCodespace, "period duration cannot be zero")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "period duration cannot be zero")
 	}
 
 	return nil

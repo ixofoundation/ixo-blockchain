@@ -2,6 +2,7 @@ package project
 
 import (
 	"encoding/json"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -60,7 +61,7 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	projectTxCmd.AddCommand(client.PostCommands(
+	projectTxCmd.AddCommand(flags.PostCommands(
 		cli.GetCmdCreateProject(cdc),
 		cli.GetCmdCreateAgent(cdc),
 		cli.GetCmdUpdateProjectStatus(cdc),
@@ -82,7 +83,7 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	projectQueryCmd.AddCommand(client.GetCommands(
+	projectQueryCmd.AddCommand(flags.GetCommands(
 		cli.GetCmdProjectDoc(cdc),
 		cli.GetCmdProjectAccounts(cdc),
 		cli.GetCmdProjectTxs(cdc),

@@ -1,6 +1,9 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
 
 // --------------------------------------------- TestPeriod
 
@@ -28,12 +31,12 @@ func (p TestPeriod) GetPeriodUnit() string {
 	return BlockPeriodUnit
 }
 
-func (p TestPeriod) Validate() sdk.Error {
+func (p TestPeriod) Validate() error {
 	// Validate period-related values
 	if p.PeriodStartBlock > p.periodEndBlock() {
-		return ErrInvalidPeriod(DefaultCodespace, "start time is after end time")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "start time is after end time")
 	} else if p.PeriodLength <= 0 {
-		return ErrInvalidPeriod(DefaultCodespace, "period length must be greater than zero")
+		return sdkerrors.Wrap(ErrInvalidPeriod, "period length must be greater than zero")
 	}
 
 	return nil

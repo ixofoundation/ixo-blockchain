@@ -16,10 +16,11 @@ type (
 	ProjectDataMap             map[string]json.RawMessage
 	ProjectFeesMap             struct {
 		Context string `json:"@context" yaml:"@context"`
-		Items   []struct {
-			Type              FeeType `json:"@type" yaml:"@type"`
-			PaymentTemplateId string  `json:"id" yaml:"id"`
-		}
+		Items   []ProjectFeesMapItem
+	}
+	ProjectFeesMapItem struct {
+		Type              FeeType `json:"@type" yaml:"@type"`
+		PaymentTemplateId string  `json:"id" yaml:"id"`
 	}
 	FeeType string
 )
@@ -36,13 +37,13 @@ const (
 	DisputeSettlement  FeeType = "DisputeSettlement"
 )
 
-func (pfm ProjectFeesMap) GetPayTemplateId(feeType FeeType) (string, sdk.Error) {
+func (pfm ProjectFeesMap) GetPayTemplateId(feeType FeeType) (string, error) {
 	for _, v := range pfm.Items {
 		if v.Type == feeType {
 			return v.PaymentTemplateId, nil
 		}
 	}
-	return "", sdk.ErrInternal(fmt.Sprintf("fee '%s' not found in fees map", feeType))
+	return "", fmt.Errorf("fee '%s' not found in fees map", feeType)
 }
 
 func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
