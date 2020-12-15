@@ -8,15 +8,15 @@ import (
 // https://github.com/BlockScience/cadCAD-Tutorials/tree/master/00-Reference-Mechanisms
 
 // value function for a given state (R,S)
-func Invariant(R, S sdk.Dec, kappa int64) sdk.Dec {
-	return Power(S, uint64(kappa)).Quo(R)
+func Invariant(R, S sdk.Dec, kappa sdk.Dec) sdk.Dec {
+	return Power(S, kappa).Quo(R)
 }
 
 // given a value function (parameterized by kappa)
 // and an invariant coeficient V0
 // return Supply S as a function of reserve R
-func Supply(R sdk.Dec, kappa int64, V0 sdk.Dec) sdk.Dec {
-	result, err := ApproxRoot(V0.Mul(R), uint64(kappa))
+func Supply(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) sdk.Dec {
+	result, err := ApproxRoot(V0.Mul(R), kappa)
 	if err != nil {
 		panic(err)
 	}
@@ -24,23 +24,21 @@ func Supply(R sdk.Dec, kappa int64, V0 sdk.Dec) sdk.Dec {
 }
 
 // This is the reverse of Supply(...) function
-func Reserve(S sdk.Dec, kappa int64, V0 sdk.Dec) sdk.Dec {
-	return Power(S, uint64(kappa)).Quo(V0)
+func Reserve(S sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) sdk.Dec {
+	return Power(S, kappa).Quo(V0)
 }
 
 // given a value function (parameterized by kappa)
 // and an invariant coeficient V0
 // return a spot price P as a function of reserve R
-func SpotPrice(R sdk.Dec, kappa int64, V0 sdk.Dec) sdk.Dec {
-	kappaDec := sdk.NewInt(kappa).ToDec()
-
-	temp1, err := ApproxRoot(V0, uint64(kappa))
+func SpotPrice(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) sdk.Dec {
+	temp1, err := ApproxRoot(V0, kappa)
 	if err != nil {
 		panic(err)
 	}
-	temp2, err := ApproxRoot(Power(R, uint64(kappa)-1), uint64(kappa))
+	temp2, err := ApproxRoot(Power(R, kappa.Sub(sdk.OneDec())), kappa)
 	if err != nil {
 		panic(err)
 	}
-	return (kappaDec.Mul(temp2)).Quo(temp1)
+	return (kappa.Mul(temp2)).Quo(temp1)
 }

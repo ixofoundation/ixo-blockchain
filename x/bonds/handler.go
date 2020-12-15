@@ -115,7 +115,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 		R0 := d0.Mul(sdk.OneDec().Sub(theta))
 		S0 := d0.Quo(p0)
-		V0 := types.Invariant(R0, S0, kappa.TruncateInt64())
+		V0 := types.Invariant(R0, S0, kappa)
 		// TODO: consider calculating these on-the-fly, especially R0 and S0
 
 		msg.FunctionParameters = append(msg.FunctionParameters,
@@ -284,10 +284,10 @@ func handleMsgEditKappa(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEdit
 	d0, _ := paramsMap["d0"]
 	p0, _ := paramsMap["p0"]
 	theta, _ := paramsMap["theta"]
-	kappa := msg.Kappa.ToDec()
+	kappa := msg.Kappa
 	R0, _ := paramsMap["R0"]
 	S0, _ := paramsMap["S0"]
-	V0 := types.Invariant(R.ToDec(), S.ToDec(), kappa.TruncateInt64())
+	V0 := types.Invariant(R.ToDec(), S.ToDec(), kappa)
 
 	// Set new function parameters
 	bond.FunctionParameters = types.FunctionParams{

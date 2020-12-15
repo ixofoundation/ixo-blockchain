@@ -1,9 +1,10 @@
 package types
 
 import (
-	"errors"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"math/big"
+	"math"
+	"strconv"
 	"strings"
 )
 
@@ -12,67 +13,76 @@ import (
 // using Newton's method (where n is positive). The algorithm starts with some guess and
 // computes the sequence of improved guesses until an answer converges to an
 // approximate answer.  It returns `|d|.ApproxRoot() * -1` if input is negative.
-func ApproxRoot(d sdk.Dec, root uint64) (guess sdk.Dec, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			var ok bool
-			err, ok = r.(error)
-			if !ok {
-				err = errors.New("out of bounds")
-			}
-		}
-	}()
+func ApproxRoot(d sdk.Dec, root sdk.Dec) (guess sdk.Dec, err error) {
+	return Power(d, sdk.OneDec().Quo(root)), nil
 
-	if d.IsNegative() {
-		absRoot, err := ApproxRoot(d.MulInt64(-1), root)
-		return absRoot.MulInt64(-1), err
-	}
-
-	if root == 1 || d.IsZero() || d.Equal(sdk.OneDec()) {
-		return d, nil
-	}
-
-	if root == 0 {
-		return sdk.OneDec(), nil
-	}
-
-	temp := big.NewInt(0)
-	temp.SetUint64(root)
-	rootInt := sdk.NewIntFromBigInt(temp)
-	guess, delta := sdk.OneDec(), sdk.OneDec()
-
-	for delta.Abs().GT(sdk.SmallestDec()) {
-		prev := Power(guess, root-1)
-		if prev.IsZero() {
-			prev = sdk.SmallestDec()
-		}
-		delta = d.Quo(prev)
-		delta = delta.Sub(guess)
-		delta = delta.QuoInt(rootInt)
-
-		guess = guess.Add(delta)
-	}
-
-	return guess, nil
+	//defer func() {
+	//	if r := recover(); r != nil {
+	//		var ok bool
+	//		err, ok = r.(error)
+	//		if !ok {
+	//			err = errors.New("out of bounds")
+	//		}
+	//	}
+	//}()
+	//
+	//if d.IsNegative() {
+	//	absRoot, err := ApproxRoot(d.MulInt64(-1), root)
+	//	return absRoot.MulInt64(-1), err
+	//}
+	//
+	//if root == 1 || d.IsZero() || d.Equal(sdk.OneDec()) {
+	//	return d, nil
+	//}
+	//
+	//if root == 0 {
+	//	return sdk.OneDec(), nil
+	//}
+	//
+	//temp := big.NewInt(0)
+	//temp.SetUint64(root)
+	//rootInt := sdk.NewIntFromBigInt(temp)
+	//guess, delta := sdk.OneDec(), sdk.OneDec()
+	//
+	//for delta.Abs().GT(sdk.SmallestDec()) {
+	//	prev := Power(guess, sdk.NewDec(int64(root-1)))
+	//	if prev.IsZero() {
+	//		prev = sdk.SmallestDec()
+	//	}
+	//	delta = d.Quo(prev)
+	//	delta = delta.Sub(guess)
+	//	delta = delta.QuoInt(rootInt)
+	//
+	//	guess = guess.Add(delta)
+	//}
+	//
+	//return guess, nil
 }
 
 // NOTE: copied off of more recent versions of Cosmos SDK
 // Power returns a the result of raising to a positive integer power
-func Power(d sdk.Dec, power uint64) sdk.Dec {
-	if power == 0 {
-		return sdk.OneDec()
-	}
-	tmp := sdk.OneDec()
-	for i := power; i > 1; {
-		if i%2 == 0 {
-			i /= 2
-		} else {
-			tmp = tmp.Mul(d)
-			i = (i - 1) / 2
-		}
-		d = d.Mul(d)
-	}
-	return d.Mul(tmp)
+func Power(d sdk.Dec, power sdk.Dec) sdk.Dec {
+	dFloat64, _ := strconv.ParseFloat(d.String(), 64)
+	pFloat64, _ := strconv.ParseFloat(power.String(), 64)
+
+	ansFloat64 := math.Pow(dFloat64, pFloat64)
+	ansDec, _ := sdk.NewDecFromStr(fmt.Sprintf("%f", ansFloat64))
+	return ansDec
+
+	//if power == 0 {
+	//	return sdk.OneDec()
+	//}
+	//tmp := sdk.OneDec()
+	//for i := power; i > 1; {
+	//	if i%2 == 0 {
+	//		i /= 2
+	//	} else {
+	//		tmp = tmp.Mul(d)
+	//		i = (i - 1) / 2
+	//	}
+	//	d = d.Mul(d)
+	//}
+	//return d.Mul(tmp)
 }
 
 func RoundReservePrice(p sdk.DecCoin) sdk.Coin {

@@ -267,11 +267,11 @@ func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 type MsgEditKappa struct {
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
 	Token     string  `json:"token" yaml:"token"`
-	Kappa     sdk.Int `json:"kappa" yaml:"kappa"`
+	Kappa     sdk.Dec `json:"kappa" yaml:"kappa"`
 	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgEditKappa(token string, kappa sdk.Int, editorDid, bondDid did.Did) MsgEditKappa {
+func NewMsgEditKappa(token string, kappa sdk.Dec, editorDid, bondDid did.Did) MsgEditKappa {
 	return MsgEditKappa{
 		BondDid:   bondDid,
 		Token:     token,

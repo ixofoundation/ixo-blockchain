@@ -269,17 +269,17 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 	switch bond.FunctionType {
 	case PowerFunction:
 		m := args["m"]
-		n64 := args["n"].TruncateInt64() // enforced by powerParameterRestrictions
+		n := args["n"]
 		c := args["c"]
 		result = bond.GetNewReserveDecCoins(
-			Power(x, uint64(n64)).Mul(m).Add(c))
+			Power(x, n).Mul(m).Add(c))
 	case SigmoidFunction:
 		a := args["a"]
 		b := args["b"]
 		c := args["c"]
 		temp1 := x.Sub(b)
 		temp2 := temp1.Mul(temp1).Add(c)
-		temp3, err := ApproxRoot(temp2, 2)
+		temp3, err := ApproxRoot(temp2, sdk.NewDec(2))
 		if err != nil {
 			return nil, err
 		}
@@ -292,7 +292,7 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		case HatchState:
 			result = bond.GetNewReserveDecCoins(args["p0"])
 		case OpenState:
-			kappa := args["kappa"].TruncateInt64()
+			kappa := args["kappa"]
 			res := Reserve(x, kappa, args["V0"])
 			// If reserve < 1, default to zero price to avoid calculation issues
 			if res.LT(sdk.OneDec()) {
@@ -343,9 +343,9 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 	switch bond.FunctionType {
 	case PowerFunction:
 		m := args["m"]
-		n, n64 := args["n"], args["n"].TruncateInt64() // enforced by powerParameterRestrictions
+		n := args["n"]
 		c := args["c"]
-		temp1 := Power(x, uint64(n64+1))
+		temp1 := Power(x, n.Add(sdk.OneDec()))
 		temp2 := temp1.Mul(m).Quo(n.Add(sdk.OneDec()))
 		temp3 := x.Mul(c)
 		result = temp2.Add(temp3)
@@ -355,19 +355,19 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 		c := args["c"]
 		temp1 := x.Sub(b)
 		temp2 := temp1.Mul(temp1).Add(c)
-		temp3, err := ApproxRoot(temp2, 2)
+		temp3, err := ApproxRoot(temp2, sdk.NewDec(2))
 		if err != nil {
 			panic(err) // mathematical problem // TODO: consider returning err
 		}
 		temp5 := a.Mul(temp3.Add(x))
-		temp6, err := ApproxRoot(b.Mul(b).Add(c), 2)
+		temp6, err := ApproxRoot(b.Mul(b).Add(c), sdk.NewDec(2))
 		if err != nil {
 			panic(err) // mathematical problem // TODO: consider returning err
 		}
 		constant := a.Mul(temp6)
 		result = temp5.Sub(constant)
 	case AugmentedFunction:
-		kappa := args["kappa"].TruncateInt64()
+		kappa := args["kappa"]
 		V0 := args["V0"]
 		result = Reserve(x, kappa, V0)
 	case SwapperFunction:
