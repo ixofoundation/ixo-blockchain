@@ -140,11 +140,17 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse outcome payment
-		outcomePayment, ok := sdk.NewIntFromString(req.OutcomePayment)
-		if !ok {
-			err := sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+		var outcomePayment sdk.Int
+		if len(req.OutcomePayment) == 0 {
+			outcomePayment = sdk.ZeroInt()
+		} else {
+			var ok bool
+			outcomePayment, ok = sdk.NewIntFromString(req.OutcomePayment)
+			if !ok {
+				err := sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,

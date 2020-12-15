@@ -128,9 +128,15 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse outcome payment
-			outcomePayment, ok := sdk.NewIntFromString(_outcomePayment)
-			if !ok {
-				return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+			var outcomePayment sdk.Int
+			if len(_outcomePayment) == 0 {
+				outcomePayment = sdk.ZeroInt()
+			} else {
+				var ok bool
+				outcomePayment, ok = sdk.NewIntFromString(_outcomePayment)
+				if !ok {
+					return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+				}
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
@@ -223,9 +229,9 @@ func GetCmdEditKappa(cdc *codec.Codec) *cobra.Command {
 			_editorDid := args[3]
 
 			// Parse kappa
-			kappa, ok := sdk.NewIntFromString(_kappa)
-			if !ok {
-				return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "kappa")
+			kappa, err := sdk.NewDecFromStr(_kappa)
+			if err != nil {
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "kappa")
 			}
 
 			// Parse editor's ixo DID
