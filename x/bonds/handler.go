@@ -12,6 +12,10 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
+var (
+	DefaultAlpha = sdk.NewDecWithPrec(5, 1) // 0.5
+)
+
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -20,8 +24,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgCreateBond(ctx, keeper, msg)
 		case types.MsgEditBond:
 			return handleMsgEditBond(ctx, keeper, msg)
-		case types.MsgEditKappa:
-			return handleMsgEditKappa(ctx, keeper, msg)
+		case types.MsgEditAlpha:
+			return handleMsgEditAlpha(ctx, keeper, msg)
 		case types.MsgBuy:
 			return handleMsgBuy(ctx, keeper, msg)
 		case types.MsgSell:
@@ -116,13 +120,16 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		R0 := d0.Mul(sdk.OneDec().Sub(theta))
 		S0 := d0.Quo(p0)
 		V0 := types.Invariant(R0, S0, kappa)
-		// TODO: consider calculating these on-the-fly, especially R0 and S0
+		I0 := types.InvariantI(msg.OutcomePayment, DefaultAlpha, kappa)
+		alpha := DefaultAlpha
 
 		msg.FunctionParameters = append(msg.FunctionParameters,
 			types.FunctionParams{
 				types.NewFunctionParam("R0", R0),
 				types.NewFunctionParam("S0", S0),
 				types.NewFunctionParam("V0", V0),
+				types.NewFunctionParam("I0", I0),
+				types.NewFunctionParam("alpha", alpha),
 			}...)
 
 		// Set state to Hatch and disable sells. Note that it is never the case
@@ -257,7 +264,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
-func handleMsgEditKappa(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditKappa) (*sdk.Result, error) {
+func handleMsgEditAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditAlpha) (*sdk.Result, error) {
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -279,38 +286,36 @@ func handleMsgEditKappa(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEdit
 	R := bond.CurrentReserve[0].Amount // common reserve balance
 	S := bond.CurrentSupply.Amount
 
-	// Get parameters (with new kappa and recalculated V0)
+	// Recalculate kappa and V0 using new alpha
 	paramsMap := bond.FunctionParameters.AsMap()
-	d0, _ := paramsMap["d0"]
-	p0, _ := paramsMap["p0"]
-	theta, _ := paramsMap["theta"]
-	kappa := msg.Kappa
-	R0, _ := paramsMap["R0"]
-	S0, _ := paramsMap["S0"]
-	V0 := types.Invariant(R.ToDec(), S.ToDec(), kappa)
+	newAlpha := msg.Alpha
+	newKappa := types.Kappa(paramsMap["I0"], bond.OutcomePayment, newAlpha)
+	newV0 := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
 
 	// Set new function parameters
 	bond.FunctionParameters = types.FunctionParams{
-		types.NewFunctionParam("d0", d0),
-		types.NewFunctionParam("p0", p0),
-		types.NewFunctionParam("theta", theta),
-		types.NewFunctionParam("kappa", kappa),
-		types.NewFunctionParam("R0", R0),
-		types.NewFunctionParam("S0", S0),
-		types.NewFunctionParam("V0", V0),
+		types.NewFunctionParam("d0", paramsMap["d0"]),
+		types.NewFunctionParam("p0", paramsMap["p0"]),
+		types.NewFunctionParam("theta", paramsMap["theta"]),
+		types.NewFunctionParam("kappa", newKappa),
+		types.NewFunctionParam("R0", paramsMap["R0"]),
+		types.NewFunctionParam("S0", paramsMap["S0"]),
+		types.NewFunctionParam("V0", newV0),
+		types.NewFunctionParam("I0", paramsMap["I0"]),
+		types.NewFunctionParam("alpha", newAlpha),
 	}
 	keeper.SetBond(ctx, bond.BondDid, bond)
 
 	logger := keeper.Logger(ctx)
-	logger.Info(fmt.Sprintf("bond %s kappa edited by %s",
+	logger.Info(fmt.Sprintf("bond %s alpha edited by %s",
 		msg.BondDid, msg.EditorDid))
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeEditKappa,
+			types.EventTypeEditAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
-			sdk.NewAttribute(types.AttributeKeyKappa, msg.Kappa.String()),
+			sdk.NewAttribute(types.AttributeKeyAlpha, msg.Alpha.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

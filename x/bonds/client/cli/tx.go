@@ -29,7 +29,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	bondsTxCmd.AddCommand(flags.PostCommands(
 		GetCmdCreateBond(cdc),
 		GetCmdEditBond(cdc),
-		GetCmdEditKappa(cdc),
+		GetCmdEditAlpha(cdc),
 		GetCmdBuy(cdc),
 		GetCmdSell(cdc),
 		GetCmdSwap(cdc),
@@ -216,22 +216,22 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdEditKappa(cdc *codec.Codec) *cobra.Command {
+func GetCmdEditAlpha(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "edit-kappa [bond-token] [kappa] [bond-did] [editor-did]",
-		Example: "edit-kappa abc 4 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
-		Short:   "Edit a bond's kappa parameter",
+		Use:     "edit-alpha [bond-token] [alpha] [bond-did] [editor-did]",
+		Example: "edit-alpha abc 0.5 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Short:   "Edit a bond's alpha parameter",
 		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_bondToken := args[0]
-			_kappa := args[1]
+			_alpha := args[1]
 			_bondDid := args[2]
 			_editorDid := args[3]
 
-			// Parse kappa
-			kappa, err := sdk.NewDecFromStr(_kappa)
+			// Parse alpha
+			alpha, err := sdk.NewDecFromStr(_alpha)
 			if err != nil {
-				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "kappa")
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "alpha")
 			}
 
 			// Parse editor's ixo DID
@@ -243,7 +243,7 @@ func GetCmdEditKappa(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgEditKappa(_bondToken, kappa, editorDid.Did, _bondDid)
+			msg := types.NewMsgEditAlpha(_bondToken, alpha, editorDid.Did, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},

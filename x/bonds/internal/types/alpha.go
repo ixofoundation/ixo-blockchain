@@ -2,15 +2,6 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
-// Idea 1: change MsgEditKappa to MsgEditAlpha
-// If alpha < 0.5, kappa = 2
-// If alpha = 0.5, kappa = 3
-// If alpha > 0.5, kappa = 4
-// This way we can have alpha being used in the system and be able to show it.
-
-// Idea 2: calculate alpha from kappa (rather than the other way round)
-// This way we can display an alpha, but this will not match the actual alpha.
-
 func Alpha(S0, S1, R, C sdk.Int) sdk.Dec {
 	// S0/S1: negative and positive attestations, measured in bond tokens
 	// C: outcome payment

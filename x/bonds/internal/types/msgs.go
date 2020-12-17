@@ -11,7 +11,7 @@ import (
 const (
 	TypeMsgCreateBond         = "create_bond"
 	TypeMsgEditBond           = "edit_bond"
-	TypeMsgEditKappa          = "edit_kappa"
+	TypeMsgEditAlpha          = "edit_alpha"
 	TypeMsgBuy                = "buy"
 	TypeMsgSell               = "sell"
 	TypeMsgSwap               = "swap"
@@ -22,7 +22,7 @@ const (
 var (
 	_ ixo.IxoMsg = MsgCreateBond{}
 	_ ixo.IxoMsg = MsgEditBond{}
-	_ ixo.IxoMsg = MsgEditKappa{}
+	_ ixo.IxoMsg = MsgEditAlpha{}
 	_ ixo.IxoMsg = MsgBuy{}
 	_ ixo.IxoMsg = MsgSell{}
 	_ ixo.IxoMsg = MsgSwap{}
@@ -264,23 +264,23 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-type MsgEditKappa struct {
+type MsgEditAlpha struct {
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
 	Token     string  `json:"token" yaml:"token"`
-	Kappa     sdk.Dec `json:"kappa" yaml:"kappa"`
+	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
 	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgEditKappa(token string, kappa sdk.Dec, editorDid, bondDid did.Did) MsgEditKappa {
-	return MsgEditKappa{
+func NewMsgEditAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) MsgEditAlpha {
+	return MsgEditAlpha{
 		BondDid:   bondDid,
 		Token:     token,
-		Kappa:     kappa,
+		Alpha:     alpha,
 		EditorDid: editorDid,
 	}
 }
 
-func (msg MsgEditKappa) ValidateBasic() error {
+func (msg MsgEditAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
@@ -290,9 +290,9 @@ func (msg MsgEditKappa) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}
 
-	// Check that kappa is positive
-	if !msg.Kappa.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "kappa")
+	// Check that 0 <= alpha <= 1
+	if msg.Alpha.LT(sdk.ZeroDec()) || msg.Alpha.GT(sdk.OneDec()) {
+		return sdkerrors.Wrap(ErrInvalidAlpha, "0 <= alpha <= 1")
 	}
 
 	// Check that DIDs valid
@@ -305,18 +305,18 @@ func (msg MsgEditKappa) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgEditKappa) GetSignBytes() []byte {
+func (msg MsgEditAlpha) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgEditKappa) GetSignerDid() did.Did { return msg.EditorDid }
-func (msg MsgEditKappa) GetSigners() []sdk.AccAddress {
+func (msg MsgEditAlpha) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgEditAlpha) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
-func (msg MsgEditKappa) Route() string { return RouterKey }
+func (msg MsgEditAlpha) Route() string { return RouterKey }
 
-func (msg MsgEditKappa) Type() string { return TypeMsgEditKappa }
+func (msg MsgEditAlpha) Type() string { return TypeMsgEditAlpha }
 
 type MsgBuy struct {
 	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`
