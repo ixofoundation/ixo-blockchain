@@ -93,7 +93,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 
 		// Recalculate and re-set I0
 		paramsMap := bond.FunctionParameters.AsMap()
-		newI0 := types.InvariantIAlt(bond.OutcomePayment, paramsMap["alpha"],
+		newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["alpha"],
 			bond.CurrentReserve[0].Amount)
 		bond.FunctionParameters.ReplaceParam("I0", newI0)
 
@@ -137,7 +137,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		R0 := d0.Mul(sdk.OneDec().Sub(theta))
 		S0 := d0.Quo(p0)
 		V0 := types.Invariant(R0, S0, kappa)
-		I0 := types.InvariantI(msg.OutcomePayment, DefaultAlpha, kappa)
+		I0 := types.InvariantI(msg.OutcomePayment, DefaultAlpha, sdk.ZeroInt())
 		alpha := DefaultAlpha
 
 		msg.FunctionParameters = msg.FunctionParameters.AddParams(

@@ -25,19 +25,19 @@ func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {
 	return x.Quo(y)
 }
 
-func InvariantI(C sdk.Int, alpha sdk.Dec, kappa sdk.Dec) sdk.Dec {
+func InvariantI(C sdk.Int, alpha sdk.Dec, R sdk.Int) sdk.Dec {
+	// C: outcome payment
+	// R: current reserve
+
+	return alpha.MulInt(C).Add(sdk.NewDecFromInt(R))
+}
+
+func InvariantIAlt(C sdk.Int, alpha sdk.Dec, kappa sdk.Dec) sdk.Dec {
 	// C: outcome payment
 
 	x := alpha.MulInt(C)
 	y := sdk.OneDec().Sub(sdk.OneDec().Quo(kappa))
 	return x.Quo(y)
-}
-
-func InvariantIAlt(C sdk.Int, alpha sdk.Dec, R sdk.Int) sdk.Dec {
-	// C: outcome payment
-	// R: current reserve
-
-	return alpha.MulInt(C).Add(sdk.NewDecFromInt(R))
 }
 
 //func (bond *Bond) UpdateOnBurnOrMint() {
@@ -52,7 +52,7 @@ func InvariantIAlt(C sdk.Int, alpha sdk.Dec, R sdk.Int) sdk.Dec {
 //	V0, _ := paramsMap["V0"]
 //
 //	commonReserveBalance := bond.CurrentReserve[0].Amount
-//	I := InvariantIAlt(bond.OutcomePayment, alpha, commonReserveBalance)
+//	I := InvariantI(bond.OutcomePayment, alpha, commonReserveBalance)
 //	kappa = Kappa(I, bond.OutcomePayment, alpha)
 //
 //	bond.FunctionParameters = FunctionParams{
@@ -80,7 +80,7 @@ func InvariantIAlt(C sdk.Int, alpha sdk.Dec, R sdk.Int) sdk.Dec {
 //	//V0, _ := paramsMap["V0"]
 //
 //	commonReserveBalance := bond.CurrentReserve[0].Amount
-//	I := InvariantIAlt(bond.OutcomePayment, alpha, commonReserveBalance)
+//	I := InvariantI(bond.OutcomePayment, alpha, commonReserveBalance)
 //	kappa := Kappa(I, bond.OutcomePayment, alpha)
 //	RDec := sdk.NewDecFromInt(commonReserveBalance)
 //	SDec := sdk.NewDecFromInt(bond.CurrentSupply.Amount)
