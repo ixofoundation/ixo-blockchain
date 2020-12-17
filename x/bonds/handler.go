@@ -59,6 +59,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			continue
 		}
 
+		// Store current reserve to check if this has changed later on
+		reserveBeforeOrderProcessing := bond.CurrentReserve
+
 		// Perform orders
 		keeper.PerformOrders(ctx, bond.BondDid)
 
@@ -82,6 +85,20 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		// Save current batch as last batch and reset current batch
 		keeper.SetLastBatch(ctx, bond.BondDid, batch)
 		keeper.SetBatch(ctx, bond.BondDid, types.NewBatch(bond.BondDid, bond.Token, bond.BatchBlocks))
+
+		// If reserve has not changed, no need to recalculate I0; rest of function can be skipped
+		if bond.CurrentReserve.IsEqual(reserveBeforeOrderProcessing) {
+			continue
+		}
+
+		// Recalculate and re-set I0
+		paramsMap := bond.FunctionParameters.AsMap()
+		newI0 := types.InvariantIAlt(bond.OutcomePayment, paramsMap["alpha"],
+			bond.CurrentReserve[0].Amount)
+		bond.FunctionParameters.ReplaceParam("I0", newI0)
+
+		// Save bond
+		keeper.SetBond(ctx, bond.BondDid, bond)
 	}
 	return []abci.ValidatorUpdate{}
 }
@@ -123,14 +140,14 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		I0 := types.InvariantI(msg.OutcomePayment, DefaultAlpha, kappa)
 		alpha := DefaultAlpha
 
-		msg.FunctionParameters = append(msg.FunctionParameters,
+		msg.FunctionParameters = msg.FunctionParameters.AddParams(
 			types.FunctionParams{
 				types.NewFunctionParam("R0", R0),
 				types.NewFunctionParam("S0", S0),
 				types.NewFunctionParam("V0", V0),
 				types.NewFunctionParam("I0", I0),
 				types.NewFunctionParam("alpha", alpha),
-			}...)
+			})
 
 		// Set state to Hatch and disable sells. Note that it is never the case
 		// that we start with OpenState because S0>0, since S0=d0/p0 and d0>0
@@ -293,17 +310,9 @@ func handleMsgEditAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEdit
 	newV0 := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
 
 	// Set new function parameters
-	bond.FunctionParameters = types.FunctionParams{
-		types.NewFunctionParam("d0", paramsMap["d0"]),
-		types.NewFunctionParam("p0", paramsMap["p0"]),
-		types.NewFunctionParam("theta", paramsMap["theta"]),
-		types.NewFunctionParam("kappa", newKappa),
-		types.NewFunctionParam("R0", paramsMap["R0"]),
-		types.NewFunctionParam("S0", paramsMap["S0"]),
-		types.NewFunctionParam("V0", newV0),
-		types.NewFunctionParam("I0", paramsMap["I0"]),
-		types.NewFunctionParam("alpha", newAlpha),
-	}
+	bond.FunctionParameters.ReplaceParam("kappa", newKappa)
+	bond.FunctionParameters.ReplaceParam("V0", newV0)
+	bond.FunctionParameters.ReplaceParam("alpha", newAlpha)
 	keeper.SetBond(ctx, bond.BondDid, bond)
 
 	logger := keeper.Logger(ctx)

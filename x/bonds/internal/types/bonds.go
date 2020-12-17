@@ -63,6 +63,23 @@ func NewFunctionParam(param string, value sdk.Dec) FunctionParam {
 
 type FunctionParams []FunctionParam
 
+func (fps FunctionParams) ReplaceParam(param string, value sdk.Dec) {
+	for i, fp := range fps {
+		if fp.Param == param {
+			fps[i] = NewFunctionParam(param, value)
+			return
+		}
+	}
+}
+
+func (fps FunctionParams) AddParam(param string, value sdk.Dec) FunctionParams {
+	return append(fps, NewFunctionParam(param, value))
+}
+
+func (fps FunctionParams) AddParams(newFps FunctionParams) FunctionParams {
+	return append(fps, newFps...)
+}
+
 func (fps FunctionParams) Validate(functionType string) error {
 	// Come up with list of expected parameters
 	expectedParams, err := GetRequiredParamsForFunctionType(functionType)
