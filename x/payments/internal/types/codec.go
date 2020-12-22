@@ -19,7 +19,7 @@ func RegisterCodec(cdc *codec.Codec) {
 }
 
 // ModuleCdc is the codec for the module
-var ModuleCdc *codec.Codec
+var ModuleCdc *codec.LegacyAmino
 
 func init() {
 	ModuleCdc = codec.New()

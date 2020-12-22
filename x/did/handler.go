@@ -45,7 +45,8 @@ func handleMsgAddDidDoc(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddDid) (
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
 	})
-	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	//return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCredential) (*sdk.Result, error) {
@@ -68,5 +69,6 @@ func handleMsgAddCredential(ctx sdk.Context, k keeper.Keeper, msg types.MsgAddCr
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
 	})
-	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	//return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }

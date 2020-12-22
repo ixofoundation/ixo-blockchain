@@ -29,6 +29,40 @@ type BaseDidDoc struct {
 	Credentials []exported.DidCredential `json:"credentials" yaml:"credentials"`
 }
 
+// TODO Implement ProtoMarshaler interface
+
+func (dd BaseDidDoc) Reset() {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) String() string {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) ProtoMessage() {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) Marshal() ([]byte, error) {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) MarshalTo(data []byte) (n int, err error) {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) Size() int {
+	panic("implement me")
+}
+
+func (dd BaseDidDoc) Unmarshal(data []byte) error {
+	panic("implement me")
+}
+
 func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 	return BaseDidDoc{
 		Did:         did,

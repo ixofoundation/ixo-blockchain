@@ -15,7 +15,8 @@ func TestKeeper(t *testing.T) {
 	_, err := k.GetDidDoc(ctx, types.EmptyDid)
 	require.NotNil(t, err)
 
-	err = k.SetDidDoc(ctx, &types.ValidDidDoc)
+	//err = k.SetDidDoc(ctx, &types.ValidDidDoc)
+	err = k.SetDidDoc(ctx, types.ValidDidDoc)
 	require.Nil(t, err)
 
 	_, err = k.GetDidDoc(ctx, types.ValidDidDoc.GetDid())

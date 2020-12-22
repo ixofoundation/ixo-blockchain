@@ -1,18 +1,19 @@
 package cli
 
 import (
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
 
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
+	//"github.com/cosmos/cosmos-sdk/client/context"
+	//"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
+func GetCmdAddDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 	return &cobra.Command{
 		Use:   "add-did-doc [ixo-did]",
 		Short: "Add a new IxoDid",
@@ -23,8 +24,9 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			//cliCtx := context.NewCLIContext().WithCodec(cdc).
+			//	WithFromAddress(ixoDid.Address())
+			cliCtx := client.GetClientContextFromCmd(cmd)
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
@@ -32,7 +34,7 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
+func GetCmdAddCredential(/*cdc *codec.Codec*/) *cobra.Command {
 	return &cobra.Command{
 		Use:   "add-kyc-credential [did] [signer-did-doc]",
 		Short: "Add a new KYC Credential for a Did by the signer",
@@ -50,8 +52,10 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			//cliCtx := context.NewCLIContext().WithCodec(cdc).
+			//	WithFromAddress(ixoDid.Address())
+
+			cliCtx := client.GetClientContextFromCmd(cmd)
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)

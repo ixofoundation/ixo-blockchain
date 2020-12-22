@@ -3,14 +3,16 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
+	"strings"
+
+	//"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 func GetCmdAddressFromBase58Pubkey() *cobra.Command {
@@ -30,18 +32,24 @@ func GetCmdAddressFromBase58Pubkey() *cobra.Command {
 	}
 }
 
-func GetCmdAddressFromDid(cdc *codec.Codec) *cobra.Command {
+func GetCmdAddressFromDid(/*cdc *codec.Codec*/ legacyQuerierCdc *codec.LegacyAmino) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-address-from-did [did]",
 		Short: "Query address for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			//cliCtx := context.NewCLIContext().WithCodec(legacyQuerierCdc)
+
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			didAddr := args[0]
 			key := exported.Did(didAddr)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryDidDoc, key), nil)
 			if err != nil {
 				return err
@@ -52,7 +60,7 @@ func GetCmdAddressFromDid(cdc *codec.Codec) *cobra.Command {
 			}
 
 			var didDoc types.BaseDidDoc
-			err = cdc.UnmarshalJSON(res, &didDoc)
+			err = legacyQuerierCdc.UnmarshalJSON(res, &didDoc) //cdc.UnmarshalJSON(res, &didDoc)
 			if err != nil {
 				return err
 			}
@@ -90,18 +98,23 @@ func GetCmdIxoDidFromMnemonic() *cobra.Command {
 	}
 }
 
-func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
+func GetCmdDidDoc(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-did-doc [did]",
 		Short: "Query DidDoc for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			//cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			didAddr := args[0]
 			key := exported.Did(didAddr)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := /*cliCtx*/clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryDidDoc, key), nil)
 			if err != nil {
 				return err
@@ -128,14 +141,19 @@ func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
+func GetCmdAllDids(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-all-dids",
 		Short: "Query all DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			//cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := /*cliCtx*/ clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryAllDids, "ALL"), nil)
 			if err != nil {
 				return err
@@ -158,14 +176,19 @@ func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdAllDidDocs(cdc *codec.Codec) *cobra.Command {
+func GetCmdAllDidDocs(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-all-did-docs",
 		Short: "Query all DID documents",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			//cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := /*cliCtx*/ clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryAllDidDocs, "ALL"), nil)
 			if err != nil {
 				return err

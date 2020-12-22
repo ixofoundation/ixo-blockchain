@@ -16,11 +16,11 @@ const (
 	QueryAllDidDocs = "queryAllDidDocs"
 )
 
-func NewQuerier(k Keeper) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryDidDoc:
-			return queryDidDoc(ctx, path[1:], k)
+			return queryDidDoc(ctx, path[1:], k, legacyQuerierCdc)
 		case QueryAllDids:
 			return queryAllDids(ctx, k)
 		case QueryAllDidDocs:
@@ -31,13 +31,14 @@ func NewQuerier(k Keeper) sdk.Querier {
 	}
 }
 
-func queryDidDoc(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
+func queryDidDoc(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	didDoc, err := k.GetDidDoc(ctx, path[0])
 	if err != nil {
 		return nil, err
 	}
 
-	res, errRes := codec.MarshalJSONIndent(k.cdc, didDoc)
+	//res, errRes := codec.MarshalJSONIndent(k.cdc, didDoc)
+	res, errRes := codec.MarshalJSONIndent(legacyQuerierCdc, didDoc)
 	if errRes != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", errRes.Error())
 	}

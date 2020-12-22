@@ -12,7 +12,7 @@ import (
 
 var (
 	// simulation pubkey to estimate gas consumption
-	simEd25519Pubkey ed25519.PubKeyEd25519
+	simEd25519Pubkey ed25519.PubKey //PubKeyEd25519
 )
 
 func init() {
@@ -29,7 +29,7 @@ func NewDefaultPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 			return pubKey, sdkerrors.Wrap(ErrInvalidDid, "signer DID not found")
 		}
 
-		var pubKeyRaw ed25519.PubKeyEd25519
+		var pubKeyRaw ed25519.PubKey
 		copy(pubKeyRaw[:], base58.Decode(signerDidDoc.GetPubKey()))
 		return pubKeyRaw, nil
 	}
@@ -41,7 +41,7 @@ func NewModulePubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 		// MsgAddDid: pubkey from msg since user DID does not exist yet
 		// Other: signer DID exists, so get pubkey from did module
 
-		var pubKeyEd25519 ed25519.PubKeyEd25519
+		var pubKeyEd25519 ed25519.PubKey
 		switch msg := msg.(type) {
 		case MsgAddDid:
 			copy(pubKeyEd25519[:], base58.Decode(msg.PubKey))

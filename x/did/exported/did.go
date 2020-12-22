@@ -117,7 +117,7 @@ func (id IxoDid) String() string {
 }
 
 func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
-	var pubKey ed25519tm.PubKeyEd25519
+	var pubKey ed25519tm.PubKey //ed25519tm.PubKeyEd25519
 	copy(pubKey[:], base58.Decode(verifyKey))
 	return sdk.AccAddress(pubKey.Address())
 }
@@ -180,16 +180,16 @@ func FromSeed(seed [32]byte) (IxoDid, error) {
 }
 
 func (id IxoDid) SignMessage(msg []byte) ([]byte, error) {
-	var privateKey ed25519tm.PrivKeyEd25519
+	var privateKey ed25519tm.PrivKey //ed25519tm.PrivKeyEd25519
 	copy(privateKey[:], base58.Decode(id.Secret.SignKey))
 	copy(privateKey[32:], base58.Decode(id.VerifyKey))
 	return privateKey.Sign(msg)
 }
 
 func (id IxoDid) VerifySignedMessage(msg []byte, sig []byte) bool {
-	var publicKey ed25519tm.PubKeyEd25519
+	var publicKey ed25519tm.PubKey //ed25519tm.PubKeyEd25519
 	copy(publicKey[:], base58.Decode(id.VerifyKey))
-	return publicKey.VerifyBytes(msg, sig)
+	return publicKey.VerifySignature(msg, sig) //publicKey.VerifyBytes(msg, sig)
 }
 
 type Claim struct {

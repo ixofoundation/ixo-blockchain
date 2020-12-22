@@ -2,11 +2,16 @@ package did
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client/flags"
+	//"github.com/cosmos/cosmos-sdk/client/flags"
+	//"github.com/cosmos/cosmos-sdk/x/auth/tx"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
+	//"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
+	//"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/gorilla/mux"
@@ -29,28 +34,49 @@ func (AppModuleBasic) Name() string {
 	return ModuleName
 }
 
-func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	RegisterCodec(cdc)
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	RegisterLegacyAminoCodec(cdc)
 }
 
-func (AppModuleBasic) DefaultGenesis() json.RawMessage {
+func (AppModuleBasic) RegisterInterfaces(codectypes.InterfaceRegistry) {
+}
+
+//func (AppModuleBasic) DefaultGenesis() json.RawMessage {
+//	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
+//}
+
+func (AppModuleBasic) DefaultGenesis(codec.JSONMarshaler) json.RawMessage {
 	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
-func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
+//func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
+//	var data GenesisState
+//	err := ModuleCdc.UnmarshalJSON(bz, &data)
+//	if err != nil {
+//		return err
+//	}
+//	return ValidateGenesis(data)
+//}
+
+func (AppModuleBasic) ValidateGenesis(cd codec.JSONMarshaler, enc client.TxEncodingConfig, bz json.RawMessage) error {
 	var data GenesisState
 	err := ModuleCdc.UnmarshalJSON(bz, &data)
 	if err != nil {
 		return err
 	}
+
 	return ValidateGenesis(data)
 }
 
-func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
+func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
 	rest.RegisterRoutes(ctx, rtr)
 }
 
-func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {
+	//tx.RegisterGRPCGatewayRoutes()
+}
+
+func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	didTxCmd := &cobra.Command{
 		Use:                        ModuleName,
 		Short:                      "did transaction sub commands",
@@ -59,15 +85,18 @@ func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	didTxCmd.AddCommand(flags.PostCommands(
-		cli.GetCmdAddDidDoc(cdc),
-		cli.GetCmdAddCredential(cdc),
-	)...)
+	didTxCmd.AddCommand(cli.GetCmdAddDidDoc())
+	didTxCmd.AddCommand(cli.GetCmdAddCredential())
+
+	//didTxCmd.AddCommand(flags.PostCommands(
+	//	cli.GetCmdAddDidDoc(cdc)),
+	//	cli.GetCmdAddCredential(cdc),
+	//)...)
 
 	return didTxCmd
 }
 
-func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	didQueryCmd := &cobra.Command{
 		Use:                        ModuleName,
 		Short:                      "did query sub commands",
@@ -76,14 +105,22 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	didQueryCmd.AddCommand(flags.GetCommands(
-		cli.GetCmdAddressFromBase58Pubkey(),
-		cli.GetCmdAddressFromDid(cdc),
-		cli.GetCmdIxoDidFromMnemonic(),
-		cli.GetCmdDidDoc(cdc),
-		cli.GetCmdAllDids(cdc),
-		cli.GetCmdAllDidDocs(cdc),
-	)...)
+	// TODO remove LegacyAmino from cli functions below and add them to command
+	didQueryCmd.AddCommand(cli.GetCmdAddressFromBase58Pubkey())
+	//didQueryCmd.AddCommand(cli.GetCmdAddressFromDid())
+	didQueryCmd.AddCommand(cli.GetCmdIxoDidFromMnemonic())
+	//didQueryCmd.AddCommand(cli.GetCmdDidDoc())
+	//didQueryCmd.AddCommand(cli.GetCmdAllDids())
+	//didQueryCmd.AddCommand(cli.GetCmdAllDidDocs())
+
+	//didQueryCmd.AddCommand(flags.GetCommands(
+	//	cli.GetCmdAddressFromBase58Pubkey(),
+	//	cli.GetCmdAddressFromDid(cdc),
+	//	cli.GetCmdIxoDidFromMnemonic(),
+	//	cli.GetCmdDidDoc(cdc),
+	//	cli.GetCmdAllDids(cdc),
+	//	cli.GetCmdAllDidDocs(cdc),
+	//)...)
 
 	return didQueryCmd
 }
@@ -104,28 +141,36 @@ func (AppModule) Name() string {
 	return ModuleName
 }
 
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
+}
 
-func (AppModule) Route() string {
-	return RouterKey
+// TODO Populate
+func (am AppModule) Route() sdk.Route {
+	return sdk.Route{} //RouterKey
 }
 
 func (am AppModule) NewHandler() sdk.Handler { return NewHandler(am.keeper) }
 
 func (AppModule) QuerierRoute() string { return QuerierRoute }
 
-func (am AppModule) NewQuerierHandler() sdk.Querier {
-	return NewQuerier(am.keeper)
+func (am AppModule) LegacyQuerierHandler(cdc *codec.LegacyAmino) sdk.Querier {
+	return NewQuerier(am.keeper, cdc)
 }
 
-func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
-	var genesisState GenesisState
-	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, genesisState)
+func (AppModule) RegisterServices(module.Configurator) {}
+
+//func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
+//	var genesisState GenesisState
+//	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
+//	InitGenesis(ctx, am.keeper, genesisState)
+//	return []abci.ValidatorUpdate{}
+//}
+
+func (AppModule) InitGenesis(sdk.Context, codec.JSONMarshaler, json.RawMessage) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 
-func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
+func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
 	return ModuleCdc.MustMarshalJSON(gs)
 }

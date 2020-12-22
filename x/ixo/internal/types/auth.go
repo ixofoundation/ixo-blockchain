@@ -11,16 +11,22 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	//"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/viper"
 	"github.com/tendermint/ed25519"
 	"github.com/tendermint/tendermint/crypto"
 	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
-	"github.com/tendermint/tendermint/crypto/multisig"
+	//"github.com/tendermint/tendermint/crypto/multisig"
+	"github.com/cosmos/cosmos-sdk/crypto/types/multisig"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 	"os"
 )
@@ -31,7 +37,7 @@ var (
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 
 	// simulation signature values used to estimate gas consumption
-	simEd25519Pubkey ed25519tm.PubKeyEd25519
+	simEd25519Pubkey ed25519tm.PubKey
 	simEd25519Sig    [ed25519.SignatureSize]byte
 )
 
@@ -43,7 +49,10 @@ func init() {
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
 
-func NewDefaultAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
+func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
+	sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter,
+	signModeHandler authsigning.SignModeHandler,) sdk.AnteHandler {
+	//ak auth.AccountKeeper, supplyKeeper supply.Keeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler. Below, we will discuss the differences
@@ -89,9 +98,9 @@ func NewDefaultAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper, si
 		ante.NewConsumeGasForTxSizeDecorator(ak),
 		NewSetPubKeyDecorator(ak, pubKeyGetter), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
-		NewDeductFeeDecorator(ak, supplyKeeper, pubKeyGetter),
+		NewDeductFeeDecorator(ak, bk, pubKeyGetter),
 		NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
-		NewSigVerificationDecorator(ak, pubKeyGetter),
+		NewSigVerificationDecorator(ak, signModeHandler, pubKeyGetter),
 		NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator
 	)
 }
@@ -248,23 +257,53 @@ func MakeSignature(signBytes []byte,
 }
 
 // Identical to DefaultSigVerificationGasConsumer, but with ed25519 allowed
-func IxoSigVerificationGasConsumer(
-	meter sdk.GasMeter, sig []byte, pubkey crypto.PubKey, params auth.Params,
-) error {
-	switch pubkey := pubkey.(type) {
-	case ed25519tm.PubKeyEd25519:
-		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
-		return nil
+//func IxoSigVerificationGasConsumer(
+//	meter sdk.GasMeter, sig []byte, pubkey crypto.PubKey, params authtypes.Params,
+//) error {
+//	switch pubkey := pubkey.(type) {
+//	case ed25519tm.PubKey:
+//		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
+//		return nil
+//
+//	case secp256k1.PubKey:
+//		meter.ConsumeGas(params.SigVerifyCostSecp256k1, "ante verify: secp256k1")
+//		return nil
+//
+//	case multisig.PubKeyMultisigThreshold:
+//		var multisignature multisig.Multisignature
+//		codec.Cdc.MustUnmarshalBinaryBare(sig, &multisignature)
+//
+//		ante.ConsumeMultisignatureVerificationGas(meter, multisignature, pubkey, params)
+//		return nil
+//
+//	default:
+//		return sdkerrors.Wrapf(sdkerrors.ErrInvalidPubKey, "unrecognized public key type: %T", pubkey)
+//	}
+//}
 
-	case secp256k1.PubKeySecp256k1:
+// Identical to DefaultSigVerificationGasConsumer, but with ed25519 allowed
+func IxoSigVerificationGasConsumer(
+	meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params,
+) error {
+	pubkey := sig.PubKey
+	switch pubkey := pubkey.(type) {
+	case *ed25519tm.PubKey:
+		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "ED25519 public keys are unsupported")
+
+	case *secp256k1.PubKey:
 		meter.ConsumeGas(params.SigVerifyCostSecp256k1, "ante verify: secp256k1")
 		return nil
 
-	case multisig.PubKeyMultisigThreshold:
-		var multisignature multisig.Multisignature
-		codec.Cdc.MustUnmarshalBinaryBare(sig, &multisignature)
-
-		ante.ConsumeMultisignatureVerificationGas(meter, multisignature, pubkey, params)
+	case multisig.PubKey:
+		multisignature, ok := sig.Data.(*signing.MultiSignatureData)
+		if !ok {
+			return fmt.Errorf("expected %T, got, %T", &signing.MultiSignatureData{}, sig.Data)
+		}
+		err := ante.ConsumeMultisignatureVerificationGas(meter, multisignature, pubkey, params, sig.Sequence)
+		if err != nil {
+			return err
+		}
 		return nil
 
 	default:

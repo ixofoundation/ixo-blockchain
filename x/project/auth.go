@@ -5,10 +5,15 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/exported"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -18,7 +23,7 @@ import (
 
 var (
 	// simulation pubkey to estimate gas consumption
-	simEd25519Pubkey ed25519.PubKeyEd25519
+	simEd25519Pubkey ed25519.PubKey
 )
 
 func init() {
@@ -35,7 +40,7 @@ func NewDefaultPubKeyGetter(keeper Keeper) ixo.PubKeyGetter {
 			return pubKey, sdkerrors.Wrap(did.ErrInvalidDid, "project DID not found")
 		}
 
-		var pubKeyRaw ed25519.PubKeyEd25519
+		var pubKeyRaw ed25519.PubKey
 		copy(pubKeyRaw[:], base58.Decode(projectDidDoc.PubKey))
 		return pubKeyRaw, nil
 	}
@@ -48,7 +53,7 @@ func NewModulePubKeyGetter(keeper Keeper, didKeeper did.Keeper) ixo.PubKeyGetter
 		// MsgWithdrawFunds: signer is user DID, so get pubkey from did module
 		// Other: signer is project DID, so get pubkey from project module
 
-		var pubKeyEd25519 ed25519.PubKeyEd25519
+		var pubKeyEd25519 ed25519.PubKey
 		switch msg := msg.(type) {
 		case MsgCreateProject:
 			copy(pubKeyEd25519[:], base58.Decode(msg.GetPubKey()))
@@ -92,7 +97,7 @@ func deductProjectFundingFees(bankKeeper bank.Keeper, ctx sdk.Context,
 	return nil
 }
 
-func getProjectCreationSignBytes(ctx sdk.Context, tx auth.StdTx, acc exported.Account) []byte {
+func getProjectCreationSignBytes(ctx sdk.Context, tx legacytx.StdTx, acc types.AccountI) []byte {
 	genesis := ctx.BlockHeight() == 0
 	chainID := ctx.ChainID()
 	var accNum uint64
@@ -101,13 +106,16 @@ func getProjectCreationSignBytes(ctx sdk.Context, tx auth.StdTx, acc exported.Ac
 		accNum = uint64(0)
 	}
 
-	return auth.StdSignBytes(
-		chainID, accNum, acc.GetSequence(), tx.Fee, tx.Msgs, tx.Memo,
+	return legacytx.StdSignBytes(
+		chainID, accNum, acc.GetSequence(), 0, tx.Fee, tx.Msgs, tx.Memo,
 	)
 }
 
-func NewProjectCreationAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Keeper,
-	bk bank.Keeper, didKeeper did.Keeper, pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
+func NewProjectCreationAnteHandler(
+	ak authkeeper.AccountKeeper, bk bankkeeper.Keeper, didKeeper did.Keeper,
+	pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
+	//ak auth.AccountKeeper, supplyKeeper supply.Keeper,
+	//bk bank.Keeper, didKeeper did.Keeper, pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler, and especially a custom AnteHandler for
@@ -168,7 +176,7 @@ func NewProjectCreationAnteHandler(ak auth.AccountKeeper, supplyKeeper supply.Ke
 		ante.NewConsumeGasForTxSizeDecorator(ak),
 		NewSetPubKeyDecorator(ak, pubKeyGetter), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
-		NewDeductFeeDecorator(ak, supplyKeeper, bk, didKeeper, pubKeyGetter),
+		NewDeductFeeDecorator(ak, bk, didKeeper, pubKeyGetter),
 		//ixo.NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
 		NewSigVerificationDecorator(ak, pubKeyGetter),
 		ixo.NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator

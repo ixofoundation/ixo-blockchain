@@ -13,7 +13,8 @@ import (
 func TestQueryDidDocs(t *testing.T) {
 	ctx, k, cdc := CreateTestInput()
 	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
-	err := k.SetDidDoc(ctx, &types.ValidDidDoc)
+	//err := k.SetDidDoc(ctx, &types.ValidDidDoc)
+	err := k.SetDidDoc(ctx, types.ValidDidDoc)
 	require.Nil(t, err)
 
 	query := abci.RequestQuery{
@@ -21,7 +22,7 @@ func TestQueryDidDocs(t *testing.T) {
 		Data: []byte{},
 	}
 
-	querier := NewQuerier(k)
+	querier := NewQuerier(k, cdc)
 	res, err := querier(ctx, []string{"queryDidDoc", types.ValidDidDoc.Did}, query)
 	require.Nil(t, err)
 

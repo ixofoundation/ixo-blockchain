@@ -3,13 +3,15 @@ package payments
 import (
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	"github.com/cosmos/cosmos-sdk/client"
 
 	"github.com/ixofoundation/ixo-blockchain/x/payments/client/cli"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	//"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -32,15 +34,17 @@ func (AppModuleBasic) Name() string {
 	return ModuleName
 }
 
-func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	RegisterCodec(cdc)
 }
 
-func (AppModuleBasic) DefaultGenesis() json.RawMessage {
+func (AppModuleBasic) RegisterInterfaces(codectypes.InterfaceRegistry) {}
+
+func (AppModuleBasic) DefaultGenesis(marshaler codec.JSONMarshaler) json.RawMessage {
 	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 }
 
-func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(m codec.JSONMarshaler, enc client.TxEncodingConfig, bz json.RawMessage) error {
 	var data GenesisState
 	err := ModuleCdc.UnmarshalJSON(bz, &data)
 	if err != nil {
@@ -49,48 +53,50 @@ func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 	return ValidateGenesis(data)
 }
 
-func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
+func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
 	rest.RegisterRoutes(ctx, rtr)
 }
 
-func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
-	paymentsTxCmd := &cobra.Command{
-		Use:                        ModuleName,
-		Short:                      "payments transaction sub commands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
 
-	paymentsTxCmd.AddCommand(flags.PostCommands(
-		cli.GetCmdCreatePaymentTemplate(cdc),
-		cli.GetCmdCreatePaymentContract(cdc),
-		cli.GetCmdCreateSubscription(cdc),
-		cli.GetCmdSetPaymentContractAuthorisation(cdc),
-		cli.GetCmdGrantPaymentDiscount(cdc),
-		cli.GetCmdRevokePaymentDiscount(cdc),
-		cli.GetCmdEffectPayment(cdc),
-	)...)
-
-	return paymentsTxCmd
+func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
+	//paymentsTxCmd := &cobra.Command{
+	//	Use:                        ModuleName,
+	//	Short:                      "payments transaction sub commands",
+	//	DisableFlagParsing:         true,
+	//	SuggestionsMinimumDistance: 2,
+	//	RunE:                       client.ValidateCmd,
+	//}
+	//
+	//paymentsTxCmd.AddCommand(flags.PostCommands(
+	//	cli.GetCmdCreatePaymentTemplate(cdc),
+	//	cli.GetCmdCreatePaymentContract(cdc),
+	//	cli.GetCmdCreateSubscription(cdc),
+	//	cli.GetCmdSetPaymentContractAuthorisation(cdc),
+	//	cli.GetCmdGrantPaymentDiscount(cdc),
+	//	cli.GetCmdRevokePaymentDiscount(cdc),
+	//	cli.GetCmdEffectPayment(cdc),
+	//)...)
+	//
+	//return paymentsTxCmd
 }
 
-func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	paymentsQueryCmd := &cobra.Command{
-		Use:                        ModuleName,
-		Short:                      "payments query sub commands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
-
-	paymentsQueryCmd.AddCommand(flags.GetCommands(
-		cli.GetCmdPaymentTemplate(cdc),
-		cli.GetCmdPaymentContract(cdc),
-		cli.GetCmdSubscription(cdc),
-	)...)
-
-	return paymentsQueryCmd
+func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
+	//paymentsQueryCmd := &cobra.Command{
+	//	Use:                        ModuleName,
+	//	Short:                      "payments query sub commands",
+	//	DisableFlagParsing:         true,
+	//	SuggestionsMinimumDistance: 2,
+	//	RunE:                       client.ValidateCmd,
+	//}
+	//
+	//paymentsQueryCmd.AddCommand(flags.GetCommands(
+	//	cli.GetCmdPaymentTemplate(cdc),
+	//	cli.GetCmdPaymentContract(cdc),
+	//	cli.GetCmdSubscription(cdc),
+	//)...)
+	//
+	//return paymentsQueryCmd
 }
 
 type AppModule struct {
@@ -114,8 +120,9 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
 }
 
-func (AppModule) Route() string {
-	return RouterKey
+// TODO Populate
+func (am AppModule) Route() sdk.Route {
+	return sdk.Route{} //RouterKey
 }
 
 func (am AppModule) NewHandler() sdk.Handler {
@@ -126,14 +133,16 @@ func (AppModule) QuerierRoute() string {
 	return QuerierRoute
 }
 
-func (am AppModule) NewQuerierHandler() sdk.Querier {
+func (am AppModule) LegacyQuerierHandler(*codec.LegacyAmino) sdk.Querier {
 	return NewQuerier(am.keeper)
 }
 
+func (am AppModule) RegisterServices(module.Configurator) {}
+
 func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
-	var genesisState GenesisState
-	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, genesisState)
+	//var genesisState GenesisState
+	//ModuleCdc.MustUnmarshalJSON(data, &genesisState)
+	//InitGenesis(ctx, am.keeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 

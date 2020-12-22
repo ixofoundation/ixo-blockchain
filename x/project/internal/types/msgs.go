@@ -122,6 +122,11 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
+func (msg MsgCreateProject) Reset() {}
+
+func (msg MsgCreateProject) ProtoMessage() {}
+
+
 type MsgUpdateProjectStatus struct {
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
 	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`

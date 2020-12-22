@@ -5,7 +5,19 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
-func RegisterCodec(cdc *codec.Codec) {
+/*func RegisterCodec(cdc *codec.Codec) {
+	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
+	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
+
+	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
+
+	// TODO: https://github.com/ixofoundation/ixo-blockchain/issues/76
+	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
+	//cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
+	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
+}*/
+
+func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
 	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
 
@@ -18,10 +30,20 @@ func RegisterCodec(cdc *codec.Codec) {
 }
 
 // ModuleCdc is the codec for the module
-var ModuleCdc *codec.Codec
+//var ModuleCdc *codec.Codec
+
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
+
+//func init() {
+//	ModuleCdc = codec.New()
+//	RegisterCodec(ModuleCdc)
+//	ModuleCdc.Seal()
+//}
 
 func init() {
-	ModuleCdc = codec.New()
-	RegisterCodec(ModuleCdc)
+	RegisterLegacyAminoCodec(amino)
 	ModuleCdc.Seal()
 }

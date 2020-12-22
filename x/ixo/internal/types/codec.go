@@ -2,18 +2,19 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	crypto "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
 
 // module wide codec
-var ModuleCdc *codec.Codec
+var ModuleCdc *codec.LegacyAmino
 
-func RegisterCodec(cdc *codec.Codec) {
+func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*IxoMsg)(nil), nil)
 }
 
 func init() {
-	ModuleCdc = codec.New()
+	ModuleCdc = codec.NewLegacyAmino()
 	RegisterCodec(ModuleCdc)
-	codec.RegisterCrypto(ModuleCdc)
+	crypto.RegisterCrypto(ModuleCdc)
 	ModuleCdc.Seal()
 }

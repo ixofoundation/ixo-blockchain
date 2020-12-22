@@ -77,6 +77,16 @@ func (msg MsgAddDid) String() string {
 	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", msg.Did, msg.PubKey)
 }
 
+func (msg MsgAddDid) Reset() {
+	// TODO Implement Reset() of Msg interface
+	panic("implement me")
+}
+
+func (msg MsgAddDid) ProtoMessage() {
+	// TODO Implement ProtoMessage() of Msg interface
+	panic("implement me")
+}
+
 type MsgAddCredential struct {
 	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
 }
@@ -128,4 +138,14 @@ func (msg MsgAddCredential) ValidateBasic() error {
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgAddCredential) Reset() {
+	// TODO Implement Reset() of Msg interface
+	panic("implement me")
+}
+
+func (msg MsgAddCredential) ProtoMessage() {
+	// TODO Implement ProtoMessage() of Msg interface
+	panic("implement me")
 }

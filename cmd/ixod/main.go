@@ -1,9 +1,20 @@
 package main
 
 import (
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/debug"
+	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"os"
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/simapp/simd/cmd"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"io"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -18,6 +29,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	tmcli "github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/ixofoundation/ixo-blockchain/app"
@@ -66,6 +78,73 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func main() {
+	rootCmd, _ := cmd.NewRootCmd()
+	if err := cmd.Execute(rootCmd); err != nil {
+		switch e := err.(type) {
+		case server.ErrorCode:
+			os.Exit(e.Code)
+		default:
+			os.Exit(1)
+		}
+	}
+}
+
+func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+	encodingConfig := simapp.MakeTestEncodingConfig()
+	initClientCtx := client.Context{}.
+		WithJSONMarshaler(encodingConfig.Marshaler).
+		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
+		WithTxConfig(encodingConfig.TxConfig).
+		WithLegacyAmino(encodingConfig.Amino).
+		WithInput(os.Stdin).
+		WithAccountRetriever(types.AccountRetriever{}).
+		WithBroadcastMode(flags.BroadcastBlock).
+		WithHomeDir(simapp.DefaultNodeHome)
+
+	rootCmd := &cobra.Command{
+		Use:   "ixod",
+		Short: "ixo Daemon (server)",
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
+				return err
+			}
+
+			return server.InterceptConfigsPreRunHandler(cmd)
+		},
+	}
+
+	initRootCmd(rootCmd, encodingConfig)
+
+	return rootCmd, encodingConfig
+}
+
+func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+	authclient.Codec = encodingConfig.Marshaler
+
+	rootCmd.AddCommand(
+		genutilcli.InitCmd(simapp.ModuleBasics, simapp.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, simapp.DefaultNodeHome),
+		genutilcli.MigrateGenesisCmd(),
+		genutilcli.GenTxCmd(simapp.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, simapp.DefaultNodeHome),
+		genutilcli.ValidateGenesisCmd(simapp.ModuleBasics, encodingConfig.TxConfig),
+		AddGenesisAccountCmd(simapp.DefaultNodeHome),
+		tmcli.NewCompletionCmd(rootCmd, true),
+		testnetCmd(simapp.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		debug.Cmd(),
+	)
+
+	server.AddCommands(rootCmd, simapp.DefaultNodeHome, newApp, createSimappAndExport, addModuleInitFlags)
+
+	// add keybase, auxiliary RPC, query, and tx child commands
+	rootCmd.AddCommand(
+		rpc.StatusCommand(),
+		queryCommand(),
+		txCommand(),
+		keys.Commands(simapp.DefaultNodeHome),
+	)
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {

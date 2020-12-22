@@ -6,14 +6,15 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	//"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/gorilla/mux"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerQueryRoutes(cliCtx /*context*/client.Context, r *mux.Router) {
 	// The .* is necessary so that a slash in the did gets included as part of the did
 	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandler(cliCtx)).Methods("GET")
 	r.HandleFunc("/pubKeyToAddr/{pubKey}", queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx)).Methods("GET")
@@ -22,7 +23,7 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandler(cliCtx)).Methods("GET")
 }
 
-func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -40,7 +41,7 @@ func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx context.CLIContext
 	}
 }
 
-func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryAddressFromDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -61,14 +62,15 @@ func queryAddressFromDidRequestHandler(cliCtx context.CLIContext) http.HandlerFu
 		}
 
 		var didDoc types.BaseDidDoc
-		cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
+		//cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
+		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
 		addressFromDid := didDoc.Address()
 
 		rest.PostProcessResponse(w, cliCtx, addressFromDid)
 	}
 }
 
-func queryDidDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryDidDocRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -89,13 +91,15 @@ func queryDidDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var didDoc types.BaseDidDoc
-		cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
+		//cliCtx.Codec.MustUnmarshalJSON(res, &didDoc)
+		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
+
 
 		rest.PostProcessResponse(w, cliCtx, didDoc)
 	}
 }
 
-func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryAllDidsRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -113,13 +117,14 @@ func queryAllDidsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var dids []exported.Did
-		cliCtx.Codec.MustUnmarshalJSON(res, &dids)
+		//cliCtx.Codec.MustUnmarshalJSON(res, &dids)
+		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &dids)
 
 		rest.PostProcessResponse(w, cliCtx, dids)
 	}
 }
 
-func queryAllDidDocsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryAllDidDocsRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -138,7 +143,8 @@ func queryAllDidDocsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var didDocs []types.BaseDidDoc
-		cliCtx.Codec.MustUnmarshalJSON(res, &didDocs)
+		//cliCtx.Codec.MustUnmarshalJSON(res, &didDocs)
+		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &didDocs)
 
 		rest.PostProcessResponse(w, cliCtx, didDocs)
 	}
