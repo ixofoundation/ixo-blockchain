@@ -117,7 +117,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		return nil, types.ErrBondTokenCannotBeStakingToken
 	}
 
-	// Check that bond token not reserved TODOTODOTODO
+	// Check that bond token not reserved
 	if keeper.ReservedBondToken(ctx, msg.Token) {
 		return nil, types.ErrReservedBondToken
 	}
