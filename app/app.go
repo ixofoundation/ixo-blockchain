@@ -1,10 +1,16 @@
 package app
 
 import (
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/server/api"
+	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/ixofoundation/ixo-blockchain/app/params"
+	"github.com/gogo/protobuf/grpc"
+
 	//"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -19,7 +25,8 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
-	"github.com/ixofoundation/ixo-blockchain/x/oracles"
+	//TODO uncomment
+	//"github.com/ixofoundation/ixo-blockchain/x/oracles"
 	"github.com/spf13/cast"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"io"
@@ -52,7 +59,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	minttypes"github.com/cosmos/cosmos-sdk/x/mint/types"
 	mintkeeper"github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	sdkparams "github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper"github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
@@ -62,7 +69,7 @@ import (
 	stakingtypes"github.com/cosmos/cosmos-sdk/x/staking/types"
 	stakingkeeper"github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+	//simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	//"github.com/cosmos/cosmos-sdk/x/supply"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -80,12 +87,13 @@ import (
 	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
-	"github.com/ixofoundation/ixo-blockchain/x/bonds"
+	//TODO uncomment
+	//"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
+	//"github.com/ixofoundation/ixo-blockchain/x/payments"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
-	"github.com/ixofoundation/ixo-blockchain/x/treasury"
+	//"github.com/ixofoundation/ixo-blockchain/x/treasury"
 )
 
 const (
@@ -122,7 +130,7 @@ var (
 		gov.NewAppModuleBasic(
 			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
 		),
-		params.AppModuleBasic{},
+		sdkparams.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
@@ -132,7 +140,7 @@ var (
 		vesting.AppModuleBasic{},
 
 		// Custom ixo modules
-		did.AppModuleBasic{},
+		did.AppModuleBasic{}, //TODO uncomment rest of ixo modules
 		//payments.AppModuleBasic{},
 		//project.AppModuleBasic{},
 		//bonds.AppModuleBasic{},
@@ -152,11 +160,12 @@ var (
 		ibctransfertypes.ModuleName: 	{authtypes.Minter, authtypes.Burner},
 
 		// Custom ixo module accounts
-		bonds.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
-		bonds.BatchesIntermediaryAccount: nil,
-		bonds.BondsReserveAccount:        nil,
-		treasury.ModuleName:              {authtypes.Minter, authtypes.Burner},
-		payments.PayRemainderPool:        nil,
+		//TODO uncomment ixo modules
+		//bonds.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
+		//bonds.BatchesIntermediaryAccount: nil,
+		//bonds.BondsReserveAccount:        nil,
+		//treasury.ModuleName:              {authtypes.Minter, authtypes.Burner},
+		//payments.PayRemainderPool:        nil,
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -227,11 +236,12 @@ type ixoApp struct {
 
 	// Custom ixo keepers
 	didKeeper      did.Keeper
-	paymentsKeeper payments.Keeper
-	projectKeeper  project.Keeper
-	bondsKeeper    bonds.Keeper
-	oraclesKeeper  oracles.Keeper
-	treasuryKeeper treasury.Keeper
+	//TODO uncomment rest of ixo modules
+	//paymentsKeeper payments.Keeper
+	//projectKeeper  project.Keeper
+	//bondsKeeper    bonds.Keeper
+	//oraclesKeeper  oracles.Keeper
+	//treasuryKeeper treasury.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -240,10 +250,27 @@ type ixoApp struct {
 	sm *module.SimulationManager
 }
 
+// TODO Implement functions for servertypes.Application interface
+func (app *ixoApp) RegisterAPIRoutes(server *api.Server, config srvconfig.APIConfig) {
+	panic("implement me")
+}
+
+//func (app *ixoApp) RegisterGRPCServer(g interface{}) {
+//	panic("implement me")
+//}
+
+func (app *ixoApp) RegisterGRPCServer(grpc.Server) {
+	panic("implement me")
+}
+
+func (app *ixoApp) RegisterTxService(clientCtx client.Context) {
+	panic("implement me")
+}
+
 // NewIxoApp returns a reference to an initialized IxoApp.
 func NewIxoApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig simappparams.EncodingConfig,
+	homePath string, invCheckPeriod uint, encodingConfig params.EncodingConfig,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*bam.BaseApp),
 ) *ixoApp {
 
@@ -258,10 +285,16 @@ func NewIxoApp(
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
+		// Standard Cosmos store keys
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+
+		// Custom ixo store keys
+		// TODO uncomment ixo modules store keys
+		did.StoreKey, /*payments.StoreKey, project.StoreKey, bonds.StoreKey,
+		treasury.StoreKey, oracles.StoreKey*/
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -331,7 +364,7 @@ func NewIxoApp(
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper))
@@ -371,7 +404,7 @@ func NewIxoApp(
 	// we prefer to be more strict in what arguments the modules expect.
 	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
-	// add keepers (for custom ixo modules)
+	//TODO replace below keepers (for custom ixo modules)
 	// app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
 	//app.paymentsKeeper = payments.NewKeeper(app.cdc, keys[payments.StoreKey],
 	//	app.BankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
@@ -384,7 +417,7 @@ func NewIxoApp(
 	//	app.oraclesKeeper, app.SupplyKeeper, app.didKeeper)
 
 	app.didKeeper = did.NewKeeper(*app.legacyAmino, keys[did.StoreKey]) // not what Cosmos uses because keeper is different
-	// TODO add the rest
+	// TODO add the rest of ixo modules keeper
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -394,7 +427,7 @@ func NewIxoApp(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
 			encodingConfig.TxConfig,
 		),
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+		auth.NewAppModule(appCodec, app.AccountKeeper, nil), //authsims.RandomGenesisAccounts),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
@@ -407,11 +440,11 @@ func NewIxoApp(
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
-		params.NewAppModule(app.ParamsKeeper),
+		sdkparams.NewAppModule(app.ParamsKeeper),
 		transferModule,
 
 		// Custom ixo AppModules
-		did.NewAppModule(app.didKeeper),
+		did.NewAppModule(app.didKeeper), //TODO uncomment rest of ixo modules
 		//payments.NewAppModule(app.paymentsKeeper, app.BankKeeper),
 		//project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.BankKeeper),
 		//bonds.NewAppModule(app.bondsKeeper, app.AccountKeeper),
@@ -428,13 +461,15 @@ func NewIxoApp(
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 		// Custom ixo modules
-		bonds.ModuleName,
+		//TODO uncomment rest of ixo modules
+		//bonds.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
 		// Custom ixo modules
-		bonds.ModuleName, payments.ModuleName,
+		//TODO uncomment rest of ixo modules
+		//bonds.ModuleName, payments.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -448,8 +483,9 @@ func NewIxoApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		// Custom ixo modules
-		did.ModuleName, project.ModuleName, payments.ModuleName,
-		bonds.ModuleName, treasury.ModuleName, oracles.ModuleName,
+		//TODO uncomment rest of ixo modules
+		did.ModuleName, //project.ModuleName, payments.ModuleName,
+		//bonds.ModuleName, treasury.ModuleName, oracles.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -472,7 +508,7 @@ func NewIxoApp(
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		params.NewAppModule(app.ParamsKeeper),
+		sdkparams.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
@@ -548,12 +584,6 @@ func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 // LoadHeight loads a particular height
 func (app *ixoApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height) //, app.keys[bam.MainStoreKey])
-}
-
-func (app *ixoApp) ExportAppStateAndValidators(
-	forZeroHeight bool, jailAllowedAddrs []string,
-) (servertypes.ExportedApp, error) {
-	return servertypes.ExportedApp{}, nil //TODO implement me (look at ExportAppStateAndValidators in export.go)
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
@@ -632,7 +662,7 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func NewIxoAnteHandler(app *ixoApp, encodingConfig simappparams.EncodingConfig) sdk.AnteHandler { //TODO encodingConfig
+func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler { //TODO encodingConfig
 
 	// The AnteHandler needs to get the signer's pubkey to verify signatures,
 	// charge gas fees (to the corresponding address), and for other purposes.
@@ -662,23 +692,27 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig simappparams.EncodingConfig) 
 	// of a project DID). The project module PubKeyGetter deals with this
 	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
 
-	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.didKeeper)
+	//TODO uncomment
+	//defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.NewModulePubKeyGetter(app.didKeeper)
-	projectPubKeyGetter := project.NewModulePubKeyGetter(app.projectKeeper, app.didKeeper)
+	//TODO uncomment ixo module
+	//projectPubKeyGetter := project.NewModulePubKeyGetter(app.projectKeeper, app.didKeeper)
 
 	// Since we have parameterised pubkey getters, we can use the same default
 	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
 	// instead of having to implement three unique AnteHandlers.
 
-	defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	//TODO uncomment
+	//defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
+	//	app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
+	//	defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 	didAnteHandler := ixo.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
 		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	projectAnteHandler := ixo.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
-		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	//TODO uncomment ixo module
+	//projectAnteHandler := ixo.NewDefaultAnteHandler(
+	//	app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
+	//	projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 
 	//defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
 	//	app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, defaultPubKeyGetter)
@@ -713,8 +747,9 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig simappparams.EncodingConfig) 
 	// to the original creator, which is pointed out in the project doc. For
 	// this purpose, a custom project creation AnteHandler had to be created.
 
-	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.didKeeper, projectPubKeyGetter)
+	//TODO uncomment ixo module
+	//projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+	//	app.AccountKeeper, app.BankKeeper, app.didKeeper, projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
@@ -723,19 +758,20 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig simappparams.EncodingConfig) 
 		switch msg.Route() {
 		case did.RouterKey:
 			return didAnteHandler(ctx, tx, simulate)
-		case project.RouterKey:
-			switch msg.Type() {
-			case project.TypeMsgCreateProject:
-				return projectCreationAnteHandler(ctx, tx, simulate)
-			default:
-				return projectAnteHandler(ctx, tx, simulate)
-			}
-		case bonds.RouterKey:
-			fallthrough
-		case treasury.RouterKey:
-			fallthrough
-		case payments.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
+		//TODO uncomment rest of ixo modules
+		//case project.RouterKey:
+		//	switch msg.Type() {
+		//	case project.TypeMsgCreateProject:
+		//		return projectCreationAnteHandler(ctx, tx, simulate)
+		//	default:
+		//		return projectAnteHandler(ctx, tx, simulate)
+		//	}
+		//case bonds.RouterKey:
+		//	fallthrough
+		//case treasury.RouterKey:
+		//	fallthrough
+		//case payments.RouterKey:
+		//	return defaultIxoAnteHandler(ctx, tx, simulate)
 		default:
 			return cosmosAnteHandler(ctx, tx, simulate)
 		}
@@ -758,8 +794,9 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 
 	// init params keeper and subspaces (for custom ixo modules
-	paramsKeeper.Subspace(project.ModuleName)
-	paramsKeeper.Subspace(bonds.ModuleName)
+	//TODO uncomment rest of ixo modules
+	//paramsKeeper.Subspace(project.ModuleName)
+	//paramsKeeper.Subspace(bonds.ModuleName)
 
 	return paramsKeeper
 }

@@ -29,7 +29,10 @@ func GetCmdAddDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 			cliCtx := client.GetClientContextFromCmd(cmd)
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			if err := msg.ValidateBasic() ; err != nil {
+				return err
+			}
+			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg) //return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
@@ -58,7 +61,10 @@ func GetCmdAddCredential(/*cdc *codec.Codec*/) *cobra.Command {
 			cliCtx := client.GetClientContextFromCmd(cmd)
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			if err := msg.ValidateBasic() ; err != nil {
+				return err
+			}
+			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg) //ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 		},
 	}
 }
