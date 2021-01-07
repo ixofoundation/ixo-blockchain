@@ -1,4 +1,5 @@
 package keeper
+// TODO uncomment
 //
 //import (
 //	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -137,7 +138,7 @@ package keeper
 //	// Set payer balance
 //	balance, err := sdk.ParseCoins("10uixo,10res")
 //	require.Nil(t, err)
-//	err = k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+//	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, contract.Payer, balance)//k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
 //	require.Nil(t, err)
 //
 //	// At this point, cumulative: /
@@ -153,7 +154,7 @@ package keeper
 //	require.True(t, effected)
 //
 //	// Check balance
-//	newBalance := k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance := k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err := sdk.ParseCoins("9uixo,7res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -171,7 +172,7 @@ package keeper
 //	require.True(t, effected)
 //
 //	// Check balance
-//	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance = k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err = sdk.ParseCoins("8uixo,5res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -186,7 +187,7 @@ package keeper
 //	require.True(t, effected)
 //
 //	// Check balance
-//	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance = k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err = sdk.ParseCoins("7uixo,3res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -212,7 +213,7 @@ package keeper
 //	// Set payer balance
 //	balance, err := sdk.ParseCoins("10uixo,10res")
 //	require.Nil(t, err)
-//	err = k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+//	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, contract.Payer, balance)//k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
 //	require.Nil(t, err)
 //
 //	// Set discount
@@ -232,7 +233,7 @@ package keeper
 //	require.True(t, effected)
 //
 //	// Check balance
-//	newBalance := k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance := k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err := sdk.ParseCoins("9uixo,7res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -250,7 +251,7 @@ package keeper
 //	require.True(t, effected)
 //
 //	// Check balance
-//	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance = k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err = sdk.ParseCoins("8uixo,5res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -265,7 +266,7 @@ package keeper
 //	require.True(t, effected)
 //
 //	// Check balance
-//	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance = k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err = sdk.ParseCoins("7uixo,3res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -297,7 +298,7 @@ package keeper
 //	// Set payer balance
 //	balance, err := sdk.ParseCoins("10uixo,10res")
 //	require.Nil(t, err)
-//	err = k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+//	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, contract.Payer, balance)//k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
 //	require.Nil(t, err)
 //
 //	// At this point, cumulative: /
@@ -312,7 +313,7 @@ package keeper
 //	require.Nil(t, err)
 //
 //	// Check balance
-//	newBalance := k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance := k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err := sdk.ParseCoins("9uixo,7res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -329,7 +330,7 @@ package keeper
 //	require.Nil(t, err)
 //
 //	// Check balance
-//	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance = k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err = sdk.ParseCoins("8uixo,5res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())
@@ -343,7 +344,7 @@ package keeper
 //	require.Nil(t, err)
 //
 //	// Check balance
-//	newBalance = k.bankKeeper.GetCoins(ctx, contract.Payer)
+//	newBalance = k.bankKeeper.GetAllBalances(ctx, contract.Payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
 //	expected, err = sdk.ParseCoins("7uixo,3res")
 //	require.Nil(t, err)
 //	require.Equal(t, expected.String(), newBalance.String())

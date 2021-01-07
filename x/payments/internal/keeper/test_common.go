@@ -1,18 +1,25 @@
 package keeper
+// TODO uncomment and fix CreateTestInput()
 //
 //import (
 //	"github.com/cosmos/cosmos-sdk/codec"
+//	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 //	"github.com/cosmos/cosmos-sdk/store"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/cosmos/cosmos-sdk/types/module"
 //	"github.com/cosmos/cosmos-sdk/x/auth"
-//	"github.com/cosmos/cosmos-sdk/x/bank"
-//	"github.com/cosmos/cosmos-sdk/x/params"
+//	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+//	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+//	//"github.com/cosmos/cosmos-sdk/x/bank"
+//	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+//	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+//	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 //	"github.com/ixofoundation/ixo-blockchain/x/did"
 //	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
-//	abci "github.com/tendermint/tendermint/abci/types"
+//	//abci "github.com/tendermint/tendermint/abci/types"
 //	"github.com/tendermint/tendermint/crypto"
 //	"github.com/tendermint/tendermint/libs/log"
+//	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 //	dbm "github.com/tendermint/tm-db"
 //)
 //
@@ -93,13 +100,13 @@ package keeper
 //	return nil
 //}
 //
-//func CreateTestInput() (sdk.Context, Keeper, *codec.Codec) {
+//func CreateTestInput() (sdk.Context, Keeper, *codec.LegacyAmino) {
 //	if err := ValidateVariables(); err != nil {
 //		panic(err)
 //	}
 //
 //	storeKey := sdk.NewKVStoreKey(types.StoreKey)
-//	actStoreKey := sdk.NewKVStoreKey(auth.StoreKey)
+//	actStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
 //	keyDid := sdk.NewKVStoreKey(did.StoreKey)
 //
 //	db := dbm.NewMemDB()
@@ -109,23 +116,23 @@ package keeper
 //	ms.MountStoreWithDB(keyDid, sdk.StoreTypeIAVL, nil)
 //
 //	_ = ms.LoadLatestVersion()
-//	ctx := sdk.NewContext(ms, abci.Header{}, true, log.NewNopLogger())
+//	ctx := sdk.NewContext(ms, /*abci.Header{}*/tmproto.Header{}, true, log.NewNopLogger())
 //
-//	cdc := codec.New()
-//	module.NewBasicManager(auth.AppModuleBasic{}).RegisterCodec(cdc)
-//	sdk.RegisterCodec(cdc)
-//	codec.RegisterCrypto(cdc)
-//	types.RegisterCodec(cdc)
+//	cdc := codec.NewLegacyAmino()
+//	module.NewBasicManager(auth.AppModuleBasic{}).RegisterLegacyAminoCodec(cdc)
+//	sdk.RegisterLegacyAminoCodec(cdc)
+//	cryptocodec.RegisterCrypto(cdc)
+//	types.RegisterLegacyAminoCodec(cdc)
 //	cdc.RegisterConcrete(types.TestPeriod{}, "payments/TestPeriod", nil)
 //
 //	keyParams := sdk.NewKVStoreKey("subspace")
 //	tkeyParams := sdk.NewTransientStoreKey("transient_params")
 //
-//	pk1 := params.NewKeeper(cdc, keyParams, tkeyParams)
+//	pk1 := paramskeeper.NewKeeper(cdc, keyParams, tkeyParams)
 //
-//	accountKeeper := auth.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
-//	bankKeeper := bank.NewBaseKeeper(accountKeeper, pk1.Subspace(bank.DefaultParamspace), nil)
-//	didKeeper := did.NewKeeper(cdc, keyDid)
+//	accountKeeper := authkeeper.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(/*auth.DefaultParamspace*/authtypes.ModuleName), authtypes.ProtoBaseAccount)
+//	bankKeeper := bankkeeper.NewBaseKeeper(accountKeeper, pk1.Subspace(/*bank.DefaultParamspace*/banktypes.ModuleName), nil)
+//	didKeeper := did.NewKeeper(*cdc, keyDid)
 //	keeper := NewKeeper(cdc, storeKey, bankKeeper, didKeeper, nil)
 //
 //	return ctx, keeper, cdc

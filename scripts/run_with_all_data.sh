@@ -4,28 +4,28 @@ PASSWORD="12345678"
 
 ixod init local --chain-id pandora-1
 
-yes $PASSWORD | ixocli keys delete miguel --force
-yes $PASSWORD | ixocli keys delete francesco --force
-yes $PASSWORD | ixocli keys delete shaun --force
-yes $PASSWORD | ixocli keys delete fee --force
-yes $PASSWORD | ixocli keys delete fee2 --force
-yes $PASSWORD | ixocli keys delete fee3 --force
-yes $PASSWORD | ixocli keys delete fee4 --force
-yes $PASSWORD | ixocli keys delete fee5 --force
+yes 'y' | ixod keys delete miguel --force
+yes 'y' | ixod keys delete francesco --force
+yes 'y' | ixod keys delete shaun --force
+yes 'y' | ixod keys delete fee --force
+yes 'y' | ixod keys delete fee2 --force
+yes 'y' | ixod keys delete fee3 --force
+yes 'y' | ixod keys delete fee4 --force
+yes 'y' | ixod keys delete fee5 --force
 
-yes $PASSWORD | ixocli keys add miguel
-yes $PASSWORD | ixocli keys add francesco
-yes $PASSWORD | ixocli keys add shaun
-yes $PASSWORD | ixocli keys add fee
-yes $PASSWORD | ixocli keys add fee2
-yes $PASSWORD | ixocli keys add fee3
-yes $PASSWORD | ixocli keys add fee4
-yes $PASSWORD | ixocli keys add fee5
+yes $PASSWORD | ixod keys add miguel
+yes $PASSWORD | ixod keys add francesco
+yes $PASSWORD | ixod keys add shaun
+yes $PASSWORD | ixod keys add fee
+yes $PASSWORD | ixod keys add fee2
+yes $PASSWORD | ixod keys add fee3
+yes $PASSWORD | ixod keys add fee4
+yes $PASSWORD | ixod keys add fee5
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000000uixo,100000000000res,100000000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000000uixo,100000000000res,100000000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 100000000000uixo,100000000000res,100000000000rez
 
 # Add pubkey-based genesis accounts
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
@@ -69,12 +69,13 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
-ixocli config chain-id pandora-1
-ixocli config output json
-ixocli config indent true
-ixocli config trust-node true
+#TODO config missing from new version???
+ixod config chain-id pandora-1
+ixod config output json
+ixod config indent true
+ixod config trust-node true
 
-yes $PASSWORD | ixod gentx --name miguel --amount 1000000uixo
+ixod gentx miguel --amount 1000000uixo --chain-id pandora-1
 
 ixod collect-gentxs
 ixod validate-genesis
@@ -87,7 +88,7 @@ ixod validate-genesis
 # Uncomment the below to broadcast REST endpoint
 # Do not forget to comment the bottom lines !!
 #ixod start --pruning "syncable" &
-#ixocli rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg
+#ixod rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg
 
 ixod start --pruning "everything" &
-ixocli rest-server --chain-id pandora-1 --trust-node && fg
+ixod rest-server --chain-id pandora-1 --trust-node && fg

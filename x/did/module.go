@@ -137,6 +137,7 @@ func NewAppModule(keeper Keeper) AppModule {
 	}
 }
 
+// TODO Implement functions
 func (AppModule) Name() string {
 	return ModuleName
 }
@@ -144,7 +145,6 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
 }
 
-// TODO Populate
 func (am AppModule) Route() sdk.Route {
 	return sdk.Route{} //RouterKey
 }

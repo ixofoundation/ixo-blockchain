@@ -33,7 +33,8 @@ import (
 	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
 	//"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/cosmos/cosmos-sdk/crypto/types/multisig"
-	"github.com/tendermint/tendermint/crypto/secp256k1"
+	//"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	"os"
 )
 

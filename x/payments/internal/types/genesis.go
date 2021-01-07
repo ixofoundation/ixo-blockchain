@@ -6,6 +6,20 @@ type GenesisState struct {
 	Subscriptions    []Subscription    `json:"subscriptions" yaml:"subscriptions"`
 }
 
+// TODO Implement for proto.Message interface
+
+func (g GenesisState) Reset() {
+	panic("implement me")
+}
+
+func (g GenesisState) String() string {
+	panic("implement me")
+}
+
+func (g GenesisState) ProtoMessage() {
+	panic("implement me")
+}
+
 func NewGenesisState(templates []PaymentTemplate, contracts []PaymentContract,
 	subscriptions []Subscription) GenesisState {
 	return GenesisState{
