@@ -10,14 +10,14 @@ import (
 
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      *codec.LegacyAmino
-	//cdc codec.BinaryMarshaler //what Cosmos uses
+	//cdc      *codec.LegacyAmino
+	cdc codec.BinaryMarshaler //what Cosmos uses
 }
 
-func NewKeeper(/*cdc *codec.Codec*/ cdc codec.LegacyAmino, key sdk.StoreKey) Keeper {
+func NewKeeper(/*cdc *codec.Codec cdc codec.LegacyAmino*/ cdc codec.BinaryMarshaler, key sdk.StoreKey) Keeper {
 	return Keeper{
 		storeKey: key,
-		cdc:      &cdc,
+		cdc:      cdc,
 	}
 }
 
@@ -60,27 +60,7 @@ func (k Keeper) AddDidDoc(ctx sdk.Context, did exported.DidDoc) {
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(did))
 }
 
-
-/*
 // TODO we cannot implement ProtoMarshal interface functions because exported.DidDoc is also an interface
-func (k Keeper) SetDidDoc(ctx sdk.Context, did types.BaseDidDoc) (err error) {
-	existedDidDoc, err := k.GetDidDoc(ctx, did.GetDid())
-	if existedDidDoc != nil {
-		return sdkerrors.Wrap(types.ErrInvalidDid, "DID already exists")
-	}
-
-	k.AddDidDoc(ctx, did)
-	return nil
-}
-
-func (k Keeper) AddDidDoc(ctx sdk.Context, did types.BaseDidDoc) {
-	store := ctx.KVStore(k.storeKey)
-	key := types.GetDidPrefixKey(did.GetDid())
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(did))
-	// TODO we cannot implement ProtoMarshal interface functions because exported.DidDoc is also an interface
-	// TODO Maybe replace exported.DidDoc with types.BaseDidDoc?
-}
-*/
 
 func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exported.DidCredential) (err error) {
 	existedDid, err := k.GetDidDoc(ctx, did)

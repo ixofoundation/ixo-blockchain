@@ -70,7 +70,7 @@ func (msg MsgAddDid) ValidateBasic() error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
 }
 
 func (msg MsgAddDid) String() string {
@@ -137,7 +137,7 @@ func (msg MsgAddCredential) ValidateBasic() error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
 }
 
 func (msg MsgAddCredential) Reset() {

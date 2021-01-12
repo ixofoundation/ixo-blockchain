@@ -39,6 +39,17 @@ type DidDoc interface {
 	SetPubKey(pubkey string) error
 	GetPubKey() string
 	Address() sdk.AccAddress
+
+	// TODO instead of adding codec.ProtoMarshaler here, implement functions for (*BaseDidDoc)
+	//codec.ProtoMarshaler
+	//Reset()
+    //String() string
+	//ProtoMessage()
+	//Marshal() ([]byte, error)
+	//MarshalTo(data []byte) (n int, err error)
+	//MarshalToSizedBuffer(dAtA []byte) (int, error)
+	//Size() int
+	//Unmarshal(data []byte) error
 }
 
 type Secret struct {

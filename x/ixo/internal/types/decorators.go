@@ -13,7 +13,7 @@ import (
 	authsigning"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	//bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/tendermint/tendermint/crypto"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types" //"github.com/tendermint/tendermint/crypto"
 )
 
 type SetPubKeyDecorator struct {
@@ -49,7 +49,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	// fetch first (and only) signer
 	signerAddr := sdk.AccAddress(pubKey.Address())
 
-	pubkeys := []crypto.PubKey{pubKey}
+	pubkeys := []cryptotypes.PubKey{pubKey}
 	signers := []sdk.AccAddress{signerAddr}
 
 	for i, pk := range pubkeys {
@@ -58,7 +58,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 			if !simulate {
 				continue
 			}
-			pk = simEd25519Pubkey
+			pk = &simEd25519Pubkey
 		}
 		// Only make check if simulate=false
 		if !simulate && !bytes.Equal(pk.Address(), signers[i]) {
@@ -200,7 +200,7 @@ func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 		// shall consume the largest amount, i.e. it takes more gas to verify
 		// secp256k1 keys than ed25519 ones.
 		if simulate && pubKey == nil {
-			pubKey = simEd25519Pubkey
+			pubKey = &simEd25519Pubkey
 		}
 
 		// make a SignatureV2 with PubKey filled in from above

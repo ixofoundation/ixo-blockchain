@@ -34,7 +34,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 
 var (
 	amino     = codec.NewLegacyAmino()
-	ModuleCdc = codec.NewAminoCodec(amino)
+	//ModuleCdc = codec.NewAminoCodec(amino)
 )
 
 //func init() {
@@ -42,8 +42,3 @@ var (
 //	RegisterCodec(ModuleCdc)
 //	ModuleCdc.Seal()
 //}
-
-func init() {
-	RegisterLegacyAminoCodec(amino)
-	ModuleCdc.Seal()
-}

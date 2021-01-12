@@ -25,12 +25,12 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/spf13/pflag"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types" //"github.com/tendermint/tendermint/crypto"
 	//"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	//"github.com/spf13/viper"
-	"github.com/tendermint/ed25519"
-	"github.com/tendermint/tendermint/crypto"
-	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	//ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
 	//"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/cosmos/cosmos-sdk/crypto/types/multisig"
 	//"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -44,17 +44,17 @@ var (
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 
 	// simulation signature values used to estimate gas consumption
-	simEd25519Pubkey ed25519tm.PubKey
+	simEd25519Pubkey ed25519.PubKey
 	simEd25519Sig    [ed25519.SignatureSize]byte
 )
 
 func init() {
 	// This decodes a valid hex string into a ed25519Pubkey for use in transaction simulation
 	bz, _ := hex.DecodeString("035AD6810A47F073553FF30D2FCC7E0D3B1C0B74B61A1AAA2582344037151E14")
-	copy(simEd25519Pubkey[:], bz)
+	copy(simEd25519Pubkey.Key[:], bz)
 }
 
-type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (crypto.PubKey, error)
+type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (cryptotypes.PubKey, error)
 
 func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter,
@@ -225,7 +225,7 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 		return err
 	}
 
-	return clientCtx.PrintOutput(res)
+	return clientCtx.PrintProto(res) //PrintOutput(res)
 }
 
 //func CompleteAndBroadcastTxCLI(txBldr auth.TxBuilder, cliCtx context.CLIContext, msgs []sdk.Msg, ixoDid exported.IxoDid) error {
@@ -306,9 +306,13 @@ func Sign(txf tx.Factory, name string, txBuilder client.TxBuilder, ixoDid export
 	//	return err
 	//}
 
-	var privateKey ed25519tm.PrivKey
-	copy(privateKey[:], base58.Decode(ixoDid.Secret.SignKey))
-	copy(privateKey[32:], base58.Decode(ixoDid.VerifyKey))
+	//var privateKey ed25519tm.PrivKey
+	//copy(privateKey[:], base58.Decode(ixoDid.Secret.SignKey))
+	//copy(privateKey[32:], base58.Decode(ixoDid.VerifyKey))\
+
+	var privateKey ed25519.PrivKey
+	copy(privateKey.Key[:], base58.Decode(ixoDid.Secret.SignKey))
+	copy(privateKey.Key[32:], base58.Decode(ixoDid.VerifyKey))
 
 	pubKey := privateKey.PubKey() //key.GetPubKey()
 	//signerData := authsigning.SignerData{
@@ -455,7 +459,7 @@ func IxoSigVerificationGasConsumer(
 ) error {
 	pubkey := sig.PubKey
 	switch pubkey := pubkey.(type) {
-	case *ed25519tm.PubKey:
+	case *ed25519.PubKey:
 		meter.ConsumeGas(params.SigVerifyCostED25519, "ante verify: ed25519")
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "ED25519 public keys are unsupported")
 

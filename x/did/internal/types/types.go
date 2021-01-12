@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ghodss/yaml"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"regexp"
 )
@@ -27,40 +28,6 @@ type BaseDidDoc struct {
 	Did         exported.Did             `json:"did" yaml:"did"`
 	PubKey      string                   `json:"pubKey" yaml:"pubKey"`
 	Credentials []exported.DidCredential `json:"credentials" yaml:"credentials"`
-}
-
-// TODO Implement ProtoMarshaler interface
-
-func (dd BaseDidDoc) Reset() {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) String() string {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) ProtoMessage() {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) Marshal() ([]byte, error) {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) MarshalTo(data []byte) (n int, err error) {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) Size() int {
-	panic("implement me")
-}
-
-func (dd BaseDidDoc) Unmarshal(data []byte) error {
-	panic("implement me")
 }
 
 func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
@@ -107,6 +74,50 @@ func (dd *BaseDidDoc) AddCredential(cred exported.DidCredential) {
 	dd.Credentials = append(dd.Credentials, cred)
 }
 
+// TODO Implement ProtoMarshaler interface - copying from cosmos-sdk/x/gov/types/deposit.go
+
+func (dd *BaseDidDoc) Reset() {
+	*dd = BaseDidDoc{}
+}
+
+func (dd *BaseDidDoc) String() string {
+	out , _ := yaml.Marshal(dd)
+	return string(out)
+}
+
+func (dd *BaseDidDoc) ProtoMessage() {
+}
+
+func (dd *BaseDidDoc) Marshal() (dAtA []byte, err error) {
+	size := dd.Size()
+	dAtA = make([]byte, size)
+	n, err := dd.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (dd *BaseDidDoc) MarshalTo(dAtA []byte) (n int, err error) {
+	size := dd.Size()
+	return dd.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (dd *BaseDidDoc) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	panic("implement me")
+}
+
+func (dd *BaseDidDoc) Size() int {
+	if dd == nil {
+		return 0
+	}
+	panic("implement me")
+}
+
+func (dd *BaseDidDoc) Unmarshal(data []byte) error {
+	panic("implement me")
+}
+
 type Credential struct{}
 
 func fromJsonString(jsonIxoDid string) (exported.IxoDid, error) {
@@ -123,3 +134,4 @@ func fromJsonString(jsonIxoDid string) (exported.IxoDid, error) {
 func UnmarshalIxoDid(jsonIxoDid string) (exported.IxoDid, error) {
 	return fromJsonString(jsonIxoDid)
 }
+

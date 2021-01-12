@@ -6,8 +6,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"strings"
 
-	//"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
@@ -32,7 +30,8 @@ func GetCmdAddressFromBase58Pubkey() *cobra.Command {
 	}
 }
 
-func GetCmdAddressFromDid(/*cdc *codec.Codec*/ legacyQuerierCdc *codec.LegacyAmino) *cobra.Command {
+// Referred to cosmos-sdk x/upgrade/client/cli/query.go for refactoring GetCmds which took amino as argument
+func GetCmdAddressFromDid(/*cdc *codec.Codec*/) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-address-from-did [did]",
 		Short: "Query address for a DID",
@@ -60,7 +59,7 @@ func GetCmdAddressFromDid(/*cdc *codec.Codec*/ legacyQuerierCdc *codec.LegacyAmi
 			}
 
 			var didDoc types.BaseDidDoc
-			err = legacyQuerierCdc.UnmarshalJSON(res, &didDoc) //cdc.UnmarshalJSON(res, &didDoc)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &didDoc) //cdc.UnmarshalJSON(res, &didDoc)
 			if err != nil {
 				return err
 			}
@@ -98,13 +97,14 @@ func GetCmdIxoDidFromMnemonic() *cobra.Command {
 	}
 }
 
-func GetCmdDidDoc(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
+func GetCmdDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-did-doc [did]",
 		Short: "Query DidDoc for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//cliCtx := context.NewCLIContext().WithCodec(cdc)
+
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
@@ -114,7 +114,7 @@ func GetCmdDidDoc(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 			didAddr := args[0]
 			key := exported.Did(didAddr)
 
-			res, _, err := /*cliCtx*/clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+			res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 				keeper.QueryDidDoc, key), nil)
 			if err != nil {
 				return err
@@ -125,12 +125,12 @@ func GetCmdDidDoc(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 			}
 
 			var didDoc types.BaseDidDoc
-			err = cdc.UnmarshalJSON(res, &didDoc)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &didDoc) //cdc.UnmarshalJSON(res, &didDoc)
 			if err != nil {
 				return err
 			}
 
-			output, err := cdc.MarshalJSONIndent(didDoc, "", "  ")
+			output, err := clientCtx.LegacyAmino.MarshalJSONIndent(didDoc, "", "  ") //cdc.MarshalJSONIndent(didDoc, "", "  ")
 			if err != nil {
 				return err
 			}
@@ -141,7 +141,7 @@ func GetCmdDidDoc(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 	}
 }
 
-func GetCmdAllDids(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
+func GetCmdAllDids(/*cdc *codec.Codec*/) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-all-dids",
 		Short: "Query all DIDs",
@@ -160,12 +160,12 @@ func GetCmdAllDids(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 			}
 
 			var didDids []exported.Did
-			err = cdc.UnmarshalJSON(res, &didDids)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &didDids) //cdc.UnmarshalJSON(res, &didDids)
 			if err != nil {
 				return err
 			}
 
-			output, err := cdc.MarshalJSONIndent(didDids, "", "  ")
+			output, err := clientCtx.LegacyAmino.MarshalJSONIndent(didDids, "", "  ") //cdc.MarshalJSONIndent(didDids, "", "  ")
 			if err != nil {
 				return err
 			}
@@ -176,7 +176,7 @@ func GetCmdAllDids(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
 	}
 }
 
-func GetCmdAllDidDocs(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Command {
+func GetCmdAllDidDocs(/*cdc *codec.Codec*/) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-all-did-docs",
 		Short: "Query all DID documents",
@@ -195,12 +195,12 @@ func GetCmdAllDidDocs(/*cdc *codec.Codec*/ cdc *codec.LegacyAmino) *cobra.Comman
 			}
 
 			var didDocs []types.BaseDidDoc
-			err = cdc.UnmarshalJSON(res, &didDocs)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &didDocs) //cdc.UnmarshalJSON(res, &didDocs)
 			if err != nil {
 				return err
 			}
 
-			output, err := cdc.MarshalJSONIndent(didDocs, "", "  ")
+			output, err := clientCtx.LegacyAmino.MarshalJSONIndent(didDocs, "", "  ") //cdc.MarshalJSONIndent(didDocs, "", "  ")
 			if err != nil {
 				return err
 			}

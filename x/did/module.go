@@ -1,7 +1,11 @@
 package did
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/gov/types"
+
 	//"github.com/cosmos/cosmos-sdk/client/flags"
 	//"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -28,25 +32,33 @@ var (
 	_ module.AppModuleBasic = AppModuleBasic{}
 )
 
+// AppModuleBasic defines the basic application module used by the did module.
 type AppModuleBasic struct{}
 
+// Name returns the did module's name.
 func (AppModuleBasic) Name() string {
 	return ModuleName
 }
 
+// RegisterLegacyAminoCodec registers the did module's types for the given codec.
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	RegisterLegacyAminoCodec(cdc)
 }
 
-func (AppModuleBasic) RegisterInterfaces(codectypes.InterfaceRegistry) {
+// RegisterInterfaces registers interfaces and implementations of the did module.
+func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
+	types.RegisterInterfaces(registry)
 }
 
 //func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 //	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 //}
 
-func (AppModuleBasic) DefaultGenesis(codec.JSONMarshaler) json.RawMessage {
-	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
+// DefaultGenesis returns default genesis state as raw bytes for the did
+// module.
+func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
+	//return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
+	return cdc.MustMarshalJSON(DefaultGenesisState())
 }
 
 //func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
@@ -58,24 +70,28 @@ func (AppModuleBasic) DefaultGenesis(codec.JSONMarshaler) json.RawMessage {
 //	return ValidateGenesis(data)
 //}
 
-func (AppModuleBasic) ValidateGenesis(cd codec.JSONMarshaler, enc client.TxEncodingConfig, bz json.RawMessage) error {
+// ValidateGenesis performs genesis state validation for the did module.
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var data GenesisState
-	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	err := cdc.UnmarshalJSON(bz, &data) //ModuleCdc.UnmarshalJSON(bz, &data)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to unmarshal %s genesis state: %w", ModuleName, err)
 	}
 
 	return ValidateGenesis(data)
 }
 
-func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
-	rest.RegisterRoutes(ctx, rtr)
+// RegisterRESTRoutes registers the REST routes for the did module.
+func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
+	rest.RegisterRoutes(clientCtx, rtr)
 }
 
-func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {
-	//tx.RegisterGRPCGatewayRoutes()
+// RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the did module.
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
+	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx)) //tx.RegisterGRPCGatewayRoutes()
 }
 
+// GetTxCmd returns the root tx command for the did module.
 func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	didTxCmd := &cobra.Command{
 		Use:                        ModuleName,
@@ -85,8 +101,10 @@ func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	didTxCmd.AddCommand(cli.GetCmdAddDidDoc())
-	didTxCmd.AddCommand(cli.GetCmdAddCredential())
+	didTxCmd.AddCommand(
+		cli.GetCmdAddDidDoc(),
+		cli.GetCmdAddCredential(),
+	)
 
 	//didTxCmd.AddCommand(flags.PostCommands(
 	//	cli.GetCmdAddDidDoc(cdc)),
@@ -96,6 +114,7 @@ func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	return didTxCmd
 }
 
+// GetQueryCmd returns the root query command for the did module.
 func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	didQueryCmd := &cobra.Command{
 		Use:                        ModuleName,
@@ -105,13 +124,14 @@ func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	// TODO remove LegacyAmino from cli functions below and add them to command
-	didQueryCmd.AddCommand(cli.GetCmdAddressFromBase58Pubkey())
-	//didQueryCmd.AddCommand(cli.GetCmdAddressFromDid())
-	didQueryCmd.AddCommand(cli.GetCmdIxoDidFromMnemonic())
-	//didQueryCmd.AddCommand(cli.GetCmdDidDoc())
-	//didQueryCmd.AddCommand(cli.GetCmdAllDids())
-	//didQueryCmd.AddCommand(cli.GetCmdAllDidDocs())
+	didQueryCmd.AddCommand(
+		cli.GetCmdAddressFromBase58Pubkey(),
+		cli.GetCmdAddressFromDid(),
+		cli.GetCmdIxoDidFromMnemonic(),
+		cli.GetCmdDidDoc(),
+		cli.GetCmdAllDids(),
+		cli.GetCmdAllDidDocs(),
+	)
 
 	//didQueryCmd.AddCommand(flags.GetCommands(
 	//	cli.GetCmdAddressFromBase58Pubkey(),
@@ -124,12 +144,16 @@ func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
 
 	return didQueryCmd
 }
+//____________________________________________________________________________
 
+// AppModule implements an application module for the did module.
 type AppModule struct {
 	AppModuleBasic
+
 	keeper keeper.Keeper
 }
 
+// NewAppModule creates a new AppModule object
 func NewAppModule(keeper Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
@@ -137,27 +161,41 @@ func NewAppModule(keeper Keeper) AppModule {
 	}
 }
 
-// TODO Implement functions
+// Name returns the did module's name.
 func (AppModule) Name() string {
 	return ModuleName
 }
 
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
-}
+// TODO what is this?
+// RegisterInvariants performs a no-op.
+func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
+// Route returns the message routing key for the did module.
 func (am AppModule) Route() sdk.Route {
-	return sdk.Route{} //RouterKey
+	return sdk.NewRoute(RouterKey, NewHandler(am.keeper)) //RouterKey
 }
 
-func (am AppModule) NewHandler() sdk.Handler { return NewHandler(am.keeper) }
+//func (am AppModule) NewHandler() sdk.Handler {
+//	return NewHandler(am.keeper)
+//}
 
-func (AppModule) QuerierRoute() string { return QuerierRoute }
+// QuerierRoute returns the did module's querier route name.
+func (AppModule) QuerierRoute() string {
+	return QuerierRoute
+}
 
+// LegacyQuerierHandler returns the did module sdk.Querier.
 func (am AppModule) LegacyQuerierHandler(cdc *codec.LegacyAmino) sdk.Querier {
-	return NewQuerier(am.keeper, cdc)
+	return keeper.NewQuerier(am.keeper, cdc)
 }
 
-func (AppModule) RegisterServices(module.Configurator) {}
+// RegisterServices registers a GRPC query service to respond to the
+// module-specific GRPC queries.
+func (am AppModule) RegisterServices(cfg module.Configurator) {
+	//types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	//types.RegisterMsgServer(cfg.MsgServer(), am.keeper)
+	// TODO what does this do?
+}
 
 //func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
 //	var genesisState GenesisState
@@ -166,18 +204,28 @@ func (AppModule) RegisterServices(module.Configurator) {}
 //	return []abci.ValidatorUpdate{}
 //}
 
-func (AppModule) InitGenesis(sdk.Context, codec.JSONMarshaler, json.RawMessage) []abci.ValidatorUpdate {
+// InitGenesis performs genesis initialization for the did module. It returns
+// no validator updates.
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
+	var genesisState GenesisState
+	cdc.MustUnmarshalJSON(data, &genesisState)
+	InitGenesis(ctx, am.keeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
+// ExportGenesis returns the exported genesis state as raw bytes for the did
+// module.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
-	return ModuleCdc.MustMarshalJSON(gs)
+	return cdc.MustMarshalJSON(gs) //ModuleCdc.MustMarshalJSON(gs)
 }
 
-func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
+// BeginBlock returns the begin blocker for the did module.
+func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
 }
 
+// EndBlock returns the end blocker for the did module. It returns no validator
+// updates.
 func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }

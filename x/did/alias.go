@@ -44,7 +44,7 @@ var (
 	UnmarshalIxoDid = types.UnmarshalIxoDid
 
 	// variable aliases
-	ModuleCdc = types.ModuleCdc
+	//ModuleCdc = types.ModuleCdc
 
 	ErrInvalidDid        = types.ErrInvalidDid
 	ErrInvalidPubKey     = types.ErrInvalidPubKey

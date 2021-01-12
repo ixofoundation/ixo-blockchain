@@ -16,7 +16,6 @@ import (
 
 	//"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/capability"
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
@@ -37,17 +36,16 @@ import (
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	crypto "github.com/cosmos/cosmos-sdk/crypto/codec"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -184,21 +182,30 @@ var (
 	}
 )
 
-// MakeCodec - custom tx codec
-func MakeCodec() *codec.LegacyAmino { //.Codec {
-	var cdc = codec.NewLegacyAmino() //codec.New()
+//// MakeCodec - custom tx codec
+//func MakeCodec() *codec.LegacyAmino { //.Codec {
+//	var cdc = codec.NewLegacyAmino() //codec.New()
+//
+//	// Register standard Cosmos codecs
+//	ModuleBasics.RegisterLegacyAminoCodec(cdc)
+//	vestingtypes.RegisterLegacyAminoCodec(cdc)
+//	sdk.RegisterLegacyAminoCodec(cdc)
+//	crypto.RegisterCrypto(cdc)
+//	//codec.RegisterEvidences(cdc)
+//
+//	// Register ixo codec
+//	ixo.RegisterCodec(cdc)
+//
+//	return cdc
+//}
 
-	// Register standard Cosmos codecs
-	ModuleBasics.RegisterLegacyAminoCodec(cdc)
-	vestingtypes.RegisterLegacyAminoCodec(cdc)
-	sdk.RegisterLegacyAminoCodec(cdc)
-	crypto.RegisterCrypto(cdc)
-	//codec.RegisterEvidences(cdc)
-
-	// Register ixo codec
-	ixo.RegisterCodec(cdc)
-
-	return cdc
+// MakeCodecs constructs the *std.Codec and *codec.LegacyAmino instances used by
+// ixoapp. It is useful for tests and clients who do not want to construct the
+// full ixoapp.
+func MakeCodecs() (codec.Marshaler, *codec.LegacyAmino) {
+	config := MakeEncodingConfig()
+	return config.Marshaler, config.Amino
+	// TODO register ixo codec?
 }
 
 // Verify app interface at compile time
@@ -453,7 +460,7 @@ func NewIxoApp(
 	//app.treasuryKeeper = treasury.NewKeeper(app.cdc, keys[treasury.StoreKey], app.BankKeeper,
 	//	app.oraclesKeeper, app.SupplyKeeper, app.didKeeper)
 
-	app.didKeeper = did.NewKeeper(*app.legacyAmino, keys[did.StoreKey]) // not what Cosmos uses because keeper is different
+	app.didKeeper = did.NewKeeper(app.appCodec, keys[did.StoreKey]) // not what Cosmos uses because keeper is different
 	// TODO add the rest of ixo modules keeper
 
 	// NOTE: Any module instantiated in the module manager that is later modified
