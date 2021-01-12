@@ -44,15 +44,12 @@ all: lint install
 build: go.sum
 ifeq ($(OS),Windows_NT)
 	go build -mod=readonly $(BUILD_FLAGS) -o build/ixod.exe ./cmd/ixod
-	go build -mod=readonly $(BUILD_FLAGS) -o build/ixocli.exe ./cmd/ixocli
 else
 	go build -mod=readonly $(BUILD_FLAGS) -o build/ixod ./cmd/ixod
-	go build -mod=readonly $(BUILD_FLAGS) -o build/ixocli ./cmd/ixocli
 endif
 
 install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/ixod
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/ixocli
 
 ########################################
 ### Tools & dependencies
