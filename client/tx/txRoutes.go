@@ -4,14 +4,17 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -80,7 +83,20 @@ func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
 			signerAddress := did.VerifyKeyToAddr(req.PubKey)
 			cliCtx = cliCtx.WithFromAddress(signerAddress)
 
-			txBldr, err := utils.PrepareTxBuilder(auth.NewTxBuilderFromCLI(cliCtx.Input), cliCtx)
+			// Create tx builder with:
+			// - TxEncoder set to GetTxEncoder(...)
+			// - Acc no. and sequence set to 0 (set by PrepareTxBuilder)
+			// - Gas and gas adjustment set to 0 (set by ApproximateFeeForTx)
+			// - Simulate set to false
+			// - Chain ID obtained using viper.GetString(...)
+			// - Memo set to empty string (custom memo not supported)
+			// - Fees and gas prices set to nil (set by ApproximateFeeForTx)
+			chainId := viper.GetString(flags.FlagChainID)
+			txBldr := types.NewTxBuilder(
+				utils.GetTxEncoder(cliCtx.Codec),
+				0, 0, 0, 0, false, chainId, "", nil, nil)
+
+			txBldr, err = utils.PrepareTxBuilder(txBldr, cliCtx)
 			if err != nil {
 				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 				return
