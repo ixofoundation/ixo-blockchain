@@ -260,7 +260,23 @@ func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, msg MsgUpdateAgent) (*sdk.R
 
 	// TODO: implement agent update (or remove functionality)
 
-	return nil, nil
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeUpdateAgent,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.Did),
+			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
+			sdk.NewAttribute(types.AttributeKeyUpdatedStatus, msg.Data.Status),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) (*sdk.Result, error) {

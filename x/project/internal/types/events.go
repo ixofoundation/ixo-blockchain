@@ -4,6 +4,7 @@ const (
 	EventTypeCreateProject       = "create_project"
 	EventTypeUpdateProjectStatus = "update_project_status"
 	EventTypeCreateAgent         = "create_agent"
+	EventTypeUpdateAgent         = "update_agent"
 	EventTypeCreateClaim         = "create_claim"
 	EventTypeCreateEvaluation    = "create_evaluation"
 	EventTypeWithdrawFunds       = "withdraw_funds"
