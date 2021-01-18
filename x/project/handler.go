@@ -125,8 +125,14 @@ func handleMsgUpdateProjectStatus(ctx sdk.Context, k Keeper, bk bank.Keeper,
 				"could not find project's account with address %s", projectAddr)
 		}
 
+		// Two conditions for minimum funding not reached:
+		// - Either minimumFunding has some denom that is not in the projectAcc
+		//   coins, indicating that the projectAcc has zero of this denom
+		// - Or minimumFunding has some denom with a larger value than the projectAcc
+		//   coins, indicating that the projectAcc has less than the minimum
 		minimumFunding := k.GetParams(ctx).ProjectMinimumInitialFunding
-		if minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
+		if !minimumFunding.DenomsSubsetOf(projectAcc.GetCoins()) ||
+			minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"project has not reached minimum funding %s", minimumFunding)
 		}
@@ -254,7 +260,23 @@ func handleMsgUpdateAgent(ctx sdk.Context, k Keeper, msg MsgUpdateAgent) (*sdk.R
 
 	// TODO: implement agent update (or remove functionality)
 
-	return nil, nil
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeUpdateAgent,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.Did),
+			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
+			sdk.NewAttribute(types.AttributeKeyUpdatedStatus, msg.Data.Status),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
 func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) (*sdk.Result, error) {
