@@ -9,7 +9,7 @@ import (
 
 // value function for a given state (R,S)
 func Invariant(R, S sdk.Dec, kappa sdk.Dec) sdk.Dec {
-	return Power(S, kappa).Quo(R)
+	return ApproxPower(S, kappa).Quo(R)
 }
 
 // given a value function (parameterized by kappa)
@@ -25,7 +25,7 @@ func Supply(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) sdk.Dec {
 
 // This is the reverse of Supply(...) function
 func Reserve(S sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) sdk.Dec {
-	return Power(S, kappa).Quo(V0)
+	return ApproxPower(S, kappa).Quo(V0)
 }
 
 // given a value function (parameterized by kappa)
@@ -36,7 +36,7 @@ func SpotPrice(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) sdk.Dec {
 	if err != nil {
 		panic(err)
 	}
-	temp2, err := ApproxRoot(Power(R, kappa.Sub(sdk.OneDec())), kappa)
+	temp2, err := ApproxRoot(ApproxPower(R, kappa.Sub(sdk.OneDec())), kappa)
 	if err != nil {
 		panic(err)
 	}
