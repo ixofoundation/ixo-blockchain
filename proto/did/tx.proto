@@ -15,7 +15,7 @@ service Msg {
 }
 
 message MsgAddDid {
-  Did did       = 1 [(gogoproto.moretags) = "yaml:\"did\""]; //TODO should this just be string instead of Did?
+  /*Did*/ string did = 1 [(gogoproto.moretags) = "yaml:\"did\""];
   string pubkey = 2 [(gogoproto.moretags) = "yaml:\"pubKey\""];
 }
 

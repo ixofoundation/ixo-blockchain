@@ -6,23 +6,23 @@ import "google/protobuf/any.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
 
-message Did {
-  option (gogoproto.goproto_stringer) = false;
+//message Did {
+//  option (gogoproto.goproto_stringer) = false;
+//
+//  string did = 1;
+//}
 
-  string did = 1;
-}
-
-message DidDoc {
-  option (gogoproto.goproto_stringer) = false;
-
-  repeated google.protobuf.Any accounts = 1;
-}
+//message DidDoc {
+//  option (gogoproto.goproto_stringer) = false;
+//
+//  repeated google.protobuf.Any accounts = 1;
+//}
 
 message DidCredential {
   option (gogoproto.goproto_stringer) = false;
 
   repeated string credtype = 1;
-  Did did = 2;
+  /*Did*/ string issuer = 2;
   string issued = 3;
   Claim claim = 4;
 }
@@ -30,6 +30,6 @@ message DidCredential {
 message Claim {
   option (gogoproto.goproto_stringer) = false;
 
-  Did id = 1;
+  /*Did*/ string id = 1;
   bool KYCvalidated = 2;
 }

@@ -35,14 +35,12 @@ message QueryDidDocResponse {
 
 message QueryAllDidsRequest {} //No input needed
 
-
 message QueryAllDidsResponse {
   // List of all DIDs
   string dids = 1;
 }
 
 message QueryAllDidDocsRequest {} //No input needed
-
 
 message QueryAllDidDocsResponse {
   // List of all DidDocs
