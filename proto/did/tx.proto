@@ -1,0 +1,28 @@
+syntax = "proto3";
+package did;
+
+//import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "gogoproto/gogo.proto";
+import "did/did.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
+
+// To get a list of all module messages, go to your module's handler.go and check all cases in NewHandler().
+service Msg {
+  rpc AddDid(MsgAddDid) returns (MsgAddDidResponse);
+
+  rpc AddCredential(MsgAddCredential) returns (MsgAddCredentialResponse);
+}
+
+message MsgAddDid {
+  Did did       = 1 [(gogoproto.moretags) = "yaml:\"did\""]; //TODO should this just be string instead of Did?
+  string pubkey = 2 [(gogoproto.moretags) = "yaml:\"pubKey\""];
+}
+
+message MsgAddDidResponse {}
+
+message MsgAddCredential {
+  DidCredential didcredential = 1 [(gogoproto.moretags) = "yaml:\"credential\""];
+}
+
+message MsgAddCredentialResponse {}

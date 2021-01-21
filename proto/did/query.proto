@@ -1,0 +1,50 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "did/did.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
+
+// To get a list of all module queries, go to your module's keeper/querier.go and check all cases in NewQuerier().
+// REST endpoints taken from previous did/client/rest/query.go
+service Query {
+  rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
+    option (google.api.http).get = "/did/{did}"; //TODO this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+  }
+
+  rpc AllDids(QueryAllDidsRequest) returns (QueryAllDidsResponse) {
+    option (google.api.http).get = "/did";
+  }
+
+  rpc AllDidDocs(QueryAllDidDocsRequest) returns (QueryAllDidDocsResponse) {
+    option (google.api.http).get = "/allDidDocs";
+  }
+}
+
+// Request/response types from old x/did/client/cli/query.go
+message QueryDidDocRequest {
+  Did did = 1;
+}
+
+message QueryDidDocResponse {
+  // DidDoc corresponding to given DID
+  string diddoc = 1;
+}
+
+message QueryAllDidsRequest {} //No input needed
+
+
+message QueryAllDidsResponse {
+  // List of all DIDs
+  string dids = 1;
+}
+
+message QueryAllDidDocsRequest {} //No input needed
+
+
+message QueryAllDidDocsResponse {
+  // List of all DidDocs
+  string diddocs = 1;
+}

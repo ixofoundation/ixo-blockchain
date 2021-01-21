@@ -1,0 +1,12 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+import "did/did.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
+
+// GenesisState defines the did module's genesis state.
+message GenesisState {
+  repeated DidDoc diddocs = 1 [(gogoproto.nullable) = false];
+}
