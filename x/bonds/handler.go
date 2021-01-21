@@ -299,14 +299,29 @@ func handleMsgEditAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEdit
 			"editor must be the creator of the bond")
 	}
 
-	// Get reserve and supply
+	// Get reserve, supply, outcome payment
 	R := bond.CurrentReserve[0].Amount // common reserve balance
 	S := bond.CurrentSupply.Amount
+	C := bond.OutcomePayment
+
+	// Get current parameters
+	paramsMap := bond.FunctionParameters.AsMap()
+
+	// Check 1 (I > C * alpha)
+	if paramsMap["I0"].LTE(msg.Alpha.MulInt(C)) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"cannot change alpha to that value due to violated restriction [1]")
+	}
+	// Check 2 (R / C > newAlpha - alpha)
+	RDec := sdk.NewDecFromInt(R)
+	if RDec.QuoInt(C).LTE(msg.Alpha.Sub(paramsMap["alpha"])) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"cannot change alpha to that value due to violated restriction [2]")
+	}
 
 	// Recalculate kappa and V0 using new alpha
-	paramsMap := bond.FunctionParameters.AsMap()
 	newAlpha := msg.Alpha
-	newKappa := types.Kappa(paramsMap["I0"], bond.OutcomePayment, newAlpha)
+	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
 	newV0 := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
 
 	// Set new function parameters

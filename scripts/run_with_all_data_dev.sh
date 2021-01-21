@@ -65,9 +65,9 @@ TO="\"$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
 # Set min-gas-prices (using fee token)
-FROM="minimum-gas-prices = \"\""
-TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
-sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+#FROM="minimum-gas-prices = \"\""
+#TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
+#sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 ixocli config chain-id pandora-1
 ixocli config output json
