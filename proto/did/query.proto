@@ -25,7 +25,7 @@ service Query {
 
 // Request/response types from old x/did/client/cli/query.go
 message QueryDidDocRequest {
-  Did did = 1;
+  /*Did*/ string did = 1;
 }
 
 message QueryDidDocResponse {
