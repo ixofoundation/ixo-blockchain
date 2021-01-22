@@ -47,7 +47,7 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | Did |
+| id | [string](#string) |  |  |
 | KYCvalidated | [bool](#bool) |  |  |
 
 
@@ -64,7 +64,7 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | credtype | [string](#string) | repeated |  |
-| issuer | [string](#string) |  | Did |
+| issuer | [string](#string) |  |  |
 | issued | [string](#string) |  |  |
 | claim | [Claim](#did.Claim) |  |  |
 
@@ -178,7 +178,7 @@ Request/response types from old x/did/client/cli/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  | Did |
+| did | [string](#string) |  |  |
 
 
 
@@ -193,7 +193,9 @@ Request/response types from old x/did/client/cli/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diddoc | [string](#string) |  | DidDoc corresponding to given DID |
+| diddoc | [string](#string) |  | DidDoc corresponding to given DID
+
+TODO string or DidDoc? (latter we would have to create) |
 
 
 
@@ -237,7 +239,7 @@ REST endpoints taken from previous did/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| didcredential | [DidCredential](#did.DidCredential) |  |  |
+| didCredential | [DidCredential](#did.DidCredential) |  |  |
 
 
 
@@ -262,8 +264,8 @@ REST endpoints taken from previous did/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  | Did |
-| pubkey | [string](#string) |  |  |
+| did | [string](#string) |  |  |
+| pubKey | [string](#string) |  |  |
 
 
 
