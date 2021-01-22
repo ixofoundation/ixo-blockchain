@@ -11,7 +11,7 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/type
 // REST endpoints taken from previous did/client/rest/query.go
 service Query {
   rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
-    option (google.api.http).get = "/did/{did}"; //TODO this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+    option (google.api.http).get = "/did/{did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
   }
 
   rpc AllDids(QueryAllDidsRequest) returns (QueryAllDidsResponse) {
@@ -25,24 +25,24 @@ service Query {
 
 // Request/response types from old x/did/client/cli/query.go
 message QueryDidDocRequest {
-  /*Did*/ string did = 1;
+  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
 }
 
 message QueryDidDocResponse {
   // DidDoc corresponding to given DID
-  string diddoc = 1;
+  string diddoc = 1 [(gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\""]; //TODO string or DidDoc? (latter we would have to create)
 }
 
 message QueryAllDidsRequest {} //No input needed
 
 message QueryAllDidsResponse {
   // List of all DIDs
-  string dids = 1;
+  string dids = 1 [(gogoproto.moretags) = "json:\"dids\" yaml:\"dids\""];
 }
 
 message QueryAllDidDocsRequest {} //No input needed
 
 message QueryAllDidDocsResponse {
   // List of all DidDocs
-  string diddocs = 1;
+  string diddocs = 1 [(gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\""];
 }

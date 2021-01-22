@@ -2,7 +2,6 @@ syntax = "proto3";
 package did;
 
 import "gogoproto/gogo.proto";
-import "google/protobuf/any.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
 
@@ -19,17 +18,13 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/type
 //}
 
 message DidCredential {
-  option (gogoproto.goproto_stringer) = false;
-
-  repeated string credtype = 1;
-  /*Did*/ string issuer = 2;
-  string issued = 3;
-  Claim claim = 4;
+  repeated string credtype = 1 [(gogoproto.moretags) = "json:\"type\" yaml:\"type\""];
+  string issuer            = 2 [(gogoproto.moretags) = "json:\"issuer\" yaml:\"issuer\""];
+  string issued            = 3 [(gogoproto.moretags) = "json:\"issued\" yaml:\"issued\""];
+  Claim claim              = 4 [(gogoproto.moretags) = "json:\"claim\" yaml:\"claim\""];
 }
 
 message Claim {
-  option (gogoproto.goproto_stringer) = false;
-
-  /*Did*/ string id = 1;
-  bool KYCvalidated = 2;
+  string id         = 1 [(gogoproto.moretags) = "json:\"id\" yaml:\"id\""];
+  bool KYCvalidated = 2 [(gogoproto.moretags) = "json:\"KYCValidated\" yaml:\"KYCValidated\""];
 }

@@ -15,14 +15,14 @@ service Msg {
 }
 
 message MsgAddDid {
-  /*Did*/ string did = 1 [(gogoproto.moretags) = "yaml:\"did\""];
-  string pubkey = 2 [(gogoproto.moretags) = "yaml:\"pubKey\""];
+  string did    = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+  string pubKey = 2 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
 }
 
 message MsgAddDidResponse {}
 
 message MsgAddCredential {
-  DidCredential didcredential = 1 [(gogoproto.moretags) = "yaml:\"credential\""];
+  DidCredential didCredential = 1 [(gogoproto.moretags) = "json:\"credential\" yaml:\"credential\""];
 }
 
 message MsgAddCredentialResponse {}
