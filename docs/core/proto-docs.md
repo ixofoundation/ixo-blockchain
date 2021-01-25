@@ -6,17 +6,25 @@
 - [did/did.proto](#did/did.proto)
     - [Claim](#did.Claim)
     - [DidCredential](#did.DidCredential)
+    - [IxoDid](#did.IxoDid)
+    - [Secret](#did.Secret)
   
 - [did/genesis.proto](#did/genesis.proto)
     - [GenesisState](#did.GenesisState)
   
 - [did/query.proto](#did/query.proto)
+    - [QueryAddressFromBase58EncodedPubkeyRequest](#did.QueryAddressFromBase58EncodedPubkeyRequest)
+    - [QueryAddressFromBase58EncodedPubkeyResponse](#did.QueryAddressFromBase58EncodedPubkeyResponse)
+    - [QueryAddressFromDidRequest](#did.QueryAddressFromDidRequest)
+    - [QueryAddressFromDidResponse](#did.QueryAddressFromDidResponse)
     - [QueryAllDidDocsRequest](#did.QueryAllDidDocsRequest)
     - [QueryAllDidDocsResponse](#did.QueryAllDidDocsResponse)
     - [QueryAllDidsRequest](#did.QueryAllDidsRequest)
     - [QueryAllDidsResponse](#did.QueryAllDidsResponse)
     - [QueryDidDocRequest](#did.QueryDidDocRequest)
     - [QueryDidDocResponse](#did.QueryDidDocResponse)
+    - [QueryIxoDidFromMnemonicRequest](#did.QueryIxoDidFromMnemonicRequest)
+    - [QueryIxoDidFromMnemonicResponse](#did.QueryIxoDidFromMnemonicResponse)
   
     - [Query](#did.Query)
   
@@ -72,6 +80,41 @@
 
 
 
+
+<a name="did.IxoDid"></a>
+
+### IxoDid
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| did | [string](#string) |  |  |
+| verifyKey | [string](#string) |  |  |
+| encryptionPublicKey | [string](#string) |  |  |
+| secret | [Secret](#did.Secret) |  |  |
+
+
+
+
+
+
+<a name="did.Secret"></a>
+
+### Secret
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| seed | [string](#string) |  |  |
+| signKey | [string](#string) |  |  |
+| encryptionPrivateKey | [string](#string) |  |  |
+
+
+
+
+
  
 
  
@@ -120,10 +163,70 @@ GenesisState defines the did module&#39;s genesis state.
 
 
 
+<a name="did.QueryAddressFromBase58EncodedPubkeyRequest"></a>
+
+### QueryAddressFromBase58EncodedPubkeyRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pubKey | [string](#string) |  | pubKey defines the PubKey for the requested address |
+
+
+
+
+
+
+<a name="did.QueryAddressFromBase58EncodedPubkeyResponse"></a>
+
+### QueryAddressFromBase58EncodedPubkeyResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  | address returns the address for a given PubKey |
+
+
+
+
+
+
+<a name="did.QueryAddressFromDidRequest"></a>
+
+### QueryAddressFromDidRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| did | [string](#string) |  | did defines the DID for the requested address |
+
+
+
+
+
+
+<a name="did.QueryAddressFromDidResponse"></a>
+
+### QueryAddressFromDidResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  | address returns the address for a given DID |
+
+
+
+
+
+
 <a name="did.QueryAllDidDocsRequest"></a>
 
 ### QueryAllDidDocsRequest
-No input needed
+no input needed
 
 
 
@@ -138,7 +241,7 @@ No input needed
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diddocs | [string](#string) |  | List of all DidDocs |
+| diddocs | [google.protobuf.Any](#google.protobuf.Any) | repeated | diddocs returns a list of all DidDocs |
 
 
 
@@ -148,7 +251,7 @@ No input needed
 <a name="did.QueryAllDidsRequest"></a>
 
 ### QueryAllDidsRequest
-No input needed
+no input needed
 
 
 
@@ -163,7 +266,7 @@ No input needed
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| dids | [string](#string) |  | List of all DIDs |
+| dids | [string](#string) | repeated | dids returns a list of all DIDs |
 
 
 
@@ -173,12 +276,12 @@ No input needed
 <a name="did.QueryDidDocRequest"></a>
 
 ### QueryDidDocRequest
-Request/response types from old x/did/client/cli/query.go
+Request/response types from old x/did/client/cli/query.go and x/did/client/rest/query.go
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  |  |
+| did | [string](#string) |  | did defines the DID for the requested DidDoc |
 
 
 
@@ -193,9 +296,37 @@ Request/response types from old x/did/client/cli/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diddoc | [string](#string) |  | DidDoc corresponding to given DID
+| diddoc | [google.protobuf.Any](#google.protobuf.Any) |  | diddoc returns the requested DidDoc |
 
-TODO string or DidDoc? (latter we would have to create) |
+
+
+
+
+
+<a name="did.QueryIxoDidFromMnemonicRequest"></a>
+
+### QueryIxoDidFromMnemonicRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| mnemonic | [string](#string) |  | mnemonic defines the 12-word secret mnemonic for a given ixo DID |
+
+
+
+
+
+
+<a name="did.QueryIxoDidFromMnemonicResponse"></a>
+
+### QueryIxoDidFromMnemonicResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ixodid | [IxoDid](#did.IxoDid) |  | ixodid returns the IxoDid for a given 12-word mnemonic |
 
 
 
@@ -219,6 +350,9 @@ REST endpoints taken from previous did/client/rest/query.go
 | DidDoc | [QueryDidDocRequest](#did.QueryDidDocRequest) | [QueryDidDocResponse](#did.QueryDidDocResponse) |  |
 | AllDids | [QueryAllDidsRequest](#did.QueryAllDidsRequest) | [QueryAllDidsResponse](#did.QueryAllDidsResponse) |  |
 | AllDidDocs | [QueryAllDidDocsRequest](#did.QueryAllDidDocsRequest) | [QueryAllDidDocsResponse](#did.QueryAllDidDocsResponse) |  |
+| AddressFromDid | [QueryAddressFromDidRequest](#did.QueryAddressFromDidRequest) | [QueryAddressFromDidResponse](#did.QueryAddressFromDidResponse) |  |
+| AddressFromBase58EncodedPubkey | [QueryAddressFromBase58EncodedPubkeyRequest](#did.QueryAddressFromBase58EncodedPubkeyRequest) | [QueryAddressFromBase58EncodedPubkeyResponse](#did.QueryAddressFromBase58EncodedPubkeyResponse) |  |
+| IxoDidFromMnemonic | [QueryIxoDidFromMnemonicRequest](#did.QueryIxoDidFromMnemonicRequest) | [QueryIxoDidFromMnemonicResponse](#did.QueryIxoDidFromMnemonicResponse) |  |
 
  
 
