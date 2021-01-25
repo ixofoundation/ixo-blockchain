@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
 )
 
@@ -11,20 +12,27 @@ var (
 
 // ApproxRoot returns an approximation of a Dec's nth root
 func ApproxRoot(d sdk.Dec, root sdk.Dec) (guess sdk.Dec, err error) {
-	return ApproxPower(d, sdk.OneDec().Quo(root)), nil
+	return ApproxPower(d, sdk.OneDec().Quo(root))
 }
 
 // ApproxPower returns an approximation of raising a Dec to a positive power
-func ApproxPower(d sdk.Dec, power sdk.Dec) sdk.Dec {
+func ApproxPower(d sdk.Dec, power sdk.Dec) (guess sdk.Dec, err error) {
 	// Convert Dec's to Uint's
 	dUint := sdk.NewUintFromBigInt(d.Int)
 	powerUint := sdk.NewUintFromBigInt(power.Int)
+
+	// Handle panics
+	defer func() {
+		if r := recover(); r != nil {
+			err = sdkerrors.Wrapf(ErrInvalidAlpha, "%s", r)
+		}
+	}()
 
 	// Find answer using the Uint's
 	ansUint := pow(dUint, powerUint)
 
 	// Convert back to Dec
-	return sdk.NewDecFromBigInt(ansUint.BigInt()).Quo(TEN18DEC)
+	return sdk.NewDecFromBigInt(ansUint.BigInt()).Quo(TEN18DEC), nil
 }
 
 func RoundReservePrice(p sdk.DecCoin) sdk.Coin {

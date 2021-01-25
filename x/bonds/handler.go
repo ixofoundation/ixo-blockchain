@@ -132,7 +132,10 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 		R0 := d0.Mul(sdk.OneDec().Sub(theta))
 		S0 := d0.Quo(p0)
-		V0 := types.Invariant(R0, S0, kappa)
+		V0, err := types.Invariant(R0, S0, kappa)
+		if err != nil {
+			return nil, err
+		}
 
 		// S1 * reserve / (S1 * reserve - S0 * reserve + S0 * C) with S0=S1=1
 		alpha := R0.QuoInt(msg.OutcomePayment)
@@ -321,7 +324,10 @@ func handleMsgEditAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEdit
 	// Recalculate kappa and V0 using new alpha
 	newAlpha := msg.Alpha
 	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
-	newV0 := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
+	newV0, err := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
+	if err != nil {
+		return nil, err
+	}
 
 	// Set new function parameters
 	bond.FunctionParameters.ReplaceParam("kappa", newKappa)

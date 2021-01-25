@@ -288,7 +288,11 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		m := args["m"]
 		n := args["n"]
 		c := args["c"]
-		result = bond.GetNewReserveDecCoins(ApproxPower(x, n).Mul(m).Add(c))
+		XtoN, err := ApproxPower(x, n)
+		if err != nil {
+			return nil, err
+		}
+		result = bond.GetNewReserveDecCoins(XtoN.Mul(m).Add(c))
 	case SigmoidFunction:
 		a := args["a"]
 		b := args["b"]
@@ -309,12 +313,19 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 			result = bond.GetNewReserveDecCoins(args["p0"])
 		case OpenState:
 			kappa := args["kappa"]
-			res := Reserve(x, kappa, args["V0"])
+			res, err := Reserve(x, kappa, args["V0"])
+			if err != nil {
+				return nil, err
+			}
+
 			// If reserve < 1, default to zero price to avoid calculation issues
 			if res.LT(sdk.OneDec()) {
 				result = bond.GetNewReserveDecCoins(sdk.ZeroDec())
 			} else {
-				spotPriceDec := SpotPrice(res, kappa, args["V0"])
+				spotPriceDec, err := SpotPrice(res, kappa, args["V0"])
+				if err != nil {
+					return nil, err
+				}
 				result = bond.GetNewReserveDecCoins(spotPriceDec)
 			}
 		case SettleState:
@@ -351,7 +362,7 @@ func (bond Bond) GetCurrentPricesPT(reserveBalances sdk.Coins) (sdk.DecCoins, er
 	}
 }
 
-func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
+func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec, err error) {
 	if supply.IsNegative() {
 		panic(fmt.Sprintf("negative supply for bond %s", bond.Token))
 	}
@@ -363,7 +374,10 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 		m := args["m"]
 		n := args["n"]
 		c := args["c"]
-		temp1 := ApproxPower(x, n.Add(sdk.OneDec()))
+		temp1, err := ApproxPower(x, n.Add(sdk.OneDec()))
+		if err != nil {
+			return sdk.Dec{}, err
+		}
 		temp2 := temp1.Mul(m).Quo(n.Add(sdk.OneDec()))
 		temp3 := x.Mul(c)
 		result = temp2.Add(temp3)
@@ -387,7 +401,10 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 	case AugmentedFunction:
 		kappa := args["kappa"]
 		V0 := args["V0"]
-		result = Reserve(x, kappa, V0)
+		result, err = Reserve(x, kappa, V0)
+		if err != nil {
+			return sdk.Dec{}, err
+		}
 	case SwapperFunction:
 		panic("invalid function for function type")
 	default:
@@ -399,7 +416,7 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 		// intersect the x-axis and is greater than zero throughout
 		panic(fmt.Sprintf("negative reserve result for bond %s", bond.Token))
 	}
-	return result
+	return result, nil
 }
 
 func (bond Bond) GetReserveDeltaForLiquidityDelta(mintOrBurn sdk.Int, reserveBalances sdk.Coins) sdk.DecCoins {
@@ -463,16 +480,20 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	case SigmoidFunction:
 		fallthrough
 	case AugmentedFunction:
+		reserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Add(mint))
+		if err != nil {
+			return nil, err
+		}
+
 		var priceToMint sdk.Dec
-		result := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Add(mint))
 		if reserveBalances.Empty() {
-			priceToMint = result
+			priceToMint = reserve
 		} else {
 			// Reserve balances should all be equal given that we are always
 			// applying the same additions/subtractions to all reserve balances.
 			// Thus we can pick the first reserve balance as the global balance.
 			commonReserveBalance := reserveBalances[0].Amount.ToDec()
-			priceToMint = result.Sub(commonReserveBalance)
+			priceToMint = reserve.Sub(commonReserveBalance)
 		}
 		if priceToMint.IsNegative() {
 			// Negative priceToMint means that the previous buyer overpaid
@@ -492,7 +513,7 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	// Note: fees have to be added to these prices to get actual prices
 }
 
-func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.DecCoins {
+func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) (sdk.DecCoins, error) {
 	if burn.IsNegative() {
 		panic(fmt.Sprintf("negative burn amount for bond %s", bond.Token))
 	} else if reserveBalances.IsAnyNegative() {
@@ -505,7 +526,10 @@ func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.
 	case SigmoidFunction:
 		fallthrough
 	case AugmentedFunction:
-		result := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Sub(burn))
+		reserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Sub(burn))
+		if err != nil {
+			return nil, err
+		}
 
 		var reserveBalance sdk.Dec
 		if reserveBalances.Empty() {
@@ -517,15 +541,15 @@ func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.
 			reserveBalance = reserveBalances[0].Amount.ToDec()
 		}
 
-		if result.GT(reserveBalance) {
+		if reserve.GT(reserveBalance) {
 			panic("not enough reserve available for burn")
 		} else {
-			returnForBurn := reserveBalance.Sub(result)
-			return bond.GetNewReserveDecCoins(returnForBurn)
+			returnForBurn := reserveBalance.Sub(reserve)
+			return bond.GetNewReserveDecCoins(returnForBurn), nil
 			// TODO: investigate possibility of negative returnForBurn
 		}
 	case SwapperFunction:
-		return bond.GetReserveDeltaForLiquidityDelta(burn, reserveBalances)
+		return bond.GetReserveDeltaForLiquidityDelta(burn, reserveBalances), nil
 	default:
 		panic("unrecognized function type")
 	}

@@ -117,7 +117,10 @@ func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch typ
 	} else {
 		matchedAmount = buyAmountDec // since buys < sells, greatest common amount is buys
 		extraSells := batch.TotalSellAmount.Sub(batch.TotalBuyAmount)
-		curvedValues = bond.GetReturnsForBurn(extraSells.Amount, reserveBalances) // sell returns
+		curvedValues, err = bond.GetReturnsForBurn(extraSells.Amount, reserveBalances) // sell returns
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	// Get (actual) matched values

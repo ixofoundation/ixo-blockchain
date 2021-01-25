@@ -284,7 +284,10 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
-	reserveReturns := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
+	reserveReturns, err := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
+	if err != nil {
+		return nil, err
+	}
 	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
 
 	txFees := bond.GetTxFees(reserveReturns)
