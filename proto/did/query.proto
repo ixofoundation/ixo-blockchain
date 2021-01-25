@@ -24,7 +24,11 @@ service Query {
   }
 
   rpc AddressFromDid(QueryAddressFromDidRequest) returns (QueryAddressFromDidResponse) {
+<<<<<<< Updated upstream
     option (google.api.http).get = "/didToAddr/{did=**}";
+=======
+    option (google.api.http).get = "/didToAddr/{did}"; ///{did:.*}";
+>>>>>>> Stashed changes
   }
 
   rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest) returns (QueryAddressFromBase58EncodedPubkeyResponse) {
