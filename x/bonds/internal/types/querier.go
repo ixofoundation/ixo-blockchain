@@ -32,3 +32,8 @@ type QuerySwapReturn struct {
 	TotalReturns sdk.Coins `json:"total_returns" yaml:"total_returns"`
 	TotalFees    sdk.Coins `json:"total_fees" yaml:"total_fees"`
 }
+
+type QueryAlphaMaximums struct {
+	MaxAlphaIncrease sdk.Dec `json:"max_alpha_increase" yaml:"max_alpha_increase"`
+	MaxAlpha         sdk.Dec `json:"max_alpha" yaml:"max_alpha"`
+}

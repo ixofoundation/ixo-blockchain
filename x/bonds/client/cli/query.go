@@ -33,6 +33,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdBuyPrice(storeKey, cdc),
 		GetCmdSellReturn(storeKey, cdc),
 		GetCmdSwapReturn(storeKey, cdc),
+		GetCmdAlphaMaximums(storeKey, cdc),
 		GetParamsRequestHandler(cdc),
 	)...)
 
@@ -390,6 +391,41 @@ func GetCmdSwapReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var out types.QuerySwapReturn
+			err = cdc.UnmarshalJSON(res, &out)
+			if err != nil {
+				return err
+			}
+
+			output, err := cdc.MarshalJSONIndent(out, "", "  ")
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+}
+
+func GetCmdAlphaMaximums(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:     "alpha-maximums [bond-did]",
+		Example: "alpha-maximums U7GK8p8rVhJMKhBVRCJJ8c",
+		Short:   "Query alpha maximums for an augmented bonding curve",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			bondDid := args[0]
+
+			res, _, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/alpha_maximums/%s",
+					queryRoute, bondDid), nil)
+			if err != nil {
+				fmt.Printf("%s", err.Error())
+				return nil
+			}
+
+			var out types.QueryAlphaMaximums
 			err = cdc.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err
