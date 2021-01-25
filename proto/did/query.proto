@@ -3,6 +3,7 @@ package did;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
 import "did/did.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
@@ -21,28 +22,69 @@ service Query {
   rpc AllDidDocs(QueryAllDidDocsRequest) returns (QueryAllDidDocsResponse) {
     option (google.api.http).get = "/allDidDocs";
   }
+
+  rpc AddressFromDid(QueryAddressFromDidRequest) returns (QueryAddressFromDidResponse) {
+    option (google.api.http).get = "/didToAddr/{did:.*}";
+  }
+
+  rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest) returns (QueryAddressFromBase58EncodedPubkeyResponse) {
+    option (google.api.http).get = "/pubKeyToAddr/{pubKey}";
+  }
+
+  rpc IxoDidFromMnemonic(QueryIxoDidFromMnemonicRequest) returns (QueryIxoDidFromMnemonicResponse);
 }
 
-// Request/response types from old x/did/client/cli/query.go
+// Request/response types from old x/did/client/cli/query.go and x/did/client/rest/query.go
 message QueryDidDocRequest {
+  // did defines the DID for the requested DidDoc
   string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
 }
 
 message QueryDidDocResponse {
-  // DidDoc corresponding to given DID
-  string diddoc = 1 [(gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\""]; //TODO string or DidDoc? (latter we would have to create)
+  // diddoc returns the requested DidDoc
+  google.protobuf.Any diddoc = 1 [(gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\""];
 }
 
-message QueryAllDidsRequest {} //No input needed
+message QueryAllDidsRequest {} // no input needed
 
 message QueryAllDidsResponse {
-  // List of all DIDs
-  string dids = 1 [(gogoproto.moretags) = "json:\"dids\" yaml:\"dids\""];
+  // dids returns a list of all DIDs
+  repeated string dids = 1 [(gogoproto.moretags) = "json:\"dids\" yaml:\"dids\""];
 }
 
-message QueryAllDidDocsRequest {} //No input needed
+message QueryAllDidDocsRequest {} // no input needed
 
 message QueryAllDidDocsResponse {
-  // List of all DidDocs
-  string diddocs = 1 [(gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\""];
+  // diddocs returns a list of all DidDocs
+  repeated google.protobuf.Any diddocs = 1 [(gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\""];
+}
+
+message QueryAddressFromDidRequest {
+  // did defines the DID for the requested address
+  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+}
+
+message QueryAddressFromDidResponse {
+  // address returns the address for a given DID
+  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+}
+
+message QueryAddressFromBase58EncodedPubkeyRequest {
+  // pubKey defines the PubKey for the requested address
+  string pubKey = 1 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
+}
+
+message QueryAddressFromBase58EncodedPubkeyResponse {
+  // address returns the address for a given PubKey
+  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+}
+
+message QueryIxoDidFromMnemonicRequest {
+  // mnemonic defines the 12-word secret mnemonic for a given ixo DID
+  string mnemonic = 1 [(gogoproto.moretags) = "json:\"mnemonic\" yaml:\"mnemonic\""];
+}
+
+message QueryIxoDidFromMnemonicResponse {
+  // ixodid returns the IxoDid for a given 12-word mnemonic
+  IxoDid ixodid = 1 [(gogoproto.moretags) = "json:\"ixodid\" yaml:\"ixodid\""];
 }
