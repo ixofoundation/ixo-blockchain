@@ -12,10 +12,6 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-var (
-	DefaultAlpha = sdk.NewDecWithPrec(5, 1) // 0.5
-)
-
 func NewHandler(keeper keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
@@ -137,8 +133,11 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		R0 := d0.Mul(sdk.OneDec().Sub(theta))
 		S0 := d0.Quo(p0)
 		V0 := types.Invariant(R0, S0, kappa)
-		I0 := types.InvariantI(msg.OutcomePayment, DefaultAlpha, sdk.ZeroInt())
-		alpha := DefaultAlpha
+
+		// S1 * reserve / (S1 * reserve - S0 * reserve + S0 * C) with S0=S1=1
+		alpha := R0.QuoInt(msg.OutcomePayment)
+
+		I0 := types.InvariantI(msg.OutcomePayment, alpha, sdk.ZeroInt())
 
 		msg.FunctionParameters = msg.FunctionParameters.AddParams(
 			types.FunctionParams{
