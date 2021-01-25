@@ -317,6 +317,8 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 				spotPriceDec := SpotPrice(res, kappa, args["V0"])
 				result = bond.GetNewReserveDecCoins(spotPriceDec)
 			}
+		case SettleState:
+			return nil, ErrInvalidStateForAction
 		default:
 			panic("unrecognized bond state")
 		}
