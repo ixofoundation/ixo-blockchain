@@ -121,19 +121,26 @@ func local_request_Query_AllDidDocs_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-var (
-	filter_Query_AddressFromDid_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-)
-
 func request_Query_AddressFromDid_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryAddressFromDidRequest
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["did"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_AddressFromDid_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Did, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did", err)
 	}
 
 	msg, err := client.AddressFromDid(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -145,11 +152,22 @@ func local_request_Query_AddressFromDid_0(ctx context.Context, marshaler runtime
 	var protoReq QueryAddressFromDidRequest
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["did"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "did")
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_AddressFromDid_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+
+	protoReq.Did, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "did", err)
 	}
 
 	msg, err := server.AddressFromDid(ctx, &protoReq)
@@ -468,7 +486,7 @@ var (
 
 	pattern_Query_AllDidDocs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"allDidDocs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_AddressFromDid_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"didToAddr"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_AddressFromDid_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"didToAddr", "did"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_AddressFromBase58EncodedPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"pubKeyToAddr", "pubKey"}, "", runtime.AssumeColonVerbOpt(true)))
 )
