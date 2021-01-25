@@ -140,28 +140,34 @@ ixocli q bonds bond "$BOND_DID"
 echo "Current price is 3..."
 ixocli q bonds current-price "$BOND_DID"
 
-#echo "Changing alpha 0.5->????..."
-#NEW_ALPHA="????"
-#ixocli tx bonds edit-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-#echo "Current price is now ????..."
-#ixocli q bonds current-price "$BOND_DID"
-#
-#echo "Miguel sells 20000abc..."
-#ixocli tx bonds sell 20000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-#echo "Miguel's account..."
-#ixocli q auth account "$MIGUEL_ADDR"
-#
-#echo "Francesco makes outcome payment..."
-#ixocli tx bonds make-outcome-payment "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-#echo "Francesco's account..."
-#ixocli q auth account "$FRANCESCO_ADDR"
-#
-#echo "Francesco withdraws share..."
-#ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-#echo "Francesco's account..."
-#ixocli q auth account "$FRANCESCO_ADDR"
-#
-#echo "Shaun withdraws share..."
-#ixocli tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-#echo "Shaun's account..."
-#ixocli q auth account "$SHAUN_ADDR"
+echo "Changing alpha to 0.0033->0.004..."
+NEW_ALPHA="0.0044"
+ixocli tx bonds edit-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is now approx 2.94..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Changing alpha to 0.004->0.0033..."
+NEW_ALPHA="0.0033"
+ixocli tx bonds edit-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is now approx 1.98..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Miguel sells 400000abc..."
+ixocli tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel's account..."
+ixocli q auth account "$MIGUEL_ADDR"
+
+echo "Francesco makes outcome payment..."
+ixocli tx bonds make-outcome-payment "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco's account..."
+ixocli q auth account "$FRANCESCO_ADDR"
+
+echo "Francesco withdraws share..."
+ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco's account..."
+ixocli q auth account "$FRANCESCO_ADDR"
+
+echo "Shaun withdraws share..."
+ixocli tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Shaun's account..."
+ixocli q auth account "$SHAUN_ADDR"
