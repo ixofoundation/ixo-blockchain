@@ -486,7 +486,7 @@ var (
 
 	pattern_Query_AllDidDocs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"allDidDocs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_AddressFromDid_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"didToAddr", "did"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_AddressFromDid_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 3, 0, 4, 1, 5, 1}, []string{"didToAddr", "did"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_AddressFromBase58EncodedPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"pubKeyToAddr", "pubKey"}, "", runtime.AssumeColonVerbOpt(true)))
 )
