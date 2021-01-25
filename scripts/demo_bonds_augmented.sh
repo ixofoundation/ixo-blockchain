@@ -140,13 +140,13 @@ ixocli q bonds bond "$BOND_DID"
 echo "Current price is 3..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Changing alpha to 0.0033->0.004..."
+echo "Changing alpha to 0.0033->0.0044..."
 NEW_ALPHA="0.0044"
 ixocli tx bonds edit-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Current price is now approx 2.94..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Changing alpha to 0.004->0.0033..."
+echo "Changing alpha to 0.0044->0.0033..."
 NEW_ALPHA="0.0033"
 ixocli tx bonds edit-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Current price is now approx 1.98..."
