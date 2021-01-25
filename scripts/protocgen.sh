@@ -27,6 +27,8 @@ for dir in $proto_dirs; do
 Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
 
+  echo "$dir .pb.go generated"
+
   # command to generate gRPC gateway (*.pb.gw.go in respective modules) files
   buf protoc \
   -I "proto" \
@@ -34,21 +36,26 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   --grpc-gateway_out=logtostderr=true:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
 
+  echo "$dir .pb.gw.go generated"
 done
+
+echo "done"
 
 # command to generate docs using protoc-gen-doc
 buf protoc \
 -I "proto" \
 -I "third_party/proto" \
 --doc_out=./docs/core \
---doc_opt=./docs/protodoc-markdown.tmpl,proto-docs.md \
+--doc_opt=markdown,proto-docs.md \
 $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
 go mod tidy
 
+echo "done done"
+
 # generate codec/testdata proto code
-buf protoc -I "proto" -I "third_party/proto" -I "testutil/testdata" --gocosmos_out=plugins=interfacetype+grpc,\
-Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. ./testutil/testdata/*.proto
+#buf protoc -I "proto" -I "third_party/proto" -I "testutil/testdata" --gocosmos_out=plugins=interfacetype+grpc,\
+#Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. ./testutil/testdata/*.proto
 
 # move proto files to the right places
-cp -r github.com/cosmos/cosmos-sdk/* ./
+cp -r github.com/ixofoundation/ixo-blockchain/* ./
 rm -rf github.com
