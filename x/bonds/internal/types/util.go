@@ -24,7 +24,7 @@ func ApproxPower(d sdk.Dec, power sdk.Dec) (guess sdk.Dec, err error) {
 	// Handle panics
 	defer func() {
 		if r := recover(); r != nil {
-			err = sdkerrors.Wrapf(ErrInvalidAlpha, "%s", r)
+			err = sdkerrors.Wrapf(ErrNumericOverflow, "%s", r)
 		}
 	}()
 

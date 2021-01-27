@@ -51,4 +51,5 @@ var (
 	ErrBondTokenDoesNotMatchBond            = sdkerrors.Register(DefaultCodespace, 41, "bond token does not match bond")
 	ErrReservedBondToken                    = sdkerrors.Register(DefaultCodespace, 42, "bond token is reserved")
 	ErrInvalidAlpha                         = sdkerrors.Register(DefaultCodespace, 43, "alpha value is invalid")
+	ErrNumericOverflow                      = sdkerrors.Register(DefaultCodespace, 44, "numeric overflow")
 )
