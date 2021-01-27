@@ -3,7 +3,9 @@ package types
 const (
 	EventTypeCreateBond         = "create_bond"
 	EventTypeEditBond           = "edit_bond"
-	EventTypeEditAlpha          = "edit_alpha"
+	EventTypeSetNextAlpha       = "set_next_alpha"
+	EventTypeEditAlphaSuccess   = "edit_alpha_success"
+	EventTypeEditAlphaFailed    = "edit_alpha_failed"
 	EventTypeInitSwapper        = "init_swapper"
 	EventTypeBuy                = "buy"
 	EventTypeSell               = "sell"

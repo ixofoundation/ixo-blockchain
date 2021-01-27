@@ -11,7 +11,7 @@ import (
 const (
 	TypeMsgCreateBond         = "create_bond"
 	TypeMsgEditBond           = "edit_bond"
-	TypeMsgEditAlpha          = "edit_alpha"
+	TypeMsgSetNextAlpha       = "set_next_alpha"
 	TypeMsgBuy                = "buy"
 	TypeMsgSell               = "sell"
 	TypeMsgSwap               = "swap"
@@ -22,7 +22,7 @@ const (
 var (
 	_ ixo.IxoMsg = MsgCreateBond{}
 	_ ixo.IxoMsg = MsgEditBond{}
-	_ ixo.IxoMsg = MsgEditAlpha{}
+	_ ixo.IxoMsg = MsgSetNextAlpha{}
 	_ ixo.IxoMsg = MsgBuy{}
 	_ ixo.IxoMsg = MsgSell{}
 	_ ixo.IxoMsg = MsgSwap{}
@@ -264,15 +264,15 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-type MsgEditAlpha struct {
+type MsgSetNextAlpha struct {
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
 	Token     string  `json:"token" yaml:"token"`
 	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
 	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgEditAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) MsgEditAlpha {
-	return MsgEditAlpha{
+func NewMsgSetNextAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
+	return MsgSetNextAlpha{
 		BondDid:   bondDid,
 		Token:     token,
 		Alpha:     alpha,
@@ -280,7 +280,7 @@ func NewMsgEditAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) Ms
 	}
 }
 
-func (msg MsgEditAlpha) ValidateBasic() error {
+func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
@@ -305,18 +305,18 @@ func (msg MsgEditAlpha) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgEditAlpha) GetSignBytes() []byte {
+func (msg MsgSetNextAlpha) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgEditAlpha) GetSignerDid() did.Did { return msg.EditorDid }
-func (msg MsgEditAlpha) GetSigners() []sdk.AccAddress {
+func (msg MsgSetNextAlpha) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgSetNextAlpha) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
-func (msg MsgEditAlpha) Route() string { return RouterKey }
+func (msg MsgSetNextAlpha) Route() string { return RouterKey }
 
-func (msg MsgEditAlpha) Type() string { return TypeMsgEditAlpha }
+func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
 
 type MsgBuy struct {
 	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`

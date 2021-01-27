@@ -29,7 +29,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	bondsTxCmd.AddCommand(flags.PostCommands(
 		GetCmdCreateBond(cdc),
 		GetCmdEditBond(cdc),
-		GetCmdEditAlpha(cdc),
+		GetCmdSetNextAlpha(cdc),
 		GetCmdBuy(cdc),
 		GetCmdSell(cdc),
 		GetCmdSwap(cdc),
@@ -216,10 +216,10 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-func GetCmdEditAlpha(cdc *codec.Codec) *cobra.Command {
+func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "edit-alpha [bond-token] [alpha] [bond-did] [editor-did]",
-		Example: "edit-alpha abc 0.5 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Use:     "set-next-alpha [bond-token] [alpha] [bond-did] [editor-did]",
+		Example: "set-next-alpha abc 0.5 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
 		Short:   "Edit a bond's alpha parameter",
 		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -243,7 +243,7 @@ func GetCmdEditAlpha(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgEditAlpha(_bondToken, alpha, editorDid.Did, _bondDid)
+			msg := types.NewMsgSetNextAlpha(_bondToken, alpha, editorDid.Did, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},

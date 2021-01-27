@@ -20,8 +20,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgCreateBond(ctx, keeper, msg)
 		case types.MsgEditBond:
 			return handleMsgEditBond(ctx, keeper, msg)
-		case types.MsgEditAlpha:
-			return handleMsgEditAlpha(ctx, keeper, msg)
+		case types.MsgSetNextAlpha:
+			return handleMsgSetNextAlpha(ctx, keeper, msg)
 		case types.MsgBuy:
 			return handleMsgBuy(ctx, keeper, msg)
 		case types.MsgSell:
@@ -76,6 +76,11 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 				bond.AllowSells = true                       // enable sells
 				keeper.SetBond(ctx, bond.BondDid, bond)      // update bond
 			}
+		}
+
+		// Update alpha value if in open state and next alpha is not null
+		if bond.State == types.OpenState && batch.HasNextAlpha() {
+			keeper.UpdateAlpha(ctx, bond.BondDid)
 		}
 
 		// Save current batch as last batch and reset current batch
@@ -283,12 +288,14 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }
 
-func handleMsgEditAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditAlpha) (*sdk.Result, error) {
+func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSetNextAlpha) (*sdk.Result, error) {
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
 		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
+
+	newAlpha := msg.Alpha
 
 	if bond.FunctionType != types.AugmentedFunction {
 		return nil, types.ErrFunctionNotAvailableForFunctionType
@@ -301,50 +308,57 @@ func handleMsgEditAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEdit
 			"editor must be the creator of the bond")
 	}
 
-	// Get reserve, supply, outcome payment
-	R := bond.CurrentReserve[0].Amount // common reserve balance
-	S := bond.CurrentSupply.Amount
+	// Get supply, reserve, outcome payment. Note that we get the adjusted
+	// supply in order to take into consideration the influence of the buys and
+	// sells in the current batch. We then get the reserve based on this supply.
+	S := keeper.GetSupplyAdjustedForAlphaEdit(ctx, bond.BondDid).Amount
+	R, err := bond.ReserveAtSupply(S)
+	if err != nil {
+		return nil, err
+	}
 	C := bond.OutcomePayment
 
 	// Get current parameters
 	paramsMap := bond.FunctionParameters.AsMap()
 
-	// Check 1 (I > C * alpha)
-	if paramsMap["I0"].LTE(msg.Alpha.MulInt(C)) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+	// Check 1 (newAlpha != alpha)
+	if newAlpha.Equal(paramsMap["alpha"]) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			"cannot change alpha to the current value of alpha")
+	}
+	// Check 2 (I > C * alpha)
+	if paramsMap["I0"].LTE(newAlpha.MulInt(C)) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [1]")
 	}
-	// Check 2 (R / C > newAlpha - alpha)
-	RDec := sdk.NewDecFromInt(R)
-	if RDec.QuoInt(C).LTE(msg.Alpha.Sub(paramsMap["alpha"])) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+	// Check 3 (R / C > newAlpha - alpha)
+	if R.QuoInt(C).LTE(newAlpha.Sub(paramsMap["alpha"])) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [2]")
 	}
 
 	// Recalculate kappa and V0 using new alpha
-	newAlpha := msg.Alpha
 	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
-	newV0, err := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
+	_, err = types.Invariant(R, S.ToDec(), newKappa)
 	if err != nil {
 		return nil, err
 	}
 
-	// Set new function parameters
-	bond.FunctionParameters.ReplaceParam("kappa", newKappa)
-	bond.FunctionParameters.ReplaceParam("V0", newV0)
-	bond.FunctionParameters.ReplaceParam("alpha", newAlpha)
-	keeper.SetBond(ctx, bond.BondDid, bond)
+	// Get batch to set new alpha
+	batch := keeper.MustGetBatch(ctx, bond.BondDid)
+	batch.NextAlpha = newAlpha
+	keeper.SetBatch(ctx, bond.BondDid, batch)
 
 	logger := keeper.Logger(ctx)
-	logger.Info(fmt.Sprintf("bond %s alpha edited by %s",
+	logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
 		msg.BondDid, msg.EditorDid))
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeEditAlpha,
+			types.EventTypeSetNextAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
-			sdk.NewAttribute(types.AttributeKeyAlpha, msg.Alpha.String()),
+			sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

@@ -632,3 +632,71 @@ func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid did.Did) (can
 	k.SetBatch(ctx, bondDid, batch)
 	return cancelledOrders
 }
+
+func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
+	bond := k.MustGetBond(ctx, bondDid)
+	batch := k.MustGetBatch(ctx, bondDid)
+	newAlpha := batch.NextAlpha
+
+	// Get supply, reserve, outcome payment
+	S := bond.CurrentSupply.Amount.ToDec()
+	R := bond.CurrentReserve[0].Amount.ToDec()
+	C := bond.OutcomePayment
+
+	// Get current parameters
+	paramsMap := bond.FunctionParameters.AsMap()
+
+	// Check 1 (I > C * alpha)
+	if paramsMap["I0"].LTE(newAlpha.MulInt(C)) {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason,
+				"cannot change alpha to that value due to violated restriction [1]"),
+		))
+		return
+	}
+	// Check 2 (R / C > newAlpha - alpha)
+	if R.QuoInt(C).LTE(newAlpha.Sub(paramsMap["alpha"])) {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason,
+				"cannot change alpha to that value due to violated restriction [2]"),
+		))
+		return
+	}
+
+	// Recalculate kappa and V0 using new alpha
+	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
+	newV0, err := types.Invariant(R, S, newKappa)
+	if err != nil {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+		))
+		return
+	}
+
+	// Get batch to reset alpha
+	batch = k.MustGetBatch(ctx, bond.BondDid)
+	batch.NextAlpha = sdk.OneDec().Neg()
+	k.SetBatch(ctx, bond.BondDid, batch)
+
+	// Set new function parameters
+	bond.FunctionParameters.ReplaceParam("kappa", newKappa)
+	bond.FunctionParameters.ReplaceParam("V0", newV0)
+	bond.FunctionParameters.ReplaceParam("alpha", newAlpha)
+	k.SetBond(ctx, bond.BondDid, bond)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypeEditAlphaSuccess,
+		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+		sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
+	))
+}
