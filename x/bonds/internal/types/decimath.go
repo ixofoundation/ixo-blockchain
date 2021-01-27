@@ -1,3 +1,5 @@
+// SOURCE: https://github.com/RickGriff/decimath
+
 package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"

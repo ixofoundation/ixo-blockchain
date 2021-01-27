@@ -1,3 +1,5 @@
+# SOURCE: https://github.com/RickGriff/decimath
+
 # Abbreviation: DP stands for 'Decimal Places'
 
 TEN38 = int(10 ** 38)
