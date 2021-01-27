@@ -23,9 +23,9 @@ yes $PASSWORD | ixocli keys add fee4
 yes $PASSWORD | ixocli keys add fee5
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000000uixo,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000000uixo,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000000uixo,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show miguel -a)" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show francesco -a)" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 100000000000uixo,100000000000res,100000000000rez
 
 # Add pubkey-based genesis accounts
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
@@ -40,7 +40,7 @@ MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
 yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "uixo:mint"
-yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "uixo:mint/burn/transfer,xusd:mint/burn/transfer"
+yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "uixo:mint/burn/transfer,uxgbp:mint/burn/transfer"
 yes $PASSWORD | ixod add-genesis-oracle "$SHAUN_DID" "res:transfer,rez:transfer"
 
 # Add ixo did
@@ -65,9 +65,9 @@ TO="\"$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
 # Set min-gas-prices (using fee token)
-#FROM="minimum-gas-prices = \"\""
-#TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
-#sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+FROM="minimum-gas-prices = \"\""
+TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 ixocli config chain-id pandora-1
 ixocli config output json
