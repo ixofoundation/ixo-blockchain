@@ -19,6 +19,9 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/payments/contracts/{%s}", RestPaymentContractId),
 		queryPaymentContractHandler(cliCtx)).Methods("GET")
 
+	r.HandleFunc(fmt.Sprintf("/payments/contracts_by_id_prefix/{%s}", RestPaymentContractsIdPrefix),
+		queryPaymentContractsByIdPrefixHandler(cliCtx)).Methods("GET")
+
 	r.HandleFunc(fmt.Sprintf("/payments/subscriptions/{%s}", RestSubscriptionId),
 		querySubscriptionHandler(cliCtx)).Methods("GET")
 }
@@ -68,6 +71,30 @@ func queryPaymentContractHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		rest.PostProcessResponse(w, cliCtx, contract)
+	}
+}
+
+func queryPaymentContractsByIdPrefixHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		contractIdPrefix := vars[RestPaymentContractsIdPrefix]
+
+		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+			types.QuerierRoute, keeper.QueryPaymentContractsByIdPrefix, contractIdPrefix), nil)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			return
+		}
+
+		var contracts []types.PaymentContract
+		if err := cliCtx.Codec.UnmarshalJSON(bz, &contracts); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, contracts)
 	}
 }
 

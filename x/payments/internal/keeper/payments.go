@@ -126,6 +126,20 @@ func (k Keeper) GetPaymentContract(ctx sdk.Context, contractId string) (types.Pa
 	return contract, nil
 }
 
+func (k Keeper) GetPaymentContractsByPrefix(ctx sdk.Context, contractIdPrefix string) []types.PaymentContract {
+	store := ctx.KVStore(k.storeKey)
+	key := types.GetPaymentContractKey(contractIdPrefix)
+	iterator := sdk.KVStorePrefixIterator(store, key)
+
+	var contracts []types.PaymentContract
+	for ; iterator.Valid(); iterator.Next() {
+		contract := k.MustGetPaymentContractByKey(ctx, iterator.Key())
+		contracts = append(contracts, contract)
+	}
+
+	return contracts
+}
+
 func (k Keeper) SetPaymentContract(ctx sdk.Context, contract types.PaymentContract) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentContractKey(contract.Id)
