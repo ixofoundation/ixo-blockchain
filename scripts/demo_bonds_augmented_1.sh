@@ -162,8 +162,6 @@ ixocli tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode b
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
-echo "Sending 300000000res to Francesco so that he is able to make the outcome payment"
-ixocli tx send miguel "$(ixocli q did get-address-from-did "$FRANCESCO_DID")" 300000000res --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco makes outcome payment..."
 ixocli tx bonds make-outcome-payment "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
