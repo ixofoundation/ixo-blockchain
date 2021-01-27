@@ -49,8 +49,8 @@ func GetCmdBonds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/bonds",
-					queryRoute), nil)
+				fmt.Sprintf("custom/%s/%s", queryRoute,
+					keeper.QueryBonds), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -73,8 +73,8 @@ func GetCmdBond(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/bond/%s",
-					queryRoute, bondDid), nil)
+				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+					keeper.QueryBond, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -107,8 +107,8 @@ func GetCmdBatch(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/batch/%s",
-					queryRoute, bondDid), nil)
+				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+					keeper.QueryBatch, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -141,8 +141,8 @@ func GetCmdLastBatch(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/last_batch/%s",
-					queryRoute, bondDid), nil)
+				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+					keeper.QueryLastBatch, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -175,8 +175,8 @@ func GetCmdCurrentPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/current_price/%s",
-					queryRoute, bondDid), nil)
+				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+					keeper.QueryCurrentPrice, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -210,8 +210,8 @@ func GetCmdCurrentReserve(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/current_reserve/%s",
-					queryRoute, bondDid), nil)
+				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+					keeper.QueryCurrentReserve, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
@@ -252,8 +252,8 @@ func GetCmdCustomPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/custom_price/%s/%s",
-					queryRoute, bondDid,
+				fmt.Sprintf("custom/%s/%s/%s/%s", queryRoute,
+					keeper.QueryCustomPrice, bondDid,
 					bondCoinWithAmount.Amount.String()), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -295,8 +295,8 @@ func GetCmdBuyPrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/buy_price/%s/%s",
-					queryRoute, bondDid,
+				fmt.Sprintf("custom/%s/%s/%s/%s", queryRoute,
+					keeper.QueryBuyPrice, bondDid,
 					bondCoinWithAmount.Amount.String()), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -338,8 +338,8 @@ func GetCmdSellReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/sell_return/%s/%s",
-					queryRoute, bondDid,
+				fmt.Sprintf("custom/%s/%s/%s/%s", queryRoute,
+					keeper.QuerySellReturn, bondDid,
 					bondCoinWithAmount.Amount.String()), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -382,8 +382,8 @@ func GetCmdSwapReturn(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/swap_return/%s/%s/%s/%s",
-					queryRoute, bondDid, fromCoinWithAmount.Denom,
+				fmt.Sprintf("custom/%s/%s/%s/%s/%s/%s", queryRoute,
+					keeper.QuerySwapReturn, bondDid, fromCoinWithAmount.Denom,
 					fromCoinWithAmount.Amount.String(), toToken), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
@@ -418,8 +418,8 @@ func GetCmdAlphaMaximums(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			bondDid := args[0]
 
 			res, _, err := cliCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/alpha_maximums/%s",
-					queryRoute, bondDid), nil)
+				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+					keeper.QueryAlphaMaximums, bondDid), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
