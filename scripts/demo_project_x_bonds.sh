@@ -234,16 +234,16 @@ ixocli tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL
 
 # Create claims
 echo "Creating claims in project..."
-ixocli tx project create-claim "tx_hash" "$DID_1" "claim1" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_2" "claim2" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_3" "claim3" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_4" "claim4" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_5" "claim5" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_6" "claim6" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_7" "claim7" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_8" "claim8" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_9" "claim9" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixocli tx project create-claim "tx_hash" "$DID_10" "claim10" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_1" "claim1" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_2" "claim2" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_3" "claim3" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_4" "claim4" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_5" "claim5" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_6" "claim6" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_7" "claim7" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_8" "claim8" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_9" "claim9" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixocli tx project create-claim "tx_hash" "$DID_10" "claim10" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Create evaluations
 echo "Creating evaluations in project..."
