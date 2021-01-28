@@ -132,11 +132,11 @@ echo "Francesco updates the bond state to FAILED"
 ixocli tx bonds update-bond-state "FAILED" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
 
 echo "Miguel withdraws share..."
-ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixocli q auth account "$MIGUEL_ADDR"
 
-echo "Shaun withdraws share..."
-ixocli tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun's account..."
-ixocli q auth account "$SHAUN_ADDR"
+echo "Francesco withdraws share..."
+ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco's account..."
+ixocli q auth account "$FRANCESCO_ADDR"
