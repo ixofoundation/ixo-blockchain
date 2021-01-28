@@ -22,6 +22,8 @@ const (
 	AttributeKeyDescription            = "description"
 	AttributeKeyFunctionType           = "function_type"
 	AttributeKeyFunctionParameters     = "function_parameters"
+	AttributeKeyCreatorDid             = "creator_did"
+	AttributeKeyControllerDid          = "controller_did"
 	AttributeKeyReserveTokens          = "reserve_tokens"
 	AttributeKeyTxFeePercentage        = "tx_fee_percentage"
 	AttributeKeyExitFeePercentage      = "exit_fee_percentage"

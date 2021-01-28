@@ -22,6 +22,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgEditBond(ctx, keeper, msg)
 		case types.MsgSetNextAlpha:
 			return handleMsgSetNextAlpha(ctx, keeper, msg)
+		case types.MsgUpdateBondState:
+			return handleMsgUpdateBondState(ctx, keeper, msg)
 		case types.MsgBuy:
 			return handleMsgBuy(ctx, keeper, msg)
 		case types.MsgSell:
@@ -163,9 +165,9 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 	}
 
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
-		msg.FunctionType, msg.FunctionParameters, msg.ReserveTokens,
-		msg.TxFeePercentage, msg.ExitFeePercentage, msg.FeeAddress,
-		msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
+		msg.ControllerDid, msg.FunctionType, msg.FunctionParameters,
+		msg.ReserveTokens, msg.TxFeePercentage, msg.ExitFeePercentage,
+		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
 		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks,
 		msg.OutcomePayment, state, msg.BondDid)
 
@@ -186,6 +188,8 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyFunctionType, msg.FunctionType),
 			sdk.NewAttribute(types.AttributeKeyFunctionParameters, msg.FunctionParameters.String()),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyControllerDid, msg.ControllerDid),
 			sdk.NewAttribute(types.AttributeKeyReserveTokens, types.StringsToString(msg.ReserveTokens)),
 			sdk.NewAttribute(types.AttributeKeyTxFeePercentage, msg.TxFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyExitFeePercentage, msg.ExitFeePercentage.String()),
@@ -197,7 +201,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			sdk.NewAttribute(types.AttributeKeyAllowSells, strconv.FormatBool(msg.AllowSells)),
 			sdk.NewAttribute(types.AttributeKeyBatchBlocks, msg.BatchBlocks.String()),
 			sdk.NewAttribute(types.AttributeKeyOutcomePayment, msg.OutcomePayment.String()),
-			sdk.NewAttribute(types.AttributeKeyState, state),
+			sdk.NewAttribute(types.AttributeKeyState, string(state)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -357,9 +361,52 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		sdk.NewEvent(
 			types.EventTypeSetNextAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
 		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+		),
+	})
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+}
+
+func handleMsgUpdateBondState(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgUpdateBondState) (*sdk.Result, error) {
+
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
+	if !found {
+		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+	}
+	batch := keeper.MustGetBatch(ctx, msg.BondDid)
+
+	if bond.FunctionType != types.AugmentedFunction {
+		return nil, types.ErrFunctionNotAvailableForFunctionType
+	} else if !msg.State.IsValidProgressionFrom(bond.State) {
+		return nil, types.ErrInvalidStateProgression
+	} // Also, next state must be SETTLE or FAILED -- checked by ValidateBasic
+
+	if bond.ControllerDid != msg.EditorDid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"editor must be the controller of the bond")
+	}
+
+	// If state is settle or failed, move all outcome payment to reserve, so
+	// that it is available for share withdrawal (MsgWithdrawShare)
+	if msg.State == types.SettleState || msg.State == types.FailedState {
+		if !batch.Empty() {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+				"cannot update bond state to SETTLE/FAILED while there are orders in the batch")
+		}
+		keeper.MoveOutcomePaymentToReserve(ctx, bond.BondDid)
+	}
+
+	// Update bond state
+	keeper.SetBondState(ctx, bond.BondDid, msg.State)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		// No need to emit event/log for state change, as SetBondState does this
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
@@ -637,24 +684,20 @@ func handleMsgMakeOutcomePayment(ctx sdk.Context, keeper keeper.Keeper, msg type
 	// Confirm that state is OPEN and that outcome payment is not nil
 	if bond.State != types.OpenState {
 		return nil, types.ErrInvalidStateForAction
-	} else if bond.OutcomePayment.IsZero() {
-		return nil, types.ErrCannotMakeZeroOutcomePayment
 	}
 
-	// Send outcome payment to reserve
-	outcomePayment := bond.GetNewReserveCoins(bond.OutcomePayment)
-	err := keeper.DepositReserve(ctx, bond.BondDid, senderAddr, outcomePayment)
+	// Send outcome payment to outcome payment reserve
+	outcomePayment := bond.GetNewReserveCoins(msg.Amount)
+	err := keeper.DepositOutcomePayment(ctx, bond.BondDid, senderAddr, outcomePayment)
 	if err != nil {
 		return nil, err
 	}
-
-	// Set bond state to SETTLE
-	keeper.SetBondState(ctx, bond.BondDid, types.SettleState)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeMakeOutcomePayment,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, outcomePayment.String()),
 			sdk.NewAttribute(types.AttributeKeyAddress, senderAddr.String()),
 		),
 		sdk.NewEvent(
@@ -675,8 +718,8 @@ func handleMsgWithdrawShare(ctx sdk.Context, keeper keeper.Keeper, msg types.Msg
 		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
-	// Check that state is SETTLE
-	if bond.State != types.SettleState {
+	// Check that state is SETTLE or FAILED
+	if bond.State != types.SettleState && bond.State != types.FailedState {
 		return nil, types.ErrInvalidStateForAction
 	}
 

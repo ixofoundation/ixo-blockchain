@@ -30,6 +30,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		GetCmdCreateBond(cdc),
 		GetCmdEditBond(cdc),
 		GetCmdSetNextAlpha(cdc),
+		GetCmdUpdateBondState(cdc),
 		GetCmdBuy(cdc),
 		GetCmdSell(cdc),
 		GetCmdSwap(cdc),
@@ -63,6 +64,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_outcomePayment := viper.GetString(FlagOutcomePayment)
 			_bondDid := viper.GetString(FlagBondDid)
 			_creatorDid := viper.GetString(FlagCreatorDid)
+			_controllerDid := viper.GetString(FlagControllerDid)
 
 			// Parse function parameters
 			functionParams, err := client2.ParseFunctionParams(_functionParameters)
@@ -143,9 +145,9 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(creatorDid.Address())
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
-				creatorDid.Did, _functionType, functionParams, reserveTokens,
-				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
-				orderQuantityLimits, sanityRate, sanityMarginPercentage,
+				creatorDid.Did, _controllerDid, _functionType, functionParams,
+				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
+				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
 				_allowSells, batchBlocks, outcomePayment, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
@@ -181,7 +183,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 		Use:   "edit-bond",
 		Short: "Edit bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_token := viper.GetString(FlagToken)
 			_name := viper.GetString(FlagName)
 			_description := viper.GetString(FlagDescription)
 			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
@@ -200,7 +201,7 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 				WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgEditBond(
-				_token, _name, _description, _orderQuantityLimits, _sanityRate,
+				_name, _description, _orderQuantityLimits, _sanityRate,
 				_sanityMarginPercentage, editorDid.Did, _bondDid)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
@@ -218,15 +219,14 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "set-next-alpha [bond-token] [new-alpha] [bond-did] [editor-did]",
-		Example: "set-next-alpha abc 0.5 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Use:     "set-next-alpha [new-alpha] [bond-did] [editor-did]",
+		Example: "set-next-alpha 0.5 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
 		Short:   "Edit a bond's alpha parameter",
-		Args:    cobra.ExactArgs(4),
+		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_bondToken := args[0]
-			_alpha := args[1]
-			_bondDid := args[2]
-			_editorDid := args[3]
+			_alpha := args[0]
+			_bondDid := args[1]
+			_editorDid := args[2]
 
 			// Parse alpha
 			alpha, err := sdk.NewDecFromStr(_alpha)
@@ -243,7 +243,35 @@ func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgSetNextAlpha(_bondToken, alpha, editorDid.Did, _bondDid)
+			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid)
+
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+		},
+	}
+	return cmd
+}
+
+func GetCmdUpdateBondState(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "update-bond-state [new-state] [bond-did] [editor-did]",
+		Example: "update-bond-state SETTLE U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Short:   "Edit a bond's current state",
+		Args:    cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_state := args[0]
+			_bondDid := args[1]
+			_editorDid := args[2]
+
+			// Parse editor's ixo DID
+			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+			if err != nil {
+				return err
+			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(editorDid.Address())
+
+			msg := types.NewMsgUpdateBondState(types.BondState(_state), editorDid.Did, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
@@ -354,14 +382,19 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdMakeOutcomePayment(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "make-outcome-payment [bond-did] [sender-did]",
-		Example: "make-outcome-payment U7GK8p8rVhJMKhBVRCJJ8c <sender-ixo-did>",
+		Use:     "make-outcome-payment [bond-did] [amount] [sender-did]",
+		Example: "make-outcome-payment U7GK8p8rVhJMKhBVRCJJ8c 100 <sender-ixo-did>",
 		Short:   "Make an outcome payment to a bond",
-		Args:    cobra.ExactArgs(2),
+		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			amount, ok := sdk.NewIntFromString(args[1])
+			if !ok {
+				return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+			}
+
 			// Parse sender's ixo DID
-			sender, err := did.UnmarshalIxoDid(args[1])
+			sender, err := did.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
@@ -369,7 +402,7 @@ func GetCmdMakeOutcomePayment(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(sender.Address())
 
-			msg := types.NewMsgMakeOutcomePayment(sender.Did, args[0])
+			msg := types.NewMsgMakeOutcomePayment(sender.Did, amount, args[0])
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sender)
 		},

@@ -112,6 +112,7 @@ ixocli tx bonds create-bond \
   --outcome-payment="300000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Created bond..."
 ixocli q bonds bond "$BOND_DID"
@@ -143,29 +144,36 @@ ixocli q bonds current-price "$BOND_DID"
 
 echo "Changing alpha to 0.0033->0.0044..."
 NEW_ALPHA="0.0044"
-ixocli tx bonds set-next-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Current price is now approx 2.94..."
 ixocli q bonds current-price "$BOND_DID"
 
 echo "Changing alpha to 0.0044->0.0033..."
 NEW_ALPHA="0.0033"
-ixocli tx bonds set-next-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Current price is now approx 1.98..."
 ixocli q bonds current-price "$BOND_DID"
 
 echo "Cannot change alpha to 0.0033->0.09..."
 NEW_ALPHA="0.09"
-ixocli tx bonds set-next-alpha abc "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "Miguel sells 400000abc..."
 ixocli tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
-echo "Francesco makes outcome payment..."
-ixocli tx bonds make-outcome-payment "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco makes outcome payment of 50000000 [1]..."
+ixocli tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco makes outcome payment of 100000000 [2]..."
+ixocli tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco makes outcome payment of 150000000 [3]..."
+ixocli tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
+
+echo "Francesco updates the bond state to SETTLE"
+ixocli tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
 
 echo "Francesco withdraws share..."
 ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

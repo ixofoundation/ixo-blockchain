@@ -12,6 +12,7 @@ const (
 	TypeMsgCreateBond         = "create_bond"
 	TypeMsgEditBond           = "edit_bond"
 	TypeMsgSetNextAlpha       = "set_next_alpha"
+	TypeMsgUpdateBondState    = "update_bond_state"
 	TypeMsgBuy                = "buy"
 	TypeMsgSell               = "sell"
 	TypeMsgSwap               = "swap"
@@ -36,6 +37,7 @@ type MsgCreateBond struct {
 	FunctionType           string         `json:"function_type" yaml:"function_type"`
 	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
 	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
+	ControllerDid          did.Did        `json:"controller_did" yaml:"controller_did"`
 	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
 	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
 	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
@@ -49,7 +51,7 @@ type MsgCreateBond struct {
 	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 }
 
-func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
+func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
@@ -60,6 +62,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
 		Name:                   name,
 		Description:            description,
 		CreatorDid:             creatorDid,
+		ControllerDid:          controllerDid,
 		FunctionType:           functionType,
 		FunctionParameters:     functionParameters,
 		ReserveTokens:          reserveTokens,
@@ -191,11 +194,10 @@ type MsgEditBond struct {
 	EditorDid              did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
+func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editorDid, bondDid did.Did) MsgEditBond {
 	return MsgEditBond{
 		BondDid:                bondDid,
-		Token:                  token,
 		Name:                   name,
 		Description:            description,
 		OrderQuantityLimits:    orderQuantityLimits,
@@ -209,8 +211,6 @@ func (msg MsgEditBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
-	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Description) == "" {
@@ -266,15 +266,13 @@ func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
 type MsgSetNextAlpha struct {
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
-	Token     string  `json:"token" yaml:"token"`
 	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
 	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgSetNextAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
+func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
 	return MsgSetNextAlpha{
 		BondDid:   bondDid,
-		Token:     token,
 		Alpha:     alpha,
 		EditorDid: editorDid,
 	}
@@ -284,8 +282,6 @@ func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
-	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "Token")
 	} else if strings.TrimSpace(msg.EditorDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}
@@ -317,6 +313,56 @@ func (msg MsgSetNextAlpha) GetSigners() []sdk.AccAddress {
 func (msg MsgSetNextAlpha) Route() string { return RouterKey }
 
 func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
+
+type MsgUpdateBondState struct {
+	BondDid   did.Did   `json:"bond_did" yaml:"bond_did"`
+	State     BondState `json:"state" yaml:"state"`
+	EditorDid did.Did   `json:"editor_did" yaml:"editor_did"`
+}
+
+func NewMsgUpdateBondState(state BondState, editorDid, bondDid did.Did) MsgUpdateBondState {
+	return MsgUpdateBondState{
+		BondDid:   bondDid,
+		State:     state,
+		EditorDid: editorDid,
+	}
+}
+
+func (msg MsgUpdateBondState) ValidateBasic() error {
+	// Check if empty
+	if strings.TrimSpace(msg.BondDid) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
+	} else if strings.TrimSpace(msg.EditorDid) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
+	}
+
+	// Bond status can only be updated to SETTLE or FAILED
+	if msg.State != SettleState && msg.State != FailedState {
+		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot transition to that state")
+	}
+
+	// Check that DIDs valid
+	if !did.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
+	} else if !did.IsValidDid(msg.EditorDid) {
+		return sdkerrors.Wrap(did.ErrInvalidDid, "editor did is invalid")
+	}
+
+	return nil
+}
+
+func (msg MsgUpdateBondState) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+func (msg MsgUpdateBondState) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgUpdateBondState) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+}
+
+func (msg MsgUpdateBondState) Route() string { return RouterKey }
+
+func (msg MsgUpdateBondState) Type() string { return TypeMsgUpdateBondState }
 
 type MsgBuy struct {
 	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`
@@ -505,12 +551,14 @@ func (msg MsgSwap) Type() string { return TypeMsgSwap }
 
 type MsgMakeOutcomePayment struct {
 	SenderDid did.Did `json:"sender_did" yaml:"sender_did"`
+	Amount    sdk.Int `json:"amount" yaml:"amount"`
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewMsgMakeOutcomePayment(senderDid, bondDid did.Did) MsgMakeOutcomePayment {
+func NewMsgMakeOutcomePayment(senderDid did.Did, amount sdk.Int, bondDid did.Did) MsgMakeOutcomePayment {
 	return MsgMakeOutcomePayment{
 		SenderDid: senderDid,
+		Amount:    amount,
 		BondDid:   bondDid,
 	}
 }
@@ -521,6 +569,11 @@ func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sender DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
+	}
+
+	// Outcome payment amount has to be greater than 0
+	if msg.Amount.LTE(sdk.ZeroInt()) {
+		return sdkerrors.Wrap(ErrArgumentMustBePositive, "amount")
 	}
 
 	// Check that DIDs valid

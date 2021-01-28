@@ -90,7 +90,6 @@ ixocli q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
 ixocli tx bonds edit-bond \
-  --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL" \

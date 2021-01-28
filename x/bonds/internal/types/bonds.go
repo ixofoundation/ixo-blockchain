@@ -9,20 +9,47 @@ import (
 	"sort"
 )
 
+type (
+	BondState              string
+	BondStateTransitionMap map[BondState][]BondState
+)
+
 const (
 	PowerFunction     = "power_function"
 	SigmoidFunction   = "sigmoid_function"
 	SwapperFunction   = "swapper_function"
 	AugmentedFunction = "augmented_function"
 
-	HatchState  = "HATCH"
-	OpenState   = "OPEN"
-	SettleState = "SETTLE"
+	HatchState  BondState = "HATCH"
+	OpenState   BondState = "OPEN"
+	SettleState BondState = "SETTLE"
+	FailedState BondState = "FAILED"
 
 	DoNotModifyField = "[do-not-modify]"
 
 	AnyNumberOfReserveTokens = -1
 )
+
+var StateTransitions = initStateTransitions()
+
+func initStateTransitions() BondStateTransitionMap {
+	return BondStateTransitionMap{
+		HatchState:  {OpenState, FailedState},
+		OpenState:   {SettleState, FailedState},
+		SettleState: {},
+		FailedState: {},
+	}
+}
+
+func (next BondState) IsValidProgressionFrom(prev BondState) bool {
+	validStatuses := StateTransitions[prev]
+	for _, v := range validStatuses {
+		if v == next {
+			return true
+		}
+	}
+	return false
+}
 
 type FunctionParamRestrictions func(paramsMap map[string]sdk.Dec) error
 
@@ -201,62 +228,66 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 }
 
 type Bond struct {
-	Token                  string         `json:"token" yaml:"token"`
-	Name                   string         `json:"name" yaml:"name"`
-	Description            string         `json:"description" yaml:"description"`
-	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
-	FunctionType           string         `json:"function_type" yaml:"function_type"`
-	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
-	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
-	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-	FeeAddress             sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
-	MaxSupply              sdk.Coin       `json:"max_supply" yaml:"max_supply"`
-	OrderQuantityLimits    sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	CurrentSupply          sdk.Coin       `json:"current_supply" yaml:"current_supply"`
-	CurrentReserve         sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
-	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
-	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
-	State                  string         `json:"state" yaml:"state"`
-	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
+	Token                        string         `json:"token" yaml:"token"`
+	Name                         string         `json:"name" yaml:"name"`
+	Description                  string         `json:"description" yaml:"description"`
+	CreatorDid                   did.Did        `json:"creator_did" yaml:"creator_did"`
+	ControllerDid                did.Did        `json:"controller_did" yaml:"controller_did"`
+	FunctionType                 string         `json:"function_type" yaml:"function_type"`
+	FunctionParameters           FunctionParams `json:"function_parameters" yaml:"function_parameters"`
+	ReserveTokens                []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
+	TxFeePercentage              sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
+	ExitFeePercentage            sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
+	FeeAddress                   sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
+	MaxSupply                    sdk.Coin       `json:"max_supply" yaml:"max_supply"`
+	OrderQuantityLimits          sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate                   sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage       sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	CurrentSupply                sdk.Coin       `json:"current_supply" yaml:"current_supply"`
+	CurrentReserve               sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
+	CurrentOutcomePaymentReserve sdk.Coins      `json:"current_outcome_payment_reserve" yaml:"current_outcome_payment_reserve"`
+	AllowSells                   bool           `json:"allow_sells" yaml:"allow_sells"`
+	BatchBlocks                  sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
+	OutcomePayment               sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
+	State                        BondState      `json:"state" yaml:"state"`
+	BondDid                      did.Did        `json:"bond_did" yaml:"bond_did"`
 }
 
-func NewBond(token, name, description string, creatorDid did.Did,
+func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
 	sanityMarginPercentage sdk.Dec, allowSells bool, batchBlocks sdk.Uint,
-	outcomePayment sdk.Int, state string, bondDid did.Did) Bond {
+	outcomePayment sdk.Int, state BondState, bondDid did.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
 	orderQuantityLimits = orderQuantityLimits.Sort()
 
 	return Bond{
-		Token:                  token,
-		Name:                   name,
-		Description:            description,
-		CreatorDid:             creatorDid,
-		FunctionType:           functionType,
-		FunctionParameters:     functionParameters,
-		ReserveTokens:          reserveTokens,
-		TxFeePercentage:        txFeePercentage,
-		ExitFeePercentage:      exitFeePercentage,
-		FeeAddress:             feeAddress,
-		MaxSupply:              maxSupply,
-		OrderQuantityLimits:    orderQuantityLimits,
-		SanityRate:             sanityRate,
-		SanityMarginPercentage: sanityMarginPercentage,
-		CurrentSupply:          sdk.NewCoin(token, sdk.ZeroInt()),
-		CurrentReserve:         nil,
-		AllowSells:             allowSells,
-		BatchBlocks:            batchBlocks,
-		OutcomePayment:         outcomePayment,
-		State:                  state,
-		BondDid:                bondDid,
+		Token:                        token,
+		Name:                         name,
+		Description:                  description,
+		CreatorDid:                   creatorDid,
+		ControllerDid:                controllerDid,
+		FunctionType:                 functionType,
+		FunctionParameters:           functionParameters,
+		ReserveTokens:                reserveTokens,
+		TxFeePercentage:              txFeePercentage,
+		ExitFeePercentage:            exitFeePercentage,
+		FeeAddress:                   feeAddress,
+		MaxSupply:                    maxSupply,
+		OrderQuantityLimits:          orderQuantityLimits,
+		SanityRate:                   sanityRate,
+		SanityMarginPercentage:       sanityMarginPercentage,
+		CurrentSupply:                sdk.NewCoin(token, sdk.ZeroInt()),
+		CurrentReserve:               nil,
+		CurrentOutcomePaymentReserve: nil,
+		AllowSells:                   allowSells,
+		BatchBlocks:                  batchBlocks,
+		OutcomePayment:               outcomePayment,
+		State:                        state,
+		BondDid:                      bondDid,
 	}
 }
 
