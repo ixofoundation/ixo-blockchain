@@ -91,6 +91,8 @@ func (msg MsgCreateBond) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
 	} else if strings.TrimSpace(msg.CreatorDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "creator DID")
+	} else if strings.TrimSpace(msg.ControllerDid) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "controller DID")
 	} else if len(msg.ReserveTokens) == 0 {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve tokens")
 	} else if msg.FeeAddress.Empty() {
