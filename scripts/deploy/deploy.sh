@@ -13,4 +13,4 @@ sudo /bin/systemctl enable ixod.service
 
 # Start the services
 sudo /bin/systemctl restart ixo-rest-server.service
-sudo /bin/systemctl restart dixod.service
+sudo /bin/systemctl restart ixod.service
