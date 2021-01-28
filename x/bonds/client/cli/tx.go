@@ -174,6 +174,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	// _ = cmd.MarkFlagRequired(FlagOutcomePayment) // Optional
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagCreatorDid)
+	_ = cmd.MarkFlagRequired(FlagControllerDid)
 
 	return cmd
 }
@@ -200,9 +201,8 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgEditBond(
-				_name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, editorDid.Did, _bondDid)
+			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
+				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
 	}
@@ -210,7 +210,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(fsBondGeneral)
 	cmd.Flags().AddFlagSet(fsBondEdit)
 
-	_ = cmd.MarkFlagRequired(FlagToken)
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagEditorDid)
 
