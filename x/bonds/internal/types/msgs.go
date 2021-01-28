@@ -187,7 +187,6 @@ func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
 type MsgEditBond struct {
 	BondDid                did.Did `json:"bond_did" yaml:"bond_did"`
-	Token                  string  `json:"token" yaml:"token"`
 	Name                   string  `json:"name" yaml:"name"`
 	Description            string  `json:"description" yaml:"description"`
 	OrderQuantityLimits    string  `json:"order_quantity_limits" yaml:"order_quantity_limits"`

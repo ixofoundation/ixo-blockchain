@@ -69,7 +69,7 @@ var (
 	}
 
 	ExtraParameterRestrictions = map[string]FunctionParamRestrictions{
-		PowerFunction:     powerParameterRestrictions,
+		PowerFunction:     nil,
 		SigmoidFunction:   sigmoidParameterRestrictions,
 		SwapperFunction:   nil,
 		AugmentedFunction: augmentedParameterRestrictions,
@@ -161,17 +161,6 @@ func (fps FunctionParams) AsMap() (paramsMap map[string]sdk.Dec) {
 	return paramsMap
 }
 
-func powerParameterRestrictions(paramsMap map[string]sdk.Dec) error {
-	// Power exception 1: n must be an integer, otherwise x^n loop does not work
-	val, ok := paramsMap["n"]
-	if !ok {
-		panic("did not find parameter n for power function")
-	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "n")
-	}
-	return nil
-}
-
 func sigmoidParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	// Sigmoid exception 1: c != 0, otherwise we run into divisions by zero
 	val, ok := paramsMap["c"]
@@ -185,7 +174,8 @@ func sigmoidParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 
 func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	// Augmented exception 1.1: d0 must be an integer, since it is a token amount
-	// Augmented exception 1.2: d0 != 0, otherwise we run into divisions by zero
+	// Augmented exception 1.2: d0 > 0, since a negative raise is not valid, but
+	// also to avoid division by zero
 	val, ok := paramsMap["d0"]
 	if !ok {
 		panic("did not find parameter d0 for augmented function")
@@ -195,7 +185,8 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "d0")
 	}
 
-	// Augmented exception 2: p0 != 0, otherwise we run into divisions by zero
+	// Augmented exception 2: p0 > 0, since a negative price is not valid, but
+	// also to avoid division by zero
 	val, ok = paramsMap["p0"]
 	if !ok {
 		panic("did not find parameter p0 for augmented function")
@@ -203,7 +194,8 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "p0")
 	}
 
-	// Augmented exception 3: theta must be from 0 to 1 (excluding 1)
+	// Augmented exception 3: theta must be from 0 to 1 (excluding 1), since
+	// theta is a percentage (0% to 100%) and we cannot charge 100% fee
 	val, ok = paramsMap["theta"]
 	if !ok {
 		panic("did not find parameter theta for augmented function")
@@ -213,13 +205,11 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 			sdk.ZeroDec().String(), sdk.OneDec().String())
 	}
 
-	// Augmented exception 4.1: kappa must be an integer, since we use it for powers
-	// Augmented exception 4.2: kappa != 0, otherwise we run into divisions by zero
+	// Augmented exception 4: kappa > 0, since negative exponents are not
+	// allowed, but also to avoid division by zero
 	val, ok = paramsMap["kappa"]
 	if !ok {
 		panic("did not find parameter kappa for augmented function")
-	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "kappa")
 	} else if !val.IsPositive() {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "kappa")
 	}
