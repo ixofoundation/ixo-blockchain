@@ -356,7 +356,6 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		sdk.NewEvent(
 			types.EventTypeSetNextAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
 		),
 		sdk.NewEvent(
