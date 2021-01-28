@@ -203,7 +203,6 @@ func editBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 type setNextAlphaReq struct {
 	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
-	Token     string       `json:"token" yaml:"token"`
 	NewAlpha  string       `json:"new_alpha" yaml:"new_alpha"`
 	BondDid   string       `json:"bond_did" yaml:"bond_did"`
 	EditorDid string       `json:"editor_did" yaml:"editor_did"`
@@ -228,7 +227,7 @@ func setNextAlphaRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSetNextAlpha(req.Token, newAlpha, req.EditorDid, req.BondDid)
+		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

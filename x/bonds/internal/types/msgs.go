@@ -262,15 +262,13 @@ func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
 type MsgSetNextAlpha struct {
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
-	Token     string  `json:"token" yaml:"token"`
 	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
 	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgSetNextAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
+func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
 	return MsgSetNextAlpha{
 		BondDid:   bondDid,
-		Token:     token,
 		Alpha:     alpha,
 		EditorDid: editorDid,
 	}
@@ -280,8 +278,6 @@ func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
-	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "Token")
 	} else if strings.TrimSpace(msg.EditorDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}
