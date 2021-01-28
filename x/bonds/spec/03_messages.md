@@ -126,7 +126,7 @@ This message stores the updated `Bond` object.
 
 ## MsgSetNextAlpha
 
-The creator of a bond can set the next alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
+The controller of a bond can set the next alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
 
 | **Field** | **Type**  | **Description** |
 |:----------|:----------|:----------------|
@@ -141,7 +141,7 @@ This message is expected to fail if:
   - `newAlpha != alpha`
   - `I > C * alpha`
   - `R / C > newAlpha - alpha`
-- editor is not the bond creator
+- editor is not the bond controller
 - bond DID or editor DID is not a valid DID
 
 ```go
@@ -153,6 +153,33 @@ type MsgSetNextAlpha struct {
 ```
 
 This message stores the next alpha value in the current `Batch` object, where it gets processed and set at the end of the batch.
+
+## MsgUpdateBondState
+
+The controller of a bond can change a bond's state to SETTLE or FAILED using `MsgUpdateBondState`.
+
+| **Field** | **Type**    | **Description** |
+|:----------|:------------|:----------------|
+| BondDid   | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| State     | `BondState` | Bond state to be set (e.g. `SETTLE`)
+| EditorDid | `did.Did`   | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+
+This message is expected to fail if:
+- bond being interacted with does not exist
+- state is not SETTLE or FAILED
+- state is not a valid transition from the current bond state
+- editor is not the bond controller
+- bond DID or editor DID is not a valid DID
+
+```go
+type MsgUpdateBondState struct {
+	BondDid   did.Did
+	State     BondState
+	EditorDid did.Did
+}
+```
+
+This message updated the bond status to SETTLE or FAILED and moves the outcome payment reserve to the bond reserve, so that this is available for bond token holders to withdraw a share from, proportional to the amount of bond tokens they hold.
 
 ## MsgBuy
 

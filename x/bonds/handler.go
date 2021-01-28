@@ -306,9 +306,9 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		return nil, types.ErrInvalidStateForAction
 	}
 
-	if bond.CreatorDid != msg.EditorDid {
+	if bond.ControllerDid != msg.EditorDid {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
-			"editor must be the creator of the bond")
+			"editor must be the controller of the bond")
 	}
 
 	// Get supply, reserve, outcome payment. Note that we get the adjusted
