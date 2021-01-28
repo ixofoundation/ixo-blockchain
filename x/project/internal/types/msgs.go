@@ -312,9 +312,13 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.ClaimID, "ClaimID"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.Data.ClaimTemplateID, "ClaimTemplateID"); !valid {
+		return err
 	}
 
-	// TODO: perform some checks on the Data (of type CreateClaimDoc)
+	// TODO: perform some additional checks on the Data (of type CreateClaimDoc)
 
 	// Check that DIDs valid
 	if !did.IsValidDid(msg.ProjectDid) {
