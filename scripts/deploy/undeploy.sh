@@ -12,5 +12,6 @@ sudo /bin/systemctl stop ixod.service
 sudo rm /etc/systemd/system/ixo-rest-server.service
 sudo rm /etc/systemd/system/ixod.service
 
-# Reload all unit files
+# Reload all unit files and reset failed
 sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl reset-failed
