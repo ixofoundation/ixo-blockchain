@@ -216,7 +216,7 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "set-next-alpha [new-alpha] [bond-did] [editor-did]",
-		Example: "set-next-alpha 0.5 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Example: "set-next-alpha 0.5 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
 		Short:   "Edit a bond's alpha parameter",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
