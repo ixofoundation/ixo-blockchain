@@ -124,6 +124,36 @@ type MsgEditBond struct {
 
 This message stores the updated `Bond` object.
 
+## MsgSetNextAlpha
+
+The creator of a bond can set the next alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
+
+| **Field** | **Type**  | **Description** |
+|:----------|:----------|:----------------|
+| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| Alpha     | `sdk.Dec` | Alpha value to be set (e.g. `0.5`)
+| EditorDid | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+
+This message is expected to fail if:
+- bond being interacted with does not exist
+- alpha value falls outside of 0 <= alpha <= 1
+- alpha value violates any of the below rules
+  - `newAlpha != alpha`
+  - `I > C * alpha`
+  - `R / C > newAlpha - alpha`
+- editor is not the bond creator
+- bond DID or editor DID is not a valid DID
+
+```go
+type MsgSetNextAlpha struct {
+	BondDid   did.Did
+	Alpha     sdk.Dec
+	EditorDid did.Did
+}
+```
+
+This message stores the next alpha value in the current `Batch` object, where it gets processed and set at the end of the batch.
+
 ## MsgBuy
 
 Any address that holds tokens that a bond uses as its reserve can buy tokens from that bond in exchange for reserve tokens. Rather than performing the buy itself, the `MsgBuy` handler registers a buy order in the current orders batch and cancels any other orders that become unfulfillable. Any order in that batch gets fulfilled at the end of the batch's lifespan. The `MsgBuy` handler also locks away the `MaxPrices` value (`< Balance`) indicated by the address so that these are not used elsewhere whilst the batch is being processed.
