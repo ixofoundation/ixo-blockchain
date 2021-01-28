@@ -46,7 +46,7 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc *cod
 }
 
 func queryAllDids(ctx sdk.Context, k Keeper) ([]byte, error) {
-	allDids := k.GetAddDids(ctx)
+	allDids := k.GetAllDids(ctx)
 
 	res, errRes := json.Marshal(allDids)
 	if errRes != nil {

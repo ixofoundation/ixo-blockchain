@@ -4,8 +4,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	//"github.com/golang/protobuf/ptypes/any"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	//codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 type Keeper struct {
@@ -21,6 +23,41 @@ func NewKeeper(/*cdc *codec.Codec cdc codec.LegacyAmino*/ cdc codec.BinaryMarsha
 	}
 }
 
+// Like auth's MarshalAccount
+func (k Keeper) MarshalDidDoc(did exported.DidDoc) ([]byte, error) {
+	return k.cdc.MarshalInterface(did)
+}
+
+// Like auth's UnmarshalAccount
+func (k Keeper) UnmarshalDidDoc(bz []byte) (exported.DidDoc, error){
+	var dd exported.DidDoc
+	return dd, k.cdc.UnmarshalInterface(bz, &dd)
+}
+
+// Like auth's decodeAccount
+func (k Keeper) decodeDidDoc(bz []byte) exported.DidDoc {
+	dd, err := k.UnmarshalDidDoc(bz)
+	if err != nil {
+		panic(err)
+	}
+
+	return dd
+}
+
+func (k Keeper) IterateDidDocs(ctx sdk.Context, cb func(account exported.DidDoc) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.DidKey)
+
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		account := k.decodeDidDoc(iterator.Value())
+
+		if cb(account) {
+			break
+		}
+	}
+}
+
 func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetDidPrefixKey(did)
@@ -29,10 +66,12 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, e
 		return nil, sdkerrors.Wrap(types.ErrInvalidDid, did)
 	}
 
-	var didDoc types.BaseDidDoc
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &didDoc)
+	return k.decodeDidDoc(bz), nil
 
-	return didDoc, nil
+	//var didDoc types.BaseDidDoc
+	//k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &didDoc)
+	//
+	//return didDoc, nil
 }
 
 func (k Keeper) MustGetDidDoc(ctx sdk.Context, did exported.Did) exported.DidDoc {
@@ -57,12 +96,18 @@ func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err error) {
 func (k Keeper) AddDidDoc(ctx sdk.Context, did exported.DidDoc) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetDidPrefixKey(did.GetDid())
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(did))
+
+	dd, err := k.MarshalDidDoc(did)
+	if err != nil {
+		panic(err)
+	}
+
+	store.Set(key, dd) //k.cdc.MustMarshalBinaryLengthPrefixed(did))
 }
 
 // TODO we cannot implement ProtoMarshal interface functions because exported.DidDoc is also an interface
 
-func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exported.DidCredential) (err error) {
+func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential types.DidCredential) (err error) {
 	existedDid, err := k.GetDidDoc(ctx, did)
 	if err != nil {
 		return err
@@ -72,7 +117,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exp
 	credentials := baseDidDoc.GetCredentials()
 
 	for _, data := range credentials {
-		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] && data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
+		if data.Issuer == credential.Issuer && data.Credtype[0] == credential.Credtype[0] && data.Credtype[1] == credential.Credtype[1] && data.Claim.KYCvalidated == credential.Claim.KYCvalidated {
 			return sdkerrors.Wrap(types.ErrInvalidCredentials, "credentials already exist")
 		}
 	}
@@ -84,19 +129,27 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential exp
 }
 
 func (k Keeper) GetAllDidDocs(ctx sdk.Context) (didDocs []exported.DidDoc) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.DidKey)
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		var didDoc types.BaseDidDoc
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &didDoc)
-		didDocs = append(didDocs, &didDoc)
-	}
+	//store := ctx.KVStore(k.storeKey)
+	//iterator := sdk.KVStorePrefixIterator(store, types.DidKey)
+	//
+	//defer iterator.Close()
+	//for ; iterator.Valid(); iterator.Next() {
+	//	var didDoc types.BaseDidDoc
+	//	k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &didDoc)
+	//	didDocs = append(didDocs, &didDoc)
+	//}
+	//
+	//return didDocs
+
+	k.IterateDidDocs(ctx, func(dd exported.DidDoc) (stop bool) {
+		didDocs = append(didDocs, dd)
+		return false
+	})
 
 	return didDocs
 }
 
-func (k Keeper) GetAddDids(ctx sdk.Context) (dids []exported.Did) {
+func (k Keeper) GetAllDids(ctx sdk.Context) (dids []exported.Did) {
 	didDocs := k.GetAllDidDocs(ctx)
 	for _, did := range didDocs {
 		dids = append(dids, did.GetDid())

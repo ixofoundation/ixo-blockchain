@@ -2,8 +2,7 @@ package rest
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
-	//"github.com/cosmos/cosmos-sdk/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
@@ -16,9 +15,9 @@ import (
 
 // TODO We can copy WriteGenerateStdTxResponse from cosmos-sdk/x/auth/client/utils v0.39.1
 
-func registerTxRoutes(cliCtx /*context*/client.Context, r *mux.Router) {
-	r.HandleFunc("/did/add_did", addDidRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/did/add_credential", addCredentialRequestHandler(cliCtx)).Methods("POST")
+func registerTxHandlers(cliCtx /*context*/client.Context, r *mux.Router) {
+	r.HandleFunc("/did/add_did", newAddDidRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/did/add_credential", newAddCredentialRequestHandler(cliCtx)).Methods("POST")
 }
 
 type addDidReq struct {
@@ -27,7 +26,7 @@ type addDidReq struct {
 	PubKey  string       `json:"pubKey" yaml:"pubKey"`
 }
 
-func addDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req addDidReq
 		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino/*Codec*/, &req) {
@@ -40,13 +39,14 @@ func addDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgAddDid(req.Did, req.PubKey)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) { //err := msg.ValidateBasic(); err != nil {
+			//rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// /*utils.*/WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
-		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, []sdk.Msg{msg}...)
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
+		// TODO we have to prepend an & to msg above because MsgAddDid does not have the gogoproto.nullable = false option set, should it be?
 	}
 }
 
@@ -56,7 +56,7 @@ type addCredentialReq struct {
 	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
 }
 
-func addCredentialRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func newAddCredentialRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req addCredentialReq
 		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino/*Codec*/, &req) {
@@ -69,12 +69,14 @@ func addCredentialRequestHandler(cliCtx /*context*/client.Context) http.HandlerF
 		}
 
 		msg := types.NewMsgAddCredential(req.Did, req.DidCredential.CredType, req.Did, req.DidCredential.Issued)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) { //err := msg.ValidateBasic(); err != nil {
+			//rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		// /*utils.*/WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
-		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, []sdk.Msg{msg}...)
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
+		// TODO we have to prepend an & to msg above because MsgAddCredential does not have the gogoproto.nullable = false option set, should it be?
+
 	}
 }

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
 
@@ -13,8 +14,8 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-func GetCmdAddDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
-	return &cobra.Command{
+func NewCmdAddDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "add-did-doc [ixo-did]",
 		Short: "Add a new IxoDid",
 		Args:  cobra.ExactArgs(1),
@@ -32,13 +33,17 @@ func GetCmdAddDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
-			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg) //return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, &msg) //return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			// TODO we have to prepend an & to msg above because MsgAddDid does not have the gogoproto.nullable = false option set, should it be?
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdAddCredential(/*cdc *codec.Codec*/) *cobra.Command {
-	return &cobra.Command{
+func NewCmdAddCredential(/*cdc *codec.Codec*/) *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "add-kyc-credential [did] [signer-did-doc]",
 		Short: "Add a new KYC Credential for a Did by the signer",
 		Args:  cobra.ExactArgs(2),
@@ -64,7 +69,11 @@ func GetCmdAddCredential(/*cdc *codec.Codec*/) *cobra.Command {
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
-			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg) //ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, &msg) //ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			// TODO we have to prepend an & to msg above because MsgAddCredential does not have the gogoproto.nullable = false option set, should it be?
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

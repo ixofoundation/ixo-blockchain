@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"errors"
 	//"encoding/json"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
@@ -18,6 +17,7 @@ import (
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
@@ -29,7 +29,6 @@ import (
 	//abci "github.com/tendermint/tendermint/abci/types"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
-	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	//tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 	"io"
@@ -69,23 +68,23 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 // Execute executes the root command.
-func Execute(rootCmd *cobra.Command) error {
-	// Create and set a client.Context on the command's Context. During the pre-run
-	// of the root command, a default initialized client.Context is provided to
-	// seed child command execution with values such as AccountRetriver, Keyring,
-	// and a Tendermint RPC. This requires the use of a pointer reference when
-	// getting and setting the client.Context. Ideally, we utilize
-	// https://github.com/spf13/cobra/pull/1118.
-	srvCtx := server.NewDefaultContext()
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, client.ClientContextKey, &client.Context{})
-	ctx = context.WithValue(ctx, server.ServerContextKey, srvCtx)
-
-	rootCmd.PersistentFlags().String("log_level", srvCtx.Config.LogLevel, "The logging level in the format of <module>:<level>,...")
-
-	executor := tmcli.PrepareBaseCmd(rootCmd, "", app.DefaultNodeHome)
-	return executor.ExecuteContext(ctx)
-}
+//func Execute(rootCmd *cobra.Command) error {
+//	// Create and set a client.Context on the command's Context. During the pre-run
+//	// of the root command, a default initialized client.Context is provided to
+//	// seed child command execution with values such as AccountRetriver, Keyring,
+//	// and a Tendermint RPC. This requires the use of a pointer reference when
+//	// getting and setting the client.Context. Ideally, we utilize
+//	// https://github.com/spf13/cobra/pull/1118.
+//	srvCtx := server.NewDefaultContext()
+//	ctx := context.Background()
+//	ctx = context.WithValue(ctx, client.ClientContextKey, &client.Context{})
+//	ctx = context.WithValue(ctx, server.ServerContextKey, srvCtx)
+//
+//	rootCmd.PersistentFlags().String("log_level", srvCtx.Config.LogLevel, "The logging level in the format of <module>:<level>,...")
+//
+//	executor := tmcli.PrepareBaseCmd(rootCmd, "", app.DefaultNodeHome)
+//	return executor.ExecuteContext(ctx)
+//}
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	authclient.Codec = encodingConfig.Marshaler
@@ -95,14 +94,15 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(), //TODO gaia has custom function, make a custom function too?
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(app.ModuleBasics, encodingConfig.TxConfig),
+		genutilcli.ValidateGenesisCmd(app.ModuleBasics), //, encodingConfig.TxConfig),
 		AddGenesisAccountCmd(app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createSimappAndExport, addModuleInitFlags)
+	a := appCreator{encodingConfig}
+	server.AddCommands(rootCmd, app.DefaultNodeHome, a.newApp, a.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -168,8 +168,12 @@ func txCommand() *cobra.Command {
 
 	return cmd
 }
+type appCreator struct {
+	encCfg params.EncodingConfig
+}
 
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
+// newApp is an AppCreator
+func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
 	var cache sdk.MultiStorePersistentCache
 
 	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
@@ -223,17 +227,21 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	//)
 }
 
-func createSimappAndExport(
+func (a appCreator) appExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
 	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
 
-	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
-	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
+	//encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
+	//encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
+	homePath, ok := appOpts.Get(flags.FlagHome).(string)
+	if !ok || homePath == "" {
+		return servertypes.ExportedApp{}, errors.New("application home not set")
+	}
 
 	//var ixoApp *app.ixoApp
 
 	if height != -1 {
-		ixoApp := app.NewIxoApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg, appOpts)
+		ixoApp := app.NewIxoApp(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 
 		if err := ixoApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
@@ -241,7 +249,7 @@ func createSimappAndExport(
 
 		return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 	} else {
-		ixoApp := app.NewIxoApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg, appOpts)
+		ixoApp := app.NewIxoApp(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 
 		return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 	}

@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
@@ -27,6 +28,16 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
 	//cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
 	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
+}
+
+//Registers did module's interface types and their concrete implementations as proto.Message.
+// TODO Add more types if necessary (look at cosmos x/auth/types/codec.go)
+func RegisterInterfaces(registry types.InterfaceRegistry) {
+	registry.RegisterInterface(
+		"did.DidDoc",
+		(*exported.DidDoc)(nil),
+		&BaseDidDoc{},
+	)
 }
 
 // ModuleCdc is the codec for the module

@@ -16,14 +16,14 @@ import (
 
 func registerQueryRoutes(cliCtx /*context*/client.Context, r *mux.Router) {
 	// The .* is necessary so that a slash in the did gets included as part of the did
-	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/pubKeyToAddr/{pubKey}", queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/did/{did}", queryDidDocRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/did", queryAllDidsRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandler(cliCtx)).Methods("GET")
+	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/pubKeyToAddr/{pubKey}", queryAddressFromBase58EncodedPubkeyRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/did/{did}", queryDidDocRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/did", queryAllDidsRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandlerFn(cliCtx)).Methods("GET")
 }
 
-func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func queryAddressFromBase58EncodedPubkeyRequestHandlerFn(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -41,7 +41,7 @@ func queryAddressFromBase58EncodedPubkeyRequestHandler(cliCtx /*context*/client.
 	}
 }
 
-func queryAddressFromDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func queryAddressFromDidRequestHandlerFn(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -70,7 +70,7 @@ func queryAddressFromDidRequestHandler(cliCtx /*context*/client.Context) http.Ha
 	}
 }
 
-func queryDidDocRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func queryDidDocRequestHandlerFn(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -99,7 +99,7 @@ func queryDidDocRequestHandler(cliCtx /*context*/client.Context) http.HandlerFun
 	}
 }
 
-func queryAllDidsRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func queryAllDidsRequestHandlerFn(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -124,7 +124,7 @@ func queryAllDidsRequestHandler(cliCtx /*context*/client.Context) http.HandlerFu
 	}
 }
 
-func queryAllDidDocsRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func queryAllDidDocsRequestHandlerFn(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")

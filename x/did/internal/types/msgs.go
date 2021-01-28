@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"strings"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -17,14 +16,14 @@ const (
 )
 
 var (
-	_ ixo.IxoMsg = MsgAddDid{}
-	_ ixo.IxoMsg = MsgAddCredential{}
+	_ ixo.IxoMsg = &MsgAddDid{}
+	_ ixo.IxoMsg = &MsgAddCredential{}
 )
 
-type MsgAddDid struct {
-	Did    exported.Did `json:"did" yaml:"did"`
-	PubKey string       `json:"pubKey" yaml:"pubKey"`
-}
+//type MsgAddDid struct {
+//	Did    exported.Did `json:"did" yaml:"did"`
+//	PubKey string       `json:"pubKey" yaml:"pubKey"`
+//}
 
 func NewMsgAddDid(did string, publicKey string) MsgAddDid {
 	return MsgAddDid{
@@ -38,6 +37,7 @@ func (msg MsgAddDid) Type() string { return TypeMsgAddDid }
 func (msg MsgAddDid) Route() string { return RouterKey }
 
 func (msg MsgAddDid) GetSignerDid() exported.Did { return msg.Did }
+
 func (msg MsgAddDid) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -73,51 +73,34 @@ func (msg MsgAddDid) GetSignBytes() []byte {
 	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
 }
 
-func (msg MsgAddDid) String() string {
-	return fmt.Sprintf("MsgAddDid{Did: %v, publicKey: %v}", msg.Did, msg.PubKey)
-}
-
-func (msg MsgAddDid) Reset() {
-	// TODO Implement Reset() of Msg interface
-	panic("implement me")
-}
-
-func (msg MsgAddDid) ProtoMessage() {
-	// TODO Implement ProtoMessage() of Msg interface
-	panic("implement me")
-}
-
-type MsgAddCredential struct {
-	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
-}
+//type MsgAddCredential struct {
+//	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
+//}
 
 func NewMsgAddCredential(did string, credType []string, issuer string, issued string) MsgAddCredential {
-	didCredential := exported.DidCredential{
-		CredType: credType,
+	didCredential := DidCredential{
+		Credtype: credType,
 		Issuer:   issuer,
 		Issued:   issued,
-		Claim: exported.Claim{
+		Claim: &Claim{
 			Id:           did,
-			KYCValidated: true,
+			KYCvalidated: true,
 		},
 	}
 
 	return MsgAddCredential{
-		DidCredential: didCredential,
+		DidCredential: &didCredential,
 	}
 }
 
 func (msg MsgAddCredential) Type() string  { return TypeMsgAddCredential }
+
 func (msg MsgAddCredential) Route() string { return RouterKey }
 
 func (msg MsgAddCredential) GetSignerDid() exported.Did { return msg.DidCredential.Issuer }
+
 func (msg MsgAddCredential) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
-}
-
-func (msg MsgAddCredential) String() string {
-	return fmt.Sprintf("MsgAddCredential{Did: %v, Type: %v, Signer: %v}",
-		string(msg.DidCredential.Claim.Id), msg.DidCredential.CredType, string(msg.DidCredential.Issuer))
 }
 
 func (msg MsgAddCredential) ValidateBasic() error {
@@ -138,14 +121,4 @@ func (msg MsgAddCredential) ValidateBasic() error {
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
 	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
-}
-
-func (msg MsgAddCredential) Reset() {
-	// TODO Implement Reset() of Msg interface
-	panic("implement me")
-}
-
-func (msg MsgAddCredential) ProtoMessage() {
-	// TODO Implement ProtoMessage() of Msg interface
-	panic("implement me")
 }

@@ -40,6 +40,11 @@ type DidDoc interface {
 	GetPubKey() string
 	Address() sdk.AccAddress
 
+	//proto.Message
+	//Reset()
+	//String() string
+	//ProtoMessage()
+
 	// TODO instead of adding codec.ProtoMarshaler here, implement functions for (*BaseDidDoc)
 	//codec.ProtoMarshaler
 	//Reset()

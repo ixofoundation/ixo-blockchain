@@ -89,6 +89,9 @@ run_with_all_data:
 ########################################
 ### Protobuf
 
+#generate:
+#	protoc -I . --go_out x/did/internal/types/ --go_opt paths=source_relative proto/did/tx.proto
+
 proto-all: proto-format proto-lint proto-gen
 
 proto-gen:

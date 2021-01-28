@@ -12,5 +12,5 @@ type DidKeeper interface {
 	AddDidDoc(ctx sdk.Context, did exported.DidDoc)
 	AddCredentials(ctx sdk.Context, did exported.Did, credential exported.DidCredential) (err error)
 	GetAllDidDocs(ctx sdk.Context) (didDocs []exported.DidDoc)
-	GetAddDids(ctx sdk.Context) (dids []exported.Did)
+	GetAllDids(ctx sdk.Context) (dids []exported.Did)
 }

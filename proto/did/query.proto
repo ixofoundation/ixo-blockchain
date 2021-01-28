@@ -66,7 +66,7 @@ message QueryAddressFromDidRequest {
 
 message QueryAddressFromDidResponse {
   // address returns the address for a given DID
-  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+  string address = 1 [/*(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.nullable) = false,*/ (gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
 }
 
 message QueryAddressFromBase58EncodedPubkeyRequest {
@@ -76,7 +76,7 @@ message QueryAddressFromBase58EncodedPubkeyRequest {
 
 message QueryAddressFromBase58EncodedPubkeyResponse {
   // address returns the address for a given PubKey
-  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+  string address = 1 [/*(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.nullable) = false,*/ (gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
 }
 
 message QueryIxoDidFromMnemonicRequest {

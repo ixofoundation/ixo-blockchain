@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"strings"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
@@ -14,7 +15,7 @@ import (
 )
 
 func GetCmdAddressFromBase58Pubkey() *cobra.Command {
-	return &cobra.Command{
+	cmd :=  &cobra.Command{
 		Use:   "get-address-from-pubkey [base-58-encoded-pubkey]",
 		Short: "Get the address for a base-58 encoded ed25519 public key",
 		Args:  cobra.ExactArgs(1),
@@ -28,11 +29,14 @@ func GetCmdAddressFromBase58Pubkey() *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 // Referred to cosmos-sdk x/upgrade/client/cli/query.go for refactoring GetCmds which took amino as argument
 func GetCmdAddressFromDid(/*cdc *codec.Codec*/) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-address-from-did [did]",
 		Short: "Query address for a DID",
 		Args:  cobra.ExactArgs(1),
@@ -40,7 +44,7 @@ func GetCmdAddressFromDid(/*cdc *codec.Codec*/) *cobra.Command {
 			//cliCtx := context.NewCLIContext().WithCodec(legacyQuerierCdc)
 
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags()) //client.ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -69,10 +73,13 @@ func GetCmdAddressFromDid(/*cdc *codec.Codec*/) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdIxoDidFromMnemonic() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-ixo-did-from-mnemonic [mnemonic]",
 		Short: "Get an ixo DID from a 12-word secret mnemonic",
 		Args:  cobra.ExactArgs(1),
@@ -95,10 +102,13 @@ func GetCmdIxoDidFromMnemonic() *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-did-doc [did]",
 		Short: "Query DidDoc for a DID",
 		Args:  cobra.ExactArgs(1),
@@ -106,7 +116,7 @@ func GetCmdDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 			//cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags()) //client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -139,16 +149,19 @@ func GetCmdDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdAllDids(/*cdc *codec.Codec*/) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-all-dids",
 		Short: "Query all DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//cliCtx := context.NewCLIContext().WithCodec(cdc)
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags()) //client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -174,16 +187,19 @@ func GetCmdAllDids(/*cdc *codec.Codec*/) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdAllDidDocs(/*cdc *codec.Codec*/) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-all-did-docs",
 		Short: "Query all DID documents",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			//cliCtx := context.NewCLIContext().WithCodec(cdc)
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			clientCtx, err := client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
+			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags()) //client. ReadQueryCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -209,4 +225,7 @@ func GetCmdAllDidDocs(/*cdc *codec.Codec*/) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }

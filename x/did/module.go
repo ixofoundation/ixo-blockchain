@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 
 	//"github.com/cosmos/cosmos-sdk/client/flags"
 	//"github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -37,12 +37,12 @@ type AppModuleBasic struct{}
 
 // Name returns the did module's name.
 func (AppModuleBasic) Name() string {
-	return ModuleName
+	return types.ModuleName
 }
 
 // RegisterLegacyAminoCodec registers the did module's types for the given codec.
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	RegisterLegacyAminoCodec(cdc)
+	types.RegisterLegacyAminoCodec(cdc)
 }
 
 // RegisterInterfaces registers interfaces and implementations of the did module.
@@ -50,51 +50,39 @@ func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) 
 	types.RegisterInterfaces(registry)
 }
 
-//func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-//	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
-//}
-
 // DefaultGenesis returns default genesis state as raw bytes for the did
 // module.
 func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
 	//return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
-	return cdc.MustMarshalJSON(DefaultGenesisState())
+	return cdc.MustMarshalJSON(types.DefaultGenesisState())
 }
-
-//func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
-//	var data GenesisState
-//	err := ModuleCdc.UnmarshalJSON(bz, &data)
-//	if err != nil {
-//		return err
-//	}
-//	return ValidateGenesis(data)
-//}
 
 // ValidateGenesis performs genesis state validation for the did module.
 func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var data GenesisState
-	err := cdc.UnmarshalJSON(bz, &data) //ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal %s genesis state: %w", ModuleName, err)
+	//	err := ModuleCdc.UnmarshalJSON(bz, &data)
+	if err := cdc.UnmarshalJSON(bz, &data); err != nil {
+		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
 	}
 
 	return ValidateGenesis(data)
 }
 
 // RegisterRESTRoutes registers the REST routes for the did module.
+// TODO Check if we need to add more
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterRoutes(clientCtx, rtr)
+	rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the did module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx)) //tx.RegisterGRPCGatewayRoutes()
+	types.RegisterQueryHandlerClient(context.Background(), mux, NewQueryClient(clientCtx)) //tx.RegisterGRPCGatewayRoutes()
 }
 
 // GetTxCmd returns the root tx command for the did module.
 func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	didTxCmd := &cobra.Command{
-		Use:                        ModuleName,
+		Use:                        types.ModuleName,
 		Short:                      "did transaction sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
@@ -102,8 +90,8 @@ func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	}
 
 	didTxCmd.AddCommand(
-		cli.GetCmdAddDidDoc(),
-		cli.GetCmdAddCredential(),
+		cli.NewCmdAddDidDoc(),
+		cli.NewCmdAddCredential(),
 	)
 
 	//didTxCmd.AddCommand(flags.PostCommands(
@@ -117,7 +105,7 @@ func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 // GetQueryCmd returns the root query command for the did module.
 func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
 	didQueryCmd := &cobra.Command{
-		Use:                        ModuleName,
+		Use:                        types.ModuleName,
 		Short:                      "did query sub commands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
@@ -154,7 +142,7 @@ type AppModule struct {
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper) AppModule {
+func NewAppModule(keeper keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
@@ -163,16 +151,15 @@ func NewAppModule(keeper Keeper) AppModule {
 
 // Name returns the did module's name.
 func (AppModule) Name() string {
-	return ModuleName
+	return types.ModuleName
 }
 
-// TODO what is this?
-// RegisterInvariants performs a no-op.
+// RegisterInvariants performs a no-op (did has no invariants).
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the did module.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(RouterKey, NewHandler(am.keeper)) //RouterKey
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper)) //RouterKey
 }
 
 //func (am AppModule) NewHandler() sdk.Handler {
@@ -181,20 +168,19 @@ func (am AppModule) Route() sdk.Route {
 
 // QuerierRoute returns the did module's querier route name.
 func (AppModule) QuerierRoute() string {
-	return QuerierRoute
+	return types.QuerierRoute
 }
 
 // LegacyQuerierHandler returns the did module sdk.Querier.
-func (am AppModule) LegacyQuerierHandler(cdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, cdc)
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
 }
 
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	//types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
-	//types.RegisterMsgServer(cfg.MsgServer(), am.keeper)
-	// TODO what does this do?
+	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 }
 
 //func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
@@ -209,7 +195,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, genesisState)
+	InitGenesis(ctx, am.keeper, &genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
@@ -217,12 +203,11 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data j
 // module.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
-	return cdc.MustMarshalJSON(gs) //ModuleCdc.MustMarshalJSON(gs)
+	return cdc.MustMarshalJSON(&gs) //ModuleCdc.MustMarshalJSON(gs)
 }
 
 // BeginBlock returns the begin blocker for the did module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
-}
+func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 // EndBlock returns the end blocker for the did module. It returns no validator
 // updates.
