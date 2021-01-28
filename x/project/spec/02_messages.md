@@ -131,6 +131,8 @@ This will create a claim for the specified project.
 This message is expected to fail if:
 - senderDid is wrong
 - projectDid is wrong
+- claim ID (in Data) is wrong
+- claim template ID (in Data) is wrong
 
 ```go
 type MsgCreateClaim struct {
