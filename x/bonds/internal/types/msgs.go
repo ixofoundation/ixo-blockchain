@@ -182,7 +182,6 @@ func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
 type MsgEditBond struct {
 	BondDid                did.Did `json:"bond_did" yaml:"bond_did"`
-	Token                  string  `json:"token" yaml:"token"`
 	Name                   string  `json:"name" yaml:"name"`
 	Description            string  `json:"description" yaml:"description"`
 	OrderQuantityLimits    string  `json:"order_quantity_limits" yaml:"order_quantity_limits"`
@@ -191,11 +190,10 @@ type MsgEditBond struct {
 	EditorDid              did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
+func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editorDid, bondDid did.Did) MsgEditBond {
 	return MsgEditBond{
 		BondDid:                bondDid,
-		Token:                  token,
 		Name:                   name,
 		Description:            description,
 		OrderQuantityLimits:    orderQuantityLimits,
@@ -209,8 +207,6 @@ func (msg MsgEditBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
-	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Description) == "" {
@@ -266,15 +262,13 @@ func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
 type MsgSetNextAlpha struct {
 	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
-	Token     string  `json:"token" yaml:"token"`
 	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
 	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgSetNextAlpha(token string, alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
+func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
 	return MsgSetNextAlpha{
 		BondDid:   bondDid,
-		Token:     token,
 		Alpha:     alpha,
 		EditorDid: editorDid,
 	}
@@ -284,8 +278,6 @@ func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
-	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "Token")
 	} else if strings.TrimSpace(msg.EditorDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}

@@ -181,7 +181,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 		Use:   "edit-bond",
 		Short: "Edit bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_token := viper.GetString(FlagToken)
 			_name := viper.GetString(FlagName)
 			_description := viper.GetString(FlagDescription)
 			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
@@ -199,9 +198,8 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgEditBond(
-				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, editorDid.Did, _bondDid)
+			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
+				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
 	}
@@ -209,7 +207,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(fsBondGeneral)
 	cmd.Flags().AddFlagSet(fsBondEdit)
 
-	_ = cmd.MarkFlagRequired(FlagToken)
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagEditorDid)
 
@@ -218,15 +215,14 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 
 func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "set-next-alpha [bond-token] [new-alpha] [bond-did] [editor-did]",
-		Example: "set-next-alpha abc 0.5 1000res1 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Use:     "set-next-alpha [new-alpha] [bond-did] [editor-did]",
+		Example: "set-next-alpha 0.5 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
 		Short:   "Edit a bond's alpha parameter",
-		Args:    cobra.ExactArgs(4),
+		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_bondToken := args[0]
-			_alpha := args[1]
-			_bondDid := args[2]
-			_editorDid := args[3]
+			_alpha := args[0]
+			_bondDid := args[1]
+			_editorDid := args[2]
 
 			// Parse alpha
 			alpha, err := sdk.NewDecFromStr(_alpha)
@@ -243,7 +239,7 @@ func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgSetNextAlpha(_bondToken, alpha, editorDid.Did, _bondDid)
+			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},

@@ -73,10 +73,13 @@ Orders can be added to the current batch at any point in time. Any order that is
 
 The primary task of the batching mechanism is to find a common price for all of the buys and sells submitted to the batch by summing up all of the buys and sells, thus ignoring their order, and matching-up the total buy and sell amounts to give balanced and fair global buy and sell prices.
 
+For alpha bonds, the batch also stores the next alpha value, if it was changed throughout the lifetime of the batch. If alpha has not changed, then it will show up as `-1`.
+
 ```go
 type Batch struct {
-	Token           string
+	BondDid         did.Did
 	BlocksRemaining sdk.Uint
+	NextAlpha       sdk.Dec
 	TotalBuyAmount  sdk.Coin
 	TotalSellAmount sdk.Coin
 	BuyPrices       sdk.DecCoins

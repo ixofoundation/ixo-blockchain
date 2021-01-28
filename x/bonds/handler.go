@@ -271,7 +271,6 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 		sdk.NewEvent(
 			types.EventTypeEditBond,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits),
@@ -357,7 +356,6 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		sdk.NewEvent(
 			types.EventTypeSetNextAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
 		),
 		sdk.NewEvent(
