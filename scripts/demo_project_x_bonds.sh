@@ -198,6 +198,7 @@ ixocli tx bonds create-bond \
   --outcome-payment="300000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$OWNER_DID_FULL" \
+  --controller-did="$OWNER_DID" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
 
 # Create oracle fee payment template

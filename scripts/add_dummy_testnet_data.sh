@@ -203,6 +203,7 @@ ixocli tx bonds create-bond \
   --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND1_DID" \
+  --controller-did="$FRANCESCO_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
@@ -224,6 +225,7 @@ ixocli tx bonds create-bond \
   --allow-sells \
   --batch-blocks=3 \
   --bond-did="$BOND2_DID" \
+  --controller-did="$FRANCESCO_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
@@ -245,6 +247,7 @@ ixocli tx bonds create-bond \
   --allow-sells \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID" \
+  --controller-did="$FRANCESCO_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
@@ -266,6 +269,7 @@ ixocli tx bonds create-bond \
   --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND4_DID" \
+  --controller-did="$FRANCESCO_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Buy 5token1, 5token2 from Miguel
