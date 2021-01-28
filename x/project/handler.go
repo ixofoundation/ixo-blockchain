@@ -308,6 +308,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) (*sdk.R
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
+			sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateID),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

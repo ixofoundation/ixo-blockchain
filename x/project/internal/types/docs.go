@@ -83,12 +83,14 @@ func NewUpdateAgentDoc(did did.Did, status AgentStatus, role string) UpdateAgent
 }
 
 type CreateClaimDoc struct {
-	ClaimID string `json:"claimID" yaml:"claimID"`
+	ClaimID         string `json:"claimID" yaml:"claimID"`
+	ClaimTemplateID string `json:"claimTemplateID" yaml:"claimTemplateID"`
 }
 
-func NewCreateClaimDoc(claimId string) CreateClaimDoc {
+func NewCreateClaimDoc(claimId string, claimTemplateID string) CreateClaimDoc {
 	return CreateClaimDoc{
-		ClaimID: claimId,
+		ClaimID:         claimId,
+		ClaimTemplateID: claimTemplateID,
 	}
 }
 
