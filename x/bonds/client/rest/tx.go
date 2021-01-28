@@ -170,7 +170,6 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 type editBondReq struct {
 	BaseReq                rest.BaseReq `json:"base_req" yaml:"base_req"`
-	Token                  string       `json:"token" yaml:"token"`
 	Name                   string       `json:"name" yaml:"name"`
 	Description            string       `json:"description" yaml:"description"`
 	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
@@ -192,9 +191,7 @@ func editBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
-			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+		msg := types.NewMsgEditBond(req.Name, req.Description, req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage, req.EditorDid, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

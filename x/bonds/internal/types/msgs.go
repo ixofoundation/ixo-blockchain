@@ -190,11 +190,10 @@ type MsgEditBond struct {
 	EditorDid              did.Did `json:"editor_did" yaml:"editor_did"`
 }
 
-func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
+func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editorDid, bondDid did.Did) MsgEditBond {
 	return MsgEditBond{
 		BondDid:                bondDid,
-		Token:                  token,
 		Name:                   name,
 		Description:            description,
 		OrderQuantityLimits:    orderQuantityLimits,
@@ -208,8 +207,6 @@ func (msg MsgEditBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
-	} else if strings.TrimSpace(msg.Token) == "" {
-		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token")
 	} else if strings.TrimSpace(msg.Name) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Description) == "" {
