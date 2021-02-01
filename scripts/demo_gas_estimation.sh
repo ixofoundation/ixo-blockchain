@@ -99,7 +99,6 @@ ixocli_tx bonds create-bond \
 
 echo "Editing bond..."
 ixocli_tx bonds edit-bond \
-  --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL" \

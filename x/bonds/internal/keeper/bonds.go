@@ -145,6 +145,13 @@ func (k Keeper) GetSupplyAdjustedForSell(ctx sdk.Context, bondDid did.Did) sdk.C
 	return supply.Sub(batch.TotalSellAmount)
 }
 
+func (k Keeper) GetSupplyAdjustedForAlphaEdit(ctx sdk.Context, bondDid did.Did) sdk.Coin {
+	bond := k.MustGetBond(ctx, bondDid)
+	batch := k.MustGetBatch(ctx, bondDid)
+	supply := bond.CurrentSupply
+	return supply.Add(batch.TotalBuyAmount).Sub(batch.TotalSellAmount)
+}
+
 func (k Keeper) SetCurrentSupply(ctx sdk.Context, bondDid did.Did, currentSupply sdk.Coin) {
 	if currentSupply.IsNegative() {
 		panic("current supply cannot be negative")

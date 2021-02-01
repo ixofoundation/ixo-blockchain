@@ -94,7 +94,10 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 				continue // Check does not apply to augmented/swapper functions
 			}
 
-			expectedReserve := bond.ReserveAtSupply(bond.CurrentSupply.Amount)
+			expectedReserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount)
+			if err != nil {
+				continue // ignore error
+			}
 			expectedRounded := expectedReserve.Ceil().TruncateInt()
 			actualReserve := k.GetReserveBalances(ctx, did)
 

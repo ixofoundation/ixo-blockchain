@@ -78,6 +78,40 @@ func GetCmdPaymentContract(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
+func GetCmdPaymentContractsByIdPrefix(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "payment-contracts-by-id-prefix [payment-contracts-id-prefix]",
+		Short: "Query info of list of payment contracts by ID prefix",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			contractIdPrefix := args[0]
+
+			res, _, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+					keeper.QueryPaymentContractsByIdPrefix, contractIdPrefix), nil)
+			if err != nil {
+				fmt.Printf("%s", err.Error())
+				return nil
+			}
+
+			var out []types.PaymentContract
+			err = cdc.UnmarshalJSON(res, &out)
+			if err != nil {
+				return err
+			}
+
+			output, err := cdc.MarshalJSONIndent(out, "", "  ")
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(output))
+			return nil
+		},
+	}
+}
+
 func GetCmdSubscription(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "subscription [subscription-id]",

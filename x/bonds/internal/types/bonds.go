@@ -42,7 +42,7 @@ var (
 	}
 
 	ExtraParameterRestrictions = map[string]FunctionParamRestrictions{
-		PowerFunction:     powerParameterRestrictions,
+		PowerFunction:     nil,
 		SigmoidFunction:   sigmoidParameterRestrictions,
 		SwapperFunction:   nil,
 		AugmentedFunction: augmentedParameterRestrictions,
@@ -62,6 +62,23 @@ func NewFunctionParam(param string, value sdk.Dec) FunctionParam {
 }
 
 type FunctionParams []FunctionParam
+
+func (fps FunctionParams) ReplaceParam(param string, value sdk.Dec) {
+	for i, fp := range fps {
+		if fp.Param == param {
+			fps[i] = NewFunctionParam(param, value)
+			return
+		}
+	}
+}
+
+func (fps FunctionParams) AddParam(param string, value sdk.Dec) FunctionParams {
+	return append(fps, NewFunctionParam(param, value))
+}
+
+func (fps FunctionParams) AddParams(newFps FunctionParams) FunctionParams {
+	return append(fps, newFps...)
+}
 
 func (fps FunctionParams) Validate(functionType string) error {
 	// Come up with list of expected parameters
@@ -117,17 +134,6 @@ func (fps FunctionParams) AsMap() (paramsMap map[string]sdk.Dec) {
 	return paramsMap
 }
 
-func powerParameterRestrictions(paramsMap map[string]sdk.Dec) error {
-	// Power exception 1: n must be an integer, otherwise x^n loop does not work
-	val, ok := paramsMap["n"]
-	if !ok {
-		panic("did not find parameter n for power function")
-	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "n")
-	}
-	return nil
-}
-
 func sigmoidParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	// Sigmoid exception 1: c != 0, otherwise we run into divisions by zero
 	val, ok := paramsMap["c"]
@@ -141,7 +147,8 @@ func sigmoidParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 
 func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	// Augmented exception 1.1: d0 must be an integer, since it is a token amount
-	// Augmented exception 1.2: d0 != 0, otherwise we run into divisions by zero
+	// Augmented exception 1.2: d0 > 0, since a negative raise is not valid, but
+	// also to avoid division by zero
 	val, ok := paramsMap["d0"]
 	if !ok {
 		panic("did not find parameter d0 for augmented function")
@@ -151,7 +158,8 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "d0")
 	}
 
-	// Augmented exception 2: p0 != 0, otherwise we run into divisions by zero
+	// Augmented exception 2: p0 > 0, since a negative price is not valid, but
+	// also to avoid division by zero
 	val, ok = paramsMap["p0"]
 	if !ok {
 		panic("did not find parameter p0 for augmented function")
@@ -159,7 +167,8 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "p0")
 	}
 
-	// Augmented exception 3: theta must be from 0 to 1 (excluding 1)
+	// Augmented exception 3: theta must be from 0 to 1 (excluding 1), since
+	// theta is a percentage (0% to 100%) and we cannot charge 100% fee
 	val, ok = paramsMap["theta"]
 	if !ok {
 		panic("did not find parameter theta for augmented function")
@@ -169,13 +178,11 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 			sdk.ZeroDec().String(), sdk.OneDec().String())
 	}
 
-	// Augmented exception 4.1: kappa must be an integer, since we use it for powers
-	// Augmented exception 4.2: kappa != 0, otherwise we run into divisions by zero
+	// Augmented exception 4: kappa > 0, since negative exponents are not
+	// allowed, but also to avoid division by zero
 	val, ok = paramsMap["kappa"]
 	if !ok {
 		panic("did not find parameter kappa for augmented function")
-	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "kappa")
 	} else if !val.IsPositive() {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "kappa")
 	}
@@ -202,7 +209,7 @@ type Bond struct {
 	CurrentReserve         sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
 	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-	OutcomePayment         sdk.Coins      `json:"outcome_payment" yaml:"outcome_payment"`
+	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 	State                  string         `json:"state" yaml:"state"`
 	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
 }
@@ -212,7 +219,7 @@ func NewBond(token, name, description string, creatorDid did.Did,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
 	sanityMarginPercentage sdk.Dec, allowSells bool, batchBlocks sdk.Uint,
-	outcomePayment sdk.Coins, state string, bondDid did.Did) Bond {
+	outcomePayment sdk.Int, state string, bondDid did.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -243,8 +250,16 @@ func NewBond(token, name, description string, creatorDid did.Did,
 	}
 }
 
-//noinspection GoNilness
+func (bond Bond) GetNewReserveCoins(amount sdk.Int) (coins sdk.Coins) {
+	coins = sdk.Coins{}
+	for _, r := range bond.ReserveTokens {
+		coins = coins.Add(sdk.NewCoin(r, amount))
+	}
+	return coins
+}
+
 func (bond Bond) GetNewReserveDecCoins(amount sdk.Dec) (coins sdk.DecCoins) {
+	coins = sdk.DecCoins{}
 	for _, r := range bond.ReserveTokens {
 		coins = coins.Add(sdk.NewDecCoinFromDec(r, amount))
 	}
@@ -261,17 +276,20 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 	switch bond.FunctionType {
 	case PowerFunction:
 		m := args["m"]
-		n64 := args["n"].TruncateInt64() // enforced by powerParameterRestrictions
+		n := args["n"]
 		c := args["c"]
-		result = bond.GetNewReserveDecCoins(
-			Power(x, uint64(n64)).Mul(m).Add(c))
+		XtoN, err := ApproxPower(x, n)
+		if err != nil {
+			return nil, err
+		}
+		result = bond.GetNewReserveDecCoins(XtoN.Mul(m).Add(c))
 	case SigmoidFunction:
 		a := args["a"]
 		b := args["b"]
 		c := args["c"]
 		temp1 := x.Sub(b)
 		temp2 := temp1.Mul(temp1).Add(c)
-		temp3, err := ApproxRoot(temp2, 2)
+		temp3, err := ApproxRoot(temp2, sdk.NewDec(2))
 		if err != nil {
 			return nil, err
 		}
@@ -284,15 +302,24 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		case HatchState:
 			result = bond.GetNewReserveDecCoins(args["p0"])
 		case OpenState:
-			kappa := args["kappa"].TruncateInt64()
-			res := Reserve(x, kappa, args["V0"])
+			kappa := args["kappa"]
+			res, err := Reserve(x, kappa, args["V0"])
+			if err != nil {
+				return nil, err
+			}
+
 			// If reserve < 1, default to zero price to avoid calculation issues
 			if res.LT(sdk.OneDec()) {
 				result = bond.GetNewReserveDecCoins(sdk.ZeroDec())
 			} else {
-				spotPriceDec := SpotPrice(res, kappa, args["V0"])
+				spotPriceDec, err := SpotPrice(res, kappa, args["V0"])
+				if err != nil {
+					return nil, err
+				}
 				result = bond.GetNewReserveDecCoins(spotPriceDec)
 			}
+		case SettleState:
+			return nil, ErrInvalidStateForAction
 		default:
 			panic("unrecognized bond state")
 		}
@@ -325,7 +352,7 @@ func (bond Bond) GetCurrentPricesPT(reserveBalances sdk.Coins) (sdk.DecCoins, er
 	}
 }
 
-func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
+func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec, err error) {
 	if supply.IsNegative() {
 		panic(fmt.Sprintf("negative supply for bond %s", bond.Token))
 	}
@@ -335,9 +362,12 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 	switch bond.FunctionType {
 	case PowerFunction:
 		m := args["m"]
-		n, n64 := args["n"], args["n"].TruncateInt64() // enforced by powerParameterRestrictions
+		n := args["n"]
 		c := args["c"]
-		temp1 := Power(x, uint64(n64+1))
+		temp1, err := ApproxPower(x, n.Add(sdk.OneDec()))
+		if err != nil {
+			return sdk.Dec{}, err
+		}
 		temp2 := temp1.Mul(m).Quo(n.Add(sdk.OneDec()))
 		temp3 := x.Mul(c)
 		result = temp2.Add(temp3)
@@ -347,21 +377,24 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 		c := args["c"]
 		temp1 := x.Sub(b)
 		temp2 := temp1.Mul(temp1).Add(c)
-		temp3, err := ApproxRoot(temp2, 2)
+		temp3, err := ApproxRoot(temp2, sdk.NewDec(2))
 		if err != nil {
 			panic(err) // mathematical problem // TODO: consider returning err
 		}
 		temp5 := a.Mul(temp3.Add(x))
-		temp6, err := ApproxRoot(b.Mul(b).Add(c), 2)
+		temp6, err := ApproxRoot(b.Mul(b).Add(c), sdk.NewDec(2))
 		if err != nil {
 			panic(err) // mathematical problem // TODO: consider returning err
 		}
 		constant := a.Mul(temp6)
 		result = temp5.Sub(constant)
 	case AugmentedFunction:
-		kappa := args["kappa"].TruncateInt64()
+		kappa := args["kappa"]
 		V0 := args["V0"]
-		result = Reserve(x, kappa, V0)
+		result, err = Reserve(x, kappa, V0)
+		if err != nil {
+			return sdk.Dec{}, err
+		}
 	case SwapperFunction:
 		panic("invalid function for function type")
 	default:
@@ -373,7 +406,7 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec) {
 		// intersect the x-axis and is greater than zero throughout
 		panic(fmt.Sprintf("negative reserve result for bond %s", bond.Token))
 	}
-	return result
+	return result, nil
 }
 
 func (bond Bond) GetReserveDeltaForLiquidityDelta(mintOrBurn sdk.Int, reserveBalances sdk.Coins) sdk.DecCoins {
@@ -437,16 +470,20 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	case SigmoidFunction:
 		fallthrough
 	case AugmentedFunction:
+		reserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Add(mint))
+		if err != nil {
+			return nil, err
+		}
+
 		var priceToMint sdk.Dec
-		result := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Add(mint))
 		if reserveBalances.Empty() {
-			priceToMint = result
+			priceToMint = reserve
 		} else {
 			// Reserve balances should all be equal given that we are always
 			// applying the same additions/subtractions to all reserve balances.
 			// Thus we can pick the first reserve balance as the global balance.
 			commonReserveBalance := reserveBalances[0].Amount.ToDec()
-			priceToMint = result.Sub(commonReserveBalance)
+			priceToMint = reserve.Sub(commonReserveBalance)
 		}
 		if priceToMint.IsNegative() {
 			// Negative priceToMint means that the previous buyer overpaid
@@ -466,7 +503,7 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	// Note: fees have to be added to these prices to get actual prices
 }
 
-func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.DecCoins {
+func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) (sdk.DecCoins, error) {
 	if burn.IsNegative() {
 		panic(fmt.Sprintf("negative burn amount for bond %s", bond.Token))
 	} else if reserveBalances.IsAnyNegative() {
@@ -479,7 +516,10 @@ func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.
 	case SigmoidFunction:
 		fallthrough
 	case AugmentedFunction:
-		result := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Sub(burn))
+		reserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount.Sub(burn))
+		if err != nil {
+			return nil, err
+		}
 
 		var reserveBalance sdk.Dec
 		if reserveBalances.Empty() {
@@ -491,15 +531,15 @@ func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) sdk.
 			reserveBalance = reserveBalances[0].Amount.ToDec()
 		}
 
-		if result.GT(reserveBalance) {
+		if reserve.GT(reserveBalance) {
 			panic("not enough reserve available for burn")
 		} else {
-			returnForBurn := reserveBalance.Sub(result)
-			return bond.GetNewReserveDecCoins(returnForBurn)
+			returnForBurn := reserveBalance.Sub(reserve)
+			return bond.GetNewReserveDecCoins(returnForBurn), nil
 			// TODO: investigate possibility of negative returnForBurn
 		}
 	case SwapperFunction:
-		return bond.GetReserveDeltaForLiquidityDelta(burn, reserveBalances)
+		return bond.GetReserveDeltaForLiquidityDelta(burn, reserveBalances), nil
 	default:
 		panic("unrecognized function type")
 	}

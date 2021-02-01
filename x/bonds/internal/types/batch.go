@@ -8,6 +8,7 @@ import (
 type Batch struct {
 	BondDid         did.Did      `json:"bond_did" yaml:"bond_did"`
 	BlocksRemaining sdk.Uint     `json:"blocks_remaining" yaml:"blocks_remaining"`
+	NextAlpha       sdk.Dec      `json:"next_alpha" yaml:"next_alpha"`
 	TotalBuyAmount  sdk.Coin     `json:"total_buy_amount" yaml:"total_buy_amount"`
 	TotalSellAmount sdk.Coin     `json:"total_sell_amount" yaml:"total_sell_amount"`
 	BuyPrices       sdk.DecCoins `json:"buy_prices" yaml:"buy_prices"`
@@ -20,11 +21,13 @@ type Batch struct {
 func (b Batch) MoreBuysThanSells() bool { return b.TotalSellAmount.IsLT(b.TotalBuyAmount) }
 func (b Batch) MoreSellsThanBuys() bool { return b.TotalBuyAmount.IsLT(b.TotalSellAmount) }
 func (b Batch) EqualBuysAndSells() bool { return b.TotalBuyAmount.IsEqual(b.TotalSellAmount) }
+func (b Batch) HasNextAlpha() bool      { return !b.NextAlpha.IsNegative() }
 
 func NewBatch(bondDid did.Did, token string, blocks sdk.Uint) Batch {
 	return Batch{
 		BondDid:         bondDid,
 		BlocksRemaining: blocks,
+		NextAlpha:       sdk.OneDec().Neg(),
 		TotalBuyAmount:  sdk.NewInt64Coin(token, 0),
 		TotalSellAmount: sdk.NewInt64Coin(token, 0),
 	}

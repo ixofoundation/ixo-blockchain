@@ -3,6 +3,9 @@ package types
 const (
 	EventTypeCreateBond         = "create_bond"
 	EventTypeEditBond           = "edit_bond"
+	EventTypeSetNextAlpha       = "set_next_alpha"
+	EventTypeEditAlphaSuccess   = "edit_alpha_success"
+	EventTypeEditAlphaFailed    = "edit_alpha_failed"
 	EventTypeInitSwapper        = "init_swapper"
 	EventTypeBuy                = "buy"
 	EventTypeSell               = "sell"
@@ -48,6 +51,7 @@ const (
 	AttributeKeyNewBondTokenBalance    = "new_bond_token_balance"
 	AttributeKeyOldState               = "old_state"
 	AttributeKeyNewState               = "new_state"
+	AttributeKeyAlpha                  = "alpha"
 
 	AttributeValueBuyOrder  = "buy"
 	AttributeValueSellOrder = "sell"

@@ -54,6 +54,7 @@ MIGUEL_DID_FULL='{
     "encryptionPrivateKey":"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh"
   }
 }'
+FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 FRANCESCO_DID_FULL='{
   "did":"did:ixo:UKzkhVSHc3qEFva5EY2XHt",
   "verifyKey":"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej",
@@ -83,14 +84,14 @@ ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-pri
 echo "Ledgering DID 3/3..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# d0 := 500.0   // initial raise (reserve)
-# p0 := 0.01    // initial price (reserve per token)
-# theta := 0.4  // initial allocation (percentage)
-# kappa := 3.0  // degrees of polynomial (i.e. x^2, x^4, x^6)
+# d0 := 1000000 // initial raise (reserve)
+# p0 := 1       // initial price (reserve per token)
+# theta := 0    // initial allocation (percentage)
+# kappa := 3    // degrees of polynomial (i.e. x^2, x^4, x^6)
 
-# R0 = 300              // initial reserve (1-theta)*d0
-# S0 = 50000            // initial supply
-# V0 = 416666666666.667 // invariant
+# R0 = 1000000        // initial reserve (1-theta)*d0
+# S0 = 1000000        // initial supply
+# V0 = 1000000000000  // invariant
 
 echo "Creating bond..."
 ixocli tx bonds create-bond \
@@ -98,48 +99,66 @@ ixocli tx bonds create-bond \
   --name="A B C" \
   --description="Description about A B C" \
   --function-type=augmented_function \
-  --function-parameters="d0:500.0,p0:0.01,theta:0.4,kappa:3.0" \
+  --function-parameters="d0:1000000,p0:1,theta:0,kappa:3.0" \
   --reserve-tokens=res \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE" \
-  --max-supply=1000000abc \
+  --max-supply=20000000abc \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
-  --allow-sells \
   --batch-blocks=1 \
-  --outcome-payment="100000res" \
+  --outcome-payment="300000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Created bond..."
 ixocli q bonds bond "$BOND_DID"
 
-echo "Miguel buys 20000abc..."
-ixocli tx bonds buy 20000abc 100000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel buys 400000abc..."
+ixocli tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
-echo "Francesco buys 20000abc..."
-ixocli tx bonds buy 20000abc 100000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco buys 400000abc..."
+ixocli tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
 
-echo "Shaun cannot buy 10001abc..."
-ixocli tx bonds buy 10001abc 100000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Shaun cannot buy 200001abc..."
+ixocli tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Shaun cannot sell anything..."
-ixocli tx bonds sell 10000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun can buy 10000abc..."
-ixocli tx bonds buy 10000abc 100000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Shaun can buy 200000abc..."
+ixocli tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Shaun's account..."
 ixocli q auth account "$SHAUN_ADDR"
 
 echo "Bond state is now open..."  # since 50000 (S0) reached
 ixocli q bonds bond "$BOND_DID"
 
-echo "Miguel sells 20000abc..."
-ixocli tx bonds sell 20000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is 3..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Changing alpha to 0.0033->0.0044..."
+NEW_ALPHA="0.0044"
+ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is now approx 2.94..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Changing alpha to 0.0044->0.0033..."
+NEW_ALPHA="0.0033"
+ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is now approx 1.98..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Cannot change alpha to 0.0033->0.09..."
+NEW_ALPHA="0.09"
+ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+echo "Miguel sells 400000abc..."
+ixocli tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 

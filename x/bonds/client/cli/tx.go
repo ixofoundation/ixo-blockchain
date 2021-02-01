@@ -29,6 +29,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	bondsTxCmd.AddCommand(flags.PostCommands(
 		GetCmdCreateBond(cdc),
 		GetCmdEditBond(cdc),
+		GetCmdSetNextAlpha(cdc),
 		GetCmdBuy(cdc),
 		GetCmdSell(cdc),
 		GetCmdSwap(cdc),
@@ -122,11 +123,20 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 
 			// Parse creator's ixo DID
 			creatorDid, err := did.UnmarshalIxoDid(_creatorDid)
-
-			// Parse order quantity limits
-			outcomePayment, err := sdk.ParseCoins(_outcomePayment)
 			if err != nil {
 				return err
+			}
+
+			// Parse outcome payment
+			var outcomePayment sdk.Int
+			if len(_outcomePayment) == 0 {
+				outcomePayment = sdk.ZeroInt()
+			} else {
+				var ok bool
+				outcomePayment, ok = sdk.NewIntFromString(_outcomePayment)
+				if !ok {
+					return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+				}
 			}
 
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
@@ -171,7 +181,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 		Use:   "edit-bond",
 		Short: "Edit bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_token := viper.GetString(FlagToken)
 			_name := viper.GetString(FlagName)
 			_description := viper.GetString(FlagDescription)
 			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
@@ -189,9 +198,8 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).
 				WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgEditBond(
-				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-				_sanityMarginPercentage, editorDid.Did, _bondDid)
+			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
+				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid)
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 		},
 	}
@@ -199,10 +207,43 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	cmd.Flags().AddFlagSet(fsBondGeneral)
 	cmd.Flags().AddFlagSet(fsBondEdit)
 
-	_ = cmd.MarkFlagRequired(FlagToken)
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagEditorDid)
 
+	return cmd
+}
+
+func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "set-next-alpha [new-alpha] [bond-did] [editor-did]",
+		Example: "set-next-alpha 0.5 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+		Short:   "Edit a bond's alpha parameter",
+		Args:    cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_alpha := args[0]
+			_bondDid := args[1]
+			_editorDid := args[2]
+
+			// Parse alpha
+			alpha, err := sdk.NewDecFromStr(_alpha)
+			if err != nil {
+				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "alpha")
+			}
+
+			// Parse editor's ixo DID
+			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+			if err != nil {
+				return err
+			}
+
+			cliCtx := context.NewCLIContext().WithCodec(cdc).
+				WithFromAddress(editorDid.Address())
+
+			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid)
+
+			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+		},
+	}
 	return cmd
 }
 

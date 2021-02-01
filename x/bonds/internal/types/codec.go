@@ -14,6 +14,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(&SwapOrder{}, "bonds/SwapOrder", nil)
 	cdc.RegisterConcrete(MsgCreateBond{}, "bonds/MsgCreateBond", nil)
 	cdc.RegisterConcrete(MsgEditBond{}, "bonds/MsgEditBond", nil)
+	cdc.RegisterConcrete(MsgSetNextAlpha{}, "bonds/MsgSetNextAlpha", nil)
 	cdc.RegisterConcrete(MsgBuy{}, "bonds/MsgBuy", nil)
 	cdc.RegisterConcrete(MsgSell{}, "bonds/MsgSell", nil)
 	cdc.RegisterConcrete(MsgSwap{}, "bonds/MsgSwap", nil)

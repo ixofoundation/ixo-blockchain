@@ -2,11 +2,11 @@ package bonds
 
 import (
 	"fmt"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strconv"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -20,6 +20,8 @@ func NewHandler(keeper keeper.Keeper) sdk.Handler {
 			return handleMsgCreateBond(ctx, keeper, msg)
 		case types.MsgEditBond:
 			return handleMsgEditBond(ctx, keeper, msg)
+		case types.MsgSetNextAlpha:
+			return handleMsgSetNextAlpha(ctx, keeper, msg)
 		case types.MsgBuy:
 			return handleMsgBuy(ctx, keeper, msg)
 		case types.MsgSell:
@@ -53,6 +55,9 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			continue
 		}
 
+		// Store current reserve to check if this has changed later on
+		reserveBeforeOrderProcessing := bond.CurrentReserve
+
 		// Perform orders
 		keeper.PerformOrders(ctx, bond.BondDid)
 
@@ -73,9 +78,28 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			}
 		}
 
+		// Update alpha value if in open state and next alpha is not null
+		if bond.State == types.OpenState && batch.HasNextAlpha() {
+			keeper.UpdateAlpha(ctx, bond.BondDid)
+		}
+
 		// Save current batch as last batch and reset current batch
 		keeper.SetLastBatch(ctx, bond.BondDid, batch)
 		keeper.SetBatch(ctx, bond.BondDid, types.NewBatch(bond.BondDid, bond.Token, bond.BatchBlocks))
+
+		// If reserve has not changed, no need to recalculate I0; rest of function can be skipped
+		if bond.CurrentReserve.IsEqual(reserveBeforeOrderProcessing) {
+			continue
+		}
+
+		// Recalculate and re-set I0
+		paramsMap := bond.FunctionParameters.AsMap()
+		newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["alpha"],
+			bond.CurrentReserve[0].Amount)
+		bond.FunctionParameters.ReplaceParam("I0", newI0)
+
+		// Save bond
+		keeper.SetBond(ctx, bond.BondDid, bond)
 	}
 	return []abci.ValidatorUpdate{}
 }
@@ -94,7 +118,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		return nil, types.ErrBondTokenCannotBeStakingToken
 	}
 
-	// Check that bond token not reserved TODOTODOTODO
+	// Check that bond token not reserved
 	if keeper.ReservedBondToken(ctx, msg.Token) {
 		return nil, types.ErrReservedBondToken
 	}
@@ -113,15 +137,24 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 
 		R0 := d0.Mul(sdk.OneDec().Sub(theta))
 		S0 := d0.Quo(p0)
-		V0 := types.Invariant(R0, S0, kappa.TruncateInt64())
-		// TODO: consider calculating these on-the-fly, especially R0 and S0
+		V0, err := types.Invariant(R0, S0, kappa)
+		if err != nil {
+			return nil, err
+		}
 
-		msg.FunctionParameters = append(msg.FunctionParameters,
+		// S1 * reserve / (S1 * reserve - S0 * reserve + S0 * C) with S0=S1=1
+		alpha := R0.QuoInt(msg.OutcomePayment)
+
+		I0 := types.InvariantI(msg.OutcomePayment, alpha, sdk.ZeroInt())
+
+		msg.FunctionParameters = msg.FunctionParameters.AddParams(
 			types.FunctionParams{
 				types.NewFunctionParam("R0", R0),
 				types.NewFunctionParam("S0", S0),
 				types.NewFunctionParam("V0", V0),
-			}...)
+				types.NewFunctionParam("I0", I0),
+				types.NewFunctionParam("alpha", alpha),
+			})
 
 		// Set state to Hatch and disable sells. Note that it is never the case
 		// that we start with OpenState because S0>0, since S0=d0/p0 and d0>0
@@ -228,22 +261,102 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgEditB
 		bond.SanityMarginPercentage = sanityMarginPercentage
 	}
 
+	keeper.SetBond(ctx, bond.BondDid, bond)
+
 	logger := keeper.Logger(ctx)
 	logger.Info(fmt.Sprintf("bond %s edited by %s",
 		msg.BondDid, msg.EditorDid))
-
-	keeper.SetBond(ctx, bond.BondDid, bond)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeEditBond,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
 			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits),
 			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate),
 			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+		),
+	})
+
+	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+}
+
+func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSetNextAlpha) (*sdk.Result, error) {
+
+	bond, found := keeper.GetBond(ctx, msg.BondDid)
+	if !found {
+		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+	}
+
+	newAlpha := msg.Alpha
+
+	if bond.FunctionType != types.AugmentedFunction {
+		return nil, types.ErrFunctionNotAvailableForFunctionType
+	} else if bond.State != types.OpenState {
+		return nil, types.ErrInvalidStateForAction
+	}
+
+	if bond.CreatorDid != msg.EditorDid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"editor must be the creator of the bond")
+	}
+
+	// Get supply, reserve, outcome payment. Note that we get the adjusted
+	// supply in order to take into consideration the influence of the buys and
+	// sells in the current batch. We then get the reserve based on this supply.
+	S := keeper.GetSupplyAdjustedForAlphaEdit(ctx, bond.BondDid).Amount
+	R, err := bond.ReserveAtSupply(S)
+	if err != nil {
+		return nil, err
+	}
+	C := bond.OutcomePayment
+
+	// Get current parameters
+	paramsMap := bond.FunctionParameters.AsMap()
+
+	// Check 1 (newAlpha != alpha)
+	if newAlpha.Equal(paramsMap["alpha"]) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			"cannot change alpha to the current value of alpha")
+	}
+	// Check 2 (I > C * alpha)
+	if paramsMap["I0"].LTE(newAlpha.MulInt(C)) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			"cannot change alpha to that value due to violated restriction [1]")
+	}
+	// Check 3 (R / C > newAlpha - alpha)
+	if R.QuoInt(C).LTE(newAlpha.Sub(paramsMap["alpha"])) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			"cannot change alpha to that value due to violated restriction [2]")
+	}
+
+	// Recalculate kappa and V0 using new alpha
+	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
+	_, err = types.Invariant(R, S.ToDec(), newKappa)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get batch to set new alpha
+	batch := keeper.MustGetBatch(ctx, bond.BondDid)
+	batch.NextAlpha = newAlpha
+	keeper.SetBatch(ctx, bond.BondDid, batch)
+
+	logger := keeper.Logger(ctx)
+	logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
+		msg.BondDid, msg.EditorDid))
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeSetNextAlpha,
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -522,12 +635,13 @@ func handleMsgMakeOutcomePayment(ctx sdk.Context, keeper keeper.Keeper, msg type
 	// Confirm that state is OPEN and that outcome payment is not nil
 	if bond.State != types.OpenState {
 		return nil, types.ErrInvalidStateForAction
-	} else if bond.OutcomePayment.Empty() {
+	} else if bond.OutcomePayment.IsZero() {
 		return nil, types.ErrCannotMakeZeroOutcomePayment
 	}
 
 	// Send outcome payment to reserve
-	err := keeper.DepositReserve(ctx, bond.BondDid, senderAddr, bond.OutcomePayment)
+	outcomePayment := bond.GetNewReserveCoins(bond.OutcomePayment)
+	err := keeper.DepositReserve(ctx, bond.BondDid, senderAddr, outcomePayment)
 	if err != nil {
 		return nil, err
 	}

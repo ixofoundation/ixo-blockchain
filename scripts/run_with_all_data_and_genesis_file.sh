@@ -37,9 +37,9 @@ yes $PASSWORD | ixod add-genesis-account "$(ixocli keys show shaun -a)" 10000000
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
 FRANCESCO_ADDR="ixo1cpa6w2wnqyxpxm4rryfjwjnx75kn4xt372dp3y" # address from did:ixo:UKzkhVSHc3qEFva5EY2XHt's pubkey
 SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"     # address from did:ixo:U4tSpzzv91HHqWW1YmFkHJ's pubkey
-yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000000uixo,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000000uixo,1000000res,1000000rez
-yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000000uixo,1000000res,1000000rez
+yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 100000000000uixo,100000000000res,100000000000rez
+yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 100000000000uixo,100000000000res,100000000000rez
 
 # Add genesis oracles
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
@@ -92,8 +92,8 @@ ixod validate-genesis
 
 # Uncomment the below to broadcast REST endpoint
 # Do not forget to comment the bottom lines !!
-#ixod start --pruning "syncable" &
+#ixod start --pruning "everything" &
 #ixocli rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg
 
-ixod start --pruning "syncable" &
+ixod start --pruning "everything" &
 ixocli rest-server --chain-id pandora-1 --trust-node && fg

@@ -62,6 +62,11 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute st
 	).Methods("GET")
 
 	r.HandleFunc(
+		fmt.Sprintf("/bonds/{%s}/alpha_maximums", RestBondDid),
+		queryAlphaMaximumsHandler(cliCtx, queryRoute),
+	).Methods("GET")
+
+	r.HandleFunc(
 		"/bonds/params",
 		queryParamsRequestHandler(cliCtx),
 	).Methods("GET")
@@ -235,6 +240,23 @@ func querySwapReturnHandler(cliCtx context.CLIContext, queryRoute string) http.H
 			fmt.Sprintf("custom/%s/swap_return/%s/%s/%s/%s",
 				queryRoute, bondDid, reserveCoinWithAmount.Denom,
 				reserveCoinWithAmount.Amount.String(), toToken), nil)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func queryAlphaMaximumsHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bondDid := vars[RestBondDid]
+
+		res, _, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/alpha_maximums/%s",
+				queryRoute, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

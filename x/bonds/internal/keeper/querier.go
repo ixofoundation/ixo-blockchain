@@ -20,6 +20,7 @@ const (
 	QueryBuyPrice       = "buy_price"
 	QuerySellReturn     = "sell_return"
 	QuerySwapReturn     = "swap_return"
+	QueryAlphaMaximums  = "alpha_maximums"
 	QueryParams         = "params"
 )
 
@@ -47,6 +48,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 			return querySellReturn(ctx, path[1:], keeper)
 		case QuerySwapReturn:
 			return querySwapReturn(ctx, path[1:], keeper)
+		case QueryAlphaMaximums:
+			return queryAlphaMaximums(ctx, path[1:], keeper)
 		case QueryParams:
 			return queryParams(ctx, keeper)
 		default:
@@ -281,7 +284,10 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
-	reserveReturns := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
+	reserveReturns, err := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
+	if err != nil {
+		return nil, err
+	}
 	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
 
 	txFees := bond.GetTxFees(reserveReturns)
@@ -333,6 +339,44 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	var result types.QuerySwapReturn
 	result.TotalFees = sdk.Coins{txFee}
 	result.TotalReturns = reserveReturns
+
+	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return bz, nil
+}
+
+func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+	bondDid := path[0]
+
+	bond, found := keeper.GetBond(ctx, bondDid)
+	if !found {
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+	}
+
+	if bond.FunctionType != types.AugmentedFunction {
+		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
+	}
+
+	var maxAlphaIncrease, maxAlpha sdk.Dec
+	if len(bond.CurrentReserve) == 0 {
+		maxAlphaIncrease = sdk.ZeroDec()
+		maxAlpha = sdk.ZeroDec()
+	} else {
+		R := bond.CurrentReserve[0].Amount // common reserve balance
+		C := bond.OutcomePayment
+		maxAlphaIncrease = sdk.NewDecFromInt(R).QuoInt(C)
+
+		paramsMap := bond.FunctionParameters.AsMap()
+		I := paramsMap["I0"]
+		maxAlpha = I.QuoInt(C)
+	}
+
+	var result types.QueryAlphaMaximums
+	result.MaxAlphaIncrease = maxAlphaIncrease
+	result.MaxAlpha = maxAlpha
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
 	if err != nil {

@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	RestPaymentTemplateId = "payment_template_id"
-	RestPaymentContractId = "payment_contract_id"
-	RestSubscriptionId    = "subscription_id"
+	RestPaymentTemplateId        = "payment_template_id"
+	RestPaymentContractId        = "payment_contract_id"
+	RestPaymentContractsIdPrefix = "payment_contracts_id_prefix"
+	RestSubscriptionId           = "subscription_id"
 )
 
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {

@@ -16,6 +16,7 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/bonds/create_bond", createBondRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/edit_bond", editBondRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/set_next_alpha", setNextAlphaRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/buy", buyRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/sell", sellRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/swap", swapRequestHandler(cliCtx)).Methods("POST")
@@ -140,10 +141,17 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// Parse outcome payment
-		outcomePayment, err := sdk.ParseCoins(req.OutcomePayment)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+		var outcomePayment sdk.Int
+		if len(req.OutcomePayment) == 0 {
+			outcomePayment = sdk.ZeroInt()
+		} else {
+			var ok bool
+			outcomePayment, ok = sdk.NewIntFromString(req.OutcomePayment)
+			if !ok {
+				err := sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+				return
+			}
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
@@ -162,7 +170,6 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 type editBondReq struct {
 	BaseReq                rest.BaseReq `json:"base_req" yaml:"base_req"`
-	Token                  string       `json:"token" yaml:"token"`
 	Name                   string       `json:"name" yaml:"name"`
 	Description            string       `json:"description" yaml:"description"`
 	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
@@ -184,9 +191,43 @@ func editBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
-			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+		msg := types.NewMsgEditBond(req.Name, req.Description, req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
+
+type setNextAlphaReq struct {
+	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
+	NewAlpha  string       `json:"new_alpha" yaml:"new_alpha"`
+	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+	EditorDid string       `json:"editor_did" yaml:"editor_did"`
+}
+
+func setNextAlphaRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req setNextAlphaReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		// Parse new alpha
+		newAlpha, err := sdk.NewDecFromStr(req.NewAlpha)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
