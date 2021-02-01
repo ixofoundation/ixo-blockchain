@@ -22,6 +22,7 @@ func (b Batch) MoreBuysThanSells() bool { return b.TotalSellAmount.IsLT(b.TotalB
 func (b Batch) MoreSellsThanBuys() bool { return b.TotalBuyAmount.IsLT(b.TotalSellAmount) }
 func (b Batch) EqualBuysAndSells() bool { return b.TotalBuyAmount.IsEqual(b.TotalSellAmount) }
 func (b Batch) HasNextAlpha() bool      { return !b.NextAlpha.IsNegative() }
+func (b Batch) Empty() bool             { return len(b.Buys) == 0 && len(b.Sells) == 0 && len(b.Swaps) == 0 }
 
 func NewBatch(bondDid did.Did, token string, blocks sdk.Uint) Batch {
 	return Batch{

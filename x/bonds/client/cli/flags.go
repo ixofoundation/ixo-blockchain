@@ -24,6 +24,7 @@ const (
 	FlagOutcomePayment         = "outcome-payment"
 	FlagBondDid                = "bond-did"
 	FlagCreatorDid             = "creator-did"
+	FlagControllerDid          = "controller-did"
 	FlagEditorDid              = "editor-did"
 )
 
@@ -54,6 +55,7 @@ func init() {
 	fsBondCreate.String(FlagOutcomePayment, "", "The payment that would be required to transition the bond to settlement")
 	fsBondCreate.String(FlagBondDid, "", "Bond's DID")
 	fsBondCreate.String(FlagCreatorDid, "", "Bond creator's DID")
+	fsBondCreate.String(FlagControllerDid, "", "Bond controller's DID")
 
 	fsBondEdit.String(FlagName, types.DoNotModifyField, "The bond's name")
 	fsBondEdit.String(FlagDescription, types.DoNotModifyField, "The bond's description")
