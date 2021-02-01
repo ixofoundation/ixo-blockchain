@@ -179,7 +179,7 @@ type MsgUpdateBondState struct {
 }
 ```
 
-This message updated the bond status to SETTLE or FAILED and moves the outcome payment reserve to the bond reserve, so that this is available for bond token holders to withdraw a share from, proportional to the amount of bond tokens they hold.
+This message updates the bond status to SETTLE or FAILED and moves the outcome payment reserve to the bond reserve, so that this is available for bond token holders to withdraw a share from, proportional to the amount of bond tokens they hold.
 
 ## MsgBuy
 
