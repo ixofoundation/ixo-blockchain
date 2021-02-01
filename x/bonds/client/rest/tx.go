@@ -17,6 +17,7 @@ func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc("/bonds/create_bond", createBondRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/edit_bond", editBondRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/set_next_alpha", setNextAlphaRequestHandler(cliCtx)).Methods("POST")
+	r.HandleFunc("/bonds/update_bond_state", updateBondStateRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/buy", buyRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/sell", sellRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/bonds/swap", swapRequestHandler(cliCtx)).Methods("POST")
@@ -44,6 +45,7 @@ type createBondReq struct {
 	OutcomePayment         string       `json:"outcome_payment" yaml:"outcome_payment"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 	CreatorDid             string       `json:"creator_did" yaml:"creator_did"`
+	ControllerDid          string       `json:"controller_did" yaml:"controller_did"`
 }
 
 func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -155,7 +157,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
+			req.CreatorDid, req.ControllerDid, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
 			allowSells, batchBlocks, outcomePayment, req.BondDid)
@@ -191,7 +193,9 @@ func editBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgEditBond(req.Name, req.Description, req.OrderQuantityLimits, req.SanityRate, req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+		msg := types.NewMsgEditBond(req.Name, req.Description,
+			req.OrderQuantityLimits, req.SanityRate,
+			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -228,6 +232,34 @@ func setNextAlphaRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+	}
+}
+
+type updateBondStateReq struct {
+	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
+	NewState  string       `json:"new_state" yaml:"new_state"`
+	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+	EditorDid string       `json:"editor_did" yaml:"editor_did"`
+}
+
+func updateBondStateRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req updateBondStateReq
+		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), req.EditorDid, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -357,6 +389,7 @@ func swapRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 type makeOutcomePaymentReq struct {
 	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
 	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+	Amount    string       `json:"amount" yaml:"amount"`
 	SenderDid string       `json:"sender_did" yaml:"sender_did"`
 }
 
@@ -372,7 +405,14 @@ func makeOutcomePaymentRequestHandler(cliCtx context.CLIContext) http.HandlerFun
 			return
 		}
 
-		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, req.BondDid)
+		amount, ok := sdk.NewIntFromString(req.Amount)
+		if !ok {
+			err := sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "amount")
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, amount, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

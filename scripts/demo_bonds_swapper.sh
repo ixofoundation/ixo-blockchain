@@ -53,6 +53,7 @@ MIGUEL_DID_FULL='{
     "encryptionPrivateKey":"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh"
   }
 }'
+FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 FRANCESCO_DID_FULL='{
   "did":"did:ixo:UKzkhVSHc3qEFva5EY2XHt",
   "verifyKey":"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej",
@@ -89,6 +90,7 @@ ixocli tx bonds create-bond \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Created bond..."
 ixocli q bonds bond "$BOND_DID"
