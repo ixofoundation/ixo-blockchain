@@ -101,13 +101,15 @@ const (
 
 type Claim struct {
 	Id         string      `json:"id" yaml:"id"`
+	TemplateId string      `json:"template_id" yaml:"template_id"`
 	ClaimerDid did.Did     `json:"claimer_did" yaml:"claimer_did"`
 	Status     ClaimStatus `json:"status" yaml:"status"`
 }
 
-func NewClaim(id string, claimerDid did.Did) Claim {
+func NewClaim(id string, templateId string, claimerDid did.Did) Claim {
 	return Claim{
 		Id:         id,
+		TemplateId: templateId,
 		ClaimerDid: claimerDid,
 		Status:     PendingClaim,
 	}

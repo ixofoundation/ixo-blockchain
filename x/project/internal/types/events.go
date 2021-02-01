@@ -17,6 +17,7 @@ const (
 	AttributeKeyAmount          = "amount"
 	AttributeKeyIsRefund        = "is_refund"
 	AttributeKeyClaimID         = "claim_id"
+	AttributeKeyClaimTemplateID = "claim_template_id"
 	AttributeKeyClaimStatus     = "claim_status"
 	AttributeKeyAgentDid        = "agent_did"
 	AttributeKeyAgentRole       = "role"

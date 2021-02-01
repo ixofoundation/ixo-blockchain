@@ -298,7 +298,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) (*sdk.R
 	}
 
 	// Create and set claim
-	claim := types.NewClaim(msg.Data.ClaimID, msg.SenderDid)
+	claim := types.NewClaim(msg.Data.ClaimID, msg.Data.ClaimTemplateID, msg.SenderDid)
 	k.SetClaim(ctx, msg.ProjectDid, claim)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
@@ -308,6 +308,7 @@ func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) (*sdk.R
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
+			sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateID),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
