@@ -48,7 +48,7 @@ type MsgCreateBond struct {
 	SanityRate             sdk.Dec
 	SanityMarginPercentage sdk.Dec
 	AllowSells             bool
-    AlphaBond              bool
+	AlphaBond              bool
 	BatchBlocks            sdk.Uint
 	OutcomePayment         sdk.Int
 }
