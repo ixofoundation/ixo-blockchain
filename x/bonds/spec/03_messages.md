@@ -25,6 +25,7 @@ Bonds can be created by any address using `MsgCreateBond`.
 | SanityRate             | `sdk.Dec`        | For a swapper, restricts conversion rate (`r1/r2`) to `sanity rate ± sanity margin percentage`. `0` for no sanity checks.
 | SanityMarginPercentage | `sdk.Dec`        | Used as described above. `0` for no sanity checks
 | AllowSells             | `bool`           | Whether or not selling is allowed
+| AlphaBond              | `bool`           | Whether or not bond is an alpha bond
 | BatchBlocks            | `sdk.Uint`       | The lifespan of each orders batch in blocks
 | OutcomePayment         | `sdk.Int`        | The approximate total payment required to be made in order to transition a bond from OPEN to SETTLE
 
@@ -47,6 +48,7 @@ type MsgCreateBond struct {
 	SanityRate             sdk.Dec
 	SanityMarginPercentage sdk.Dec
 	AllowSells             bool
+    AlphaBond              bool
 	BatchBlocks            sdk.Uint
 	OutcomePayment         sdk.Int
 }

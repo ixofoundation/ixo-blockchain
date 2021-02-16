@@ -58,6 +58,7 @@ type Bond struct {
 	CurrentSupply          sdk.Coin
 	CurrentReserve         sdk.Coins
 	AllowSells             bool
+	AlphaBond              bool
 	Signers                []sdk.AccAddress
 	BatchBlocks            sdk.Uint
 	OutcomePayment         sdk.Coins

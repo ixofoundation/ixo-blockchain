@@ -60,6 +60,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			_sanityRate := viper.GetString(FlagSanityRate)
 			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
 			_allowSells := viper.GetBool(FlagAllowSells)
+			_alphaBond := viper.GetBool(FlagAlphaBond)
 			_batchBlocks := viper.GetString(FlagBatchBlocks)
 			_outcomePayment := viper.GetString(FlagOutcomePayment)
 			_bondDid := viper.GetString(FlagBondDid)
@@ -148,7 +149,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				creatorDid.Did, _controllerDid, _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
 				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
-				_allowSells, batchBlocks, outcomePayment, _bondDid)
+				_allowSells, _alphaBond, batchBlocks, outcomePayment, _bondDid)
 
 			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
 		},

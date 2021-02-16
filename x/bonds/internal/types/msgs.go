@@ -47,6 +47,7 @@ type MsgCreateBond struct {
 	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
+	AlphaBond              bool           `json:"alpha_bond" yaml:"alpha_bond"`
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 }
@@ -55,7 +56,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid did.Did) MsgCreateBond {
+	allowSell, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid did.Did) MsgCreateBond {
 	return MsgCreateBond{
 		BondDid:                bondDid,
 		Token:                  token,
@@ -74,6 +75,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
 		AllowSells:             allowSell,
+		AlphaBond:              alphaBond,
 		BatchBlocks:            batchBlocks,
 		OutcomePayment:         outcomePayment,
 	}
@@ -153,6 +155,12 @@ func (msg MsgCreateBond) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "batch blocks")
 	} else if msg.MaxSupply.Amount.IsZero() {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "max supply")
+	}
+
+	// Alpha bonds have to be augmented bonding curves
+	if msg.AlphaBond && msg.FunctionType != AugmentedFunction {
+		return sdkerrors.Wrap(ErrFunctionNotAvailableForFunctionType,
+			"only augmented bonding curves can be alpha bonds")
 	}
 
 	// Check that outcome payment not negative

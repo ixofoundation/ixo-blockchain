@@ -41,6 +41,7 @@ type createBondReq struct {
 	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
+	AlphaBond              string       `json:"alpha_bond" yaml:"alpha_bond"`
 	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
 	OutcomePayment         string       `json:"outcome_payment" yaml:"outcome_payment"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
@@ -134,6 +135,19 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
+		// Parse alphaBond
+		var alphaBond bool
+		alphaBondStrLower := strings.ToLower(req.AlphaBond)
+		if alphaBondStrLower == "true" {
+			alphaBond = true
+		} else if alphaBondStrLower == "false" {
+			alphaBond = false
+		} else {
+			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBoolean, "alpha_bond")
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		// Parse batch blocks
 		batchBlocks, err := sdk.ParseUint(req.BatchBlocks)
 		if err != nil {
@@ -160,7 +174,7 @@ func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			req.CreatorDid, req.ControllerDid, req.FunctionType, functionParams, reserveTokens,
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			allowSells, batchBlocks, outcomePayment, req.BondDid)
+			allowSells, alphaBond, batchBlocks, outcomePayment, req.BondDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

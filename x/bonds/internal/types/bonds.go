@@ -237,6 +237,7 @@ type Bond struct {
 	CurrentReserve               sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
 	CurrentOutcomePaymentReserve sdk.Coins      `json:"current_outcome_payment_reserve" yaml:"current_outcome_payment_reserve"`
 	AllowSells                   bool           `json:"allow_sells" yaml:"allow_sells"`
+	AlphaBond                    bool           `json:"alpha_bond" yaml:"alpha_bond"`
 	BatchBlocks                  sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 	OutcomePayment               sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 	State                        BondState      `json:"state" yaml:"state"`
@@ -247,7 +248,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
-	sanityMarginPercentage sdk.Dec, allowSells bool, batchBlocks sdk.Uint,
+	sanityMarginPercentage sdk.Dec, allowSells, alphaBond bool, batchBlocks sdk.Uint,
 	outcomePayment sdk.Int, state BondState, bondDid did.Did) Bond {
 
 	// Ensure tokens and coins are sorted
@@ -274,6 +275,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
 		CurrentReserve:               nil,
 		CurrentOutcomePaymentReserve: nil,
 		AllowSells:                   allowSells,
+		AlphaBond:                    alphaBond,
 		BatchBlocks:                  batchBlocks,
 		OutcomePayment:               outcomePayment,
 		State:                        state,
