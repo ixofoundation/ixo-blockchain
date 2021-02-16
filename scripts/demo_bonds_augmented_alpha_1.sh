@@ -108,6 +108,7 @@ ixocli tx bonds create-bond \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
+  --allow-sells \
   --alpha-bond \
   --batch-blocks=1 \
   --outcome-payment="300000000" \

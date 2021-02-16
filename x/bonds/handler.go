@@ -74,9 +74,6 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			args := bond.FunctionParameters.AsMap()
 			if bond.CurrentSupply.Amount.ToDec().GTE(args["S0"]) {
 				keeper.SetBondState(ctx, bond.BondDid, types.OpenState)
-				bond = keeper.MustGetBond(ctx, bond.BondDid) // get bond again
-				bond.AllowSells = true                       // enable sells
-				keeper.SetBond(ctx, bond.BondDid, bond)      // update bond
 			}
 		}
 
@@ -166,10 +163,9 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 				})
 		}
 
-		// Set state to Hatch and disable sells. Note that it is never the case
-		// that we start with OpenState because S0>0, since S0=d0/p0 and d0>0
+		// The starting state for augmented bonding curves is the Hatch state.
+		// Note that we can never start with OpenState since S0>0 (S0=d0/p0 and d0>0).
 		state = types.HatchState
-		msg.AllowSells = false
 	}
 
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
