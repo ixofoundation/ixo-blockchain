@@ -151,8 +151,8 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			})
 
 		if msg.AlphaBond {
-			// S1 * reserve / (S1 * reserve - S0 * reserve + S0 * C) with S0=S1=1
-			alpha := R0.QuoInt(msg.OutcomePayment)
+			alpha := types.Alpha(sdk.OneInt(), sdk.OneInt(),
+				R0.TruncateInt(), msg.OutcomePayment)
 
 			I0 := types.InvariantI(msg.OutcomePayment, alpha, sdk.ZeroInt())
 
