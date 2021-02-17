@@ -650,7 +650,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 	prevPublicAlpha := paramsMap["publicAlpha"]
 	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
 	temp, err := types.ApproxPower(
-		prevPublicAlpha.Mul(sdk.OneDec().Sub(sdk.MustNewDecFromStr("0.5"))),
+		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
 		sdk.MustNewDecFromStr("2"))
 	if err != nil {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
@@ -664,20 +664,32 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
 
 	// Calculate new system alpha
+	prevSystemAlpha := paramsMap["systemAlpha"]
 	var newSystemAlpha sdk.Dec
 	if deltaPublicAlpha.IsPositive() {
 		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
 		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-		temp2 := sdk.OneDec().Sub(prevPublicAlpha)
+		temp2 := sdk.OneDec().Sub(prevSystemAlpha)
 		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
 	} else {
 		// (1 - scaled_delta_public_alpha) * (previous_alpha)
 		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-		temp2 := prevPublicAlpha
+		temp2 := prevSystemAlpha
 		newSystemAlpha = temp1.Mul(temp2)
 	}
 
-	// Check 1 (I > C * alpha)
+	// Check 1 (newSystemAlpha != systemAlpha)
+	if newSystemAlpha.Equal(paramsMap["systemAlpha"]) {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason,
+				"resultant system alpha based on public alpha is unchanged"),
+		))
+		return
+	}
+	// Check 2 (I > C * systemAlpha)
 	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,
@@ -688,7 +700,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 		))
 		return
 	}
-	// Check 2 (R / C > newAlpha - alpha)
+	// Check 3 (R / C > newSystemAlpha - systemAlpha)
 	if R.QuoInt(C).LTE(newSystemAlpha.Sub(paramsMap["systemAlpha"])) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,

@@ -152,7 +152,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			})
 
 		if msg.AlphaBond {
-			publicAlpha := sdk.MustNewDecFromStr("0.5")
+			publicAlpha := types.StartingPublicAlpha
 			systemAlpha := types.SystemAlpha(publicAlpha, sdk.OneInt(),
 				sdk.OneInt(), R0.TruncateInt(), msg.OutcomePayment)
 
@@ -336,11 +336,17 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 	// Get current parameters
 	paramsMap := bond.FunctionParameters.AsMap()
 
+	// Check (newPublicAlpha != publicAlpha)
+	if newPublicAlpha.Equal(paramsMap["publicAlpha"]) {
+		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			"cannot change public alpha to the current value of public alpha")
+	}
+
 	// Calculate scaled delta public alpha, to calculate new system alpha
 	prevPublicAlpha := paramsMap["publicAlpha"]
 	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
 	temp, err := types.ApproxPower(
-		prevPublicAlpha.Mul(sdk.OneDec().Sub(sdk.MustNewDecFromStr("0.5"))),
+		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
 		sdk.MustNewDecFromStr("2"))
 	if err != nil {
 		return nil, err
@@ -348,30 +354,31 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
 
 	// Calculate new system alpha
+	prevSystemAlpha := paramsMap["systemAlpha"]
 	var newSystemAlpha sdk.Dec
 	if deltaPublicAlpha.IsPositive() {
 		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
 		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-		temp2 := sdk.OneDec().Sub(prevPublicAlpha)
+		temp2 := sdk.OneDec().Sub(prevSystemAlpha)
 		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
 	} else {
 		// (1 - scaled_delta_public_alpha) * (previous_alpha)
 		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-		temp2 := prevPublicAlpha
+		temp2 := prevSystemAlpha
 		newSystemAlpha = temp1.Mul(temp2)
 	}
 
-	// Check 1 (newAlpha != alpha)
+	// Check 1 (newSystemAlpha != systemAlpha)
 	if newSystemAlpha.Equal(paramsMap["systemAlpha"]) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
-			"cannot change alpha to the current value of alpha")
+			"resultant system alpha based on public alpha is unchanged")
 	}
-	// Check 2 (I > C * alpha)
+	// Check 2 (I > C * systemAlpha)
 	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [1]")
 	}
-	// Check 3 (R / C > newAlpha - alpha)
+	// Check 3 (R / C > newSystemAlpha - systemAlpha)
 	if R.QuoInt(C).LTE(newSystemAlpha.Sub(paramsMap["systemAlpha"])) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [2]")

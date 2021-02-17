@@ -360,23 +360,23 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []by
 		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
 	}
 
-	var maxAlphaIncrease, maxAlpha sdk.Dec
+	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec
 	if len(bond.CurrentReserve) == 0 {
-		maxAlphaIncrease = sdk.ZeroDec()
-		maxAlpha = sdk.ZeroDec()
+		maxSystemAlphaIncrease = sdk.ZeroDec()
+		maxSystemAlpha = sdk.ZeroDec()
 	} else {
 		R := bond.CurrentReserve[0].Amount // common reserve balance
 		C := bond.OutcomePayment
-		maxAlphaIncrease = sdk.NewDecFromInt(R).QuoInt(C)
+		maxSystemAlphaIncrease = sdk.NewDecFromInt(R).QuoInt(C)
 
 		paramsMap := bond.FunctionParameters.AsMap()
 		I := paramsMap["I0"]
-		maxAlpha = I.QuoInt(C)
+		maxSystemAlpha = I.QuoInt(C)
 	}
 
 	var result types.QueryAlphaMaximums
-	result.MaxAlphaIncrease = maxAlphaIncrease
-	result.MaxAlpha = maxAlpha
+	result.MaxSystemAlphaIncrease = maxSystemAlphaIncrease
+	result.MaxSystemAlpha = maxSystemAlpha
 
 	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
 	if err != nil {

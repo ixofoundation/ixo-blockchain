@@ -34,6 +34,6 @@ type QuerySwapReturn struct {
 }
 
 type QueryAlphaMaximums struct {
-	MaxAlphaIncrease sdk.Dec `json:"max_alpha_increase" yaml:"max_alpha_increase"`
-	MaxAlpha         sdk.Dec `json:"max_alpha" yaml:"max_alpha"`
+	MaxSystemAlphaIncrease sdk.Dec `json:"max_system_alpha_increase" yaml:"max_system_alpha_increase"`
+	MaxSystemAlpha         sdk.Dec `json:"max_system_alpha" yaml:"max_system_alpha"`
 }

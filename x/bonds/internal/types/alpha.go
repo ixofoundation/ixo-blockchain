@@ -2,6 +2,10 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
+var (
+	StartingPublicAlpha = sdk.MustNewDecFromStr("0.5")
+)
+
 func SystemAlpha(publicAlpha sdk.Dec, S0, S1, R, C sdk.Int) sdk.Dec {
 	// S0/S1: negative and positive attestations, measured in bond tokens
 	// C: outcome payment
