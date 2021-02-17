@@ -94,11 +94,13 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			continue
 		}
 
-		// Recalculate and re-set I0
-		paramsMap := bond.FunctionParameters.AsMap()
-		newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["alpha"],
-			bond.CurrentReserve[0].Amount)
-		bond.FunctionParameters.ReplaceParam("I0", newI0)
+		// Recalculate and re-set I0 if alpha bond
+		if bond.AlphaBond {
+			paramsMap := bond.FunctionParameters.AsMap()
+			newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["alpha"],
+				bond.CurrentReserve[0].Amount)
+			bond.FunctionParameters.ReplaceParam("I0", newI0)
+		}
 
 		// Save bond
 		keeper.SetBond(ctx, bond.BondDid, bond)
@@ -144,19 +146,25 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			return nil, err
 		}
 
-		// S1 * reserve / (S1 * reserve - S0 * reserve + S0 * C) with S0=S1=1
-		alpha := R0.QuoInt(msg.OutcomePayment)
-
-		I0 := types.InvariantI(msg.OutcomePayment, alpha, sdk.ZeroInt())
-
 		msg.FunctionParameters = msg.FunctionParameters.AddParams(
 			types.FunctionParams{
 				types.NewFunctionParam("R0", R0),
 				types.NewFunctionParam("S0", S0),
 				types.NewFunctionParam("V0", V0),
-				types.NewFunctionParam("I0", I0),
-				types.NewFunctionParam("alpha", alpha),
 			})
+
+		if msg.AlphaBond {
+			// S1 * reserve / (S1 * reserve - S0 * reserve + S0 * C) with S0=S1=1
+			alpha := R0.QuoInt(msg.OutcomePayment)
+
+			I0 := types.InvariantI(msg.OutcomePayment, alpha, sdk.ZeroInt())
+
+			msg.FunctionParameters = msg.FunctionParameters.AddParams(
+				types.FunctionParams{
+					types.NewFunctionParam("I0", I0),
+					types.NewFunctionParam("alpha", alpha),
+				})
+		}
 
 		// Set state to Hatch and disable sells. Note that it is never the case
 		// that we start with OpenState because S0>0, since S0=d0/p0 and d0>0
@@ -168,7 +176,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 		msg.ControllerDid, msg.FunctionType, msg.FunctionParameters,
 		msg.ReserveTokens, msg.TxFeePercentage, msg.ExitFeePercentage,
 		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.BatchBlocks,
+		msg.SanityMarginPercentage, msg.AllowSells, msg.AlphaBond, msg.BatchBlocks,
 		msg.OutcomePayment, state, msg.BondDid)
 
 	keeper.SetBond(ctx, bond.BondDid, bond)
@@ -199,6 +207,7 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate.String()),
 			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyAllowSells, strconv.FormatBool(msg.AllowSells)),
+			sdk.NewAttribute(types.AttributeKeyAlphaBond, strconv.FormatBool(msg.AlphaBond)),
 			sdk.NewAttribute(types.AttributeKeyBatchBlocks, msg.BatchBlocks.String()),
 			sdk.NewAttribute(types.AttributeKeyOutcomePayment, msg.OutcomePayment.String()),
 			sdk.NewAttribute(types.AttributeKeyState, string(state)),
@@ -301,7 +310,11 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 	newAlpha := msg.Alpha
 
 	if bond.FunctionType != types.AugmentedFunction {
-		return nil, types.ErrFunctionNotAvailableForFunctionType
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
+			"bond is not an augmented bonding curve")
+	} else if !bond.AlphaBond {
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
+			"bond is not an alpha bond")
 	} else if bond.State != types.OpenState {
 		return nil, types.ErrInvalidStateForAction
 	}

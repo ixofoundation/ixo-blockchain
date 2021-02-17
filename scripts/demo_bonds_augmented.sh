@@ -84,14 +84,14 @@ ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-pri
 echo "Ledgering DID 3/3..."
 ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# d0 := 500.0   // initial raise (reserve)
-# p0 := 0.01    // initial price (reserve per token)
-# theta := 0.4  // initial allocation (percentage)
-# kappa := 3.0  // degrees of polynomial (i.e. x^2, x^4, x^6)
+# d0 := 200000000000  // initial raise (reserve)
+# p0 := 1000000       // initial price (reserve per token)
+# theta := 0          // initial allocation (percentage)
+# kappa := 1.1358     // degrees of polynomial (i.e. x^2, x^4, x^6)
 
-# R0 = 300              // initial reserve (1-theta)*d0
-# S0 = 50000            // initial supply
-# V0 = 416666666666.667 // invariant
+# R0 = 200000000000          // initial reserve (1-theta)*d0
+# S0 = 200000                // initial supply
+# V0 = 0.000005246623176922  // invariant
 
 echo "Creating bond..."
 ixocli tx bonds create-bond \
@@ -99,18 +99,18 @@ ixocli tx bonds create-bond \
   --name="A B C" \
   --description="Description about A B C" \
   --function-type=augmented_function \
-  --function-parameters="d0:500.0,p0:0.01,theta:0.4,kappa:3.0" \
+  --function-parameters="d0:200000000000,p0:1000000,theta:0,kappa:1.1358" \
   --reserve-tokens=res \
   --tx-fee-percentage=0 \
-  --exit-fee-percentage=0 \
+  --exit-fee-percentage=0.2 \
   --fee-address="$FEE" \
-  --max-supply=1000000abc \
+  --max-supply=300000abc \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
   --allow-sells \
   --batch-blocks=1 \
-  --outcome-payment="100000" \
+  --outcome-payment="60000000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
   --controller-did="$FRANCESCO_DID" \
@@ -118,18 +118,40 @@ ixocli tx bonds create-bond \
 echo "Created bond..."
 ixocli q bonds bond "$BOND_DID"
 
-echo "Miguel buys 20000abc..."
-ixocli tx bonds buy 20000abc 100000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel buys 100000abc..."
+ixocli tx bonds buy 100000abc 100000000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixocli q auth account "$MIGUEL_ADDR"
 
-echo "Francesco buys 20000abc..."
-ixocli tx bonds buy 20000abc 100000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco buys 100000abc..."
+ixocli tx bonds buy 100000abc 100000000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
 
-echo "Francesco updates the bond state to FAILED"
-ixocli tx bonds update-bond-state "FAILED" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
+echo "Bond state is now open..."  # since 200000 (S0) reached
+ixocli q bonds bond "$BOND_DID"
+
+echo "Current price is approx 1135800..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Miguel buys 100000abc..."
+ixocli tx bonds buy 100000abc 200000000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel's account..."
+ixocli q auth account "$MIGUEL_ADDR"
+
+echo "Current price is approx 1200000..."
+ixocli q bonds current-price "$BOND_DID"
+
+echo "Max supply reached..."
+ixocli tx bonds buy 1abc 2000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+echo "Francesco makes outcome payment of 60000000000..."
+ixocli tx bonds make-outcome-payment "$BOND_DID" "60000000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco's account..."
+ixocli q auth account "$FRANCESCO_ADDR"
+
+echo "Francesco updates the bond state to SETTLE"
+ixocli tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
 
 echo "Miguel withdraws share..."
 ixocli tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y

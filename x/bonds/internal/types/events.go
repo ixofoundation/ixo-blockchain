@@ -33,6 +33,7 @@ const (
 	AttributeKeySanityRate             = "sanity_rate"
 	AttributeKeySanityMarginPercentage = "sanity_margin_percentage"
 	AttributeKeyAllowSells             = "allow_sells"
+	AttributeKeyAlphaBond              = "alpha_bond"
 	AttributeKeyBatchBlocks            = "batch_blocks"
 	AttributeKeyOutcomePayment         = "outcome_payment"
 	AttributeKeyState                  = "state"
