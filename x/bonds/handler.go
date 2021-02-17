@@ -74,6 +74,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			args := bond.FunctionParameters.AsMap()
 			if bond.CurrentSupply.Amount.ToDec().GTE(args["S0"]) {
 				keeper.SetBondState(ctx, bond.BondDid, types.OpenState)
+				bond = keeper.MustGetBond(ctx, bond.BondDid) // get updated bond
 			}
 		}
 
