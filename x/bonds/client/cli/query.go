@@ -23,7 +23,8 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	bondsQueryCmd.AddCommand(flags.GetCommands(
-		GetCmdBonds(storeKey, cdc),
+		GetCmdBondsList(storeKey, cdc),
+		GetCmdBondsListDetailed(storeKey, cdc),
 		GetCmdBond(storeKey, cdc),
 		GetCmdBatch(storeKey, cdc),
 		GetCmdLastBatch(storeKey, cdc),
@@ -40,7 +41,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	return bondsQueryCmd
 }
 
-func GetCmdBonds(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdBondsList(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "bonds-list",
 		Short: "List of all bonds",
@@ -57,6 +58,29 @@ func GetCmdBonds(queryRoute string, cdc *codec.Codec) *cobra.Command {
 			}
 
 			var out types.QueryBonds
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+func GetCmdBondsListDetailed(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "bonds-list-detailed",
+		Short: "List of all bonds with information about current state",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			res, _, err := cliCtx.QueryWithData(
+				fmt.Sprintf("custom/%s/%s", queryRoute,
+					keeper.QueryBondsDetailed), nil)
+			if err != nil {
+				fmt.Printf("%s", err.Error())
+				return nil
+			}
+
+			var out types.QueryBondsDetailed
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},

@@ -9,11 +9,22 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"net/http"
+	"strconv"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute string) {
 	r.HandleFunc(
 		"/bonds", queryBondsHandler(cliCtx, queryRoute),
+	).Methods("GET")
+
+	r.HandleFunc(
+		"/bonds_detailed",
+		queryBondsDetailedHandler(cliCtx, queryRoute),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/bonds_detailed/{%s}", RestHeight),
+		queryBondsDetailedHandlerWithHeight(cliCtx, queryRoute),
 	).Methods("GET")
 
 	r.HandleFunc(
@@ -75,7 +86,45 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute st
 func queryBondsHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/bonds", queryRoute), nil)
+			fmt.Sprintf("custom/%s/%s",
+				queryRoute, keeper.QueryBonds), nil)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func queryBondsDetailedHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, _, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s",
+				queryRoute, keeper.QueryBondsDetailed), nil)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+			return
+		}
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func queryBondsDetailedHandlerWithHeight(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		heightStr := vars[RestHeight]
+
+		height, err := strconv.ParseInt(heightStr, 10, 64)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest,
+				fmt.Errorf("invalid height").Error())
+			return
+		}
+		cliCtx = cliCtx.WithHeight(height)
+
+		res, _, err := cliCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s",
+				queryRoute, keeper.QueryBondsDetailed), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -90,8 +139,8 @@ func queryBondHandler(cliCtx context.CLIContext, queryRoute string) http.Handler
 		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/bond/%s",
-				queryRoute, bondDid), nil)
+			fmt.Sprintf("custom/%s/%s/%s",
+				queryRoute, keeper.QueryBond, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -107,8 +156,8 @@ func queryBatchHandler(cliCtx context.CLIContext, queryRoute string) http.Handle
 		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/batch/%s",
-				queryRoute, bondDid), nil)
+			fmt.Sprintf("custom/%s/%s/%s",
+				queryRoute, keeper.QueryBatch, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -124,8 +173,8 @@ func queryLastBatchHandler(cliCtx context.CLIContext, queryRoute string) http.Ha
 		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/last_batch/%s",
-				queryRoute, bondDid), nil)
+			fmt.Sprintf("custom/%s/%s/%s",
+				queryRoute, keeper.QueryLastBatch, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -141,8 +190,8 @@ func queryCurrentPriceHandler(cliCtx context.CLIContext, queryRoute string) http
 		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/current_price/%s",
-				queryRoute, bondDid), nil)
+			fmt.Sprintf("custom/%s/%s/%s",
+				queryRoute, keeper.QueryCurrentPrice, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -158,8 +207,8 @@ func queryCurrentReserveHandler(cliCtx context.CLIContext, queryRoute string) ht
 		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/current_reserve/%s",
-				queryRoute, bondDid), nil)
+			fmt.Sprintf("custom/%s/%s/%s",
+				queryRoute, keeper.QueryCurrentReserve, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -176,8 +225,8 @@ func queryCustomPriceHandler(cliCtx context.CLIContext, queryRoute string) http.
 		bondAmount := vars[RestBondAmount]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/custom_price/%s/%s",
-				queryRoute, bondDid, bondAmount), nil)
+			fmt.Sprintf("custom/%s/%s/%s/%s",
+				queryRoute, keeper.QueryCustomPrice, bondDid, bondAmount), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -194,8 +243,8 @@ func queryBuyPriceHandler(cliCtx context.CLIContext, queryRoute string) http.Han
 		bondAmount := vars[RestBondAmount]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/buy_price/%s/%s",
-				queryRoute, bondDid, bondAmount), nil)
+			fmt.Sprintf("custom/%s/%s/%s/%s",
+				queryRoute, keeper.QueryBuyPrice, bondDid, bondAmount), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -212,8 +261,8 @@ func querySellReturnHandler(cliCtx context.CLIContext, queryRoute string) http.H
 		bondAmount := vars[RestBondAmount]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/sell_return/%s/%s",
-				queryRoute, bondDid, bondAmount), nil)
+			fmt.Sprintf("custom/%s/%s/%s/%s",
+				queryRoute, keeper.QuerySellReturn, bondDid, bondAmount), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -237,8 +286,8 @@ func querySwapReturnHandler(cliCtx context.CLIContext, queryRoute string) http.H
 		}
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/swap_return/%s/%s/%s/%s",
-				queryRoute, bondDid, reserveCoinWithAmount.Denom,
+			fmt.Sprintf("custom/%s/%s/%s/%s/%s/%s",
+				queryRoute, keeper.QuerySwapReturn, bondDid, reserveCoinWithAmount.Denom,
 				reserveCoinWithAmount.Amount.String(), toToken), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
@@ -255,8 +304,8 @@ func queryAlphaMaximumsHandler(cliCtx context.CLIContext, queryRoute string) htt
 		bondDid := vars[RestBondDid]
 
 		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/alpha_maximums/%s",
-				queryRoute, bondDid), nil)
+			fmt.Sprintf("custom/%s/%s/%s",
+				queryRoute, keeper.QueryAlphaMaximums, bondDid), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

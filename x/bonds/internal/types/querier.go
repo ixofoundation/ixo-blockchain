@@ -11,6 +11,14 @@ func (b QueryBonds) String() string {
 	return strings.Join(b[:], "\n")
 }
 
+type QueryBondsDetailed []BondDetails
+type BondDetails struct {
+	BondDid   string       `json:"did" yaml:"did"`
+	SpotPrice sdk.DecCoins `json:"spot_price" yaml:"spot_price"`
+	Supply    sdk.Coin     `json:"supply" yaml:"supply"`
+	Reserve   sdk.Coins    `json:"reserve" yaml:"reserve"`
+}
+
 type QueryBuyPrice struct {
 	AdjustedSupply sdk.Coin  `json:"adjusted_supply" yaml:"asdjusted_supply"`
 	Prices         sdk.Coins `json:"prices" yaml:"prices"`
