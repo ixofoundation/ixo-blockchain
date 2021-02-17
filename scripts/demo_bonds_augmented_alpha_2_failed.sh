@@ -144,20 +144,20 @@ ixocli q bonds bond "$BOND_DID"
 echo "Current price is 0.018..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Changing alpha to 0.003->0.004..."
-NEW_ALPHA="0.004"
+echo "Changing public alpha 0.5->0.51..."
+NEW_ALPHA="0.51"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Current price is now [still] 0.018..."
+echo "Current price is now approx 0.011..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Changing alpha to 0.004->0.003..."
-NEW_ALPHA="0.003"
+echo "Changing public alpha 0.51->0.5..."
+NEW_ALPHA="0.5"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Current price is now 0.012..."
+echo "Current price is now approx [still] 0.011..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Cannot change alpha to 0.0033->0.09..."
-NEW_ALPHA="0.09"
+echo "Cannot change public alpha 0.5->0.6..."
+NEW_ALPHA="0.6"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "Miguel sells 20000abc..."
