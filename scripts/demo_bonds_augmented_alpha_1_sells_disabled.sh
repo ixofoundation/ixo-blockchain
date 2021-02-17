@@ -130,8 +130,8 @@ ixocli q auth account "$FRANCESCO_ADDR"
 
 echo "Shaun cannot buy 200001abc..."
 ixocli tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun cannot sell anything..."
-ixocli tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+# echo "Shaun cannot sell anything..." ----- commented out because sells are disabled, so Shaun cannot sell in any case
+# ixocli tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Shaun can buy 200000abc..."
 ixocli tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Shaun's account..."
@@ -159,10 +159,8 @@ echo "Cannot change alpha to 0.0033->0.09..."
 NEW_ALPHA="0.09"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-echo "Miguel sells 400000abc..."
+echo "Miguel cannot sell because sells are disabled..."
 ixocli tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco makes outcome payment of 50000000 [1]..."
 ixocli tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -175,6 +173,11 @@ ixocli q auth account "$FRANCESCO_ADDR"
 
 echo "Francesco updates the bond state to SETTLE"
 ixocli tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
+
+echo "Miguel withdraws share..."
+ixocli tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel's account..."
+ixocli q auth account "$MIGUEL_ADDR"
 
 echo "Francesco withdraws share..."
 ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
