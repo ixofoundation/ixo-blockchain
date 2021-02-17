@@ -636,7 +636,7 @@ func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid did.Did) (can
 func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
-	newAlpha := batch.NextAlpha
+	newPublicAlpha := batch.NextPublicAlpha
 
 	// Get supply, reserve, outcome payment
 	S := bond.CurrentSupply.Amount.ToDec()
@@ -646,8 +646,39 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 	// Get current parameters
 	paramsMap := bond.FunctionParameters.AsMap()
 
+	// Calculate scaled delta public alpha, to calculate new system alpha
+	prevPublicAlpha := paramsMap["publicAlpha"]
+	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
+	temp, err := types.ApproxPower(
+		prevPublicAlpha.Mul(sdk.OneDec().Sub(sdk.MustNewDecFromStr("0.5"))),
+		sdk.MustNewDecFromStr("2"))
+	if err != nil {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+		))
+		return
+	}
+	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
+
+	// Calculate new system alpha
+	var newSystemAlpha sdk.Dec
+	if deltaPublicAlpha.IsPositive() {
+		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
+		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+		temp2 := sdk.OneDec().Sub(prevPublicAlpha)
+		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
+	} else {
+		// (1 - scaled_delta_public_alpha) * (previous_alpha)
+		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+		temp2 := prevPublicAlpha
+		newSystemAlpha = temp1.Mul(temp2)
+	}
+
 	// Check 1 (I > C * alpha)
-	if paramsMap["I0"].LTE(newAlpha.MulInt(C)) {
+	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,
 			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
@@ -658,7 +689,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 		return
 	}
 	// Check 2 (R / C > newAlpha - alpha)
-	if R.QuoInt(C).LTE(newAlpha.Sub(paramsMap["alpha"])) {
+	if R.QuoInt(C).LTE(newSystemAlpha.Sub(paramsMap["systemAlpha"])) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,
 			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
@@ -670,7 +701,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 	}
 
 	// Recalculate kappa and V0 using new alpha
-	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
+	newKappa := types.Kappa(paramsMap["I0"], C, newSystemAlpha)
 	newV0, err := types.Invariant(R, S, newKappa)
 	if err != nil {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
@@ -684,19 +715,21 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 
 	// Get batch to reset alpha
 	batch = k.MustGetBatch(ctx, bond.BondDid)
-	batch.NextAlpha = sdk.OneDec().Neg()
+	batch.NextPublicAlpha = sdk.OneDec().Neg()
 	k.SetBatch(ctx, bond.BondDid, batch)
 
 	// Set new function parameters
 	bond.FunctionParameters.ReplaceParam("kappa", newKappa)
 	bond.FunctionParameters.ReplaceParam("V0", newV0)
-	bond.FunctionParameters.ReplaceParam("alpha", newAlpha)
+	bond.FunctionParameters.ReplaceParam("publicAlpha", newPublicAlpha)
+	bond.FunctionParameters.ReplaceParam("systemAlpha", newSystemAlpha)
 	k.SetBond(ctx, bond.BondDid, bond)
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeEditAlphaSuccess,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-		sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
+		sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
+		sdk.NewAttribute(types.AttributeKeySystemAlpha, newSystemAlpha.String()),
 	))
 }

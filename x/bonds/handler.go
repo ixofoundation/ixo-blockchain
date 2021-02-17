@@ -94,7 +94,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		// Recalculate and re-set I0 if alpha bond
 		if bond.AlphaBond {
 			paramsMap := bond.FunctionParameters.AsMap()
-			newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["alpha"],
+			newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["systemAlpha"],
 				bond.CurrentReserve[0].Amount)
 			bond.FunctionParameters.ReplaceParam("I0", newI0)
 		}
@@ -151,15 +151,17 @@ func handleMsgCreateBond(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgCre
 			})
 
 		if msg.AlphaBond {
-			alpha := types.Alpha(sdk.OneInt(), sdk.OneInt(),
-				R0.TruncateInt(), msg.OutcomePayment)
+			publicAlpha := sdk.MustNewDecFromStr("0.5")
+			systemAlpha := types.SystemAlpha(publicAlpha, sdk.OneInt(),
+				sdk.OneInt(), R0.TruncateInt(), msg.OutcomePayment)
 
-			I0 := types.InvariantI(msg.OutcomePayment, alpha, sdk.ZeroInt())
+			I0 := types.InvariantI(msg.OutcomePayment, systemAlpha, sdk.ZeroInt())
 
 			msg.FunctionParameters = msg.FunctionParameters.AddParams(
 				types.FunctionParams{
 					types.NewFunctionParam("I0", I0),
-					types.NewFunctionParam("alpha", alpha),
+					types.NewFunctionParam("publicAlpha", publicAlpha),
+					types.NewFunctionParam("systemAlpha", systemAlpha),
 				})
 		}
 
@@ -303,7 +305,7 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
-	newAlpha := msg.Alpha
+	newPublicAlpha := msg.Alpha
 
 	if bond.FunctionType != types.AugmentedFunction {
 		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
@@ -333,24 +335,49 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 	// Get current parameters
 	paramsMap := bond.FunctionParameters.AsMap()
 
+	// Calculate scaled delta public alpha, to calculate new system alpha
+	prevPublicAlpha := paramsMap["publicAlpha"]
+	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
+	temp, err := types.ApproxPower(
+		prevPublicAlpha.Mul(sdk.OneDec().Sub(sdk.MustNewDecFromStr("0.5"))),
+		sdk.MustNewDecFromStr("2"))
+	if err != nil {
+		return nil, err
+	}
+	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
+
+	// Calculate new system alpha
+	var newSystemAlpha sdk.Dec
+	if deltaPublicAlpha.IsPositive() {
+		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
+		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+		temp2 := sdk.OneDec().Sub(prevPublicAlpha)
+		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
+	} else {
+		// (1 - scaled_delta_public_alpha) * (previous_alpha)
+		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+		temp2 := prevPublicAlpha
+		newSystemAlpha = temp1.Mul(temp2)
+	}
+
 	// Check 1 (newAlpha != alpha)
-	if newAlpha.Equal(paramsMap["alpha"]) {
+	if newSystemAlpha.Equal(paramsMap["systemAlpha"]) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to the current value of alpha")
 	}
 	// Check 2 (I > C * alpha)
-	if paramsMap["I0"].LTE(newAlpha.MulInt(C)) {
+	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [1]")
 	}
 	// Check 3 (R / C > newAlpha - alpha)
-	if R.QuoInt(C).LTE(newAlpha.Sub(paramsMap["alpha"])) {
+	if R.QuoInt(C).LTE(newSystemAlpha.Sub(paramsMap["systemAlpha"])) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [2]")
 	}
 
 	// Recalculate kappa and V0 using new alpha
-	newKappa := types.Kappa(paramsMap["I0"], C, newAlpha)
+	newKappa := types.Kappa(paramsMap["I0"], C, newSystemAlpha)
 	_, err = types.Invariant(R, S.ToDec(), newKappa)
 	if err != nil {
 		return nil, err
@@ -358,7 +385,7 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 
 	// Get batch to set new alpha
 	batch := keeper.MustGetBatch(ctx, bond.BondDid)
-	batch.NextAlpha = newAlpha
+	batch.NextPublicAlpha = newPublicAlpha
 	keeper.SetBatch(ctx, bond.BondDid, batch)
 
 	logger := keeper.Logger(ctx)
@@ -369,7 +396,7 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		sdk.NewEvent(
 			types.EventTypeSetNextAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyAlpha, newAlpha.String()),
+			sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

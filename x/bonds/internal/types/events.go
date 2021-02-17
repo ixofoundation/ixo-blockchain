@@ -54,7 +54,8 @@ const (
 	AttributeKeyNewBondTokenBalance    = "new_bond_token_balance"
 	AttributeKeyOldState               = "old_state"
 	AttributeKeyNewState               = "new_state"
-	AttributeKeyAlpha                  = "alpha"
+	AttributeKeyPublicAlpha            = "public_alpha"
+	AttributeKeySystemAlpha            = "system_alpha"
 
 	AttributeValueBuyOrder  = "buy"
 	AttributeValueSellOrder = "sell"
