@@ -83,5 +83,5 @@ FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
 TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
-ixod start --pruning "everything" &
+ixod start --pruning "nothing" &
 ixocli rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg

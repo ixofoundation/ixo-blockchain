@@ -21,5 +21,5 @@ ixod validate-genesis
 #TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 #sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
-ixod start --pruning "everything" &
+ixod start --pruning "nothing" &
 ixocli rest-server --chain-id pandora-1 --trust-node && fg
