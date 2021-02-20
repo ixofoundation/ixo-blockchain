@@ -28,7 +28,7 @@ func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
 
 		signerDidDoc, err := keeper.GetDidDoc(ctx, msg.GetSignerDid())
 		if err != nil {
-			return pubKey, sdkerrors.Wrap(ErrInvalidDid, "signer DID not found")
+			return pubKey, sdkerrors.Wrap(types.ErrInvalidDid, "signer DID not found")
 		}
 
 		var pubKeyRaw ed25519.PubKey

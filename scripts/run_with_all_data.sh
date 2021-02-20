@@ -75,7 +75,8 @@ ixod config output json
 ixod config indent true
 ixod config trust-node true
 
-ixod gentx miguel --amount 1000000uixo --chain-id pandora-1
+#ixod gentx miguel --amount 1000000uixo --chain-id pandora-1
+ixod gentx miguel 1000000uixo --chain-id pandora-1
 
 ixod collect-gentxs
 ixod validate-genesis

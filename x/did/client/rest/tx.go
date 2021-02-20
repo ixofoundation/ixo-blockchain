@@ -45,7 +45,7 @@ func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc 
 		}
 
 		// /*utils.*/WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
-		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 		// TODO we have to prepend an & to msg above because MsgAddDid does not have the gogoproto.nullable = false option set, should it be?
 	}
 }
@@ -53,7 +53,7 @@ func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc 
 type addCredentialReq struct {
 	BaseReq       rest.BaseReq           `json:"base_req" yaml:"base_req"`
 	Did           exported.Did           `json:"did" yaml:"did"`
-	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
+	DidCredential types.DidCredential `json:"credential" yaml:"credential"`
 }
 
 func newAddCredentialRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
@@ -68,7 +68,7 @@ func newAddCredentialRequestHandler(cliCtx /*context*/client.Context) http.Handl
 			return
 		}
 
-		msg := types.NewMsgAddCredential(req.Did, req.DidCredential.CredType, req.Did, req.DidCredential.Issued)
+		msg := types.NewMsgAddCredential(req.Did, req.DidCredential.Credtype, req.Did, req.DidCredential.Issued)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) { //err := msg.ValidateBasic(); err != nil {
 			//rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

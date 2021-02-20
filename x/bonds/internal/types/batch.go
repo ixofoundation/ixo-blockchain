@@ -3,10 +3,11 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
 type Batch struct {
-	BondDid         did.Did      `json:"bond_did" yaml:"bond_did"`
+	BondDid         exported.Did      `json:"bond_did" yaml:"bond_did"`
 	BlocksRemaining sdk.Uint     `json:"blocks_remaining" yaml:"blocks_remaining"`
 	TotalBuyAmount  sdk.Coin     `json:"total_buy_amount" yaml:"total_buy_amount"`
 	TotalSellAmount sdk.Coin     `json:"total_sell_amount" yaml:"total_sell_amount"`
@@ -31,7 +32,7 @@ func NewBatch(bondDid did.Did, token string, blocks sdk.Uint) Batch {
 }
 
 type BaseOrder struct {
-	AccountDid   did.Did  `json:"sender_did" yaml:"sender_did"`
+	AccountDid   exported.Did  `json:"sender_did" yaml:"sender_did"`
 	Amount       sdk.Coin `json:"amount" yaml:"amount"`
 	Cancelled    bool     `json:"cancelled" yaml:"cancelled"`
 	CancelReason string   `json:"cancel_reason" yaml:"cancel_reason"`

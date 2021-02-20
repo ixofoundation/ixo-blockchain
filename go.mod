@@ -6,7 +6,6 @@ require (
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/cosmos/cosmos-sdk v0.40.0 // latest
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/ghodss/yaml v1.0.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0
@@ -21,7 +20,7 @@ require (
 	github.com/tendermint/tendermint v0.34.1 //latest
 	github.com/tendermint/tm-db v0.6.3
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	google.golang.org/genproto v0.0.0-20210126160654-44e461bb6506
+	google.golang.org/genproto v0.0.0-20210203152818-3206188e46ba
 	google.golang.org/grpc v1.33.2
 )
 

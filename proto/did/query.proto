@@ -30,8 +30,6 @@ service Query {
   rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest) returns (QueryAddressFromBase58EncodedPubkeyResponse) {
     option (google.api.http).get = "/pubKeyToAddr/{pubKey}";
   }
-
-  rpc IxoDidFromMnemonic(QueryIxoDidFromMnemonicRequest) returns (QueryIxoDidFromMnemonicResponse);
 }
 
 // Request/response types from old x/did/client/cli/query.go and x/did/client/rest/query.go
@@ -66,7 +64,7 @@ message QueryAddressFromDidRequest {
 
 message QueryAddressFromDidResponse {
   // address returns the address for a given DID
-  string address = 1 [/*(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.nullable) = false,*/ (gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
 }
 
 message QueryAddressFromBase58EncodedPubkeyRequest {
@@ -76,15 +74,5 @@ message QueryAddressFromBase58EncodedPubkeyRequest {
 
 message QueryAddressFromBase58EncodedPubkeyResponse {
   // address returns the address for a given PubKey
-  string address = 1 [/*(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.nullable) = false,*/ (gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
-}
-
-message QueryIxoDidFromMnemonicRequest {
-  // mnemonic defines the 12-word secret mnemonic for a given ixo DID
-  string mnemonic = 1 [(gogoproto.moretags) = "json:\"mnemonic\" yaml:\"mnemonic\""];
-}
-
-message QueryIxoDidFromMnemonicResponse {
-  // ixodid returns the IxoDid for a given 12-word mnemonic
-  IxoDid ixodid = 1 [(gogoproto.moretags) = "json:\"ixodid\" yaml:\"ixodid\""];
+  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
 }

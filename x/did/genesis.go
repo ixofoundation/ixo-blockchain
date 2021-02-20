@@ -29,7 +29,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 	return []abci.ValidatorUpdate{}
 }
 
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) (data GenesisState) {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) (data types.GenesisState) {
 	dds := k.GetAllDidDocs(ctx)
 	diddocs := make([]*codectypes.Any, len(dds))
 	for i, dd := range dds {
@@ -44,7 +44,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) (data GenesisState) {
 		diddocs[i] = any
 	}
 
-	return GenesisState{
+	return types.GenesisState{
 		Diddocs: diddocs, //keeper.GetAllDidDocs(ctx)
 	}
 }

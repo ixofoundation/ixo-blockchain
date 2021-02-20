@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/gogo/protobuf/grpc"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/rakyll/statik/fs"
@@ -29,9 +28,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	//TODO uncomment
-	//"github.com/ixofoundation/ixo-blockchain/x/oracles"
-	"github.com/spf13/cast"
+
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"io"
 	"os"
@@ -114,12 +111,12 @@ const (
 
 var (
 	// default home directories for ixocli
-	DefaultCLIHome = os.ExpandEnv("$HOME/.ixocli")
+	//DefaultCLIHome = os.ExpandEnv("$HOME/.ixocli")
 
-	// default home directories for ixod
+	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome = os.ExpandEnv("$HOME/.ixod")
 
-	// The module BasicManager is in charge of setting up basic,
+	// ModuleBasics defines the module BasicManager BasicManager which is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
@@ -305,9 +302,9 @@ func RegisterSwaggerAPI(ctx client.Context, rtr *mux.Router) {
 //	panic("implement me")
 //}
 
-func (app *ixoApp) RegisterGRPCServer(grpc.Server) {
-	panic("implement me")
-}
+//func (app *ixoApp) RegisterGRPCServer(grpc.Server) {
+//	panic("implement me")
+//}
 
 // RegisterTxService implements the Application.RegisterTxService method.
 func (app *ixoApp) RegisterTxService(clientCtx client.Context) {
@@ -455,7 +452,12 @@ func NewIxoApp(
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
-	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
+	//var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
+	var skipGenesisInvariants = false
+	opt := appOpts.Get(crisis.FlagSkipGenesisInvariants)
+	if opt, ok := opt.(bool); ok {
+		skipGenesisInvariants = opt
+	}
 
 	//TODO replace below keepers (for custom ixo modules)
 	// app.didKeeper = did.NewKeeper(app.cdc, keys[did.StoreKey])
@@ -664,7 +666,7 @@ func (app *ixoApp) BlockedAddrs() map[string]bool {
 	return blockedAddrs
 }
 
-// AppCodec returns SimApp's app codec.
+// AppCodec returns ixoApp's app codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -672,7 +674,7 @@ func (app *ixoApp) AppCodec() codec.Marshaler {
 	return app.appCodec
 }
 
-// InterfaceRegistry returns SimApp's InterfaceRegistry
+// InterfaceRegistry returns ixoApp's InterfaceRegistry
 func (app *ixoApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }

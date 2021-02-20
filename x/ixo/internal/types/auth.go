@@ -3,7 +3,6 @@ package types
 import (
 	"bufio"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -209,7 +208,7 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 		}
 	}
 
-	err = Sign(txf, clientCtx.GetFromName(), tx, ixoDid, msg) //like old local BuildAndSign
+	err = Sign(txf, clientCtx, tx, true, ixoDid)//Sign(txf, clientCtx.GetFromName(), tx, ixoDid, msg) //like old local BuildAndSign
 	if err != nil {
 		return err
 	}
@@ -289,37 +288,124 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 //	return cliCtx.PrintOutput(res)
 //}
 
-// copied from cosmos-sdk
-func Sign(txf tx.Factory, name string, txBuilder client.TxBuilder, ixoDid exported.IxoDid, msg sdk.Msg) error {
-	if txf.Keybase() == nil {
-		return errors.New("keybase must be set prior to signing a transaction")
+func checkMultipleSigners(mode signing.SignMode, tx authsigning.Tx) error {
+	if mode == signing.SignMode_SIGN_MODE_DIRECT &&
+		len(tx.GetSigners()) > 1 {
+		return sdkerrors.Wrap(sdkerrors.ErrNotSupported, "Signing in DIRECT mode is only supported for transactions with one signer only")
 	}
+	return nil
+}
+
+// copied from cosmos-sdk
+//func Sign(txf tx.Factory, name string, txBuilder client.TxBuilder, ixoDid exported.IxoDid, msg sdk.Msg) error {
+//	if txf.Keybase() == nil {
+//		return errors.New("keybase must be set prior to signing a transaction")
+//	}
+//
+//	signMode := txf.SignMode()
+//	if signMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
+//		// use the SignModeHandler's default mode if unspecified
+//		signMode = signing.SignMode_SIGN_MODE_DIRECT //TODO - no access to txf.txConfig.SignModeHandler().DefaultMode()
+//	}
+//	if err := checkMultipleSigners(signMode, txBuilder.GetTx()); err != nil {
+//		return err
+//	}
+//
+//	//key, err := txf.keybase.Key(name)
+//	//if err != nil {
+//	//	return err
+//	//}
+//
+//	//var privateKey ed25519tm.PrivKey
+//	//copy(privateKey[:], base58.Decode(ixoDid.Secret.SignKey))
+//	//copy(privateKey[32:], base58.Decode(ixoDid.VerifyKey))\
+//
+//	var privateKey ed25519.PrivKey
+//	privateKey.Key = append(base58.Decode(ixoDid.Secret.SignKey), base58.Decode(ixoDid.VerifyKey)...)
+//
+//	//var privateKey ed25519.PrivKey
+//	//copy(privateKey.Key[:], base58.Decode(ixoDid.Secret.SignKey))
+//	//copy(privateKey.Key[32:], base58.Decode(ixoDid.VerifyKey))
+//
+//	pubKey := privateKey.PubKey() //key.GetPubKey()
+//	//signerData := authsigning.SignerData{
+//	//	ChainID:       txf.ChainID(),
+//	//	AccountNumber: txf.AccountNumber(),
+//	//	Sequence:      txf.Sequence(),
+//	//}
+//
+//	// For SIGN_MODE_DIRECT, calling SetSignatures calls setSignerInfos on
+//	// TxBuilder under the hood, and SignerInfos is needed to generated the
+//	// sign bytes. This is the reason for setting SetSignatures here, with a
+//	// nil signature.
+//	//
+//	// Note: this line is not needed for SIGN_MODE_LEGACY_AMINO, but putting it
+//	// also doesn't affect its generated sign bytes, so for code's simplicity
+//	// sake, we put it here.
+//	sigData := signing.SingleSignatureData{
+//		SignMode:  signMode,
+//		Signature: nil,
+//	}
+//	sigv2 := signing.SignatureV2{
+//		PubKey:   pubKey,
+//		Data:     &sigData,
+//		Sequence: txf.Sequence(),
+//	}
+//	if err := txBuilder.SetSignatures(sigv2); err != nil {
+//		return err
+//	}
+//
+//	// Generate the bytes to be signed.
+//	//signBytes, err := txf.txConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())
+//	//if err != nil {
+//	//	return err
+//	//}
+//
+//	sigBytes, err := privateKey.Sign(msg.GetSignBytes())
+//	if err != nil {
+//		return err
+//	} // WHERE TO USE?
+//
+//	// Sign those bytes
+//	//sigBytes, _, err := txf.Keybase().Sign(name, signBytes)
+//	//if err != nil {
+//	//	return err
+//	//}
+//
+//	// Construct the SignatureV2 struct
+//	sigData = signing.SingleSignatureData{
+//		SignMode:  signMode,
+//		Signature: sigBytes,
+//	}
+//	sigv2 = signing.SignatureV2{
+//		PubKey:   pubKey,
+//		Data:     &sigData,
+//		Sequence: txf.Sequence(),
+//	}
+//
+//	// And here the tx is populated with the signature
+//	return txBuilder.SetSignatures(sigv2)
+//}
+
+func Sign(txf tx.Factory, clientCtx client.Context, txBuilder client.TxBuilder, overwriteSig bool, ixoDid exported.IxoDid) error {
+	var privateKey ed25519.PrivKey
+	privateKey.Key = append(base58.Decode(ixoDid.Secret.SignKey), base58.Decode(ixoDid.VerifyKey)...)
 
 	signMode := txf.SignMode()
 	if signMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
 		// use the SignModeHandler's default mode if unspecified
-		signMode = signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON //TODO - no access to txf.txConfig.SignModeHandler().DefaultMode()
+		signMode = clientCtx.TxConfig.SignModeHandler().DefaultMode() //clientCtx.TxConfig used instead of txf.txConfig
+	}
+	err := checkMultipleSigners(signMode, txBuilder.GetTx())
+	if err != nil {
+		return err
 	}
 
-	//key, err := txf.keybase.Key(name)
-	//if err != nil {
-	//	return err
-	//}
-
-	//var privateKey ed25519tm.PrivKey
-	//copy(privateKey[:], base58.Decode(ixoDid.Secret.SignKey))
-	//copy(privateKey[32:], base58.Decode(ixoDid.VerifyKey))\
-
-	var privateKey ed25519.PrivKey
-	copy(privateKey.Key[:], base58.Decode(ixoDid.Secret.SignKey))
-	copy(privateKey.Key[32:], base58.Decode(ixoDid.VerifyKey))
-
-	pubKey := privateKey.PubKey() //key.GetPubKey()
-	//signerData := authsigning.SignerData{
-	//	ChainID:       txf.ChainID(),
-	//	AccountNumber: txf.AccountNumber(),
-	//	Sequence:      txf.Sequence(),
-	//}
+	signerData := authsigning.SignerData{
+		ChainID:       txf.ChainID(),
+		AccountNumber: txf.AccountNumber(),
+		Sequence:      txf.Sequence(),
+	}
 
 	// For SIGN_MODE_DIRECT, calling SetSignatures calls setSignerInfos on
 	// TxBuilder under the hood, and SignerInfos is needed to generated the
@@ -333,46 +419,50 @@ func Sign(txf tx.Factory, name string, txBuilder client.TxBuilder, ixoDid export
 		SignMode:  signMode,
 		Signature: nil,
 	}
-	sigv2 := signing.SignatureV2{
-		PubKey:   pubKey,
+	sig := signing.SignatureV2{
+		PubKey:   privateKey.PubKey(),
 		Data:     &sigData,
 		Sequence: txf.Sequence(),
 	}
-	if err := txBuilder.SetSignatures(sigv2); err != nil {
+	var prevSignatures []signing.SignatureV2
+	if !overwriteSig {
+		prevSignatures, err = txBuilder.GetTx().GetSignaturesV2()
+		if err != nil {
+			return err
+		}
+	}
+	if err := txBuilder.SetSignatures(sig); err != nil {
 		return err
 	}
 
-	// Generate the bytes to be signed.
-	//signBytes, err := txf.txConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())
-	//if err != nil {
-	//	return err
-	//}
-
-	sigBytes, err := privateKey.Sign(msg.GetSignBytes())
+	bytesToSign, err := clientCtx.TxConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())//txf.txConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())
 	if err != nil {
 		return err
-	} // WHERE TO USE?
+	}
 
-	// Sign those bytes
-	//sigBytes, _, err := txf.Keybase().Sign(name, signBytes)
-	//if err != nil {
-	//	return err
-	//}
+	sigBytes, err := privateKey.Sign(bytesToSign)
+	if err != nil {
+		return err
+	}
 
 	// Construct the SignatureV2 struct
 	sigData = signing.SingleSignatureData{
 		SignMode:  signMode,
 		Signature: sigBytes,
 	}
-	sigv2 = signing.SignatureV2{
-		PubKey:   pubKey,
+	sig = signing.SignatureV2{
+		PubKey:   privateKey.PubKey(),
 		Data:     &sigData,
 		Sequence: txf.Sequence(),
 	}
 
-	// And here the tx is populated with the signature
-	return txBuilder.SetSignatures(sigv2)
+	if overwriteSig {
+		return txBuilder.SetSignatures(sig)
+	}
+	prevSignatures = append(prevSignatures, sig)
+	return txBuilder.SetSignatures(prevSignatures...)
 }
+
 
 //func Sign(cliCtx context.CLIContext, msg auth.StdSignMsg, ixoDid exported.IxoDid) ([]byte, error) {
 //	var privateKey ed25519tm.PrivKeyEd25519

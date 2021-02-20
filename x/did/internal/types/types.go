@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"regexp"
@@ -28,6 +30,25 @@ type BaseDidDoc struct {
 	PubKey      string                   `json:"pubKey" yaml:"pubKey"`
 	Credentials []DidCredential `json:"credentials" yaml:"credentials"`
 }
+
+func (dd BaseDidDoc) Reset() {
+	dd = BaseDidDoc{}
+}
+
+func (bdd BaseDidDoc) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &bdd)
+	if err != nil {
+		return nil, err
+	}
+	return string(bz), err
+}
+
+func (dd BaseDidDoc) String() string {
+	out, _ := dd.MarshalYAML()
+	return out.(string)
+}
+
+func (dd BaseDidDoc) ProtoMessage() {}
 
 func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 	return BaseDidDoc{
@@ -72,20 +93,6 @@ func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
 
 	dd.Credentials = append(dd.Credentials, cred)
 }
-
-// TODO Implement ProtoMarshaler interface - copying from cosmos-sdk/x/gov/types/deposit.go
-
-//func (dd BaseDidDoc) Reset() {
-//	//*dd = BaseDidDoc{}
-//}
-//
-//func (dd BaseDidDoc) String() string {
-//	out , _ := yaml.Marshal(dd)
-//	return string(out)
-//}
-//
-//func (dd BaseDidDoc) ProtoMessage() {
-//}
 
 //func (dd *BaseDidDoc) Marshal() (dAtA []byte, err error) {
 //	size := dd.Size()

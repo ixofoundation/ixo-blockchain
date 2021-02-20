@@ -24,7 +24,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			//return handleMsgAddCredential(ctx, k, msg)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
-				"unrecognized did Msg type: %v", msg.Type())
+				"unrecognized %s Msg type: %v", types.ModuleName, msg.Type())
 		}
 	}
 }

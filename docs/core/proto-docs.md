@@ -23,8 +23,6 @@
     - [QueryAllDidsResponse](#did.QueryAllDidsResponse)
     - [QueryDidDocRequest](#did.QueryDidDocRequest)
     - [QueryDidDocResponse](#did.QueryDidDocResponse)
-    - [QueryIxoDidFromMnemonicRequest](#did.QueryIxoDidFromMnemonicRequest)
-    - [QueryIxoDidFromMnemonicResponse](#did.QueryIxoDidFromMnemonicResponse)
   
     - [Query](#did.Query)
   
@@ -302,36 +300,6 @@ Request/response types from old x/did/client/cli/query.go and x/did/client/rest/
 
 
 
-
-<a name="did.QueryIxoDidFromMnemonicRequest"></a>
-
-### QueryIxoDidFromMnemonicRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| mnemonic | [string](#string) |  | mnemonic defines the 12-word secret mnemonic for a given ixo DID |
-
-
-
-
-
-
-<a name="did.QueryIxoDidFromMnemonicResponse"></a>
-
-### QueryIxoDidFromMnemonicResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| ixodid | [IxoDid](#did.IxoDid) |  | ixodid returns the IxoDid for a given 12-word mnemonic |
-
-
-
-
-
  
 
  
@@ -352,7 +320,6 @@ REST endpoints taken from previous did/client/rest/query.go
 | AllDidDocs | [QueryAllDidDocsRequest](#did.QueryAllDidDocsRequest) | [QueryAllDidDocsResponse](#did.QueryAllDidDocsResponse) |  |
 | AddressFromDid | [QueryAddressFromDidRequest](#did.QueryAddressFromDidRequest) | [QueryAddressFromDidResponse](#did.QueryAddressFromDidResponse) |  |
 | AddressFromBase58EncodedPubkey | [QueryAddressFromBase58EncodedPubkeyRequest](#did.QueryAddressFromBase58EncodedPubkeyRequest) | [QueryAddressFromBase58EncodedPubkeyResponse](#did.QueryAddressFromBase58EncodedPubkeyResponse) |  |
-| IxoDidFromMnemonic | [QueryIxoDidFromMnemonicRequest](#did.QueryIxoDidFromMnemonicRequest) | [QueryIxoDidFromMnemonicResponse](#did.QueryIxoDidFromMnemonicResponse) |  |
 
  
 

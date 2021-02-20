@@ -7,20 +7,20 @@ import (
 )
 
 const (
-	//ModuleName   = types.ModuleName
+	ModuleName   = types.ModuleName
 	//QuerierRoute = types.QuerierRoute
 	RouterKey    = types.RouterKey
 	StoreKey     = types.StoreKey
 )
 
 type (
-	//Keeper       = keeper.Keeper
-	GenesisState = types.GenesisState
+	Keeper       = keeper.Keeper
+	//GenesisState = types.GenesisState
 
 	Did           = exported.Did
-	DidCredential = exported.DidCredential
+	DidCredential = types.DidCredential
 	//DidDoc        = exported.DidDoc
-	IxoDid        = exported.IxoDid
+	//IxoDid        = exported.IxoDid
 
 	//MsgAddDid        = types.MsgAddDid
 	//MsgAddCredential = types.MsgAddCredential
@@ -38,9 +38,9 @@ var (
 
 	//NewGenesisState     = types.NewGenesisState
 	//DefaultGenesisState = types.DefaultGenesisState
-	ValidateGenesis     = types.ValidateGenesis
+	//ValidateGenesis     = types.ValidateGenesis
 	//RegisterQueryHandlerClient = types.RegisterQueryHandlerClient
-	NewQueryClient      = types.NewQueryClient
+	//NewQueryClient      = types.NewQueryClient
 
 	//VerifyKeyToAddr = exported.VerifyKeyToAddr
 

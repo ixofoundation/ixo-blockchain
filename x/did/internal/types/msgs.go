@@ -25,8 +25,8 @@ var (
 //	PubKey string       `json:"pubKey" yaml:"pubKey"`
 //}
 
-func NewMsgAddDid(did string, publicKey string) MsgAddDid {
-	return MsgAddDid{
+func NewMsgAddDid(did string, publicKey string) *MsgAddDid {
+	return &MsgAddDid{
 		Did:    did,
 		PubKey: publicKey,
 	}

@@ -27,13 +27,17 @@ func NewCmdAddDidDoc(/*cdc *codec.Codec*/) *cobra.Command {
 
 			//cliCtx := context.NewCLIContext().WithCodec(cdc).
 			//	WithFromAddress(ixoDid.Address())
-			cliCtx := client.GetClientContextFromCmd(cmd)
+			cliCtx, err := client.GetClientTxContext(cmd) //client.GetClientContextFromCmd(cmd)
+			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
-			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, &msg) //return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg) //return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
 			// TODO we have to prepend an & to msg above because MsgAddDid does not have the gogoproto.nullable = false option set, should it be?
 		},
 	}
@@ -63,7 +67,11 @@ func NewCmdAddCredential(/*cdc *codec.Codec*/) *cobra.Command {
 			//cliCtx := context.NewCLIContext().WithCodec(cdc).
 			//	WithFromAddress(ixoDid.Address())
 
-			cliCtx := client.GetClientContextFromCmd(cmd)
+			cliCtx, err := client.GetClientTxContext(cmd) //GetClientContextFromCmd(cmd)
+			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
 			if err := msg.ValidateBasic() ; err != nil {

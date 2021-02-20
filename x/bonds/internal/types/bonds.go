@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"sort"
 )
 
@@ -187,7 +188,7 @@ type Bond struct {
 	Token                  string         `json:"token" yaml:"token"`
 	Name                   string         `json:"name" yaml:"name"`
 	Description            string         `json:"description" yaml:"description"`
-	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
+	CreatorDid             exported.Did        `json:"creator_did" yaml:"creator_did"`
 	FunctionType           string         `json:"function_type" yaml:"function_type"`
 	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
 	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
@@ -204,7 +205,7 @@ type Bond struct {
 	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
 	OutcomePayment         sdk.Coins      `json:"outcome_payment" yaml:"outcome_payment"`
 	State                  string         `json:"state" yaml:"state"`
-	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
+	BondDid                exported.Did        `json:"bond_did" yaml:"bond_did"`
 }
 
 func NewBond(token, name, description string, creatorDid did.Did,
