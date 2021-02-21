@@ -9,7 +9,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	"net/http"
-	"strconv"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute string) {
@@ -20,11 +19,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute st
 	r.HandleFunc(
 		"/bonds_detailed",
 		queryBondsDetailedHandler(cliCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds_detailed/{%s}", RestHeight),
-		queryBondsDetailedHandlerWithHeight(cliCtx, queryRoute),
 	).Methods("GET")
 
 	r.HandleFunc(
@@ -98,37 +92,21 @@ func queryBondsHandler(cliCtx context.CLIContext, queryRoute string) http.Handle
 
 func queryBondsDetailedHandler(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := cliCtx.QueryWithData(
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
+		res, height, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s",
 				queryRoute, keeper.QueryBondsDetailed), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
 
-func queryBondsDetailedHandlerWithHeight(cliCtx context.CLIContext, queryRoute string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		heightStr := vars[RestHeight]
-
-		height, err := strconv.ParseInt(heightStr, 10, 64)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest,
-				fmt.Errorf("invalid height").Error())
-			return
-		}
 		cliCtx = cliCtx.WithHeight(height)
 
-		res, _, err := cliCtx.QueryWithData(
-			fmt.Sprintf("custom/%s/%s",
-				queryRoute, keeper.QueryBondsDetailed), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
 		rest.PostProcessResponse(w, cliCtx, res)
 	}
 }

@@ -11,7 +11,6 @@ import (
 //noinspection GoNameStartsWithPackageName
 const (
 	RestBondDid             = "bond_did"
-	RestHeight              = "height"
 	RestBondAmount          = "bond_amount"
 	RestFromTokenWithAmount = "from_token_with_amount"
 	RestToToken             = "to_token"
