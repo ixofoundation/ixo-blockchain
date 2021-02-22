@@ -678,8 +678,8 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 		newSystemAlpha = temp1.Mul(temp2)
 	}
 
-	// Check 1 (newSystemAlpha != systemAlpha)
-	if newSystemAlpha.Equal(paramsMap["systemAlpha"]) {
+	// Check 1 (newSystemAlpha != prevSystemAlpha)
+	if newSystemAlpha.Equal(prevSystemAlpha) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,
 			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
@@ -689,7 +689,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 		))
 		return
 	}
-	// Check 2 (I > C * systemAlpha)
+	// Check 2 (I > C * newSystemAlpha)
 	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,
@@ -700,8 +700,8 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
 		))
 		return
 	}
-	// Check 3 (R / C > newSystemAlpha - systemAlpha)
-	if R.QuoInt(C).LTE(newSystemAlpha.Sub(paramsMap["systemAlpha"])) {
+	// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
+	if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
 		ctx.EventManager().EmitEvent(sdk.NewEvent(
 			types.EventTypeEditAlphaFailed,
 			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),

@@ -368,18 +368,18 @@ func handleMsgSetNextAlpha(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgS
 		newSystemAlpha = temp1.Mul(temp2)
 	}
 
-	// Check 1 (newSystemAlpha != systemAlpha)
-	if newSystemAlpha.Equal(paramsMap["systemAlpha"]) {
+	// Check 1 (newSystemAlpha != prevSystemAlpha)
+	if newSystemAlpha.Equal(prevSystemAlpha) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"resultant system alpha based on public alpha is unchanged")
 	}
-	// Check 2 (I > C * systemAlpha)
+	// Check 2 (I > C * newSystemAlpha)
 	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [1]")
 	}
-	// Check 3 (R / C > newSystemAlpha - systemAlpha)
-	if R.QuoInt(C).LTE(newSystemAlpha.Sub(paramsMap["systemAlpha"])) {
+	// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
+	if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
 		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
 			"cannot change alpha to that value due to violated restriction [2]")
 	}
