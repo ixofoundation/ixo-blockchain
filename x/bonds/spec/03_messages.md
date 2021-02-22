@@ -138,7 +138,7 @@ The controller of a bond can set the next alpha value for Augmented Bonding Curv
 
 This message is expected to fail if:
 - bond being interacted with does not exist
-- alpha value falls outside of 0 <= alpha <= 1
+- alpha value falls outside of 0.0001 <= alpha <= 0.9999
 - alpha value violates any of the below rules
   - `newAlpha != alpha`
   - `I > C * alpha`
