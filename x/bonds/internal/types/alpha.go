@@ -2,7 +2,11 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
-func Alpha(S0, S1, R, C sdk.Int) sdk.Dec {
+var (
+	StartingPublicAlpha = sdk.MustNewDecFromStr("0.5")
+)
+
+func SystemAlpha(publicAlpha sdk.Dec, S0, S1, R, C sdk.Int) sdk.Dec {
 	// S0/S1: negative and positive attestations, measured in bond tokens
 	// C: outcome payment
 	// R: current reserve
@@ -13,7 +17,7 @@ func Alpha(S0, S1, R, C sdk.Int) sdk.Dec {
 
 	x := sdk.NewDecFromInt(S1R)
 	y := sdk.NewDecFromInt(S1R.Sub(S0R).Add(S0C))
-	return x.Quo(y)
+	return publicAlpha.Mul(x.Quo(y))
 }
 
 func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {

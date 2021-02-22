@@ -295,9 +295,13 @@ func (msg MsgSetNextAlpha) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}
 
-	// Check that 0 <= alpha <= 1
-	if msg.Alpha.LT(sdk.ZeroDec()) || msg.Alpha.GT(sdk.OneDec()) {
-		return sdkerrors.Wrap(ErrInvalidAlpha, "0 <= alpha <= 1")
+	// Check that 0.0001 <= alpha <= 0.9999. Note that we cannot set public
+	// alpha to 0 or 1, because these are edge cases which cause the system
+	// alpha to get stuck if we try to change the value of public alpha again.
+	minNextAlpha := sdk.MustNewDecFromStr("0.0001")
+	maxNextAlpha := sdk.MustNewDecFromStr("0.9999")
+	if msg.Alpha.LT(minNextAlpha) || msg.Alpha.GT(maxNextAlpha) {
+		return sdkerrors.Wrap(ErrInvalidAlpha, "0.0001 <= alpha <= 0.9999")
 	}
 
 	// Check that DIDs valid

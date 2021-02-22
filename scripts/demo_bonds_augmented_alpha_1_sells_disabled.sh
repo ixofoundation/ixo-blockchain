@@ -137,26 +137,26 @@ ixocli tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcas
 echo "Shaun's account..."
 ixocli q auth account "$SHAUN_ADDR"
 
-echo "Bond state is now open..."  # since 50000 (S0) reached
+echo "Bond state is now open..."  # since 1000000 (S0) reached
 ixocli q bonds bond "$BOND_DID"
 
 echo "Current price is 3..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Changing alpha to 0.0033->0.0044..."
-NEW_ALPHA="0.0044"
+echo "Changing public alpha 0.5->0.51..."
+NEW_ALPHA="0.51"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Current price is now approx 2.94..."
+echo "Current price is now approx 1.85..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Changing alpha to 0.0044->0.0033..."
-NEW_ALPHA="0.0033"
+echo "Changing public alpha 0.51->0.4..."
+NEW_ALPHA="0.4"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Current price is now approx 1.98..."
+echo "Current price is now approx 1.86..."
 ixocli q bonds current-price "$BOND_DID"
 
-echo "Cannot change alpha to 0.0033->0.09..."
-NEW_ALPHA="0.09"
+echo "Cannot change public alpha 0.4->0.6..."
+NEW_ALPHA="0.6"
 ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "Miguel cannot sell because sells are disabled..."
@@ -170,9 +170,13 @@ echo "Francesco makes outcome payment of 150000000 [3]..."
 ixocli tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
+echo "Bond outcome payment reserve is now 300000000..."
+ixocli q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
 ixocli tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
+echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
+ixocli q bonds bond "$BOND_DID"
 
 echo "Miguel withdraws share..."
 ixocli tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
@@ -188,3 +192,6 @@ echo "Shaun withdraws share..."
 ixocli tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Shaun's account..."
 ixocli q auth account "$SHAUN_ADDR"
+
+echo "Bond reserve is now empty and supply is 0..."
+ixocli q bonds bond "$BOND_DID"
