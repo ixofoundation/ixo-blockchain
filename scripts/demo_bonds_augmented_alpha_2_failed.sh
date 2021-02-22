@@ -141,3 +141,6 @@ echo "Francesco withdraws share..."
 ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
+
+echo "Bond reserve is now empty and supply is 0..."
+ixocli q bonds bond "$BOND_DID"
