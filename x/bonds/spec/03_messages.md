@@ -128,21 +128,23 @@ This message stores the updated `Bond` object.
 
 ## MsgSetNextAlpha
 
-The controller of a bond can set the next alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
+The controller of a bond can set the next public alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
 
 | **Field** | **Type**  | **Description** |
 |:----------|:----------|:----------------|
 | BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Alpha     | `sdk.Dec` | Alpha value to be set (e.g. `0.5`)
+| Alpha     | `sdk.Dec` | Public alpha value to be set (e.g. `0.5`)
 | EditorDid | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
 - bond being interacted with does not exist
-- alpha value falls outside of 0.0001 <= alpha <= 0.9999
-- alpha value violates any of the below rules
-  - `newAlpha != alpha`
-  - `I > C * alpha`
-  - `R / C > newAlpha - alpha`
+- public alpha value falls outside of 0.0001 <= alpha <= 0.9999
+- public alpha value violates any of the below rules
+  - `newPublicAlpha != publicAlpha`
+- resultant system alpha value violates any of the below rules
+  - `newSystemAlpha != systemAlpha`
+  - `I > C * systemAlpha`
+  - `R / C > newSystemAlpha - systemAlpha`
 - editor is not the bond controller
 - bond DID or editor DID is not a valid DID
 
