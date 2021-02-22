@@ -21,13 +21,32 @@ paths:
         - application/json
       responses:
         200:
-          description: List of bonds by token name
+          description: List of bonds by bond DID
           schema:
             type: array
             items:
-              type: string
-              example: abc
-  /bonds/{bond_token}:
+              $ref: "#/definitions/Did"
+  /bonds_detailed:
+    get:
+      description: List of all bonds with information about current state
+      summary: List of bonds with info about state
+      tags:
+        - Bonds Module
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: height
+          description: Block height
+          required: false
+          type: string
+          x-example: 5
+      responses:
+        200:
+          description: List of bonds with state info
+          schema:
+            $ref: "#/definitions/BondsListDetailedQueryResult"
+  /bonds/{bond_did}:
     get:
       description: Information about the bond
       summary: The properties of the bond
@@ -37,17 +56,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
       responses:
         200:
           description: Bond details
           schema:
             $ref: "#/definitions/BondQueryResult"
-  /bonds/{bond_token}/batch:
+  /bonds/{bond_did}/batch:
     get:
       description: Bond's current batch with current list of buy and sell orders
       summary: Current orders batch of the bond
@@ -57,17 +76,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
       responses:
         200:
           description: Current batch
           schema:
             $ref: "#/definitions/BatchQueryResult"
-  /bonds/{bond_token}/last_batch:
+  /bonds/{bond_did}/last_batch:
     get:
       description: Bond's last batch with last list of buy and sell orders
       summary: Last orders batch of the bond
@@ -77,17 +96,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
       responses:
         200:
           description: Last batch
           schema:
             $ref: "#/definitions/BatchQueryResult"
-  /bonds/{bond_token}/current_price:
+  /bonds/{bond_did}/current_price:
     get:
       description: Computes the current price(s) of the bond
       summary: Current price(s) of the bond
@@ -97,17 +116,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
       responses:
         200:
           description: Current price(s) of the bond
           schema:
             $ref: "#/definitions/ResCoins"
-  /bonds/{bond_token}/current_reserve:
+  /bonds/{bond_did}/current_reserve:
     get:
       description: Obtains the reserve pool balance(s) of the bond
       summary: Current balance(s) of the reserve pool
@@ -117,17 +136,17 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
       responses:
         200:
           description: Current balance(s) of the reserve pool
           schema:
             $ref: "#/definitions/ResCoins"
-  /bonds/{bond_token}/price/{bond_amount}:
+  /bonds/{bond_did}/price/{bond_amount}:
     get:
       description: Computes the price(s) of the bond at a specific amount of supply
       summary: Price(s) of the bond at a specific supply
@@ -137,11 +156,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
         - in: path
           name: bond_amount
           description: Number of bond tokens
@@ -153,7 +172,7 @@ paths:
           description: Price(s) to buy the tokens
           schema:
             $ref: "#/definitions/ResCoins"
-  /bonds/{bond_token}/buy_price/{bond_amount}:
+  /bonds/{bond_did}/buy_price/{bond_amount}:
     get:
       description: Computes the price(s) to buy an amount of tokens of the bond
       summary: Price(s) of buying an amount of tokens of the bond
@@ -163,11 +182,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
         - in: path
           name: bond_amount
           description: Number of bond tokens
@@ -179,7 +198,7 @@ paths:
           description: Price(s) to buy the tokens
           schema:
             $ref: "#/definitions/BuyPriceQueryResult"
-  /bonds/{bond_token}/sell_return/{bond_amount}:
+  /bonds/{bond_did}/sell_return/{bond_amount}:
     get:
       description: Computes the return on selling an amount of tokens of the bond
       summary: Return on selling an amount of tokens of the bond
@@ -189,11 +208,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
         - in: path
           name: bond_amount
           description: Number of bond tokens
@@ -205,7 +224,7 @@ paths:
           description: Return when selling the tokens
           schema:
             $ref: "#/definitions/SellReturnQueryResult"
-  /bonds/{bond_token}/swap_return/{from_token_with_amount}/{to_token}:
+  /bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}:
     get:
       description: Computes the return on an amount of tokens by swapping
       summary: Return on an amount of tokens by swapping
@@ -215,11 +234,11 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: bond_token
-          description: Bond token
+          name: bond_did
+          description: Bond DID
           required: true
           type: string
-          x-example: abc
+          x-example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
         - in: path
           name: from_token_with_amount
           description: Number of reserve tokens
@@ -266,9 +285,41 @@ paths:
       parameters:
         - in: body
           name: edit_bond_body
-          description: The fields to be edited and the list of the bond's signers
+          description: The fields to be edited
           schema:
             $ref: "#/definitions/BondEdit"
+  /bonds/set_next_alpha:
+    post:
+      description: Set an alpha bond's next alpha value
+      summary: Set an alpha bond's next alpha value
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: set_next_alpha_body
+          description: The next alpha value
+          schema:
+            $ref: "#/definitions/BondSetNextAlpha"
+  /bonds/update_bond_state:
+    post:
+      description: Set a bond's next state
+      summary: Set a bond's next state
+      tags:
+        - Bonds Module
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: update_bond_state_body
+          description: The next bond state
+          schema:
+            $ref: "#/definitions/BondUpdateBondState"
   /bonds/buy:
     post:
       description: Buy tokens from a bond
@@ -297,6 +348,10 @@ paths:
               max_prices:
                 type: string
                 example: 1000res1,1000res2,...
+              bond_did:
+                $ref: "#/definitions/Did"
+              buyer_did:
+                $ref: "#/definitions/Did"
   /bonds/sell:
     post:
       description: Sell tokens from a bond
@@ -322,6 +377,10 @@ paths:
               bond_amount:
                 type: string
                 example: 100
+              bond_did:
+                $ref: "#/definitions/Did"
+              seller_did:
+                $ref: "#/definitions/Did"
   /bonds/swap:
     post:
       description: Perform a swap between two tokens using a swapper bond
@@ -350,9 +409,13 @@ paths:
               to_token:
                 type: string
                 example: res2
+              bond_did:
+                $ref: "#/definitions/Did"
+              swapper_did:
+                $ref: "#/definitions/Did"
   /bonds/make_outcome_payment:
     post:
-      description: Make an outcome payment to a bond to progress it to SETTLE state
+      description: Make an outcome payment to a bond
       summary: Make outcome payment
       tags:
         - Bonds Module
@@ -369,12 +432,16 @@ paths:
             properties:
               base_req:
                 $ref: "#/definitions/BaseReq"
-              bond_token:
+              bond_did:
+                $ref: "#/definitions/Did"
+              amount:
                 type: string
-                example: abc
+                example: "1000"
+              sender_did:
+                $ref: "#/definitions/Did"
   /bonds/withdraw_share:
     post:
-      description: As a bond token holder, withdraw the reserve tokens share from a bond in SETTLE state
+      description: As a bond token holder, withdraw the reserve tokens share from a bond in SETTLE/FAILED state
       summary: Withdraw share from bond
       tags:
         - Bonds Module
@@ -391,10 +458,14 @@ paths:
             properties:
               base_req:
                 $ref: "#/definitions/BaseReq"
-              bond_token:
-                type: string
-                example: abc
+              bond_did:
+                $ref: "#/definitions/Did"
+              recipient_did:
+                $ref: "#/definitions/Did"
 definitions:
+  Did:
+    type: string
+    example: did:ixo:48PVm1uyF6QVDSPdGRWw4T
   StakeCoin:
     type: object
     properties:
@@ -453,21 +524,21 @@ definitions:
   BaseOrder:
     type: object
     properties:
-      buyer:
-        $ref: "#/definitions/Address"
+      sender_did:
+        $ref: "#/definitions/Did"
       amount:
         $ref: "#/definitions/BondCoin"
       cancelled:
-        type: string
-        example: "false"
+        type: boolean
+        example: false
       cancel_reason:
         type: string
         example: "reason for cancellation"
   BaseOrderSwap:
     type: object
     properties:
-      buyer:
-        $ref: "#/definitions/Address"
+      sender_did:
+        $ref: "#/definitions/Did"
       amount:
         $ref: "#/definitions/ResCoin"
       cancelled:
@@ -499,21 +570,22 @@ definitions:
   Batch:
     type: object
     properties:
+      bond_did:
+        $ref: "#/definitions/Did"
       blocks_remaining:
         type: number
         example: 2
+      next_alpha:
+        type: number
+        example: 0.5
       total_buy_amount:
-        type: number
-        example: 1000
+        $ref: "#/definitions/BondCoin"
       total_sell_amount:
-        type: number
-        example: 1000
-      buy_price:
-        type: number
-        example: 2.5
-      sell_price:
-        type: number
-        example: 2.5
+        $ref: "#/definitions/BondCoin"
+      buy_prices:
+        $ref: "#/definitions/ResCoins"
+      sell_prices:
+        $ref: "#/definitions/ResCoins"
       buys:
         type: array
         items:
@@ -526,12 +598,29 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/SwapOrder"
+  BondsListQueryResult:
+    type: array
+    items:
+      $ref: "#/definitions/Did"
+  BondsListDetailedQueryResult:
+    type: array
+    items:
+      type: object
+      properties:
+        did:
+          $ref: "#/definitions/Did"
+        spot_price:
+          $ref: "#/definitions/ResCoins"
+        supply:
+          $ref: "#/definitions/BondCoin"
+        reserve:
+          $ref: "#/definitions/ResCoins"
   BondQueryResult:
     type: object
     properties:
       type:
         type: string
-        example: cosmos-sdk/Bond
+        example: bonds/Bond
       value:
         type: object
         properties:
@@ -544,8 +633,10 @@ definitions:
           description:
             type: string
             example: Description about bond.
-          creator:
-            $ref: "#/definitions/Address"
+          creator_did:
+            $ref: "#/definitions/Did"
+          controller_did:
+            $ref: "#/definitions/Did"
           function_type:
             type: string
             example: power_function
@@ -556,8 +647,6 @@ definitions:
             items:
               type: string
               example: res1
-          reserve_address:
-            $ref: "#/definitions/Address"
           tx_fee_percentage:
             type: number
             example: 0.5
@@ -578,28 +667,32 @@ definitions:
             example: 56.78
           current_supply:
             $ref: "#/definitions/BondCoin"
+          current_reserve:
+            $ref: "#/definitions/ResCoins"
+          current_outcome_payment_reserve:
+            $ref: "#/definitions/ResCoins"
           allow_sells:
             type: string
             example: "true"
-          signers:
-            type: array
-            items:
-              $ref: "#/definitions/Address"
+          alpha_bond:
+            type: string
+            example: "true"
           batch_blocks:
             type: number
             example: 5
           outcome_payment:
-            order_quantity_limits:
-              $ref: "#/definitions/AnyCoins"
+            $ref: "#/definitions/AnyCoins"
           state:
             type: string
             example: OPEN
+          bond_did:
+            $ref: "#/definitions/Did"
   BatchQueryResult:
     type: object
     properties:
       type:
         type: string
-        example: cosmos-sdk/Batch
+        example: bonds/Batch
       value:
         $ref: "#/definitions/Batch"
   BuyPriceQueryResult:
@@ -714,23 +807,26 @@ definitions:
       allow_sells:
         type: string
         example: "true"
-      signers:
+      alpha_bond:
         type: string
-        example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
+        example: "true"
       batch_blocks:
         type: string
         example: "5"
       outcome_payment:
         type: string
         example: 100abc,200xyz,...
+      bond_did:
+        $ref: "#/definitions/Did"
+      creator_did:
+        $ref: "#/definitions/Did"
+      controller_did:
+        $ref: "#/definitions/Did"
   BondEdit:
     type: object
     properties:
       base_req:
         $ref: "#/definitions/BaseReq"
-      token:
-        type: string
-        example: abc
       name:
         type: string
         example: New Bond Name
@@ -746,9 +842,34 @@ definitions:
       sanity_margin_percentage:
         type: string
         example: "56.78"
-      signers:
+      bond_did:
+        $ref: "#/definitions/Did"
+      editor_did:
+        $ref: "#/definitions/Did"
+  BondSetNextAlpha:
+    type: object
+    properties:
+      base_req:
+        $ref: "#/definitions/BaseReq"
+      new_alpha:
         type: string
-        example: "cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje,cosmos1qns07zjjsllfc6w7486f7v2nvyfsq30myn3nje"
+        example: "12.34"
+      bond_did:
+        $ref: "#/definitions/Did"
+      editor_did:
+        $ref: "#/definitions/Did"
+  BondUpdateBondState:
+    type: object
+    properties:
+      base_req:
+        $ref: "#/definitions/BaseReq"
+      new_state:
+        type: string
+        example: "SETTLE"
+      bond_did:
+        $ref: "#/definitions/Did"
+      editor_did:
+        $ref: "#/definitions/Did"
   FunctionParameter:
     type: object
     properties:
