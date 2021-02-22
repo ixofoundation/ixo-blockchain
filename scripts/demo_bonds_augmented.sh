@@ -149,7 +149,7 @@ echo "Francesco makes outcome payment of 60000000000..."
 ixocli tx bonds make-outcome-payment "$BOND_DID" "60000000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixocli q auth account "$FRANCESCO_ADDR"
-echo "Bond outcome payment reserve is now 300000000..."
+echo "Bond outcome payment reserve is now 60000000000..."
 ixocli q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
