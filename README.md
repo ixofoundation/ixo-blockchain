@@ -22,7 +22,7 @@ To build and run the application:
 make run
 ```
 
-To build and run the application with some preset accounts:
+To build and run the application and also create some accounts:
 
 ```bash
 make run_with_some_data  # Option 1
