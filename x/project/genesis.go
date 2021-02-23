@@ -24,7 +24,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 			data.ProjectDocs[i].ProjectDid, accountMaps[i])
 		keeper.SetProjectWithdrawalTransactions(ctx,
 			data.ProjectDocs[i].ProjectDid, data.WithdrawalsInfos[i])
-		for j := range data.Claims {
+		for j := range data.Claims[i] {
 			keeper.SetClaim(ctx,
 				data.ProjectDocs[i].ProjectDid, data.Claims[i][j])
 		}
