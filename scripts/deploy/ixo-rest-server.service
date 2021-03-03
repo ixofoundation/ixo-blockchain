@@ -8,7 +8,7 @@ After=network.target
 Type=simple
 User=ixo
 WorkingDirectory=/home/ixo
-ExecStart=/home/ixo/go/bin/ixocli rest-server --node tcp://localhost:26657 --laddr tcp://0.0.0.0:1317 --chain-id=pandora-1
+ExecStart=/home/ixo/go/bin/ixocli rest-server --node tcp://localhost:26657 --laddr tcp://0.0.0.0:1317 --chain-id=pandora-2
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=4096

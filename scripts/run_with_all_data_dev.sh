@@ -2,7 +2,7 @@
 
 PASSWORD="12345678"
 
-ixod init local --chain-id pandora-1
+ixod init local --chain-id pandora-2
 
 yes $PASSWORD | ixocli keys delete miguel --force
 yes $PASSWORD | ixocli keys delete francesco --force
@@ -69,7 +69,7 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
-ixocli config chain-id pandora-1
+ixocli config chain-id pandora-2
 ixocli config output json
 ixocli config indent true
 ixocli config trust-node true
@@ -84,4 +84,4 @@ TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 ixod start --pruning "nothing" &
-ixocli rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg
+ixocli rest-server --chain-id pandora-2 --laddr="tcp://0.0.0.0:1317" --trust-node && fg

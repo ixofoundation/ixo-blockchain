@@ -22,4 +22,4 @@ ixod validate-genesis
 #sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 ixod start --pruning "nothing" &
-ixocli rest-server --chain-id pandora-1 --trust-node && fg
+ixocli rest-server --chain-id pandora-2 --trust-node && fg
