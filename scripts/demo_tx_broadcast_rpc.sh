@@ -9,7 +9,7 @@ curl -X GET localhost:26657/broadcast_tx_commit?tx=$TX
 echo ""
 
 echo "Now we can query the DID..."
-ixocli q did get-did-doc did:ixo:U4tSpzzv91HHqWW1YmFkHJ
+ixod q did get-did-doc did:ixo:U4tSpzzv91HHqWW1YmFkHJ
 
 
 

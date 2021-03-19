@@ -3,7 +3,7 @@
 wait() {
   echo "Waiting for chain to start..."
   while :; do
-    RET=$(ixocli status 2>&1)
+    RET=$(ixod status 2>&1)
     if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
       sleep 1
     else
@@ -14,27 +14,27 @@ wait() {
   done
 }
 
-RET=$(ixocli status 2>&1)
+RET=$(ixod status 2>&1)
 if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
   wait
 fi
 
 GAS_PRICES="0.025uixo"
-ixocli_tx() {
+ixod_tx() {
   # This function first approximates the gas (adjusted to 105%) and then
   # supplies this for the actual transaction broadcasting as the --gas.
   # This might fail sometimes: https://github.com/cosmos/cosmos-sdk/issues/4938
   cmd="$1 $2"
   shift
   shift
-  APPROX=$(ixocli tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --dry-run "$@" 2>&1)
+  APPROX=$(ixod tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --dry-run "$@" 2>&1)
   APPROX=${APPROX//gas estimate: /}
   echo "Gas estimate: $APPROX"
-  ixocli tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@"
+  ixod tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@"
 }
 
 PASSWORD="12345678"
-FEE=$(yes $PASSWORD | ixocli keys show fee -a)
+FEE=$(yes $PASSWORD | ixod keys show fee -a)
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
@@ -72,12 +72,12 @@ FRANCESCO_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-ixocli_tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block -y
 echo "Ledgering DID 2/2..."
-ixocli_tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 
 echo "Creating bond..."
-ixocli_tx bonds create-bond \
+ixod_tx bonds create-bond \
   --token=abc \
   --name="A B C" \
   --description="Description about A B C" \
@@ -98,7 +98,7 @@ ixocli_tx bonds create-bond \
   --broadcast-mode block -y
 
 echo "Editing bond..."
-ixocli_tx bonds edit-bond \
+ixod_tx bonds edit-bond \
   --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
@@ -106,13 +106,13 @@ ixocli_tx bonds edit-bond \
   --broadcast-mode block -y
 
 echo "Miguel buys 10abc..."
-ixocli_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
 
 echo "Francesco buys 10abc..."
-ixocli_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 
 echo "Miguel sells 10abc..."
-ixocli_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixod_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block -y
 
 echo "Francesco sells 10abc..."
-ixocli_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y
+ixod_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block -y

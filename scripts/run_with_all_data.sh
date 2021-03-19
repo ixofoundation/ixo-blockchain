@@ -2,7 +2,7 @@
 
 PASSWORD="12345678"
 
-ixod init local --chain-id pandora-1
+ixod init local --chain-id pandora-2
 
 yes 'y' | ixod keys delete miguel --force
 yes 'y' | ixod keys delete francesco --force
@@ -70,26 +70,29 @@ TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 # TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
-ixod config chain-id pandora-1
+ixod config chain-id pandora-2
 ixod config output json
 ixod config indent true
 ixod config trust-node true
 
-#ixod gentx miguel --amount 1000000uixo --chain-id pandora-1
-ixod gentx miguel 1000000uixo --chain-id pandora-1
+ixod gentx miguel 1000000uixo --chain-id pandora-2
 
 ixod collect-gentxs
 ixod validate-genesis
+
+# Enable REST API (assumed to be at line 104 of app.toml)
+FROM="enable = false"
+TO="enable = true"
+sed -i "104s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+
+# Enable Swagger docs (assumed to be at line 107 of app.toml)
+FROM="swagger = false"
+TO="swagger = true"
+sed -i "107s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 # Uncomment the below to broadcast node RPC endpoint
 #FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
 #TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 #sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
-# Uncomment the below to broadcast REST endpoint
-# Do not forget to comment the bottom lines !!
-#ixod start --pruning "syncable" &
-#ixod rest-server --chain-id pandora-1 --laddr="tcp://0.0.0.0:1317" --trust-node && fg
-
-ixod start --pruning "everything" &
-ixod rest-server --chain-id pandora-1 --trust-node && fg
+ixod start --pruning "nothing"

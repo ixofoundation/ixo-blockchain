@@ -3,7 +3,7 @@
 wait() {
   echo "Waiting for chain to start..."
   while :; do
-    RET=$(ixocli status 2>&1)
+    RET=$(ixod status 2>&1)
     if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
       sleep 1
     else
@@ -14,7 +14,7 @@ wait() {
   done
 }
 
-RET=$(ixocli status 2>&1)
+RET=$(ixod status 2>&1)
 if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
   wait
 fi
@@ -65,11 +65,11 @@ PAYMENT_RECIPIENTS='[
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixod tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering Francesco DID..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixod tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering Shaun DID..."
-ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Create payment template
 echo "Creating payment template..."
@@ -86,7 +86,7 @@ PAYMENT_TEMPLATE='{
   "discounts": []
 }'
 CREATOR="$MIGUEL_DID_FULL"
-ixocli tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Create payment contract
 echo "Creating payment contract..."
@@ -94,13 +94,13 @@ PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
 PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixocli q did get-address-from-did $FRANCESCO_DID)"
-ixocli tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
+ixod tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Authorise payment contract
 echo "Authorising payment contract..."
 PAYER="$FRANCESCO_DID_FULL"
-ixocli tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" True "$PAYER" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" True "$PAYER" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Create subscription (with block period)
 echo "Creating subscription 1/2 (with block period)..."
@@ -114,7 +114,7 @@ PERIOD='{
 }'
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
-ixocli tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "Wait a few seconds for the subscription to get effected..."
 sleep 6
@@ -122,7 +122,7 @@ sleep 6
 # Deauthorise payment contract
 echo "Deauthorising payment contract..."
 PAYER="$FRANCESCO_DID_FULL"
-ixocli tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" False "$PAYER" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" False "$PAYER" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "Now the subscription (block-period) will just accumulate periods and not charge anything."
 echo ""
@@ -139,6 +139,6 @@ PERIOD='{
 }'
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
-ixocli tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 echo "The subscription (time-period) will just accumulate periods and not charge anything."
