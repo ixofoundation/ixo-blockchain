@@ -69,7 +69,7 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
-#TODO config missing from new version???
+# TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
 ixod config chain-id pandora-1
 ixod config output json
 ixod config indent true
