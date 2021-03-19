@@ -21,7 +21,26 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
+CHAIN_ID="pandora-2"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
+
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    --broadcast-mode block \
+    --trust-node \
+    -y \
+    "$@"  # any extra arguments added at the end
+}
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
@@ -61,12 +80,12 @@ FRANCESCO_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-ixod tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering DID 2/2..."
-ixod tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 
 echo "Creating bond..."
-ixod tx bonds create-bond \
+ixod_tx bonds create-bond \
   --token=abc \
   --name="A B C" \
   --description="Description about A B C" \
@@ -83,37 +102,35 @@ ixod tx bonds create-bond \
   --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
-  --creator-did="$MIGUEL_DID_FULL" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+  --creator-did="$MIGUEL_DID_FULL"
 echo "Created bond..."
 ixod q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
-ixod tx bonds edit-bond \
+ixod_tx bonds edit-bond \
   --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
-  --editor-did="$MIGUEL_DID_FULL" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+  --editor-did="$MIGUEL_DID_FULL"
 echo "Edited bond..."
 ixod q bonds bond "$BOND_DID"
 
 echo "Miguel buys 10abc..."
-ixod tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod q auth account "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
-ixod tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
 ixod q auth account "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
-ixod tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod q auth account "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
-ixod tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
 ixod q auth account "$FRANCESCO_ADDR"
