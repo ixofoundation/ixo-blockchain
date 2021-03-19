@@ -46,7 +46,7 @@ func NewModulePubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
 		var pubKeyEd25519 ed25519.PubKey
 		switch msg := msg.(type) {
 		case *types.MsgAddDid:
-			copy(pubKeyEd25519.Key[:], base58.Decode(msg.PubKey))
+			pubKeyEd25519.Key = base58.Decode(msg.PubKey)
 		default:
 			return NewDefaultPubKeyGetter(keeper)(ctx, msg)
 		}
