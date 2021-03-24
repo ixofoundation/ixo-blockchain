@@ -11,8 +11,8 @@ Refer to [01_state.md](./01_state.md) for information about payment templates.
 
 | **Field**       | **Type**          | **Description** |
 |:----------------|:------------------|:----------------|
-| CreatorDid      | `did.Did`         | Did of the creator
-| PaymentTemplate | `PaymentTemplate` | The payment template being created
+| CreatorDid      | `did.Did`         | DID of the template creator
+| PaymentTemplate | `PaymentTemplate` | Details of the payment template being created
 
 ```go
 type MsgCreatePaymentTemplate struct {
@@ -39,13 +39,13 @@ Refer to [01_state.md](./01_state.md) for information about payment contracts.
 
 | **Field**         | **Type**         | **Description** |
 |:------------------|:-----------------|:----------------|
-| CreatorDid        | `did.Did`        | Did of the user
-| PaymentTemplateId | `string`         | ID of the paymentTemplate
-| PaymentContractId | `string`         | ID of the PaymentContract
-| Payer             | `sdk.AccAddress` | Address of the payer
-| Recipients        | `Distribution`   | List of recipients with percentage shares
-| CanDeauthorise    | `bool`           | Bool of de_authorise
-| DiscountId        | `sdk.Uint`       | Any discount given
+| CreatorDid        | `did.Did`        | DID of the contract creator
+| PaymentTemplateId | `string`         | ID of the payment template on which this contract is based
+| PaymentContractId | `string`         | ID of this payment contract
+| Payer             | `sdk.AccAddress` | Address from where tokens will be deducted
+| Recipients        | `Distribution`   | List of token recipients with percentage shares
+| CanDeauthorise    | `bool`           | Whether or not this contract can be de-authorised
+| DiscountId        | `sdk.Uint`       | Any discount assigned to this contract (discounts defined in the template)
 
 ```go
 type MsgCreatePaymentContract struct {
@@ -88,11 +88,11 @@ to [01_state.md](./01_state.md) for information about subscriptions.
 
 | **Field**         | **Type**   | **Description** |
 |:------------------|:-----------|:----------------|
-| CreatorDid        | `did.Did`  | Did of the user
-| SubscriptionId    | `string`   | ID for the subscription
-| PaymentContractId | `string`   | ID for the paymentContract
-| MaxPeriods        | `sdk.Uint` | Maximum number of times chargeable
-| Period            | `Period`   | IF the periods are allowed or not
+| CreatorDid        | `did.Did`  | DID of the subscription creator
+| SubscriptionId    | `string`   | ID of this subscription
+| PaymentContractId | `string`   | ID the payment contract on which this subscription is based
+| MaxPeriods        | `sdk.Uint` | Maximum number of times that the subscription payment is triggered
+| Period            | `Period`   | Describes the period (period unit and period length)
 
 ```go
 type MsgCreateSubscription struct {
@@ -132,9 +132,9 @@ or disable effecting of the payment contract.
 
 | **Field**         | **Type**  | **Description** |
 |:------------------|:----------|:----------------|
-| PayerDid          | `did.Did` | Payer's DID
-| PaymentContractId | `string`  | ID of the paymentContract
-| Authorised        | `bool`    | Status of authorisation
+| PayerDid          | `did.Did` | DID of the payer associated with the contract
+| PaymentContractId | `string`  | ID of the payment contract being modified
+| Authorised        | `bool`    | New status of authorisation for the contract
 
 ```go
 type MsgSetPaymentContractAuthorisation struct {
@@ -161,10 +161,10 @@ This message grants a discount to a recipient for a particular payment contract.
 
 | **Field**         | **Type**         | **Description** |
 |:------------------|:-----------------|:----------------|
-| SenderDid         | `did.Did`        | Initiator DID
-| PaymentContractId | `string`         | ID for the paymentContract
-| DiscountId        | `sdk.Uint`       | How much is the discount
-| Recipient         | `sdk.AccAddress` | Who is the recipient
+| SenderDid         | `did.Did`        | DID of the discount granter
+| PaymentContractId | `string`         | ID of the contract for which the discount is being granted
+| DiscountId        | `sdk.Uint`       | ID of the discount being granted
+| Recipient         | `sdk.AccAddress` | The recipient of the discount
 
 ```go
 type MsgGrantDiscount struct {
@@ -193,9 +193,9 @@ contract.
 
 | **Field**         | **Type**         | **Description** |
 |:------------------|:-----------------|:----------------|
-| SenderDid         | `did.Did`        | Who send the transaction
-| PaymentContractId | `string`         | ID of the payment_Contract
-| Holder            | `sdk.AccAddress` | Address of who's holds the discount
+| SenderDid         | `did.Did`        | DID of the discount revoker
+| PaymentContractId | `string`         | ID of the contract from which the discount is being revoked
+| Holder            | `sdk.AccAddress` | The current holder of the discount
 
 ```go
 type MsgRevokeDiscount struct {
