@@ -9,6 +9,9 @@
     - [IxoDid](#did.IxoDid)
     - [Secret](#did.Secret)
   
+- [did/diddoc.proto](#did/diddoc.proto)
+    - [BaseDidDoc](#did.BaseDidDoc)
+  
 - [did/genesis.proto](#did/genesis.proto)
     - [GenesisState](#did.GenesisState)
   
@@ -108,6 +111,39 @@
 | seed | [string](#string) |  |  |
 | signKey | [string](#string) |  |  |
 | encryptionPrivateKey | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="did/diddoc.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## did/diddoc.proto
+
+
+
+<a name="did.BaseDidDoc"></a>
+
+### BaseDidDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| did | [string](#string) |  |  |
+| pubKey | [string](#string) |  |  |
+| credentials | [DidCredential](#did.DidCredential) | repeated |  |
 
 
 
@@ -274,7 +310,8 @@ no input needed
 <a name="did.QueryDidDocRequest"></a>
 
 ### QueryDidDocRequest
-Request/response types from old x/did/client/cli/query.go and x/did/client/rest/query.go
+Request/response types from old x/did/client/cli/query.go and
+x/did/client/rest/query.go
 
 
 | Field | Type | Label | Description |
@@ -310,8 +347,9 @@ Request/response types from old x/did/client/cli/query.go and x/did/client/rest/
 <a name="did.Query"></a>
 
 ### Query
-To get a list of all module queries, go to your module&#39;s keeper/querier.go and check all cases in NewQuerier().
-REST endpoints taken from previous did/client/rest/query.go
+To get a list of all module queries, go to your module&#39;s keeper/querier.go
+and check all cases in NewQuerier(). REST endpoints taken from previous
+did/client/rest/query.go
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -392,7 +430,8 @@ REST endpoints taken from previous did/client/rest/query.go
 <a name="did.Msg"></a>
 
 ### Msg
-To get a list of all module messages, go to your module&#39;s handler.go and check all cases in NewHandler().
+To get a list of all module messages, go to your module&#39;s handler.go and
+check all cases in NewHandler().
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|

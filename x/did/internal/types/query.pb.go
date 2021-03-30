@@ -30,7 +30,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Request/response types from old x/did/client/cli/query.go and x/did/client/rest/query.go
+// Request/response types from old x/did/client/cli/query.go and
+// x/did/client/rest/query.go
 type QueryDidDocRequest struct {
 	// did defines the DID for the requested DidDoc
 	Did string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" json:"did" yaml:"did"`

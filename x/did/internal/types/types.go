@@ -23,17 +23,17 @@ var (
 	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
 )
 
-var _ exported.DidDoc = (*BaseDidDoc)(nil)
+var _ exported.DidDoc = &BaseDidDoc{} //(*BaseDidDoc)(nil)
 
-type BaseDidDoc struct {
-	Did         exported.Did             `json:"did" yaml:"did"`
-	PubKey      string                   `json:"pubKey" yaml:"pubKey"`
-	Credentials []DidCredential `json:"credentials" yaml:"credentials"`
-}
+//type BaseDidDoc struct {
+//	Did         exported.Did             `json:"did" yaml:"did"`
+//	PubKey      string                   `json:"pubKey" yaml:"pubKey"`
+//	Credentials []DidCredential `json:"credentials" yaml:"credentials"`
+//}
 
-func (dd BaseDidDoc) Reset() {
-	dd = BaseDidDoc{}
-}
+//func (dd BaseDidDoc) Reset() {
+//	dd = BaseDidDoc{}
+//}
 
 func (bdd BaseDidDoc) MarshalYAML() (interface{}, error) {
 	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &bdd)
@@ -48,21 +48,36 @@ func (dd BaseDidDoc) String() string {
 	return out.(string)
 }
 
-func (dd BaseDidDoc) ProtoMessage() {}
+//func (dd BaseDidDoc) ProtoMessage() {}
 
 func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 	return BaseDidDoc{
 		Did:         did,
 		PubKey:      pubKey,
-		Credentials: []DidCredential{},
+		Credentials: []*DidCredential{},
 	}
+}
+
+func (m BaseDidDoc) Reset()      { m = BaseDidDoc{} }
+func (BaseDidDoc) ProtoMessage() {}
+func (BaseDidDoc) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df34300e393a57f6, []int{0}
 }
 
 func (dd BaseDidDoc) GetDid() exported.Did                     { return dd.Did }
 func (dd BaseDidDoc) GetPubKey() string                        { return dd.PubKey }
-func (dd BaseDidDoc) GetCredentials() []DidCredential { return dd.Credentials }
+func (dd BaseDidDoc) GetCredentials() []DidCredential {
+	lstToRet := make([]DidCredential, 0)
+	credentials := dd.Credentials
 
-func (dd BaseDidDoc) SetDid(did exported.Did) error {
+	for _, cred := range credentials {
+		lstToRet = append(lstToRet, *cred)
+	}
+
+	return lstToRet
+}
+
+func (dd *BaseDidDoc) SetDid(did exported.Did) error {
 	if len(dd.Did) != 0 {
 		return errors.New("cannot override BaseDidDoc did")
 	}
@@ -72,7 +87,7 @@ func (dd BaseDidDoc) SetDid(did exported.Did) error {
 	return nil
 }
 
-func (dd BaseDidDoc) SetPubKey(pubKey string) error {
+func (dd *BaseDidDoc) SetPubKey(pubKey string) error {
 	if len(dd.PubKey) != 0 {
 		return errors.New("cannot override BaseDidDoc pubKey")
 	}
@@ -86,9 +101,9 @@ func (dd BaseDidDoc) Address() sdk.AccAddress {
 	return exported.VerifyKeyToAddr(dd.GetPubKey())
 }
 
-func (dd *BaseDidDoc) AddCredential(cred DidCredential) {
+func (dd *BaseDidDoc) AddCredential(cred *DidCredential) {
 	if dd.Credentials == nil {
-		dd.Credentials = make([]DidCredential, 0)
+		dd.Credentials = make([]*DidCredential, 0)
 	}
 
 	dd.Credentials = append(dd.Credentials, cred)

@@ -13,6 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/gogo/protobuf/proto"
+
 	//"golang.org/x/crypto/ed25519"
 	naclBox "golang.org/x/crypto/nacl/box"
 	"io"
@@ -36,16 +37,16 @@ func UnprefixedDidFromPubKey(pubKey string) string {
 }
 
 type DidDoc interface {
+	proto.Message
+	//Reset()
+	//String() string
+	//ProtoMessage()
+
 	SetDid(did Did) error
 	GetDid() Did
 	SetPubKey(pubkey string) error
 	GetPubKey() string
 	Address() sdk.AccAddress
-
-	proto.Message
-	//Reset()
-	//String() string
-	//ProtoMessage()
 
 	//codec.ProtoMarshaler
 	//Reset()

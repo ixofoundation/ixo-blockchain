@@ -1,0 +1,17 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+import "did/did.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
+
+message BaseDidDoc {
+  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.equal)            = false;
+
+  string did                         = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\"" ];
+  string pubKey                      = 2 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\"" ];
+  repeated DidCredential credentials = 3 [(gogoproto.moretags) = "json:\"credentials\" yaml:\"credentials\"" ];
+}

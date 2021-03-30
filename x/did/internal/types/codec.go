@@ -22,13 +22,13 @@ import (
 }*/
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
-	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
-
 	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
 
+	cdc.RegisterConcrete(&MsgAddDid{}, "did/AddDid", nil)
+	cdc.RegisterConcrete(&MsgAddCredential{}, "did/AddCredential", nil)
+
 	// TODO: https://github.com/ixofoundation/ixo-blockchain/issues/76
-	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
+	cdc.RegisterConcrete(&BaseDidDoc{}, "did/BaseDidDoc", nil)
 	//cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
 	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
 }

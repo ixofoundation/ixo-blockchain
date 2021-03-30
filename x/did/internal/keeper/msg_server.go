@@ -24,7 +24,7 @@ func (k msgServer) AddDid(goCtx context.Context, msg *types.MsgAddDid) (*types.M
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	didDoc := types.NewBaseDidDoc(msg.Did, msg.PubKey)
 
-	err := k.SetDidDoc(ctx, didDoc)
+	err := k.SetDidDoc(ctx, &didDoc)
 	if err != nil {
 		return nil, err
 	}

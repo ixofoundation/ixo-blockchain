@@ -9,5 +9,5 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/type
 // GenesisState defines the did module's genesis state.
 message GenesisState {
   // DidDoc is an interface to we use Any here, like evidence GenesisState
-  repeated google.protobuf.Any diddocs = 1;
+  repeated google.protobuf.Any diddocs = 1 ;
 }

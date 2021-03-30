@@ -113,7 +113,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential typ
 		return err
 	}
 
-	baseDidDoc := existedDid.(types.BaseDidDoc)
+	baseDidDoc := existedDid.(*types.BaseDidDoc)
 	credentials := baseDidDoc.GetCredentials()
 
 	for _, data := range credentials {
@@ -122,7 +122,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential typ
 		}
 	}
 
-	baseDidDoc.AddCredential(credential)
+	baseDidDoc.AddCredential(&credential)
 	k.AddDidDoc(ctx, baseDidDoc)
 
 	return nil
