@@ -36,7 +36,6 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc *cod
 		return nil, err
 	}
 
-	//res, errRes := codec.MarshalJSONIndent(k.cdc, didDoc)
 	res, errRes := codec.MarshalJSONIndent(legacyQuerierCdc, didDoc)
 	if errRes != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", errRes.Error())

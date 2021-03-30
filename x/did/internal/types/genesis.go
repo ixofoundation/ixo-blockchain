@@ -7,11 +7,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
-//type GenesisState struct {
-//	DidDocs []exported.DidDoc `json:"did_docs" yaml:"did_docs"`
-//}
-
-// like NewGenesisState in evidence
 func NewGenesisState(dd []exported.DidDoc) *GenesisState {
 	didDocs := make([]*types.Any, len(dd))
 

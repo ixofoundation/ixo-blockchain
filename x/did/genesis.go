@@ -22,10 +22,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 		k.AddDidDoc(ctx, dd)
 	}
 
-	//for _, d := range gs.Diddocs {
-	//	keeper.AddDidDoc(ctx, d)
-	//}
-
 	return []abci.ValidatorUpdate{}
 }
 
@@ -45,6 +41,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) (data types.GenesisState) {
 	}
 
 	return types.GenesisState{
-		Diddocs: diddocs, //keeper.GetAllDidDocs(ctx)
+		Diddocs: diddocs,
 	}
 }

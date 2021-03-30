@@ -6,14 +6,9 @@ import (
 	"fmt"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 
-	//"github.com/cosmos/cosmos-sdk/client/flags"
-	//"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	//"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
-	//"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -53,14 +48,12 @@ func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) 
 // DefaultGenesis returns default genesis state as raw bytes for the did
 // module.
 func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
-	//return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 	return cdc.MustMarshalJSON(types.DefaultGenesisState())
 }
 
 // ValidateGenesis performs genesis state validation for the did module.
 func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var data types.GenesisState
-	//	err := ModuleCdc.UnmarshalJSON(bz, &data)
 	if err := cdc.UnmarshalJSON(bz, &data); err != nil {
 		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
 	}
@@ -75,7 +68,7 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the did module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	_ = types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx)) //tx.RegisterGRPCGatewayRoutes()
+	_ = types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
 // GetTxCmd returns the root tx command for the did module.
@@ -92,11 +85,6 @@ func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
 		cli.NewCmdAddDidDoc(),
 		cli.NewCmdAddCredential(),
 	)
-
-	//didTxCmd.AddCommand(flags.PostCommands(
-	//	cli.GetCmdAddDidDoc(cdc)),
-	//	cli.GetCmdAddCredential(cdc),
-	//)...)
 
 	return didTxCmd
 }
@@ -119,15 +107,6 @@ func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
 		cli.GetCmdAllDids(),
 		cli.GetCmdAllDidDocs(),
 	)
-
-	//didQueryCmd.AddCommand(flags.GetCommands(
-	//	cli.GetCmdAddressFromBase58Pubkey(),
-	//	cli.GetCmdAddressFromDid(cdc),
-	//	cli.GetCmdIxoDidFromMnemonic(),
-	//	cli.GetCmdDidDoc(cdc),
-	//	cli.GetCmdAllDids(cdc),
-	//	cli.GetCmdAllDidDocs(cdc),
-	//)...)
 
 	return didQueryCmd
 }
@@ -158,12 +137,8 @@ func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the did module.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper)) //RouterKey
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
 }
-
-//func (am AppModule) NewHandler() sdk.Handler {
-//	return NewHandler(am.keeper)
-//}
 
 // QuerierRoute returns the did module's querier route name.
 func (AppModule) QuerierRoute() string {
@@ -181,13 +156,6 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 }
-
-//func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
-//	var genesisState GenesisState
-//	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-//	InitGenesis(ctx, am.keeper, genesisState)
-//	return []abci.ValidatorUpdate{}
-//}
 
 // InitGenesis performs genesis initialization for the did module. It returns
 // no validator updates.

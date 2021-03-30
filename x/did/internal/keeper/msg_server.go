@@ -40,7 +40,7 @@ func (k msgServer) AddDid(goCtx context.Context, msg *types.MsgAddDid) (*types.M
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
 	})
-	return &types.MsgAddDidResponse{}, nil //&sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	return &types.MsgAddDidResponse{}, nil
 }
 
 func (k msgServer) AddCredential(goCtx context.Context, msg *types.MsgAddCredential) (*types.MsgAddCredentialResponse, error) {
@@ -64,5 +64,5 @@ func (k msgServer) AddCredential(goCtx context.Context, msg *types.MsgAddCredent
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 		),
 	})
-	return &types.MsgAddCredentialResponse{}, nil //&sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	return &types.MsgAddCredentialResponse{}, nil
 }

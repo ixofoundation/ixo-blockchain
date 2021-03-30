@@ -9,13 +9,10 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	//"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-// TODO We can copy WriteGenerateStdTxResponse from cosmos-sdk/x/auth/client/utils v0.39.1
-
-func registerTxHandlers(cliCtx /*context*/client.Context, r *mux.Router) {
+func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/did/add_did", newAddDidRequestHandler(cliCtx)).Methods("POST")
 	r.HandleFunc("/did/add_credential", newAddCredentialRequestHandler(cliCtx)).Methods("POST")
 }
@@ -29,7 +26,7 @@ type addDidReq struct {
 func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req addDidReq
-		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino/*Codec*/, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 
@@ -44,9 +41,7 @@ func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc 
 			return
 		}
 
-		// /*utils.*/WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
 		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
-		// TODO we have to prepend an & to msg above because MsgAddDid does not have the gogoproto.nullable = false option set, should it be?
 	}
 }
 
@@ -74,9 +69,6 @@ func newAddCredentialRequestHandler(cliCtx /*context*/client.Context) http.Handl
 			return
 		}
 
-		// /*utils.*/WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
-		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
-		// TODO we have to prepend an & to msg above because MsgAddCredential does not have the gogoproto.nullable = false option set, should it be?
-
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
 	}
 }

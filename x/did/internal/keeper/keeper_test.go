@@ -2,7 +2,6 @@ package keeper
 
 // TODO tests now generate app (simapp.Setup) instead of using CreateTestInput()
 
-//
 //import (
 //	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 //	"testing"

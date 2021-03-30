@@ -14,13 +14,13 @@ import (
 
 var (
 	// simulation pubkey to estimate gas consumption
-	simEd25519Pubkey ed25519.PubKey //PubKeyEd25519
+	simEd25519Pubkey ed25519.PubKey
 )
 
 func init() {
 	// This decodes a valid hex string into a ed25519Pubkey for use in transaction simulation
 	bz, _ := hex.DecodeString("035AD6810A47F073553FF30D2FCC7E0D3B1C0B74B61A1AAA2582344037151E14")
-	copy(simEd25519Pubkey.Key[:], bz)
+	simEd25519Pubkey.Key = bz
 }
 
 func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
@@ -33,7 +33,6 @@ func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
 
 		var pubKeyRaw ed25519.PubKey
 		pubKeyRaw.Key = base58.Decode(signerDidDoc.GetPubKey())
-		//copy(pubKeyRaw.Key[:], base58.Decode(signerDidDoc.GetPubKey()))
 		return &pubKeyRaw, nil
 	}
 }

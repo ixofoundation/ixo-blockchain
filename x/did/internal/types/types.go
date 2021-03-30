@@ -23,20 +23,10 @@ var (
 	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
 )
 
-var _ exported.DidDoc = &BaseDidDoc{} //(*BaseDidDoc)(nil)
+var _ exported.DidDoc = &BaseDidDoc{}
 
-//type BaseDidDoc struct {
-//	Did         exported.Did             `json:"did" yaml:"did"`
-//	PubKey      string                   `json:"pubKey" yaml:"pubKey"`
-//	Credentials []DidCredential `json:"credentials" yaml:"credentials"`
-//}
-
-//func (dd BaseDidDoc) Reset() {
-//	dd = BaseDidDoc{}
-//}
-
-func (bdd BaseDidDoc) MarshalYAML() (interface{}, error) {
-	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &bdd)
+func (dd BaseDidDoc) MarshalYAML() (interface{}, error) {
+	bz, err := codec.MarshalYAML(codec.NewProtoCodec(codectypes.NewInterfaceRegistry()), &dd)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +38,6 @@ func (dd BaseDidDoc) String() string {
 	return out.(string)
 }
 
-//func (dd BaseDidDoc) ProtoMessage() {}
-
 func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 	return BaseDidDoc{
 		Did:         did,
@@ -57,12 +45,6 @@ func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 		Credentials: []*DidCredential{},
 	}
 }
-
-//func (m BaseDidDoc) Reset()      { m = BaseDidDoc{} }
-//func (BaseDidDoc) ProtoMessage() {}
-//func (BaseDidDoc) Descriptor() ([]byte, []int) {
-//	return fileDescriptor_df34300e393a57f6, []int{0}
-//}
 
 func (dd BaseDidDoc) GetDid() exported.Did                     { return dd.Did }
 func (dd BaseDidDoc) GetPubKey() string                        { return dd.PubKey }
@@ -108,38 +90,6 @@ func (dd *BaseDidDoc) AddCredential(cred *DidCredential) {
 
 	dd.Credentials = append(dd.Credentials, cred)
 }
-
-//func (dd *BaseDidDoc) Marshal() (dAtA []byte, err error) {
-//	size := dd.Size()
-//	dAtA = make([]byte, size)
-//	n, err := dd.MarshalToSizedBuffer(dAtA[:size])
-//	if err != nil {
-//		return nil, err
-//	}
-//	return dAtA[:n], nil
-//}
-//
-//func (dd *BaseDidDoc) MarshalTo(dAtA []byte) (n int, err error) {
-//	size := dd.Size()
-//	return dd.MarshalToSizedBuffer(dAtA[:size])
-//}
-//
-//func (dd *BaseDidDoc) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-//	panic("implement me")
-//}
-//
-//func (dd *BaseDidDoc) Size() int {
-//	if dd == nil {
-//		return 0
-//	}
-//	panic("implement me")
-//}
-//
-//func (dd *BaseDidDoc) Unmarshal(data []byte) error {
-//	panic("implement me")
-//}
-
-type Credential struct{}
 
 func fromJsonString(jsonIxoDid string) (exported.IxoDid, error) {
 	var did exported.IxoDid

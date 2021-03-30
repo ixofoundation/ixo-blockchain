@@ -9,18 +9,6 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
 
-/*func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgAddDid{}, "did/AddDid", nil)
-	cdc.RegisterConcrete(MsgAddCredential{}, "did/AddCredential", nil)
-
-	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
-
-	// TODO: https://github.com/ixofoundation/ixo-blockchain/issues/76
-	cdc.RegisterConcrete(BaseDidDoc{}, "did/BaseDidDoc", nil)
-	//cdc.RegisterConcrete(DidCredential{}, "did/DidCredential", nil)
-	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
-}*/
-
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
 
@@ -33,25 +21,20 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	//cdc.RegisterConcrete(Claim{}, "did/Claim", nil)
 }
 
-//Registers did module's interface types and their concrete implementations as proto.Message.
-// TODO Add RegisterImplementations?
 func RegisterInterfaces(registry types.InterfaceRegistry) {
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgAddDid{},
-		&MsgAddCredential{},
-	)
-
 	registry.RegisterInterface(
 		"did.DidDoc",
 		(*exported.DidDoc)(nil),
 		&BaseDidDoc{},
 	)
 
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgAddDid{},
+		&MsgAddCredential{},
+	)
+
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
-
-// ModuleCdc is the codec for the module
-//var ModuleCdc *codec.Codec
 
 var (
 	amino     = codec.NewLegacyAmino()
@@ -69,9 +52,3 @@ func init() {
 	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
 }
-
-//func init() {
-//	ModuleCdc = codec.New()
-//	RegisterCodec(ModuleCdc)
-//	ModuleCdc.Seal()
-//}

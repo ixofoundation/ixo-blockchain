@@ -12,29 +12,28 @@ import (
 
 type Keeper struct {
 	storeKey sdk.StoreKey
-	//cdc      *codec.LegacyAmino
-	cdc codec.BinaryMarshaler //what Cosmos uses
+	cdc codec.BinaryMarshaler
 }
 
-func NewKeeper(/*cdc *codec.Codec cdc codec.LegacyAmino*/ cdc codec.BinaryMarshaler, key sdk.StoreKey) Keeper {
+func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey) Keeper {
 	return Keeper{
 		storeKey: key,
 		cdc:      cdc,
 	}
 }
 
-// Like auth's MarshalAccount
+// MarshalDidDoc protobuf serializes a DidDoc interface
 func (k Keeper) MarshalDidDoc(did exported.DidDoc) ([]byte, error) {
 	return k.cdc.MarshalInterface(did)
 }
 
-// Like auth's UnmarshalAccount
+// UnmarshalDidDoc returns a DidDoc interface from raw encoded did document
+// bytes of a Proto-based DidDoc type
 func (k Keeper) UnmarshalDidDoc(bz []byte) (exported.DidDoc, error){
 	var dd exported.DidDoc
 	return dd, k.cdc.UnmarshalInterface(bz, &dd)
 }
 
-// Like auth's decodeAccount
 func (k Keeper) decodeDidDoc(bz []byte) exported.DidDoc {
 	dd, err := k.UnmarshalDidDoc(bz)
 	if err != nil {
@@ -67,11 +66,6 @@ func (k Keeper) GetDidDoc(ctx sdk.Context, did exported.Did) (exported.DidDoc, e
 	}
 
 	return k.decodeDidDoc(bz), nil
-
-	//var didDoc types.BaseDidDoc
-	//k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &didDoc)
-	//
-	//return didDoc, nil
 }
 
 func (k Keeper) MustGetDidDoc(ctx sdk.Context, did exported.Did) exported.DidDoc {
@@ -102,10 +96,8 @@ func (k Keeper) AddDidDoc(ctx sdk.Context, did exported.DidDoc) {
 		panic(err)
 	}
 
-	store.Set(key, dd) //k.cdc.MustMarshalBinaryLengthPrefixed(did))
+	store.Set(key, dd)
 }
-
-// TODO we cannot implement ProtoMarshal interface functions because exported.DidDoc is also an interface
 
 func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential types.DidCredential) (err error) {
 	existedDid, err := k.GetDidDoc(ctx, did)
@@ -129,18 +121,6 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential typ
 }
 
 func (k Keeper) GetAllDidDocs(ctx sdk.Context) (didDocs []exported.DidDoc) {
-	//store := ctx.KVStore(k.storeKey)
-	//iterator := sdk.KVStorePrefixIterator(store, types.DidKey)
-	//
-	//defer iterator.Close()
-	//for ; iterator.Valid(); iterator.Next() {
-	//	var didDoc types.BaseDidDoc
-	//	k.cdc.MustUnmarshalBinaryLengthPrefixed(iterator.Value(), &didDoc)
-	//	didDocs = append(didDocs, &didDoc)
-	//}
-	//
-	//return didDocs
-
 	k.IterateDidDocs(ctx, func(dd exported.DidDoc) (stop bool) {
 		didDocs = append(didDocs, dd)
 		return false

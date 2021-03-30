@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/go-bip39"
 	"github.com/gogo/protobuf/proto"
 
-	//"golang.org/x/crypto/ed25519"
 	naclBox "golang.org/x/crypto/nacl/box"
 	"io"
 )
@@ -38,25 +37,12 @@ func UnprefixedDidFromPubKey(pubKey string) string {
 
 type DidDoc interface {
 	proto.Message
-	//Reset()
-	//String() string
-	//ProtoMessage()
 
 	SetDid(did Did) error
 	GetDid() Did
 	SetPubKey(pubkey string) error
 	GetPubKey() string
 	Address() sdk.AccAddress
-
-	//codec.ProtoMarshaler
-	//Reset()
-    //String() string
-	//ProtoMessage()
-	//Marshal() ([]byte, error)
-	//MarshalTo(data []byte) (n int, err error)
-	//MarshalToSizedBuffer(dAtA []byte) (int, error)
-	//Size() int
-	//Unmarshal(data []byte) error
 }
 
 type Secret struct {
@@ -172,7 +158,7 @@ func Gen() (IxoDid, error) {
 }
 
 func FromSeed(seed [32]byte) (IxoDid, error) {
-	publicKeyBytes, privateKeyBytes, err := ed25519Local.GenerateKey(bytes.NewReader(seed[0:32]))//ed25519.GenerateKey(bytes.NewReader(seed[0:32]))
+	publicKeyBytes, privateKeyBytes, err := ed25519Local.GenerateKey(bytes.NewReader(seed[0:32]))
 	if err != nil {
 		return IxoDid{}, err
 	}
@@ -198,10 +184,6 @@ func FromSeed(seed [32]byte) (IxoDid, error) {
 }
 
 func (id IxoDid) SignMessage(msg []byte) ([]byte, error) {
-	//var privateKey ed25519tm.PrivKey //ed25519tm.PrivKeyEd25519
-	//copy(privateKey[:], base58.Decode(id.Secret.SignKey))
-	//copy(privateKey[32:], base58.Decode(id.VerifyKey))
-
 	var privateKey ed25519.PrivKey
 	privateKey.Key = append(base58.Decode(id.Secret.SignKey), base58.Decode(id.VerifyKey)...)
 
@@ -209,23 +191,8 @@ func (id IxoDid) SignMessage(msg []byte) ([]byte, error) {
 }
 
 func (id IxoDid) VerifySignedMessage(msg []byte, sig []byte) bool {
-	//var publicKey ed25519tm.PubKey //ed25519tm.PubKeyEd25519
-	//copy(publicKey[:], base58.Decode(id.VerifyKey))
-
 	var publicKey ed25519.PubKey
 	publicKey.Key = base58.Decode(id.VerifyKey)
 
-	return publicKey.VerifySignature(msg, sig) //publicKey.VerifyBytes(msg, sig)
+	return publicKey.VerifySignature(msg, sig)
 }
-
-//type Claim struct {
-//	Id           Did  `json:"id" yaml:"id"`
-//	KYCValidated bool `json:"KYCValidated" yaml:"KYCValidated"`
-//}
-//
-//type DidCredential struct {
-//	CredType []string `json:"type" yaml:"type"`
-//	Issuer   Did      `json:"issuer" yaml:"issuer"`
-//	Issued   string   `json:"issued" yaml:"issued"`
-//	Claim    Claim    `json:"claim" yaml:"claim"`
-//}

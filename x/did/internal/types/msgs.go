@@ -20,11 +20,6 @@ var (
 	_ ixo.IxoMsg = &MsgAddCredential{}
 )
 
-//type MsgAddDid struct {
-//	Did    exported.Did `json:"did" yaml:"did"`
-//	PubKey string       `json:"pubKey" yaml:"pubKey"`
-//}
-
 func NewMsgAddDid(did string, publicKey string) *MsgAddDid {
 	return &MsgAddDid{
 		Did:    did,
@@ -73,11 +68,7 @@ func (msg MsgAddDid) GetSignBytes() []byte {
 	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
 }
 
-//type MsgAddCredential struct {
-//	DidCredential exported.DidCredential `json:"credential" yaml:"credential"`
-//}
-
-func NewMsgAddCredential(did string, credType []string, issuer string, issued string) MsgAddCredential {
+func NewMsgAddCredential(did string, credType []string, issuer string, issued string) *MsgAddCredential {
 	didCredential := DidCredential{
 		Credtype: credType,
 		Issuer:   issuer,
@@ -88,7 +79,7 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 		},
 	}
 
-	return MsgAddCredential{
+	return &MsgAddCredential{
 		DidCredential: &didCredential,
 	}
 }
