@@ -29,11 +29,11 @@ type BaseDidDoc struct {
 	Credentials []*DidCredential `protobuf:"bytes,3,rep,name=credentials,proto3" json:"credentials,omitempty" json:"credentials" yaml:"credentials"`
 }
 
-//func (m *BaseDidDoc) Reset()      { *m = BaseDidDoc{} }
-//func (*BaseDidDoc) ProtoMessage() {}
-//func (*BaseDidDoc) Descriptor() ([]byte, []int) {
-//	return fileDescriptor_df34300e393a57f6, []int{0}
-//}
+func (m *BaseDidDoc) Reset()      { *m = BaseDidDoc{} }
+func (*BaseDidDoc) ProtoMessage() {}
+func (*BaseDidDoc) Descriptor() ([]byte, []int) {
+	return fileDescriptor_df34300e393a57f6, []int{0}
+}
 func (m *BaseDidDoc) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }

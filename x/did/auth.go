@@ -32,7 +32,8 @@ func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
 		}
 
 		var pubKeyRaw ed25519.PubKey
-		copy(pubKeyRaw.Key[:], base58.Decode(signerDidDoc.GetPubKey()))
+		pubKeyRaw.Key = base58.Decode(signerDidDoc.GetPubKey())
+		//copy(pubKeyRaw.Key[:], base58.Decode(signerDidDoc.GetPubKey()))
 		return &pubKeyRaw, nil
 	}
 }

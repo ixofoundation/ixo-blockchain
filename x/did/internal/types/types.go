@@ -58,11 +58,11 @@ func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 	}
 }
 
-func (m BaseDidDoc) Reset()      { m = BaseDidDoc{} }
-func (BaseDidDoc) ProtoMessage() {}
-func (BaseDidDoc) Descriptor() ([]byte, []int) {
-	return fileDescriptor_df34300e393a57f6, []int{0}
-}
+//func (m BaseDidDoc) Reset()      { m = BaseDidDoc{} }
+//func (BaseDidDoc) ProtoMessage() {}
+//func (BaseDidDoc) Descriptor() ([]byte, []int) {
+//	return fileDescriptor_df34300e393a57f6, []int{0}
+//}
 
 func (dd BaseDidDoc) GetDid() exported.Did                     { return dd.Did }
 func (dd BaseDidDoc) GetPubKey() string                        { return dd.PubKey }
