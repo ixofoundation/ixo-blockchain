@@ -90,7 +90,7 @@ to [01_state.md](./01_state.md) for information about subscriptions.
 |:------------------|:-----------|:----------------|
 | CreatorDid        | `did.Did`  | DID of the subscription creator
 | SubscriptionId    | `string`   | ID of this subscription
-| PaymentContractId | `string`   | ID the payment contract on which this subscription is based
+| PaymentContractId | `string`   | ID of the payment contract on which this subscription is based
 | MaxPeriods        | `sdk.Uint` | Maximum number of times that the subscription payment is triggered
 | Period            | `Period`   | Describes the period (period unit and period length)
 
