@@ -121,10 +121,10 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	}
 
 	// Check that IDs valid
-	if !IsValidPaymentTemplateId(msg.PaymentTemplateId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
-	} else if !IsValidPaymentContractId(msg.PaymentContractId) {
+	if !IsValidPaymentContractId(msg.PaymentContractId) {
 		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
+	} else if !IsValidPaymentTemplateId(msg.PaymentTemplateId) {
+		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
 	}
 
 	// Validate recipient distribution
@@ -186,7 +186,9 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 
 	// Check that IDs valid
 	if !IsValidSubscriptionId(msg.SubscriptionId) {
-		return sdkerrors.Wrap(ErrInvalidId, "payment template ID invalid")
+		return sdkerrors.Wrap(ErrInvalidId, "subscription ID invalid")
+	} else if !IsValidPaymentContractId(msg.PaymentContractId) {
+		return sdkerrors.Wrap(ErrInvalidId, "payment contract ID invalid")
 	}
 
 	// Validate Period
