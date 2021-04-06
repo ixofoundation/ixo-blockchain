@@ -1,11 +1,11 @@
 package rest
 //
 //import (
-//	//"github.com/cosmos/cosmos-sdk/client/context"
+//	"github.com/cosmos/cosmos-sdk/client/context"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 //	"github.com/cosmos/cosmos-sdk/types/rest"
-//	//"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+//	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 //	"github.com/gorilla/mux"
 //	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 //	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
@@ -16,6 +16,8 @@ package rest
 //func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 //	r.HandleFunc("/bonds/create_bond", createBondRequestHandler(cliCtx)).Methods("POST")
 //	r.HandleFunc("/bonds/edit_bond", editBondRequestHandler(cliCtx)).Methods("POST")
+//	r.HandleFunc("/bonds/set_next_alpha", setNextAlphaRequestHandler(cliCtx)).Methods("POST")
+//	r.HandleFunc("/bonds/update_bond_state", updateBondStateRequestHandler(cliCtx)).Methods("POST")
 //	r.HandleFunc("/bonds/buy", buyRequestHandler(cliCtx)).Methods("POST")
 //	r.HandleFunc("/bonds/sell", sellRequestHandler(cliCtx)).Methods("POST")
 //	r.HandleFunc("/bonds/swap", swapRequestHandler(cliCtx)).Methods("POST")
@@ -39,10 +41,12 @@ package rest
 //	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
 //	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 //	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
+//	AlphaBond              string       `json:"alpha_bond" yaml:"alpha_bond"`
 //	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
 //	OutcomePayment         string       `json:"outcome_payment" yaml:"outcome_payment"`
 //	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 //	CreatorDid             string       `json:"creator_did" yaml:"creator_did"`
+//	ControllerDid          string       `json:"controller_did" yaml:"controller_did"`
 //}
 //
 //func createBondRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -131,6 +135,19 @@ package rest
 //			return
 //		}
 //
+//		// Parse alphaBond
+//		var alphaBond bool
+//		alphaBondStrLower := strings.ToLower(req.AlphaBond)
+//		if alphaBondStrLower == "true" {
+//			alphaBond = true
+//		} else if alphaBondStrLower == "false" {
+//			alphaBond = false
+//		} else {
+//			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBoolean, "alpha_bond")
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//			return
+//		}
+//
 //		// Parse batch blocks
 //		batchBlocks, err := sdk.ParseUint(req.BatchBlocks)
 //		if err != nil {
@@ -140,17 +157,24 @@ package rest
 //		}
 //
 //		// Parse outcome payment
-//		outcomePayment, err := sdk.ParseCoins(req.OutcomePayment)
-//		if err != nil {
-//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-//			return
+//		var outcomePayment sdk.Int
+//		if len(req.OutcomePayment) == 0 {
+//			outcomePayment = sdk.ZeroInt()
+//		} else {
+//			var ok bool
+//			outcomePayment, ok = sdk.NewIntFromString(req.OutcomePayment)
+//			if !ok {
+//				err := sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+//				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//				return
+//			}
 //		}
 //
 //		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-//			req.CreatorDid, req.FunctionType, functionParams, reserveTokens,
+//			req.CreatorDid, req.ControllerDid, req.FunctionType, functionParams, reserveTokens,
 //			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 //			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-//			allowSells, batchBlocks, outcomePayment, req.BondDid)
+//			allowSells, alphaBond, batchBlocks, outcomePayment, req.BondDid)
 //		if err := msg.ValidateBasic(); err != nil {
 //			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 //			return
@@ -162,7 +186,6 @@ package rest
 //
 //type editBondReq struct {
 //	BaseReq                rest.BaseReq `json:"base_req" yaml:"base_req"`
-//	Token                  string       `json:"token" yaml:"token"`
 //	Name                   string       `json:"name" yaml:"name"`
 //	Description            string       `json:"description" yaml:"description"`
 //	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
@@ -184,9 +207,73 @@ package rest
 //			return
 //		}
 //
-//		msg := types.NewMsgEditBond(req.Token, req.Name, req.Description,
+//		msg := types.NewMsgEditBond(req.Name, req.Description,
 //			req.OrderQuantityLimits, req.SanityRate,
 //			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+//		if err := msg.ValidateBasic(); err != nil {
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//			return
+//		}
+//
+//		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+//	}
+//}
+//
+//type setNextAlphaReq struct {
+//	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
+//	NewAlpha  string       `json:"new_alpha" yaml:"new_alpha"`
+//	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+//	EditorDid string       `json:"editor_did" yaml:"editor_did"`
+//}
+//
+//func setNextAlphaRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		var req setNextAlphaReq
+//		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+//			return
+//		}
+//
+//		baseReq := req.BaseReq.Sanitize()
+//		if !baseReq.ValidateBasic(w) {
+//			return
+//		}
+//
+//		// Parse new alpha
+//		newAlpha, err := sdk.NewDecFromStr(req.NewAlpha)
+//		if err != nil {
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//			return
+//		}
+//
+//		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid)
+//		if err := msg.ValidateBasic(); err != nil {
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//			return
+//		}
+//
+//		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+//	}
+//}
+//
+//type updateBondStateReq struct {
+//	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
+//	NewState  string       `json:"new_state" yaml:"new_state"`
+//	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+//	EditorDid string       `json:"editor_did" yaml:"editor_did"`
+//}
+//
+//func updateBondStateRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		var req updateBondStateReq
+//		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+//			return
+//		}
+//
+//		baseReq := req.BaseReq.Sanitize()
+//		if !baseReq.ValidateBasic(w) {
+//			return
+//		}
+//		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), req.EditorDid, req.BondDid)
 //		if err := msg.ValidateBasic(); err != nil {
 //			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 //			return
@@ -316,6 +403,7 @@ package rest
 //type makeOutcomePaymentReq struct {
 //	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
 //	BondDid   string       `json:"bond_did" yaml:"bond_did"`
+//	Amount    string       `json:"amount" yaml:"amount"`
 //	SenderDid string       `json:"sender_did" yaml:"sender_did"`
 //}
 //
@@ -331,7 +419,14 @@ package rest
 //			return
 //		}
 //
-//		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, req.BondDid)
+//		amount, ok := sdk.NewIntFromString(req.Amount)
+//		if !ok {
+//			err := sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "amount")
+//			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+//			return
+//		}
+//
+//		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, amount, req.BondDid)
 //		if err := msg.ValidateBasic(); err != nil {
 //			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 //			return

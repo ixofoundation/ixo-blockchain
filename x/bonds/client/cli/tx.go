@@ -3,7 +3,7 @@ package cli
 //import (
 //	"fmt"
 //	"github.com/cosmos/cosmos-sdk/client"
-//	//"github.com/cosmos/cosmos-sdk/client/context"
+//	"github.com/cosmos/cosmos-sdk/client/context"
 //	"github.com/cosmos/cosmos-sdk/client/flags"
 //	"github.com/cosmos/cosmos-sdk/codec"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -29,6 +29,8 @@ package cli
 //	bondsTxCmd.AddCommand(flags.PostCommands(
 //		GetCmdCreateBond(cdc),
 //		GetCmdEditBond(cdc),
+//		GetCmdSetNextAlpha(cdc),
+//		GetCmdUpdateBondState(cdc),
 //		GetCmdBuy(cdc),
 //		GetCmdSell(cdc),
 //		GetCmdSwap(cdc),
@@ -58,10 +60,12 @@ package cli
 //			_sanityRate := viper.GetString(FlagSanityRate)
 //			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
 //			_allowSells := viper.GetBool(FlagAllowSells)
+//			_alphaBond := viper.GetBool(FlagAlphaBond)
 //			_batchBlocks := viper.GetString(FlagBatchBlocks)
 //			_outcomePayment := viper.GetString(FlagOutcomePayment)
 //			_bondDid := viper.GetString(FlagBondDid)
 //			_creatorDid := viper.GetString(FlagCreatorDid)
+//			_controllerDid := viper.GetString(FlagControllerDid)
 //
 //			// Parse function parameters
 //			functionParams, err := client2.ParseFunctionParams(_functionParameters)
@@ -122,21 +126,30 @@ package cli
 //
 //			// Parse creator's ixo DID
 //			creatorDid, err := did.UnmarshalIxoDid(_creatorDid)
-//
-//			// Parse order quantity limits
-//			outcomePayment, err := sdk.ParseCoins(_outcomePayment)
 //			if err != nil {
 //				return err
+//			}
+//
+//			// Parse outcome payment
+//			var outcomePayment sdk.Int
+//			if len(_outcomePayment) == 0 {
+//				outcomePayment = sdk.ZeroInt()
+//			} else {
+//				var ok bool
+//				outcomePayment, ok = sdk.NewIntFromString(_outcomePayment)
+//				if !ok {
+//					return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+//				}
 //			}
 //
 //			cliCtx := context.NewCLIContext().WithCodec(cdc).
 //				WithFromAddress(creatorDid.Address())
 //
 //			msg := types.NewMsgCreateBond(_token, _name, _description,
-//				creatorDid.Did, _functionType, functionParams, reserveTokens,
-//				txFeePercentage, exitFeePercentage, feeAddress, maxSupply,
-//				orderQuantityLimits, sanityRate, sanityMarginPercentage,
-//				_allowSells, batchBlocks, outcomePayment, _bondDid)
+//				creatorDid.Did, _controllerDid, _functionType, functionParams,
+//				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
+//				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
+//				_allowSells, _alphaBond, batchBlocks, outcomePayment, _bondDid)
 //
 //			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
 //		},
@@ -162,6 +175,7 @@ package cli
 //	// _ = cmd.MarkFlagRequired(FlagOutcomePayment) // Optional
 //	_ = cmd.MarkFlagRequired(FlagBondDid)
 //	_ = cmd.MarkFlagRequired(FlagCreatorDid)
+//	_ = cmd.MarkFlagRequired(FlagControllerDid)
 //
 //	return cmd
 //}
@@ -171,7 +185,6 @@ package cli
 //		Use:   "edit-bond",
 //		Short: "Edit bond",
 //		RunE: func(cmd *cobra.Command, args []string) error {
-//			_token := viper.GetString(FlagToken)
 //			_name := viper.GetString(FlagName)
 //			_description := viper.GetString(FlagDescription)
 //			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
@@ -189,9 +202,8 @@ package cli
 //			cliCtx := context.NewCLIContext().WithCodec(cdc).
 //				WithFromAddress(editorDid.Address())
 //
-//			msg := types.NewMsgEditBond(
-//				_token, _name, _description, _orderQuantityLimits, _sanityRate,
-//				_sanityMarginPercentage, editorDid.Did, _bondDid)
+//			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
+//				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid)
 //			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
 //		},
 //	}
@@ -199,10 +211,71 @@ package cli
 //	cmd.Flags().AddFlagSet(fsBondGeneral)
 //	cmd.Flags().AddFlagSet(fsBondEdit)
 //
-//	_ = cmd.MarkFlagRequired(FlagToken)
 //	_ = cmd.MarkFlagRequired(FlagBondDid)
 //	_ = cmd.MarkFlagRequired(FlagEditorDid)
 //
+//	return cmd
+//}
+//
+//func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
+//	cmd := &cobra.Command{
+//		Use:     "set-next-alpha [new-alpha] [bond-did] [editor-did]",
+//		Example: "set-next-alpha 0.5 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+//		Short:   "Edit a bond's alpha parameter",
+//		Args:    cobra.ExactArgs(3),
+//		RunE: func(cmd *cobra.Command, args []string) error {
+//			_alpha := args[0]
+//			_bondDid := args[1]
+//			_editorDid := args[2]
+//
+//			// Parse alpha
+//			alpha, err := sdk.NewDecFromStr(_alpha)
+//			if err != nil {
+//				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "alpha")
+//			}
+//
+//			// Parse editor's ixo DID
+//			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+//			if err != nil {
+//				return err
+//			}
+//
+//			cliCtx := context.NewCLIContext().WithCodec(cdc).
+//				WithFromAddress(editorDid.Address())
+//
+//			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid)
+//
+//			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+//		},
+//	}
+//	return cmd
+//}
+//
+//func GetCmdUpdateBondState(cdc *codec.Codec) *cobra.Command {
+//	cmd := &cobra.Command{
+//		Use:     "update-bond-state [new-state] [bond-did] [editor-did]",
+//		Example: "update-bond-state SETTLE U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
+//		Short:   "Edit a bond's current state",
+//		Args:    cobra.ExactArgs(3),
+//		RunE: func(cmd *cobra.Command, args []string) error {
+//			_state := args[0]
+//			_bondDid := args[1]
+//			_editorDid := args[2]
+//
+//			// Parse editor's ixo DID
+//			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+//			if err != nil {
+//				return err
+//			}
+//
+//			cliCtx := context.NewCLIContext().WithCodec(cdc).
+//				WithFromAddress(editorDid.Address())
+//
+//			msg := types.NewMsgUpdateBondState(types.BondState(_state), editorDid.Did, _bondDid)
+//
+//			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+//		},
+//	}
 //	return cmd
 //}
 //
@@ -309,14 +382,19 @@ package cli
 //
 //func GetCmdMakeOutcomePayment(cdc *codec.Codec) *cobra.Command {
 //	cmd := &cobra.Command{
-//		Use:     "make-outcome-payment [bond-did] [sender-did]",
-//		Example: "make-outcome-payment U7GK8p8rVhJMKhBVRCJJ8c <sender-ixo-did>",
+//		Use:     "make-outcome-payment [bond-did] [amount] [sender-did]",
+//		Example: "make-outcome-payment U7GK8p8rVhJMKhBVRCJJ8c 100 <sender-ixo-did>",
 //		Short:   "Make an outcome payment to a bond",
-//		Args:    cobra.ExactArgs(2),
+//		Args:    cobra.ExactArgs(3),
 //		RunE: func(cmd *cobra.Command, args []string) error {
 //
+//			amount, ok := sdk.NewIntFromString(args[1])
+//			if !ok {
+//				return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+//			}
+//
 //			// Parse sender's ixo DID
-//			sender, err := did.UnmarshalIxoDid(args[1])
+//			sender, err := did.UnmarshalIxoDid(args[2])
 //			if err != nil {
 //				return err
 //			}
@@ -324,7 +402,7 @@ package cli
 //			cliCtx := context.NewCLIContext().WithCodec(cdc).
 //				WithFromAddress(sender.Address())
 //
-//			msg := types.NewMsgMakeOutcomePayment(sender.Did, args[0])
+//			msg := types.NewMsgMakeOutcomePayment(sender.Did, amount, args[0])
 //
 //			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sender)
 //		},

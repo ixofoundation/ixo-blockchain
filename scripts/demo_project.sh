@@ -141,7 +141,7 @@ ixod tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL" 
 # Create claim and evaluation
 echo "Creating a claim in project..."
 SENDER_DID="$SHAUN_DID"
-ixod tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Creating an evaluation in project..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1

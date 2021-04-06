@@ -17,7 +17,7 @@ package project
 //	projectDid := types.ValidCreateProjectMsg.ProjectDid
 //	txHash := "txHash"
 //	senderDid := "senderDid"
-//	data := types.NewCreateClaimDoc("claim1")
+//	data := types.NewCreateClaimDoc("claim1", "claimTemplateA")
 //
 //	res, _ := handleMsgCreateProject(ctx, k, types.ValidCreateProjectMsg)
 //	require.NotNil(t, res)
@@ -70,7 +70,7 @@ package project
 //	project.Status = types.StartedStatus
 //	k.SetProjectDoc(ctx, project)
 //
-//	msg2 := types.NewMsgCreateClaim(txHash, senderDid, types.NewCreateClaimDoc("claim1"), projectDid)
+//	msg2 := types.NewMsgCreateClaim(txHash, senderDid, types.NewCreateClaimDoc("claim1", "claimTemplateA"), projectDid)
 //	res, err = handleMsgCreateClaim(ctx, k, msg2)
 //	require.NoError(t, err)
 //	require.NotNil(t, res)

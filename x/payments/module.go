@@ -2,13 +2,14 @@ package payments
 //
 //import (
 //	"encoding/json"
-//	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-//	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-//	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+//	"github.com/cosmos/cosmos-sdk/client/flags"
+//	"github.com/cosmos/cosmos-sdk/x/bank"
 //
 //	"github.com/cosmos/cosmos-sdk/client"
 //
-//	//"github.com/cosmos/cosmos-sdk/client/context"
+//	"github.com/ixofoundation/ixo-blockchain/x/payments/client/cli"
+//
+//	"github.com/cosmos/cosmos-sdk/client/context"
 //	"github.com/cosmos/cosmos-sdk/codec"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/cosmos/cosmos-sdk/types/module"
@@ -31,17 +32,15 @@ package payments
 //	return ModuleName
 //}
 //
-//func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-//	RegisterLegacyAminoCodec(cdc)
+//func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
+//	RegisterCodec(cdc)
 //}
 //
-//func (AppModuleBasic) RegisterInterfaces(codectypes.InterfaceRegistry) {}
-//
-//func (AppModuleBasic) DefaultGenesis(marshaler codec.JSONMarshaler) json.RawMessage {
+//func (AppModuleBasic) DefaultGenesis() json.RawMessage {
 //	return ModuleCdc.MustMarshalJSON(DefaultGenesisState())
 //}
-////
-//func (AppModuleBasic) ValidateGenesis(m codec.JSONMarshaler, enc client.TxEncodingConfig, bz json.RawMessage) error {
+//
+//func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 //	var data GenesisState
 //	err := ModuleCdc.UnmarshalJSON(bz, &data)
 //	if err != nil {
@@ -50,13 +49,11 @@ package payments
 //	return ValidateGenesis(data)
 //}
 //
-//func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
+//func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
 //	rest.RegisterRoutes(ctx, rtr)
 //}
 //
-//func (AppModuleBasic) RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux) {}
-//
-//func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
+//func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 //	paymentsTxCmd := &cobra.Command{
 //		Use:                        ModuleName,
 //		Short:                      "payments transaction sub commands",
@@ -65,21 +62,20 @@ package payments
 //		RunE:                       client.ValidateCmd,
 //	}
 //
-//	// TODO remove LegacyAmino from cli functions below and add them to command
-//	//paymentsTxCmd.AddCommand(flags.PostCommands(
-//	//	cli.GetCmdCreatePaymentTemplate(cdc),
-//	//	cli.GetCmdCreatePaymentContract(cdc),
-//	//	cli.GetCmdCreateSubscription(cdc),
-//	//	cli.GetCmdSetPaymentContractAuthorisation(cdc),
-//	//	cli.GetCmdGrantPaymentDiscount(cdc),
-//	//	cli.GetCmdRevokePaymentDiscount(cdc),
-//	//	cli.GetCmdEffectPayment(cdc),
-//	//)...)
+//	paymentsTxCmd.AddCommand(flags.PostCommands(
+//		cli.GetCmdCreatePaymentTemplate(cdc),
+//		cli.GetCmdCreatePaymentContract(cdc),
+//		cli.GetCmdCreateSubscription(cdc),
+//		cli.GetCmdSetPaymentContractAuthorisation(cdc),
+//		cli.GetCmdGrantPaymentDiscount(cdc),
+//		cli.GetCmdRevokePaymentDiscount(cdc),
+//		cli.GetCmdEffectPayment(cdc),
+//	)...)
 //
 //	return paymentsTxCmd
 //}
 //
-//func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
+//func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 //	paymentsQueryCmd := &cobra.Command{
 //		Use:                        ModuleName,
 //		Short:                      "payments query sub commands",
@@ -88,12 +84,12 @@ package payments
 //		RunE:                       client.ValidateCmd,
 //	}
 //
-//	// TODO remove LegacyAmino from cli functions below and add them to command
-//	//paymentsQueryCmd.AddCommand(flags.GetCommands(
-//	//	cli.GetCmdPaymentTemplate(cdc),
-//	//	cli.GetCmdPaymentContract(cdc),
-//	//	cli.GetCmdSubscription(cdc),
-//	//)...)
+//	paymentsQueryCmd.AddCommand(flags.GetCommands(
+//		cli.GetCmdPaymentTemplate(cdc),
+//		cli.GetCmdPaymentContract(cdc),
+//		cli.GetCmdPaymentContractsByIdPrefix(cdc),
+//		cli.GetCmdSubscription(cdc),
+//	)...)
 //
 //	return paymentsQueryCmd
 //}
@@ -101,10 +97,10 @@ package payments
 //type AppModule struct {
 //	AppModuleBasic
 //	keeper     keeper.Keeper
-//	bankKeeper bankkeeper.Keeper
+//	bankKeeper bank.Keeper
 //}
 //
-//func NewAppModule(keeper Keeper, bankKeeper bankkeeper.Keeper) AppModule {
+//func NewAppModule(keeper Keeper, bankKeeper bank.Keeper) AppModule {
 //	return AppModule{
 //		AppModuleBasic: AppModuleBasic{},
 //		keeper:         keeper,
@@ -112,7 +108,6 @@ package payments
 //	}
 //}
 //
-//// TODO Implement functions
 //func (AppModule) Name() string {
 //	return ModuleName
 //}
@@ -120,8 +115,8 @@ package payments
 //func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
 //}
 //
-//func (am AppModule) Route() sdk.Route {
-//	return sdk.Route{} //RouterKey
+//func (AppModule) Route() string {
+//	return RouterKey
 //}
 //
 //func (am AppModule) NewHandler() sdk.Handler {
@@ -132,21 +127,18 @@ package payments
 //	return QuerierRoute
 //}
 //
-//func (am AppModule) LegacyQuerierHandler(*codec.LegacyAmino) sdk.Querier {
+//func (am AppModule) NewQuerierHandler() sdk.Querier {
 //	return NewQuerier(am.keeper)
 //}
 //
-//func (am AppModule) RegisterServices(module.Configurator) {}
-//
-//func (am AppModule) InitGenesis(sdk.Context, codec.JSONMarshaler, json.RawMessage) []abci.ValidatorUpdate {
-//
-//	//var genesisState GenesisState
-//	//ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-//	//InitGenesis(ctx, am.keeper, genesisState)
+//func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
+//	var genesisState GenesisState
+//	ModuleCdc.MustUnmarshalJSON(data, &genesisState)
+//	InitGenesis(ctx, am.keeper, genesisState)
 //	return []abci.ValidatorUpdate{}
 //}
 //
-//func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
+//func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
 //	gs := ExportGenesis(ctx, am.keeper)
 //	return ModuleCdc.MustMarshalJSON(gs)
 //}

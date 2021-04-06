@@ -7,7 +7,7 @@ package cli
 //	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
 //	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 //
-//	//"github.com/cosmos/cosmos-sdk/client/context"
+//	"github.com/cosmos/cosmos-sdk/client/context"
 //	"github.com/cosmos/cosmos-sdk/codec"
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/spf13/cobra"
@@ -23,7 +23,8 @@ package cli
 //	}
 //
 //	bondsQueryCmd.AddCommand(flags.GetCommands(
-//		GetCmdBonds(storeKey, cdc),
+//		GetCmdBondsList(storeKey, cdc),
+//		GetCmdBondsListDetailed(storeKey, cdc),
 //		GetCmdBond(storeKey, cdc),
 //		GetCmdBatch(storeKey, cdc),
 //		GetCmdLastBatch(storeKey, cdc),
@@ -33,13 +34,14 @@ package cli
 //		GetCmdBuyPrice(storeKey, cdc),
 //		GetCmdSellReturn(storeKey, cdc),
 //		GetCmdSwapReturn(storeKey, cdc),
+//		GetCmdAlphaMaximums(storeKey, cdc),
 //		GetParamsRequestHandler(cdc),
 //	)...)
 //
 //	return bondsQueryCmd
 //}
 //
-//func GetCmdBonds(queryRoute string, cdc *codec.Codec) *cobra.Command {
+//func GetCmdBondsList(queryRoute string, cdc *codec.Codec) *cobra.Command {
 //	return &cobra.Command{
 //		Use:   "bonds-list",
 //		Short: "List of all bonds",
@@ -48,14 +50,37 @@ package cli
 //			cliCtx := context.NewCLIContext().WithCodec(cdc)
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/bonds",
-//					queryRoute), nil)
+//				fmt.Sprintf("custom/%s/%s", queryRoute,
+//					keeper.QueryBonds), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
 //				return nil
 //			}
 //
 //			var out types.QueryBonds
+//			cdc.MustUnmarshalJSON(res, &out)
+//			return cliCtx.PrintOutput(out)
+//		},
+//	}
+//}
+//
+//func GetCmdBondsListDetailed(queryRoute string, cdc *codec.Codec) *cobra.Command {
+//	return &cobra.Command{
+//		Use:   "bonds-list-detailed",
+//		Short: "List of all bonds with information about current state",
+//		Args:  cobra.ExactArgs(0),
+//		RunE: func(cmd *cobra.Command, args []string) error {
+//			cliCtx := context.NewCLIContext().WithCodec(cdc)
+//
+//			res, _, err := cliCtx.QueryWithData(
+//				fmt.Sprintf("custom/%s/%s", queryRoute,
+//					keeper.QueryBondsDetailed), nil)
+//			if err != nil {
+//				fmt.Printf("%s", err.Error())
+//				return nil
+//			}
+//
+//			var out types.QueryBondsDetailed
 //			cdc.MustUnmarshalJSON(res, &out)
 //			return cliCtx.PrintOutput(out)
 //		},
@@ -72,8 +97,8 @@ package cli
 //			bondDid := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/bond/%s",
-//					queryRoute, bondDid), nil)
+//				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+//					keeper.QueryBond, bondDid), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
 //				return nil
@@ -106,8 +131,8 @@ package cli
 //			bondDid := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/batch/%s",
-//					queryRoute, bondDid), nil)
+//				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+//					keeper.QueryBatch, bondDid), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
 //				return nil
@@ -140,8 +165,8 @@ package cli
 //			bondDid := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/last_batch/%s",
-//					queryRoute, bondDid), nil)
+//				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+//					keeper.QueryLastBatch, bondDid), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
 //				return nil
@@ -174,8 +199,8 @@ package cli
 //			bondDid := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/current_price/%s",
-//					queryRoute, bondDid), nil)
+//				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+//					keeper.QueryCurrentPrice, bondDid), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
 //				return nil
@@ -209,8 +234,8 @@ package cli
 //			bondDid := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/current_reserve/%s",
-//					queryRoute, bondDid), nil)
+//				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+//					keeper.QueryCurrentReserve, bondDid), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
 //				return nil
@@ -251,8 +276,8 @@ package cli
 //			}
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/custom_price/%s/%s",
-//					queryRoute, bondDid,
+//				fmt.Sprintf("custom/%s/%s/%s/%s", queryRoute,
+//					keeper.QueryCustomPrice, bondDid,
 //					bondCoinWithAmount.Amount.String()), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
@@ -294,8 +319,8 @@ package cli
 //			}
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/buy_price/%s/%s",
-//					queryRoute, bondDid,
+//				fmt.Sprintf("custom/%s/%s/%s/%s", queryRoute,
+//					keeper.QueryBuyPrice, bondDid,
 //					bondCoinWithAmount.Amount.String()), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
@@ -337,8 +362,8 @@ package cli
 //			}
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/sell_return/%s/%s",
-//					queryRoute, bondDid,
+//				fmt.Sprintf("custom/%s/%s/%s/%s", queryRoute,
+//					keeper.QuerySellReturn, bondDid,
 //					bondCoinWithAmount.Amount.String()), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
@@ -381,8 +406,8 @@ package cli
 //			}
 //
 //			res, _, err := cliCtx.QueryWithData(
-//				fmt.Sprintf("custom/%s/swap_return/%s/%s/%s/%s",
-//					queryRoute, bondDid, fromCoinWithAmount.Denom,
+//				fmt.Sprintf("custom/%s/%s/%s/%s/%s/%s", queryRoute,
+//					keeper.QuerySwapReturn, bondDid, fromCoinWithAmount.Denom,
 //					fromCoinWithAmount.Amount.String(), toToken), nil)
 //			if err != nil {
 //				fmt.Printf("%s", err.Error())
@@ -390,6 +415,41 @@ package cli
 //			}
 //
 //			var out types.QuerySwapReturn
+//			err = cdc.UnmarshalJSON(res, &out)
+//			if err != nil {
+//				return err
+//			}
+//
+//			output, err := cdc.MarshalJSONIndent(out, "", "  ")
+//			if err != nil {
+//				return err
+//			}
+//
+//			fmt.Println(string(output))
+//			return nil
+//		},
+//	}
+//}
+//
+//func GetCmdAlphaMaximums(queryRoute string, cdc *codec.Codec) *cobra.Command {
+//	return &cobra.Command{
+//		Use:     "alpha-maximums [bond-did]",
+//		Example: "alpha-maximums U7GK8p8rVhJMKhBVRCJJ8c",
+//		Short:   "Query alpha maximums for an augmented bonding curve",
+//		Args:    cobra.ExactArgs(1),
+//		RunE: func(cmd *cobra.Command, args []string) error {
+//			cliCtx := context.NewCLIContext().WithCodec(cdc)
+//			bondDid := args[0]
+//
+//			res, _, err := cliCtx.QueryWithData(
+//				fmt.Sprintf("custom/%s/%s/%s", queryRoute,
+//					keeper.QueryAlphaMaximums, bondDid), nil)
+//			if err != nil {
+//				fmt.Printf("%s", err.Error())
+//				return nil
+//			}
+//
+//			var out types.QueryAlphaMaximums
 //			err = cdc.UnmarshalJSON(res, &out)
 //			if err != nil {
 //				return err

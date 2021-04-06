@@ -59,6 +59,7 @@ MIGUEL_DID_FULL='{
   }
 }'
 
+FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 FRANCESCO_DID_FULL='{
   "did":"did:ixo:UKzkhVSHc3qEFva5EY2XHt",
   "verifyKey":"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej",
@@ -95,11 +96,11 @@ ixod_tx bonds create-bond \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" \
   --broadcast-mode block -y
 
 echo "Editing bond..."
 ixod_tx bonds edit-bond \
-  --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL" \

@@ -89,6 +89,22 @@ package keeper
 //	return nil
 //}
 //
+//func (k Keeper) DepositOutcomePayment(ctx sdk.Context, bondDid did.Did,
+//	from sdk.AccAddress, amount sdk.Coins) error {
+//
+//	// Send tokens to bonds reserve account
+//	err := k.SupplyKeeper.SendCoinsFromAccountToModule(
+//		ctx, from, types.BondsReserveAccount, amount)
+//	if err != nil {
+//		return err
+//	}
+//
+//	// Update bond outcome payment reserve
+//	k.setOutcomePaymentReserveBalances(ctx, bondDid,
+//		k.MustGetBond(ctx, bondDid).CurrentOutcomePaymentReserve.Add(amount...))
+//	return nil
+//}
+//
 //func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid did.Did,
 //	fromModule string, amount sdk.Coins) error {
 //
@@ -121,9 +137,25 @@ package keeper
 //	return nil
 //}
 //
+//func (k Keeper) MoveOutcomePaymentToReserve(ctx sdk.Context, bondDid did.Did) {
+//
+//	bond := k.MustGetBond(ctx, bondDid)
+//	newReserve := bond.CurrentReserve.Add(bond.CurrentOutcomePaymentReserve...)
+//
+//	// Update bond reserve and outcome payment reserve
+//	k.setReserveBalances(ctx, bondDid, newReserve)
+//	k.setOutcomePaymentReserveBalances(ctx, bondDid, nil)
+//}
+//
 //func (k Keeper) setReserveBalances(ctx sdk.Context, bondDid did.Did, balance sdk.Coins) {
 //	bond := k.MustGetBond(ctx, bondDid)
 //	bond.CurrentReserve = balance
+//	k.SetBond(ctx, bondDid, bond)
+//}
+//
+//func (k Keeper) setOutcomePaymentReserveBalances(ctx sdk.Context, bondDid did.Did, balance sdk.Coins) {
+//	bond := k.MustGetBond(ctx, bondDid)
+//	bond.CurrentOutcomePaymentReserve = balance
 //	k.SetBond(ctx, bondDid, bond)
 //}
 //
@@ -145,6 +177,13 @@ package keeper
 //	return supply.Sub(batch.TotalSellAmount)
 //}
 //
+//func (k Keeper) GetSupplyAdjustedForAlphaEdit(ctx sdk.Context, bondDid did.Did) sdk.Coin {
+//	bond := k.MustGetBond(ctx, bondDid)
+//	batch := k.MustGetBatch(ctx, bondDid)
+//	supply := bond.CurrentSupply
+//	return supply.Add(batch.TotalBuyAmount).Sub(batch.TotalSellAmount)
+//}
+//
 //func (k Keeper) SetCurrentSupply(ctx sdk.Context, bondDid did.Did, currentSupply sdk.Coin) {
 //	if currentSupply.IsNegative() {
 //		panic("current supply cannot be negative")
@@ -154,7 +193,7 @@ package keeper
 //	k.SetBond(ctx, bondDid, bond)
 //}
 //
-//func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState string) {
+//func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState types.BondState) {
 //	bond := k.MustGetBond(ctx, bondDid)
 //	previousState := bond.State
 //	bond.State = newState
@@ -166,8 +205,8 @@ package keeper
 //	ctx.EventManager().EmitEvent(sdk.NewEvent(
 //		types.EventTypeStateChange,
 //		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-//		sdk.NewAttribute(types.AttributeKeyOldState, previousState),
-//		sdk.NewAttribute(types.AttributeKeyNewState, newState),
+//		sdk.NewAttribute(types.AttributeKeyOldState, string(previousState)),
+//		sdk.NewAttribute(types.AttributeKeyNewState, string(newState)),
 //	))
 //}
 //

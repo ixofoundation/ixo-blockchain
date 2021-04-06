@@ -117,7 +117,10 @@ package keeper
 //	} else {
 //		matchedAmount = buyAmountDec // since buys < sells, greatest common amount is buys
 //		extraSells := batch.TotalSellAmount.Sub(batch.TotalBuyAmount)
-//		curvedValues = bond.GetReturnsForBurn(extraSells.Amount, reserveBalances) // sell returns
+//		curvedValues, err = bond.GetReturnsForBurn(extraSells.Amount, reserveBalances) // sell returns
+//		if err != nil {
+//			return nil, nil, err
+//		}
 //	}
 //
 //	// Get (actual) matched values
@@ -628,4 +631,117 @@ package keeper
 //	// Save batch and return number of cancelled orders
 //	k.SetBatch(ctx, bondDid, batch)
 //	return cancelledOrders
+//}
+//
+//func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
+//	bond := k.MustGetBond(ctx, bondDid)
+//	batch := k.MustGetBatch(ctx, bondDid)
+//	newPublicAlpha := batch.NextPublicAlpha
+//
+//	// Get supply, reserve, outcome payment
+//	S := bond.CurrentSupply.Amount.ToDec()
+//	R := bond.CurrentReserve[0].Amount.ToDec()
+//	C := bond.OutcomePayment
+//
+//	// Get current parameters
+//	paramsMap := bond.FunctionParameters.AsMap()
+//
+//	// Calculate scaled delta public alpha, to calculate new system alpha
+//	prevPublicAlpha := paramsMap["publicAlpha"]
+//	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
+//	temp, err := types.ApproxPower(
+//		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
+//		sdk.MustNewDecFromStr("2"))
+//	if err != nil {
+//		ctx.EventManager().EmitEvent(sdk.NewEvent(
+//			types.EventTypeEditAlphaFailed,
+//			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+//			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+//			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+//		))
+//		return
+//	}
+//	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
+//
+//	// Calculate new system alpha
+//	prevSystemAlpha := paramsMap["systemAlpha"]
+//	var newSystemAlpha sdk.Dec
+//	if deltaPublicAlpha.IsPositive() {
+//		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
+//		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+//		temp2 := sdk.OneDec().Sub(prevSystemAlpha)
+//		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
+//	} else {
+//		// (1 - scaled_delta_public_alpha) * (previous_alpha)
+//		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+//		temp2 := prevSystemAlpha
+//		newSystemAlpha = temp1.Mul(temp2)
+//	}
+//
+//	// Check 1 (newSystemAlpha != prevSystemAlpha)
+//	if newSystemAlpha.Equal(prevSystemAlpha) {
+//		ctx.EventManager().EmitEvent(sdk.NewEvent(
+//			types.EventTypeEditAlphaFailed,
+//			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+//			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+//			sdk.NewAttribute(types.AttributeKeyCancelReason,
+//				"resultant system alpha based on public alpha is unchanged"),
+//		))
+//		return
+//	}
+//	// Check 2 (I > C * newSystemAlpha)
+//	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
+//		ctx.EventManager().EmitEvent(sdk.NewEvent(
+//			types.EventTypeEditAlphaFailed,
+//			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+//			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+//			sdk.NewAttribute(types.AttributeKeyCancelReason,
+//				"cannot change alpha to that value due to violated restriction [1]"),
+//		))
+//		return
+//	}
+//	// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
+//	if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
+//		ctx.EventManager().EmitEvent(sdk.NewEvent(
+//			types.EventTypeEditAlphaFailed,
+//			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+//			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+//			sdk.NewAttribute(types.AttributeKeyCancelReason,
+//				"cannot change alpha to that value due to violated restriction [2]"),
+//		))
+//		return
+//	}
+//
+//	// Recalculate kappa and V0 using new alpha
+//	newKappa := types.Kappa(paramsMap["I0"], C, newSystemAlpha)
+//	newV0, err := types.Invariant(R, S, newKappa)
+//	if err != nil {
+//		ctx.EventManager().EmitEvent(sdk.NewEvent(
+//			types.EventTypeEditAlphaFailed,
+//			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+//			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+//			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+//		))
+//		return
+//	}
+//
+//	// Get batch to reset alpha
+//	batch = k.MustGetBatch(ctx, bond.BondDid)
+//	batch.NextPublicAlpha = sdk.OneDec().Neg()
+//	k.SetBatch(ctx, bond.BondDid, batch)
+//
+//	// Set new function parameters
+//	bond.FunctionParameters.ReplaceParam("kappa", newKappa)
+//	bond.FunctionParameters.ReplaceParam("V0", newV0)
+//	bond.FunctionParameters.ReplaceParam("publicAlpha", newPublicAlpha)
+//	bond.FunctionParameters.ReplaceParam("systemAlpha", newSystemAlpha)
+//	k.SetBond(ctx, bond.BondDid, bond)
+//
+//	ctx.EventManager().EmitEvent(sdk.NewEvent(
+//		types.EventTypeEditAlphaSuccess,
+//		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+//		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+//		sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
+//		sdk.NewAttribute(types.AttributeKeySystemAlpha, newSystemAlpha.String()),
+//	))
 //}

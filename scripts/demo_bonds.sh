@@ -67,6 +67,7 @@ MIGUEL_DID_FULL='{
     "encryptionPrivateKey":"4oMozrMR6BXRN93MDk6UYoqBVBLiPn9RnZhR3wQd6tBh"
   }
 }'
+FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 FRANCESCO_DID_FULL='{
   "did":"did:ixo:UKzkhVSHc3qEFva5EY2XHt",
   "verifyKey":"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej",
@@ -102,13 +103,13 @@ ixod_tx bonds create-bond \
   --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
-  --creator-did="$MIGUEL_DID_FULL"
+  --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" \
 echo "Created bond..."
 ixod q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
 ixod_tx bonds edit-bond \
-  --token=abc \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL"

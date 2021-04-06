@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	QueryParams          = "queryParams"
-	QueryPaymentTemplate = "queryPaymentTemplate"
-	QueryPaymentContract = "queryPaymentContract"
-	QuerySubscription    = "querySubscription"
+	QueryPaymentTemplate            = "queryPaymentTemplate"
+	QueryPaymentContract            = "queryPaymentContract"
+	QueryPaymentContractsByIdPrefix = "queryPaymentContractsByIdPrefix"
+	QuerySubscription               = "querySubscription"
 )
 
 func NewQuerier(k Keeper) sdk.Querier {
@@ -21,6 +21,8 @@ func NewQuerier(k Keeper) sdk.Querier {
 			return queryPaymentTemplate(ctx, path[1:], k)
 		case QueryPaymentContract:
 			return queryPaymentContract(ctx, path[1:], k)
+		case QueryPaymentContractsByIdPrefix:
+			return queryPaymentContractsByIdPrefix(ctx, path[1:], k)
 		case QuerySubscription:
 			return querySubscription(ctx, path[1:], k)
 		default:
@@ -55,6 +57,19 @@ func queryPaymentContract(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 	}
 
 	res, err := codec.MarshalJSONIndent(k.cdc, contract)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal JSON: %s", err.Error())
+	}
+
+	return res, nil
+}
+
+func queryPaymentContractsByIdPrefix(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
+	contractIdPrefix := path[0]
+
+	contracts := k.GetPaymentContractsByPrefix(ctx, contractIdPrefix)
+
+	res, err := codec.MarshalJSONIndent(k.cdc, contracts)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal JSON: %s", err.Error())
 	}

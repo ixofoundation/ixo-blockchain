@@ -4,7 +4,7 @@ package keeper
 //
 //import (
 //	"fmt"
-//	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
+//	"github.com/cosmos/cosmos-sdk/x/auth/exported"
 //
 //	sdk "github.com/cosmos/cosmos-sdk/types"
 //	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
@@ -94,7 +94,10 @@ package keeper
 //				continue // Check does not apply to augmented/swapper functions
 //			}
 //
-//			expectedReserve := bond.ReserveAtSupply(bond.CurrentSupply.Amount)
+//			expectedReserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount)
+//			if err != nil {
+//				continue // ignore error
+//			}
 //			expectedRounded := expectedReserve.Ceil().TruncateInt()
 //			actualReserve := k.GetReserveBalances(ctx, did)
 //

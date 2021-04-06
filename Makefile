@@ -172,3 +172,7 @@ proto-update-deps:
 ## insert go package option into proofs.proto file
 ## Issue link: https://github.com/confio/ics23/issues/32
 	@sed -i '4ioption go_package = "github.com/confio/ics23/go";' $(CONFIO_TYPES)/proofs.proto
+
+run_with_all_data_dev:
+	./scripts/clean_build.sh
+	./scripts/run_with_all_data_dev.sh

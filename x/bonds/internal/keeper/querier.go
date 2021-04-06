@@ -11,6 +11,7 @@ package keeper
 //
 //const (
 //	QueryBonds          = "bonds"
+//	QueryBondsDetailed  = "bonds_detailed"
 //	QueryBond           = "bond"
 //	QueryBatch          = "batch"
 //	QueryLastBatch      = "last_batch"
@@ -20,6 +21,7 @@ package keeper
 //	QueryBuyPrice       = "buy_price"
 //	QuerySellReturn     = "sell_return"
 //	QuerySwapReturn     = "swap_return"
+//	QueryAlphaMaximums  = "alpha_maximums"
 //	QueryParams         = "params"
 //)
 //
@@ -29,6 +31,8 @@ package keeper
 //		switch path[0] {
 //		case QueryBonds:
 //			return queryBonds(ctx, keeper)
+//		case QueryBondsDetailed:
+//			return queryBondsDetailed(ctx, keeper)
 //		case QueryBond:
 //			return queryBond(ctx, path[1:], keeper)
 //		case QueryBatch:
@@ -47,6 +51,8 @@ package keeper
 //			return querySellReturn(ctx, path[1:], keeper)
 //		case QuerySwapReturn:
 //			return querySwapReturn(ctx, path[1:], keeper)
+//		case QueryAlphaMaximums:
+//			return queryAlphaMaximums(ctx, path[1:], keeper)
 //		case QueryParams:
 //			return queryParams(ctx, keeper)
 //		default:
@@ -84,6 +90,33 @@ package keeper
 //		var bond types.Bond
 //		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
 //		bondsList = append(bondsList, bond.BondDid)
+//	}
+//
+//	bz, err := codec.MarshalJSONIndent(keeper.cdc, bondsList)
+//	if err != nil {
+//		panic("could not marshal result to JSON")
+//	}
+//
+//	return bz, nil
+//}
+//
+//func queryBondsDetailed(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
+//	var bondsList types.QueryBondsDetailed
+//	iterator := keeper.GetBondIterator(ctx)
+//	for ; iterator.Valid(); iterator.Next() {
+//		var bond types.Bond
+//		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+//
+//		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
+//		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
+//		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
+//
+//		bondsList = append(bondsList, types.BondDetails{
+//			BondDid:   bond.BondDid,
+//			SpotPrice: reservePrices,
+//			Supply:    bond.CurrentSupply,
+//			Reserve:   reserveBalances,
+//		})
 //	}
 //
 //	bz, err := codec.MarshalJSONIndent(keeper.cdc, bondsList)
@@ -281,7 +314,10 @@ package keeper
 //	}
 //
 //	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
-//	reserveReturns := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
+//	reserveReturns, err := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
+//	if err != nil {
+//		return nil, err
+//	}
 //	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
 //
 //	txFees := bond.GetTxFees(reserveReturns)
@@ -333,6 +369,44 @@ package keeper
 //	var result types.QuerySwapReturn
 //	result.TotalFees = sdk.Coins{txFee}
 //	result.TotalReturns = reserveReturns
+//
+//	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+//	if err != nil {
+//		panic("could not marshal result to JSON")
+//	}
+//
+//	return bz, nil
+//}
+//
+//func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+//	bondDid := path[0]
+//
+//	bond, found := keeper.GetBond(ctx, bondDid)
+//	if !found {
+//		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+//	}
+//
+//	if bond.FunctionType != types.AugmentedFunction {
+//		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
+//	}
+//
+//	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec
+//	if len(bond.CurrentReserve) == 0 {
+//		maxSystemAlphaIncrease = sdk.ZeroDec()
+//		maxSystemAlpha = sdk.ZeroDec()
+//	} else {
+//		R := bond.CurrentReserve[0].Amount // common reserve balance
+//		C := bond.OutcomePayment
+//		maxSystemAlphaIncrease = sdk.NewDecFromInt(R).QuoInt(C)
+//
+//		paramsMap := bond.FunctionParameters.AsMap()
+//		I := paramsMap["I0"]
+//		maxSystemAlpha = I.QuoInt(C)
+//	}
+//
+//	var result types.QueryAlphaMaximums
+//	result.MaxSystemAlphaIncrease = maxSystemAlphaIncrease
+//	result.MaxSystemAlpha = maxSystemAlpha
 //
 //	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
 //	if err != nil {

@@ -2,7 +2,7 @@ package cli
 //
 //import (
 //	"encoding/json"
-//	//"github.com/cosmos/cosmos-sdk/client/context"
+//	"github.com/cosmos/cosmos-sdk/client/context"
 //	"github.com/cosmos/cosmos-sdk/codec"
 //	"github.com/ixofoundation/ixo-blockchain/x/did"
 //	"github.com/ixofoundation/ixo-blockchain/x/ixo"
@@ -147,16 +147,17 @@ package cli
 //
 //func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 //	return &cobra.Command{
-//		Use:   "create-claim [tx-hash] [sender-did] [claim-id] [ixo-did]",
+//		Use:   "create-claim [tx-hash] [sender-did] [claim-id] [claim-template-id] [ixo-did]",
 //		Short: "Create a new claim on a project signed by the ixoDid of the project",
-//		Args:  cobra.ExactArgs(4),
+//		Args:  cobra.ExactArgs(5),
 //		RunE: func(cmd *cobra.Command, args []string) error {
 //			txHash := args[0]
 //			senderDid := args[1]
 //			claimId := args[2]
-//			createClaimDoc := types.NewCreateClaimDoc(claimId)
+//			claimTemplateId := args[3]
+//			createClaimDoc := types.NewCreateClaimDoc(claimId, claimTemplateId)
 //
-//			ixoDid, err := did.UnmarshalIxoDid(args[3])
+//			ixoDid, err := did.UnmarshalIxoDid(args[4])
 //			if err != nil {
 //				return err
 //			}

@@ -11,6 +11,8 @@ package types
 //const (
 //	TypeMsgCreateBond         = "create_bond"
 //	TypeMsgEditBond           = "edit_bond"
+//	TypeMsgSetNextAlpha       = "set_next_alpha"
+//	TypeMsgUpdateBondState    = "update_bond_state"
 //	TypeMsgBuy                = "buy"
 //	TypeMsgSell               = "sell"
 //	TypeMsgSwap               = "swap"
@@ -21,6 +23,7 @@ package types
 //var (
 //	_ ixo.IxoMsg = MsgCreateBond{}
 //	_ ixo.IxoMsg = MsgEditBond{}
+//	_ ixo.IxoMsg = MsgSetNextAlpha{}
 //	_ ixo.IxoMsg = MsgBuy{}
 //	_ ixo.IxoMsg = MsgSell{}
 //	_ ixo.IxoMsg = MsgSwap{}
@@ -34,6 +37,7 @@ package types
 //	FunctionType           string         `json:"function_type" yaml:"function_type"`
 //	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
 //	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
+//	ControllerDid          did.Did        `json:"controller_did" yaml:"controller_did"`
 //	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
 //	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
 //	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
@@ -43,21 +47,23 @@ package types
 //	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
 //	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 //	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
+//	AlphaBond              bool           `json:"alpha_bond" yaml:"alpha_bond"`
 //	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-//	OutcomePayment         sdk.Coins      `json:"outcome_payment" yaml:"outcome_payment"`
+//	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
 //}
 //
-//func NewMsgCreateBond(token, name, description string, creatorDid did.Did,
+//func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid did.Did,
 //	functionType string, functionParameters FunctionParams, reserveTokens []string,
 //	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 //	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-//	allowSell bool, batchBlocks sdk.Uint, outcomePayment sdk.Coins, bondDid did.Did) MsgCreateBond {
+//	allowSell, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid did.Did) MsgCreateBond {
 //	return MsgCreateBond{
 //		BondDid:                bondDid,
 //		Token:                  token,
 //		Name:                   name,
 //		Description:            description,
 //		CreatorDid:             creatorDid,
+//		ControllerDid:          controllerDid,
 //		FunctionType:           functionType,
 //		FunctionParameters:     functionParameters,
 //		ReserveTokens:          reserveTokens,
@@ -69,6 +75,7 @@ package types
 //		SanityRate:             sanityRate,
 //		SanityMarginPercentage: sanityMarginPercentage,
 //		AllowSells:             allowSell,
+//		AlphaBond:              alphaBond,
 //		BatchBlocks:            batchBlocks,
 //		OutcomePayment:         outcomePayment,
 //	}
@@ -86,6 +93,8 @@ package types
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
 //	} else if strings.TrimSpace(msg.CreatorDid) == "" {
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "creator DID")
+//	} else if strings.TrimSpace(msg.ControllerDid) == "" {
+//		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "controller DID")
 //	} else if len(msg.ReserveTokens) == 0 {
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve tokens")
 //	} else if msg.FeeAddress.Empty() {
@@ -118,8 +127,6 @@ package types
 //		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "max supply")
 //	} else if !msg.OrderQuantityLimits.IsValid() {
 //		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "order quantity limits")
-//	} else if !msg.OutcomePayment.IsValid() {
-//		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "outcome payment")
 //	}
 //
 //	// Check that max supply denom matches token denom
@@ -150,6 +157,17 @@ package types
 //		return sdkerrors.Wrap(ErrArgumentMustBePositive, "max supply")
 //	}
 //
+//	// Alpha bonds have to be augmented bonding curves
+//	if msg.AlphaBond && msg.FunctionType != AugmentedFunction {
+//		return sdkerrors.Wrap(ErrFunctionNotAvailableForFunctionType,
+//			"only augmented bonding curves can be alpha bonds")
+//	}
+//
+//	// Check that outcome payment not negative
+//	if msg.OutcomePayment.IsNegative() {
+//		return sdkerrors.Wrap(ErrArgumentMustBePositive, "outcome payment")
+//	}
+//
 //	// Note: uniqueness of reserve tokens checked when parsing
 //
 //	// Check that DIDs valid
@@ -177,7 +195,6 @@ package types
 //
 //type MsgEditBond struct {
 //	BondDid                did.Did `json:"bond_did" yaml:"bond_did"`
-//	Token                  string  `json:"token" yaml:"token"`
 //	Name                   string  `json:"name" yaml:"name"`
 //	Description            string  `json:"description" yaml:"description"`
 //	OrderQuantityLimits    string  `json:"order_quantity_limits" yaml:"order_quantity_limits"`
@@ -186,11 +203,10 @@ package types
 //	EditorDid              did.Did `json:"editor_did" yaml:"editor_did"`
 //}
 //
-//func NewMsgEditBond(token, name, description, orderQuantityLimits, sanityRate,
+//func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 //	sanityMarginPercentage string, editorDid, bondDid did.Did) MsgEditBond {
 //	return MsgEditBond{
 //		BondDid:                bondDid,
-//		Token:                  token,
 //		Name:                   name,
 //		Description:            description,
 //		OrderQuantityLimits:    orderQuantityLimits,
@@ -204,8 +220,6 @@ package types
 //	// Check if empty
 //	if strings.TrimSpace(msg.BondDid) == "" {
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
-//	} else if strings.TrimSpace(msg.Token) == "" {
-//		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "token")
 //	} else if strings.TrimSpace(msg.Name) == "" {
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 //	} else if strings.TrimSpace(msg.Description) == "" {
@@ -258,6 +272,110 @@ package types
 //func (msg MsgEditBond) Route() string { return RouterKey }
 //
 //func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
+//
+//type MsgSetNextAlpha struct {
+//	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
+//	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
+//	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
+//}
+//
+//func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid did.Did) MsgSetNextAlpha {
+//	return MsgSetNextAlpha{
+//		BondDid:   bondDid,
+//		Alpha:     alpha,
+//		EditorDid: editorDid,
+//	}
+//}
+//
+//func (msg MsgSetNextAlpha) ValidateBasic() error {
+//	// Check if empty
+//	if strings.TrimSpace(msg.BondDid) == "" {
+//		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
+//	} else if strings.TrimSpace(msg.EditorDid) == "" {
+//		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
+//	}
+//
+//	// Check that 0.0001 <= alpha <= 0.9999. Note that we cannot set public
+//	// alpha to 0 or 1, because these are edge cases which cause the system
+//	// alpha to get stuck if we try to change the value of public alpha again.
+//	minNextAlpha := sdk.MustNewDecFromStr("0.0001")
+//	maxNextAlpha := sdk.MustNewDecFromStr("0.9999")
+//	if msg.Alpha.LT(minNextAlpha) || msg.Alpha.GT(maxNextAlpha) {
+//		return sdkerrors.Wrap(ErrInvalidAlpha, "0.0001 <= alpha <= 0.9999")
+//	}
+//
+//	// Check that DIDs valid
+//	if !did.IsValidDid(msg.BondDid) {
+//		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
+//	} else if !did.IsValidDid(msg.EditorDid) {
+//		return sdkerrors.Wrap(did.ErrInvalidDid, "editor did is invalid")
+//	}
+//
+//	return nil
+//}
+//
+//func (msg MsgSetNextAlpha) GetSignBytes() []byte {
+//	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+//}
+//
+//func (msg MsgSetNextAlpha) GetSignerDid() did.Did { return msg.EditorDid }
+//func (msg MsgSetNextAlpha) GetSigners() []sdk.AccAddress {
+//	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+//}
+//
+//func (msg MsgSetNextAlpha) Route() string { return RouterKey }
+//
+//func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
+//
+//type MsgUpdateBondState struct {
+//	BondDid   did.Did   `json:"bond_did" yaml:"bond_did"`
+//	State     BondState `json:"state" yaml:"state"`
+//	EditorDid did.Did   `json:"editor_did" yaml:"editor_did"`
+//}
+//
+//func NewMsgUpdateBondState(state BondState, editorDid, bondDid did.Did) MsgUpdateBondState {
+//	return MsgUpdateBondState{
+//		BondDid:   bondDid,
+//		State:     state,
+//		EditorDid: editorDid,
+//	}
+//}
+//
+//func (msg MsgUpdateBondState) ValidateBasic() error {
+//	// Check if empty
+//	if strings.TrimSpace(msg.BondDid) == "" {
+//		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
+//	} else if strings.TrimSpace(msg.EditorDid) == "" {
+//		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
+//	}
+//
+//	// Bond status can only be updated to SETTLE or FAILED
+//	if msg.State != SettleState && msg.State != FailedState {
+//		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot transition to that state")
+//	}
+//
+//	// Check that DIDs valid
+//	if !did.IsValidDid(msg.BondDid) {
+//		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
+//	} else if !did.IsValidDid(msg.EditorDid) {
+//		return sdkerrors.Wrap(did.ErrInvalidDid, "editor did is invalid")
+//	}
+//
+//	return nil
+//}
+//
+//func (msg MsgUpdateBondState) GetSignBytes() []byte {
+//	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+//}
+//
+//func (msg MsgUpdateBondState) GetSignerDid() did.Did { return msg.EditorDid }
+//func (msg MsgUpdateBondState) GetSigners() []sdk.AccAddress {
+//	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+//}
+//
+//func (msg MsgUpdateBondState) Route() string { return RouterKey }
+//
+//func (msg MsgUpdateBondState) Type() string { return TypeMsgUpdateBondState }
 //
 //type MsgBuy struct {
 //	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`
@@ -446,12 +564,14 @@ package types
 //
 //type MsgMakeOutcomePayment struct {
 //	SenderDid did.Did `json:"sender_did" yaml:"sender_did"`
+//	Amount    sdk.Int `json:"amount" yaml:"amount"`
 //	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
 //}
 //
-//func NewMsgMakeOutcomePayment(senderDid, bondDid did.Did) MsgMakeOutcomePayment {
+//func NewMsgMakeOutcomePayment(senderDid did.Did, amount sdk.Int, bondDid did.Did) MsgMakeOutcomePayment {
 //	return MsgMakeOutcomePayment{
 //		SenderDid: senderDid,
+//		Amount:    amount,
 //		BondDid:   bondDid,
 //	}
 //}
@@ -462,6 +582,11 @@ package types
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sender DID")
 //	} else if strings.TrimSpace(msg.BondDid) == "" {
 //		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
+//	}
+//
+//	// Outcome payment amount has to be greater than 0
+//	if msg.Amount.LTE(sdk.ZeroInt()) {
+//		return sdkerrors.Wrap(ErrArgumentMustBePositive, "amount")
 //	}
 //
 //	// Check that DIDs valid

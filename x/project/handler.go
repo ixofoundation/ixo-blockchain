@@ -260,7 +260,23 @@ package project
 //
 //	// TODO: implement agent update (or remove functionality)
 //
-//	return nil, nil
+//	ctx.EventManager().EmitEvents(sdk.Events{
+//		sdk.NewEvent(
+//			types.EventTypeUpdateAgent,
+//			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+//			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+//			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+//			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.Did),
+//			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
+//			sdk.NewAttribute(types.AttributeKeyUpdatedStatus, msg.Data.Status),
+//		),
+//		sdk.NewEvent(
+//			sdk.EventTypeMessage,
+//			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+//		),
+//	})
+//
+//	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 //}
 //
 //func handleMsgCreateClaim(ctx sdk.Context, k Keeper, msg MsgCreateClaim) (*sdk.Result, error) {
@@ -282,7 +298,7 @@ package project
 //	}
 //
 //	// Create and set claim
-//	claim := types.NewClaim(msg.Data.ClaimID, msg.SenderDid)
+//	claim := types.NewClaim(msg.Data.ClaimID, msg.Data.ClaimTemplateID, msg.SenderDid)
 //	k.SetClaim(ctx, msg.ProjectDid, claim)
 //
 //	ctx.EventManager().EmitEvents(sdk.Events{
@@ -292,6 +308,7 @@ package project
 //			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 //			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 //			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimID),
+//			sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateID),
 //		),
 //		sdk.NewEvent(
 //			sdk.EventTypeMessage,

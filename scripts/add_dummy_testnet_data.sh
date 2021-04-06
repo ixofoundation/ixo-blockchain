@@ -163,22 +163,22 @@ PAYMENT_RECIPIENTS='[
 # ----------------------------------------------------------------------------------------- dids
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixod tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 2/3..."
-ixod tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
 echo "Ledgering DID 3/3..."
-ixod tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Adding KYC credentials
 echo "Adding KYC credential 1/1..."
-ixod tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixocli tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # ----------------------------------------------------------------------------------------- mints/burns
 # Mint and burn ixo tokens
 echo "Minting 1000uixo tokens to Miguel using Miguel oracle..."
-ixod tx treasury oracle-mint "$MIGUEL_DID" 1000uixo "$MIGUEL_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+ixocli tx treasury oracle-mint "$MIGUEL_DID" 1000uixo "$MIGUEL_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
 echo "Burning 1000uixo tokens from Francesco using Francesco oracle..."
-ixod tx treasury oracle-burn "$FRANCESCO_DID" 1000uixo "$FRANCESCO_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
+ixocli tx treasury oracle-burn "$FRANCESCO_DID" 1000uixo "$FRANCESCO_DID_FULL" "dummy proof" --gas-prices="$GAS_PRICES" -y
 
 echo "Sleeping for a bit..."
 sleep 7 # to make sure mints/burns were processed before proceeding
@@ -186,7 +186,7 @@ sleep 7 # to make sure mints/burns were processed before proceeding
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
 echo "Creating bond 1/4..."
-ixod tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token1 \
   --name="Test Token 1" \
   --description="Power function with non-zero fees and batch_blocks=1" \
@@ -207,7 +207,7 @@ ixod tx bonds create-bond \
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
 echo "Creating bond 2/4..."
-ixod tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token2 \
   --name="Test Token 2" \
   --description="Power function with zero fees and batch_blocks=4" \
@@ -228,7 +228,7 @@ ixod tx bonds create-bond \
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
 echo "Creating bond 3/4..."
-ixod tx bonds create-bond \
+ixocli tx bonds create-bond \
   --token=token3 \
   --name="Test Token 3" \
   --description="Swapper function between res and rez" \
@@ -245,6 +245,7 @@ ixod tx bonds create-bond \
   --allow-sells \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID" \
+  --controller-did="$FRANCESCO_DID" \
   --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
@@ -323,7 +324,7 @@ ixod tx project update-project-status "$SENDER_DID" STARTED "$PROJECT2_DID_FULL"
 # Adding a claim and evaluation
 echo "Creating a claim in project 2..."
 SENDER_DID="$SHAUN_DID"
-ixod tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT2_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Creating an evaluation in project 2..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1 implicitly (explicitly in blocksync)

@@ -41,6 +41,7 @@ The bonds module emits the following events:
 | create_bond | sanity_rate              | {sanityRate}             |
 | create_bond | sanity_margin_percentage | {sanityMarginPercentage} |
 | create_bond | allow_sells              | {allowSells}             |
+| create_bond | alpha_bond               | {alphaBond}              |
 | create_bond | signers [2]              | {signers}                |
 | create_bond | batch_blocks             | {batchBlocks}            |
 | create_bond | state                    | {state}                  |

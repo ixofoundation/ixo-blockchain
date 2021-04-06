@@ -83,14 +83,14 @@ ixod tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-price
 echo "Ledgering DID 3/3..."
 ixod tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 
-# d0 := 500.0   // initial raise (reserve)
-# p0 := 0.01    // initial price (reserve per token)
-# theta := 0.4  // initial allocation (percentage)
-# kappa := 3.0  // degrees of polynomial (i.e. x^2, x^4, x^6)
+# d0 := 200000000000  // initial raise (reserve)
+# p0 := 1000000       // initial price (reserve per token)
+# theta := 0          // initial allocation (percentage)
+# kappa := 1.1358     // degrees of polynomial (i.e. x^2, x^4, x^6)
 
-# R0 = 300              // initial reserve (1-theta)*d0
-# S0 = 50000            // initial supply
-# V0 = 416666666666.667 // invariant
+# R0 = 200000000000          // initial reserve (1-theta)*d0
+# S0 = 200000                // initial supply
+# V0 = 0.000005246623176922  // invariant
 
 echo "Creating bond..."
 ixod tx bonds create-bond \
@@ -98,62 +98,73 @@ ixod tx bonds create-bond \
   --name="A B C" \
   --description="Description about A B C" \
   --function-type=augmented_function \
-  --function-parameters="d0:500.0,p0:0.01,theta:0.4,kappa:3.0" \
+  --function-parameters="d0:200000000000,p0:1000000,theta:0,kappa:1.1358" \
   --reserve-tokens=res \
   --tx-fee-percentage=0 \
-  --exit-fee-percentage=0 \
+  --exit-fee-percentage=0.2 \
   --fee-address="$FEE" \
-  --max-supply=1000000abc \
+  --max-supply=300000abc \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
   --allow-sells \
   --batch-blocks=1 \
-  --outcome-payment="100000res" \
+  --outcome-payment="60000000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" \
   --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Created bond..."
 ixod q bonds bond "$BOND_DID"
 
-echo "Miguel buys 20000abc..."
-ixod tx bonds buy 20000abc 100000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel buys 100000abc..."
+ixod tx bonds buy 100000abc 100000000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixod q auth account "$MIGUEL_ADDR"
 
-echo "Francesco buys 20000abc..."
-ixod tx bonds buy 20000abc 100000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Francesco buys 100000abc..."
+ixod tx bonds buy 100000abc 100000000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixod q auth account "$FRANCESCO_ADDR"
 
-echo "Shaun cannot buy 10001abc..."
-ixod tx bonds buy 10001abc 100000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun cannot sell anything..."
-ixod tx bonds sell 10000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun can buy 10000abc..."
-ixod tx bonds buy 10000abc 100000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun's account..."
-ixod q auth account "$SHAUN_ADDR"
-
-echo "Bond state is now open..."  # since 50000 (S0) reached
+echo "Bond state is now open..."  # since 200000 (S0) reached
 ixod q bonds bond "$BOND_DID"
 
-echo "Miguel sells 20000abc..."
-ixod tx bonds sell 20000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is approx 1135800..."
+ixod q bonds current-price "$BOND_DID"
+
+echo "Miguel buys 100000abc..."
+ixod tx bonds buy 100000abc 200000000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Miguel's account..."
 ixod q auth account "$MIGUEL_ADDR"
 
-echo "Francesco makes outcome payment..."
-ixod tx bonds make-outcome-payment "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Current price is approx 1200000..."
+ixod q bonds current-price "$BOND_DID"
+
+echo "Max supply reached..."
+ixod tx bonds buy 1abc 2000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+
+echo "Francesco makes outcome payment of 60000000000..."
+ixod tx bonds make-outcome-payment "$BOND_DID" "60000000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixod q auth account "$FRANCESCO_ADDR"
+echo "Bond outcome payment reserve is now 60000000000..."
+ixod q bonds bond "$BOND_DID"
+
+echo "Francesco updates the bond state to SETTLE"
+ixod tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
+echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
+ixod q bonds bond "$BOND_DID"
+
+echo "Miguel withdraws share..."
+ixod tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+echo "Miguel's account..."
+ixod q auth account "$MIGUEL_ADDR"
 
 echo "Francesco withdraws share..."
 ixod tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
 echo "Francesco's account..."
 ixod q auth account "$FRANCESCO_ADDR"
 
-echo "Shaun withdraws share..."
-ixod tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
-echo "Shaun's account..."
-ixod q auth account "$SHAUN_ADDR"
+echo "Bond reserve is now empty and supply is 0..."
+ixod q bonds bond "$BOND_DID"

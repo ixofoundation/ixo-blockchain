@@ -2,9 +2,7 @@ package cli
 //
 //import (
 //	"fmt"
-//	"github.com/cosmos/cosmos-sdk/client"
-//
-//	//"github.com/cosmos/cosmos-sdk/client/context"
+//	"github.com/cosmos/cosmos-sdk/client/context"
 //	"github.com/cosmos/cosmos-sdk/codec"
 //	"github.com/spf13/cobra"
 //
@@ -12,14 +10,13 @@ package cli
 //	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 //)
 //
-//func GetCmdPaymentTemplate(cdc *codec.LegacyAmino) *cobra.Command {
+//func GetCmdPaymentTemplate(cdc *codec.Codec) *cobra.Command {
 //	return &cobra.Command{
 //		Use:   "payment-template [payment-template-id]",
 //		Short: "Query info of a payment template",
 //		Args:  cobra.ExactArgs(1),
 //		RunE: func(cmd *cobra.Command, args []string) error {
-//			//cliCtx := context.NewCLIContext().WithCodec(cdc)
-//			cliCtx := client.GetClientContextFromCmd(cmd)
+//			cliCtx := context.NewCLIContext().WithCodec(cdc)
 //			templateId := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
@@ -47,14 +44,13 @@ package cli
 //	}
 //}
 //
-//func GetCmdPaymentContract(cdc *codec.LegacyAmino) *cobra.Command {
+//func GetCmdPaymentContract(cdc *codec.Codec) *cobra.Command {
 //	return &cobra.Command{
 //		Use:   "payment-contract [payment-contract-id]",
 //		Short: "Query info of a payment contract",
 //		Args:  cobra.ExactArgs(1),
 //		RunE: func(cmd *cobra.Command, args []string) error {
-//			//cliCtx := context.NewCLIContext().WithCodec(cdc)
-//			cliCtx := client.GetClientContextFromCmd(cmd)
+//			cliCtx := context.NewCLIContext().WithCodec(cdc)
 //			contractId := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
@@ -82,14 +78,47 @@ package cli
 //	}
 //}
 //
-//func GetCmdSubscription(cdc *codec.LegacyAmino) *cobra.Command {
+//func GetCmdPaymentContractsByIdPrefix(cdc *codec.Codec) *cobra.Command {
+//	return &cobra.Command{
+//		Use:   "payment-contracts-by-id-prefix [payment-contracts-id-prefix]",
+//		Short: "Query info of list of payment contracts by ID prefix",
+//		Args:  cobra.ExactArgs(1),
+//		RunE: func(cmd *cobra.Command, args []string) error {
+//			cliCtx := context.NewCLIContext().WithCodec(cdc)
+//			contractIdPrefix := args[0]
+//
+//			res, _, err := cliCtx.QueryWithData(
+//				fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+//					keeper.QueryPaymentContractsByIdPrefix, contractIdPrefix), nil)
+//			if err != nil {
+//				fmt.Printf("%s", err.Error())
+//				return nil
+//			}
+//
+//			var out []types.PaymentContract
+//			err = cdc.UnmarshalJSON(res, &out)
+//			if err != nil {
+//				return err
+//			}
+//
+//			output, err := cdc.MarshalJSONIndent(out, "", "  ")
+//			if err != nil {
+//				return err
+//			}
+//
+//			fmt.Println(string(output))
+//			return nil
+//		},
+//	}
+//}
+//
+//func GetCmdSubscription(cdc *codec.Codec) *cobra.Command {
 //	return &cobra.Command{
 //		Use:   "subscription [subscription-id]",
 //		Short: "Query info of a subscription",
 //		Args:  cobra.ExactArgs(1),
 //		RunE: func(cmd *cobra.Command, args []string) error {
-//			//cliCtx := context.NewCLIContext().WithCodec(cdc)
-//			cliCtx := client.GetClientContextFromCmd(cmd)
+//			cliCtx := context.NewCLIContext().WithCodec(cdc)
 //			subscriptionId := args[0]
 //
 //			res, _, err := cliCtx.QueryWithData(
