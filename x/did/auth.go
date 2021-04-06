@@ -9,7 +9,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+
 )
 
 var (
@@ -23,8 +24,8 @@ func init() {
 	simEd25519Pubkey.Key = bz
 }
 
-func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
+func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixotypes.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixotypes.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
 
 		signerDidDoc, err := keeper.GetDidDoc(ctx, msg.GetSignerDid())
 		if err != nil {
@@ -37,8 +38,8 @@ func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
 	}
 }
 
-func NewModulePubKeyGetter(keeper keeper.Keeper) ixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg ixo.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
+func NewModulePubKeyGetter(keeper keeper.Keeper) ixotypes.PubKeyGetter {
+	return func(ctx sdk.Context, msg ixotypes.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
 
 		// MsgAddDid: pubkey from msg since user DID does not exist yet
 		// Other: signer DID exists, so get pubkey from did module

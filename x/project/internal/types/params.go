@@ -5,8 +5,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	//"github.com/cosmos/cosmos-sdk/x/params" //TODO uncomment
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 )
+
+const (
+	IxoNativeToken = "uixo"
+)
+
 //
 //// Parameter store keys
 //var (
@@ -44,7 +48,7 @@ type Params struct {
 func DefaultParams() Params {
 	defaultIxoDid := did.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
 	defaultMinInitFunding := sdk.NewCoins(sdk.NewCoin(
-		ixo.IxoNativeToken, sdk.OneInt()))
+		IxoNativeToken, sdk.OneInt()))
 	tenPercentFee := sdk.NewDec(10)
 
 	return Params{

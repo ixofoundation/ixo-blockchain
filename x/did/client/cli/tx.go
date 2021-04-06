@@ -3,7 +3,7 @@ package cli
 import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"time"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
@@ -31,7 +31,7 @@ func NewCmdAddDidDoc() *cobra.Command {
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
-			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 
@@ -67,7 +67,7 @@ func NewCmdAddCredential() *cobra.Command {
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
-			return ixo.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 

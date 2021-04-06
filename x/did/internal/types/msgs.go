@@ -5,7 +5,7 @@ import (
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -16,8 +16,8 @@ const (
 )
 
 var (
-	_ ixo.IxoMsg = &MsgAddDid{}
-	_ ixo.IxoMsg = &MsgAddCredential{}
+	_ ixotypes.IxoMsg = &MsgAddDid{}
+	_ ixotypes.IxoMsg = &MsgAddCredential{}
 )
 
 func NewMsgAddDid(did string, publicKey string) *MsgAddDid {

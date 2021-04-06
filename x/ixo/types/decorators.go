@@ -7,13 +7,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	//"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	//bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types" //"github.com/tendermint/tendermint/crypto"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 )
 
 type SetPubKeyDecorator struct {

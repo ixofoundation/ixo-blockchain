@@ -92,7 +92,7 @@ import (
 	//TODO uncomment
 	//"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	//"github.com/ixofoundation/ixo-blockchain/x/payments"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
 	//"github.com/ixofoundation/ixo-blockchain/x/treasury"
@@ -761,8 +761,8 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 	//defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
 	//	app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
 	//	defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	didAnteHandler := ixo.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
+	didAnteHandler := ixotypes.NewDefaultAnteHandler(
+		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
 		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 	//TODO uncomment ixo module
 	//projectAnteHandler := ixo.NewDefaultAnteHandler(
@@ -783,7 +783,7 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
 
 	cosmosAnteHandler := authante.NewAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer, encodingConfig.TxConfig.SignModeHandler())
+		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer, encodingConfig.TxConfig.SignModeHandler())
 			//authante.NewAnteHandler(
 		//app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer)
 
