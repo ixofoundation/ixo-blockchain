@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

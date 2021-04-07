@@ -7,10 +7,9 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-
 )
 
 var (

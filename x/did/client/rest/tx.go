@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 )
 
 func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
@@ -46,8 +46,8 @@ func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc 
 }
 
 type addCredentialReq struct {
-	BaseReq       rest.BaseReq           `json:"base_req" yaml:"base_req"`
-	Did           exported.Did           `json:"did" yaml:"did"`
+	BaseReq       rest.BaseReq        `json:"base_req" yaml:"base_req"`
+	Did           exported.Did        `json:"did" yaml:"did"`
 	DidCredential types.DidCredential `json:"credential" yaml:"credential"`
 }
 

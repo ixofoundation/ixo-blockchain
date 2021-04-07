@@ -46,8 +46,8 @@ func NewBaseDidDoc(did exported.Did, pubKey string) BaseDidDoc {
 	}
 }
 
-func (dd BaseDidDoc) GetDid() exported.Did                     { return dd.Did }
-func (dd BaseDidDoc) GetPubKey() string                        { return dd.PubKey }
+func (dd BaseDidDoc) GetDid() exported.Did { return dd.Did }
+func (dd BaseDidDoc) GetPubKey() string    { return dd.PubKey }
 func (dd BaseDidDoc) GetCredentials() []DidCredential {
 	lstToRet := make([]DidCredential, 0)
 	credentials := dd.Credentials

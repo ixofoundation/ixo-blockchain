@@ -6,7 +6,7 @@ import (
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"time"
 
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/spf13/cobra"
 )
 
@@ -22,10 +22,10 @@ func NewCmdAddDidDoc() *cobra.Command {
 			}
 
 			cliCtx, err := client.GetClientTxContext(cmd)
-			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
 			if err != nil {
 				return err
 			}
+			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 			if err := msg.ValidateBasic() ; err != nil {

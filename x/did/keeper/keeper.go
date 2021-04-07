@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	//"github.com/golang/protobuf/ptypes/any"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	//codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 

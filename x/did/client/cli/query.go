@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

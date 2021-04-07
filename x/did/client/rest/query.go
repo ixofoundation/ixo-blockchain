@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/gorilla/mux"
 
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 )
 
 func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {

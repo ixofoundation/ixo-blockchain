@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

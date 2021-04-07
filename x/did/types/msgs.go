@@ -84,7 +84,7 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 	}
 }
 
-func (msg MsgAddCredential) Type() string  { return TypeMsgAddCredential }
+func (msg MsgAddCredential) Type() string { return TypeMsgAddCredential }
 
 func (msg MsgAddCredential) Route() string { return RouterKey }
 
