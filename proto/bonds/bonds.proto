@@ -1,0 +1,116 @@
+syntax = "proto3";
+package bonds;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types";
+
+message FunctionParam {
+  string param = 1;
+  string value = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+}
+
+message QueryBonds {
+  repeated string bonds = 1;
+}
+
+message BondsDetailed {
+  string bond_did                           = 1;
+  string spot_price                         = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  cosmos.base.v1beta1.Coin supply           = 3;
+  repeated cosmos.base.v1beta1.Coin reserve = 4;
+}
+
+message QueryBondsDetailed {
+  repeated BondsDetailed bonds_detailed = 1;
+}
+
+message Bond {
+  string token                                                      = 1;
+  string name                                                       = 2;
+  string description                                                = 3;
+  string creator_did                                                = 4;
+  string controller_did                                             = 5;
+  string function_type                                              = 6;
+  repeated FunctionParam function_parameters                        = 7;
+  repeated string reserve_tokens                                    = 8;
+  string tx_fee_percentage                                          = 9 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string exit_fee_percentage                                        = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string fee_address                                                = 11;
+  cosmos.base.v1beta1.Coin max_supply                               = 12;
+  repeated cosmos.base.v1beta1.Coin order_quantity_limits           = 13;
+  string sanity_rate                                                = 14 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string sanity_margin_percentage                                   = 15 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  cosmos.base.v1beta1.Coin current_supply                           = 16;
+  repeated cosmos.base.v1beta1.Coin current_reserve                 = 17;
+  repeated cosmos.base.v1beta1.Coin current_outcome_payment_reserve = 18;
+  bool allow_sells                                                  = 19;
+  bool alpha_bond                                                   = 20;
+  uint64 batch_blocks                                               = 21;
+  int64 outcome_payment                                             = 22;
+  string state                                                      = 23;
+  string bond_did                                                   = 24;
+}
+
+message BaseOrder {
+  string account_did              = 1;
+  cosmos.base.v1beta1.Coin amount = 2;
+  bool cancelled                  = 3;
+  string cancel_reason            = 4;
+}
+
+message BuyOrder {
+  BaseOrder base_order                         = 1;
+  repeated cosmos.base.v1beta1.Coin max_prices = 2;
+}
+
+message SellOrder {
+  BaseOrder base_order = 1;
+}
+
+message SwapOrder {
+  BaseOrder base_order = 1;
+  string to_token      = 2;
+}
+
+message Batch {
+  string bond_did = 1;
+  uint64 blocks_remaining = 2;
+  string next_public_alpha  = 3  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  cosmos.base.v1beta1.Coin total_buy_amount = 4;
+  cosmos.base.v1beta1.Coin total_sell_amount = 5;
+  repeated cosmos.base.v1beta1.Coin buy_prices = 6;
+  repeated cosmos.base.v1beta1.Coin sell_prices = 7;
+  repeated BuyOrder buys = 8;
+  repeated SellOrder sells = 9;
+  repeated SwapOrder swap = 10;
+}
+
+message QueryBuyPrice {
+  cosmos.base.v1beta1.Coin adjusted_supply       = 1;
+  repeated cosmos.base.v1beta1.Coin prices       = 2;
+  repeated cosmos.base.v1beta1.Coin tx_fees      = 3;
+  repeated cosmos.base.v1beta1.Coin total_prices = 4;
+  repeated cosmos.base.v1beta1.Coin total_fees   = 5;
+}
+
+message QuerySellReturn {
+  cosmos.base.v1beta1.Coin adjusted_supply = 1;
+  repeated cosmos.base.v1beta1.Coin returns = 2;
+  repeated cosmos.base.v1beta1.Coin tx_fees = 3;
+  repeated cosmos.base.v1beta1.Coin exit_fees = 4;
+  repeated cosmos.base.v1beta1.Coin total_returns = 5;
+  repeated cosmos.base.v1beta1.Coin total_fees = 6;
+}
+
+message QuerySwapReturn {
+  cosmos.base.v1beta1.Coin total_returns = 1;
+  repeated cosmos.base.v1beta1.Coin total_fees = 2;
+}
+
+message QueryAlphaMaximums {
+  string max_system_alpha_increase = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string max_system_alpha          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+}
+
+message Params {
+  repeated string reserved_bond_tokens = 1;
+}

@@ -1,0 +1,171 @@
+syntax = "proto3";
+package bonds;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "bonds/bonds.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types";
+
+// To get a list of all module queries, go to the module's keeper/querier.go
+// and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest/query.go
+service Query {
+  rpc Bonds(QueryBondsRequest) returns (QueryBondsResponse){
+    option (google.api.http).get = "/bonds"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+  }
+
+  rpc BondsDetailed(QueryBondsDetailedRequest) returns (QueryBondsDetailedResponse) {
+    option (google.api.http).get = "/bonds_detailed";
+  }
+
+  rpc Bond(QueryBondRequest) returns (QueryBondResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}";
+  }
+
+  rpc Batch(QueryBatchRequest) returns (QueryBatchResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/batch";
+  }
+
+  rpc LastBatch(QueryLastBatchRequest) returns (QueryLastBatchResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/last_batch";
+  }
+
+  rpc CurrentPrice(QueryCurrentPriceRequest) returns (QueryCurrentPriceResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/current_price";
+  }
+
+  rpc CurrentReserve(QueryCurrentReserveRequest) returns (QueryCurrentReserveResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/current_reserve";
+  }
+
+  rpc CustomPrice (QueryCustomPriceRequest) returns (QueryCustomPriceResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/price/{bond_amount}";
+  }
+
+  rpc BuyPrice(QueryBuyPriceRequest) returns (QueryBuyPriceResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/buy_price/{bond_amount}}";
+  }
+
+  rpc SellReturn(QuerySellReturnRequest) returns (QuerySellReturnResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}}/sell_return/{bond_amount}";
+  }
+
+  rpc SwapReturn(QuerySwapReturnRequest) returns (QuerySwapReturnResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}";
+  }
+
+  rpc AlphaMaximums(QueryAlphaMaximumsRequest) returns (QueryAlphaMaximumsResponse) {
+    option (google.api.http).get = "/bonds/{bond_did}/alpha_maximums";
+  }
+
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/bonds/params";
+  }
+}
+
+// Request/response types from old x/bonds/client/cli/query.go and
+// x/bonds/client/rest/query.go
+message QueryBondsRequest {}
+
+message QueryBondsResponse {
+  QueryBonds bonds = 1;
+}
+
+message QueryBondsDetailedRequest {}
+
+message QueryBondsDetailedResponse {
+  QueryBondsDetailed bonds_detailed = 1;
+}
+
+message QueryBondRequest {
+  string bond_did = 1;
+}
+
+message QueryBondResponse {
+  Bond bond = 1;
+}
+
+message QueryBatchRequest{
+  string bond_did = 1;
+}
+
+message QueryBatchResponse {
+  Batch batch = 1;
+}
+
+message QueryLastBatchRequest{
+  string bond_did = 1;
+}
+
+message QueryLastBatchResponse {
+  Batch batch = 1;
+}
+
+message QueryCurrentPriceRequest {
+  string bond_did = 1;
+}
+
+message QueryCurrentPriceResponse {
+  repeated cosmos.base.v1beta1.DecCoin dec_coins = 1;
+}
+
+message QueryCurrentReserveRequest {
+  string bond_did = 1;
+}
+
+message QueryCurrentReserveResponse {
+  repeated cosmos.base.v1beta1.Coin coins = 1;
+}
+
+message QueryCustomPriceRequest {
+  string bond_did    = 1;
+  string bond_amount = 2;
+}
+
+message QueryCustomPriceResponse {
+  repeated cosmos.base.v1beta1.DecCoin dec_coins = 1;
+}
+
+message QueryBuyPriceRequest {
+  string bond_did    = 1;
+  string bond_amount = 2;
+}
+
+// TODO (Stef) Instead of using QueryBuyPrice, QuerySellReturn etc we can write the types directly in the Response msg
+// TODO but this will not allow us to use clientCtx.JSONMarshaler.UnmarshalJSON() in query.go
+message QueryBuyPriceResponse {
+  QueryBuyPrice query_buy_price = 1;
+}
+
+message QuerySellReturnRequest {
+  string bond_did    = 1;
+  string bond_amount = 2;
+}
+
+message QuerySellReturnResponse {
+  QuerySellReturn query_sell_return = 1;
+}
+
+message QuerySwapReturnRequest {
+  string bond_did               = 1;
+  string from_token_with_amount = 2;
+  string to_token               = 3;
+}
+
+message QuerySwapReturnResponse {
+  QuerySwapReturn query_swap_return = 1;
+}
+
+message QueryAlphaMaximumsRequest {
+  string bond_did = 1;
+}
+
+message QueryAlphaMaximumsResponse {
+  QueryAlphaMaximums query_alpha_maximums = 1;
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1;
+}

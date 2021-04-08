@@ -1,0 +1,115 @@
+syntax = "proto3";
+package bonds;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "bonds/bonds.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types";
+
+// To get a list of all module messages, go to your module's handler.go and
+// check all cases in NewHandler().
+service Msg {
+  rpc CreateBond(MsgCreateBond) returns (MsgCreateBondResponse);
+  rpc EditBond(MsgEditBond) returns (MsgEditBondResponse);
+  rpc SetNextAlpha(MsgSetNextAlpha) returns (MsgSetNextAlphaResponse);
+  rpc UpdateBondState(MsgUpdateBondState) returns (MsgUpdateBondStateResponse);
+  rpc Buy(MsgBuy) returns (MsgBuyResponse);
+  rpc Sell(MsgSell) returns (MsgSellResponse);
+  rpc Swap(MsgSwap) returns (MsgSwapResponse);
+  rpc MakeOutcomePayment(MsgMakeOutcomePayment) returns (MsgMakeOutcomePaymentResponse);
+  rpc WithdrawShare(MsgWithdrawShare) returns (MsgWithdrawShareResponse);
+}
+
+message MsgCreateBond {
+  string bond_did                                         = 1;
+  string token                                            = 2;
+  string name                                             = 3;
+  string description                                      = 4;
+  string function_type                                    = 5;
+  repeated FunctionParam function_parameters              = 6;
+  string creator_did                                      = 7;
+  repeated string controller_did                          = 8;
+  repeated string reserved_tokens                         = 9;
+  string tx_fee_percentage                                = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string exit_fee_percentage                              = 11 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string fee_address                                      = 12;
+  cosmos.base.v1beta1.Coin max_supply                     = 13;
+  repeated cosmos.base.v1beta1.Coin order_quantity_limits = 14;
+  string sanity_rate                                      = 15 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string sanity_margin_percentage                         = 16 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  bool allow_sells                                        = 17;
+  bool alpha_bond                                         = 18;
+  uint64 batch_blocks                                     = 19;
+  int64 outcome_payment                                   = 20;
+}
+
+message MsgCreateBondResponse {}
+
+message MsgEditBond {
+  string bond_did                 = 1;
+  string name                     = 2;
+  string description              = 3;
+  string order_quantity_limits    = 4;
+  string sanity_rate              = 5;
+  string sanity_margin_percentage = 6;
+  string editor_did               = 7;
+}
+
+message MsgEditBondResponse {}
+
+message MsgSetNextAlpha {
+  string bond_did   = 1;
+  string alpha      = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string editor_did = 3;
+}
+
+message MsgSetNextAlphaResponse {}
+
+message MsgUpdateBondState {
+  string bond_did      = 1;
+  string bond_state    = 2; // or instead of string, BondState enum?
+  string editor_did    = 3;
+}
+
+message MsgUpdateBondStateResponse {}
+
+message MsgBuy {
+  string buyer_did                             = 1;
+  cosmos.base.v1beta1.Coin amount              = 2;
+  repeated cosmos.base.v1beta1.Coin max_prices = 3;
+  string bond_did                              = 4;
+}
+
+message MsgBuyResponse {}
+
+message MsgSell {
+  string seller_did               = 1;
+  cosmos.base.v1beta1.Coin amount = 2;
+  string bond_did                 = 3;
+}
+
+message MsgSellResponse {}
+
+message MsgSwap {
+  string swapper_did            = 1;
+  string bond_did               = 2;
+  cosmos.base.v1beta1.Coin from = 3;
+  string to_token               = 4;
+}
+
+message MsgSwapResponse {}
+
+message MsgMakeOutcomePayment {
+  string sender_did = 1;
+  int64 amount      = 2;
+  string bond_did   = 3;
+}
+
+message MsgMakeOutcomePaymentResponse {}
+
+message MsgWithdrawShare {
+  string recipient_did = 1;
+  string bond_did      = 2;
+}
+
+message MsgWithdrawShareResponse {}

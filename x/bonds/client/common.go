@@ -61,7 +61,7 @@ func ParseFunctionParams(fnParamsStr string) (fnParams types.FunctionParams, err
 }
 
 func ParseTwoPartCoin(amount, denom string) (coin sdk.Coin, err error) {
-	coin, err = sdk.ParseCoin(amount + denom)
+	coin, err = sdk.ParseCoinNormalized(amount + denom)
 	if err != nil {
 		return sdk.Coin{}, err
 	} else if denom != coin.Denom {
