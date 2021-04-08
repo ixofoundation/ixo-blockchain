@@ -3,7 +3,7 @@ package did;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
 // message Did {
 //  option (gogoproto.goproto_stringer) = false;

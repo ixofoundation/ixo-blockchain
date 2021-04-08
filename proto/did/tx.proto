@@ -5,7 +5,7 @@ package did;
 import "gogoproto/gogo.proto";
 import "did/did.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/internal/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
 // To get a list of all module messages, go to your module's handler.go and
 // check all cases in NewHandler().
