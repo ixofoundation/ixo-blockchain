@@ -3,6 +3,7 @@ package bonds;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "bonds/bonds.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types";
@@ -43,11 +44,11 @@ service Query {
   }
 
   rpc BuyPrice(QueryBuyPriceRequest) returns (QueryBuyPriceResponse) {
-    option (google.api.http).get = "/bonds/{bond_did}/buy_price/{bond_amount}}";
+    option (google.api.http).get = "/bonds/{bond_did}/buy_price/{bond_amount}";
   }
 
   rpc SellReturn(QuerySellReturnRequest) returns (QuerySellReturnResponse) {
-    option (google.api.http).get = "/bonds/{bond_did}}/sell_return/{bond_amount}";
+    option (google.api.http).get = "/bonds/{bond_did}/sell_return/{bond_amount}";
   }
 
   rpc SwapReturn(QuerySwapReturnRequest) returns (QuerySwapReturnResponse) {

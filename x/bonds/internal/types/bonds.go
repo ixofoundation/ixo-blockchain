@@ -77,10 +77,10 @@ var (
 	}
 )
 
-type FunctionParam struct {
-	Param string  `json:"param" yaml:"param"`
-	Value sdk.Dec `json:"value" yaml:"value"`
-}
+//type FunctionParam struct {
+//	Param string  `json:"param" yaml:"param"`
+//	Value sdk.Dec `json:"value" yaml:"value"`
+//}
 
 func NewFunctionParam(param string, value sdk.Dec) FunctionParam {
 	return FunctionParam{
