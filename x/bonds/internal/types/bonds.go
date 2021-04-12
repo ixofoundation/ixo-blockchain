@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"sort"
 )
 
@@ -220,32 +219,32 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	return nil
 }
 
-type Bond struct {
-	Token                        string         `json:"token" yaml:"token"`
-	Name                         string         `json:"name" yaml:"name"`
-	Description                  string         `json:"description" yaml:"description"`
-	CreatorDid                   exported.Did   `json:"creator_did" yaml:"creator_did"`
-	ControllerDid                exported.Did   `json:"controller_did" yaml:"controller_did"`
-	FunctionType                 string         `json:"function_type" yaml:"function_type"`
-	FunctionParameters           FunctionParams `json:"function_parameters" yaml:"function_parameters"`
-	ReserveTokens                []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
-	TxFeePercentage              sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-	ExitFeePercentage            sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-	FeeAddress                   sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
-	MaxSupply                    sdk.Coin       `json:"max_supply" yaml:"max_supply"`
-	OrderQuantityLimits          sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate                   sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage       sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	CurrentSupply                sdk.Coin       `json:"current_supply" yaml:"current_supply"`
-	CurrentReserve         		 sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
-	CurrentOutcomePaymentReserve sdk.Coins      `json:"current_outcome_payment_reserve" yaml:"current_outcome_payment_reserve"`
-	AllowSells                   bool           `json:"allow_sells" yaml:"allow_sells"`
-	AlphaBond                    bool           `json:"alpha_bond" yaml:"alpha_bond"`
-	BatchBlocks                  sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-	OutcomePayment               sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
-	State                        BondState      `json:"state" yaml:"state"`
-	BondDid                      exported.Did   `json:"bond_did" yaml:"bond_did"`
-}
+//type Bond struct {
+//	Token                        string         `json:"token" yaml:"token"`
+//	Name                         string         `json:"name" yaml:"name"`
+//	Description                  string         `json:"description" yaml:"description"`
+//	CreatorDid                   exported.Did   `json:"creator_did" yaml:"creator_did"`
+//	ControllerDid                exported.Did   `json:"controller_did" yaml:"controller_did"`
+//	FunctionType                 string         `json:"function_type" yaml:"function_type"`
+//	FunctionParameters           FunctionParams `json:"function_parameters" yaml:"function_parameters"`
+//	ReserveTokens                []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
+//	TxFeePercentage              sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
+//	ExitFeePercentage            sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
+//	FeeAddress                   sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
+//	MaxSupply                    sdk.Coin       `json:"max_supply" yaml:"max_supply"`
+//	OrderQuantityLimits          sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+//	SanityRate                   sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
+//	SanityMarginPercentage       sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+//	CurrentSupply                sdk.Coin       `json:"current_supply" yaml:"current_supply"`
+//	CurrentReserve         		 sdk.Coins      `json:"current_reserve" yaml:"current_reserve"`
+//	CurrentOutcomePaymentReserve sdk.Coins      `json:"current_outcome_payment_reserve" yaml:"current_outcome_payment_reserve"`
+//	AllowSells                   bool           `json:"allow_sells" yaml:"allow_sells"`
+//	AlphaBond                    bool           `json:"alpha_bond" yaml:"alpha_bond"`
+//	BatchBlocks                  sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
+//	OutcomePayment               sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
+//	State                        BondState      `json:"state" yaml:"state"`
+//	BondDid                      exported.Did   `json:"bond_did" yaml:"bond_did"`
+//}
 
 func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,

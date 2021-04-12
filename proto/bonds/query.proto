@@ -107,7 +107,7 @@ message QueryCurrentPriceRequest {
 }
 
 message QueryCurrentPriceResponse {
-  repeated cosmos.base.v1beta1.DecCoin dec_coins = 1;
+  repeated cosmos.base.v1beta1.DecCoin buy_prices  = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"];
 }
 
 message QueryCurrentReserveRequest {
@@ -115,7 +115,7 @@ message QueryCurrentReserveRequest {
 }
 
 message QueryCurrentReserveResponse {
-  repeated cosmos.base.v1beta1.Coin coins = 1;
+  repeated cosmos.base.v1beta1.Coin coins = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryCustomPriceRequest {
@@ -124,7 +124,7 @@ message QueryCustomPriceRequest {
 }
 
 message QueryCustomPriceResponse {
-  repeated cosmos.base.v1beta1.DecCoin dec_coins = 1;
+  repeated cosmos.base.v1beta1.DecCoin dec_coins = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"];
 }
 
 message QueryBuyPriceRequest {

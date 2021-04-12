@@ -42,7 +42,7 @@ func GetQueryCmd(storeKey string) *cobra.Command {
 }
 
 func GetCmdBondsList(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "bonds-list",
 		Short: "List of all bonds",
 		Args:  cobra.ExactArgs(0),
@@ -68,13 +68,16 @@ func GetCmdBondsList(queryRoute string) *cobra.Command {
 			// clientCtx.LegacyAmino.MustUnmarshalJSON(res, &out)
 			// return clientCtx.PrintObjectLegacy(out)
 			clientCtx.JSONMarshaler.MustUnmarshalJSON(res, &out)
-			return clientCtx.PrintProto(out)
+			return clientCtx.PrintProto(&out)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdBondsListDetailed(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "bonds-list-detailed",
 		Short: "List of all bonds with information about current state",
 		Args:  cobra.ExactArgs(0),
@@ -96,13 +99,16 @@ func GetCmdBondsListDetailed(queryRoute string) *cobra.Command {
 			var out types.QueryBondsDetailed
 			//cdc.MustUnmarshalJSON(res, &out)
 			clientCtx.JSONMarshaler.MustUnmarshalJSON(res, &out)
-			return clientCtx.PrintProto(out)
+			return clientCtx.PrintProto(&out)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdBond(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "bond [bond-did]",
 		Short: "Query info of a bond",
 		Args:  cobra.ExactArgs(1),
@@ -139,10 +145,13 @@ func GetCmdBond(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdBatch(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "batch [bond-did]",
 		Short: "Query info of a bond's current batch",
 		Args:  cobra.ExactArgs(1),
@@ -179,6 +188,9 @@ func GetCmdBatch(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdLastBatch(queryRoute string) *cobra.Command {
@@ -222,7 +234,7 @@ func GetCmdLastBatch(queryRoute string) *cobra.Command {
 }
 
 func GetCmdCurrentPrice(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "current-price [bond-did]",
 		Short: "Query current price(s) of the bond",
 		Args:  cobra.ExactArgs(1),
@@ -243,8 +255,9 @@ func GetCmdCurrentPrice(queryRoute string) *cobra.Command {
 			}
 
 			var out sdk.DecCoins
+			// TODO (Stef) Replace LegacyAmino
 			//err = cdc.UnmarshalJSON(res, &out)
-			err = clientCtx.JSONMarshaler.UnmarshalJSON(res, &out)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &out) //supposed to use: clientCtx.JSONMarshaler.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err
 			}
@@ -259,10 +272,13 @@ func GetCmdCurrentPrice(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdCurrentReserve(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "current-reserve [bond-did]",
 		Example: "current-reserve U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query current balance(s) of the reserve pool",
@@ -284,8 +300,9 @@ func GetCmdCurrentReserve(queryRoute string) *cobra.Command {
 			}
 
 			var out sdk.Coins
+			// TODO (Stef) Replace LegacyAmino
 			//err = cdc.UnmarshalJSON(res, &out)
-			err = clientCtx.JSONMarshaler.UnmarshalJSON(res, &out)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &out) //supposed to use: clientCtx.JSONMarshaler.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err
 			}
@@ -300,10 +317,13 @@ func GetCmdCurrentReserve(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdCustomPrice(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "price [bond-token-with-amount] [bond-did]",
 		Example: "price 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query price(s) of the bond at a specific supply",
@@ -333,8 +353,9 @@ func GetCmdCustomPrice(queryRoute string) *cobra.Command {
 			}
 
 			var out sdk.DecCoins
+			// TODO (Stef) Replace LegacyAmino
 			//err = cdc.UnmarshalJSON(res, &out)
-			err = clientCtx.JSONMarshaler.UnmarshalJSON(res, &out)
+			err = clientCtx.LegacyAmino.UnmarshalJSON(res, &out) //supposed to use: clientCtx.JSONMarshaler.UnmarshalJSON(res, &out)
 			if err != nil {
 				return err
 			}
@@ -349,10 +370,13 @@ func GetCmdCustomPrice(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdBuyPrice(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "buy-price [bond-token-with-amount] [bond-did]",
 		Example: "buy-price 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query price(s) of buying an amount of tokens of the bond",
@@ -398,10 +422,13 @@ func GetCmdBuyPrice(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdSellReturn(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "sell-return [bond-token-with-amount] [bond-did]",
 		Example: "sell-return 10abc U7GK8p8rVhJMKhBVRCJJ8c",
 		Short:   "Query return(s) on selling an amount of tokens of the bond",
@@ -447,10 +474,13 @@ func GetCmdSellReturn(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdSwapReturn(queryRoute string) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "swap-return [bond-did] [from-token-with-amount] [to-token]",
 		Example: "swap-return U7GK8p8rVhJMKhBVRCJJ8c 10res1 res2",
 		Short:   "Query return(s) on swapping an amount of tokens to another token",
@@ -497,6 +527,9 @@ func GetCmdSwapReturn(queryRoute string) *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdAlphaMaximums(queryRoute string) *cobra.Command {
@@ -541,7 +574,7 @@ func GetCmdAlphaMaximums(queryRoute string) *cobra.Command {
 }
 
 func GetParamsRequestHandler() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "params",
 		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -566,4 +599,7 @@ func GetParamsRequestHandler() *cobra.Command {
 			return nil
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
