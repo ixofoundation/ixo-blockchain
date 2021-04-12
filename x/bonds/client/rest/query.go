@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"net/http"
 )
 

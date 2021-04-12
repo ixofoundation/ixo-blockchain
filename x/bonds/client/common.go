@@ -3,7 +3,7 @@ package client
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	types "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"strings"
 )
 

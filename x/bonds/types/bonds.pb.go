@@ -9,7 +9,6 @@ import (
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	github_com_ixofoundation_ixo_blockchain_x_did_exported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	io "io"
 	math "math"
@@ -229,30 +228,30 @@ func (m *QueryBondsDetailed) GetBondsDetailed() []*BondDetails {
 }
 
 type Bond struct {
-	Token                        string                                                                        `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	Name                         string                                                                        `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description                  string                                                                        `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	CreatorDid                   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did                    `protobuf:"bytes,4,opt,name=creator_did,json=creatorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"creator_did"`
-	ControllerDid                github_com_ixofoundation_ixo_blockchain_x_did_exported.Did                    `protobuf:"bytes,5,opt,name=controller_did,json=controllerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"controller_did"`
-	FunctionType                 string                                                                        `protobuf:"bytes,6,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
-	FunctionParameters           github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types.FunctionParams `protobuf:"bytes,7,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.FunctionParams" json:"function_parameters"`
-	ReserveTokens                []string                                                                      `protobuf:"bytes,8,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
-	TxFeePercentage              github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,9,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tx_fee_percentage"`
-	ExitFeePercentage            github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,10,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"exit_fee_percentage"`
-	FeeAddress                   github_com_cosmos_cosmos_sdk_types.AccAddress                                 `protobuf:"bytes,11,opt,name=fee_address,json=feeAddress,proto3,customtype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"fee_address"`
-	MaxSupply                    types.Coin                                                                    `protobuf:"bytes,12,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply"`
-	OrderQuantityLimits          github_com_cosmos_cosmos_sdk_types.Coins                                      `protobuf:"bytes,13,rep,name=order_quantity_limits,json=orderQuantityLimits,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"order_quantity_limits"`
-	SanityRate                   github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,14,opt,name=sanity_rate,json=sanityRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_rate"`
-	SanityMarginPercentage       github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,15,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_margin_percentage"`
-	CurrentSupply                types.Coin                                                                    `protobuf:"bytes,16,opt,name=current_supply,json=currentSupply,proto3" json:"current_supply"`
-	CurrentReserve               github_com_cosmos_cosmos_sdk_types.Coins                                      `protobuf:"bytes,17,rep,name=current_reserve,json=currentReserve,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"current_reserve"`
-	CurrentOutcomePaymentReserve github_com_cosmos_cosmos_sdk_types.Coins                                      `protobuf:"bytes,18,rep,name=current_outcome_payment_reserve,json=currentOutcomePaymentReserve,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"current_outcome_payment_reserve"`
-	AllowSells                   bool                                                                          `protobuf:"varint,19,opt,name=allow_sells,json=allowSells,proto3" json:"allow_sells,omitempty"`
-	AlphaBond                    bool                                                                          `protobuf:"varint,20,opt,name=alpha_bond,json=alphaBond,proto3" json:"alpha_bond,omitempty"`
-	BatchBlocks                  github_com_cosmos_cosmos_sdk_types.Uint                                       `protobuf:"bytes,21,opt,name=batch_blocks,json=batchBlocks,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"batch_blocks"`
-	OutcomePayment               github_com_cosmos_cosmos_sdk_types.Int                                        `protobuf:"bytes,22,opt,name=outcome_payment,json=outcomePayment,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"outcome_payment"`
-	State                        github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types.BondState      `protobuf:"bytes,23,opt,name=state,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.BondState" json:"state"`
-	BondDid                      github_com_ixofoundation_ixo_blockchain_x_did_exported.Did                    `protobuf:"bytes,24,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	Token                        string                                                     `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Name                         string                                                     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description                  string                                                     `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	CreatorDid                   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,4,opt,name=creator_did,json=creatorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"creator_did"`
+	ControllerDid                github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,5,opt,name=controller_did,json=controllerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"controller_did"`
+	FunctionType                 string                                                     `protobuf:"bytes,6,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
+	FunctionParameters           FunctionParams                                             `protobuf:"bytes,7,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.FunctionParams" json:"function_parameters"`
+	ReserveTokens                []string                                                   `protobuf:"bytes,8,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
+	TxFeePercentage              github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,9,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tx_fee_percentage"`
+	ExitFeePercentage            github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,10,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"exit_fee_percentage"`
+	FeeAddress                   github_com_cosmos_cosmos_sdk_types.AccAddress              `protobuf:"bytes,11,opt,name=fee_address,json=feeAddress,proto3,customtype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"fee_address"`
+	MaxSupply                    types.Coin                                                 `protobuf:"bytes,12,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply"`
+	OrderQuantityLimits          github_com_cosmos_cosmos_sdk_types.Coins                   `protobuf:"bytes,13,rep,name=order_quantity_limits,json=orderQuantityLimits,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"order_quantity_limits"`
+	SanityRate                   github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,14,opt,name=sanity_rate,json=sanityRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_rate"`
+	SanityMarginPercentage       github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,15,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_margin_percentage"`
+	CurrentSupply                types.Coin                                                 `protobuf:"bytes,16,opt,name=current_supply,json=currentSupply,proto3" json:"current_supply"`
+	CurrentReserve               github_com_cosmos_cosmos_sdk_types.Coins                   `protobuf:"bytes,17,rep,name=current_reserve,json=currentReserve,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"current_reserve"`
+	CurrentOutcomePaymentReserve github_com_cosmos_cosmos_sdk_types.Coins                   `protobuf:"bytes,18,rep,name=current_outcome_payment_reserve,json=currentOutcomePaymentReserve,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"current_outcome_payment_reserve"`
+	AllowSells                   bool                                                       `protobuf:"varint,19,opt,name=allow_sells,json=allowSells,proto3" json:"allow_sells,omitempty"`
+	AlphaBond                    bool                                                       `protobuf:"varint,20,opt,name=alpha_bond,json=alphaBond,proto3" json:"alpha_bond,omitempty"`
+	BatchBlocks                  github_com_cosmos_cosmos_sdk_types.Uint                    `protobuf:"bytes,21,opt,name=batch_blocks,json=batchBlocks,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"batch_blocks"`
+	OutcomePayment               github_com_cosmos_cosmos_sdk_types.Int                     `protobuf:"bytes,22,opt,name=outcome_payment,json=outcomePayment,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"outcome_payment"`
+	State                        BondState                                                  `protobuf:"bytes,23,opt,name=state,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.BondState" json:"state"`
+	BondDid                      github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,24,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
 }
 
 func (m *Bond) Reset()         { *m = Bond{} }
@@ -316,7 +315,7 @@ func (m *Bond) GetFunctionType() string {
 	return ""
 }
 
-func (m *Bond) GetFunctionParameters() github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types.FunctionParams {
+func (m *Bond) GetFunctionParameters() FunctionParams {
 	if m != nil {
 		return m.FunctionParameters
 	}

@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	types2 "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -61,7 +61,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins {
+func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types2.Bond) sdk.Coins {
 	if reserveCoins.IsZero() {
 		zeroes, _ := bond.GetNewReserveDecCoins(sdk.OneDec()).TruncateDecimal()
 		for i := range zeroes {
@@ -72,7 +72,7 @@ func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins
 	return reserveCoins
 }
 
-func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk.DecCoins {
+func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types2.Bond) sdk.DecCoins {
 	if reserveCoins.IsZero() {
 		zeroes := bond.GetNewReserveDecCoins(sdk.OneDec())
 		for i := range zeroes {
@@ -84,10 +84,10 @@ func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk
 }
 
 func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
-	var bondsList types.QueryBonds
+	var bondsList types2.QueryBonds
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
-		var bond types.Bond
+		var bond types2.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
 		bondsList = append(bondsList, bond.BondDid)
 	}
@@ -101,17 +101,17 @@ func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
 }
 
 func queryBondsDetailed(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
-	var bondsList types.QueryBondsDetailed
+	var bondsList types2.QueryBondsDetailed
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
-		var bond types.Bond
+		var bond types2.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
 
 		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
 		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		bondsList = append(bondsList, types.BondDetails{
+		bondsList = append(bondsList, types2.BondDetails{
 			BondDid:   bond.BondDid,
 			SpotPrice: reservePrices,
 			Supply:    bond.CurrentSupply,
@@ -263,7 +263,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	// Max supply cannot be less than supply (max supply >= supply)
 	adjustedSupply := keeper.GetSupplyAdjustedForBuy(ctx, bondDid)
 	if bond.MaxSupply.IsLT(adjustedSupply.Add(bondCoin)) {
-		return nil, types.ErrCannotMintMoreThanMaxSupply
+		return nil, types2.ErrCannotMintMoreThanMaxSupply
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -271,10 +271,10 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	if err != nil {
 		return nil, err
 	}
-	reservePricesRounded := types.RoundReservePrices(reservePrices)
+	reservePricesRounded := types2.RoundReservePrices(reservePrices)
 	txFee := bond.GetTxFees(reservePrices)
 
-	var result types.QueryBuyPrice
+	var result types2.QueryBuyPrice
 	result.AdjustedSupply = adjustedSupply
 	result.Prices = zeroReserveTokensIfEmpty(reservePricesRounded, bond)
 	result.TxFees = zeroReserveTokensIfEmpty(txFee, bond)
@@ -304,13 +304,13 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	if !bond.AllowSells {
-		return nil, types.ErrBondDoesNotAllowSelling
+		return nil, types2.ErrBondDoesNotAllowSelling
 	}
 
 	// Cannot burn more tokens than what exists
 	adjustedSupply := keeper.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(bondCoin) {
-		return nil, types.ErrCannotBurnMoreThanSupply
+		return nil, types2.ErrCannotBurnMoreThanSupply
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -318,13 +318,13 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	if err != nil {
 		return nil, err
 	}
-	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
+	reserveReturnsRounded := types2.RoundReserveReturns(reserveReturns)
 
 	txFees := bond.GetTxFees(reserveReturns)
 	exitFees := bond.GetExitFees(reserveReturns)
-	totalFees := types.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded)
+	totalFees := types2.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded)
 
-	var result types.QuerySellReturn
+	var result types2.QuerySellReturn
 	result.AdjustedSupply = adjustedSupply
 	result.Returns = zeroReserveTokensIfEmpty(reserveReturnsRounded, bond)
 	result.TxFees = zeroReserveTokensIfEmpty(txFees, bond)
@@ -353,7 +353,7 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+		return nil, sdkerrors.Wrapf(types2.ErrBondDoesNotExist, bondDid)
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -366,7 +366,7 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: sdk.ZeroInt()}}
 	}
 
-	var result types.QuerySwapReturn
+	var result types2.QuerySwapReturn
 	result.TotalFees = sdk.Coins{txFee}
 	result.TotalReturns = reserveReturns
 
@@ -383,11 +383,11 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []by
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+		return nil, sdkerrors.Wrapf(types2.ErrBondDoesNotExist, bondDid)
 	}
 
-	if bond.FunctionType != types.AugmentedFunction {
-		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
+	if bond.FunctionType != types2.AugmentedFunction {
+		return nil, sdkerrors.Wrapf(types2.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
 	}
 
 	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec
@@ -404,7 +404,7 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []by
 		maxSystemAlpha = I.QuoInt(C)
 	}
 
-	var result types.QueryAlphaMaximums
+	var result types2.QueryAlphaMaximums
 	result.MaxSystemAlphaIncrease = maxSystemAlphaIncrease
 	result.MaxSystemAlpha = maxSystemAlpha
 

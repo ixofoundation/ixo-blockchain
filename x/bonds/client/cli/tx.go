@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
+	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/spf13/cobra"
@@ -66,7 +66,7 @@ func NewCmdCreateBond() *cobra.Command {
 			_controllerDid := viper.GetString(FlagControllerDid)
 
 			// Parse function parameters
-			functionParams, err := client2.ParseFunctionParams(_functionParameters)
+			functionParams, err := bondsclient.ParseFunctionParams(_functionParameters)
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
@@ -397,7 +397,7 @@ func NewCmdSwap() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			// Check that from amount and token can be parsed to a coin
-			from, err := client2.ParseTwoPartCoin(args[0], args[1])
+			from, err := bondsclient.ParseTwoPartCoin(args[0], args[1])
 			if err != nil {
 				return err
 			}

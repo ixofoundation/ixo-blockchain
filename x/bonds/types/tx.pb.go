@@ -11,7 +11,6 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
 	github_com_ixofoundation_ixo_blockchain_x_did_exported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -33,22 +32,22 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgCreateBond struct {
-	BondDid                github_com_ixofoundation_ixo_blockchain_x_did_exported.Did                    `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	Token                  string                                                                        `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	Name                   string                                                                        `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Description            string                                                                        `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	FunctionType           string                                                                        `protobuf:"bytes,5,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
-	FunctionParameters     github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types.FunctionParams `protobuf:"bytes,6,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.FunctionParams" json:"function_parameters"`
-	CreatorDid             github_com_ixofoundation_ixo_blockchain_x_did_exported.Did                    `protobuf:"bytes,7,opt,name=creator_did,json=creatorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"creator_did"`
-	ControllerDid          github_com_ixofoundation_ixo_blockchain_x_did_exported.Did                    `protobuf:"bytes,8,opt,name=controller_did,json=controllerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"controller_did"`
-	ReserveTokens          []string                                                                      `protobuf:"bytes,9,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
-	TxFeePercentage        github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,10,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tx_fee_percentage"`
-	ExitFeePercentage      github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,11,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"exit_fee_percentage"`
-	FeeAddress             github_com_cosmos_cosmos_sdk_types.AccAddress                                 `protobuf:"bytes,12,opt,name=fee_address,json=feeAddress,proto3,customtype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"fee_address"`
-	MaxSupply              types.Coin                                                                    `protobuf:"bytes,13,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply"`
-	OrderQuantityLimits    github_com_cosmos_cosmos_sdk_types.Coins                                      `protobuf:"bytes,14,rep,name=order_quantity_limits,json=orderQuantityLimits,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"order_quantity_limits"`
-	SanityRate             github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,15,opt,name=sanity_rate,json=sanityRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_rate"`
-	SanityMarginPercentage github_com_cosmos_cosmos_sdk_types.Dec                                        `protobuf:"bytes,16,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_margin_percentage"`
+	BondDid                github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	Token                  string                                                     `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	Name                   string                                                     `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description            string                                                     `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	FunctionType           string                                                     `protobuf:"bytes,5,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
+	FunctionParameters     FunctionParams                                             `protobuf:"bytes,6,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.FunctionParams" json:"function_parameters"`
+	CreatorDid             github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,7,opt,name=creator_did,json=creatorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"creator_did"`
+	ControllerDid          github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,8,opt,name=controller_did,json=controllerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"controller_did"`
+	ReserveTokens          []string                                                   `protobuf:"bytes,9,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
+	TxFeePercentage        github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,10,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tx_fee_percentage"`
+	ExitFeePercentage      github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,11,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"exit_fee_percentage"`
+	FeeAddress             github_com_cosmos_cosmos_sdk_types.AccAddress              `protobuf:"bytes,12,opt,name=fee_address,json=feeAddress,proto3,customtype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"fee_address"`
+	MaxSupply              types.Coin                                                 `protobuf:"bytes,13,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply"`
+	OrderQuantityLimits    github_com_cosmos_cosmos_sdk_types.Coins                   `protobuf:"bytes,14,rep,name=order_quantity_limits,json=orderQuantityLimits,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"order_quantity_limits"`
+	SanityRate             github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,15,opt,name=sanity_rate,json=sanityRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_rate"`
+	SanityMarginPercentage github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,16,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_margin_percentage"`
 	AllowSells             bool                                                                          `protobuf:"varint,17,opt,name=allow_sells,json=allowSells,proto3" json:"allow_sells,omitempty"`
 	AlphaBond              bool                                                                          `protobuf:"varint,18,opt,name=alpha_bond,json=alphaBond,proto3" json:"alpha_bond,omitempty"`
 	BatchBlocks            github_com_cosmos_cosmos_sdk_types.Uint                                       `protobuf:"bytes,19,opt,name=batch_blocks,json=batchBlocks,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"batch_blocks"`
@@ -116,7 +115,7 @@ func (m *MsgCreateBond) GetFunctionType() string {
 	return ""
 }
 
-func (m *MsgCreateBond) GetFunctionParameters() github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types.FunctionParams {
+func (m *MsgCreateBond) GetFunctionParameters() FunctionParams {
 	if m != nil {
 		return m.FunctionParameters
 	}
@@ -384,9 +383,9 @@ func (m *MsgSetNextAlphaResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgSetNextAlphaResponse proto.InternalMessageInfo
 
 type MsgUpdateBondState struct {
-	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did               `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	State     github_com_ixofoundation_ixo_blockchain_x_bonds_internal_types.BondState `protobuf:"bytes,2,opt,name=state,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.BondState" json:"state"`
-	EditorDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did               `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"editor_did"`
+	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	State     BondState                                                  `protobuf:"bytes,2,opt,name=state,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types.BondState" json:"state"`
+	EditorDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"editor_did"`
 }
 
 func (m *MsgUpdateBondState) Reset()         { *m = MsgUpdateBondState{} }
