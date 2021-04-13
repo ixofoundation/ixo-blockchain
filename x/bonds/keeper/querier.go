@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client"
-	types2 "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -26,42 +26,42 @@ const (
 )
 
 // NewQuerier is the module level router for state queries
-func NewQuerier(keeper Keeper) sdk.Querier {
+func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
 		case QueryBonds:
-			return queryBonds(ctx, keeper)
+			return queryBonds(ctx, keeper, legacyQuerierCdc)
 		case QueryBondsDetailed:
-			return queryBondsDetailed(ctx, keeper)
+			return queryBondsDetailed(ctx, keeper, legacyQuerierCdc)
 		case QueryBond:
-			return queryBond(ctx, path[1:], keeper)
+			return queryBond(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryBatch:
-			return queryBatch(ctx, path[1:], keeper)
+			return queryBatch(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryLastBatch:
-			return queryLastBatch(ctx, path[1:], keeper)
+			return queryLastBatch(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryCurrentPrice:
-			return queryCurrentPrice(ctx, path[1:], keeper)
+			return queryCurrentPrice(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryCurrentReserve:
-			return queryCurrentReserve(ctx, path[1:], keeper)
+			return queryCurrentReserve(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryCustomPrice:
-			return queryCustomPrice(ctx, path[1:], keeper)
+			return queryCustomPrice(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryBuyPrice:
-			return queryBuyPrice(ctx, path[1:], keeper)
+			return queryBuyPrice(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QuerySellReturn:
-			return querySellReturn(ctx, path[1:], keeper)
+			return querySellReturn(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QuerySwapReturn:
-			return querySwapReturn(ctx, path[1:], keeper)
+			return querySwapReturn(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryAlphaMaximums:
-			return queryAlphaMaximums(ctx, path[1:], keeper)
+			return queryAlphaMaximums(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryParams:
-			return queryParams(ctx, keeper)
+			return queryParams(ctx, keeper, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown bonds query endpoint")
 		}
 	}
 }
 
-func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types2.Bond) sdk.Coins {
+func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins {
 	if reserveCoins.IsZero() {
 		zeroes, _ := bond.GetNewReserveDecCoins(sdk.OneDec()).TruncateDecimal()
 		for i := range zeroes {
@@ -72,7 +72,7 @@ func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types2.Bond) sdk.Coin
 	return reserveCoins
 }
 
-func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types2.Bond) sdk.DecCoins {
+func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk.DecCoins {
 	if reserveCoins.IsZero() {
 		zeroes := bond.GetNewReserveDecCoins(sdk.OneDec())
 		for i := range zeroes {
@@ -83,16 +83,16 @@ func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types2.Bond) sd
 	return reserveCoins
 }
 
-func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
-	var bondsList types2.QueryBonds
+func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
+	var bondsList types.QueryBonds
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
-		var bond types2.Bond
+		var bond types.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
 		bondsList = append(bondsList, bond.BondDid)
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, bondsList)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -100,18 +100,18 @@ func queryBonds(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
 	return bz, nil
 }
 
-func queryBondsDetailed(ctx sdk.Context, keeper Keeper) (res []byte, err error) {
-	var bondsList types2.QueryBondsDetailed
+func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
+	var bondsList types.QueryBondsDetailed
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
-		var bond types2.Bond
+		var bond types.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
 
 		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
 		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		bondsList = append(bondsList, types2.BondDetails{
+		bondsList = append(bondsList, types.BondDetails{
 			BondDid:   bond.BondDid,
 			SpotPrice: reservePrices,
 			Supply:    bond.CurrentSupply,
@@ -119,7 +119,7 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper) (res []byte, err error) 
 		})
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, bondsList)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -127,7 +127,7 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper) (res []byte, err error) 
 	return bz, nil
 }
 
-func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryBond(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 
 	bond, found := keeper.GetBond(ctx, bondDid)
@@ -135,7 +135,7 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err e
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, bond)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bond)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -143,7 +143,7 @@ func queryBond(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err e
 	return bz, nil
 }
 
-func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryBatch(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 
 	if !keeper.BatchExists(ctx, bondDid) {
@@ -152,7 +152,7 @@ func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err 
 
 	batch := keeper.MustGetBatch(ctx, bondDid)
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, batch)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, batch)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -160,7 +160,7 @@ func queryBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err 
 	return bz, nil
 }
 
-func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 
 	if !keeper.LastBatchExists(ctx, bondDid) {
@@ -169,7 +169,7 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 
 	batch := keeper.MustGetLastBatch(ctx, bondDid)
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, batch)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, batch)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -177,7 +177,7 @@ func queryLastBatch(ctx sdk.Context, path []string, keeper Keeper) (res []byte, 
 	return bz, nil
 }
 
-func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 
 	bond, found := keeper.GetBond(ctx, bondDid)
@@ -192,7 +192,7 @@ func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byt
 	}
 	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, reservePrices)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -200,7 +200,7 @@ func queryCurrentPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byt
 	return bz, nil
 }
 
-func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 
 	bond, found := keeper.GetBond(ctx, bondDid)
@@ -209,7 +209,7 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []b
 	}
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, reserveBalances)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, reserveBalances)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -217,7 +217,7 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper) (res []b
 	return bz, nil
 }
 
-func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 	bondAmount := path[1]
 
@@ -237,7 +237,7 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 	}
 	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, reservePrices)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, reservePrices)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -245,7 +245,7 @@ func queryCustomPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte
 	return bz, nil
 }
 
-func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 	bondAmount := path[1]
 
@@ -263,7 +263,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	// Max supply cannot be less than supply (max supply >= supply)
 	adjustedSupply := keeper.GetSupplyAdjustedForBuy(ctx, bondDid)
 	if bond.MaxSupply.IsLT(adjustedSupply.Add(bondCoin)) {
-		return nil, types2.ErrCannotMintMoreThanMaxSupply
+		return nil, types.ErrCannotMintMoreThanMaxSupply
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -271,17 +271,17 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	if err != nil {
 		return nil, err
 	}
-	reservePricesRounded := types2.RoundReservePrices(reservePrices)
+	reservePricesRounded := types.RoundReservePrices(reservePrices)
 	txFee := bond.GetTxFees(reservePrices)
 
-	var result types2.QueryBuyPrice
+	var result types.QueryBuyPrice
 	result.AdjustedSupply = adjustedSupply
 	result.Prices = zeroReserveTokensIfEmpty(reservePricesRounded, bond)
 	result.TxFees = zeroReserveTokensIfEmpty(txFee, bond)
 	result.TotalPrices = zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee...), bond)
 	result.TotalFees = zeroReserveTokensIfEmpty(txFee, bond)
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -289,7 +289,7 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper) (res []byte, e
 	return bz, nil
 }
 
-func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func querySellReturn(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 	bondAmount := path[1]
 
@@ -304,13 +304,13 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	}
 
 	if !bond.AllowSells {
-		return nil, types2.ErrBondDoesNotAllowSelling
+		return nil, types.ErrBondDoesNotAllowSelling
 	}
 
 	// Cannot burn more tokens than what exists
 	adjustedSupply := keeper.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(bondCoin) {
-		return nil, types2.ErrCannotBurnMoreThanSupply
+		return nil, types.ErrCannotBurnMoreThanSupply
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -318,13 +318,13 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	if err != nil {
 		return nil, err
 	}
-	reserveReturnsRounded := types2.RoundReserveReturns(reserveReturns)
+	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
 
 	txFees := bond.GetTxFees(reserveReturns)
 	exitFees := bond.GetExitFees(reserveReturns)
-	totalFees := types2.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded)
+	totalFees := types.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded)
 
-	var result types2.QuerySellReturn
+	var result types.QuerySellReturn
 	result.AdjustedSupply = adjustedSupply
 	result.Returns = zeroReserveTokensIfEmpty(reserveReturnsRounded, bond)
 	result.TxFees = zeroReserveTokensIfEmpty(txFees, bond)
@@ -332,7 +332,7 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	result.TotalReturns = zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond)
 	result.TotalFees = zeroReserveTokensIfEmpty(totalFees, bond)
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -340,7 +340,7 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	return bz, nil
 }
 
-func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 	fromToken := path[1]
 	fromAmount := path[2]
@@ -353,7 +353,7 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types2.ErrBondDoesNotExist, bondDid)
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
 	reserveBalances := keeper.GetReserveBalances(ctx, bondDid)
@@ -366,11 +366,11 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: sdk.ZeroInt()}}
 	}
 
-	var result types2.QuerySwapReturn
+	var result types.QuerySwapReturn
 	result.TotalFees = sdk.Coins{txFee}
 	result.TotalReturns = reserveReturns
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -378,16 +378,16 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper) (res []byte,
 	return bz, nil
 }
 
-func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []byte, err error) {
+func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	bondDid := path[0]
 
 	bond, found := keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types2.ErrBondDoesNotExist, bondDid)
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
-	if bond.FunctionType != types2.AugmentedFunction {
-		return nil, sdkerrors.Wrapf(types2.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
+	if bond.FunctionType != types.AugmentedFunction {
+		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
 	}
 
 	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec
@@ -404,11 +404,11 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []by
 		maxSystemAlpha = I.QuoInt(C)
 	}
 
-	var result types2.QueryAlphaMaximums
+	var result types.QueryAlphaMaximums
 	result.MaxSystemAlphaIncrease = maxSystemAlphaIncrease
 	result.MaxSystemAlpha = maxSystemAlpha
 
-	bz, err := codec.MarshalJSONIndent(keeper.cdc, result)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -416,10 +416,10 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper) (res []by
 	return bz, nil
 }
 
-func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
+func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	params := k.GetParams(ctx)
 
-	res, err := codec.MarshalJSONIndent(k.cdc, params)
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
