@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -241,7 +241,7 @@ func handleMsgEditBond(ctx sdk.Context, keeper keeper.Keeper, msg types2.MsgEdit
 	}
 
 	if msg.OrderQuantityLimits != types2.DoNotModifyField {
-		orderQuantityLimits, err := sdk.ParseCoins(msg.OrderQuantityLimits)
+		orderQuantityLimits, err := sdk.ParseCoinsNormalized(msg.OrderQuantityLimits)
 		if err != nil {
 			return nil, err
 		}

@@ -1,0 +1,14 @@
+syntax = "proto3";
+package bonds;
+
+import "gogoproto/gogo.proto";
+import "bonds/bonds.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+
+// GenesisState defines the did module's genesis state.
+message GenesisState {
+  repeated Bond bonds    = 1 [(gogoproto.nullable) = false];
+  repeated Batch batches = 2 [(gogoproto.nullable) = false];
+  Params params          = 3 [(gogoproto.nullable) = false];
+}

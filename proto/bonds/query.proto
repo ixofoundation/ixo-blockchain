@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "bonds/bonds.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
 
 // To get a list of all module queries, go to the module's keeper/querier.go
 // and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest/query.go
