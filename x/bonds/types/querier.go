@@ -1,11 +1,11 @@
 package types
 
 //type QueryBonds []string
-
+//
 //func (b QueryBonds) String() string {
 //	return strings.Join(b[:], "\n")
 //}
-
+//
 //type QueryBondsDetailed []BondDetails
 //type BondDetails struct {
 //	BondDid   string       `json:"did" yaml:"did"`
@@ -13,7 +13,7 @@ package types
 //	Supply    sdk.Coin     `json:"supply" yaml:"supply"`
 //	Reserve   sdk.Coins    `json:"reserve" yaml:"reserve"`
 //}
-
+//
 //type QueryBuyPrice struct {
 //	AdjustedSupply sdk.Coin  `json:"adjusted_supply" yaml:"asdjusted_supply"`
 //	Prices         sdk.Coins `json:"prices" yaml:"prices"`
@@ -21,7 +21,7 @@ package types
 //	TotalPrices    sdk.Coins `json:"total_prices" yaml:"total_prices"`
 //	TotalFees      sdk.Coins `json:"total_fees" yaml:"total_fees"`
 //}
-
+//
 //type QuerySellReturn struct {
 //	AdjustedSupply sdk.Coin  `json:"adjusted_supply" yaml:"asdjusted_supply"`
 //	Returns        sdk.Coins `json:"returns" yaml:"returns"`
@@ -30,12 +30,12 @@ package types
 //	TotalReturns   sdk.Coins `json:"total_returns" yaml:"total_returns"`
 //	TotalFees      sdk.Coins `json:"total_fees" yaml:"total_fees"`
 //}
-
+//
 //type QuerySwapReturn struct {
 //	TotalReturns sdk.Coins `json:"total_returns" yaml:"total_returns"`
 //	TotalFees    sdk.Coins `json:"total_fees" yaml:"total_fees"`
 //}
-
+//
 //type QueryAlphaMaximums struct {
 //	MaxSystemAlphaIncrease sdk.Dec `json:"max_system_alpha_increase" yaml:"max_system_alpha_increase"`
 //	MaxSystemAlpha         sdk.Dec `json:"max_system_alpha" yaml:"max_system_alpha"`

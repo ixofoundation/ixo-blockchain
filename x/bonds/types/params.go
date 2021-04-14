@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	paramstypes"github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // Parameter store keys
@@ -16,8 +16,8 @@ var (
 //}
 
 // ParamTable for bonds module.
-func ParamKeyTable() params.KeyTable {
-	return params.NewKeyTable().RegisterParamSet(&Params{})
+func ParamKeyTable() paramstypes.KeyTable {
+	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
 func NewParams(reservedBondTokens []string) Params {
@@ -56,8 +56,8 @@ func validateReservedBondTokens(i interface{}) error {
 }
 
 // Implements params.ParamSet
-func (p *Params) ParamSetPairs() params.ParamSetPairs {
-	return params.ParamSetPairs{
+func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
+	return paramstypes.ParamSetPairs{
 		{KeyReservedBondTokens, &p.ReservedBondTokens, validateReservedBondTokens},
 	}
 }

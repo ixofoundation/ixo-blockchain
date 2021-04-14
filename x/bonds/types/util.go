@@ -18,8 +18,8 @@ func ApproxRoot(d sdk.Dec, root sdk.Dec) (guess sdk.Dec, err error) {
 // ApproxPower returns an approximation of raising a Dec to a positive power
 func ApproxPower(d sdk.Dec, power sdk.Dec) (guess sdk.Dec, err error) {
 	// Convert Dec's to Uint's
-	dUint := sdk.NewUintFromBigInt(d.Int)
-	powerUint := sdk.NewUintFromBigInt(power.Int)
+	dUint := sdk.NewUintFromBigInt(d.BigInt())
+	powerUint := sdk.NewUintFromBigInt(power.BigInt())
 
 	// Handle panics
 	defer func() {
