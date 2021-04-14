@@ -4,9 +4,8 @@ package keeper
 
 import (
 	"fmt"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 )
 
@@ -36,10 +35,12 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 
 		// Get supply of coins held in accounts (includes stake token)
 		supplyInAccounts := sdk.Coins{}
-		k.accountKeeper.IterateAccounts(ctx, func(acc authtypes.Account) bool {
-			supplyInAccounts = supplyInAccounts.Add(acc.GetCoins()...)
-			return false
-		})
+		k.accountKeeper.IterateAccounts(ctx,
+			func(acc authtypes.AccountI) bool {
+				supplyInAccounts = supplyInAccounts.Add(k.BankKeeper.GetAllBalances(ctx, acc.GetAddress())...) //acc.GetCoins()...)
+				return false
+			},
+		)
 
 		iterator := k.GetBondIterator(ctx)
 		for ; iterator.Valid(); iterator.Next() {

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -88,8 +89,13 @@ func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAm
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
-		bondsList = append(bondsList, bond.BondDid)
+		//keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		err := bond.Unmarshal(iterator.Value())
+		if err != nil {
+			panic(fmt.Sprintf("Cannot unmarshal bond"))
+		}
+
+		bondsList.Bonds = append(bondsList.Bonds, bond.BondDid)
 	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
@@ -105,13 +111,17 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		//keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		err := bond.Unmarshal(iterator.Value())
+		if err != nil {
+			panic(fmt.Sprintf("Cannot unmarshal bond"))
+		}
 
 		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
 		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		bondsList = append(bondsList, types.BondDetails{
+		bondsList.BondsDetailed = append(bondsList.BondsDetailed, &types.BondDetails{
 			BondDid:   bond.BondDid,
 			SpotPrice: reservePrices,
 			Supply:    bond.CurrentSupply,

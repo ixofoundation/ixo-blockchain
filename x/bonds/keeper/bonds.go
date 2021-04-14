@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"github.com/tendermint/go-amino"
 )
 
 func (k Keeper) GetBondIterator(ctx sdk.Context) sdk.Iterator {
@@ -33,7 +34,9 @@ func (k Keeper) GetBondDid(ctx sdk.Context, bondToken string) (bondDid did.Did, 
 		return
 	}
 	bz := store.Get(types.GetBondDidsKey(bondToken))
-	k.cdc.MustUnmarshalBinaryBare(bz, &bondDid)
+	//k.cdc.MustUnmarshalBinaryBare(bz, &bondDid)
+	//TODO (Stef) We need an unmarshal function for did
+	amino.UnmarshalBinaryBare(bz, &bondDid)
 	return bondDid, true
 }
 
@@ -84,7 +87,12 @@ func (k Keeper) SetBond(ctx sdk.Context, bondDid did.Did, bond types.Bond) {
 
 func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid did.Did) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetBondDidsKey(bondToken), k.cdc.MustMarshalBinaryBare(bondDid))
+	bz, err := amino.MarshalBinaryBare(bondDid)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot amino marshal bond did"))
+	}
+	store.Set(types.GetBondDidsKey(bondToken), bz) //k.cdc.MustMarshalBinaryBare(bondDid))
+	// TODO (Stef) We need an unmarshal function for did
 }
 
 func (k Keeper) DepositReserve(ctx sdk.Context, bondDid did.Did,
