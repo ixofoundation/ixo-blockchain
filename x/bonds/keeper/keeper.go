@@ -24,13 +24,13 @@ type Keeper struct {
 	storeKey   sdk.StoreKey
 	paramSpace params.Subspace
 
-	cdc *codec.BinaryMarshaler
+	cdc codec.BinaryMarshaler
 }
 
 func NewKeeper(bankKeeper bank.Keeper, /*supplyKeeper supply.Keeper,*/
 	accountKeeper auth.AccountKeeper, stakingKeeper staking.Keeper,
 	didKeeper did.Keeper, storeKey sdk.StoreKey, paramSpace params.Subspace,
-	cdc *codec.BinaryMarshaler) Keeper {
+	cdc codec.BinaryMarshaler) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {

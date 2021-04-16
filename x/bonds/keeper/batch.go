@@ -16,11 +16,7 @@ func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid did.Did) types.Batch {
 
 	bz := store.Get(types.GetBatchKey(bondDid))
 	var batch types.Batch
-	//k.cdc.MustUnmarshalBinaryBare(bz, &batch)
-	err := batch.Unmarshal(bz)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot unmarshal batch"))
-	}
+	k.cdc.MustUnmarshalBinaryBare(bz, &batch)
 
 	return batch
 }
@@ -33,11 +29,7 @@ func (k Keeper) MustGetLastBatch(ctx sdk.Context, bondDid did.Did) types.Batch {
 
 	bz := store.Get(types.GetLastBatchKey(bondDid))
 	var batch types.Batch
-	//k.cdc.MustUnmarshalBinaryBare(bz, &batch)
-	err := batch.Unmarshal(bz)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot unmarshal batch"))
-	}
+	k.cdc.MustUnmarshalBinaryBare(bz, &batch)
 
 	return batch
 }
@@ -54,23 +46,12 @@ func (k Keeper) LastBatchExists(ctx sdk.Context, bondDid did.Did) bool {
 
 func (k Keeper) SetBatch(ctx sdk.Context, bondDid did.Did, batch types.Batch) {
 	store := ctx.KVStore(k.storeKey)
-	//store.Set(types.GetBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(batch))
-	bz, err := batch.Marshal()
-	if err != nil {
-		panic(fmt.Sprintf("Cannot marshal batch"))
-	}
-	store.Set(types.GetBatchKey(bondDid), bz)
-
+	store.Set(types.GetBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(&batch))
 }
 
 func (k Keeper) SetLastBatch(ctx sdk.Context, bondDid did.Did, batch types.Batch) {
 	store := ctx.KVStore(k.storeKey)
-	//store.Set(types.GetLastBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(batch))
-	bz, err := batch.Marshal()
-	if err != nil {
-		panic(fmt.Sprintf("Cannot marshal batch"))
-	}
-	store.Set(types.GetLastBatchKey(bondDid), bz)
+	store.Set(types.GetLastBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(&batch))
 }
 
 func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, buyPrices, sellPrices sdk.DecCoins) {
