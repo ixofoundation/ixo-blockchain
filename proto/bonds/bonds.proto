@@ -30,8 +30,8 @@ message Bond {
   string token                                                      = 1;
   string name                                                       = 2;
   string description                                                = 3;
-  string creator_did                                                = 4 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/did/exported.Did", (gogoproto.nullable) = false];
-  string controller_did                                             = 5 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/did/exported.Did", (gogoproto.nullable) = false];
+  string creator_did                                                = 4;
+  string controller_did                                             = 5;
   string function_type                                              = 6;
   repeated FunctionParam function_parameters                        = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/ixofoundation/ixo-blockchain/x/bonds/types.FunctionParams"];
   repeated string reserve_tokens                                    = 8;
@@ -50,11 +50,11 @@ message Bond {
   string batch_blocks                                               = 21 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string outcome_payment                                            = 22 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   string state                                                      = 23 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/bonds/types.BondState", (gogoproto.nullable) = false];
-  string bond_did                                                   = 24 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/did/exported.Did", (gogoproto.nullable) = false];
+  string bond_did                                                   = 24;
 }
 
 message BaseOrder {
-  string account_did              = 1 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/did/exported.Did", (gogoproto.nullable) = false];
+  string account_did              = 1;
   cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false];
   bool cancelled                  = 3;
   string cancel_reason            = 4;
@@ -75,7 +75,7 @@ message SwapOrder {
 }
 
 message Batch {
-  string bond_did                                  = 1 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/did/exported.Did", (gogoproto.nullable) = false];
+  string bond_did                                  = 1;
   string blocks_remaining                          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string next_public_alpha                         = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
   cosmos.base.v1beta1.Coin total_buy_amount        = 4 [(gogoproto.nullable) = false];

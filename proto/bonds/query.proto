@@ -134,6 +134,7 @@ message QueryBuyPriceRequest {
 
 // TODO (Stef) Instead of using QueryBuyPrice, QuerySellReturn etc we can write the types directly in the Response msg
 // TODO but this will not allow us to use clientCtx.JSONMarshaler.UnmarshalJSON() in query.go
+// TODO Also types are used in querier.go and grpc_query.go
 message QueryBuyPriceResponse {
   QueryBuyPrice query_buy_price = 1;
 }
