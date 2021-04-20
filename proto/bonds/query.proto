@@ -69,7 +69,7 @@ service Query {
 message QueryBondsRequest {}
 
 message QueryBondsResponse {
-  QueryBonds bonds = 1;
+  repeated string bonds = 1;
 }
 
 message QueryBondsDetailedRequest {}

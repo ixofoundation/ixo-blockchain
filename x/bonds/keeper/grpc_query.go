@@ -13,16 +13,15 @@ import (
 func (k Keeper) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.QueryBondsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	var bondsList types.QueryBonds
+	var bondsList []string
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
-
-		bondsList.Bonds = append(bondsList.Bonds, bond.BondDid)
+		bondsList = append(bondsList, bond.BondDid)
 	}
 
-	return &types.QueryBondsResponse{Bonds: &bondsList}, nil
+	return &types.QueryBondsResponse{Bonds: bondsList}, nil
 }
 
 func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequest) (*types.QueryBondsDetailedResponse, error) {

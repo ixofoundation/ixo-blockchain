@@ -88,11 +88,13 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// Parse fee address
-		feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		//feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
+		//if err != nil {
+		//	rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		//	return
+		//}
+		feeAddress := sdk.AccAddress(req.FeeAddress)
+
 
 		// Parse max supply
 		maxSupply, err := sdk.ParseCoinNormalized(req.MaxSupply)

@@ -11,10 +11,6 @@ message FunctionParam {
   string value = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }
 
-message QueryBonds {
-  repeated string bonds = 1;
-}
-
 message BondDetails {
   string bond_did                                 = 1;
   repeated cosmos.base.v1beta1.DecCoin spot_price = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"];

@@ -70,7 +70,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		ReserveTokens:          reserveTokens,
 		TxFeePercentage:        txFeePercentage,
 		ExitFeePercentage:      exitFeePercentage,
-		FeeAddress: 			feeAddress,
+		FeeAddress: 			feeAddress.String(),
 		MaxSupply:              maxSupply,
 		OrderQuantityLimits:    orderQuantityLimits,
 		SanityRate:             sanityRate,
@@ -98,7 +98,7 @@ func (msg MsgCreateBond) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "controller DID")
 	} else if len(msg.ReserveTokens) == 0 {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve tokens")
-	} else if msg.FeeAddress.Empty() {
+	} else if strings.TrimSpace(msg.FeeAddress) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "fee address")
 	} else if strings.TrimSpace(msg.FunctionType) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "function type")
@@ -337,7 +337,7 @@ func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
 func NewMsgUpdateBondState(state BondState, editorDid, bondDid did.Did) *MsgUpdateBondState {
 	return &MsgUpdateBondState{
 		BondDid:   bondDid,
-		State:     state,
+		State:     state.String(),
 		EditorDid: editorDid,
 	}
 }
@@ -351,7 +351,7 @@ func (msg MsgUpdateBondState) ValidateBasic() error {
 	}
 
 	// Bond status can only be updated to SETTLE or FAILED
-	if msg.State != SettleState && msg.State != FailedState {
+	if msg.State != SettleState.String() && msg.State != FailedState.String() {
 		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot transition to that state")
 	}
 

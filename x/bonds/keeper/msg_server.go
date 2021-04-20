@@ -24,7 +24,15 @@ var _ types.MsgServer = msgServer{}
 
 func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (*types.MsgCreateBondResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if k.BankKeeper.BlockedAddr(msg.FeeAddress) {
+
+	//feeAddr , err := sdk.AccAddressFromBech32(msg.FeeAddress)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	feeAddr := sdk.AccAddress(msg.FeeAddress)
+
+	if k.BankKeeper.BlockedAddr(feeAddr) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
 	}
 
@@ -91,7 +99,7 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
 		msg.ControllerDid, msg.FunctionType, msg.FunctionParameters,
 		msg.ReserveTokens, msg.TxFeePercentage, msg.ExitFeePercentage,
-		msg.FeeAddress, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
+		feeAddr, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
 		msg.SanityMarginPercentage, msg.AllowSells, msg.AlphaBond, msg.BatchBlocks,
 		msg.OutcomePayment, state, msg.BondDid)
 
@@ -117,7 +125,7 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 			sdk.NewAttribute(types.AttributeKeyReserveTokens, types.StringsToString(msg.ReserveTokens)),
 			sdk.NewAttribute(types.AttributeKeyTxFeePercentage, msg.TxFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyExitFeePercentage, msg.ExitFeePercentage.String()),
-			sdk.NewAttribute(types.AttributeKeyFeeAddress, msg.FeeAddress.String()),
+			sdk.NewAttribute(types.AttributeKeyFeeAddress, msg.FeeAddress),
 			sdk.NewAttribute(types.AttributeKeyMaxSupply, msg.MaxSupply.String()),
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits.String()),
 			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate.String()),
@@ -231,7 +239,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 	} else if !bond.AlphaBond {
 		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
 			"bond is not an alpha bond")
-	} else if bond.State != types.OpenState {
+	} else if bond.State != types.OpenState.String() {
 		return nil, types.ErrInvalidStateForAction
 	}
 
@@ -343,7 +351,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 
 	if bond.FunctionType != types.AugmentedFunction {
 		return nil, types.ErrFunctionNotAvailableForFunctionType
-	} else if !msg.State.IsValidProgressionFrom(bond.State) {
+	} else if !types.BondStateFromString(msg.State).IsValidProgressionFrom(types.BondStateFromString(bond.State)) {
 		return nil, types.ErrInvalidStateProgression
 	} // Also, next state must be SETTLE or FAILED -- checked by ValidateBasic
 
@@ -354,7 +362,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 
 	// If state is settle or failed, move all outcome payment to reserve, so
 	// that it is available for share withdrawal (MsgWithdrawShare)
-	if msg.State == types.SettleState || msg.State == types.FailedState {
+	if msg.State == types.SettleState.String() || msg.State == types.FailedState.String() {
 		if !batch.Empty() {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
 				"cannot update bond state to SETTLE/FAILED while there are orders in the batch")
@@ -392,7 +400,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	}
 
 	// Check current state is HATCH/OPEN, max prices, order quantity limits
-	if bond.State != types.OpenState && bond.State != types.HatchState {
+	if bond.State != types.OpenState.String() && bond.State != types.HatchState.String() {
 		return nil, types.ErrInvalidStateForAction
 	} else if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
 		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
@@ -518,7 +526,7 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 	// Check sells allowed, current state is OPEN, and order limits not exceeded
 	if !bond.AllowSells {
 		return nil, sdkerrors.Wrap(types.ErrBondDoesNotAllowSelling, msg.BondDid)
-	} else if bond.State != types.OpenState {
+	} else if bond.State != types.OpenState.String() {
 		return nil, types.ErrInvalidStateForAction
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
 		return nil, types.ErrOrderQuantityLimitExceeded
@@ -586,7 +594,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	// Confirm that function type is swapper_function and state is OPEN
 	if bond.FunctionType != types.SwapperFunction {
 		return nil, types.ErrFunctionNotAvailableForFunctionType
-	} else if bond.State != types.OpenState {
+	} else if bond.State != types.OpenState.String() {
 		return nil, types.ErrInvalidStateForAction
 	}
 
@@ -646,7 +654,7 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 	}
 
 	// Confirm that state is OPEN and that outcome payment is not nil
-	if bond.State != types.OpenState {
+	if bond.State != types.OpenState.String() {
 		return nil, types.ErrInvalidStateForAction
 	}
 
@@ -684,7 +692,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	}
 
 	// Check that state is SETTLE or FAILED
-	if bond.State != types.SettleState && bond.State != types.FailedState {
+	if bond.State != types.SettleState.String() && bond.State != types.FailedState.String() {
 		return nil, types.ErrInvalidStateForAction
 	}
 

@@ -77,12 +77,12 @@ func (k Keeper) BondDidExists(ctx sdk.Context, bondToken string) bool {
 
 func (k Keeper) SetBond(ctx sdk.Context, bondDid did.Did, bond types.Bond) {
 	store := ctx.KVStore(k.storeKey)
-	//store.Set(types.GetBondKey(bondDid), k.cdc.MustMarshalBinaryBare(bond))
-	bz, err := bond.Marshal()
-	if err != nil {
-		panic(fmt.Sprintf("Cannot marshal bond"))
-	}
-	store.Set(types.GetBatchKey(bondDid), bz)
+	store.Set(types.GetBondKey(bondDid), k.cdc.MustMarshalBinaryBare(&bond))
+	//bz, err := bond.Marshal()
+	//if err != nil {
+	//	panic(fmt.Sprintf("Cannot marshal bond"))
+	//}
+	//store.Set(types.GetBatchKey(bondDid), bz)
 }
 
 func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid did.Did) {
@@ -215,7 +215,7 @@ func (k Keeper) SetCurrentSupply(ctx sdk.Context, bondDid did.Did, currentSupply
 	k.SetBond(ctx, bondDid, bond)
 }
 
-func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState types.BondState) {
+func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState string) {
 	bond := k.MustGetBond(ctx, bondDid)
 	previousState := bond.State
 	bond.State = newState
@@ -227,8 +227,8 @@ func (k Keeper) SetBondState(ctx sdk.Context, bondDid did.Did, newState types.Bo
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeStateChange,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyOldState, string(previousState)),
-		sdk.NewAttribute(types.AttributeKeyNewState, string(newState)),
+		sdk.NewAttribute(types.AttributeKeyOldState, previousState),
+		sdk.NewAttribute(types.AttributeKeyNewState, newState),
 	))
 }
 

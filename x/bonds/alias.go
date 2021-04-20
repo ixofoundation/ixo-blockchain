@@ -24,7 +24,7 @@ var (
 	RegisterInvariants = keeper.RegisterInvariants
 	NewKeeper          = keeper.NewKeeper
 	NewQuerier         = keeper.NewQuerier
-	RegisterCodec      = types.RegisterCodec
+	RegisterCodec      = types.RegisterLegacyAminoCodec
 
 	NewGenesisState     = types.NewGenesisState
 	DefaultGenesisState = types.DefaultGenesisState

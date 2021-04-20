@@ -84,13 +84,12 @@ func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk
 }
 
 func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
-	var bondsList types.QueryBonds
+	var bondsList []string
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
-
-		bondsList.Bonds = append(bondsList.Bonds, bond.BondDid)
+		bondsList = append(bondsList, bond.BondDid)
 	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)

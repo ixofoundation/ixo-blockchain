@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -23,7 +24,7 @@ func GetQueryCmd(storeKey string) *cobra.Command {
 	}
 
 	bondsQueryCmd.AddCommand(
-		GetCmdBondsList(storeKey),
+		GetCmdBondsList(),
 		GetCmdBondsListDetailed(storeKey),
 		GetCmdBond(storeKey),
 		GetCmdBatch(storeKey),
@@ -41,34 +42,29 @@ func GetQueryCmd(storeKey string) *cobra.Command {
 	return bondsQueryCmd
 }
 
-func GetCmdBondsList(queryRoute string) *cobra.Command {
+func GetCmdBondsList() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bonds-list",
 		Short: "List of all bonds",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			//cliCtx := context.NewCLIContext().WithCodec(cdc)
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-			// TODO (Stef) Should we use types.NewQueryClient(clientCtx) here? (Look at staking and gov query.go)
 
-			res, _, err := clientCtx.QueryWithData(
-				fmt.Sprintf("custom/%s/%s", queryRoute,
-					keeper.QueryBonds), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.Bonds(context.Background(), &types.QueryBondsRequest{})
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil
 			}
 
-			var out types.QueryBonds
-			//cdc.MustUnmarshalJSON(res, &out)
-			// TODO (Stef) Or use below
-			// clientCtx.LegacyAmino.MustUnmarshalJSON(res, &out)
-			// return clientCtx.PrintObjectLegacy(out)
-			clientCtx.JSONMarshaler.MustUnmarshalJSON(res, &out)
-			return clientCtx.PrintProto(&out)
+			if len(res.GetBonds()) == 0 {
+				return fmt.Errorf("no proposals found")
+			}
+
+			return clientCtx.PrintProto(res)
 		},
 	}
 

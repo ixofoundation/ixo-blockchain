@@ -51,6 +51,14 @@ func (next BondState) IsValidProgressionFrom(prev BondState) bool {
 	return false
 }
 
+func (s BondState) String() string {
+	return string(s)
+}
+
+func BondStateFromString(s string) BondState {
+	return BondState(s)
+}
+
 type FunctionParamRestrictions func(paramsMap map[string]sdk.Dec) error
 
 var (
@@ -268,7 +276,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
 		ReserveTokens:                reserveTokens,
 		TxFeePercentage:              txFeePercentage,
 		ExitFeePercentage:            exitFeePercentage,
-		FeeAddress:                   feeAddress,
+		FeeAddress:                   feeAddress.String(),
 		MaxSupply:                    maxSupply,
 		OrderQuantityLimits:          orderQuantityLimits,
 		SanityRate:                   sanityRate,
@@ -280,7 +288,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
 		AlphaBond:                    alphaBond,
 		BatchBlocks:                  batchBlocks,
 		OutcomePayment:               outcomePayment,
-		State:                        state,
+		State:                        state.String(),
 		BondDid:                      bondDid,
 	}
 }
@@ -334,9 +342,9 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		// Note: during the hatch phase, this function returns the hatch price
 		// p0 even if the supply argument is greater than the initial supply S0
 		switch bond.State {
-		case HatchState:
+		case HatchState.String():
 			result = bond.GetNewReserveDecCoins(args["p0"])
-		case OpenState:
+		case OpenState.String():
 			kappa := args["kappa"]
 			res, err := Reserve(x, kappa, args["V0"])
 			if err != nil {
@@ -353,7 +361,7 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 				}
 				result = bond.GetNewReserveDecCoins(spotPriceDec)
 			}
-		case SettleState:
+		case SettleState.String():
 			return nil, ErrInvalidStateForAction
 		default:
 			panic("unrecognized bond state")
@@ -491,9 +499,9 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	}
 
 	// If hatch phase for augmented function, use fixed p0 price
-	if bond.FunctionType == AugmentedFunction && bond.State == HatchState {
+	if bond.FunctionType == AugmentedFunction && bond.State == HatchState.String() {
 		args := bond.FunctionParameters.AsMap()
-		if bond.State == HatchState {
+		if bond.State == HatchState.String(){
 			price := args["p0"].Mul(mint.ToDec())
 			return bond.GetNewReserveDecCoins(price), nil
 		}

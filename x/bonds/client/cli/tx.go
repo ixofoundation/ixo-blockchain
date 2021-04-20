@@ -87,10 +87,11 @@ func NewCmdCreateBond() *cobra.Command {
 			}
 
 			// Parse fee address
-			feeAddress, err := sdk.AccAddressFromBech32(_feeAddress)
-			if err != nil {
-				return err
-			}
+			//feeAddress, err := sdk.AccAddressFromBech32(_feeAddress)
+			//if err != nil {
+			//	return err
+			//}
+			feeAddress := sdk.AccAddress(_feeAddress) //TODO (Stef) Check which one is preferred
 
 			// Parse max supply
 			maxSupply, err := sdk.ParseCoinNormalized(_maxSupply) //sdk.ParseCoin(_maxSupply)

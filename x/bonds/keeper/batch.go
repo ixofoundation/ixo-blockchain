@@ -160,7 +160,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 	// (e.g. if supply is 100 and S0=100.5, we cannot reach S0 by performing
 	// the minimum buy of 1 token [101>100.5], so S0 is rounded to ceil; S0=101)
 	if bond.FunctionType == types.AugmentedFunction &&
-		bond.State == types.HatchState {
+		bond.State == types.HatchState.String() {
 		args := bond.FunctionParameters.AsMap()
 		if adjustedSupplyWithBuy.Amount.ToDec().GT(args["S0"].Ceil()) {
 			return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins,
@@ -213,6 +213,13 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	}
 	buyerAddr := buyerDidDoc.Address()
 
+	//feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
+	//if err != nil {
+	//	return err
+	//}
+	feeAddr := sdk.AccAddress(bond.FeeAddress)
+
+
 	// Mint bond tokens
 	err = k.BankKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
 		sdk.Coins{bo.BaseOrder.Amount})
@@ -241,7 +248,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	// Add new reserve to reserve (reservePricesRounded should never be zero)
 	// TODO: investigate possibility of zero reservePricesRounded
 	if bond.FunctionType == types.AugmentedFunction &&
-		bond.State == types.HatchState {
+		bond.State == types.HatchState.String() {
 		args := bond.FunctionParameters.AsMap()
 		theta := args["theta"]
 
@@ -283,7 +290,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 
 		// Send reserve tokens to funding pool
 		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
-			types.BatchesIntermediaryAccount, bond.FeeAddress, coinsToFundingPool)
+			types.BatchesIntermediaryAccount, feeAddr, coinsToFundingPool)
 		if err != nil {
 			return err
 		}
@@ -303,7 +310,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	// Add charged fee to fee address
 	if !txFees.IsZero() {
 		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
-			types.BatchesIntermediaryAccount, bond.FeeAddress, txFees)
+			types.BatchesIntermediaryAccount, feeAddr, txFees)
 		if err != nil {
 			return err
 		}
@@ -372,9 +379,16 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.Se
 		return err
 	}
 
+	//feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
+	//if err != nil {
+	//	return err
+	//}
+	feeAddr := sdk.AccAddress(bond.FeeAddress)
+
+
 	// Send total fee to fee address
 	if !totalFees.IsZero() {
-		err = k.WithdrawReserve(ctx, bond.BondDid, bond.FeeAddress, totalFees)
+		err = k.WithdrawReserve(ctx, bond.BondDid, feeAddr, totalFees)
 		if err != nil {
 			return err
 		}
@@ -442,10 +456,16 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder
 		return err, false
 	}
 
+	//feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
+	//if err != nil {
+	//	return err, false
+	//}
+	feeAddr := sdk.AccAddress(bond.FeeAddress)
+
 	// Add fee (taken from swapper) to fee address
 	if !txFee.IsZero() {
 		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
-			types.BatchesIntermediaryAccount, bond.FeeAddress, sdk.Coins{txFee})
+			types.BatchesIntermediaryAccount, feeAddr, sdk.Coins{txFee})
 		if err != nil {
 			return err, false
 		}
