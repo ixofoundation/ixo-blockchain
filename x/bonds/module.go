@@ -75,7 +75,7 @@ func (a AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux 
 
 // GetQueryCmd returns the root query command for the bonds module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return cli.GetQueryCmd(StoreKey)
+	return cli.GetQueryCmd()
 }
 
 // GetTxCmd returns the root tx command for the bonds module.

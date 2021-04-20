@@ -101,7 +101,7 @@ func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAm
 }
 
 func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
-	var bondsList types.QueryBondsDetailed
+	var bondsList []*types.BondDetails
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
@@ -111,7 +111,7 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
 		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		bondsList.BondsDetailed = append(bondsList.BondsDetailed, &types.BondDetails{
+		bondsList = append(bondsList, &types.BondDetails{
 			BondDid:   bond.BondDid,
 			SpotPrice: reservePrices,
 			Supply:    bond.CurrentSupply,
@@ -274,12 +274,13 @@ func queryBuyPrice(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierC
 	reservePricesRounded := types.RoundReservePrices(reservePrices)
 	txFee := bond.GetTxFees(reservePrices)
 
-	var result types.QueryBuyPrice
-	result.AdjustedSupply = adjustedSupply
-	result.Prices = zeroReserveTokensIfEmpty(reservePricesRounded, bond)
-	result.TxFees = zeroReserveTokensIfEmpty(txFee, bond)
-	result.TotalPrices = zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee...), bond)
-	result.TotalFees = zeroReserveTokensIfEmpty(txFee, bond)
+	var result = types.QueryBuyPriceResponse{
+		AdjustedSupply: adjustedSupply,
+		Prices:         zeroReserveTokensIfEmpty(reservePricesRounded, bond),
+		TxFees:         zeroReserveTokensIfEmpty(txFee, bond),
+		TotalPrices:    zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee...), bond),
+		TotalFees:      zeroReserveTokensIfEmpty(txFee, bond),
+	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
@@ -324,13 +325,14 @@ func querySellReturn(ctx sdk.Context, path []string, keeper Keeper, legacyQuerie
 	exitFees := bond.GetExitFees(reserveReturns)
 	totalFees := types.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded)
 
-	var result types.QuerySellReturn
-	result.AdjustedSupply = adjustedSupply
-	result.Returns = zeroReserveTokensIfEmpty(reserveReturnsRounded, bond)
-	result.TxFees = zeroReserveTokensIfEmpty(txFees, bond)
-	result.ExitFees = zeroReserveTokensIfEmpty(exitFees, bond)
-	result.TotalReturns = zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond)
-	result.TotalFees = zeroReserveTokensIfEmpty(totalFees, bond)
+	var result = types.QuerySellReturnResponse{
+		AdjustedSupply: adjustedSupply,
+		Returns:        zeroReserveTokensIfEmpty(reserveReturnsRounded, bond),
+		TxFees:         zeroReserveTokensIfEmpty(txFees, bond),
+		ExitFees:       zeroReserveTokensIfEmpty(exitFees, bond),
+		TotalReturns:   zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond),
+		TotalFees:      zeroReserveTokensIfEmpty(totalFees, bond),
+	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
@@ -366,9 +368,10 @@ func querySwapReturn(ctx sdk.Context, path []string, keeper Keeper, legacyQuerie
 		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: sdk.ZeroInt()}}
 	}
 
-	var result types.QuerySwapReturn
-	result.TotalFees = sdk.Coins{txFee}
-	result.TotalReturns = reserveReturns
+	var result = types.QuerySwapReturnResponse{
+		TotalFees:    sdk.Coins{txFee},
+		TotalReturns: reserveReturns,
+	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
@@ -404,9 +407,10 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper, legacyQue
 		maxSystemAlpha = I.QuoInt(C)
 	}
 
-	var result types.QueryAlphaMaximums
-	result.MaxSystemAlphaIncrease = maxSystemAlphaIncrease
-	result.MaxSystemAlpha = maxSystemAlpha
+	var result = types.QueryAlphaMaximumsResponse{
+		MaxSystemAlphaIncrease: maxSystemAlphaIncrease,
+		MaxSystemAlpha:         maxSystemAlpha,
+	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {

@@ -27,7 +27,7 @@ func (k Keeper) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.Que
 func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequest) (*types.QueryBondsDetailedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	var bondsList types.QueryBondsDetailed
+	var bondsList []*types.BondDetails
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
@@ -37,7 +37,7 @@ func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequ
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
 		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		bondsList.BondsDetailed = append(bondsList.BondsDetailed, &types.BondDetails{
+		bondsList = append(bondsList, &types.BondDetails{
 			BondDid:   bond.BondDid,
 			SpotPrice: reservePrices,
 			Supply:    bond.CurrentSupply,
@@ -45,7 +45,7 @@ func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequ
 		})
 	}
 
-	return &types.QueryBondsDetailedResponse{BondsDetailed: &bondsList}, nil
+	return &types.QueryBondsDetailedResponse{BondsDetailed: bondsList}, nil
 }
 
 func (k Keeper) Bond(c context.Context, req *types.QueryBondRequest) (*types.QueryBondResponse, error) {
@@ -55,7 +55,6 @@ func (k Keeper) Bond(c context.Context, req *types.QueryBondRequest) (*types.Que
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	// TODO (Stef) Change types in queries for bond dids to be of type DID and not string?
 	bondDid := req.BondDid
 
 	bond, found := k.GetBond(ctx, bondDid)
@@ -209,14 +208,13 @@ func (k Keeper) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*t
 	reservePricesRounded := types.RoundReservePrices(reservePrices)
 	txFee := bond.GetTxFees(reservePrices)
 
-	var result types.QueryBuyPrice
-	result.AdjustedSupply = adjustedSupply
-	result.Prices = zeroReserveTokensIfEmpty(reservePricesRounded, bond)
-	result.TxFees = zeroReserveTokensIfEmpty(txFee, bond)
-	result.TotalPrices = zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee...), bond)
-	result.TotalFees = zeroReserveTokensIfEmpty(txFee, bond)
-
-	return &types.QueryBuyPriceResponse{QueryBuyPrice: &result}, nil
+	return &types.QueryBuyPriceResponse{
+		AdjustedSupply: adjustedSupply,
+		Prices:         zeroReserveTokensIfEmpty(reservePricesRounded, bond),
+		TxFees:         zeroReserveTokensIfEmpty(txFee, bond),
+		TotalPrices:    zeroReserveTokensIfEmpty(reservePricesRounded.Add(txFee...), bond),
+		TotalFees:      zeroReserveTokensIfEmpty(txFee, bond),
+	}, nil
 }
 
 func (k Keeper) SellReturn(c context.Context, req *types.QuerySellReturnRequest) (*types.QuerySellReturnResponse, error) {
@@ -260,15 +258,14 @@ func (k Keeper) SellReturn(c context.Context, req *types.QuerySellReturnRequest)
 	exitFees := bond.GetExitFees(reserveReturns)
 	totalFees := types.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded)
 
-	var result types.QuerySellReturn
-	result.AdjustedSupply = adjustedSupply
-	result.Returns = zeroReserveTokensIfEmpty(reserveReturnsRounded, bond)
-	result.TxFees = zeroReserveTokensIfEmpty(txFees, bond)
-	result.ExitFees = zeroReserveTokensIfEmpty(exitFees, bond)
-	result.TotalReturns = zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond)
-	result.TotalFees = zeroReserveTokensIfEmpty(totalFees, bond)
-
-	return &types.QuerySellReturnResponse{QuerySellReturn: &result}, nil
+	return &types.QuerySellReturnResponse{
+		AdjustedSupply: adjustedSupply,
+		Returns:        zeroReserveTokensIfEmpty(reserveReturnsRounded, bond),
+		TxFees:         zeroReserveTokensIfEmpty(txFees, bond),
+		ExitFees:       zeroReserveTokensIfEmpty(exitFees, bond),
+		TotalReturns:   zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond),
+		TotalFees:      zeroReserveTokensIfEmpty(totalFees, bond),
+	}, nil
 }
 
 func (k Keeper) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest) (*types.QuerySwapReturnResponse, error) {
@@ -300,11 +297,10 @@ func (k Keeper) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest)
 		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: sdk.ZeroInt()}}
 	}
 
-	var result types.QuerySwapReturn
-	result.TotalFees = sdk.Coins{txFee}
-	result.TotalReturns = reserveReturns
-
-	return &types.QuerySwapReturnResponse{QuerySwapReturn: &result}, nil
+	return &types.QuerySwapReturnResponse{
+		TotalFees:    sdk.Coins{txFee},
+		TotalReturns: reserveReturns,
+	}, nil
 }
 
 func (k Keeper) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsRequest) (*types.QueryAlphaMaximumsResponse, error) {
@@ -339,11 +335,10 @@ func (k Keeper) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsRe
 		maxSystemAlpha = I.QuoInt(C)
 	}
 
-	var result types.QueryAlphaMaximums
-	result.MaxSystemAlphaIncrease = maxSystemAlphaIncrease
-	result.MaxSystemAlpha = maxSystemAlpha
-
-	return &types.QueryAlphaMaximumsResponse{QueryAlphaMaximums: &result}, nil
+	return &types.QueryAlphaMaximumsResponse{
+		MaxSystemAlphaIncrease : maxSystemAlphaIncrease,
+		MaxSystemAlpha : maxSystemAlpha,
+	}, nil
 }
 
 func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {

@@ -44,6 +44,7 @@ func NewCmdCreateBond() *cobra.Command {
 		Use:   "create-bond",
 		Short: "Create bond",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			// TODO (Stef) Replace viper
 			_token := viper.GetString(FlagToken)
 			_name := viper.GetString(FlagName)
 			_description := viper.GetString(FlagDescription)

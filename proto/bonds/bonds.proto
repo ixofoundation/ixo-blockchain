@@ -18,10 +18,6 @@ message BondDetails {
   repeated cosmos.base.v1beta1.Coin reserve       = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }
 
-message QueryBondsDetailed {
-  repeated BondDetails bonds_detailed = 1;
-}
-
 message Bond {
   string token                                                      = 1;
   string name                                                       = 2;
@@ -81,33 +77,6 @@ message Batch {
   repeated BuyOrder buys                           = 8 [(gogoproto.nullable) = false];
   repeated SellOrder sells                         = 9 [(gogoproto.nullable) = false];
   repeated SwapOrder swaps                         = 10 [(gogoproto.nullable) = false];
-}
-
-message QueryBuyPrice {
-  cosmos.base.v1beta1.Coin adjusted_supply       = 1 [(gogoproto.nullable) = false];
-  repeated cosmos.base.v1beta1.Coin prices       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin tx_fees      = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin total_prices = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin total_fees   = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-}
-
-message QuerySellReturn {
-  cosmos.base.v1beta1.Coin adjusted_supply        = 1 [(gogoproto.nullable) = false];
-  repeated cosmos.base.v1beta1.Coin returns       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin tx_fees       = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin exit_fees     = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin total_returns = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin total_fees    = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-}
-
-message QuerySwapReturn {
-  repeated cosmos.base.v1beta1.Coin total_returns = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  repeated cosmos.base.v1beta1.Coin total_fees    = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-}
-
-message QueryAlphaMaximums {
-  string max_system_alpha_increase = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  string max_system_alpha          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
 }
 
 message Params {
