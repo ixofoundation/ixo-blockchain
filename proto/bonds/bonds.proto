@@ -37,7 +37,7 @@ message Bond {
   repeated string reserve_tokens                                    = 8;
   string tx_fee_percentage                                          = 9 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
   string exit_fee_percentage                                        = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  string fee_address                                                = 11 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.nullable) = false];
+  string fee_address                                                = 11;
   cosmos.base.v1beta1.Coin max_supply                               = 12 [(gogoproto.nullable) = false];
   repeated cosmos.base.v1beta1.Coin order_quantity_limits           = 13 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
   string sanity_rate                                                = 14 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
@@ -49,7 +49,7 @@ message Bond {
   bool alpha_bond                                                   = 20;
   string batch_blocks                                               = 21 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string outcome_payment                                            = 22 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-  string state                                                      = 23 [(gogoproto.customtype) = "github.com/ixofoundation/ixo-blockchain/x/bonds/types.BondState", (gogoproto.nullable) = false];
+  string state                                                      = 23;
   string bond_did                                                   = 24;
 }
 
