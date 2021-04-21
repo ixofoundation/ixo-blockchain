@@ -19,12 +19,8 @@ func (k Keeper) GetBond(ctx sdk.Context, bondDid did.Did) (bond types.Bond, foun
 		return
 	}
 	bz := store.Get(types.GetBondKey(bondDid))
+	k.cdc.MustUnmarshalBinaryBare(bz, &bond)
 
-	//k.cdc.MustUnmarshalBinaryBare(bz, &bond)
-	err := bond.Unmarshal(bz)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot unmarshal bond"))
-	}
 	return bond, true
 }
 
@@ -56,11 +52,7 @@ func (k Keeper) MustGetBondByKey(ctx sdk.Context, key []byte) types.Bond {
 
 	bz := store.Get(key)
 	var bond types.Bond
-	//k.cdc.MustUnmarshalBinaryBare(bz, &bond)
-	err := bond.Unmarshal(bz)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot unmarshal bond"))
-	}
+	k.cdc.MustUnmarshalBinaryBare(bz, &bond)
 
 	return bond
 }
@@ -91,7 +83,7 @@ func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid did.Did) {
 	if err != nil {
 		panic(fmt.Sprintf("Cannot amino marshal bond did"))
 	}
-	store.Set(types.GetBondDidsKey(bondToken), bz) //k.cdc.MustMarshalBinaryBare(bondDid))
+	store.Set(types.GetBondDidsKey(bondToken), bz) //k.cdc.MustMarshalBinaryBare(bondDid)
 	// TODO (Stef) We need an unmarshal function for did
 }
 

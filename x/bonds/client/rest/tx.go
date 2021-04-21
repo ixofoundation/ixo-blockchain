@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func registerTxRoutes(clientCtx client.Context, r *mux.Router) {
+func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/bonds/create_bond", createBondRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/bonds/edit_bond", editBondRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/bonds/set_next_alpha", setNextAlphaRequestHandler(clientCtx)).Methods("POST")
@@ -88,13 +88,11 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// Parse fee address
-		//feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
-		//if err != nil {
-		//	rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-		//	return
-		//}
-		feeAddress := sdk.AccAddress(req.FeeAddress)
-
+		feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
 		// Parse max supply
 		maxSupply, err := sdk.ParseCoinNormalized(req.MaxSupply)

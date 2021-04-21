@@ -213,12 +213,10 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	}
 	buyerAddr := buyerDidDoc.Address()
 
-	//feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
-	//if err != nil {
-	//	return err
-	//}
-	feeAddr := sdk.AccAddress(bond.FeeAddress)
-
+	feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
+	if err != nil {
+		return err
+	}
 
 	// Mint bond tokens
 	err = k.BankKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
@@ -379,12 +377,10 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.Se
 		return err
 	}
 
-	//feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
-	//if err != nil {
-	//	return err
-	//}
-	feeAddr := sdk.AccAddress(bond.FeeAddress)
-
+	feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
+	if err != nil {
+		return err
+	}
 
 	// Send total fee to fee address
 	if !totalFees.IsZero() {
@@ -456,11 +452,10 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder
 		return err, false
 	}
 
-	//feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
-	//if err != nil {
-	//	return err, false
-	//}
-	feeAddr := sdk.AccAddress(bond.FeeAddress)
+	feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
+	if err != nil {
+		return err, false
+	}
 
 	// Add fee (taken from swapper) to fee address
 	if !txFee.IsZero() {

@@ -18,5 +18,5 @@ const (
 func RegisterHandlers(cliCtx client.Context, rtr *mux.Router, queryRoute string) {
 	r := rest.WithHTTPDeprecationHeaders(rtr)
 	registerQueryRoutes(cliCtx, r, queryRoute)
-	registerTxRoutes(cliCtx, r)
+	registerTxHandlers(cliCtx, r)
 }

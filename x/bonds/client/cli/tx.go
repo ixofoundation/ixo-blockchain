@@ -44,27 +44,26 @@ func NewCmdCreateBond() *cobra.Command {
 		Use:   "create-bond",
 		Short: "Create bond",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			// TODO (Stef) Replace viper
-			_token := viper.GetString(FlagToken)
-			_name := viper.GetString(FlagName)
-			_description := viper.GetString(FlagDescription)
-			_functionType := viper.GetString(FlagFunctionType)
-			_functionParameters := viper.GetString(FlagFunctionParameters)
-			_reserveTokens := viper.GetString(FlagReserveTokens)
-			_txFeePercentage := viper.GetString(FlagTxFeePercentage)
-			_exitFeePercentage := viper.GetString(FlagExitFeePercentage)
-			_feeAddress := viper.GetString(FlagFeeAddress)
-			_maxSupply := viper.GetString(FlagMaxSupply)
-			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
-			_sanityRate := viper.GetString(FlagSanityRate)
-			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
-			_allowSells := viper.GetBool(FlagAllowSells)
-			_alphaBond := viper.GetBool(FlagAlphaBond)
-			_batchBlocks := viper.GetString(FlagBatchBlocks)
-			_outcomePayment := viper.GetString(FlagOutcomePayment)
-			_bondDid := viper.GetString(FlagBondDid)
-			_creatorDid := viper.GetString(FlagCreatorDid)
-			_controllerDid := viper.GetString(FlagControllerDid)
+			_token, _ := cmd.Flags().GetString(FlagToken)
+			_name, _ := cmd.Flags().GetString(FlagName)
+			_description, _ := cmd.Flags().GetString(FlagDescription)
+			_functionType, _ := cmd.Flags().GetString(FlagFunctionType)
+			_functionParameters, _ := cmd.Flags().GetString(FlagFunctionParameters)
+			_reserveTokens, _ := cmd.Flags().GetString(FlagReserveTokens)
+			_txFeePercentage, _ := cmd.Flags().GetString(FlagTxFeePercentage)
+			_exitFeePercentage, _ := cmd.Flags().GetString(FlagExitFeePercentage)
+			_feeAddress, _ := cmd.Flags().GetString(FlagFeeAddress)
+			_maxSupply, _ := cmd.Flags().GetString(FlagMaxSupply)
+			_orderQuantityLimits, _ := cmd.Flags().GetString(FlagOrderQuantityLimits)
+			_sanityRate, _ := cmd.Flags().GetString(FlagSanityRate)
+			_sanityMarginPercentage, _ := cmd.Flags().GetString(FlagSanityMarginPercentage)
+			_allowSells, _ := cmd.Flags().GetBool(FlagAllowSells)
+			_alphaBond, _ := cmd.Flags().GetBool(FlagAlphaBond)
+			_batchBlocks, _ := cmd.Flags().GetString(FlagBatchBlocks)
+			_outcomePayment, _ := cmd.Flags().GetString(FlagOutcomePayment)
+			_bondDid, _ := cmd.Flags().GetString(FlagBondDid)
+			_creatorDid, _ := cmd.Flags().GetString(FlagCreatorDid)
+			_controllerDid, _ := cmd.Flags().GetString(FlagControllerDid)
 
 			// Parse function parameters
 			functionParams, err := bondsclient.ParseFunctionParams(_functionParameters)
@@ -88,11 +87,10 @@ func NewCmdCreateBond() *cobra.Command {
 			}
 
 			// Parse fee address
-			//feeAddress, err := sdk.AccAddressFromBech32(_feeAddress)
-			//if err != nil {
-			//	return err
-			//}
-			feeAddress := sdk.AccAddress(_feeAddress) //TODO (Stef) Check which one is preferred
+			feeAddress, err := sdk.AccAddressFromBech32(_feeAddress)
+			if err != nil {
+				return err
+			}
 
 			// Parse max supply
 			maxSupply, err := sdk.ParseCoinNormalized(_maxSupply) //sdk.ParseCoin(_maxSupply)
@@ -142,8 +140,6 @@ func NewCmdCreateBond() *cobra.Command {
 				}
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(creatorDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -156,7 +152,7 @@ func NewCmdCreateBond() *cobra.Command {
 				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
 				_allowSells, _alphaBond, batchBlocks, outcomePayment, _bondDid)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), creatorDid, msg) //GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), creatorDid, msg)
 		},
 	}
 
@@ -205,8 +201,6 @@ func NewCmdEditBond() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(editorDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -216,7 +210,7 @@ func NewCmdEditBond() *cobra.Command {
 			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
 				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg) //GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
 		},
 	}
 
@@ -253,8 +247,6 @@ func NewCmdSetNextAlpha() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(editorDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -263,7 +255,7 @@ func NewCmdSetNextAlpha() *cobra.Command {
 
 			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)//GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
 		},
 	}
 
@@ -288,8 +280,6 @@ func NewCmdUpdateBondState() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(editorDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -298,7 +288,7 @@ func NewCmdUpdateBondState() *cobra.Command {
 
 			msg := types.NewMsgUpdateBondState(types.BondState(_state), editorDid.Did, _bondDid)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)//GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
 		},
 	}
 
@@ -332,8 +322,6 @@ func NewCmdBuy() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(buyerDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -343,7 +331,7 @@ func NewCmdBuy() *cobra.Command {
 			msg := types.NewMsgBuy(
 				buyerDid.Did, bondCoinWithAmount, maxPrices, args[2])
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), buyerDid, msg)//GenerateOrBroadcastMsgs(cliCtx, msg, buyerDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), buyerDid, msg)
 		},
 	}
 
@@ -370,8 +358,6 @@ func NewCmdSell() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(sellerDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -380,7 +366,7 @@ func NewCmdSell() *cobra.Command {
 
 			msg := types.NewMsgSell(sellerDid.Did, bondCoinWithAmount, args[1])
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sellerDid, msg)//GenerateOrBroadcastMsgs(cliCtx, msg, sellerDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sellerDid, msg)
 		},
 	}
 
@@ -410,8 +396,6 @@ func NewCmdSwap() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(swapperDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -420,7 +404,7 @@ func NewCmdSwap() *cobra.Command {
 
 			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3])
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), swapperDid, msg) //GenerateOrBroadcastMsgs(cliCtx, msg, swapperDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), swapperDid, msg)
 		},
 	}
 
@@ -447,8 +431,6 @@ func NewCmdMakeOutcomePayment() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(sender.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -457,7 +439,7 @@ func NewCmdMakeOutcomePayment() *cobra.Command {
 
 			msg := types.NewMsgMakeOutcomePayment(sender.Did, amount, args[0])
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sender, msg)//GenerateOrBroadcastMsgs(cliCtx, msg, sender)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sender, msg)
 		},
 	}
 
@@ -479,8 +461,6 @@ func NewCmdWithdrawShare() *cobra.Command {
 				return err
 			}
 
-			//cliCtx := context.NewCLIContext().WithCodec(cdc).
-			//	WithFromAddress(recipientDid.Address())
 			cliCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -489,7 +469,7 @@ func NewCmdWithdrawShare() *cobra.Command {
 
 			msg := types.NewMsgWithdrawShare(recipientDid.Did, args[0])
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), recipientDid, msg)//GenerateOrBroadcastMsgs(cliCtx, msg, recipientDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), recipientDid, msg)
 		},
 	}
 

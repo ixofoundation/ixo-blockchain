@@ -25,12 +25,10 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (*types.MsgCreateBondResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	//feeAddr , err := sdk.AccAddressFromBech32(msg.FeeAddress)
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	feeAddr := sdk.AccAddress(msg.FeeAddress)
+	feeAddr , err := sdk.AccAddressFromBech32(msg.FeeAddress)
+	if err != nil {
+		return nil, err
+	}
 
 	if k.BankKeeper.BlockedAddr(feeAddr) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
