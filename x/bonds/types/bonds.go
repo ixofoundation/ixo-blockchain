@@ -218,8 +218,6 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	val, ok = paramsMap["kappa"]
 	if !ok {
 		panic("did not find parameter kappa for augmented function")
-	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "kappa")
 	} else if !val.IsPositive() {
 		return sdkerrors.Wrap(ErrArgumentMustBePositive, "kappa")
 	}

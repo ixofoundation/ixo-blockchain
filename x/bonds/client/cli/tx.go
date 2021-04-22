@@ -11,7 +11,6 @@ import (
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"strings"
 )
 
@@ -187,13 +186,13 @@ func NewCmdEditBond() *cobra.Command {
 		Use:   "edit-bond",
 		Short: "Edit bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_name := viper.GetString(FlagName)
-			_description := viper.GetString(FlagDescription)
-			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
-			_sanityRate := viper.GetString(FlagSanityRate)
-			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
-			_bondDid := viper.GetString(FlagBondDid)
-			_editorDid := viper.GetString(FlagEditorDid)
+			_name, _ := cmd.Flags().GetString(FlagName)
+			_description, _ := cmd.Flags().GetString(FlagDescription)
+			_orderQuantityLimits, _ := cmd.Flags().GetString(FlagOrderQuantityLimits)
+			_sanityRate, _ := cmd.Flags().GetString(FlagSanityRate)
+			_sanityMarginPercentage, _ := cmd.Flags().GetString(FlagSanityMarginPercentage)
+			_bondDid, _ := cmd.Flags().GetString(FlagBondDid)
+			_editorDid, _ := cmd.Flags().GetString(FlagEditorDid)
 
 			// Parse editor's ixo DID
 			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
