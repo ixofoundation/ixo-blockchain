@@ -3,8 +3,8 @@
 wait() {
   echo "Waiting for chain to start..."
   while :; do
-    RET=$(ixocli status 2>&1)
-    if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    RET=$(ixod status 2>&1)
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -14,20 +14,32 @@ wait() {
   done
 }
 
-tx() {
-  cmd=$1
-  shift
-  "$cmd" --broadcast-mode block "$@"
-}
-
-RET=$(ixocli status 2>&1)
-if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+RET=$(ixod status 2>&1)
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
   wait
 fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-FEE=$(yes $PASSWORD | ixocli keys show fee -a)
+CHAIN_ID="pandora-2"
+FEE=$(yes $PASSWORD | ixod keys show fee -a)
+
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod_tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    --broadcast-mode block \
+    -y \
+    "$@"  # any extra arguments added at the end
+}
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
@@ -78,11 +90,11 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL" 
 echo "Ledgering DID 2/3..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL" 
 echo "Ledgering DID 3/3..."
-ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$SHAUN_DID_FULL" 
 
 # d0 := 1000000 // initial raise (reserve)
 # p0 := 1       // initial price (reserve per token)
@@ -94,7 +106,7 @@ ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices=
 # V0 = 1000000000000  // invariant
 
 echo "Creating bond..."
-ixocli tx bonds create-bond \
+ixod_tx bonds create-bond \
   --token=abc \
   --name="A B C" \
   --description="Description about A B C" \
@@ -114,82 +126,81 @@ ixocli tx bonds create-bond \
   --outcome-payment="300000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
-  --controller-did="$FRANCESCO_DID" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+  --controller-did="$FRANCESCO_DID" 
 echo "Created bond..."
-ixocli q bonds bond "$BOND_DID"
+ixod q bonds bond "$BOND_DID"
 
 echo "Miguel buys 400000abc..."
-ixocli tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
+ixod bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 400000abc..."
-ixocli tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixod bank balances "$FRANCESCO_ADDR"
 
 echo "Shaun cannot buy 200001abc..."
-ixocli tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun cannot sell anything..."
-ixocli tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun can buy 200000abc..."
-ixocli tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun's account..."
-ixocli q auth account "$SHAUN_ADDR"
+ixod bank balances "$SHAUN_ADDR"
 
 echo "Bond state is now open..."  # since 1000000 (S0) reached
-ixocli q bonds bond "$BOND_DID"
+ixod q bonds bond "$BOND_DID"
 
 echo "Current price is 3..."
-ixocli q bonds current-price "$BOND_DID"
+ixod q bonds current-price "$BOND_DID"
 
 echo "Changing public alpha 0.5->0.51..."
 NEW_ALPHA="0.51"
-ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Current price is now approx 1.85..."
-ixocli q bonds current-price "$BOND_DID"
+ixod q bonds current-price "$BOND_DID"
 
 echo "Changing public alpha 0.51->0.4..."
 NEW_ALPHA="0.4"
-ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Current price is now approx 1.86..."
-ixocli q bonds current-price "$BOND_DID"
+ixod q bonds current-price "$BOND_DID"
 
 echo "Cannot change public alpha 0.4->0.6..."
 NEW_ALPHA="0.6"
-ixocli tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
 
 echo "Miguel sells 400000abc..."
-ixocli tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
+ixod bank balances "$MIGUEL_ADDR"
 
 echo "Francesco makes outcome payment of 50000000 [1]..."
-ixocli tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" 
 echo "Francesco makes outcome payment of 100000000 [2]..."
-ixocli tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL" 
 echo "Francesco makes outcome payment of 150000000 [3]..."
-ixocli tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixod bank balances "$FRANCESCO_ADDR"
 echo "Bond outcome payment reserve is now 300000000..."
-ixocli q bonds bond "$BOND_DID"
+ixod q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
-ixocli tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo -y
+ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
-ixocli q bonds bond "$BOND_DID"
+ixod q bonds bond "$BOND_DID"
 
 echo "Francesco withdraws share..."
-ixocli tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixod bank balances "$FRANCESCO_ADDR"
 
 echo "Shaun withdraws share..."
-ixocli tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun's account..."
-ixocli q auth account "$SHAUN_ADDR"
+ixod bank balances "$SHAUN_ADDR"
 
 echo "Bond reserve is now empty and supply is 0..."
-ixocli q bonds bond "$BOND_DID"
+ixod q bonds bond "$BOND_DID"

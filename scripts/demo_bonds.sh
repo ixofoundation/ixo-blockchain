@@ -37,7 +37,6 @@ ixod_tx() {
     --gas-prices="$GAS_PRICES" \
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
-    --trust-node \
     -y \
     "$@"  # any extra arguments added at the end
 }
@@ -104,13 +103,14 @@ ixod_tx bonds create-bond \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
-  --controller-did="$FRANCESCO_DID" \
+  --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
 ixod q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
 ixod_tx bonds edit-bond \
   --name="New A B C" \
+  --token=abc \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL"
 echo "Edited bond..."
@@ -119,19 +119,19 @@ ixod q bonds bond "$BOND_DID"
 echo "Miguel buys 10abc..."
 ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q auth account "$MIGUEL_ADDR"
+ixod q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
 ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q auth account "$FRANCESCO_ADDR"
+ixod q bank balances "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
 ixod_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q auth account "$MIGUEL_ADDR"
+ixod q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
 ixod_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q auth account "$FRANCESCO_ADDR"
+ixod q bank balances "$FRANCESCO_ADDR"
