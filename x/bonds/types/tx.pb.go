@@ -11,8 +11,6 @@ import (
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
-	github_com_ixofoundation_ixo_blockchain_x_bonds_types "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	github_com_ixofoundation_ixo_blockchain_x_did_exported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -33,26 +31,26 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgCreateBond struct {
-	BondDid                github_com_ixofoundation_ixo_blockchain_x_did_exported.Did           `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	Token                  string                                                               `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	Name                   string                                                               `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Description            string                                                               `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	FunctionType           string                                                               `protobuf:"bytes,5,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
-	FunctionParameters     github_com_ixofoundation_ixo_blockchain_x_bonds_types.FunctionParams `protobuf:"bytes,6,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=github.com/ixofoundation/ixo-blockchain/x/bonds/types.FunctionParams" json:"function_parameters"`
-	CreatorDid             github_com_ixofoundation_ixo_blockchain_x_did_exported.Did           `protobuf:"bytes,7,opt,name=creator_did,json=creatorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"creator_did"`
-	ControllerDid          github_com_ixofoundation_ixo_blockchain_x_did_exported.Did           `protobuf:"bytes,8,opt,name=controller_did,json=controllerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"controller_did"`
-	ReserveTokens          []string                                                             `protobuf:"bytes,9,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
-	TxFeePercentage        github_com_cosmos_cosmos_sdk_types.Dec                               `protobuf:"bytes,10,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tx_fee_percentage"`
-	ExitFeePercentage      github_com_cosmos_cosmos_sdk_types.Dec                               `protobuf:"bytes,11,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"exit_fee_percentage"`
-	FeeAddress             github_com_cosmos_cosmos_sdk_types.AccAddress                        `protobuf:"bytes,12,opt,name=fee_address,json=feeAddress,proto3,customtype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"fee_address"`
-	MaxSupply              types.Coin                                                           `protobuf:"bytes,13,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply"`
-	OrderQuantityLimits    github_com_cosmos_cosmos_sdk_types.Coins                             `protobuf:"bytes,14,rep,name=order_quantity_limits,json=orderQuantityLimits,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"order_quantity_limits"`
-	SanityRate             github_com_cosmos_cosmos_sdk_types.Dec                               `protobuf:"bytes,15,opt,name=sanity_rate,json=sanityRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_rate"`
-	SanityMarginPercentage github_com_cosmos_cosmos_sdk_types.Dec                               `protobuf:"bytes,16,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_margin_percentage"`
-	AllowSells             bool                                                                 `protobuf:"varint,17,opt,name=allow_sells,json=allowSells,proto3" json:"allow_sells,omitempty"`
-	AlphaBond              bool                                                                 `protobuf:"varint,18,opt,name=alpha_bond,json=alphaBond,proto3" json:"alpha_bond,omitempty"`
-	BatchBlocks            github_com_cosmos_cosmos_sdk_types.Uint                              `protobuf:"bytes,19,opt,name=batch_blocks,json=batchBlocks,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"batch_blocks"`
-	OutcomePayment         github_com_cosmos_cosmos_sdk_types.Int                               `protobuf:"bytes,20,opt,name=outcome_payment,json=outcomePayment,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"outcome_payment"`
+	BondDid                string                                   `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
+	Token                  string                                   `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	Name                   string                                   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description            string                                   `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	FunctionType           string                                   `protobuf:"bytes,5,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
+	FunctionParameters     FunctionParams                           `protobuf:"bytes,6,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=FunctionParams" json:"function_parameters"`
+	CreatorDid             string                                   `protobuf:"bytes,7,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	ControllerDid          string                                   `protobuf:"bytes,8,opt,name=controller_did,json=controllerDid,proto3" json:"controller_did,omitempty"`
+	ReserveTokens          []string                                 `protobuf:"bytes,9,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
+	TxFeePercentage        github_com_cosmos_cosmos_sdk_types.Dec   `protobuf:"bytes,10,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"tx_fee_percentage"`
+	ExitFeePercentage      github_com_cosmos_cosmos_sdk_types.Dec   `protobuf:"bytes,11,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"exit_fee_percentage"`
+	FeeAddress             string                                   `protobuf:"bytes,12,opt,name=fee_address,json=feeAddress,proto3" json:"fee_address,omitempty"`
+	MaxSupply              types.Coin                               `protobuf:"bytes,13,opt,name=max_supply,json=maxSupply,proto3" json:"max_supply"`
+	OrderQuantityLimits    github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,14,rep,name=order_quantity_limits,json=orderQuantityLimits,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"order_quantity_limits"`
+	SanityRate             github_com_cosmos_cosmos_sdk_types.Dec   `protobuf:"bytes,15,opt,name=sanity_rate,json=sanityRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_rate"`
+	SanityMarginPercentage github_com_cosmos_cosmos_sdk_types.Dec   `protobuf:"bytes,16,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sanity_margin_percentage"`
+	AllowSells             bool                                     `protobuf:"varint,17,opt,name=allow_sells,json=allowSells,proto3" json:"allow_sells,omitempty"`
+	AlphaBond              bool                                     `protobuf:"varint,18,opt,name=alpha_bond,json=alphaBond,proto3" json:"alpha_bond,omitempty"`
+	BatchBlocks            github_com_cosmos_cosmos_sdk_types.Uint  `protobuf:"bytes,19,opt,name=batch_blocks,json=batchBlocks,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"batch_blocks"`
+	OutcomePayment         github_com_cosmos_cosmos_sdk_types.Int   `protobuf:"bytes,20,opt,name=outcome_payment,json=outcomePayment,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"outcome_payment"`
 }
 
 func (m *MsgCreateBond) Reset()         { *m = MsgCreateBond{} }
@@ -88,6 +86,13 @@ func (m *MsgCreateBond) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateBond proto.InternalMessageInfo
 
+func (m *MsgCreateBond) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
+
 func (m *MsgCreateBond) GetToken() string {
 	if m != nil {
 		return m.Token
@@ -116,11 +121,25 @@ func (m *MsgCreateBond) GetFunctionType() string {
 	return ""
 }
 
-func (m *MsgCreateBond) GetFunctionParameters() github_com_ixofoundation_ixo_blockchain_x_bonds_types.FunctionParams {
+func (m *MsgCreateBond) GetFunctionParameters() FunctionParams {
 	if m != nil {
 		return m.FunctionParameters
 	}
 	return nil
+}
+
+func (m *MsgCreateBond) GetCreatorDid() string {
+	if m != nil {
+		return m.CreatorDid
+	}
+	return ""
+}
+
+func (m *MsgCreateBond) GetControllerDid() string {
+	if m != nil {
+		return m.ControllerDid
+	}
+	return ""
 }
 
 func (m *MsgCreateBond) GetReserveTokens() []string {
@@ -128,6 +147,13 @@ func (m *MsgCreateBond) GetReserveTokens() []string {
 		return m.ReserveTokens
 	}
 	return nil
+}
+
+func (m *MsgCreateBond) GetFeeAddress() string {
+	if m != nil {
+		return m.FeeAddress
+	}
+	return ""
 }
 
 func (m *MsgCreateBond) GetMaxSupply() types.Coin {
@@ -195,13 +221,13 @@ func (m *MsgCreateBondResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgCreateBondResponse proto.InternalMessageInfo
 
 type MsgEditBond struct {
-	BondDid                github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	Name                   string                                                     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description            string                                                     `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	OrderQuantityLimits    string                                                     `protobuf:"bytes,4,opt,name=order_quantity_limits,json=orderQuantityLimits,proto3" json:"order_quantity_limits,omitempty"`
-	SanityRate             string                                                     `protobuf:"bytes,5,opt,name=sanity_rate,json=sanityRate,proto3" json:"sanity_rate,omitempty"`
-	SanityMarginPercentage string                                                     `protobuf:"bytes,6,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3" json:"sanity_margin_percentage,omitempty"`
-	EditorDid              github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,7,opt,name=editor_did,json=editorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"editor_did"`
+	BondDid                string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
+	Name                   string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description            string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	OrderQuantityLimits    string `protobuf:"bytes,4,opt,name=order_quantity_limits,json=orderQuantityLimits,proto3" json:"order_quantity_limits,omitempty"`
+	SanityRate             string `protobuf:"bytes,5,opt,name=sanity_rate,json=sanityRate,proto3" json:"sanity_rate,omitempty"`
+	SanityMarginPercentage string `protobuf:"bytes,6,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3" json:"sanity_margin_percentage,omitempty"`
+	EditorDid              string `protobuf:"bytes,7,opt,name=editor_did,json=editorDid,proto3" json:"editor_did,omitempty"`
 }
 
 func (m *MsgEditBond) Reset()         { *m = MsgEditBond{} }
@@ -237,6 +263,13 @@ func (m *MsgEditBond) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEditBond proto.InternalMessageInfo
 
+func (m *MsgEditBond) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
+
 func (m *MsgEditBond) GetName() string {
 	if m != nil {
 		return m.Name
@@ -268,6 +301,13 @@ func (m *MsgEditBond) GetSanityRate() string {
 func (m *MsgEditBond) GetSanityMarginPercentage() string {
 	if m != nil {
 		return m.SanityMarginPercentage
+	}
+	return ""
+}
+
+func (m *MsgEditBond) GetEditorDid() string {
+	if m != nil {
+		return m.EditorDid
 	}
 	return ""
 }
@@ -309,9 +349,9 @@ func (m *MsgEditBondResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgEditBondResponse proto.InternalMessageInfo
 
 type MsgSetNextAlpha struct {
-	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	Alpha     github_com_cosmos_cosmos_sdk_types.Dec                     `protobuf:"bytes,2,opt,name=alpha,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"alpha"`
-	EditorDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"editor_did"`
+	BondDid   string                                 `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
+	Alpha     github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=alpha,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"alpha"`
+	EditorDid string                                 `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3" json:"editor_did,omitempty"`
 }
 
 func (m *MsgSetNextAlpha) Reset()         { *m = MsgSetNextAlpha{} }
@@ -346,6 +386,20 @@ func (m *MsgSetNextAlpha) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_MsgSetNextAlpha proto.InternalMessageInfo
+
+func (m *MsgSetNextAlpha) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
+
+func (m *MsgSetNextAlpha) GetEditorDid() string {
+	if m != nil {
+		return m.EditorDid
+	}
+	return ""
+}
 
 type MsgSetNextAlphaResponse struct {
 }
@@ -384,9 +438,9 @@ func (m *MsgSetNextAlphaResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgSetNextAlphaResponse proto.InternalMessageInfo
 
 type MsgUpdateBondState struct {
-	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did      `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	State     github_com_ixofoundation_ixo_blockchain_x_bonds_types.BondState `protobuf:"bytes,2,opt,name=state,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/bonds/types.BondState" json:"state"`
-	EditorDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did      `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"editor_did"`
+	BondDid   string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
+	State     string `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	EditorDid string `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3" json:"editor_did,omitempty"`
 }
 
 func (m *MsgUpdateBondState) Reset()         { *m = MsgUpdateBondState{} }
@@ -421,6 +475,27 @@ func (m *MsgUpdateBondState) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_MsgUpdateBondState proto.InternalMessageInfo
+
+func (m *MsgUpdateBondState) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
+
+func (m *MsgUpdateBondState) GetState() string {
+	if m != nil {
+		return m.State
+	}
+	return ""
+}
+
+func (m *MsgUpdateBondState) GetEditorDid() string {
+	if m != nil {
+		return m.EditorDid
+	}
+	return ""
+}
 
 type MsgUpdateBondStateResponse struct {
 }
@@ -459,10 +534,10 @@ func (m *MsgUpdateBondStateResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgUpdateBondStateResponse proto.InternalMessageInfo
 
 type MsgBuy struct {
-	BuyerDid  github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=buyer_did,json=buyerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"buyer_did"`
-	Amount    types.Coin                                                 `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
-	MaxPrices github_com_cosmos_cosmos_sdk_types.Coins                   `protobuf:"bytes,3,rep,name=max_prices,json=maxPrices,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"max_prices"`
-	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,4,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	BuyerDid  string                                   `protobuf:"bytes,1,opt,name=buyer_did,json=buyerDid,proto3" json:"buyer_did,omitempty"`
+	Amount    types.Coin                               `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
+	MaxPrices github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=max_prices,json=maxPrices,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"max_prices"`
+	BondDid   string                                   `protobuf:"bytes,4,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 }
 
 func (m *MsgBuy) Reset()         { *m = MsgBuy{} }
@@ -498,6 +573,13 @@ func (m *MsgBuy) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBuy proto.InternalMessageInfo
 
+func (m *MsgBuy) GetBuyerDid() string {
+	if m != nil {
+		return m.BuyerDid
+	}
+	return ""
+}
+
 func (m *MsgBuy) GetAmount() types.Coin {
 	if m != nil {
 		return m.Amount
@@ -510,6 +592,13 @@ func (m *MsgBuy) GetMaxPrices() github_com_cosmos_cosmos_sdk_types.Coins {
 		return m.MaxPrices
 	}
 	return nil
+}
+
+func (m *MsgBuy) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
 }
 
 type MsgBuyResponse struct {
@@ -549,9 +638,9 @@ func (m *MsgBuyResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgBuyResponse proto.InternalMessageInfo
 
 type MsgSell struct {
-	SellerDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=seller_did,json=sellerDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"seller_did"`
-	Amount    types.Coin                                                 `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
-	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	SellerDid string     `protobuf:"bytes,1,opt,name=seller_did,json=sellerDid,proto3" json:"seller_did,omitempty"`
+	Amount    types.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
+	BondDid   string     `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 }
 
 func (m *MsgSell) Reset()         { *m = MsgSell{} }
@@ -587,11 +676,25 @@ func (m *MsgSell) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSell proto.InternalMessageInfo
 
+func (m *MsgSell) GetSellerDid() string {
+	if m != nil {
+		return m.SellerDid
+	}
+	return ""
+}
+
 func (m *MsgSell) GetAmount() types.Coin {
 	if m != nil {
 		return m.Amount
 	}
 	return types.Coin{}
+}
+
+func (m *MsgSell) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
 }
 
 type MsgSellResponse struct {
@@ -631,10 +734,10 @@ func (m *MsgSellResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgSellResponse proto.InternalMessageInfo
 
 type MsgSwap struct {
-	SwapperDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=swapper_did,json=swapperDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"swapper_did"`
-	BondDid    github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
-	From       types.Coin                                                 `protobuf:"bytes,3,opt,name=from,proto3" json:"from"`
-	ToToken    string                                                     `protobuf:"bytes,4,opt,name=to_token,json=toToken,proto3" json:"to_token,omitempty"`
+	SwapperDid string     `protobuf:"bytes,1,opt,name=swapper_did,json=swapperDid,proto3" json:"swapper_did,omitempty"`
+	BondDid    string     `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
+	From       types.Coin `protobuf:"bytes,3,opt,name=from,proto3" json:"from"`
+	ToToken    string     `protobuf:"bytes,4,opt,name=to_token,json=toToken,proto3" json:"to_token,omitempty"`
 }
 
 func (m *MsgSwap) Reset()         { *m = MsgSwap{} }
@@ -669,6 +772,20 @@ func (m *MsgSwap) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_MsgSwap proto.InternalMessageInfo
+
+func (m *MsgSwap) GetSwapperDid() string {
+	if m != nil {
+		return m.SwapperDid
+	}
+	return ""
+}
+
+func (m *MsgSwap) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
 
 func (m *MsgSwap) GetFrom() types.Coin {
 	if m != nil {
@@ -721,9 +838,9 @@ func (m *MsgSwapResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 
 type MsgMakeOutcomePayment struct {
-	SenderDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"sender_did"`
-	Amount    github_com_cosmos_cosmos_sdk_types.Int                     `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"amount"`
-	BondDid   github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	SenderDid string                                 `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3" json:"sender_did,omitempty"`
+	Amount    github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"amount"`
+	BondDid   string                                 `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 }
 
 func (m *MsgMakeOutcomePayment) Reset()         { *m = MsgMakeOutcomePayment{} }
@@ -758,6 +875,20 @@ func (m *MsgMakeOutcomePayment) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_MsgMakeOutcomePayment proto.InternalMessageInfo
+
+func (m *MsgMakeOutcomePayment) GetSenderDid() string {
+	if m != nil {
+		return m.SenderDid
+	}
+	return ""
+}
+
+func (m *MsgMakeOutcomePayment) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
 
 type MsgMakeOutcomePaymentResponse struct {
 }
@@ -796,8 +927,8 @@ func (m *MsgMakeOutcomePaymentResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgMakeOutcomePaymentResponse proto.InternalMessageInfo
 
 type MsgWithdrawShare struct {
-	RecipientDid github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,1,opt,name=recipient_did,json=recipientDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"recipient_did"`
-	BondDid      github_com_ixofoundation_ixo_blockchain_x_did_exported.Did `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3,customtype=github.com/ixofoundation/ixo-blockchain/x/did/exported.Did" json:"bond_did"`
+	RecipientDid string `protobuf:"bytes,1,opt,name=recipient_did,json=recipientDid,proto3" json:"recipient_did,omitempty"`
+	BondDid      string `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 }
 
 func (m *MsgWithdrawShare) Reset()         { *m = MsgWithdrawShare{} }
@@ -832,6 +963,20 @@ func (m *MsgWithdrawShare) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_MsgWithdrawShare proto.InternalMessageInfo
+
+func (m *MsgWithdrawShare) GetRecipientDid() string {
+	if m != nil {
+		return m.RecipientDid
+	}
+	return ""
+}
+
+func (m *MsgWithdrawShare) GetBondDid() string {
+	if m != nil {
+		return m.BondDid
+	}
+	return ""
+}
 
 type MsgWithdrawShareResponse struct {
 }
@@ -893,90 +1038,85 @@ func init() {
 func init() { proto.RegisterFile("bonds/tx.proto", fileDescriptor_27ad5b938c9f2476) }
 
 var fileDescriptor_27ad5b938c9f2476 = []byte{
-	// 1327 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0x8f, 0xff, 0xe4, 0x8f, 0x9f, 0x63, 0xa7, 0x99, 0x24, 0xed, 0x66, 0xd5, 0xda, 0x21, 0xfc,
-	0x8b, 0x84, 0x6a, 0xd3, 0x54, 0x15, 0xa8, 0x07, 0xa0, 0x6e, 0x08, 0xaa, 0x54, 0x93, 0xb0, 0x69,
-	0x29, 0xaa, 0x54, 0x56, 0xe3, 0xdd, 0xc9, 0x7a, 0xc9, 0x7a, 0x67, 0xd9, 0x19, 0x37, 0xf6, 0x89,
-	0x0b, 0x1f, 0x00, 0x09, 0x2e, 0x1c, 0x38, 0x70, 0xe5, 0xce, 0x77, 0xe8, 0x09, 0xf5, 0x88, 0x7a,
-	0x28, 0xa8, 0x3d, 0x71, 0xe0, 0x3b, 0xa0, 0x99, 0x1d, 0xaf, 0x77, 0x9d, 0xa4, 0x72, 0x83, 0x93,
-	0x4b, 0xbb, 0xf3, 0xe6, 0xcd, 0xef, 0xcd, 0xfc, 0xde, 0x6f, 0xe6, 0xbd, 0x18, 0xca, 0x2d, 0xea,
-	0xdb, 0xac, 0xce, 0x7b, 0xb5, 0x20, 0xa4, 0x9c, 0xa2, 0x69, 0x39, 0xd6, 0x97, 0x1d, 0xea, 0x50,
-	0x69, 0xa9, 0x8b, 0xaf, 0x68, 0x52, 0xaf, 0x58, 0x94, 0x75, 0x28, 0xab, 0xb7, 0x30, 0x23, 0xf5,
-	0xc7, 0xd7, 0x5a, 0x84, 0xe3, 0x6b, 0x75, 0x8b, 0xba, 0xbe, 0x9a, 0x5f, 0x8c, 0xc0, 0xe4, 0xbf,
-	0x91, 0x69, 0xfd, 0x9f, 0x22, 0x94, 0x9a, 0xcc, 0xb9, 0x1d, 0x12, 0xcc, 0x49, 0x83, 0xfa, 0x36,
-	0x7a, 0x04, 0x73, 0xc2, 0xc1, 0xb4, 0x5d, 0x5b, 0xcb, 0xac, 0x65, 0x36, 0x0a, 0x8d, 0xc6, 0x93,
-	0xe7, 0xd5, 0xa9, 0x67, 0xcf, 0xab, 0x37, 0x1d, 0x97, 0xb7, 0xbb, 0xad, 0x9a, 0x45, 0x3b, 0x75,
-	0xb7, 0x47, 0xf7, 0x69, 0xd7, 0xb7, 0x31, 0x77, 0xa9, 0x2f, 0x46, 0x57, 0x5b, 0x1e, 0xb5, 0x0e,
-	0xac, 0x36, 0x76, 0xfd, 0x7a, 0xaf, 0x6e, 0xbb, 0x76, 0x9d, 0xf4, 0x02, 0x1a, 0x72, 0x62, 0xd7,
-	0xb6, 0x5c, 0xdb, 0x98, 0x15, 0x98, 0x5b, 0xae, 0x8d, 0x96, 0x61, 0x9a, 0xd3, 0x03, 0xe2, 0x6b,
-	0x59, 0x81, 0x6d, 0x44, 0x03, 0x84, 0x20, 0xef, 0xe3, 0x0e, 0xd1, 0x72, 0xd2, 0x28, 0xbf, 0xd1,
-	0x1a, 0x14, 0x6d, 0xc2, 0xac, 0xd0, 0x0d, 0x44, 0x0c, 0x2d, 0x2f, 0xa7, 0x92, 0x26, 0xf4, 0x26,
-	0x94, 0xf6, 0xbb, 0xbe, 0x25, 0xbe, 0x4d, 0xde, 0x0f, 0x88, 0x36, 0x2d, 0x7d, 0xe6, 0x07, 0xc6,
-	0x7b, 0xfd, 0x80, 0xa0, 0x1f, 0x33, 0xb0, 0x14, 0x7b, 0x05, 0x38, 0xc4, 0x1d, 0xc2, 0x49, 0xc8,
-	0xb4, 0x99, 0xb5, 0xdc, 0x46, 0x71, 0x73, 0xb9, 0x16, 0xb1, 0xb1, 0xad, 0x3c, 0x76, 0x85, 0x43,
-	0xe3, 0xae, 0x38, 0xf1, 0x6f, 0x7f, 0x55, 0xb7, 0xc6, 0x3f, 0xb1, 0xca, 0x53, 0x3f, 0x20, 0x23,
-	0x60, 0xcc, 0x40, 0xfb, 0xc9, 0xb1, 0x8c, 0x8e, 0x2c, 0x28, 0x5a, 0x82, 0x73, 0x1a, 0x4a, 0xa2,
-	0x67, 0x27, 0x46, 0x34, 0x28, 0x58, 0xc1, 0xb5, 0x0b, 0x65, 0x8b, 0xfa, 0x3c, 0xa4, 0x9e, 0x47,
-	0xa2, 0x38, 0x73, 0x13, 0x8b, 0x53, 0x1a, 0x22, 0x8b, 0x50, 0x6f, 0x43, 0x39, 0x24, 0x8c, 0x84,
-	0x8f, 0x89, 0x29, 0x33, 0xca, 0xb4, 0xc2, 0x5a, 0x6e, 0xa3, 0x60, 0x94, 0x94, 0xf5, 0x9e, 0x34,
-	0xa2, 0x87, 0xb0, 0xc8, 0x7b, 0xe6, 0x3e, 0x21, 0x66, 0x40, 0x42, 0x8b, 0xf8, 0x1c, 0x3b, 0x44,
-	0x03, 0xb9, 0xa9, 0x9a, 0xda, 0xd4, 0x3b, 0x89, 0x4d, 0x29, 0x3d, 0x47, 0xff, 0x5d, 0x65, 0xf6,
-	0x81, 0x22, 0x78, 0x8b, 0x58, 0xc6, 0x02, 0xef, 0x6d, 0x13, 0xb2, 0x1b, 0xc3, 0xa0, 0xaf, 0x61,
-	0x89, 0xf4, 0x5c, 0x3e, 0x8a, 0x5e, 0x3c, 0x15, 0xfa, 0xa2, 0x80, 0x4a, 0xe3, 0x7f, 0x09, 0x45,
-	0x01, 0x8d, 0x6d, 0x3b, 0x24, 0x8c, 0x69, 0xf3, 0x12, 0xf7, 0x86, 0xc2, 0xbd, 0x3a, 0x06, 0xee,
-	0x2d, 0xcb, 0xba, 0x15, 0x2d, 0x36, 0x60, 0x9f, 0x10, 0xf5, 0x8d, 0x3e, 0x02, 0xe8, 0xe0, 0x9e,
-	0xc9, 0xba, 0x41, 0xe0, 0xf5, 0xb5, 0xd2, 0x5a, 0x66, 0xa3, 0xb8, 0xb9, 0x5a, 0x8b, 0x56, 0xd7,
-	0xc4, 0x55, 0xae, 0xa9, 0xab, 0x5c, 0xbb, 0x4d, 0x5d, 0xbf, 0x91, 0x17, 0x11, 0x8d, 0x42, 0x07,
-	0xf7, 0xf6, 0xe4, 0x0a, 0xf4, 0x1d, 0xac, 0xd0, 0xd0, 0x26, 0xa1, 0xf9, 0x6d, 0x17, 0xfb, 0xdc,
-	0xe5, 0x7d, 0xd3, 0x73, 0x3b, 0x2e, 0x67, 0x5a, 0x59, 0x2a, 0xfc, 0x15, 0x50, 0xef, 0x2b, 0x99,
-	0x6f, 0x8c, 0xb1, 0x79, 0xb1, 0x80, 0x19, 0x4b, 0x32, 0xd2, 0x17, 0x2a, 0xd0, 0x5d, 0x19, 0x07,
-	0xed, 0x40, 0x91, 0x61, 0x5f, 0x04, 0x0e, 0x31, 0x27, 0xda, 0xc2, 0xa9, 0x08, 0x87, 0x08, 0xc2,
-	0xc0, 0x9c, 0xa0, 0x36, 0x68, 0x0a, 0xb0, 0x83, 0x43, 0xc7, 0xf5, 0x93, 0xe9, 0xbc, 0x70, 0x2a,
-	0xf4, 0x8b, 0x11, 0x5e, 0x53, 0xc2, 0x25, 0x72, 0x5a, 0x85, 0x22, 0xf6, 0x3c, 0x7a, 0x68, 0x32,
-	0xe2, 0x79, 0x4c, 0x5b, 0x5c, 0xcb, 0x6c, 0xcc, 0x19, 0x20, 0x4d, 0x7b, 0xc2, 0x82, 0xae, 0x00,
-	0x60, 0x2f, 0x68, 0x63, 0x53, 0xdc, 0x6f, 0x0d, 0xc9, 0xf9, 0x82, 0xb4, 0xc8, 0xc7, 0xd2, 0x80,
-	0xf9, 0x16, 0xe6, 0x56, 0xdb, 0x94, 0x97, 0x85, 0x69, 0x4b, 0x72, 0x77, 0x75, 0xb5, 0xbb, 0x77,
-	0xc7, 0xd8, 0xdd, 0x7d, 0xd7, 0xe7, 0x46, 0x51, 0x82, 0x34, 0x24, 0x06, 0x7a, 0x00, 0x0b, 0xb4,
-	0xcb, 0x2d, 0xda, 0x21, 0x66, 0x80, 0xfb, 0x1d, 0xe2, 0x73, 0x6d, 0xf9, 0xb5, 0x0f, 0x7d, 0xc7,
-	0xe7, 0x46, 0x59, 0xc1, 0xec, 0x46, 0x28, 0xeb, 0x97, 0x60, 0x25, 0xf5, 0xd4, 0x1b, 0x84, 0x05,
-	0xd4, 0x67, 0x64, 0xfd, 0xa7, 0x1c, 0x14, 0x9b, 0xcc, 0xf9, 0xd4, 0x76, 0xf9, 0x79, 0x94, 0x80,
-	0xc1, 0x63, 0x9f, 0x3d, 0xf9, 0xb1, 0xcf, 0x1d, 0x7d, 0xec, 0x37, 0x4f, 0x92, 0x79, 0x54, 0x18,
-	0x8e, 0x55, 0x66, 0x35, 0xad, 0xcc, 0xa8, 0x3c, 0x24, 0x95, 0xf6, 0xe1, 0x2b, 0x94, 0x36, 0x23,
-	0xbd, 0x4f, 0x52, 0x0e, 0x06, 0x20, 0xb6, 0x3b, 0xf9, 0xf7, 0xbb, 0x10, 0xa1, 0x6e, 0xb9, 0xf6,
-	0xfa, 0x0a, 0x2c, 0x25, 0xb2, 0x12, 0x67, 0xeb, 0xe7, 0x2c, 0x2c, 0x34, 0x99, 0xb3, 0x47, 0xf8,
-	0xe7, 0xa4, 0xc7, 0x6f, 0x09, 0x2d, 0x9e, 0x75, 0xc6, 0xb6, 0x60, 0x5a, 0x6a, 0x3e, 0x4a, 0xd9,
-	0x6b, 0xdf, 0xbe, 0x68, 0xf1, 0x08, 0x65, 0xb9, 0xb3, 0xa0, 0x6c, 0x15, 0x2e, 0x8d, 0x50, 0x13,
-	0xd3, 0xf6, 0x7b, 0x16, 0x50, 0x93, 0x39, 0xf7, 0x03, 0x5b, 0xc9, 0x7f, 0x8f, 0x0b, 0x05, 0x9c,
-	0x31, 0x73, 0x8f, 0x60, 0x9a, 0x89, 0x38, 0x8a, 0xb9, 0xcf, 0x14, 0xf6, 0xc7, 0xa7, 0x6b, 0x2c,
-	0xe2, 0x6d, 0x1b, 0x11, 0xea, 0x79, 0x50, 0x7a, 0x19, 0xf4, 0xa3, 0xb4, 0xc5, 0xac, 0xfe, 0x9b,
-	0x85, 0x99, 0x26, 0x73, 0x1a, 0xdd, 0x3e, 0x32, 0xa1, 0xd0, 0xea, 0xf6, 0x55, 0xa3, 0x31, 0x39,
-	0x2a, 0xe7, 0x24, 0xa8, 0xe0, 0xf2, 0x03, 0x98, 0xc1, 0x1d, 0xda, 0xf5, 0xb9, 0x24, 0x73, 0x8c,
-	0x22, 0xa9, 0xdc, 0xd1, 0x37, 0x51, 0x85, 0x0d, 0x42, 0xd7, 0x22, 0x4c, 0xcb, 0x4d, 0xbe, 0x2c,
-	0x8a, 0x6a, 0xbc, 0x2b, 0xd1, 0x53, 0x7a, 0xca, 0x4f, 0x5c, 0x4f, 0xeb, 0x17, 0xa0, 0x1c, 0xd1,
-	0x1d, 0x67, 0xe0, 0xfb, 0x2c, 0xcc, 0x4a, 0xcd, 0x7b, 0x9e, 0x90, 0x83, 0x28, 0x64, 0x13, 0xcf,
-	0x41, 0x21, 0x42, 0xfd, 0x5f, 0x49, 0x48, 0x12, 0x93, 0x9b, 0x3c, 0x31, 0x8b, 0xea, 0x51, 0xf4,
-	0xbc, 0x98, 0x99, 0x5f, 0x14, 0x33, 0x87, 0x38, 0x10, 0xfd, 0x36, 0x3b, 0xc4, 0x41, 0x30, 0x71,
-	0x6a, 0x40, 0xc1, 0x46, 0x97, 0x7d, 0x78, 0xc4, 0xec, 0xe4, 0xdf, 0x92, 0xeb, 0x90, 0xdf, 0x0f,
-	0x69, 0x47, 0xb2, 0x37, 0x06, 0xf1, 0xd2, 0x19, 0xad, 0xc2, 0x1c, 0xa7, 0x51, 0x4f, 0xae, 0x2a,
-	0xe5, 0x2c, 0xa7, 0xb2, 0x1b, 0x1f, 0x50, 0x76, 0x88, 0x83, 0x98, 0xb2, 0x5f, 0xb3, 0xb2, 0x47,
-	0x68, 0xe2, 0x03, 0xb2, 0x93, 0x6a, 0x1e, 0x22, 0x69, 0xf9, 0xf6, 0x59, 0x48, 0x4b, 0xa0, 0x8a,
-	0xf3, 0x6d, 0xa7, 0xa4, 0xf5, 0xfa, 0xfd, 0xce, 0x39, 0x29, 0xad, 0x0a, 0x57, 0x8e, 0xa5, 0x28,
-	0x26, 0xf1, 0x59, 0x06, 0x2e, 0x34, 0x99, 0xf3, 0xc0, 0xe5, 0x6d, 0x3b, 0xc4, 0x87, 0x7b, 0x6d,
-	0x1c, 0x12, 0xe4, 0x40, 0x29, 0x24, 0x96, 0x1b, 0xb8, 0xc4, 0xe7, 0x13, 0xa6, 0x70, 0x3e, 0x06,
-	0x3e, 0x7b, 0x11, 0xae, 0xeb, 0xa0, 0x8d, 0x9e, 0x6d, 0x70, 0xf0, 0xcd, 0x3f, 0xf2, 0x90, 0x6b,
-	0x32, 0x07, 0x7d, 0x02, 0x90, 0xf8, 0x41, 0x61, 0xf0, 0x27, 0x76, 0xaa, 0xf7, 0xd4, 0x2f, 0x1f,
-	0x67, 0x1d, 0x20, 0xa1, 0x9b, 0x30, 0x17, 0x77, 0xa3, 0x68, 0xe8, 0x39, 0xb0, 0xe9, 0xfa, 0x51,
-	0x5b, 0xbc, 0x76, 0x1b, 0xe6, 0x53, 0xbd, 0xd1, 0xc5, 0xa1, 0x6f, 0xd2, 0xae, 0x57, 0x8e, 0xb7,
-	0xc7, 0x38, 0x3b, 0xb0, 0x30, 0xda, 0x2c, 0xac, 0x0e, 0x97, 0x8c, 0x4c, 0xe9, 0x6f, 0x9c, 0x38,
-	0x15, 0x03, 0xbe, 0x07, 0x39, 0x51, 0x27, 0x4b, 0x43, 0xcf, 0x46, 0xb7, 0xaf, 0xaf, 0xa4, 0x86,
-	0xb1, 0x73, 0x0d, 0xf2, 0xf2, 0x49, 0x2f, 0x27, 0x77, 0xe9, 0x79, 0xfa, 0xc5, 0xf4, 0x38, 0xe5,
-	0x2f, 0x1e, 0xba, 0xa4, 0xff, 0x21, 0x0e, 0x52, 0xfe, 0x89, 0x9b, 0x8e, 0xbe, 0x02, 0x74, 0xcc,
-	0x2d, 0x4f, 0x64, 0xe5, 0xe8, 0xac, 0xfe, 0xd6, 0xab, 0x66, 0x63, 0xe4, 0x3b, 0x50, 0x4a, 0x4b,
-	0xff, 0xd2, 0x70, 0x59, 0x6a, 0x42, 0xaf, 0x9e, 0x30, 0x31, 0x80, 0x6a, 0xec, 0x3c, 0x79, 0x51,
-	0xc9, 0x3c, 0x7d, 0x51, 0xc9, 0xfc, 0xfd, 0xa2, 0x92, 0xf9, 0xe1, 0x65, 0x65, 0xea, 0xe9, 0xcb,
-	0xca, 0xd4, 0x9f, 0x2f, 0x2b, 0x53, 0x0f, 0x6f, 0x9c, 0xaa, 0x81, 0x6a, 0xcd, 0xc8, 0x5f, 0xbd,
-	0xae, 0xff, 0x17, 0x00, 0x00, 0xff, 0xff, 0xe4, 0x0b, 0x74, 0xa9, 0x57, 0x13, 0x00, 0x00,
+	// 1242 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x57, 0x4d, 0x6f, 0x1b, 0x45,
+	0x18, 0x8e, 0x63, 0x27, 0x8d, 0x5f, 0xc7, 0x4e, 0x33, 0xf9, 0xe8, 0x76, 0x69, 0x6d, 0x63, 0xbe,
+	0x22, 0xa1, 0xda, 0x34, 0x15, 0x02, 0x71, 0x40, 0xd4, 0x0d, 0x91, 0x2a, 0x61, 0x12, 0x36, 0xad,
+	0x8a, 0x2a, 0xc1, 0x6a, 0xbc, 0x3b, 0x5e, 0x2f, 0xd9, 0xdd, 0x59, 0x76, 0xc6, 0xb5, 0x2d, 0x21,
+	0xf1, 0x07, 0x38, 0xc0, 0x81, 0x03, 0x7f, 0x81, 0x0b, 0x7f, 0xa3, 0x27, 0xd4, 0x23, 0xe2, 0x50,
+	0x50, 0x2b, 0xfe, 0x07, 0x9a, 0x99, 0xf5, 0x7a, 0xd7, 0x49, 0xdc, 0x24, 0x70, 0x49, 0x76, 0x9e,
+	0x79, 0xf7, 0x99, 0xe7, 0x7d, 0xe7, 0x9d, 0x67, 0xd6, 0x50, 0xe9, 0xd2, 0xc0, 0x66, 0x2d, 0x3e,
+	0x6a, 0x86, 0x11, 0xe5, 0x14, 0x2d, 0xc9, 0xb1, 0xbe, 0xe9, 0x50, 0x87, 0x4a, 0xa4, 0x25, 0x9e,
+	0xd4, 0xa4, 0x5e, 0xb5, 0x28, 0xf3, 0x29, 0x6b, 0x75, 0x31, 0x23, 0xad, 0x27, 0xb7, 0xbb, 0x84,
+	0xe3, 0xdb, 0x2d, 0x8b, 0xba, 0x41, 0x3c, 0xbf, 0xae, 0xc8, 0xe4, 0x5f, 0x05, 0x35, 0x7e, 0x2b,
+	0x42, 0xb9, 0xc3, 0x9c, 0x7b, 0x11, 0xc1, 0x9c, 0xb4, 0x69, 0x60, 0xa3, 0xeb, 0xb0, 0x22, 0x02,
+	0x4c, 0xdb, 0xb5, 0xb5, 0x5c, 0x3d, 0xb7, 0x53, 0x34, 0xae, 0x88, 0xf1, 0x9e, 0x6b, 0xa3, 0x4d,
+	0x58, 0xe2, 0xf4, 0x98, 0x04, 0xda, 0xa2, 0xc4, 0xd5, 0x00, 0x21, 0x28, 0x04, 0xd8, 0x27, 0x5a,
+	0x5e, 0x82, 0xf2, 0x19, 0xd5, 0xa1, 0x64, 0x13, 0x66, 0x45, 0x6e, 0xc8, 0x5d, 0x1a, 0x68, 0x05,
+	0x39, 0x95, 0x86, 0xd0, 0x1b, 0x50, 0xee, 0x0d, 0x02, 0x4b, 0x3c, 0x9b, 0x7c, 0x1c, 0x12, 0x6d,
+	0x49, 0xc6, 0xac, 0x4e, 0xc0, 0x07, 0xe3, 0x90, 0xa0, 0xaf, 0x60, 0x23, 0x09, 0x0a, 0x71, 0x84,
+	0x7d, 0xc2, 0x49, 0xc4, 0xb4, 0xe5, 0x7a, 0x7e, 0xa7, 0xb4, 0xbb, 0xd9, 0x54, 0x89, 0xec, 0xc7,
+	0x11, 0x87, 0x22, 0xa0, 0xbd, 0xfd, 0xf4, 0x79, 0x6d, 0xe1, 0xd7, 0xbf, 0x6a, 0x95, 0x0c, 0xcc,
+	0x0c, 0xd4, 0x4b, 0x8f, 0x25, 0x0f, 0xaa, 0x41, 0xc9, 0x12, 0x89, 0xd3, 0x48, 0x66, 0x7b, 0x45,
+	0x2a, 0x80, 0x18, 0x12, 0x09, 0xbf, 0x05, 0x15, 0x8b, 0x06, 0x3c, 0xa2, 0x9e, 0x47, 0x54, 0xcc,
+	0x8a, 0x8c, 0x29, 0x4f, 0xd1, 0x38, 0x2c, 0x22, 0x8c, 0x44, 0x4f, 0x88, 0x29, 0x4b, 0xc2, 0xb4,
+	0x62, 0x3d, 0x2f, 0xc2, 0x62, 0xf4, 0x81, 0x04, 0xd1, 0x63, 0x58, 0xe7, 0x23, 0xb3, 0x47, 0x88,
+	0x19, 0x92, 0xc8, 0x22, 0x01, 0xc7, 0x0e, 0xd1, 0x40, 0x10, 0xb6, 0x9b, 0x42, 0xf5, 0x9f, 0xcf,
+	0x6b, 0x6f, 0x3b, 0x2e, 0xef, 0x0f, 0xba, 0x4d, 0x8b, 0xfa, 0xad, 0x78, 0x33, 0xd5, 0xbf, 0x5b,
+	0xcc, 0x3e, 0x6e, 0x89, 0x3a, 0xb1, 0xe6, 0x1e, 0xb1, 0x8c, 0x35, 0x3e, 0xda, 0x27, 0xe4, 0x30,
+	0xa1, 0x41, 0x5f, 0xc3, 0x06, 0x19, 0xb9, 0x7c, 0x96, 0xbd, 0x74, 0x29, 0xf6, 0x75, 0x41, 0x95,
+	0xe5, 0xaf, 0x41, 0x49, 0x50, 0x63, 0xdb, 0x8e, 0x08, 0x63, 0xda, 0xaa, 0x2a, 0x55, 0x8f, 0x90,
+	0xbb, 0x0a, 0x41, 0x1f, 0x03, 0xf8, 0x78, 0x64, 0xb2, 0x41, 0x18, 0x7a, 0x63, 0xad, 0x5c, 0xcf,
+	0xed, 0x94, 0x76, 0xaf, 0x37, 0x15, 0x7d, 0x53, 0x34, 0x64, 0x33, 0x6e, 0xc8, 0xe6, 0x3d, 0xea,
+	0x06, 0xed, 0x82, 0x90, 0x64, 0x14, 0x7d, 0x3c, 0x3a, 0x92, 0x6f, 0xa0, 0xef, 0x61, 0x8b, 0x46,
+	0x36, 0x89, 0xcc, 0x6f, 0x07, 0x38, 0xe0, 0x2e, 0x1f, 0x9b, 0x9e, 0xeb, 0xbb, 0x9c, 0x69, 0x15,
+	0xb9, 0xd9, 0x73, 0xa8, 0xde, 0x8b, 0x77, 0x7c, 0xe7, 0x1c, 0xd9, 0x89, 0x17, 0x98, 0xb1, 0x21,
+	0x57, 0xfa, 0x22, 0x5e, 0xe8, 0x33, 0xb9, 0x0e, 0x3a, 0x80, 0x12, 0xc3, 0x81, 0x58, 0x38, 0xc2,
+	0x9c, 0x68, 0x6b, 0x97, 0xaa, 0x1c, 0x28, 0x0a, 0x03, 0x73, 0x82, 0xfa, 0xa0, 0xc5, 0x84, 0x3e,
+	0x8e, 0x1c, 0x37, 0x48, 0xef, 0xcb, 0xd5, 0x4b, 0xb1, 0x6f, 0x2b, 0xbe, 0x8e, 0xa4, 0xcb, 0x6e,
+	0x0e, 0xf6, 0x3c, 0x3a, 0x34, 0x19, 0xf1, 0x3c, 0xa6, 0xad, 0xd7, 0x73, 0x3b, 0x2b, 0x06, 0x48,
+	0xe8, 0x48, 0x20, 0xe8, 0x26, 0x00, 0xf6, 0xc2, 0x3e, 0x36, 0xc5, 0x89, 0xd1, 0x90, 0x9c, 0x2f,
+	0x4a, 0x44, 0x1e, 0x79, 0x03, 0x56, 0xbb, 0x98, 0x5b, 0x7d, 0xb3, 0xeb, 0x51, 0xeb, 0x98, 0x69,
+	0x1b, 0x52, 0x5d, 0x2b, 0x56, 0xf7, 0xce, 0x39, 0xd4, 0x3d, 0x74, 0x03, 0x6e, 0x94, 0x24, 0x49,
+	0x5b, 0x72, 0xa0, 0x47, 0xb0, 0x46, 0x07, 0xdc, 0xa2, 0x3e, 0x31, 0x43, 0x3c, 0xf6, 0x49, 0xc0,
+	0xb5, 0xcd, 0x0b, 0x27, 0x7d, 0x3f, 0xe0, 0x46, 0x25, 0xa6, 0x39, 0x54, 0x2c, 0x8d, 0x6b, 0xb0,
+	0x95, 0x31, 0x2c, 0x83, 0xb0, 0x90, 0x06, 0x8c, 0x34, 0x7e, 0x58, 0x84, 0x52, 0x87, 0x39, 0x9f,
+	0xda, 0x2e, 0x7f, 0x95, 0x91, 0x4d, 0x2c, 0x6b, 0xf1, 0x6c, 0xcb, 0xca, 0x9f, 0xb4, 0xac, 0xdd,
+	0xb3, 0x5a, 0x54, 0xd9, 0xdb, 0xa9, 0x5d, 0x55, 0xcb, 0x76, 0x95, 0x32, 0xb9, 0x74, 0x97, 0x7c,
+	0x38, 0xa7, 0x4b, 0x96, 0x65, 0xf4, 0x59, 0xbb, 0x7e, 0x13, 0x80, 0xd8, 0x6e, 0xd6, 0xbc, 0x8a,
+	0x0a, 0xd9, 0x73, 0xed, 0xc6, 0x16, 0x6c, 0xa4, 0xaa, 0x91, 0x54, 0xe9, 0xa7, 0x1c, 0xac, 0x75,
+	0x98, 0x73, 0x44, 0xf8, 0xe7, 0x64, 0xc4, 0xef, 0x8a, 0x1e, 0x98, 0x57, 0xa9, 0x3d, 0x58, 0x92,
+	0x7d, 0xa2, 0x4a, 0x75, 0xe1, 0x8e, 0x55, 0x2f, 0xcf, 0x48, 0xcd, 0xcf, 0x4a, 0xbd, 0x0e, 0xd7,
+	0x66, 0x24, 0x25, 0x72, 0x6d, 0x40, 0x1d, 0xe6, 0x3c, 0x0c, 0xed, 0x78, 0xb7, 0x8f, 0xb8, 0x28,
+	0xda, 0xfc, 0x3b, 0x8a, 0x89, 0x98, 0xc9, 0x1d, 0x25, 0x07, 0xaf, 0x12, 0x70, 0x03, 0xf4, 0x93,
+	0xab, 0x24, 0x1a, 0xfe, 0xc9, 0xc1, 0x72, 0x87, 0x39, 0xed, 0xc1, 0x18, 0xbd, 0x06, 0xc5, 0xee,
+	0x60, 0x1c, 0xdf, 0x05, 0x6a, 0xe5, 0x15, 0x09, 0x88, 0xa5, 0x3f, 0x80, 0x65, 0xec, 0xd3, 0x41,
+	0xc0, 0xe5, 0xda, 0xe7, 0xb0, 0xbf, 0x38, 0x1c, 0x7d, 0xa3, 0xbc, 0x33, 0x8c, 0x5c, 0x8b, 0x30,
+	0x2d, 0xff, 0xff, 0x1b, 0x9e, 0xf0, 0xd9, 0x43, 0xc9, 0x9e, 0x29, 0x5d, 0x21, 0x53, 0xba, 0xc6,
+	0x55, 0xa8, 0xa8, 0x34, 0x93, 0xcc, 0xbf, 0x83, 0x2b, 0x72, 0x63, 0x3c, 0x4f, 0x54, 0x50, 0xb8,
+	0x4b, 0x26, 0xf5, 0xa2, 0x42, 0xfe, 0x53, 0xee, 0x69, 0x3d, 0xf9, 0xac, 0x9e, 0xf5, 0xb8, 0x53,
+	0x3d, 0x2f, 0x11, 0xf4, 0x73, 0x4e, 0x29, 0x1a, 0xe2, 0x50, 0x1e, 0xad, 0x21, 0x0e, 0xc3, 0x8c,
+	0x24, 0x88, 0x21, 0xa1, 0x29, 0x4d, 0xbd, 0x98, 0xed, 0x92, 0x3b, 0x50, 0xe8, 0x45, 0xd4, 0x97,
+	0x2b, 0x9e, 0x43, 0xac, 0x0c, 0x16, 0x7c, 0x9c, 0xaa, 0x1b, 0x7e, 0x52, 0x3a, 0x4e, 0xe5, 0xdd,
+	0x3e, 0x91, 0x3a, 0xc4, 0x61, 0x22, 0xf5, 0x97, 0x9c, 0x34, 0xaa, 0x0e, 0x3e, 0x26, 0x07, 0x19,
+	0x07, 0x53, 0xa5, 0x0c, 0xec, 0xd9, 0x52, 0x0a, 0x44, 0x68, 0xdb, 0xcf, 0x94, 0xf2, 0xe2, 0x86,
+	0x79, 0x8e, 0xca, 0xd6, 0xe0, 0xe6, 0xa9, 0xd2, 0x12, 0xf1, 0x06, 0x5c, 0xed, 0x30, 0xe7, 0x91,
+	0xcb, 0xfb, 0x76, 0x84, 0x87, 0x47, 0x7d, 0x1c, 0x11, 0xf1, 0xc5, 0x16, 0x11, 0xcb, 0x0d, 0x5d,
+	0x12, 0xf0, 0x94, 0xf2, 0xd5, 0x04, 0x9c, 0x5f, 0xf3, 0x86, 0x0e, 0xda, 0x2c, 0xe7, 0x64, 0xbd,
+	0xdd, 0xdf, 0x0b, 0x90, 0xef, 0x30, 0x07, 0x7d, 0x02, 0x90, 0xfa, 0x14, 0x9d, 0x7c, 0xe1, 0x65,
+	0xfc, 0x5e, 0xbf, 0x71, 0x1a, 0x3a, 0x61, 0x42, 0x1f, 0xc1, 0x4a, 0x72, 0x03, 0xa0, 0x69, 0xe4,
+	0x04, 0xd3, 0xf5, 0x93, 0x58, 0xf2, 0xee, 0x3e, 0xac, 0x66, 0x7c, 0x71, 0x7b, 0x1a, 0x9b, 0xc6,
+	0xf5, 0xea, 0xe9, 0x78, 0xc2, 0x73, 0x00, 0x6b, 0x27, 0x1c, 0x6b, 0xfa, 0xca, 0xcc, 0x94, 0xfe,
+	0xfa, 0x99, 0x53, 0x09, 0xe1, 0xbb, 0x90, 0x17, 0xee, 0x53, 0x9e, 0x46, 0xb6, 0x07, 0x63, 0x7d,
+	0x2b, 0x33, 0x4c, 0x82, 0x9b, 0x50, 0x90, 0x27, 0xb6, 0x92, 0x56, 0xe9, 0x79, 0xfa, 0x76, 0x76,
+	0x9c, 0x89, 0x17, 0xe7, 0x29, 0x1d, 0x3f, 0xc4, 0x61, 0x26, 0x3e, 0xd5, 0xd8, 0xe8, 0x4b, 0x40,
+	0xa7, 0x34, 0x75, 0x6a, 0x57, 0x4e, 0xce, 0xea, 0x6f, 0xce, 0x9b, 0x4d, 0x98, 0xef, 0x43, 0x39,
+	0xdb, 0x72, 0xd7, 0xa6, 0xaf, 0x65, 0x26, 0xf4, 0xda, 0x19, 0x13, 0x13, 0xaa, 0xf6, 0xc1, 0xd3,
+	0x17, 0xd5, 0xdc, 0xb3, 0x17, 0xd5, 0xdc, 0xdf, 0x2f, 0xaa, 0xb9, 0x1f, 0x5f, 0x56, 0x17, 0x9e,
+	0xbd, 0xac, 0x2e, 0xfc, 0xf1, 0xb2, 0xba, 0xf0, 0xf8, 0xfd, 0xd4, 0x31, 0x72, 0x47, 0xb4, 0x47,
+	0x07, 0x81, 0x8d, 0xc5, 0xfd, 0x2e, 0x46, 0xb7, 0xe4, 0x17, 0x90, 0xd5, 0xc7, 0x6e, 0xd0, 0x1a,
+	0xb5, 0xe2, 0xdf, 0x5e, 0xe2, 0x64, 0x75, 0x97, 0xe5, 0xef, 0xa5, 0x3b, 0xff, 0x06, 0x00, 0x00,
+	0xff, 0xff, 0x06, 0x01, 0x3e, 0x47, 0x91, 0x0d, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1461,16 +1601,13 @@ func (m *MsgCreateBond) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x6a
-	{
-		size := m.FeeAddress.Size()
-		i -= size
-		if _, err := m.FeeAddress.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.FeeAddress) > 0 {
+		i -= len(m.FeeAddress)
+		copy(dAtA[i:], m.FeeAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FeeAddress)))
+		i--
+		dAtA[i] = 0x62
 	}
-	i--
-	dAtA[i] = 0x62
 	{
 		size := m.ExitFeePercentage.Size()
 		i -= size
@@ -1500,26 +1637,20 @@ func (m *MsgCreateBond) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x4a
 		}
 	}
-	{
-		size := m.ControllerDid.Size()
-		i -= size
-		if _, err := m.ControllerDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.ControllerDid) > 0 {
+		i -= len(m.ControllerDid)
+		copy(dAtA[i:], m.ControllerDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerDid)))
+		i--
+		dAtA[i] = 0x42
 	}
-	i--
-	dAtA[i] = 0x42
-	{
-		size := m.CreatorDid.Size()
-		i -= size
-		if _, err := m.CreatorDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.CreatorDid) > 0 {
+		i -= len(m.CreatorDid)
+		copy(dAtA[i:], m.CreatorDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CreatorDid)))
+		i--
+		dAtA[i] = 0x3a
 	}
-	i--
-	dAtA[i] = 0x3a
 	if len(m.FunctionParameters) > 0 {
 		for iNdEx := len(m.FunctionParameters) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1562,16 +1693,13 @@ func (m *MsgCreateBond) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1618,16 +1746,13 @@ func (m *MsgEditBond) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.EditorDid.Size()
-		i -= size
-		if _, err := m.EditorDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.EditorDid) > 0 {
+		i -= len(m.EditorDid)
+		copy(dAtA[i:], m.EditorDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EditorDid)))
+		i--
+		dAtA[i] = 0x3a
 	}
-	i--
-	dAtA[i] = 0x3a
 	if len(m.SanityMarginPercentage) > 0 {
 		i -= len(m.SanityMarginPercentage)
 		copy(dAtA[i:], m.SanityMarginPercentage)
@@ -1663,16 +1788,13 @@ func (m *MsgEditBond) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1719,16 +1841,13 @@ func (m *MsgSetNextAlpha) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.EditorDid.Size()
-		i -= size
-		if _, err := m.EditorDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.EditorDid) > 0 {
+		i -= len(m.EditorDid)
+		copy(dAtA[i:], m.EditorDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EditorDid)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	i--
-	dAtA[i] = 0x1a
 	{
 		size := m.Alpha.Size()
 		i -= size
@@ -1739,16 +1858,13 @@ func (m *MsgSetNextAlpha) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1795,36 +1911,27 @@ func (m *MsgUpdateBondState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.EditorDid.Size()
-		i -= size
-		if _, err := m.EditorDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.EditorDid) > 0 {
+		i -= len(m.EditorDid)
+		copy(dAtA[i:], m.EditorDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EditorDid)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	i--
-	dAtA[i] = 0x1a
-	{
-		size := m.State.Size()
-		i -= size
-		if _, err := m.State.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.State) > 0 {
+		i -= len(m.State)
+		copy(dAtA[i:], m.State)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.State)))
+		i--
+		dAtA[i] = 0x12
 	}
-	i--
-	dAtA[i] = 0x12
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1871,16 +1978,13 @@ func (m *MsgBuy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0x22
 	}
-	i--
-	dAtA[i] = 0x22
 	if len(m.MaxPrices) > 0 {
 		for iNdEx := len(m.MaxPrices) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1905,16 +2009,13 @@ func (m *MsgBuy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	{
-		size := m.BuyerDid.Size()
-		i -= size
-		if _, err := m.BuyerDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BuyerDid) > 0 {
+		i -= len(m.BuyerDid)
+		copy(dAtA[i:], m.BuyerDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BuyerDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -1961,16 +2062,13 @@ func (m *MsgSell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	i--
-	dAtA[i] = 0x1a
 	{
 		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -1981,16 +2079,13 @@ func (m *MsgSell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	{
-		size := m.SellerDid.Size()
-		i -= size
-		if _, err := m.SellerDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.SellerDid) > 0 {
+		i -= len(m.SellerDid)
+		copy(dAtA[i:], m.SellerDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.SellerDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -2054,26 +2149,20 @@ func (m *MsgSwap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x1a
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0x12
 	}
-	i--
-	dAtA[i] = 0x12
-	{
-		size := m.SwapperDid.Size()
-		i -= size
-		if _, err := m.SwapperDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.SwapperDid) > 0 {
+		i -= len(m.SwapperDid)
+		copy(dAtA[i:], m.SwapperDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.SwapperDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -2120,16 +2209,13 @@ func (m *MsgMakeOutcomePayment) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0x1a
 	}
-	i--
-	dAtA[i] = 0x1a
 	{
 		size := m.Amount.Size()
 		i -= size
@@ -2140,16 +2226,13 @@ func (m *MsgMakeOutcomePayment) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	{
-		size := m.SenderDid.Size()
-		i -= size
-		if _, err := m.SenderDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.SenderDid) > 0 {
+		i -= len(m.SenderDid)
+		copy(dAtA[i:], m.SenderDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.SenderDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -2196,26 +2279,20 @@ func (m *MsgWithdrawShare) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		size := m.BondDid.Size()
-		i -= size
-		if _, err := m.BondDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.BondDid) > 0 {
+		i -= len(m.BondDid)
+		copy(dAtA[i:], m.BondDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BondDid)))
+		i--
+		dAtA[i] = 0x12
 	}
-	i--
-	dAtA[i] = 0x12
-	{
-		size := m.RecipientDid.Size()
-		i -= size
-		if _, err := m.RecipientDid.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
+	if len(m.RecipientDid) > 0 {
+		i -= len(m.RecipientDid)
+		copy(dAtA[i:], m.RecipientDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RecipientDid)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -2259,8 +2336,10 @@ func (m *MsgCreateBond) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = len(m.Token)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -2283,10 +2362,14 @@ func (m *MsgCreateBond) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	l = m.CreatorDid.Size()
-	n += 1 + l + sovTx(uint64(l))
-	l = m.ControllerDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.CreatorDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ControllerDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	if len(m.ReserveTokens) > 0 {
 		for _, s := range m.ReserveTokens {
 			l = len(s)
@@ -2297,8 +2380,10 @@ func (m *MsgCreateBond) Size() (n int) {
 	n += 1 + l + sovTx(uint64(l))
 	l = m.ExitFeePercentage.Size()
 	n += 1 + l + sovTx(uint64(l))
-	l = m.FeeAddress.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.FeeAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = m.MaxSupply.Size()
 	n += 1 + l + sovTx(uint64(l))
 	if len(m.OrderQuantityLimits) > 0 {
@@ -2339,8 +2424,10 @@ func (m *MsgEditBond) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -2361,8 +2448,10 @@ func (m *MsgEditBond) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = m.EditorDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.EditorDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2381,12 +2470,16 @@ func (m *MsgSetNextAlpha) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = m.Alpha.Size()
 	n += 1 + l + sovTx(uint64(l))
-	l = m.EditorDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.EditorDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2405,12 +2498,18 @@ func (m *MsgUpdateBondState) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
-	l = m.State.Size()
-	n += 1 + l + sovTx(uint64(l))
-	l = m.EditorDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.State)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.EditorDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2429,8 +2528,10 @@ func (m *MsgBuy) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.BuyerDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BuyerDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = m.Amount.Size()
 	n += 1 + l + sovTx(uint64(l))
 	if len(m.MaxPrices) > 0 {
@@ -2439,8 +2540,10 @@ func (m *MsgBuy) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2459,12 +2562,16 @@ func (m *MsgSell) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.SellerDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.SellerDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = m.Amount.Size()
 	n += 1 + l + sovTx(uint64(l))
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2483,10 +2590,14 @@ func (m *MsgSwap) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.SwapperDid.Size()
-	n += 1 + l + sovTx(uint64(l))
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.SwapperDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = m.From.Size()
 	n += 1 + l + sovTx(uint64(l))
 	l = len(m.ToToken)
@@ -2511,12 +2622,16 @@ func (m *MsgMakeOutcomePayment) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.SenderDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.SenderDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = m.Amount.Size()
 	n += 1 + l + sovTx(uint64(l))
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2535,10 +2650,14 @@ func (m *MsgWithdrawShare) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.RecipientDid.Size()
-	n += 1 + l + sovTx(uint64(l))
-	l = m.BondDid.Size()
-	n += 1 + l + sovTx(uint64(l))
+	l = len(m.RecipientDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.BondDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2616,9 +2735,7 @@ func (m *MsgCreateBond) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -2812,9 +2929,7 @@ func (m *MsgCreateBond) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.CreatorDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.CreatorDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
@@ -2846,9 +2961,7 @@ func (m *MsgCreateBond) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ControllerDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.ControllerDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
@@ -2980,9 +3093,7 @@ func (m *MsgCreateBond) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.FeeAddress.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.FeeAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 13:
 			if wireType != 2 {
@@ -3363,9 +3474,7 @@ func (m *MsgEditBond) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -3557,9 +3666,7 @@ func (m *MsgEditBond) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.EditorDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.EditorDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3697,9 +3804,7 @@ func (m *MsgSetNextAlpha) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -3765,9 +3870,7 @@ func (m *MsgSetNextAlpha) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.EditorDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.EditorDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3905,9 +4008,7 @@ func (m *MsgUpdateBondState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -3939,9 +4040,7 @@ func (m *MsgUpdateBondState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.State.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.State = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -3973,9 +4072,7 @@ func (m *MsgUpdateBondState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.EditorDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.EditorDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4113,9 +4210,7 @@ func (m *MsgBuy) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BuyerDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BuyerDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -4214,9 +4309,7 @@ func (m *MsgBuy) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4354,9 +4447,7 @@ func (m *MsgSell) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.SellerDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.SellerDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -4421,9 +4512,7 @@ func (m *MsgSell) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4561,9 +4650,7 @@ func (m *MsgSwap) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.SwapperDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.SwapperDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -4595,9 +4682,7 @@ func (m *MsgSwap) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -4800,9 +4885,7 @@ func (m *MsgMakeOutcomePayment) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.SenderDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.SenderDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -4868,9 +4951,7 @@ func (m *MsgMakeOutcomePayment) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -5008,9 +5089,7 @@ func (m *MsgWithdrawShare) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.RecipientDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.RecipientDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -5042,9 +5121,7 @@ func (m *MsgWithdrawShare) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.BondDid.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.BondDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

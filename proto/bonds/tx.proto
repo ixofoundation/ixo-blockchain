@@ -27,7 +27,7 @@ message MsgCreateBond {
   string name                                             = 3;
   string description                                      = 4;
   string function_type                                    = 5;
-  repeated FunctionParam function_parameters              = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/ixofoundation/ixo-blockchain/x/bonds/types.FunctionParams"];
+  repeated FunctionParam function_parameters              = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "FunctionParams"];
   string creator_did                                      = 7;
   string controller_did                                   = 8;
   repeated string reserve_tokens                          = 9;

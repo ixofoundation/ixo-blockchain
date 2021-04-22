@@ -25,7 +25,7 @@ message Bond {
   string creator_did                                                = 4;
   string controller_did                                             = 5;
   string function_type                                              = 6;
-  repeated FunctionParam function_parameters                        = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/ixofoundation/ixo-blockchain/x/bonds/types.FunctionParams"];
+  repeated FunctionParam function_parameters                        = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "FunctionParams"];
   repeated string reserve_tokens                                    = 8;
   string tx_fee_percentage                                          = 9 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
   string exit_fee_percentage                                        = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];

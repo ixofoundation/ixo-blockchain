@@ -17,10 +17,11 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
+	github.com/tendermint/go-amino v0.16.0
 	github.com/tendermint/tendermint v0.34.1 //latest
 	github.com/tendermint/tm-db v0.6.3
-	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
-	google.golang.org/genproto v0.0.0-20210329143202-679c6ae281ee
+	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
+	google.golang.org/genproto v0.0.0-20210422153429-2279cbceda62
 	google.golang.org/grpc v1.36.1
 )
 
