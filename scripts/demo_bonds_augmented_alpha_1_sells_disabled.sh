@@ -185,7 +185,7 @@ echo "Bond outcome payment reserve is now 300000000..."
 ixod q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
-ixod tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo --chain-id=pandora-2 -y
+ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
 ixod q bonds bond "$BOND_DID"
 
