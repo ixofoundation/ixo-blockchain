@@ -13,6 +13,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
+	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/rakyll/statik/fs"
 	"net/http"
 
@@ -164,9 +166,9 @@ var (
 
 		// Custom ixo module accounts
 		//TODO uncomment ixo modules
-		bonds.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
-		bonds.BatchesIntermediaryAccount: nil,
-		bonds.BondsReserveAccount:        nil,
+		bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
+		bondstypes.BatchesIntermediaryAccount: nil,
+		bondstypes.BondsReserveAccount:        nil,
 		//treasury.ModuleName:              {authtypes.Minter, authtypes.Burner},
 		//payments.PayRemainderPool:        nil,
 	}
@@ -252,7 +254,7 @@ type ixoApp struct {
 	//TODO uncomment rest of ixo modules
 	//paymentsKeeper payments.Keeper
 	//projectKeeper  project.Keeper
-	bondsKeeper    bonds.Keeper
+	bondsKeeper    bondskeeper.Keeper
 	//oraclesKeeper  oracles.Keeper
 	//treasuryKeeper treasury.Keeper
 
@@ -345,7 +347,7 @@ func NewIxoApp(
 		// Custom ixo store keys
 		// TODO uncomment ixo modules store keys
 		did.StoreKey, //payments.StoreKey, project.StoreKey,
-		bonds.StoreKey,
+		bondstypes.StoreKey,
 		//treasury.StoreKey, oracles.StoreKey*/
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -474,8 +476,8 @@ func NewIxoApp(
 	//	app.oraclesKeeper, app.SupplyKeeper, app.didKeeper)
 
 	app.didKeeper = did.NewKeeper(app.appCodec, keys[did.StoreKey]) // not what Cosmos uses because keeper is different
-	app.bondsKeeper = bonds.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.didKeeper,
-		keys[bonds.StoreKey], app.GetSubspace(bonds.ModuleName), app.appCodec)
+	app.bondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.didKeeper,
+		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
 	// TODO add the rest of ixo modules keeper
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -521,14 +523,14 @@ func NewIxoApp(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 		// Custom ixo modules
 		//TODO uncomment rest of ixo modules
-		bonds.ModuleName,
+		bondstypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
 		// Custom ixo modules
 		//TODO uncomment rest of ixo modules
-		bonds.ModuleName,
+		bondstypes.ModuleName,
 		//payments.ModuleName,
 	)
 
@@ -545,7 +547,7 @@ func NewIxoApp(
 		// Custom ixo modules
 		//TODO uncomment rest of ixo modules
 		did.ModuleName, //project.ModuleName, payments.ModuleName,
-		bonds.ModuleName, //treasury.ModuleName, oracles.ModuleName,
+		bondstypes.ModuleName, //treasury.ModuleName, oracles.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -827,7 +829,7 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 		//	default:
 		//		return projectAnteHandler(ctx, tx, simulate)
 		//	}
-		case bonds.RouterKey:
+		case bondstypes.RouterKey:
 			return defaultIxoAnteHandler(ctx, tx, simulate) //fallthrough
 		//case treasury.RouterKey:
 		//	fallthrough
@@ -858,7 +860,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	// init params keeper and subspaces (for custom ixo modules
 	//TODO uncomment rest of ixo modules
 	//paramsKeeper.Subspace(project.ModuleName)
-	paramsKeeper.Subspace(bonds.ModuleName)
+	paramsKeeper.Subspace(bondstypes.ModuleName)
 
 	return paramsKeeper
 }

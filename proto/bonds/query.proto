@@ -132,9 +132,6 @@ message QueryBuyPriceRequest {
   string bond_amount = 2;
 }
 
-// TODO (Stef) Instead of using QueryBuyPrice, QuerySellReturn etc we can write the types directly in the Response msg
-// TODO but this will not allow us to use clientCtx.JSONMarshaler.UnmarshalJSON() in query.go
-// TODO Also types are used in querier.go and grpc_query.go
 message QueryBuyPriceResponse {
   cosmos.base.v1beta1.Coin adjusted_supply       = 1 [(gogoproto.nullable) = false];
   repeated cosmos.base.v1beta1.Coin prices       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
