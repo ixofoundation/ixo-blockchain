@@ -33,7 +33,7 @@ ixod_tx() {
   shift
 
   # Broadcast the transaction
-  ixod_tx $cmd \
+  ixod tx $cmd \
     --gas-prices="$GAS_PRICES" \
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
@@ -133,12 +133,12 @@ ixod q bonds bond "$BOND_DID"
 echo "Miguel buys 400000abc..."
 ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod bank balances "$MIGUEL_ADDR"
+ixod q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 400000abc..."
 ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod bank balances "$FRANCESCO_ADDR"
+ixod q bank balances "$FRANCESCO_ADDR"
 
 echo "Shaun cannot buy 200001abc..."
 ixod_tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" 
@@ -147,7 +147,7 @@ ixod_tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun can buy 200000abc..."
 ixod_tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun's account..."
-ixod bank balances "$SHAUN_ADDR"
+ixod q bank balances "$SHAUN_ADDR"
 
 echo "Bond state is now open..."  # since 1000000 (S0) reached
 ixod q bonds bond "$BOND_DID"
@@ -174,7 +174,7 @@ ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Miguel sells 400000abc..."
 ixod_tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod bank balances "$MIGUEL_ADDR"
+ixod q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco makes outcome payment of 50000000 [1]..."
 ixod_tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" 
@@ -183,7 +183,7 @@ ixod_tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL"
 echo "Francesco makes outcome payment of 150000000 [3]..."
 ixod_tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod bank balances "$FRANCESCO_ADDR"
+ixod q bank balances "$FRANCESCO_ADDR"
 echo "Bond outcome payment reserve is now 300000000..."
 ixod q bonds bond "$BOND_DID"
 
@@ -195,12 +195,12 @@ ixod q bonds bond "$BOND_DID"
 echo "Francesco withdraws share..."
 ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod bank balances "$FRANCESCO_ADDR"
+ixod q bank balances "$FRANCESCO_ADDR"
 
 echo "Shaun withdraws share..."
 ixod_tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun's account..."
-ixod bank balances "$SHAUN_ADDR"
+ixod q bank balances "$SHAUN_ADDR"
 
 echo "Bond reserve is now empty and supply is 0..."
 ixod q bonds bond "$BOND_DID"

@@ -30,9 +30,8 @@ func (k Keeper) GetBondDid(ctx sdk.Context, bondToken string) (bondDid did.Did, 
 		return
 	}
 	bz := store.Get(types.GetBondDidsKey(bondToken))
-	//k.cdc.MustUnmarshalBinaryBare(bz, &bondDid)
-	//TODO (Stef) We need an unmarshal function for did
-	amino.UnmarshalBinaryBare(bz, &bondDid)
+	amino.MustUnmarshalBinaryBare(bz, &bondDid)
+
 	return bondDid, true
 }
 
@@ -70,21 +69,11 @@ func (k Keeper) BondDidExists(ctx sdk.Context, bondToken string) bool {
 func (k Keeper) SetBond(ctx sdk.Context, bondDid did.Did, bond types.Bond) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.GetBondKey(bondDid), k.cdc.MustMarshalBinaryBare(&bond))
-	//bz, err := bond.Marshal()
-	//if err != nil {
-	//	panic(fmt.Sprintf("Cannot marshal bond"))
-	//}
-	//store.Set(types.GetBatchKey(bondDid), bz)
 }
 
 func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid did.Did) {
 	store := ctx.KVStore(k.storeKey)
-	bz, err := amino.MarshalBinaryBare(bondDid)
-	if err != nil {
-		panic(fmt.Sprintf("Cannot amino marshal bond did"))
-	}
-	store.Set(types.GetBondDidsKey(bondToken), bz) //k.cdc.MustMarshalBinaryBare(bondDid)
-	// TODO (Stef) We need an unmarshal function for did
+	store.Set(types.GetBondDidsKey(bondToken), amino.MustMarshalBinaryBare(bondDid))
 }
 
 func (k Keeper) DepositReserve(ctx sdk.Context, bondDid did.Did,
