@@ -63,8 +63,7 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 		// Parse function parameters
 		functionParams, err := bondsclient.ParseFunctionParams(req.FunctionParameters)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
@@ -89,36 +88,31 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 		// Parse fee address
 		feeAddress, err := sdk.AccAddressFromBech32(req.FeeAddress)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		// Parse max supply
 		maxSupply, err := sdk.ParseCoinNormalized(req.MaxSupply)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		// Parse order quantity limits
 		orderQuantityLimits, err := sdk.ParseCoinsNormalized(req.OrderQuantityLimits)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		// Parse sanity rate
 		sanityRate, err := sdk.NewDecFromStr(req.SanityRate)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		// Parse sanity margin percentage
 		sanityMarginPercentage, err := sdk.NewDecFromStr(req.SanityMarginPercentage)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
@@ -175,8 +169,7 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
 			orderQuantityLimits, sanityRate, sanityMarginPercentage,
 			allowSells, alphaBond, batchBlocks, outcomePayment, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -210,8 +203,7 @@ func editBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		msg := types.NewMsgEditBond(req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate,
 			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -240,14 +232,12 @@ func setNextAlphaRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 		// Parse new alpha
 		newAlpha, err := sdk.NewDecFromStr(req.NewAlpha)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -274,8 +264,7 @@ func updateBondStateRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), req.EditorDid, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -305,20 +294,17 @@ func buyRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		bondCoin, err := bondsclient.ParseTwoPartCoin(req.BondAmount, req.BondToken)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		maxPrices, err := sdk.ParseCoinsNormalized(req.MaxPrices)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		msg := types.NewMsgBuy(req.BuyerDid, bondCoin, maxPrices, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -347,14 +333,12 @@ func sellRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		bondCoin, err := bondsclient.ParseTwoPartCoin(req.BondAmount, req.BondToken)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		msg := types.NewMsgSell(req.SellerDid, bondCoin, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -385,14 +369,12 @@ func swapRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 		// Check that from amount and token can be parsed to a coin
 		fromCoin, err := bondsclient.ParseTwoPartCoin(req.FromAmount, req.FromToken)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		msg := types.NewMsgSwap(req.SwapperDid, fromCoin, req.ToToken, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -426,8 +408,7 @@ func makeOutcomePaymentRequestHandler(clientCtx client.Context) http.HandlerFunc
 		}
 
 		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, amount, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 
@@ -453,8 +434,7 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgWithdrawShare(req.RecipientDid, req.BondDid)
-		if err := msg.ValidateBasic(); err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
 

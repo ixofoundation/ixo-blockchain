@@ -82,8 +82,7 @@ func queryBondsHandler(clientCtx client.Context, queryRoute string) http.Handler
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s",
 				queryRoute, keeper.QueryBonds), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 		rest.PostProcessResponse(w, clientCtx, res)
@@ -100,8 +99,7 @@ func queryBondsDetailedHandler(clientCtx client.Context, queryRoute string) http
 		res, height, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s",
 				queryRoute, keeper.QueryBondsDetailed), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -119,8 +117,7 @@ func queryBondHandler(clientCtx client.Context, queryRoute string) http.HandlerF
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
 				queryRoute, keeper.QueryBond, bondDid), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -136,8 +133,7 @@ func queryBatchHandler(clientCtx client.Context, queryRoute string) http.Handler
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
 				queryRoute, keeper.QueryBatch, bondDid), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -153,8 +149,7 @@ func queryLastBatchHandler(clientCtx client.Context, queryRoute string) http.Han
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
 				queryRoute, keeper.QueryLastBatch, bondDid), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -170,8 +165,7 @@ func queryCurrentPriceHandler(clientCtx client.Context, queryRoute string) http.
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
 				queryRoute, keeper.QueryCurrentPrice, bondDid), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -187,8 +181,7 @@ func queryCurrentReserveHandler(clientCtx client.Context, queryRoute string) htt
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
 				queryRoute, keeper.QueryCurrentReserve, bondDid), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -205,8 +198,7 @@ func queryCustomPriceHandler(clientCtx client.Context, queryRoute string) http.H
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s",
 				queryRoute, keeper.QueryCustomPrice, bondDid, bondAmount), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -223,8 +215,7 @@ func queryBuyPriceHandler(clientCtx client.Context, queryRoute string) http.Hand
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s",
 				queryRoute, keeper.QueryBuyPrice, bondDid, bondAmount), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -241,8 +232,7 @@ func querySellReturnHandler(clientCtx client.Context, queryRoute string) http.Ha
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s",
 				queryRoute, keeper.QuerySellReturn, bondDid, bondAmount), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -258,8 +248,7 @@ func querySwapReturnHandler(clientCtx client.Context, queryRoute string) http.Ha
 		toToken := vars[RestToToken]
 
 		reserveCoinWithAmount, err := sdk.ParseCoinNormalized(fromTokenWithAmount)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
@@ -284,8 +273,7 @@ func queryAlphaMaximumsHandler(clientCtx client.Context, queryRoute string) http
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
 				queryRoute, keeper.QueryAlphaMaximums, bondDid), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
+		if rest.CheckNotFoundError(w, err) {
 			return
 		}
 
