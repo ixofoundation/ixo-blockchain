@@ -22,95 +22,95 @@ service Msg {
 }
 
 message MsgCreateBond {
-  string bond_did                                         = 1;
-  string token                                            = 2;
-  string name                                             = 3;
-  string description                                      = 4;
-  string function_type                                    = 5;
-  repeated FunctionParam function_parameters              = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "FunctionParams"];
-  string creator_did                                      = 7;
-  string controller_did                                   = 8;
-  repeated string reserve_tokens                          = 9;
-  string tx_fee_percentage                                = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  string exit_fee_percentage                              = 11 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  string fee_address                                      = 12;
-  cosmos.base.v1beta1.Coin max_supply                     = 13 [(gogoproto.nullable) = false];
-  repeated cosmos.base.v1beta1.Coin order_quantity_limits = 14 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  string sanity_rate                                      = 15 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  string sanity_margin_percentage                         = 16 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  bool allow_sells                                        = 17;
-  bool alpha_bond                                         = 18;
-  string batch_blocks                                     = 19 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
-  string outcome_payment                                  = 20 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
+  string bond_did                                         = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string token                                            = 2 [(gogoproto.moretags) = "yaml:\"token\""];
+  string name                                             = 3 [(gogoproto.moretags) = "yaml:\"name\""];
+  string description                                      = 4 [(gogoproto.moretags) = "yaml:\"description\""];
+  string function_type                                    = 5 [(gogoproto.moretags) = "yaml:\"function_type\""];
+  repeated FunctionParam function_parameters              = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "FunctionParams", (gogoproto.moretags) = "yaml:\"function_parameters\""];
+  string creator_did                                      = 7 [(gogoproto.moretags) = "yaml:\"creator_did\""];
+  string controller_did                                   = 8 [(gogoproto.moretags) = "yaml:\"controller_did\""];
+  repeated string reserve_tokens                          = 9 [(gogoproto.moretags) = "yaml:\"reserve_tokens\""];
+  string tx_fee_percentage                                = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"tx_fee_percentage\""];
+  string exit_fee_percentage                              = 11 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"exit_fee_percentage\""];
+  string fee_address                                      = 12 [(gogoproto.moretags) = "yaml:\"fee_address\""];
+  cosmos.base.v1beta1.Coin max_supply                     = 13 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_supply\""];
+  repeated cosmos.base.v1beta1.Coin order_quantity_limits = 14 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"order_quantity_limits\""];
+  string sanity_rate                                      = 15 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_rate\""];
+  string sanity_margin_percentage                         = 16 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_margin_percentage\""];
+  bool allow_sells                                        = 17 [(gogoproto.moretags) = "yaml:\"allow_sells\""];
+  bool alpha_bond                                         = 18 [(gogoproto.moretags) = "yaml:\"alpha_bonds\""];
+  string batch_blocks                                     = 19 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"batch_blocks\""];
+  string outcome_payment                                  = 20 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"outcome_payment\""];
 }
 
 message MsgCreateBondResponse {}
 
 message MsgEditBond {
-  string bond_did                 = 1;
-  string name                     = 2;
-  string description              = 3;
-  string order_quantity_limits    = 4;
-  string sanity_rate              = 5;
-  string sanity_margin_percentage = 6;
-  string editor_did               = 7;
+  string bond_did                 = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string name                     = 2 [(gogoproto.moretags) = "yaml:\"name\""];
+  string description              = 3 [(gogoproto.moretags) = "yaml:\"description\""];
+  string order_quantity_limits    = 4 [(gogoproto.moretags) = "yaml:\"order_quantity_limits\""];
+  string sanity_rate              = 5 [(gogoproto.moretags) = "yaml:\"sanity_rate\""];
+  string sanity_margin_percentage = 6 [(gogoproto.moretags) = "yaml:\"sanity_margin_percentage\""];
+  string editor_did               = 7 [(gogoproto.moretags) = "yaml:\"editor_did\""];
 }
 
 message MsgEditBondResponse {}
 
 message MsgSetNextAlpha {
-  string bond_did   = 1;
-  string alpha      = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
-  string editor_did = 3;
+  string bond_did   = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string alpha      = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"alpha\""];
+  string editor_did = 3 [(gogoproto.moretags) = "yaml:\"editor_did\""];
 }
 
 message MsgSetNextAlphaResponse {}
 
 message MsgUpdateBondState {
-  string bond_did      = 1;
-  string state         = 2;
-  string editor_did    = 3;
+  string bond_did      = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string state         = 2 [(gogoproto.moretags) = "yaml:\"state\""];
+  string editor_did    = 3 [(gogoproto.moretags) = "yaml:\"editor_did\""];
 }
 
 message MsgUpdateBondStateResponse {}
 
 message MsgBuy {
-  string buyer_did                             = 1;
-  cosmos.base.v1beta1.Coin amount              = 2 [(gogoproto.nullable) = false];
-  repeated cosmos.base.v1beta1.Coin max_prices = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  string bond_did                              = 4;
+  string buyer_did                             = 1 [(gogoproto.moretags) = "yaml:\"buyer_did\""];
+  cosmos.base.v1beta1.Coin amount              = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"amount\""];
+  repeated cosmos.base.v1beta1.Coin max_prices = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"max_prices\""];
+  string bond_did                              = 4 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
 message MsgBuyResponse {}
 
 message MsgSell {
-  string seller_did               = 1;
-  cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false];
-  string bond_did                 = 3;
+  string seller_did               = 1 [(gogoproto.moretags) = "yaml:\"seller_did\""];
+  cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"amount\""];
+  string bond_did                 = 3 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
 message MsgSellResponse {}
 
 message MsgSwap {
-  string swapper_did            = 1;
-  string bond_did               = 2;
-  cosmos.base.v1beta1.Coin from = 3 [(gogoproto.nullable) = false];
-  string to_token               = 4;
+  string swapper_did            = 1 [(gogoproto.moretags) = "yaml:\"swapper_did\""];
+  string bond_did               = 2 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  cosmos.base.v1beta1.Coin from = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"from\""];
+  string to_token               = 4 [(gogoproto.moretags) = "yaml:\"to_token\""];
 }
 
 message MsgSwapResponse {}
 
 message MsgMakeOutcomePayment {
-  string sender_did = 1;
-  string amount     = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
-  string bond_did   = 3;
+  string sender_did = 1 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string amount     = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"amount\""];
+  string bond_did   = 3 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
 message MsgMakeOutcomePaymentResponse {}
 
 message MsgWithdrawShare {
-  string recipient_did = 1;
-  string bond_did      = 2;
+  string recipient_did = 1 [(gogoproto.moretags) = "yaml:\"recipient_did\""];
+  string bond_did      = 2 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
 message MsgWithdrawShareResponse {}
