@@ -15,8 +15,8 @@ const (
 	RestToToken             = "to_token"
 )
 
-func RegisterHandlers(cliCtx client.Context, rtr *mux.Router, queryRoute string) {
+func RegisterHandlers(cliCtx client.Context, rtr *mux.Router) {
 	r := rest.WithHTTPDeprecationHeaders(rtr)
-	registerQueryRoutes(cliCtx, r, queryRoute)
+	registerQueryRoutes(cliCtx, r)
 	registerTxHandlers(cliCtx, r)
 }

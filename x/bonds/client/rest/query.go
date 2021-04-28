@@ -11,27 +11,27 @@ import (
 	"net/http"
 )
 
-func registerQueryRoutes(clientCtx client.Context, r *mux.Router, queryRoute string) {
-	r.HandleFunc("/bonds", queryBondsHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc("/bonds_detailed", queryBondsDetailedHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}", RestBondDid), queryBondHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/batch", RestBondDid), queryBatchHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid),	queryLastBatchHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_price", RestBondDid), queryCurrentPriceHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_reserve", RestBondDid), queryCurrentReserveHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/price/{%s}", RestBondDid, RestBondAmount), queryCustomPriceHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/buy_price/{%s}", RestBondDid, RestBondAmount), queryBuyPriceHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/sell_return/{%s}", RestBondDid, RestBondAmount), querySellReturnHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/swap_return/{%s}/{%s}", RestBondDid, RestFromTokenWithAmount, RestToToken), querySwapReturnHandler(clientCtx, queryRoute)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/alpha_maximums", RestBondDid), queryAlphaMaximumsHandler(clientCtx, queryRoute)).Methods("GET")
+func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
+	r.HandleFunc("/bonds", queryBondsHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/bonds_detailed", queryBondsDetailedHandler(clientCtx)).Methods("GET")
 	r.HandleFunc("/bonds/params", queryParamsRequestHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}", RestBondDid), queryBondHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/batch", RestBondDid), queryBatchHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid),	queryLastBatchHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_price", RestBondDid), queryCurrentPriceHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_reserve", RestBondDid), queryCurrentReserveHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/price/{%s}", RestBondDid, RestBondAmount), queryCustomPriceHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/buy_price/{%s}", RestBondDid, RestBondAmount), queryBuyPriceHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/sell_return/{%s}", RestBondDid, RestBondAmount), querySellReturnHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/swap_return/{%s}/{%s}", RestBondDid, RestFromTokenWithAmount, RestToToken), querySwapReturnHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/alpha_maximums", RestBondDid), queryAlphaMaximumsHandler(clientCtx)).Methods("GET")
 }
 
-func queryBondsHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryBondsHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s",
-				queryRoute, keeper.QueryBonds), nil)
+				types.QuerierRoute, keeper.QueryBonds), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -39,7 +39,7 @@ func queryBondsHandler(clientCtx client.Context, queryRoute string) http.Handler
 	}
 }
 
-func queryBondsDetailedHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryBondsDetailedHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, clientCtx, r)
 		if !ok {
@@ -48,7 +48,7 @@ func queryBondsDetailedHandler(clientCtx client.Context, queryRoute string) http
 
 		res, height, err := cliCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s",
-				queryRoute, keeper.QueryBondsDetailed), nil)
+				types.QuerierRoute, keeper.QueryBondsDetailed), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -59,14 +59,14 @@ func queryBondsDetailedHandler(clientCtx client.Context, queryRoute string) http
 	}
 }
 
-func queryBondHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryBondHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				queryRoute, keeper.QueryBond, bondDid), nil)
+				types.QuerierRoute, keeper.QueryBond, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -75,14 +75,14 @@ func queryBondHandler(clientCtx client.Context, queryRoute string) http.HandlerF
 	}
 }
 
-func queryBatchHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryBatchHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				queryRoute, keeper.QueryBatch, bondDid), nil)
+				types.QuerierRoute, keeper.QueryBatch, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -91,14 +91,14 @@ func queryBatchHandler(clientCtx client.Context, queryRoute string) http.Handler
 	}
 }
 
-func queryLastBatchHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryLastBatchHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				queryRoute, keeper.QueryLastBatch, bondDid), nil)
+				types.QuerierRoute, keeper.QueryLastBatch, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -107,14 +107,14 @@ func queryLastBatchHandler(clientCtx client.Context, queryRoute string) http.Han
 	}
 }
 
-func queryCurrentPriceHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryCurrentPriceHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				queryRoute, keeper.QueryCurrentPrice, bondDid), nil)
+				types.QuerierRoute, keeper.QueryCurrentPrice, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -123,14 +123,14 @@ func queryCurrentPriceHandler(clientCtx client.Context, queryRoute string) http.
 	}
 }
 
-func queryCurrentReserveHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryCurrentReserveHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				queryRoute, keeper.QueryCurrentReserve, bondDid), nil)
+				types.QuerierRoute, keeper.QueryCurrentReserve, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -139,7 +139,7 @@ func queryCurrentReserveHandler(clientCtx client.Context, queryRoute string) htt
 	}
 }
 
-func queryCustomPriceHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryCustomPriceHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
@@ -147,7 +147,7 @@ func queryCustomPriceHandler(clientCtx client.Context, queryRoute string) http.H
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s",
-				queryRoute, keeper.QueryCustomPrice, bondDid, bondAmount), nil)
+				types.QuerierRoute, keeper.QueryCustomPrice, bondDid, bondAmount), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -156,7 +156,7 @@ func queryCustomPriceHandler(clientCtx client.Context, queryRoute string) http.H
 	}
 }
 
-func queryBuyPriceHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryBuyPriceHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
@@ -164,7 +164,7 @@ func queryBuyPriceHandler(clientCtx client.Context, queryRoute string) http.Hand
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s",
-				queryRoute, keeper.QueryBuyPrice, bondDid, bondAmount), nil)
+				types.QuerierRoute, keeper.QueryBuyPrice, bondDid, bondAmount), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -173,7 +173,7 @@ func queryBuyPriceHandler(clientCtx client.Context, queryRoute string) http.Hand
 	}
 }
 
-func querySellReturnHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func querySellReturnHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
@@ -181,7 +181,7 @@ func querySellReturnHandler(clientCtx client.Context, queryRoute string) http.Ha
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s",
-				queryRoute, keeper.QuerySellReturn, bondDid, bondAmount), nil)
+				types.QuerierRoute, keeper.QuerySellReturn, bondDid, bondAmount), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -190,7 +190,7 @@ func querySellReturnHandler(clientCtx client.Context, queryRoute string) http.Ha
 	}
 }
 
-func querySwapReturnHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func querySwapReturnHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
@@ -204,7 +204,7 @@ func querySwapReturnHandler(clientCtx client.Context, queryRoute string) http.Ha
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s/%s/%s/%s",
-				queryRoute, keeper.QuerySwapReturn, bondDid, reserveCoinWithAmount.Denom,
+				types.QuerierRoute, keeper.QuerySwapReturn, bondDid, reserveCoinWithAmount.Denom,
 				reserveCoinWithAmount.Amount.String(), toToken), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
@@ -215,14 +215,14 @@ func querySwapReturnHandler(clientCtx client.Context, queryRoute string) http.Ha
 	}
 }
 
-func queryAlphaMaximumsHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {
+func queryAlphaMaximumsHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				queryRoute, keeper.QueryAlphaMaximums, bondDid), nil)
+				types.QuerierRoute, keeper.QueryAlphaMaximums, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
@@ -234,7 +234,7 @@ func queryAlphaMaximumsHandler(clientCtx client.Context, queryRoute string) http
 func queryParamsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		bz, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 			keeper.QueryParams), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -242,13 +242,13 @@ func queryParamsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		var params types.Params
-		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &params); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-			return
-		}
+		//var params types.Params
+		//if err := clientCtx.LegacyAmino.UnmarshalJSON(res, &params); err != nil {
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+		//	return
+		//}
 
-		rest.PostProcessResponse(w, clientCtx, params)
+		rest.PostProcessResponse(w, clientCtx, res)
 	}
 }
