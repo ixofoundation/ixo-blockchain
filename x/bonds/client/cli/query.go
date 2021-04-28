@@ -154,7 +154,7 @@ func GetCmdBatch() *cobra.Command {
 }
 
 func GetCmdLastBatch() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "last-batch [bond-did]",
 		Short: "Query info of a bond's last batch",
 		Args:  cobra.ExactArgs(1),
@@ -175,6 +175,9 @@ func GetCmdLastBatch() *cobra.Command {
 			return clientCtx.PrintProto(res.Batch)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdCurrentPrice() *cobra.Command {
