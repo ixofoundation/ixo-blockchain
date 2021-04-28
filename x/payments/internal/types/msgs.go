@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 )
 
 const (
@@ -21,13 +21,13 @@ const (
 )
 
 var (
-	_ ixo.IxoMsg = MsgCreatePaymentTemplate{}
-	_ ixo.IxoMsg = MsgCreatePaymentContract{}
-	_ ixo.IxoMsg = MsgCreateSubscription{}
-	_ ixo.IxoMsg = MsgSetPaymentContractAuthorisation{}
-	_ ixo.IxoMsg = MsgGrantDiscount{}
-	_ ixo.IxoMsg = MsgRevokeDiscount{}
-	_ ixo.IxoMsg = MsgEffectPayment{}
+	_ ixotypes.IxoMsg = MsgCreatePaymentTemplate{}
+	_ ixotypes.IxoMsg = MsgCreatePaymentContract{}
+	_ ixotypes.IxoMsg = MsgCreateSubscription{}
+	_ ixotypes.IxoMsg = MsgSetPaymentContractAuthorisation{}
+	_ ixotypes.IxoMsg = MsgGrantDiscount{}
+	_ ixotypes.IxoMsg = MsgRevokeDiscount{}
+	_ ixotypes.IxoMsg = MsgEffectPayment{}
 )
 
 type MsgCreatePaymentTemplate struct {

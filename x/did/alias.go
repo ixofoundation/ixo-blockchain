@@ -13,10 +13,14 @@ const (
 )
 
 type (
-	Keeper       = keeper.Keeper
+	Keeper        = keeper.Keeper
 	Did           = exported.Did
 	DidCredential = types.DidCredential
 )
+
+func StringFromDid(did Did) string {
+	return string(did)
+}
 
 var (
 	// function aliases
