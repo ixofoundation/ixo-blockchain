@@ -12,69 +12,19 @@ import (
 )
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router, queryRoute string) {
-	r.HandleFunc(
-		"/bonds", queryBondsHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		"/bonds_detailed",
-		queryBondsDetailedHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}", RestBondDid),
-		queryBondHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/batch", RestBondDid),
-		queryBatchHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid),
-		queryLastBatchHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/current_price", RestBondDid),
-		queryCurrentPriceHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/current_reserve", RestBondDid),
-		queryCurrentReserveHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/price/{%s}", RestBondDid, RestBondAmount),
-		queryCustomPriceHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/buy_price/{%s}", RestBondDid, RestBondAmount),
-		queryBuyPriceHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/sell_return/{%s}", RestBondDid, RestBondAmount),
-		querySellReturnHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/swap_return/{%s}/{%s}", RestBondDid, RestFromTokenWithAmount, RestToToken),
-		querySwapReturnHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/bonds/{%s}/alpha_maximums", RestBondDid),
-		queryAlphaMaximumsHandler(clientCtx, queryRoute),
-	).Methods("GET")
-
-	r.HandleFunc(
-		"/bonds/params",
-		queryParamsRequestHandler(clientCtx),
-	).Methods("GET")
+	r.HandleFunc("/bonds", queryBondsHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc("/bonds_detailed", queryBondsDetailedHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}", RestBondDid), queryBondHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/batch", RestBondDid), queryBatchHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid),	queryLastBatchHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_price", RestBondDid), queryCurrentPriceHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_reserve", RestBondDid), queryCurrentReserveHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/price/{%s}", RestBondDid, RestBondAmount), queryCustomPriceHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/buy_price/{%s}", RestBondDid, RestBondAmount), queryBuyPriceHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/sell_return/{%s}", RestBondDid, RestBondAmount), querySellReturnHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/swap_return/{%s}/{%s}", RestBondDid, RestFromTokenWithAmount, RestToToken), querySwapReturnHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/alpha_maximums", RestBondDid), queryAlphaMaximumsHandler(clientCtx, queryRoute)).Methods("GET")
+	r.HandleFunc("/bonds/params", queryParamsRequestHandler(clientCtx)).Methods("GET")
 }
 
 func queryBondsHandler(clientCtx client.Context, queryRoute string) http.HandlerFunc {

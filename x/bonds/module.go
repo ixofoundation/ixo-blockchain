@@ -65,7 +65,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxE
 
 // RegisterRESTRoutes registers the REST routes for the bonds module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr, "fix") //TODO (Stef) remove queryRoute argument
+	rest.RegisterHandlers(clientCtx, rtr, "bonds") //TODO (Stef) remove queryRoute argument
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the bonds module.
