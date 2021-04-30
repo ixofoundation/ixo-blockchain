@@ -425,10 +425,14 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper, legacyQue
 func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	params := k.GetParams(ctx)
 
-	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
+	var result = types.QueryParamsResponse{
+		Params: &params,
+	}
+
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
 	}
 
-	return res, nil
+	return bz, nil
 }
