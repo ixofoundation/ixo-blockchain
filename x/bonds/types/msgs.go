@@ -29,29 +29,6 @@ var (
 	_ ixotypes.IxoMsg = &MsgSwap{}
 )
 
-//type MsgCreateBond struct {
-//	BondDid                did.Did        `json:"bond_did" yaml:"bond_did"`
-//	Token                  string         `json:"token" yaml:"token"`
-//	Name                   string         `json:"name" yaml:"name"`
-//	Description            string         `json:"description" yaml:"description"`
-//	FunctionType           string         `json:"function_type" yaml:"function_type"`
-//	FunctionParameters     FunctionParams `json:"function_parameters" yaml:"function_parameters"`
-//	CreatorDid             did.Did        `json:"creator_did" yaml:"creator_did"`
-//	ControllerDid          did.Did        `json:"controller_did" yaml:"controller_did"`
-//	ReserveTokens          []string       `json:"reserve_tokens" yaml:"reserve_tokens"`
-//	TxFeePercentage        sdk.Dec        `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-//	ExitFeePercentage      sdk.Dec        `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-//	FeeAddress             sdk.AccAddress `json:"fee_address" yaml:"fee_address"`
-//	MaxSupply              sdk.Coin       `json:"max_supply" yaml:"max_supply"`
-//	OrderQuantityLimits    sdk.Coins      `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-//	SanityRate             sdk.Dec        `json:"sanity_rate" yaml:"sanity_rate"`
-//	SanityMarginPercentage sdk.Dec        `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-//	AllowSells             bool           `json:"allow_sells" yaml:"allow_sells"`
-//	AlphaBond              bool           `json:"alpha_bond" yaml:"alpha_bond"`
-//	BatchBlocks            sdk.Uint       `json:"batch_blocks" yaml:"batch_blocks"`
-//	OutcomePayment         sdk.Int        `json:"outcome_payment" yaml:"outcome_payment"`
-//}
-
 func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid did.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
@@ -194,16 +171,6 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 
 func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
-//type MsgEditBond struct {
-//	BondDid                did.Did `json:"bond_did" yaml:"bond_did"`
-//	Name                   string  `json:"name" yaml:"name"`
-//	Description            string  `json:"description" yaml:"description"`
-//	OrderQuantityLimits    string  `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-//	SanityRate             string  `json:"sanity_rate" yaml:"sanity_rate"`
-//	SanityMarginPercentage string  `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-//	EditorDid              did.Did `json:"editor_did" yaml:"editor_did"`
-//}
-
 func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 	sanityMarginPercentage string, editorDid, bondDid did.Did) *MsgEditBond {
 	return &MsgEditBond{
@@ -274,12 +241,6 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-//type MsgSetNextAlpha struct {
-//	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
-//	Alpha     sdk.Dec `json:"alpha" yaml:"alpha"`
-//	EditorDid did.Did `json:"editor_did" yaml:"editor_did"`
-//}
-
 func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid did.Did) *MsgSetNextAlpha {
 	return &MsgSetNextAlpha{
 		BondDid:   bondDid,
@@ -328,12 +289,6 @@ func (msg MsgSetNextAlpha) Route() string { return RouterKey }
 
 func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
 
-//type MsgUpdateBondState struct {
-//	BondDid   did.Did   `json:"bond_did" yaml:"bond_did"`
-//	State     BondState `json:"state" yaml:"state"`
-//	EditorDid did.Did   `json:"editor_did" yaml:"editor_did"`
-//}
-
 func NewMsgUpdateBondState(state BondState, editorDid, bondDid did.Did) *MsgUpdateBondState {
 	return &MsgUpdateBondState{
 		BondDid:   bondDid,
@@ -377,13 +332,6 @@ func (msg MsgUpdateBondState) GetSigners() []sdk.AccAddress {
 func (msg MsgUpdateBondState) Route() string { return RouterKey }
 
 func (msg MsgUpdateBondState) Type() string { return TypeMsgUpdateBondState }
-
-//type MsgBuy struct {
-//	BuyerDid  did.Did   `json:"buyer_did" yaml:"buyer_did"`
-//	Amount    sdk.Coin  `json:"amount" yaml:"amount"`
-//	MaxPrices sdk.Coins `json:"max_prices" yaml:"max_prices"`
-//	BondDid   did.Did   `json:"bond_did" yaml:"bond_did"`
-//}
 
 func NewMsgBuy(buyerDid did.Did, amount sdk.Coin, maxPrices sdk.Coins,
 	bondDid did.Did) *MsgBuy {
@@ -438,12 +386,6 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return TypeMsgBuy }
 
-//type MsgSell struct {
-//	SellerDid did.Did  `json:"seller_did" yaml:"seller_did"`
-//	Amount    sdk.Coin `json:"amount" yaml:"amount"`
-//	BondDid   did.Did  `json:"bond_did" yaml:"bond_did"`
-//}
-
 func NewMsgSell(sellerDid did.Did, amount sdk.Coin, bondDid did.Did) *MsgSell {
 	return &MsgSell{
 		SellerDid: sellerDid,
@@ -489,13 +431,6 @@ func (msg MsgSell) GetSigners() []sdk.AccAddress {
 func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return TypeMsgSell }
-
-//type MsgSwap struct {
-//	SwapperDid did.Did  `json:"swapper_did" yaml:"swapper_did"`
-//	BondDid    did.Did  `json:"bond_did" yaml:"bond_did"`
-//	From       sdk.Coin `json:"from" yaml:"from"`
-//	ToToken    string   `json:"to_token" yaml:"to_token"`
-//}
 
 func NewMsgSwap(swapperDid did.Did, from sdk.Coin, toToken string,
 	bondDid did.Did) *MsgSwap {
@@ -563,12 +498,6 @@ func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return TypeMsgSwap }
 
-//type MsgMakeOutcomePayment struct {
-//	SenderDid did.Did `json:"sender_did" yaml:"sender_did"`
-//	Amount    sdk.Int `json:"amount" yaml:"amount"`
-//	BondDid   did.Did `json:"bond_did" yaml:"bond_did"`
-//}
-
 func NewMsgMakeOutcomePayment(senderDid did.Did, amount sdk.Int, bondDid did.Did) *MsgMakeOutcomePayment {
 	return &MsgMakeOutcomePayment{
 		SenderDid: senderDid,
@@ -612,11 +541,6 @@ func (msg MsgMakeOutcomePayment) GetSigners() []sdk.AccAddress {
 func (msg MsgMakeOutcomePayment) Route() string { return RouterKey }
 
 func (msg MsgMakeOutcomePayment) Type() string { return TypeMsgMakeOutcomePayment }
-
-//type MsgWithdrawShare struct {
-//	RecipientDid did.Did `json:"recipient_did" yaml:"recipient_did"`
-//	BondDid      did.Did `json:"bond_did" yaml:"bond_did"`
-//}
 
 func NewMsgWithdrawShare(recipientDid, bondDid did.Did) *MsgWithdrawShare {
 	return &MsgWithdrawShare{

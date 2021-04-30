@@ -1,11 +1,5 @@
 package types
 
-//type GenesisState struct {
-//	Bonds   []Bond  `json:"bonds" yaml:"bonds"`
-//	Batches []Batch `json:"batches" yaml:"batches"`
-//	Params  Params  `json:"params" yaml:"params"`
-//}
-
 func NewGenesisState(bonds []Bond, batches []Batch, params Params) *GenesisState {
 	return &GenesisState{
 		Bonds:   bonds,

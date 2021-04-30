@@ -10,11 +10,6 @@ var (
 	KeyReservedBondTokens = []byte("ReservedBondTokens")
 )
 
-// bonds parameters
-//type Params struct {
-//	ReservedBondTokens []string `json:"reserved_bond_tokens" yaml:"reserved_bond_tokens"`
-//}
-
 // ParamTable for bonds module.
 func ParamKeyTable() paramstypes.KeyTable {
 	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
@@ -38,14 +33,6 @@ func DefaultParams() Params {
 func ValidateParams(params Params) error {
 	return nil
 }
-
-//func (p Params) String() string {
-//	return fmt.Sprintf(`Bonds Params:
-// Reserved Bond Tokens: %s
-//
-//`,
-//		p.ReservedBondTokens)
-//}
 
 func validateReservedBondTokens(i interface{}) error {
 	_, ok := i.([]string)

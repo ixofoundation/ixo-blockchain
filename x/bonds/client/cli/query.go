@@ -364,22 +364,11 @@ func GetCmdSwapReturn() *cobra.Command {
 			fromTokenWithAmount := args[1]
 			toToken := args[2]
 
-			// TODO (Stef) Make FromTokenWithAmount of type Coin?
-			//fromCoinWithAmount, err := sdk.ParseCoinNormalized(fromTokenWithAmount)
-			//if err != nil {
-			//	fmt.Printf("%s", err.Error())
-			//	return nil
-			//}
-
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.SwapReturn(
 				context.Background(),
 				&types.QuerySwapReturnRequest{BondDid: bondDid, FromTokenWithAmount: fromTokenWithAmount, ToToken: toToken},
 			)
-			//res, _, err := clientCtx.QueryWithData(
-			//	fmt.Sprintf("custom/%s/%s/%s/%s/%s/%s", queryRoute,
-			//		keeper.QuerySwapReturn, bondDid, fromCoinWithAmount.Denom,
-			//		fromCoinWithAmount.Amount.String(), toToken), nil)
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil

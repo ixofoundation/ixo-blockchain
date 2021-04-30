@@ -16,7 +16,6 @@ import (
 
 type Keeper struct {
 	BankKeeper    bank.Keeper
-	//SupplyKeeper  supply.Keeper
 	accountKeeper auth.AccountKeeper
 	StakingKeeper staking.Keeper
 	DidKeeper     did.Keeper
@@ -27,10 +26,8 @@ type Keeper struct {
 	cdc codec.BinaryMarshaler
 }
 
-func NewKeeper(bankKeeper bank.Keeper, /*supplyKeeper supply.Keeper,*/
-	accountKeeper auth.AccountKeeper, stakingKeeper staking.Keeper,
-	didKeeper did.Keeper, storeKey sdk.StoreKey, paramSpace params.Subspace,
-	cdc codec.BinaryMarshaler) Keeper {
+func NewKeeper(bankKeeper bank.Keeper, accountKeeper auth.AccountKeeper, stakingKeeper staking.Keeper,
+	didKeeper did.Keeper, storeKey sdk.StoreKey, paramSpace params.Subspace, cdc codec.BinaryMarshaler) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {
@@ -39,7 +36,6 @@ func NewKeeper(bankKeeper bank.Keeper, /*supplyKeeper supply.Keeper,*/
 
 	return Keeper{
 		BankKeeper:    bankKeeper,
-		//SupplyKeeper:  supplyKeeper,
 		accountKeeper: accountKeeper,
 		StakingKeeper: stakingKeeper,
 		DidKeeper:     didKeeper,
