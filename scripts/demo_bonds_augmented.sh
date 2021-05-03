@@ -38,7 +38,8 @@ ixod_tx() {
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
     -y \
-    "$@"  # any extra arguments added at the end
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
 }
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"

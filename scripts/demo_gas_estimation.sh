@@ -30,7 +30,7 @@ ixod_tx() {
   APPROX=$(ixod tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --dry-run "$@" 2>&1)
   APPROX=${APPROX//gas estimate: /}
   echo "Gas estimate: $APPROX"
-  ixod tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@"
+  ixod tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@" | jq .
 }
 
 PASSWORD="12345678"
