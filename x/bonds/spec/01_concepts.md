@@ -11,7 +11,7 @@ Bonding curves are powerful tools because the tokens they issue can represent ri
 * rights of ownership, and 
 * voting rights. 
 
-In the case in continuous organizations, tokens issued through bonding curves ebody rights to the future revenues of a startup. 
+In the case of continuous organizations, tokens issued through bonding curves embody rights to the future revenues of a startup. 
 In the augmented bonding curve, tokens can embody the rights to govern how funds are spent by a not-for-profit organization. 
 In an Alpha-Bond, tokens can give holders the rights to future outcomes payments and performance incentive bonuses.
 
@@ -41,28 +41,30 @@ A bond may also specify non-zero fees, which are calculated based on the size of
 
 ```go
 type Bond struct {
-	Token                  string
-	Name                   string
-	Description            string
-	Creator                sdk.AccAddress
-	FunctionType           string
-	FunctionParameters     FunctionParams
-	ReserveTokens          []string
-	TxFeePercentage        sdk.Dec
-	ExitFeePercentage      sdk.Dec
-	FeeAddress             sdk.AccAddress
-	MaxSupply              sdk.Coin
-	OrderQuantityLimits    sdk.Coins
-	SanityRate             sdk.Dec
-	SanityMarginPercentage sdk.Dec
-	CurrentSupply          sdk.Coin
-	CurrentReserve         sdk.Coins
-	AllowSells             bool
-	AlphaBond              bool
-	Signers                []sdk.AccAddress
-	BatchBlocks            sdk.Uint
-	OutcomePayment         sdk.Coins
-	State                  string
+	Token                        string
+	Name                         string
+	Description                  string
+	CreatorDid                   did.Did
+	ControllerDid                did.Did
+	FunctionType                 string
+	FunctionParameters           FunctionParams
+	ReserveTokens                []string
+	TxFeePercentage              sdk.Dec
+	ExitFeePercentage            sdk.Dec
+	FeeAddress                   sdk.AccAddress
+	MaxSupply                    sdk.Coin
+	OrderQuantityLimits          sdk.Coins
+	SanityRate                   sdk.Dec
+	SanityMarginPercentage       sdk.Dec
+	CurrentSupply                sdk.Coin
+	CurrentReserve               sdk.Coins
+	CurrentOutcomePaymentReserve sdk.Coins
+	AllowSells                   bool
+	AlphaBond                    bool
+	BatchBlocks                  sdk.Uint
+	OutcomePayment               sdk.Int
+	State                        string
+	BondDid                      did.Did
 }
 ```
 
@@ -80,7 +82,7 @@ For alpha bonds, the batch also stores the next alpha value, if it was changed t
 type Batch struct {
 	BondDid         did.Did
 	BlocksRemaining sdk.Uint
-	NextAlpha       sdk.Dec
+	NextPublicAlpha sdk.Dec
 	TotalBuyAmount  sdk.Coin
 	TotalSellAmount sdk.Coin
 	BuyPrices       sdk.DecCoins

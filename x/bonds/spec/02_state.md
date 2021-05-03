@@ -4,7 +4,7 @@
 
 The instance of a bond is stored with its bond-specific parameters. This record is accessed by the identity of a token that represents the bond.
 
-- Bonds: `0x00 | tokenHash -> amino(Bond)`
+- Bonds: `0x00 | tokenHash -> ProtocolBuffer(Bond)`
 
 ## Batches
 
@@ -17,6 +17,6 @@ The temporary state of a batch in the current block is not observable. This batc
 
 Batches are accessed by the identity token of the bond.
 
-- Current Batches: `0x01 | tokenHash -> amino(Batch) `
+- Current Batches: `0x01 | tokenHash -> ProtocolBuffer(Batch) `
 
-- Last Batches: `0x02 | tokenHash -> amino(Batch) `
+- Last Batches: `0x02 | tokenHash -> ProtocolBuffer(Batch) `
