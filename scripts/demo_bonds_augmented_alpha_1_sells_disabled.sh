@@ -147,7 +147,7 @@ ixod_q bank balances "$FRANCESCO_ADDR"
 echo "Shaun cannot buy 200001abc..."
 ixod_tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL"
 # echo "Shaun cannot sell anything..." ----- commented out because sells are disabled, so Shaun cannot sell in any case
-# ixocli tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+# ixod_tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun can buy 200000abc..."
 ixod_tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun's account..."
