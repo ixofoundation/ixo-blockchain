@@ -17,6 +17,6 @@ The temporary state of a batch in the current block is not observable. This batc
 
 Batches are accessed by the identity token of the bond.
 
-- Current Batches: `0x01 | tokenHash -> ProtocolBuffer(Batch) `
+- Current Batches: `0x01 | bondDid -> ProtocolBuffer(Batch) `
 
-- Last Batches: `0x02 | tokenHash -> ProtocolBuffer(Batch) `
+- Last Batches: `0x02 | bondDid -> ProtocolBuffer(Batch) `
