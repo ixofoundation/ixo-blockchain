@@ -42,6 +42,10 @@ ixod_tx() {
     # The $@ adds any extra arguments to the end
 }
 
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
+
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
 #  "did":"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c",
@@ -105,44 +109,44 @@ ixod_tx bonds create-bond \
   --creator-did="$MIGUEL_DID_FULL" \
   --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel buys 1abc..."
 ixod_tx bonds buy 1abc 500res,1000rez "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
 ixod_tx bonds buy 10abc 10100res,10100rez "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Miguel swap 500 res to rez..."
 ixod_tx bonds swap 500 res rez "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco swap 500 rez to res..."
 ixod_tx bonds swap 500 rez res "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Miguel swaps above order limit (tx will fail)..."
 ixod_tx bonds swap 5001 res rez "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account (no  changes)..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco swaps to violate sanity (tx will be successful but order will fail)..."
 ixod_tx bonds swap 5000 rez res "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account (no changes)..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Miguel sells 1abc..."
 ixod_tx bonds sell 1abc "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
 ixod_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"

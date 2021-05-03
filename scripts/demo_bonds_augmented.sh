@@ -42,6 +42,10 @@ ixod_tx() {
     # The $@ adds any extra arguments to the end
 }
 
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
+
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
 #  "did":"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c",
@@ -128,31 +132,31 @@ ixod_tx bonds create-bond \
   --creator-did="$MIGUEL_DID_FULL" \
   --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel buys 100000abc..."
 ixod_tx bonds buy 100000abc 100000000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 100000abc..."
 ixod_tx bonds buy 100000abc 100000000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Bond state is now open..."  # since 200000 (S0) reached
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Current price is approx 1135800..."
-ixod q bonds current-price "$BOND_DID"
+ixod_q bonds current-price "$BOND_DID"
 
 echo "Miguel buys 100000abc..."
 ixod_tx bonds buy 100000abc 200000000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Current price is approx 1200000..."
-ixod q bonds current-price "$BOND_DID"
+ixod_q bonds current-price "$BOND_DID"
 
 echo "Max supply reached..."
 ixod_tx bonds buy 1abc 2000000res "$BOND_DID" "$MIGUEL_DID_FULL"
@@ -160,24 +164,24 @@ ixod_tx bonds buy 1abc 2000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Francesco makes outcome payment of 60000000000..."
 ixod_tx bonds make-outcome-payment "$BOND_DID" "60000000000" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 echo "Bond outcome payment reserve is now 60000000000..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
-ixod tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode=block --fees=5000uixo --chain-id=pandora-2 -y
+ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel withdraws share..."
 ixod_tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco withdraws share..."
 ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Bond reserve is now empty and supply is 0..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"

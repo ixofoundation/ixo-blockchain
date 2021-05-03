@@ -22,6 +22,28 @@ fi
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
 
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    --broadcast-mode block \
+    -y \
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
+
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
@@ -65,11 +87,11 @@ PAYMENT_RECIPIENTS='[
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixod tx did add-did-doc "$MIGUEL_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering Francesco DID..."
-ixod tx did add-did-doc "$FRANCESCO_DID_FULL" --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering Shaun DID..."
-ixod tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$SHAUN_DID_FULL"
 
 # Create payment template
 echo "Creating payment template..."
@@ -86,7 +108,7 @@ PAYMENT_TEMPLATE='{
   "discounts": []
 }'
 CREATOR="$MIGUEL_DID_FULL"
-ixod tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-payment-template "$PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create payment contract
 echo "Creating payment contract..."
@@ -94,13 +116,13 @@ PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
 PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
-ixod tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+PAYER_ADDR="$(ixod_q did get-address-from-did $FRANCESCO_DID)"
+ixod_tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR"
 
 # Authorise payment contract
 echo "Authorising payment contract..."
 PAYER="$FRANCESCO_DID_FULL"
-ixod tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" True "$PAYER" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" True "$PAYER"
 
 # Create subscription (with block period)
 echo "Creating subscription 1/2 (with block period)..."
@@ -114,7 +136,7 @@ PERIOD='{
 }'
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
-ixod tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR"
 
 echo "Wait a few seconds for the subscription to get effected..."
 sleep 6
@@ -122,7 +144,7 @@ sleep 6
 # Deauthorise payment contract
 echo "Deauthorising payment contract..."
 PAYER="$FRANCESCO_DID_FULL"
-ixod tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" False "$PAYER" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments set-payment-contract-authorisation "$PAYMENT_CONTRACT_ID" False "$PAYER"
 
 echo "Now the subscription (block-period) will just accumulate periods and not charge anything."
 echo ""
@@ -139,6 +161,6 @@ PERIOD='{
 }'
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
-ixod tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR"
 
 echo "The subscription (time-period) will just accumulate periods and not charge anything."

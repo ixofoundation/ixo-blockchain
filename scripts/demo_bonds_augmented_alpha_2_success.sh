@@ -42,6 +42,10 @@ ixod_tx() {
     # The $@ adds any extra arguments to the end
 }
 
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
+
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
 #  "did":"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c",

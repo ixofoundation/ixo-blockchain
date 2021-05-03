@@ -42,6 +42,10 @@ ixod_tx() {
     # The $@ adds any extra arguments to the end
 }
 
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
+
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
 #  "did":"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c",
@@ -106,7 +110,7 @@ ixod_tx bonds create-bond \
   --creator-did="$MIGUEL_DID_FULL" \
   --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
 ixod_tx bonds edit-bond \
@@ -115,24 +119,24 @@ ixod_tx bonds edit-bond \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL"
 echo "Edited bond..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel buys 10abc..."
 ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
 ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
 ixod_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
 ixod_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"

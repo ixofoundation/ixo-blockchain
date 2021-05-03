@@ -25,6 +25,29 @@ yes 'y' | ixod keys delete fee --force > /dev/null 2>&1
 yes $PASSWORD | ixod keys add fee > /dev/null 2>&1
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
 
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    -y > /dev/null
+    # The $@ adds any extra arguments to the end
+
+    # NOTE: broadcast-mode=block intentionally excluded
+    # NOTE: output is hidden via /dev/null to reduce verbosity
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
+
 IXO_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 ORACLE_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -117,70 +140,70 @@ DID_10=$(echo "$DID_10_FULL" | cut -d \" -f 4)
 OWNER_DID=$(echo "$OWNER_DID_FULL" | cut -d \" -f 4)
 
 # Ledger oracle and ixo DIDs 
-ixod tx did add-did-doc "$ORACLE_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$IXO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx did add-did-doc "$ORACLE_DID_FULL" --broadcast-mode block
+ixod_tx did add-did-doc "$IXO_DID_FULL" --broadcast-mode block
 
 # Fund DID and owner accounts using ixo DID for gas fees
 echo "Funding DID and owner accounts..."
-ADDR1=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_1_FULL")")
-ADDR2=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_2_FULL")")
-ADDR3=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_3_FULL")")
-ADDR4=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_4_FULL")")
-ADDR5=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_5_FULL")")
-ADDR6=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_6_FULL")")
-ADDR7=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_7_FULL")")
-ADDR8=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_8_FULL")")
-ADDR9=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_9_FULL")")
-ADDR10=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_10_FULL)")
-OWNER_ADDR=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$OWNER_DID_FULL")")
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR1" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR2" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR3" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR4" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR5" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR6" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR7" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR8" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR9" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$ADDR10" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$OWNER_ADDR" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ADDR1=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_1_FULL")")
+ADDR2=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_2_FULL")")
+ADDR3=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_3_FULL")")
+ADDR4=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_4_FULL")")
+ADDR5=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_5_FULL")")
+ADDR6=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_6_FULL")")
+ADDR7=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_7_FULL")")
+ADDR8=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_8_FULL")")
+ADDR9=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_9_FULL")")
+ADDR10=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_10_FULL)")
+OWNER_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$OWNER_DID_FULL")")
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR1" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR2" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR3" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR4" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR5" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR6" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR7" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR8" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR9" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR10" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$OWNER_ADDR" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
 
 # Each DID including the owner now has 10IXO for gas fees 
-# DID_1_ADDR=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
-# ixod q account $DID_1_ADDR
-# OWNER_ADDR=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
-# ixod q account $OWNER_ADDR
+# DID_1_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
+# ixod_q account $DID_1_ADDR
+# OWNER_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
+# ixod_q account $OWNER_ADDR
 
 # Ledger the 10 DIDs and owner DID
 echo "Ledgering DIDs..."
-ixod tx did add-did-doc "$DID_1_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_2_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_3_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_4_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_5_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_6_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_7_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_8_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_9_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$DID_10_FULL" --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx did add-did-doc "$DID_1_FULL"
+ixod_tx did add-did-doc "$DID_2_FULL"
+ixod_tx did add-did-doc "$DID_3_FULL"
+ixod_tx did add-did-doc "$DID_4_FULL"
+ixod_tx did add-did-doc "$DID_5_FULL"
+ixod_tx did add-did-doc "$DID_6_FULL"
+ixod_tx did add-did-doc "$DID_7_FULL"
+ixod_tx did add-did-doc "$DID_8_FULL"
+ixod_tx did add-did-doc "$DID_9_FULL"
+ixod_tx did add-did-doc "$DID_10_FULL"
+ixod_tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block
 
 # Fund oracle and ixo DID for gas fees (commented out since oracle and ixo DID are funded at genesis)
 # echo "Funding oracle and ixo DID..."
-# yes $PASSWORD | ixod tx send "$(ixodkeys show miguel -a)" "$(ixod q did get-address-from-did $ORACLE_DID)" 1000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
-# yes $PASSWORD | ixod tx send "$(ixodkeys show miguel -a)" "$(ixod q did get-address-from-did $IXO_DID)" 10000000000uixo --fees=5000uixo --broadcast-mode=block -y > /dev/null
+# yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $ORACLE_DID)" 1000000uixo --broadcast-mode=block
+# yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $IXO_DID)" 10000000000uixo --broadcast-mode=block
 
 # Fund Owner with 300xGBP (300000000uxgbp)
 echo "Funding Owner DID with 300xGBP (using treasury 'oracle-mint' using oracle)..."
-ixod tx treasury oracle-mint "$OWNER_ADDR" 300000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx treasury oracle-mint "$OWNER_ADDR" 300000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block
 
 # Owner now has 300xGBP to use in the project
 # Side note: we can now query the account using just the DID instead of using get_pubkey.js, since the DID has been registered.
-# ixod q account "$(ixod q did get-address-from-did $OWNER_DID)"
+# ixod_q account "$(ixod_q did get-address-from-did $OWNER_DID)"
 
 # Create bond
 echo "Creating bond..."
-ixod tx bonds create-bond \
+ixod_tx bonds create-bond \
   --token=uabc \
   --name="ABC" \
   --description="Description about ABC" \
@@ -199,90 +222,90 @@ ixod tx bonds create-bond \
   --bond-did="$BOND_DID" \
   --creator-did="$OWNER_DID_FULL" \
   --controller-did="$OWNER_DID" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+  --broadcast-mode block
 
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$IXO_DID_FULL"
-ixod tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block
 
 # Create fee-for-service payment template
 echo "Creating fee-for-service payment template..."
 CREATOR="$IXO_DID_FULL"
-ixod tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block
 
 # Create project and progress status to PENDING
 SENDER_DID="$OWNER_DID"
 echo "Creating project..."
-ixod tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to CREATED..."
-ixod tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to PENDING..."
-ixod tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Fund project with 100xGBP and 1000 IXO (for fees)
-PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
+PROJECT_ADDR=$(ixod_q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
 echo "Funding project with uixo and uxgbp (using treasury 'oracle-mint' and 'oracle-transfer' using oracle)..."
-ixod tx treasury oracle-mint "$PROJECT_ADDR" 100000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx treasury oracle-transfer "$IXO_DID" "$PROJECT_ADDR" 1000000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx treasury oracle-mint "$PROJECT_ADDR" 100000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx treasury oracle-transfer "$IXO_DID" "$PROJECT_ADDR" 1000000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
 
 # Progress project status to FUNDED and STARTED
 SENDER_DID="$OWNER_DID"
 echo "Updating project to FUNDED..."
-ixod tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block
 echo "Updating project to STARTED..."
-ixod tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Create claims
 echo "Creating claims in project..."
-ixod tx project create-claim "tx_hash" "$DID_1" "claim1" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_2" "claim2" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_3" "claim3" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_4" "claim4" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_5" "claim5" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_6" "claim6" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_7" "claim7" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_8" "claim8" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_9" "claim9" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-claim "tx_hash" "$DID_10" "claim10" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project create-claim "tx_hash" "$DID_1" "claim1" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_2" "claim2" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_3" "claim3" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_4" "claim4" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_5" "claim5" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_6" "claim6" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_7" "claim7" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_8" "claim8" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_9" "claim9" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-claim "tx_hash" "$DID_10" "claim10" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Create evaluations
 echo "Creating evaluations in project..."
 STATUS="1"
-ixod tx project create-evaluation "tx_hash" "$DID_1" "claim1" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_2" "claim2" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_3" "claim3" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_4" "claim4" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_5" "claim5" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_6" "claim6" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_7" "claim7" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_8" "claim8" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_9" "claim9" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx project create-evaluation "tx_hash" "$DID_10" "claim10" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx project create-evaluation "tx_hash" "$DID_1" "claim1" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_2" "claim2" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_3" "claim3" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_4" "claim4" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_5" "claim5" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_6" "claim6" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_7" "claim7" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_8" "claim8" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_9" "claim9" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
+ixod_tx project create-evaluation "tx_hash" "$DID_10" "claim10" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Each of the 10 DIDs now has 1xGBP (1000000uxgbp)
-# ixod q account "$(ixod q did get-address-from-did "$DID_1")"
+# ixod_q account "$(ixod_q did get-address-from-did "$DID_1")"
 
 # Perform bond buys
 echo "DID 1 buys 1ABC..."
-ixod tx bonds buy 1000000uabc 1000000uxgbp "$BOND_DID" "$DID_1_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds buy 1000000uabc 1000000uxgbp "$BOND_DID" "$DID_1_FULL" --broadcast-mode block
 echo "DID 2 buys 0.26ABC..."
-ixod tx bonds buy 259921uabc 1000000uxgbp "$BOND_DID" "$DID_2_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds buy 259921uabc 1000000uxgbp "$BOND_DID" "$DID_2_FULL" --broadcast-mode block
 echo "DID 3 buys 0.18ABC..."
-ixod tx bonds buy 182328uabc 1000000uxgbp "$BOND_DID" "$DID_3_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds buy 182328uabc 1000000uxgbp "$BOND_DID" "$DID_3_FULL" --broadcast-mode block
 echo "DID 4 buys 0.14ABC..."
-ixod tx bonds buy 145151uabc 1000000uxgbp "$BOND_DID" "$DID_4_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds buy 145151uabc 1000000uxgbp "$BOND_DID" "$DID_4_FULL" --broadcast-mode block
 echo "DID 5 buys 0.12ABC..."
-ixod tx bonds buy 122574uabc 1000000uxgbp "$BOND_DID" "$DID_5_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds buy 122574uabc 1000000uxgbp "$BOND_DID" "$DID_5_FULL" --broadcast-mode block
 
 # Make outcome payment
 echo "Owner makes outcome payment..."
-ixod tx bonds make-outcome-payment "$BOND_DID" "$OWNER_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds make-outcome-payment "$BOND_DID" "$OWNER_DID_FULL" --broadcast-mode block
 
 # Withdraw reserve shares
 echo "Withdrawing shares (DID 1-5)..."
-ixod tx bonds withdraw-share "$BOND_DID" "$DID_1_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx bonds withdraw-share "$BOND_DID" "$DID_2_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx bonds withdraw-share "$BOND_DID" "$DID_3_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx bonds withdraw-share "$BOND_DID" "$DID_4_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
-ixod tx bonds withdraw-share "$BOND_DID" "$DID_5_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y > /dev/null
+ixod_tx bonds withdraw-share "$BOND_DID" "$DID_1_FULL" --broadcast-mode block
+ixod_tx bonds withdraw-share "$BOND_DID" "$DID_2_FULL" --broadcast-mode block
+ixod_tx bonds withdraw-share "$BOND_DID" "$DID_3_FULL" --broadcast-mode block
+ixod_tx bonds withdraw-share "$BOND_DID" "$DID_4_FULL" --broadcast-mode block
+ixod_tx bonds withdraw-share "$BOND_DID" "$DID_5_FULL" --broadcast-mode block
