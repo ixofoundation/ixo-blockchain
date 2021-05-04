@@ -98,7 +98,7 @@ func (k Keeper) LastBatch(c context.Context, req *types.QueryLastBatchRequest) (
 
 	batch := k.MustGetLastBatch(ctx, bondDid)
 
-	return &types.QueryLastBatchResponse{Batch: &batch}, nil
+	return &types.QueryLastBatchResponse{LastBatch: &batch}, nil
 }
 
 func (k Keeper) CurrentPrice(c context.Context, req *types.QueryCurrentPriceRequest) (*types.QueryCurrentPriceResponse, error) {
@@ -122,7 +122,7 @@ func (k Keeper) CurrentPrice(c context.Context, req *types.QueryCurrentPriceRequ
 	}
 	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	return &types.QueryCurrentPriceResponse{BuyPrices: reservePrices}, nil
+	return &types.QueryCurrentPriceResponse{CurrentPrice: reservePrices}, nil
 }
 
 func (k Keeper) CurrentReserve(c context.Context, req *types.QueryCurrentReserveRequest) (*types.QueryCurrentReserveResponse, error) {
@@ -141,7 +141,7 @@ func (k Keeper) CurrentReserve(c context.Context, req *types.QueryCurrentReserve
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
 
-	return &types.QueryCurrentReserveResponse{Coins: reserveBalances}, nil
+	return &types.QueryCurrentReserveResponse{CurrentReserve: reserveBalances}, nil
 }
 
 func (k Keeper) CustomPrice(c context.Context, req *types.QueryCustomPriceRequest) (*types.QueryCustomPriceResponse, error) {
@@ -170,7 +170,7 @@ func (k Keeper) CustomPrice(c context.Context, req *types.QueryCustomPriceReques
 	}
 	reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-	return &types.QueryCustomPriceResponse{DecCoins: reservePrices}, nil
+	return &types.QueryCustomPriceResponse{Price: reservePrices}, nil
 }
 
 func (k Keeper) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*types.QueryBuyPriceResponse, error) {

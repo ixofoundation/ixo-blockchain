@@ -690,7 +690,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| buy_prices | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
+| current_price | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
 
 
 
@@ -720,7 +720,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| current_reserve | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 
 
 
@@ -751,7 +751,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| dec_coins | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
+| price | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
 
 
 
@@ -781,7 +781,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| batch | [Batch](#bonds.Batch) |  |  |
+| last_batch | [Batch](#bonds.Batch) |  |  |
 
 
 

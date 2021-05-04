@@ -172,7 +172,7 @@ func GetCmdLastBatch() *cobra.Command {
 				return nil
 			}
 
-			return clientCtx.PrintProto(res.Batch)
+			return clientCtx.PrintProto(res.LastBatch)
 		},
 	}
 
