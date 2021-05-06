@@ -2,6 +2,7 @@ syntax = "proto3";
 package project;
 
 import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
 
@@ -17,7 +18,7 @@ message CreateAgentDoc {
 
 message UpdateAgentDoc {
   string did = 1;
-  string agent_status = 2;
+  string status = 2;
   string role = 3;
 }
 
@@ -28,7 +29,7 @@ message CreateClaimDoc {
 
 message CreateEvaluationDoc {
   string claim_id = 1;
-  string claim_status = 2;
+  string status = 2;
 }
 
 message WithdrawFundsDoc {
@@ -36,4 +37,26 @@ message WithdrawFundsDoc {
   string recipient_did = 2;
   string amount = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false];
   bool is_refund = 4;
+}
+
+message ProjectDoc {
+  string tx_hash = 1;
+  string project_did = 2;
+  string sender_did = 3;
+  string pub_key = 4;
+  string status = 5;
+  bytes data = 6;
+}
+
+message WithdrawalInfoDoc {
+  string project_did = 1;
+  string recipient_did = 2;
+  cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false];
+}
+
+message Params {
+  string ixo_did = 1;
+  repeated cosmos.base.v1beta1.Coin project_minimum_initial_funding = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string oracle_fee_percentage = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string node_fee_percentage = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
 }

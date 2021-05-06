@@ -23,7 +23,7 @@ message MsgCreateProject {
   string sender_did = 2;
   string project_did = 3;
   string pub_key = 4;
-  repeated bytes raw_message = 5; //TODO (Stef) check about customtype
+  bytes data = 5; //TODO (Stef) check about customtype
 }
 
 message MsgCreateProjectResponse {}
@@ -32,7 +32,7 @@ message MsgUpdateProjectStatus {
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
-  UpdateProjectStatusDoc data = 4;
+  UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false];
 }
 
 message MsgUpdateProjectStatusResponse{}
@@ -41,7 +41,7 @@ message MsgCreateAgent {
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
-  CreateAgentDoc data = 4;
+  CreateAgentDoc data = 4 [(gogoproto.nullable) = false];
 }
 
 message MsgCreateAgentResponse {}
@@ -50,7 +50,7 @@ message MsgUpdateAgent {
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
-  UpdateAgentDoc data = 4;
+  UpdateAgentDoc data = 4 [(gogoproto.nullable) = false];
 }
 
 message MsgUpdateAgentResponse {}
@@ -59,7 +59,7 @@ message MsgCreateClaim {
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
-  CreateClaimDoc data = 4;
+  CreateClaimDoc data = 4 [(gogoproto.nullable) = false];
 }
 
 message MsgCreateClaimResponse {}
@@ -68,14 +68,14 @@ message MsgCreateEvaluation {
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
-  CreateEvaluationDoc data = 4;
+  CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false];
 }
 
 message MsgCreateEvaluationResponse {}
 
 message MsgWithdrawFunds {
   string sender_did = 1;
-  WithdrawFundsDoc data = 2;
+  WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false];
 }
 
 message MsgWithdrawFundsResponse {}
