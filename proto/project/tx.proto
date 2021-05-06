@@ -1,0 +1,81 @@
+syntax = "proto3";
+package project;
+
+import "gogoproto/gogo.proto";
+import "project/project.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
+
+// To get a list of all module messages, go to your module's handler.go and
+// check all cases in NewHandler().
+service Msg {
+  rpc CreateProject(MsgCreateProject) returns (MsgCreateProjectResponse);
+  rpc UpdateProjectStatus(MsgUpdateProjectStatus) returns (MsgUpdateProjectStatusResponse);
+  rpc CreateAgent(MsgCreateAgent) returns (MsgCreateAgentResponse);
+  rpc UpdateAgent(MsgUpdateAgent) returns (MsgUpdateAgentResponse);
+  rpc CreateClaim(MsgCreateClaim) returns (MsgCreateClaimResponse);
+  rpc CreateEvaluation(MsgCreateEvaluation) returns (MsgCreateEvaluationResponse);
+  rpc WithdrawFunds(MsgWithdrawFunds) returns (MsgWithdrawFundsResponse);
+}
+
+message MsgCreateProject {
+  string tx_hash = 1;
+  string sender_did = 2;
+  string project_did = 3;
+  string pub_key = 4;
+  repeated bytes raw_message = 5; //TODO (Stef) check about customtype
+}
+
+message MsgCreateProjectResponse {}
+
+message MsgUpdateProjectStatus {
+  string tx_hash = 1;
+  string sender_did = 2;
+  string project_did = 3;
+  UpdateProjectStatusDoc data = 4;
+}
+
+message MsgUpdateProjectStatusResponse{}
+
+message MsgCreateAgent {
+  string tx_hash = 1;
+  string sender_did = 2;
+  string project_did = 3;
+  CreateAgentDoc data = 4;
+}
+
+message MsgCreateAgentResponse {}
+
+message MsgUpdateAgent {
+  string tx_hash = 1;
+  string sender_did = 2;
+  string project_did = 3;
+  UpdateAgentDoc data = 4;
+}
+
+message MsgUpdateAgentResponse {}
+
+message MsgCreateClaim {
+  string tx_hash = 1;
+  string sender_did = 2;
+  string project_did = 3;
+  CreateClaimDoc data = 4;
+}
+
+message MsgCreateClaimResponse {}
+
+message MsgCreateEvaluation {
+  string tx_hash = 1;
+  string sender_did = 2;
+  string project_did = 3;
+  CreateEvaluationDoc data = 4;
+}
+
+message MsgCreateEvaluationResponse {}
+
+message MsgWithdrawFunds {
+  string sender_did = 1;
+  WithdrawFundsDoc data = 2;
+}
+
+message MsgWithdrawFundsResponse {}
