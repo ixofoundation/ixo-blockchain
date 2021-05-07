@@ -2,9 +2,10 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
 
-func RegisterCodec(cdc *codec.Codec) {
+func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(MsgCreateProject{}, "project/CreateProject", nil)
 	cdc.RegisterConcrete(MsgUpdateProjectStatus{}, "project/UpdateProjectStatus", nil)
 	cdc.RegisterConcrete(MsgCreateAgent{}, "project/CreateAgent", nil)
@@ -18,11 +19,20 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(WithdrawalInfoDoc{}, "project/WithdrawalInfo", nil)
 }
 
-// ModuleCdc is the codec for the module
-var ModuleCdc *codec.LegacyAmino
+var (
+	amino = codec.NewLegacyAmino()
+
+	// ModuleCdc references the global x/gov module codec. Note, the codec should
+	// ONLY be used in certain instances of tests and for JSON encoding as Amino is
+	// still used for that purpose.
+	//
+	// The actual codec used for serialization should be provided to x/gov and
+	// defined at the application level.
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
 
 func init() {
-	ModuleCdc = codec.New()
-	RegisterCodec(ModuleCdc)
-	ModuleCdc.Seal()
+	RegisterLegacyAminoCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
 }
+

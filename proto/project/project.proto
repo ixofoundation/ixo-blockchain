@@ -57,6 +57,25 @@ message WithdrawalInfoDoc {
 message Params {
   string ixo_did = 1;
   repeated cosmos.base.v1beta1.Coin project_minimum_initial_funding = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  string oracle_fee_percentage = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
-  string node_fee_percentage = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"];
+  string oracle_fee_percentage = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string node_fee_percentage = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+message Claim {
+  string id = 1;
+  string template_id = 2;
+  string claimer_did = 3;
+  string status = 4;
+}
+
+message GenesisAccountMap {
+  map<string, string> map = 1;
+}
+
+message WithdrawalInfoDocs {
+  repeated WithdrawalInfoDoc docs = 1 [(gogoproto.nullable) = false];
+}
+
+message Claims {
+  repeated Claim claims = 1 [(gogoproto.nullable) = false];
 }

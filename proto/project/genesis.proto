@@ -1,0 +1,16 @@
+syntax = "proto3";
+package project;
+
+import "gogoproto/gogo.proto";
+import "project/project.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
+
+// GenesisState defines the did module's genesis state.
+message GenesisState {
+  repeated ProjectDoc project_docs = 1 [(gogoproto.nullable) = false];
+  repeated GenesisAccountMap account_maps = 2 [(gogoproto.nullable) = false];
+  repeated WithdrawalInfoDocs withdrawals_infos = 3 [(gogoproto.nullable) = false];
+  repeated Claims claims = 4 [(gogoproto.nullable) = false];
+  Params params = 5 [(gogoproto.nullable) = false];
+}

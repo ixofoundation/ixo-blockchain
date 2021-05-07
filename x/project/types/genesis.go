@@ -1,12 +1,12 @@
 package types
 
-type GenesisState struct {
-	ProjectDocs      []ProjectDoc          `json:"project_docs" yaml:"project_docs"`
-	AccountMaps      []GenesisAccountMap   `json:"account_maps" yaml:"account_maps"`
-	WithdrawalsInfos [][]WithdrawalInfoDoc `json:"withdrawal_infos" yaml:"withdrawal_infos"`
-	Claims           [][]Claim             `json:"claims" yaml:"claims"`
-	Params           Params                `json:"params" yaml:"params"`
-}
+//type GenesisState struct {
+//	ProjectDocs      []ProjectDoc          `json:"project_docs" yaml:"project_docs"`
+//	AccountMaps      []GenesisAccountMap   `json:"account_maps" yaml:"account_maps"`
+//	WithdrawalsInfos [][]WithdrawalInfoDoc `json:"withdrawal_infos" yaml:"withdrawal_infos"`
+//	Claims           [][]Claim             `json:"claims" yaml:"claims"`
+//	Params           Params                `json:"params" yaml:"params"`
+//}
 
 func NewGenesisState(projectDocs []ProjectDoc, accountMaps []GenesisAccountMap,
 	withdrawalInfos [][]WithdrawalInfoDoc, claims [][]Claim, params Params) GenesisState {

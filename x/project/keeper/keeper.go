@@ -6,27 +6,29 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
 	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	//"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
 type Keeper struct {
-	cdc            *codec.Codec
+	cdc            codec.BinaryMarshaler
 	storeKey       sdk.StoreKey
-	paramSpace     params.Subspace
-	AccountKeeper  auth.AccountKeeper
+	paramSpace     paramstypes.Subspace
+	AccountKeeper  authkeeper.AccountKeeper //TODO (Stef) - other cosmos SDK modules use expected_keepers - do we need this?
 	DidKeeper      did.Keeper
 	paymentsKeeper payments.Keeper
 }
 
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
-	accountKeeper auth.AccountKeeper, didKeeper did.Keeper,
+func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
+	accountKeeper authkeeper.AccountKeeper, didKeeper did.Keeper,
 	paymentsKeeper payments.Keeper) Keeper {
 	return Keeper{
 		cdc:            cdc,
@@ -100,7 +102,7 @@ func (k Keeper) ValidateProjectFeesMap(ctx sdk.Context, projectFeesMap types.Pro
 func (k Keeper) SetProjectDoc(ctx sdk.Context, projectDoc types.ProjectDoc) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetProjectKey(projectDoc.ProjectDid)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(projectDoc))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&projectDoc))
 }
 
 func (k Keeper) SetAccountMap(ctx sdk.Context, projectDid did.Did, accountMap types.AccountMap) {
@@ -130,7 +132,7 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid did.Did) types.Account
 }
 
 func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
-	accountId types.InternalAccountID, account exported.Account) {
+	accountId types.InternalAccountID, account authtypes.AccountI) {
 	accountMap := k.GetAccountMap(ctx, projectDid)
 	_, found := accountMap[accountId]
 	if found {
@@ -150,8 +152,8 @@ func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
 }
 
 func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
-	accountId types.InternalAccountID) (exported.Account, error) {
-	address := supply.NewModuleAddress(accountId.ToAddressKey(projectDid))
+	accountId types.InternalAccountID) (authtypes.AccountI, error) {
+	address := authtypes.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
@@ -235,5 +237,5 @@ func (k Keeper) GetClaim(ctx sdk.Context, projectDid did.Did, claimId string) (t
 func (k Keeper) SetClaim(ctx sdk.Context, projectDid did.Did, claim types.Claim) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetClaimKey(projectDid, claim.Id)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(claim))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&claim))
 }
