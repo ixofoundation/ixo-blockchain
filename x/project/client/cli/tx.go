@@ -82,7 +82,7 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, &msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 
@@ -120,7 +120,7 @@ func NewCmdCreateAgent() *cobra.Command {
 
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, &msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 
@@ -160,7 +160,7 @@ func NewCmdUpdateAgent() *cobra.Command {
 
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, &msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 
@@ -193,7 +193,7 @@ func NewCmdCreateClaim() *cobra.Command {
 
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, &msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 
@@ -232,7 +232,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, &msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 
@@ -265,7 +265,7 @@ func NewCmdWithdrawFunds() *cobra.Command {
 
 			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
 
-			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, &msg)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
 

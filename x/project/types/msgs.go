@@ -28,26 +28,26 @@ const (
 )
 
 var (
-	_ ixotypes.IxoMsg = MsgCreateProject{}
-	_ ixotypes.IxoMsg = MsgUpdateProjectStatus{}
-	_ ixotypes.IxoMsg = MsgCreateAgent{}
-	_ ixotypes.IxoMsg = MsgUpdateAgent{}
-	_ ixotypes.IxoMsg = MsgCreateClaim{}
-	_ ixotypes.IxoMsg = MsgCreateEvaluation{}
-	_ ixotypes.IxoMsg = MsgWithdrawFunds{}
+	_ ixotypes.IxoMsg = &MsgCreateProject{}
+	_ ixotypes.IxoMsg = &MsgUpdateProjectStatus{}
+	_ ixotypes.IxoMsg = &MsgCreateAgent{}
+	_ ixotypes.IxoMsg = &MsgUpdateAgent{}
+	_ ixotypes.IxoMsg = &MsgCreateClaim{}
+	_ ixotypes.IxoMsg = &MsgCreateEvaluation{}
+	_ ixotypes.IxoMsg = &MsgWithdrawFunds{}
 )
 
-type MsgCreateProject struct {
-	TxHash     string          `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
-	PubKey     string          `json:"pubKey" yaml:"pubKey"`
-	Data       json.RawMessage `json:"data" yaml:"data"`
-}
+//type MsgCreateProject struct {
+//	TxHash     string          `json:"txHash" yaml:"txHash"`
+//	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+//	PubKey     string          `json:"pubKey" yaml:"pubKey"`
+//	Data       json.RawMessage `json:"data" yaml:"data"`
+//}
 
 func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
-	projectDid did.Did, pubKey string) MsgCreateProject {
-	return MsgCreateProject{
+	projectDid did.Did, pubKey string) *MsgCreateProject {
+	return &MsgCreateProject{
 		TxHash:     "",
 		SenderDid:  senderDid,
 		ProjectDid: projectDid,
@@ -68,7 +68,7 @@ func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
 		AccountNumber: accNum,
 		Sequence:      accSeq,
 		Fee:           stdFee,
-		Msgs:          []sdk.Msg{msg},
+		Msgs:          []sdk.Msg{&msg},
 		Memo:          memo,
 	}
 }
@@ -109,29 +109,29 @@ func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
-func (msg MsgCreateProject) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
+//func (msg MsgCreateProject) String() string {
+//	b, err := json.Marshal(msg)
+//	if err != nil {
+//		panic(err)
+//	}
+//	return string(b)
+//}
 
-func (msg MsgCreateProject) GetPubKey() string { return msg.PubKey }
+//func (msg MsgCreateProject) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateProject) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-type MsgUpdateProjectStatus struct {
-	TxHash     string                 `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
-	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
-}
+//type MsgUpdateProjectStatus struct {
+//	TxHash     string                 `json:"txHash" yaml:"txHash"`
+//	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
+//	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
+//}
 
-func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.Did) MsgUpdateProjectStatus {
-	return MsgUpdateProjectStatus{
+func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.Did) *MsgUpdateProjectStatus {
+	return &MsgUpdateProjectStatus{
 		TxHash:     "",
 		SenderDid:  senderDid,
 		ProjectDid: projectDid,
@@ -173,15 +173,15 @@ func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
-type MsgCreateAgent struct {
-	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
-	Data       CreateAgentDoc `json:"data" yaml:"data"`
-}
+//type MsgCreateAgent struct {
+//	TxHash     string         `json:"txHash" yaml:"txHash"`
+//	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+//	Data       CreateAgentDoc `json:"data" yaml:"data"`
+//}
 
-func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.Did) MsgCreateAgent {
-	return MsgCreateAgent{
+func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.Did) *MsgCreateAgent {
+	return &MsgCreateAgent{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -222,23 +222,23 @@ func (msg MsgCreateAgent) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgCreateAgent) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
+//func (msg MsgCreateAgent) String() string {
+//	b, err := json.Marshal(msg)
+//	if err != nil {
+//		panic(err)
+//	}
+//	return string(b)
+//}
 
-type MsgUpdateAgent struct {
-	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
-	Data       UpdateAgentDoc `json:"data" yaml:"data"`
-}
+//type MsgUpdateAgent struct {
+//	TxHash     string         `json:"txHash" yaml:"txHash"`
+//	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+//	Data       UpdateAgentDoc `json:"data" yaml:"data"`
+//}
 
-func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.Did) MsgUpdateAgent {
-	return MsgUpdateAgent{
+func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.Did) *MsgUpdateAgent {
+	return &MsgUpdateAgent{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -279,24 +279,24 @@ func (msg MsgUpdateAgent) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgUpdateAgent) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
+//func (msg MsgUpdateAgent) String() string {
+//	b, err := json.Marshal(msg)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return string(b)
+//}
 
-	return string(b)
-}
+//type MsgCreateClaim struct {
+//	TxHash     string         `json:"txHash" yaml:"txHash"`
+//	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+//	Data       CreateClaimDoc `json:"data" yaml:"data"`
+//}
 
-type MsgCreateClaim struct {
-	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
-	Data       CreateClaimDoc `json:"data" yaml:"data"`
-}
-
-func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.Did) MsgCreateClaim {
-	return MsgCreateClaim{
+func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.Did) *MsgCreateClaim {
+	return &MsgCreateClaim{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -313,9 +313,9 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.ClaimID, "ClaimID"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.Data.ClaimId, "ClaimID"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.ClaimTemplateID, "ClaimTemplateID"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.Data.ClaimTemplateId, "ClaimTemplateID"); !valid {
 		return err
 	}
 
@@ -340,24 +340,24 @@ func (msg MsgCreateClaim) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgCreateClaim) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
+//func (msg MsgCreateClaim) String() string {
+//	b, err := json.Marshal(msg)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return string(b)
+//}
 
-	return string(b)
-}
+//type MsgCreateEvaluation struct {
+//	TxHash     string              `json:"txHash" yaml:"txHash"`
+//	SenderDid  did.Did             `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid did.Did             `json:"projectDid" yaml:"projectDid"`
+//	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
+//}
 
-type MsgCreateEvaluation struct {
-	TxHash     string              `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did             `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did             `json:"projectDid" yaml:"projectDid"`
-	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
-}
-
-func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.Did) MsgCreateEvaluation {
-	return MsgCreateEvaluation{
+func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.Did) *MsgCreateEvaluation {
+	return &MsgCreateEvaluation{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
 		SenderDid:  senderDid,
@@ -397,22 +397,22 @@ func (msg MsgCreateEvaluation) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgCreateEvaluation) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
+//func (msg MsgCreateEvaluation) String() string {
+//	b, err := json.Marshal(msg)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return string(b)
+//}
 
-	return string(b)
-}
+//type MsgWithdrawFunds struct {
+//	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
+//	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
+//}
 
-type MsgWithdrawFunds struct {
-	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
-	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
-}
-
-func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) MsgWithdrawFunds {
-	return MsgWithdrawFunds{
+func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) *MsgWithdrawFunds {
+	return &MsgWithdrawFunds{
 		SenderDid: senderDid,
 		Data:      data,
 	}
@@ -464,11 +464,11 @@ func (msg MsgWithdrawFunds) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
-func (msg MsgWithdrawFunds) String() string {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(b)
-}
+//func (msg MsgWithdrawFunds) String() string {
+//	b, err := json.Marshal(msg)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return string(b)
+//}
