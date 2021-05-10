@@ -10,7 +10,7 @@ import (
 type (
 	InternalAccountID          string
 	AccountMap                 map[InternalAccountID]sdk.AccAddress
-	GenesisAccountMap          map[string]sdk.AccAddress
+	//GenesisAccountMap          map[string]sdk.AccAddress
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
 	ProjectDataMap             map[string]json.RawMessage
@@ -99,18 +99,18 @@ const (
 	RejectedClaim ClaimStatus = "2"
 )
 
-type Claim struct {
-	Id         string      `json:"id" yaml:"id"`
-	TemplateId string      `json:"template_id" yaml:"template_id"`
-	ClaimerDid did.Did     `json:"claimer_did" yaml:"claimer_did"`
-	Status     ClaimStatus `json:"status" yaml:"status"`
-}
+//type Claim struct {
+//	Id         string      `json:"id" yaml:"id"`
+//	TemplateId string      `json:"template_id" yaml:"template_id"`
+//	ClaimerDid did.Did     `json:"claimer_did" yaml:"claimer_did"`
+//	Status     ClaimStatus `json:"status" yaml:"status"`
+//}
 
 func NewClaim(id string, templateId string, claimerDid did.Did) Claim {
 	return Claim{
 		Id:         id,
 		TemplateId: templateId,
 		ClaimerDid: claimerDid,
-		Status:     PendingClaim,
+		Status:     string(PendingClaim),
 	}
 }

@@ -73,9 +73,9 @@ message GenesisAccountMap {
 }
 
 message WithdrawalInfoDocs {
-  repeated WithdrawalInfoDoc docs = 1 [(gogoproto.nullable) = false];
+  repeated WithdrawalInfoDoc docs_list = 1 [(gogoproto.nullable) = false];
 }
 
 message Claims {
-  repeated Claim claims = 1 [(gogoproto.nullable) = false];
+  repeated Claim claims_list = 1 [(gogoproto.nullable) = false];
 }

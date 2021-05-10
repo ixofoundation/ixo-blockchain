@@ -109,18 +109,18 @@ func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
-//func (msg MsgCreateProject) String() string {
-//	b, err := json.Marshal(msg)
-//	if err != nil {
-//		panic(err)
-//	}
-//	return string(b)
-//}
+func (msg MsgCreateProject) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
 
 //func (msg MsgCreateProject) GetPubKey() string { return msg.PubKey }
 
 func (msg MsgCreateProject) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 //type MsgUpdateProjectStatus struct {
@@ -165,7 +165,7 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 }
 
 func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
@@ -219,16 +219,16 @@ func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//func (msg MsgCreateAgent) String() string {
-//	b, err := json.Marshal(msg)
-//	if err != nil {
-//		panic(err)
-//	}
-//	return string(b)
-//}
+func (msg MsgCreateAgent) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
 
 //type MsgUpdateAgent struct {
 //	TxHash     string         `json:"txHash" yaml:"txHash"`
@@ -276,17 +276,17 @@ func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//func (msg MsgUpdateAgent) String() string {
-//	b, err := json.Marshal(msg)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	return string(b)
-//}
+func (msg MsgUpdateAgent) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}
 
 //type MsgCreateClaim struct {
 //	TxHash     string         `json:"txHash" yaml:"txHash"`
@@ -337,17 +337,17 @@ func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//func (msg MsgCreateClaim) String() string {
-//	b, err := json.Marshal(msg)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	return string(b)
-//}
+func (msg MsgCreateClaim) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}
 
 //type MsgCreateEvaluation struct {
 //	TxHash     string              `json:"txHash" yaml:"txHash"`
@@ -394,17 +394,17 @@ func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//func (msg MsgCreateEvaluation) String() string {
-//	b, err := json.Marshal(msg)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	return string(b)
-//}
+func (msg MsgCreateEvaluation) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}
 
 //type MsgWithdrawFunds struct {
 //	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
@@ -461,14 +461,14 @@ func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//func (msg MsgWithdrawFunds) String() string {
-//	b, err := json.Marshal(msg)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	return string(b)
-//}
+func (msg MsgWithdrawFunds) String() string {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}

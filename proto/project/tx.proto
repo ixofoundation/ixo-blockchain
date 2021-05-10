@@ -19,6 +19,8 @@ service Msg {
 }
 
 message MsgCreateProject {
+  option (gogoproto.goproto_stringer) = false;
+
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
@@ -38,6 +40,8 @@ message MsgUpdateProjectStatus {
 message MsgUpdateProjectStatusResponse{}
 
 message MsgCreateAgent {
+  option (gogoproto.goproto_stringer) = false;
+
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
@@ -47,6 +51,8 @@ message MsgCreateAgent {
 message MsgCreateAgentResponse {}
 
 message MsgUpdateAgent {
+  option (gogoproto.goproto_stringer) = false;
+
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
@@ -56,6 +62,8 @@ message MsgUpdateAgent {
 message MsgUpdateAgentResponse {}
 
 message MsgCreateClaim {
+  option (gogoproto.goproto_stringer) = false;
+
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
@@ -65,6 +73,8 @@ message MsgCreateClaim {
 message MsgCreateClaimResponse {}
 
 message MsgCreateEvaluation {
+  option (gogoproto.goproto_stringer) = false;
+
   string tx_hash = 1;
   string sender_did = 2;
   string project_did = 3;
@@ -74,6 +84,8 @@ message MsgCreateEvaluation {
 message MsgCreateEvaluationResponse {}
 
 message MsgWithdrawFunds {
+  option (gogoproto.goproto_stringer) = false;
+
   string sender_did = 1;
   WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false];
 }
