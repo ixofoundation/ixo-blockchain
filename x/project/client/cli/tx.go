@@ -11,6 +11,28 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func NewTxCmd() *cobra.Command {
+	projectTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "project transaction sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	projectTxCmd.AddCommand(
+		NewCmdCreateProject(),
+		NewCmdCreateAgent(),
+		NewCmdUpdateProjectStatus(),
+		NewCmdUpdateAgent(),
+		NewCmdCreateClaim(),
+		NewCmdCreateEvaluation(),
+		NewCmdWithdrawFunds(),
+	)
+
+	return projectTxCmd
+}
+
 func NewCmdCreateProject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-project [sender-did] [project-data-json] [ixo-did]",

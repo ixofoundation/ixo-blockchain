@@ -36,7 +36,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState)
 	keeper.SetParams(ctx, data.Params)
 }
 
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// Export project docs, account maps, project withdrawals
 	var projectDocs []types.ProjectDoc
 	var accountMaps []types.AccountMap
@@ -75,7 +75,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 		panic(err)
 	}
 
-	return types.GenesisState{
+	return &types.GenesisState{
 		ProjectDocs:      projectDocs,
 		AccountMaps:      genesisAccountMaps,
 		WithdrawalsInfos: withdrawalInfos,

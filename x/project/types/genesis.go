@@ -10,8 +10,8 @@ package types
 
 // TODO (Stef) Check whether this function is being called anywhere
 func NewGenesisState(projectDocs []ProjectDoc, accountMaps []GenesisAccountMap,
-	withdrawalInfos []WithdrawalInfoDocs, claims []Claims, params Params) GenesisState {
-	return GenesisState{
+	withdrawalInfos []WithdrawalInfoDocs, claims []Claims, params Params) *GenesisState {
+	return &GenesisState{
 		ProjectDocs:      projectDocs,
 		AccountMaps:      accountMaps,
 		WithdrawalsInfos: withdrawalInfos,
@@ -24,8 +24,8 @@ func ValidateGenesis(data GenesisState) error {
 	return nil
 }
 
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
+func DefaultGenesisState() *GenesisState {
+	return &GenesisState{
 		ProjectDocs:      nil,
 		AccountMaps:      nil,
 		WithdrawalsInfos: nil,

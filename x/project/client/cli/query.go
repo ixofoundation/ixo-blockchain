@@ -9,6 +9,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func GetQueryCmd() *cobra.Command {
+	projectQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "project query sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	projectQueryCmd.AddCommand(
+		GetCmdProjectDoc(),
+		GetCmdProjectAccounts(),
+		GetCmdProjectTxs(),
+		GetParamsRequestHandler(),
+	)
+
+	return projectQueryCmd
+}
+
 func GetCmdProjectDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-project-doc [did]",
