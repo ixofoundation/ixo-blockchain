@@ -10,10 +10,11 @@ import (
 )
 
 func NewHandler(k keeper.Keeper, pk payments.Keeper, bk bankkeeper.Keeper) sdk.Handler {
-	msgServer := keeper.NewMsgServerImpl(k)
+	msgServer := keeper.NewMsgServerImpl(k, bk, pk)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
+
 		switch msg := msg.(type) {
 		case *types.MsgCreateProject:
 			res, err := msgServer.CreateProject(sdk.WrapSDKContext(ctx), msg)

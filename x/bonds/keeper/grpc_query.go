@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var _ types.QueryServer = Keeper{}
+
 func (k Keeper) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.QueryBondsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 

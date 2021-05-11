@@ -3,13 +3,12 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
 
 type (
 	InternalAccountID          string
-	AccountMap                 map[InternalAccountID]sdk.AccAddress
+	//AccountMap                 map[InternalAccountID]sdk.AccAddress
 	//GenesisAccountMap          map[string]sdk.AccAddress
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
@@ -73,6 +72,10 @@ func initStateTransitions() ProjectStatusTransitionMap {
 	}
 }
 
+func ProjectStatusFromString(s string) ProjectStatus {
+	return ProjectStatus(s)
+}
+
 func (next ProjectStatus) IsValidProgressionFrom(prev ProjectStatus) bool {
 	validStatuses := StateTransitions[prev]
 	for _, v := range validStatuses {
@@ -113,4 +116,14 @@ func NewClaim(id string, templateId string, claimerDid did.Did) Claim {
 		ClaimerDid: claimerDid,
 		Status:     string(PendingClaim),
 	}
+}
+
+func AppendClaims(list Claims, claim Claim) Claims {
+	appended := append(list.ClaimsList, claim)
+	return Claims{ClaimsList: appended}
+}
+
+func AppendWithdrawalInfoDocs(list WithdrawalInfoDocs, doc WithdrawalInfoDoc) WithdrawalInfoDocs {
+	appended := append(list.DocsList, doc)
+	return WithdrawalInfoDocs{DocsList: appended}
 }

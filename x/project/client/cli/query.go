@@ -57,7 +57,7 @@ func GetCmdProjectAccounts() *cobra.Command {
 				return err
 			}
 
-			if len(res.GetAccountMap()) == 0 {
+			if len(res.GetAccountMap().Map) == 0 {
 				return errors.New("project does not exist")
 			}
 
@@ -89,7 +89,7 @@ func GetCmdProjectTxs() *cobra.Command {
 				return err
 			}
 
-			if len(res.GetTxs()) == 0 {
+			if len(res.GetTxs().DocsList) == 0 {
 				return errors.New("projectTxs does not exist for a projectDid")
 			}
 

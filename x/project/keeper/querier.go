@@ -48,7 +48,6 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc 
 }
 
 func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
-
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)
 	if err != nil {

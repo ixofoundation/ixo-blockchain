@@ -72,6 +72,10 @@ message GenesisAccountMap {
   map<string, string> map = 1;
 }
 
+message AccountMap {
+  map<string, string> map = 1;
+}
+
 message WithdrawalInfoDocs {
   repeated WithdrawalInfoDoc docs_list = 1 [(gogoproto.nullable) = false];
 }

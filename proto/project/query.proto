@@ -39,7 +39,7 @@ message QueryProjectAccountsRequest {
 }
 
 message QueryProjectAccountsResponse {
-  map<string, string> account_map = 1;
+  AccountMap account_map = 1;
 }
 
 message QueryProjectTxRequest {
@@ -47,7 +47,7 @@ message QueryProjectTxRequest {
 }
 
 message QueryProjectTxResponse {
-  repeated WithdrawalInfoDoc txs = 1;
+  WithdrawalInfoDocs txs = 1;
 }
 
 message QueryParamsRequest {}

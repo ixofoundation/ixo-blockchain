@@ -22,7 +22,7 @@ type Keeper struct {
 	cdc            codec.BinaryMarshaler
 	storeKey       sdk.StoreKey
 	paramSpace     paramstypes.Subspace
-	AccountKeeper  authkeeper.AccountKeeper //TODO (Stef) - other cosmos SDK modules use expected_keepers - do we need this?
+	AccountKeeper  authkeeper.AccountKeeper
 	DidKeeper      did.Keeper
 	paymentsKeeper payments.Keeper
 }
@@ -120,7 +120,7 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid did.Did) types.Account
 
 	bz := store.Get(key)
 	if bz == nil {
-		return make(types.AccountMap)
+		return types.AccountMap{Map: make(map[string]string)} //make(types.AccountMap)
 	} else {
 		var accountMap types.AccountMap
 		if err := json.Unmarshal(bz, &accountMap); err != nil {
@@ -133,15 +133,16 @@ func (k Keeper) GetAccountMap(ctx sdk.Context, projectDid did.Did) types.Account
 
 func (k Keeper) AddAccountToProjectAccounts(ctx sdk.Context, projectDid did.Did,
 	accountId types.InternalAccountID, account authtypes.AccountI) {
+	strAccountId := string(accountId)
 	accountMap := k.GetAccountMap(ctx, projectDid)
-	_, found := accountMap[accountId]
+	_, found := accountMap.Map[strAccountId]
 	if found {
 		return
 	}
 
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetAccountMapKey(projectDid)
-	accountMap[accountId] = account.GetAddress()
+	accountMap.Map[strAccountId] = account.GetAddress().String()
 
 	bz, err := json.Marshal(accountMap)
 	if err != nil {
@@ -165,21 +166,21 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid did.Did,
 	return account, nil
 }
 
-func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did, txs []types.WithdrawalInfoDoc) {
+func (k Keeper) SetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did, txs types.WithdrawalInfoDocs) {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(txs)
+	bz := k.cdc.MustMarshalBinaryLengthPrefixed(&txs)
 	store.Set(types.GetWithdrawalsKey(projectDid), bz)
 }
 
-func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) ([]types.WithdrawalInfoDoc, error) {
+func (k Keeper) GetProjectWithdrawalTransactions(ctx sdk.Context, projectDid did.Did) (types.WithdrawalInfoDocs, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetWithdrawalsKey(projectDid)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return []types.WithdrawalInfoDoc{}, sdkerrors.Wrap(did.ErrInvalidDid, "project does not exist")
+		return types.WithdrawalInfoDocs{}, sdkerrors.Wrap(did.ErrInvalidDid, "project does not exist")
 	} else {
-		var txs []types.WithdrawalInfoDoc
+		var txs types.WithdrawalInfoDocs
 		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &txs)
 
 		return txs, nil
@@ -191,9 +192,9 @@ func (k Keeper) AddProjectWithdrawalTransaction(ctx sdk.Context, projectDid did.
 	key := types.GetWithdrawalsKey(projectDid)
 
 	txs, _ := k.GetProjectWithdrawalTransactions(ctx, projectDid)
-	txs = append(txs, info)
+	txs = types.AppendWithdrawalInfoDocs(txs, info) //append(txs, info)
 
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(txs))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&txs))
 }
 
 func (k Keeper) GetClaimIterator(ctx sdk.Context, projectDid did.Did) sdk.Iterator {

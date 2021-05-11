@@ -53,7 +53,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 		claimIter := k.GetClaimIterator(ctx, projectDoc.ProjectDid)
 		for ; claimIter.Valid(); claimIter.Next() {
 			claim := k.MustGetClaimByKey(ctx, claimIter.Key())
-			subClaims = append(subClaims, claim)
+			subClaims = types.AppendClaims(subClaims, claim) //append(subClaims, claim)
 		}
 
 		projectDocs = append(projectDocs, projectDoc)

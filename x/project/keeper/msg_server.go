@@ -27,8 +27,12 @@ const (
 
 // NewMsgServerImpl returns an implementation of the project MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk payments.Keeper) types.MsgServer {
+	return &msgServer{
+		Keeper:         k,
+		BankKeeper:     bk,
+		PaymentsKeeper: pk,
+	}
 }
 
 func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProject) (*types.MsgCreateProjectResponse, error) {
@@ -556,9 +560,14 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk payments.Kee
 	if contract.CanEffectPayment(template) {
 		// Check that project has enough tokens to effect contract payment
 		// (assume no effect from PaymentMin, PaymentMax, Discounts)
-		if !bk.HasCoins(ctx, projectAddr, template.PaymentAmount) { //TODO (Stef) Use IterateAllBalances?
-			return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
+		for _, coin := range template.PaymentAmount {
+			if !bk.HasBalance(ctx, projectAddr, coin) {
+				return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
+			}
 		}
+		//if !bk.HasCoins(ctx, projectAddr, template.PaymentAmount) { //TODO (Stef) Use IterateAllBalances?
+		//	return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
+		//}
 
 		// Effect payment
 		effected, err := pk.EffectPayment(ctx, bk, contractId)
@@ -576,8 +585,9 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk payments.Kee
 
 func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,
 	accountId types.InternalAccountID) bool {
+	strAccountId := string(accountId)
 	accMap := k.GetAccountMap(ctx, projectDid)
-	_, found := accMap[accountId]
+	_, found := accMap.Map[strAccountId]
 
 	return found
 }
@@ -608,11 +618,12 @@ func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Di
 
 func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,
 	accountId types.InternalAccountID) (sdk.AccAddress, error) {
+	strAccountId := string(accountId)
 	accMap := k.GetAccountMap(ctx, projectDid)
 
-	addr, found := accMap[accountId]
+	addr, found := accMap.Map[strAccountId]
 	if found {
-		return addr, nil
+		return sdk.AccAddress(addr), nil
 	} else {
 		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
 	}
