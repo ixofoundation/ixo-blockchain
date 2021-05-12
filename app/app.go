@@ -15,6 +15,8 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/x/payments"
+	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"github.com/rakyll/statik/fs"
 	"net/http"
 
@@ -95,8 +97,9 @@ import (
 	//"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	//"github.com/ixofoundation/ixo-blockchain/x/payments"
-	"github.com/ixofoundation/ixo-blockchain/x/project"
+	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
 	//"github.com/ixofoundation/ixo-blockchain/x/treasury"
 )
 
@@ -146,7 +149,7 @@ var (
 		// Custom ixo modules
 		did.AppModuleBasic{}, //TODO uncomment rest of ixo modules
 		//payments.AppModuleBasic{},
-		//project.AppModuleBasic{},
+		project.AppModuleBasic{},
 		bonds.AppModuleBasic{},
 		//treasury.AppModuleBasic{},
 		//oracles.AppModuleBasic{},
@@ -179,7 +182,7 @@ var (
 
 	// Reserved payments module ID prefixes
 	paymentsReservedIdPrefixes = []string{
-		project.ModuleName,
+		projecttypes.ModuleName,
 	}
 )
 
@@ -250,8 +253,8 @@ type ixoApp struct {
 	// Custom ixo keepers
 	didKeeper      did.Keeper
 	//TODO uncomment rest of ixo modules
-	//paymentsKeeper payments.Keeper
-	//projectKeeper  project.Keeper
+	paymentsKeeper payments.Keeper
+	projectKeeper  projectkeeper.Keeper
 	bondsKeeper    bondskeeper.Keeper
 	//oraclesKeeper  oracles.Keeper
 	//treasuryKeeper treasury.Keeper
@@ -344,7 +347,8 @@ func NewIxoApp(
 
 		// Custom ixo store keys
 		// TODO uncomment ixo modules store keys
-		did.StoreKey, //payments.StoreKey, project.StoreKey,
+		did.StoreKey, //payments.StoreKey,
+		projecttypes.StoreKey,
 		bondstypes.StoreKey,
 		//treasury.StoreKey, oracles.StoreKey*/
 	)
@@ -468,6 +472,8 @@ func NewIxoApp(
 	app.didKeeper = did.NewKeeper(app.appCodec, keys[did.StoreKey]) // not what Cosmos uses because keeper is different
 	app.bondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.didKeeper,
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
+	app.projectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
+		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
 	// TODO add the rest of ixo modules keeper
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -497,7 +503,7 @@ func NewIxoApp(
 		// Custom ixo AppModules
 		did.NewAppModule(app.didKeeper), //TODO uncomment rest of ixo modules
 		//payments.NewAppModule(app.paymentsKeeper, app.BankKeeper),
-		//project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.BankKeeper),
+		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.BankKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.AccountKeeper),
 		//treasury.NewAppModule(app.treasuryKeeper),
 		//oracles.NewAppModule(app.oraclesKeeper),
@@ -536,7 +542,9 @@ func NewIxoApp(
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		// Custom ixo modules
 		//TODO uncomment rest of ixo modules
-		did.ModuleName, //project.ModuleName, payments.ModuleName,
+		did.ModuleName,
+		projecttypes.ModuleName,
+		//payments.ModuleName,
 		bondstypes.ModuleName, //treasury.ModuleName, oracles.ModuleName,
 	)
 
@@ -744,27 +752,27 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.didKeeper)
 	didPubKeyGetter := did.NewModulePubKeyGetter(app.didKeeper)
 	//TODO uncomment ixo module
-	//projectPubKeyGetter := project.NewModulePubKeyGetter(app.projectKeeper, app.didKeeper)
+	projectPubKeyGetter := project.NewModulePubKeyGetter(app.projectKeeper, app.didKeeper)
 
 	// Since we have parameterised pubkey getters, we can use the same default
 	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
 	// instead of having to implement three unique AnteHandlers.
 
 	//TODO uncomment
-	//defaultIxoAnteHandler := ixo.NewDefaultAnteHandler(
-	//	app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
-	//	defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
+		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 	didAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
 		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 	//TODO uncomment ixo module
-	//projectAnteHandler := ixo.NewDefaultAnteHandler(
-	//	app.AccountKeeper, app.BankKeeper, ixo.IxoSigVerificationGasConsumer,
-	//	projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-
-	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
+	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+
+	//defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
+	//	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+	//	defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 	//didAnteHandler := ixo.NewDefaultAnteHandler(
 	//	app.AccountKeeper, app.SupplyKeeper, ixo.IxoSigVerificationGasConsumer, didPubKeyGetter)
 	//projectAnteHandler := ixo.NewDefaultAnteHandler(
@@ -797,8 +805,9 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 	// this purpose, a custom project creation AnteHandler had to be created.
 
 	//TODO uncomment ixo module
-	//projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-	//	app.AccountKeeper, app.BankKeeper, app.didKeeper, projectPubKeyGetter)
+	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+		app.AccountKeeper, app.BankKeeper, app.didKeeper, encodingConfig.TxConfig.SignModeHandler(),
+		projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
@@ -808,13 +817,13 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 		case did.RouterKey:
 			return didAnteHandler(ctx, tx, simulate)
 		//TODO uncomment rest of ixo modules
-		//case project.RouterKey:
-		//	switch msg.Type() {
-		//	case project.TypeMsgCreateProject:
-		//		return projectCreationAnteHandler(ctx, tx, simulate)
-		//	default:
-		//		return projectAnteHandler(ctx, tx, simulate)
-		//	}
+		case projecttypes.RouterKey:
+			switch msg.Type() {
+			case projecttypes.TypeMsgCreateProject:
+				return projectCreationAnteHandler(ctx, tx, simulate)
+			default:
+				return projectAnteHandler(ctx, tx, simulate)
+			}
 		case bondstypes.RouterKey:
 			return defaultIxoAnteHandler(ctx, tx, simulate) //fallthrough
 		//case treasury.RouterKey:
@@ -845,7 +854,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 
 	// init params keeper and subspaces (for custom ixo modules
 	//TODO uncomment rest of ixo modules
-	//paramsKeeper.Subspace(project.ModuleName)
+	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 
 	return paramsKeeper
