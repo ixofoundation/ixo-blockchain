@@ -36,8 +36,8 @@ var (
 //}
 
 func NewMsgCreatePaymentTemplate(template PaymentTemplate,
-	creatorDid did.Did) MsgCreatePaymentTemplate {
-	return MsgCreatePaymentTemplate{
+	creatorDid did.Did) *MsgCreatePaymentTemplate {
+	return &MsgCreatePaymentTemplate{
 		CreatorDid:      creatorDid,
 		PaymentTemplate: template,
 	}
@@ -93,8 +93,8 @@ func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
 	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
-	discountId sdk.Uint, creatorDid did.Did) MsgCreatePaymentContract {
-	return MsgCreatePaymentContract{
+	discountId sdk.Uint, creatorDid did.Did) *MsgCreatePaymentContract {
+	return &MsgCreatePaymentContract{
 		CreatorDid:        creatorDid,
 		PaymentTemplateId: templateId,
 		PaymentContractId: contractId,
@@ -161,8 +161,8 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 //}
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
-	period Period, creatorDid did.Did) MsgCreateSubscription {
-	return MsgCreateSubscription{
+	period Period, creatorDid did.Did) *MsgCreateSubscription {
+	return &MsgCreateSubscription{
 		CreatorDid:        creatorDid,
 		SubscriptionId:    subscriptionId,
 		PaymentContractId: contractId,
@@ -223,8 +223,8 @@ func (msg MsgCreateSubscription) GetSignBytes() []byte {
 //}
 
 func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
-	payerDid did.Did) MsgSetPaymentContractAuthorisation {
-	return MsgSetPaymentContractAuthorisation{
+	payerDid did.Did) *MsgSetPaymentContractAuthorisation {
+	return &MsgSetPaymentContractAuthorisation{
 		PayerDid:          payerDid,
 		PaymentContractId: contractId,
 		Authorised:        authorised,
@@ -280,8 +280,8 @@ func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
 //}
 
 func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
-	recipient sdk.AccAddress, creatorDid did.Did) MsgGrantDiscount {
-	return MsgGrantDiscount{
+	recipient sdk.AccAddress, creatorDid did.Did) *MsgGrantDiscount {
+	return &MsgGrantDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
 		DiscountId:        discountId,
@@ -336,8 +336,8 @@ func (msg MsgGrantDiscount) GetSignBytes() []byte {
 //}
 
 func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
-	creatorDid did.Did) MsgRevokeDiscount {
-	return MsgRevokeDiscount{
+	creatorDid did.Did) *MsgRevokeDiscount {
+	return &MsgRevokeDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
 		Holder:            holder,
@@ -389,8 +389,8 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 //	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
 //}
 
-func NewMsgEffectPayment(contractId string, creatorDid did.Did) MsgEffectPayment {
-	return MsgEffectPayment{
+func NewMsgEffectPayment(contractId string, creatorDid did.Did) *MsgEffectPayment {
+	return &MsgEffectPayment{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
 	}
