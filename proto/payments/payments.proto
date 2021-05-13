@@ -1,0 +1,64 @@
+syntax = "proto3";
+package payments;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
+
+message PaymentTemplate {
+  string id = 1;
+  repeated cosmos.base.v1beta1.Coin payment_amount = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  repeated cosmos.base.v1beta1.Coin payment_minimum = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  repeated cosmos.base.v1beta1.Coin payment_maximum = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  Discounts discounts = 5;
+}
+
+message Discounts {
+  repeated Discount discounts_list = 1;
+}
+
+message Discount {
+  string id = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+  string percent = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+message Distribution {
+  repeated DistributionShare distribution_share = 1;
+}
+
+message DistributionShare {
+  string address = 1;
+  string percentage = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+message PaymentContract {
+  string id = 1;
+  string payment_template_id = 2;
+  string creator = 3;
+  string payer = 4;
+  Distribution recipients = 5;
+  repeated cosmos.base.v1beta1.Coin cumulative_pay = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  repeated cosmos.base.v1beta1.Coin current_remainder = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  bool can_deauthorise = 8;
+  bool authorised = 9;
+  string discount_id = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+}
+
+message Subscription {
+  string id = 1;
+  string payment_contract_id = 2;
+  string periods_so_far = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+  string max_periods = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+  string periods_accumulated = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+  google.protobuf.Any period = 6;
+}
+
+message BlockPeriod {
+
+}
+
+message TimePeriod {
+
+}

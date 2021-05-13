@@ -1,0 +1,81 @@
+syntax = "proto3";
+package payments;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+import "payments/payments.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
+
+// To get a list of all module messages, go to your module's handler.go and
+// check all cases in NewHandler().
+service Msg {
+  rpc SetPaymentContractAuthorisation(MsgSetPaymentContractAuthorisation) returns (MsgSetPaymentContractAuthorisationResponse);
+  rpc CreatePaymentTemplate(MsgCreatePaymentTemplate) returns (MsgCreatePaymentTemplateResponse);
+  rpc CreatePaymentContract(MsgCreatePaymentContract) returns (MsgCreatePaymentContractResponse);
+  rpc CreateSubscription(MsgCreateSubscription) returns (MsgCreateSubscriptionResponse);
+  rpc GrantDiscount(MsgGrantDiscount) returns (MsgGrantDiscountResponse);
+  rpc RevokeDiscount(MsgRevokeDiscount) returns (MsgRevokeDiscountResponse);
+  rpc EffectPayment(MsgEffectPayment) returns (MsgEffectPaymentResponse);
+}
+
+message MsgSetPaymentContractAuthorisation {
+  string payment_contract_id = 1;
+  string payer_did = 2;
+  bool authorised = 3;
+}
+
+message MsgSetPaymentContractAuthorisationResponse {}
+
+message MsgCreatePaymentTemplate {
+  string creator_did = 1;
+  PaymentTemplate payment_template = 2;
+}
+
+message MsgCreatePaymentTemplateResponse {}
+
+message MsgCreatePaymentContract {
+  string creator_did = 1;
+  string payment_template_id = 2;
+  string payment_contract_id = 3;
+  string payer = 4;
+  Distribution recipients = 5;
+  bool can_deauthorise = 6;
+  string discount_id = 7 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+}
+
+message MsgCreatePaymentContractResponse {}
+
+message MsgCreateSubscription {
+  string creator_did = 1;
+  string subscription_id = 2;
+  string payment_contract_id = 3;
+  string max_periods = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+  google.protobuf.Any period = 5;
+}
+
+message MsgCreateSubscriptionResponse {}
+
+message MsgGrantDiscount {
+  string sender_did = 1;
+  string payment_contract_id = 2;
+  string discount_id = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
+  string recipient = 4;
+}
+
+message MsgGrantDiscountResponse {}
+
+message MsgRevokeDiscount {
+  string sender_did = 1;
+  string payment_contract_id = 2;
+  string holder = 3;
+}
+
+message MsgRevokeDiscountResponse {}
+
+message MsgEffectPayment {
+  string sender_did = 1;
+  string payment_contract_id = 2;
+}
+
+message MsgEffectPaymentResponse {}
