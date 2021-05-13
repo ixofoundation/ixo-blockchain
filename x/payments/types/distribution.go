@@ -7,7 +7,7 @@ import (
 
 var oneHundred = sdk.NewDec(100)
 
-type Distribution []DistributionShare
+//type Distribution []DistributionShare
 
 func NewDistribution(shares ...DistributionShare) Distribution {
 	return Distribution(shares)
@@ -55,10 +55,10 @@ func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
 	return distributions
 }
 
-type DistributionShare struct {
-	Address    sdk.AccAddress `json:"address" yaml:"address"`
-	Percentage sdk.Dec        `json:"percentage" yaml:"percentage"`
-}
+//type DistributionShare struct {
+//	Address    sdk.AccAddress `json:"address" yaml:"address"`
+//	Percentage sdk.Dec        `json:"percentage" yaml:"percentage"`
+//}
 
 func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) DistributionShare {
 	return DistributionShare{

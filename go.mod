@@ -21,7 +21,7 @@ require (
 	github.com/tendermint/go-amino v0.16.0
 	github.com/tendermint/tendermint v0.34.1 //latest
 	github.com/tendermint/tm-db v0.6.3
-	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
+	golang.org/x/crypto v0.0.0-20210513122933-cd7d49e622d5
 	google.golang.org/genproto v0.0.0-20210510173355-fb37daa5cd7a
 	google.golang.org/grpc v1.36.1
 )

@@ -33,7 +33,7 @@ message QueryPaymentTemplateRequest {
 }
 
 message QueryPaymentTemplateResponse {
-  PaymentTemplate payment_template = 1;
+  PaymentTemplate payment_template = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryPaymentContractRequest {
@@ -41,7 +41,7 @@ message QueryPaymentContractRequest {
 }
 
 message QueryPaymentContractResponse {
-  PaymentContract payment_contract = 1;
+  PaymentContract payment_contract = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryPaymentContractsByIdPrefixRequest {
@@ -49,7 +49,7 @@ message QueryPaymentContractsByIdPrefixRequest {
 }
 
 message QueryPaymentContractsByIdPrefixResponse {
-  repeated PaymentContract payment_contracts = 1;
+  repeated PaymentContract payment_contracts = 1 [(gogoproto.nullable) = false];
 }
 
 message QuerySubscriptionRequest {
@@ -57,5 +57,5 @@ message QuerySubscriptionRequest {
 }
 
 message QuerySubscriptionResponse {
-  Subscription subscription = 1;
+  Subscription subscription = 1 [(gogoproto.nullable) = false];
 }

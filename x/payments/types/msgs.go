@@ -21,19 +21,19 @@ const (
 )
 
 var (
-	_ ixotypes.IxoMsg = MsgCreatePaymentTemplate{}
-	_ ixotypes.IxoMsg = MsgCreatePaymentContract{}
-	_ ixotypes.IxoMsg = MsgCreateSubscription{}
-	_ ixotypes.IxoMsg = MsgSetPaymentContractAuthorisation{}
-	_ ixotypes.IxoMsg = MsgGrantDiscount{}
-	_ ixotypes.IxoMsg = MsgRevokeDiscount{}
-	_ ixotypes.IxoMsg = MsgEffectPayment{}
+	_ ixotypes.IxoMsg = &MsgCreatePaymentTemplate{}
+	_ ixotypes.IxoMsg = &MsgCreatePaymentContract{}
+	_ ixotypes.IxoMsg = &MsgCreateSubscription{}
+	_ ixotypes.IxoMsg = &MsgSetPaymentContractAuthorisation{}
+	_ ixotypes.IxoMsg = &MsgGrantDiscount{}
+	_ ixotypes.IxoMsg = &MsgRevokeDiscount{}
+	_ ixotypes.IxoMsg = &MsgEffectPayment{}
 )
 
-type MsgCreatePaymentTemplate struct {
-	CreatorDid      did.Did         `json:"creator_did" yaml:"creator_did"`
-	PaymentTemplate PaymentTemplate `json:"payment_template" yaml:"payment_template"`
-}
+//type MsgCreatePaymentTemplate struct {
+//	CreatorDid      did.Did         `json:"creator_did" yaml:"creator_did"`
+//	PaymentTemplate PaymentTemplate `json:"payment_template" yaml:"payment_template"`
+//}
 
 func NewMsgCreatePaymentTemplate(template PaymentTemplate,
 	creatorDid did.Did) MsgCreatePaymentTemplate {
@@ -78,27 +78,18 @@ func (msg MsgCreatePaymentTemplate) String() string {
 }
 
 func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgCreatePaymentTemplate) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgCreatePaymentTemplate) ProtoMessage() {
-	panic("implement me")
-}
-
-
-type MsgCreatePaymentContract struct {
-	CreatorDid        did.Did        `json:"creator_did" yaml:"creator_did"`
-	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
-	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
-	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
-	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
-	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-}
+//type MsgCreatePaymentContract struct {
+//	CreatorDid        did.Did        `json:"creator_did" yaml:"creator_did"`
+//	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
+//	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
+//	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
+//	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
+//	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
+//	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+//}
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
 	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
@@ -158,24 +149,16 @@ func (msg MsgCreatePaymentContract) String() string {
 }
 
 func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgCreatePaymentContract) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgCreatePaymentContract) ProtoMessage() {
-	panic("implement me")
-}
-
-type MsgCreateSubscription struct {
-	CreatorDid        did.Did  `json:"creator_did" yaml:"creator_did"`
-	SubscriptionId    string   `json:"subscription_id" yaml:"subscription_id"`
-	PaymentContractId string   `json:"payment_contract_id" yaml:"payment_contract_id"`
-	MaxPeriods        sdk.Uint `json:"max_periods" yaml:"max_periods"`
-	Period            Period   `json:"period" yaml:"period"`
-}
+//type MsgCreateSubscription struct {
+//	CreatorDid        did.Did  `json:"creator_did" yaml:"creator_did"`
+//	SubscriptionId    string   `json:"subscription_id" yaml:"subscription_id"`
+//	PaymentContractId string   `json:"payment_contract_id" yaml:"payment_contract_id"`
+//	MaxPeriods        sdk.Uint `json:"max_periods" yaml:"max_periods"`
+//	Period            Period   `json:"period" yaml:"period"`
+//}
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
 	period Period, creatorDid did.Did) MsgCreateSubscription {
@@ -230,22 +213,14 @@ func (msg MsgCreateSubscription) String() string {
 }
 
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgCreateSubscription) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgCreateSubscription) ProtoMessage() {
-	panic("implement me")
-}
-
-type MsgSetPaymentContractAuthorisation struct {
-	PayerDid          did.Did `json:"payer_did" yaml:"payer_did"`
-	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
-	Authorised        bool    `json:"authorised" yaml:"authorised"`
-}
+//type MsgSetPaymentContractAuthorisation struct {
+//	PayerDid          did.Did `json:"payer_did" yaml:"payer_did"`
+//	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
+//	Authorised        bool    `json:"authorised" yaml:"authorised"`
+//}
 
 func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
 	payerDid did.Did) MsgSetPaymentContractAuthorisation {
@@ -294,23 +269,15 @@ func (msg MsgSetPaymentContractAuthorisation) String() string {
 }
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSetPaymentContractAuthorisation) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgSetPaymentContractAuthorisation) ProtoMessage() {
-	panic("implement me")
-}
-
-type MsgGrantDiscount struct {
-	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
-}
+//type MsgGrantDiscount struct {
+//	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+//	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
+//	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+//	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
+//}
 
 func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
 	recipient sdk.AccAddress, creatorDid did.Did) MsgGrantDiscount {
@@ -359,22 +326,14 @@ func (msg MsgGrantDiscount) String() string {
 }
 
 func (msg MsgGrantDiscount) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgGrantDiscount) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgGrantDiscount) ProtoMessage() {
-	panic("implement me")
-}
-
-type MsgRevokeDiscount struct {
-	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
-}
+//type MsgRevokeDiscount struct {
+//	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+//	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
+//	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
+//}
 
 func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
 	creatorDid did.Did) MsgRevokeDiscount {
@@ -422,21 +381,13 @@ func (msg MsgRevokeDiscount) String() string {
 }
 
 func (msg MsgRevokeDiscount) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgRevokeDiscount) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgRevokeDiscount) ProtoMessage() {
-	panic("implement me")
-}
-
-type MsgEffectPayment struct {
-	SenderDid         did.Did `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
-}
+//type MsgEffectPayment struct {
+//	SenderDid         did.Did `json:"sender_did" yaml:"sender_did"`
+//	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
+//}
 
 func NewMsgEffectPayment(contractId string, creatorDid did.Did) MsgEffectPayment {
 	return MsgEffectPayment{
@@ -480,13 +431,5 @@ func (msg MsgEffectPayment) String() string {
 }
 
 func (msg MsgEffectPayment) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
-}
-
-func (msg MsgEffectPayment) Reset() {
-	panic("implement me")
-}
-
-func (msg MsgEffectPayment) ProtoMessage() {
-	panic("implement me")
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }

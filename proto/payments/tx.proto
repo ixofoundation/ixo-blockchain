@@ -20,6 +20,8 @@ service Msg {
 }
 
 message MsgSetPaymentContractAuthorisation {
+  option (gogoproto.goproto_stringer) = false;
+
   string payment_contract_id = 1;
   string payer_did = 2;
   bool authorised = 3;
@@ -28,18 +30,22 @@ message MsgSetPaymentContractAuthorisation {
 message MsgSetPaymentContractAuthorisationResponse {}
 
 message MsgCreatePaymentTemplate {
+  option (gogoproto.goproto_stringer) = false;
+
   string creator_did = 1;
-  PaymentTemplate payment_template = 2;
+  PaymentTemplate payment_template = 2 [(gogoproto.nullable) = false];
 }
 
 message MsgCreatePaymentTemplateResponse {}
 
 message MsgCreatePaymentContract {
+  option (gogoproto.goproto_stringer) = false;
+
   string creator_did = 1;
   string payment_template_id = 2;
   string payment_contract_id = 3;
   string payer = 4;
-  Distribution recipients = 5;
+  Distribution recipients = 5 [(gogoproto.nullable) = false];
   bool can_deauthorise = 6;
   string discount_id = 7 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
 }
@@ -47,16 +53,20 @@ message MsgCreatePaymentContract {
 message MsgCreatePaymentContractResponse {}
 
 message MsgCreateSubscription {
+  option (gogoproto.goproto_stringer) = false;
+
   string creator_did = 1;
   string subscription_id = 2;
   string payment_contract_id = 3;
   string max_periods = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
-  google.protobuf.Any period = 5;
+  google.protobuf.Any period = 5 [(gogoproto.nullable) = false];
 }
 
 message MsgCreateSubscriptionResponse {}
 
 message MsgGrantDiscount {
+  option (gogoproto.goproto_stringer) = false;
+
   string sender_did = 1;
   string payment_contract_id = 2;
   string discount_id = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
@@ -66,6 +76,8 @@ message MsgGrantDiscount {
 message MsgGrantDiscountResponse {}
 
 message MsgRevokeDiscount {
+  option (gogoproto.goproto_stringer) = false;
+
   string sender_did = 1;
   string payment_contract_id = 2;
   string holder = 3;
@@ -74,6 +86,8 @@ message MsgRevokeDiscount {
 message MsgRevokeDiscountResponse {}
 
 message MsgEffectPayment {
+  option (gogoproto.goproto_stringer) = false;
+
   string sender_did = 1;
   string payment_contract_id = 2;
 }

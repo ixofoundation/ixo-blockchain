@@ -12,12 +12,12 @@ message PaymentTemplate {
   repeated cosmos.base.v1beta1.Coin payment_amount = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
   repeated cosmos.base.v1beta1.Coin payment_minimum = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
   repeated cosmos.base.v1beta1.Coin payment_maximum = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  Discounts discounts = 5;
+  repeated Discount discounts = 5 [(gogoproto.nullable) = false];
 }
 
-message Discounts {
-  repeated Discount discounts_list = 1;
-}
+//message Discounts {
+//  repeated Discount discounts_list = 1 [(gogoproto.nullable) = false];
+//}
 
 message Discount {
   string id = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
@@ -25,7 +25,7 @@ message Discount {
 }
 
 message Distribution {
-  repeated DistributionShare distribution_share = 1;
+  repeated DistributionShare distribution_share = 1 [(gogoproto.nullable) = false];
 }
 
 message DistributionShare {
@@ -38,7 +38,7 @@ message PaymentContract {
   string payment_template_id = 2;
   string creator = 3;
   string payer = 4;
-  Distribution recipients = 5;
+  Distribution recipients = 5 [(gogoproto.nullable) = false];
   repeated cosmos.base.v1beta1.Coin cumulative_pay = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
   repeated cosmos.base.v1beta1.Coin current_remainder = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
   bool can_deauthorise = 8;
@@ -52,7 +52,7 @@ message Subscription {
   string periods_so_far = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string max_periods = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string periods_accumulated = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
-  google.protobuf.Any period = 6;
+  google.protobuf.Any period = 6 [(gogoproto.nullable) = false];
 }
 
 message BlockPeriod {
