@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
@@ -31,7 +32,7 @@ func parseBool(boolStr, boolName string) (bool, error) {
 }
 
 func NewCmdCreatePaymentTemplate() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "create-payment-template [payment-template-json] [creator-ixo-did]",
 		Short: "Create and sign a create-payment-template tx using DIDs",
 		Args:  cobra.ExactArgs(2),
@@ -61,10 +62,13 @@ func NewCmdCreatePaymentTemplate() *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 func NewCmdCreatePaymentContract() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use: "create-payment-contract [payment-contract-id] [payment-template-id] " +
 			"[payer-addr] [recipients] [can-deauthorise] [discount-id] [creator-ixo-did]",
 		Short: "Create and sign a create-payment-contract tx using DIDs",
@@ -117,10 +121,13 @@ func NewCmdCreatePaymentContract() *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 func NewCmdCreateSubscription(cdc *codec.LegacyAmino) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use: "create-subscription [subscription-id] [payment-contract-id] " +
 			"[max-periods] [period-json] [creator-ixo-did]",
 		Short: "Create and sign a create-subscription tx using DIDs",
@@ -160,10 +167,12 @@ func NewCmdCreateSubscription(cdc *codec.LegacyAmino) *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 func NewCmdSetPaymentContractAuthorisation(cdc *codec.LegacyAmino) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use: "set-payment-contract-authorisation [payment-contract-id] " +
 			"[authorised] [payer-ixo-did]",
 		Short: "Create and sign a set-payment-contract-authorisation tx using DIDs",
@@ -195,10 +204,13 @@ func NewCmdSetPaymentContractAuthorisation(cdc *codec.LegacyAmino) *cobra.Comman
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 func NewCmdGrantPaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use: "grant-discount [payment-contract-id] [discount-id] " +
 			"[recipient-addr] [creator-ixo-did]",
 		Short: "Create and sign a grant-discount tx using DIDs",
@@ -236,10 +248,13 @@ func NewCmdGrantPaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 func NewCmdRevokePaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "revoke-discount [payment-contract-id] [holder-addr] [creator-ixo-did]",
 		Short: "Create and sign a revoke-discount tx using DIDs",
 		Args:  cobra.ExactArgs(3),
@@ -270,10 +285,13 @@ func NewCmdRevokePaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
 func NewCmdEffectPayment(cdc *codec.LegacyAmino) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "effect-payment [payment-contract-id] [creator-ixo-did]",
 		Short: "Create and sign a effect-payment tx using DIDs",
 		Args:  cobra.ExactArgs(2),
@@ -297,4 +315,7 @@ func NewCmdEffectPayment(cdc *codec.LegacyAmino) *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
