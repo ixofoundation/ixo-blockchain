@@ -4,12 +4,11 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
+
 	//"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-
-	//"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
 )
 
 // -------------------------------------------------------- PaymentTemplates Get/Set
@@ -63,7 +62,7 @@ func (k Keeper) GetPaymentTemplate(ctx sdk.Context, templateId string) (types.Pa
 func (k Keeper) SetPaymentTemplate(ctx sdk.Context, template types.PaymentTemplate) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentTemplateKey(template.Id)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(template))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&template))
 }
 
 func (k Keeper) DiscountIdExists(ctx sdk.Context, templateId string, discountId sdk.Uint) (bool, error) {
@@ -147,7 +146,7 @@ func (k Keeper) GetPaymentContractsByPrefix(ctx sdk.Context, contractIdPrefix st
 func (k Keeper) SetPaymentContract(ctx sdk.Context, contract types.PaymentContract) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentContractKey(contract.Id)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(contract))
+	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&contract))
 }
 
 func (k Keeper) SetPaymentContractAuthorised(ctx sdk.Context, contractId string,
@@ -284,9 +283,14 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 	// => actualPay = adjustedCumul - previousCumul
 	pay := cumulative.Sub(contract.CumulativePay)
 
+	contractPayerAddr, err := sdk.AccAddressFromBech32(contract.Payer)
+	if err != nil {
+		return false, err
+	}
+
 	// Stop if payer doesn't have enough coins. However, this is not considered
 	// an error but the caller should be looking at the 'effected' bool result
-	if pay.IsAllGTE(bankKeeper.GetAllBalances(ctx, contract.Payer)) {//!bankKeeper.HasCoins(ctx, contract.Payer, pay) {
+	if pay.IsAllGTE(bankKeeper.GetAllBalances(ctx, contractPayerAddr)) {
 		return false, nil
 	}
 
@@ -306,8 +310,12 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 		// If amount not zero, update total and add as output
 		if !outputAmt.IsZero() {
 			outputToPayees = outputToPayees.Add(outputAmt...)
-			address := contract.Recipients[i].Address
-			outputs = append(outputs, banktypes.NewOutput(address, outputAmt))
+			address := contract.Recipients.DistributionShare[i].Address
+			accAddress, err := sdk.AccAddressFromBech32(address)
+			if err != nil {
+				return false, err
+			}
+			outputs = append(outputs, banktypes.NewOutput(accAddress, outputAmt))
 		}
 	}
 
@@ -318,8 +326,9 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 		outputs = append(outputs, banktypes.NewOutput(payRemainderPoolAddr, outputToPayRemainderPool))
 	}
 
+
 	// Construct list of inputs (pay and from PayRemainderPool if non zero)
-	inputs := []banktypes.Input{banktypes.NewInput(contract.Payer, pay)}
+	inputs := []banktypes.Input{banktypes.NewInput(contractPayerAddr, pay)}
 	if !inputFromPayRemainderPool.IsZero() {
 		payRemainderPoolAddr := authtypes.NewModuleAddress(types.PayRemainderPool)
 		inputs = append(inputs, banktypes.NewInput(payRemainderPoolAddr, inputFromPayRemainderPool))
