@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	types "github.com/ixofoundation/ixo-blockchain/x/project/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/spf13/cobra"
 )
 

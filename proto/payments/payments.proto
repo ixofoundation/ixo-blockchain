@@ -3,6 +3,8 @@ package payments;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
@@ -52,13 +54,15 @@ message Subscription {
   string periods_so_far = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string max_periods = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
   string periods_accumulated = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
-  google.protobuf.Any period = 6 [(gogoproto.nullable) = false];
+  google.protobuf.Any period = 6;
 }
 
 message BlockPeriod {
-
+  int64 period_length = 1;
+  int64 period_start_block = 2;
 }
 
 message TimePeriod {
-
+  google.protobuf.Duration period_duration_ns = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  google.protobuf.Timestamp period_start_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 }

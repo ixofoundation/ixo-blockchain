@@ -2,6 +2,10 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
@@ -18,21 +22,39 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(MsgEffectPayment{}, "payments/MsgEffectPayment", nil)
 }
 
-// ModuleCdc is the codec for the module
-//var ModuleCdc *codec.Codec
+func RegisterInterfaces(registry types.InterfaceRegistry) {
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgSetPaymentContractAuthorisation{},
+		&MsgCreatePaymentTemplate{},
+		&MsgCreatePaymentContract{},
+		&MsgCreateSubscription{},
+		&MsgGrantDiscount{},
+		&MsgRevokeDiscount{},
+		&MsgEffectPayment{},
+	)
+	registry.RegisterInterface(
+		"payments.Period",
+		(*Period)(nil),
+		&BlockPeriod{},
+		&TimePeriod{},
+	)
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+}
 
 var (
-	amino     = codec.NewLegacyAmino()
+	amino = codec.NewLegacyAmino()
+
+	// ModuleCdc references the global x/payments module codec. Note, the codec should
+	// ONLY be used in certain instances of tests and for JSON encoding as Amino is
+	// still used for that purpose.
+	//
+	// The actual codec used for serialization should be provided to x/gov and
+	// defined at the application level.
 	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
-//func init() {
-//	ModuleCdc = codec.New()
-//	RegisterCodec(ModuleCdc)
-//	ModuleCdc.Seal()
-//}
-
 func init() {
 	RegisterLegacyAminoCodec(amino)
-	ModuleCdc.Seal()
+	cryptocodec.RegisterCrypto(amino)
 }

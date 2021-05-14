@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 
@@ -98,7 +99,7 @@ func NewMsgCreatePaymentContract(templateId, contractId string,
 		CreatorDid:        creatorDid,
 		PaymentTemplateId: templateId,
 		PaymentContractId: contractId,
-		Payer:             payer,
+		Payer:             payer.String(),
 		Recipients:        recipients,
 		CanDeauthorise:    canDeauthorise,
 		DiscountId:        discountId,
@@ -111,7 +112,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
-	} else if msg.Payer.Empty() {
+	} else if msg.Payer == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "payer address is empty")
 	}
 
@@ -162,13 +163,40 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
 	period Period, creatorDid did.Did) *MsgCreateSubscription {
-	return &MsgCreateSubscription{
+	msg := &MsgCreateSubscription{
 		CreatorDid:        creatorDid,
 		SubscriptionId:    subscriptionId,
 		PaymentContractId: contractId,
 		MaxPeriods:        maxPeriods,
-		Period:            period,
 	}
+
+	err := msg.SetPeriod(period)
+	if err != nil {
+		panic(err)
+	}
+
+	return msg
+}
+
+func (msg MsgCreateSubscription) SetPeriod (period Period) error {
+	if period == nil {
+		msg.Period = nil
+		return nil
+	}
+	any, err := codectypes.NewAnyWithValue(period)
+	if err == nil {
+		msg.Period= any
+	}
+	return err
+}
+
+// TODO (Stef) Look at x/gov/types/msgs.go (m MsgSubmitProposal) ValidateBasic() - content is Any
+func (msg MsgCreateSubscription) GetPeriod() Period {
+	period, ok := msg.Period.GetCachedValue().(Period)
+	if !ok {
+		return nil
+	}
+	return period
 }
 
 func (msg MsgCreateSubscription) Type() string  { return TypeMsgCreateSubscription }
@@ -192,7 +220,11 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 	}
 
 	// Validate Period
-	if err := msg.Period.Validate(); err != nil {
+	period := msg.GetPeriod()
+	if period == nil {
+		return sdkerrors.Wrap(ErrInvalidPeriod, "missing period")
+	}
+	if err := period.Validate(); err != nil {
 		return err
 	}
 
@@ -285,7 +317,7 @@ func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
 		DiscountId:        discountId,
-		Recipient:         recipient,
+		Recipient:         recipient.String(),
 	}
 }
 
@@ -295,7 +327,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if msg.Recipient.Empty() {
+	} else if msg.Recipient == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient address is empty")
 	}
 
@@ -340,7 +372,7 @@ func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
 	return &MsgRevokeDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
-		Holder:            holder,
+		Holder:            holder.String(),
 	}
 }
 
@@ -350,7 +382,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if msg.Holder.Empty() {
+	} else if msg.Holder == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "holder address is empty")
 	}
 

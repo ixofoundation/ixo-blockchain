@@ -59,7 +59,7 @@ message MsgCreateSubscription {
   string subscription_id = 2;
   string payment_contract_id = 3;
   string max_periods = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
-  google.protobuf.Any period = 5 [(gogoproto.nullable) = false];
+  google.protobuf.Any period = 5;
 }
 
 message MsgCreateSubscriptionResponse {}
