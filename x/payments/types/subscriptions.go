@@ -1,8 +1,10 @@
 package types
 
 import (
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/gogo/protobuf/proto"
 	"time"
 )
 
@@ -13,13 +15,33 @@ const (
 
 // --------------------------------------------- Subscription and Period
 
-type Subscription struct {
-	Id                 string   `json:"id" yaml:"id"`
-	PaymentContractId  string   `json:"payment_contract_id" yaml:"payment_contract_id"`
-	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
-	MaxPeriods         sdk.Uint `json:"max_periods" yaml:"max_periods"`
-	PeriodsAccumulated sdk.Uint `json:"periods_accumulated" yaml:"periods_accumulated"`
-	Period             Period   `json:"period" yaml:"period"`
+//type Subscription struct {
+//	Id                 string   `json:"id" yaml:"id"`
+//	PaymentContractId  string   `json:"payment_contract_id" yaml:"payment_contract_id"`
+//	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
+//	MaxPeriods         sdk.Uint `json:"max_periods" yaml:"max_periods"`
+//	PeriodsAccumulated sdk.Uint `json:"periods_accumulated" yaml:"periods_accumulated"`
+//	Period             Period   `json:"period" yaml:"period"`
+//}
+
+func (s Subscription) GetPeriod() Period {
+	period, ok := s.Period.GetCachedValue().(Period)
+	if !ok {
+		return nil
+	}
+	return period
+}
+
+func (s Subscription) SetPeriod(period Period) error {
+	if period == nil {
+		s.Period = nil
+		return nil
+	}
+	any, err := codectypes.NewAnyWithValue(period)
+	if err == nil {
+		s.Period = any
+	}
+	return err
 }
 
 func (s Subscription) Validate() error {
@@ -37,23 +59,33 @@ func (s Subscription) Validate() error {
 	}
 
 	// Validate period
-	return s.Period.Validate()
+	period := s.GetPeriod()
+	if period == nil {
+		return sdkerrors.Wrap(ErrInvalidPeriod, "missing period")
+	}
+	return period.Validate()
 }
 
 func NewSubscription(id, contractId string, maxPeriods sdk.Uint, period Period) Subscription {
-	return Subscription{
+	subscription := Subscription{
 		Id:                 id,
 		PaymentContractId:  contractId,
 		PeriodsSoFar:       sdk.ZeroUint(),
 		MaxPeriods:         maxPeriods,
 		PeriodsAccumulated: sdk.ZeroUint(),
-		Period:             period,
 	}
+
+	err := subscription.SetPeriod(period)
+	if err != nil {
+		panic(err)
+	}
+
+	return subscription
 }
 
 // started True if not the first period, or the current period has started
 func (s Subscription) started(ctx sdk.Context) bool {
-	return !s.PeriodsSoFar.IsZero() || s.Period.periodStarted(ctx)
+	return !s.PeriodsSoFar.IsZero() || s.GetPeriod().periodStarted(ctx)
 }
 
 // MaxPeriodsReached True if max number of periods has been reached
@@ -71,7 +103,10 @@ func (s *Subscription) NextPeriod(periodPaid bool) {
 	}
 
 	// Advance period to next period
-	s.Period = s.Period.nextPeriod()
+	err := s.SetPeriod(s.GetPeriod().nextPeriod())
+	if err != nil {
+		panic(err)
+	}
 }
 
 // ShouldEffect True if the subscription has started and
@@ -83,7 +118,7 @@ func (s Subscription) ShouldEffect(ctx sdk.Context) bool {
 	if !s.started(ctx) {
 		return false
 	} else if !s.MaxPeriodsReached() {
-		return s.Period.periodEnded(ctx)
+		return s.GetPeriod().periodEnded(ctx)
 	} else {
 		return !s.PeriodsAccumulated.IsZero()
 	}
@@ -97,6 +132,8 @@ func (s Subscription) IsComplete() bool {
 }
 
 type Period interface {
+	proto.Message
+
 	GetPeriodUnit() string
 	Validate() error
 	periodStarted(ctx sdk.Context) bool
@@ -106,12 +143,12 @@ type Period interface {
 
 // --------------------------------------------- BlockPeriod
 
-var _ Period = BlockPeriod{}
+var _ Period = &BlockPeriod{}
 
-type BlockPeriod struct {
-	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
-	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
-}
+//type BlockPeriod struct {
+//	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
+//	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
+//}
 
 func NewBlockPeriod(periodLength, periodStartBlock int64) BlockPeriod {
 	return BlockPeriod{
@@ -150,17 +187,17 @@ func (p BlockPeriod) periodEnded(ctx sdk.Context) bool {
 
 func (p BlockPeriod) nextPeriod() Period {
 	p.PeriodStartBlock = p.periodEndBlock()
-	return p
+	return &p
 }
 
 // --------------------------------------------- TimePeriod
 
-var _ Period = TimePeriod{}
+var _ Period = &TimePeriod{}
 
-type TimePeriod struct {
-	PeriodDurationNs time.Duration `json:"period_duration_ns" yaml:"period_duration_ns"`
-	PeriodStartTime  time.Time     `json:"period_start_time" yaml:"period_start_time"`
-}
+//type TimePeriod struct {
+//	PeriodDurationNs time.Duration `json:"period_duration_ns" yaml:"period_duration_ns"`
+//	PeriodStartTime  time.Time     `json:"period_start_time" yaml:"period_start_time"`
+//}
 
 func NewTimePeriod(periodDurationNs time.Duration, periodStartTime time.Time) TimePeriod {
 	return TimePeriod{
@@ -199,5 +236,5 @@ func (p TimePeriod) periodEnded(ctx sdk.Context) bool {
 
 func (p TimePeriod) nextPeriod() Period {
 	p.PeriodStartTime = p.periodEndTime()
-	return p
+	return &p
 }

@@ -3,15 +3,16 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"strings"
 )
 
-type PaymentTemplate struct {
-	Id             string    `json:"id" yaml:"id"`
-	PaymentAmount  sdk.Coins `json:"payment_amount" yaml:"payment_amount"`
-	PaymentMinimum sdk.Coins `json:"payment_minimum" yaml:"payment_minimum"`
-	PaymentMaximum sdk.Coins `json:"payment_maximum" yaml:"payment_maximum"`
-	Discounts      Discounts `json:"discounts" yaml:"discounts"`
-}
+//type PaymentTemplate struct {
+//	Id             string    `json:"id" yaml:"id"`
+//	PaymentAmount  sdk.Coins `json:"payment_amount" yaml:"payment_amount"`
+//	PaymentMinimum sdk.Coins `json:"payment_minimum" yaml:"payment_minimum"`
+//	PaymentMaximum sdk.Coins `json:"payment_maximum" yaml:"payment_maximum"`
+//	Discounts      Discounts `json:"discounts" yaml:"discounts"`
+//}
 
 func NewPaymentTemplate(id string, paymentAmount, paymentMinimum,
 	paymentMaximum sdk.Coins, discounts Discounts) PaymentTemplate {
@@ -58,25 +59,26 @@ func (pt PaymentTemplate) Validate() error {
 	}
 
 	// Validate discounts
-	if err := pt.Discounts.Validate(); err != nil {
+	var discounts Discounts = pt.Discounts
+	if err := discounts.Validate(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-type PaymentContract struct {
-	Id                string         `json:"id" yaml:"id"`
-	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
-	Creator           sdk.AccAddress `json:"creator" yaml:"creator"`
-	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
-	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
-	CumulativePay     sdk.Coins      `json:"cumulative_pay" yaml:"cumulative_pay"`
-	CurrentRemainder  sdk.Coins      `json:"current_remainder" yaml:"current_remainder"`
-	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
-	Authorised        bool           `json:"authorised" yaml:"authorised"`
-	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-}
+//type PaymentContract struct {
+//	Id                string         `json:"id" yaml:"id"`
+//	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
+//	Creator           sdk.AccAddress `json:"creator" yaml:"creator"`
+//	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
+//	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
+//	CumulativePay     sdk.Coins      `json:"cumulative_pay" yaml:"cumulative_pay"`
+//	CurrentRemainder  sdk.Coins      `json:"current_remainder" yaml:"current_remainder"`
+//	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
+//	Authorised        bool           `json:"authorised" yaml:"authorised"`
+//	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
+//}
 
 func NewPaymentContract(id, templateId string, creator, payer sdk.AccAddress,
 	recipients Distribution, canDeauthorise, authorised bool,
@@ -84,8 +86,8 @@ func NewPaymentContract(id, templateId string, creator, payer sdk.AccAddress,
 	return PaymentContract{
 		Id:                id,
 		PaymentTemplateId: templateId,
-		Creator:           creator,
-		Payer:             payer,
+		Creator:           creator.String(),
+		Payer:             payer.String(),
 		Recipients:        recipients,
 		CumulativePay:     sdk.NewCoins(),
 		CurrentRemainder:  sdk.NewCoins(),
@@ -118,9 +120,9 @@ func (pc PaymentContract) Validate() error {
 	}
 
 	// Validate addresses
-	if pc.Creator.Empty() {
+	if strings.TrimSpace(pc.Creator) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty creator address")
-	} else if pc.Payer.Empty() {
+	} else if strings.TrimSpace(pc.Payer) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty payer address")
 	}
 
@@ -130,7 +132,8 @@ func (pc PaymentContract) Validate() error {
 	}
 
 	// Validate recipient distribution
-	if err := pc.Recipients.Validate(); err != nil {
+	var recipients Distribution = pc.Recipients
+	if err := recipients.Validate(); err != nil {
 		return err
 	}
 

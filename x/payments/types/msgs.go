@@ -5,6 +5,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -112,7 +113,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
 		return err
-	} else if msg.Payer == "" {
+	} else if strings.TrimSpace(msg.Payer) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "payer address is empty")
 	}
 
@@ -129,7 +130,8 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	}
 
 	// Validate recipient distribution
-	if err := msg.Recipients.Validate(); err != nil {
+	var recipients Distribution = msg.Recipients
+	if err := recipients.Validate(); err != nil {
 		return err
 	}
 
@@ -327,7 +329,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if msg.Recipient == "" {
+	} else if strings.TrimSpace(msg.Recipient) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient address is empty")
 	}
 
@@ -382,7 +384,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
 		return err
-	} else if msg.Holder == "" {
+	} else if strings.TrimSpace(msg.Holder) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "holder address is empty")
 	}
 

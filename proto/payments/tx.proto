@@ -45,7 +45,7 @@ message MsgCreatePaymentContract {
   string payment_template_id = 2;
   string payment_contract_id = 3;
   string payer = 4;
-  Distribution recipients = 5 [(gogoproto.nullable) = false];
+  repeated DistributionShare recipients = 5 [(gogoproto.nullable) = false];
   bool can_deauthorise = 6;
   string discount_id = 7 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false];
 }
@@ -54,6 +54,7 @@ message MsgCreatePaymentContractResponse {}
 
 message MsgCreateSubscription {
   option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.goproto_getters)  = false;
 
   string creator_did = 1;
   string subscription_id = 2;

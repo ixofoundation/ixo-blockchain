@@ -3,11 +3,12 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"strings"
 )
 
 var oneHundred = sdk.NewDec(100)
 
-//type Distribution []DistributionShare
+type Distribution []DistributionShare
 
 func NewDistribution(shares ...DistributionShare) Distribution {
 	return Distribution(shares)
@@ -62,14 +63,14 @@ func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
 
 func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) DistributionShare {
 	return DistributionShare{
-		Address:    address,
+		Address:    address.String(),
 		Percentage: percentage,
 	}
 }
 
 func NewFullDistributionShare(address sdk.AccAddress) DistributionShare {
 	return DistributionShare{
-		Address:    address,
+		Address:    address.String(),
 		Percentage: sdk.NewDec(100),
 	}
 }
@@ -77,7 +78,7 @@ func NewFullDistributionShare(address sdk.AccAddress) DistributionShare {
 func (d DistributionShare) Validate() error {
 	if !d.Percentage.IsPositive() {
 		return sdkerrors.Wrap(ErrNegativeSharePercentage, "")
-	} else if d.Address.Empty() {
+	} else if strings.TrimSpace(d.Address) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty distribution share address")
 	}
 
