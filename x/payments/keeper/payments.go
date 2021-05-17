@@ -302,7 +302,8 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 	// on the calculated wallet distributions
 	var outputToPayees sdk.Coins
 	var outputs []banktypes.Output
-	distributions := contract.Recipients.GetDistributionsFor(totalInputAmount)
+	var contractRecipients types.Distribution = contract.Recipients
+	distributions := contractRecipients.GetDistributionsFor(totalInputAmount)
 	for i, share := range distributions {
 		// Get integer output
 		outputAmt, _ := share.TruncateDecimal()
@@ -310,7 +311,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 		// If amount not zero, update total and add as output
 		if !outputAmt.IsZero() {
 			outputToPayees = outputToPayees.Add(outputAmt...)
-			address := contract.Recipients.DistributionShare[i].Address
+			address := contractRecipients[i].Address
 			accAddress, err := sdk.AccAddressFromBech32(address)
 			if err != nil {
 				return false, err
