@@ -179,6 +179,9 @@
     - [Subscription](#payments.Subscription)
     - [TimePeriod](#payments.TimePeriod)
   
+- [payments/genesis.proto](#payments/genesis.proto)
+    - [GenesisState](#payments.GenesisState)
+  
 - [payments/query.proto](#payments/query.proto)
     - [QueryPaymentContractRequest](#payments.QueryPaymentContractRequest)
     - [QueryPaymentContractResponse](#payments.QueryPaymentContractResponse)
@@ -550,7 +553,7 @@ IntProto defines a Protobuf wrapper around an Int object.
 <a name="bonds.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the did module&#39;s genesis state.
+GenesisState defines the bonds module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
@@ -2665,6 +2668,39 @@ check all cases in NewHandler().
 | ----- | ---- | ----- | ----------- |
 | period_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
 | period_start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="payments/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## payments/genesis.proto
+
+
+
+<a name="payments.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the payments module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_templates | [PaymentTemplate](#payments.PaymentTemplate) | repeated |  |
+| payment_contracts | [PaymentContract](#payments.PaymentContract) | repeated |  |
+| subscriptions | [Subscription](#payments.Subscription) | repeated |  |
 
 
 

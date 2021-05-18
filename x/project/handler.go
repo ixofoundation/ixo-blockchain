@@ -4,12 +4,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	types "github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
-func NewHandler(k keeper.Keeper, pk payments.Keeper, bk bankkeeper.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper, pk paymentskeeper.Keeper, bk bankkeeper.Keeper) sdk.Handler {
 	msgServer := keeper.NewMsgServerImpl(k, bk, pk)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {

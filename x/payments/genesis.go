@@ -27,7 +27,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data *types.GenesisState
 // ExportGenesis returns a GenesisState for a given context and keeper.
 func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 	// Export payment templates
-	var templates []PaymentTemplate
+	var templates []types.PaymentTemplate
 	iterator := keeper.GetPaymentTemplateIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		template := keeper.MustGetPaymentTemplateByKey(ctx, iterator.Key())
@@ -35,7 +35,7 @@ func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 	}
 
 	// Export payment contracts
-	var contracts []PaymentContract
+	var contracts []types.PaymentContract
 	iterator = keeper.GetPaymentContractIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		contract := keeper.MustGetPaymentContractByKey(ctx, iterator.Key())
@@ -43,12 +43,12 @@ func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 	}
 
 	// Export subscriptions
-	var subscriptions []Subscription
+	var subscriptions []types.Subscription
 	iterator = keeper.GetSubscriptionIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		subscription := keeper.MustGetSubscriptionByKey(ctx, iterator.Key())
 		subscriptions = append(subscriptions, subscription)
 	}
 
-	return NewGenesisState(templates, contracts, subscriptions)
+	return types.NewGenesisState(templates, contracts, subscriptions)
 }

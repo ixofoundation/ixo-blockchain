@@ -8,7 +8,8 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"strconv"
 )
@@ -16,7 +17,7 @@ import (
 type msgServer struct {
 	Keeper         Keeper
 	BankKeeper     bankkeeper.Keeper
-	PaymentsKeeper payments.Keeper
+	PaymentsKeeper paymentskeeper.Keeper
 }
 
 const (
@@ -27,7 +28,7 @@ const (
 
 // NewMsgServerImpl returns an implementation of the project MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk payments.Keeper) types.MsgServer {
+func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper) types.MsgServer {
 	return &msgServer{
 		Keeper:         k,
 		BankKeeper:     bk,
@@ -380,10 +381,10 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
 		ixoFeeShare := feePercentage.Sub(nodeFeeShare)
 		oracleShareLessFees := sdk.NewDec(100).Sub(feePercentage)
-		oraclePayRecipients := payments.NewDistribution(
-			payments.NewDistributionShare(ixoAddr, ixoFeeShare),
-			payments.NewDistributionShare(nodeAddr, nodeFeeShare),
-			payments.NewDistributionShare(senderAddr, oracleShareLessFees))
+		oraclePayRecipients := paymentstypes.NewDistribution(
+			paymentstypes.NewDistributionShare(ixoAddr, ixoFeeShare),
+			paymentstypes.NewDistributionShare(nodeAddr, nodeFeeShare),
+			paymentstypes.NewDistributionShare(senderAddr, oracleShareLessFees))
 
 		// Process oracle pay
 		err = processPay(ctx, k, bk, pk, msg.ProjectDid, senderAddr,
@@ -405,8 +406,8 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		claimerAddr := claimerDidDoc.Address()
 
 		// Get recipients (just the claimer)
-		claimApprovedPayRecipients := payments.NewDistribution(
-			payments.NewFullDistributionShare(claimerAddr))
+		claimApprovedPayRecipients := paymentstypes.NewDistribution(
+			paymentstypes.NewFullDistributionShare(claimerAddr))
 
 		// Process the payment
 		err = processPay(ctx, k, bk, pk, projectDoc.ProjectDid, claimerAddr,
@@ -524,8 +525,8 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	return nil
 }
 
-func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk payments.Keeper,
-	projectDid did.Did, senderAddr sdk.AccAddress, recipients payments.Distribution,
+func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper,
+	projectDid did.Did, senderAddr sdk.AccAddress, recipients paymentstypes.Distribution,
 	feeType types.FeeType, paymentTemplateId string) error {
 
 	// Validate recipients
@@ -547,9 +548,9 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk payments.Kee
 	// Create or get payment contract
 	contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
 		types.ModuleName, projectDid, senderAddr.String(), feeType)
-	var contract payments.PaymentContract
+	var contract paymentstypes.PaymentContract
 	if !pk.PaymentContractExists(ctx, contractId) {
-		contract = payments.NewPaymentContract(contractId, paymentTemplateId,
+		contract = paymentstypes.NewPaymentContract(contractId, paymentTemplateId,
 			projectAddr, projectAddr, recipients, false, true, sdk.ZeroUint())
 		pk.SetPaymentContract(ctx, contract)
 	} else {

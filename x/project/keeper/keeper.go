@@ -8,11 +8,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 
 	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	//"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
 
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
@@ -24,12 +23,12 @@ type Keeper struct {
 	paramSpace     paramstypes.Subspace
 	AccountKeeper  authkeeper.AccountKeeper
 	DidKeeper      did.Keeper
-	paymentsKeeper payments.Keeper
+	paymentsKeeper paymentskeeper.Keeper
 }
 
 func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
 	accountKeeper authkeeper.AccountKeeper, didKeeper did.Keeper,
-	paymentsKeeper payments.Keeper) Keeper {
+	paymentsKeeper paymentskeeper.Keeper) Keeper {
 	return Keeper{
 		cdc:            cdc,
 		storeKey:       key,

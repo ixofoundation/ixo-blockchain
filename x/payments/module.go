@@ -50,7 +50,7 @@ func (AppModuleBasic) RegisterInterfaces (registry codectypes.InterfaceRegistry)
 // DefaultGenesis returns default genesis state as raw bytes for the payments
 // module.
 func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
-	return cdc.MustMarshalJSON(DefaultGenesisState())
+	return cdc.MustMarshalJSON(types.DefaultGenesisState())
 }
 
 // ValidateGenesis performs genesis state validation for the payments module.
@@ -93,7 +93,7 @@ type AppModule struct {
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper Keeper, bankKeeper bankkeeper.Keeper) AppModule {
+func NewAppModule(keeper keeper.Keeper, bankKeeper bankkeeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
@@ -137,7 +137,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, genesisState)
+	InitGenesis(ctx, am.keeper, &genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
@@ -145,7 +145,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data j
 // module.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
-	return cdc.MustMarshalJSON(&gs)
+	return cdc.MustMarshalJSON(gs)
 }
 
 // BeginBlock returns the begin blocker for the payments module. In this case it performs a no-op.

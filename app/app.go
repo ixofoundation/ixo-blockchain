@@ -15,7 +15,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"github.com/rakyll/statik/fs"
 	"net/http"
@@ -218,52 +218,52 @@ var _ servertypes.Application = (*ixoApp)(nil)
 
 // Extended ABCI application
 type ixoApp struct {
-	*bam.BaseApp
-	legacyAmino       *codec.LegacyAmino
-	appCodec          codec.Marshaler
-	interfaceRegistry types.InterfaceRegistry
+	*bam.BaseApp      `json:"_bam_base_app,omitempty"`
+	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
+	appCodec          codec.Marshaler         `json:"app_codec,omitempty"`
+	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
 
-	invCheckPeriod uint
+	invCheckPeriod uint `json:"inv_check_period,omitempty"`
 
 	// keys to access the substores
-	keys    map[string]*sdk.KVStoreKey
-	tkeys   map[string]*sdk.TransientStoreKey
-	memKeys map[string]*sdk.MemoryStoreKey
+	keys    map[string]*sdk.KVStoreKey        `json:"keys,omitempty"`
+	tkeys   map[string]*sdk.TransientStoreKey `json:"tkeys,omitempty"`
+	memKeys map[string]*sdk.MemoryStoreKey    `json:"mem_keys,omitempty"`
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
+	AccountKeeper    authkeeper.AccountKeeper `json:"account_keeper"`
+	BankKeeper       bankkeeper.Keeper        `json:"bank_keeper,omitempty"`
+	CapabilityKeeper *capabilitykeeper.Keeper `json:"capability_keeper,omitempty"`
+	StakingKeeper    stakingkeeper.Keeper     `json:"staking_keeper"`
+	SlashingKeeper   slashingkeeper.Keeper    `json:"slashing_keeper"`
+	MintKeeper       mintkeeper.Keeper        `json:"mint_keeper"`
+	DistrKeeper      distrkeeper.Keeper       `json:"distr_keeper"`
+	GovKeeper        govkeeper.Keeper         `json:"gov_keeper"`
+	CrisisKeeper     crisiskeeper.Keeper      `json:"crisis_keeper"`
+	UpgradeKeeper    upgradekeeper.Keeper     `json:"upgrade_keeper"`
+	ParamsKeeper     paramskeeper.Keeper      `json:"params_keeper"`
+	IBCKeeper        *ibckeeper.Keeper        `json:"ibc_keeper,omitempty"` // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
+	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
 
 	// Custom ixo keepers
-	didKeeper      did.Keeper
+	didKeeper did.Keeper `json:"did_keeper"`
 	//TODO uncomment rest of ixo modules
-	paymentsKeeper payments.Keeper
-	projectKeeper  projectkeeper.Keeper
-	bondsKeeper    bondskeeper.Keeper
+	paymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
+	projectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
+	bondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	//oraclesKeeper  oracles.Keeper
 	//treasuryKeeper treasury.Keeper
 
 	// the module manager
-	mm *module.Manager
+	mm *module.Manager `json:"mm,omitempty"`
 
 	// simulation manager
-	sm *module.SimulationManager
+	sm *module.SimulationManager `json:"sm,omitempty"`
 }
 
 // TODO(?) Implement functions for servertypes.Application interface
