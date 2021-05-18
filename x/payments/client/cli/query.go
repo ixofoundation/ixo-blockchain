@@ -9,6 +9,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func GetQueryCmd() *cobra.Command {
+	paymentsQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "payments query sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	paymentsQueryCmd.AddCommand(
+		GetCmdPaymentTemplate(),
+		GetCmdPaymentContract(),
+		GetCmdPaymentContractsByIdPrefix(),
+		GetCmdSubscription(),
+	)
+
+	return paymentsQueryCmd
+}
+
 func GetCmdPaymentTemplate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "payment-template [payment-template-id]",

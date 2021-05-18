@@ -10,7 +10,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 )
@@ -29,6 +28,28 @@ func parseBool(boolStr, boolName string) (bool, error) {
 	} else {
 		return false, sdkerrors.Wrapf(types.ErrInvalidArgument, "%s is not a valid bool (true/false)", boolName)
 	}
+}
+
+func NewTxCmd() *cobra.Command {
+	paymentsTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "payments transaction sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	paymentsTxCmd.AddCommand(
+		NewCmdCreatePaymentTemplate(),
+		NewCmdCreatePaymentContract(),
+		NewCmdCreateSubscription(),
+		NewCmdSetPaymentContractAuthorisation(),
+		NewCmdGrantPaymentDiscount(),
+		NewCmdRevokePaymentDiscount(),
+		NewCmdEffectPayment(),
+	)
+
+	return paymentsTxCmd
 }
 
 func NewCmdCreatePaymentTemplate() *cobra.Command {
@@ -126,7 +147,7 @@ func NewCmdCreatePaymentContract() *cobra.Command {
 	return cmd
 }
 
-func NewCmdCreateSubscription(cdc *codec.LegacyAmino) *cobra.Command {
+func NewCmdCreateSubscription() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "create-subscription [subscription-id] [payment-contract-id] " +
 			"[max-periods] [period-json] [creator-ixo-did]",
@@ -150,7 +171,7 @@ func NewCmdCreateSubscription(cdc *codec.LegacyAmino) *cobra.Command {
 			}
 
 			var period types.Period
-			err = cdc.UnmarshalJSON([]byte(periodStr), &period)
+			err = json.Unmarshal([]byte(periodStr), &period)
 			if err != nil {
 				return err
 			}
@@ -171,7 +192,7 @@ func NewCmdCreateSubscription(cdc *codec.LegacyAmino) *cobra.Command {
 	return cmd
 }
 
-func NewCmdSetPaymentContractAuthorisation(cdc *codec.LegacyAmino) *cobra.Command {
+func NewCmdSetPaymentContractAuthorisation() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "set-payment-contract-authorisation [payment-contract-id] " +
 			"[authorised] [payer-ixo-did]",
@@ -209,7 +230,7 @@ func NewCmdSetPaymentContractAuthorisation(cdc *codec.LegacyAmino) *cobra.Comman
 	return cmd
 }
 
-func NewCmdGrantPaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
+func NewCmdGrantPaymentDiscount() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "grant-discount [payment-contract-id] [discount-id] " +
 			"[recipient-addr] [creator-ixo-did]",
@@ -253,7 +274,7 @@ func NewCmdGrantPaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
 	return cmd
 }
 
-func NewCmdRevokePaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
+func NewCmdRevokePaymentDiscount() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "revoke-discount [payment-contract-id] [holder-addr] [creator-ixo-did]",
 		Short: "Create and sign a revoke-discount tx using DIDs",
@@ -290,7 +311,7 @@ func NewCmdRevokePaymentDiscount(cdc *codec.LegacyAmino) *cobra.Command {
 	return cmd
 }
 
-func NewCmdEffectPayment(cdc *codec.LegacyAmino) *cobra.Command {
+func NewCmdEffectPayment() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "effect-payment [payment-contract-id] [creator-ixo-did]",
 		Short: "Create and sign a effect-payment tx using DIDs",
