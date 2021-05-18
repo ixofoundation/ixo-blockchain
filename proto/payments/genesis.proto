@@ -1,0 +1,14 @@
+syntax = "proto3";
+package payments;
+
+import "gogoproto/gogo.proto";
+import "payments/payments.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
+
+// GenesisState defines the payments module's genesis state.
+message GenesisState {
+  repeated PaymentTemplate payment_templates = 1 [(gogoproto.nullable) = false];
+  repeated PaymentContract payment_contracts = 2 [(gogoproto.nullable) = false];
+  repeated Subscription subscriptions = 3 [(gogoproto.nullable) = false];
+}
