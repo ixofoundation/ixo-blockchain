@@ -76,7 +76,7 @@ func NewCmdCreatePaymentTemplate() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did)
 
@@ -133,7 +133,7 @@ func NewCmdCreatePaymentContract() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreatePaymentContract(templateIdStr,
 				contractIdStr, payerAddr, recipients, canDeauthorise,
@@ -180,7 +180,7 @@ func NewCmdCreateSubscription() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateSubscription(subIdStr,
 				contractIdStr, maxPeriods, period, ixoDid.Did)
@@ -217,7 +217,7 @@ func NewCmdSetPaymentContractAuthorisation() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgSetPaymentContractAuthorisation(
 				contractIdStr, authorised, ixoDid.Did)
@@ -261,7 +261,7 @@ func NewCmdGrantPaymentDiscount() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgGrantDiscount(
 				contractIdStr, discountId, recipientAddr, ixoDid.Did)
@@ -298,7 +298,7 @@ func NewCmdRevokePaymentDiscount() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgRevokeDiscount(
 				contractIdStr, holderAddr, ixoDid.Did)
@@ -329,7 +329,7 @@ func NewCmdEffectPayment() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgEffectPayment(contractIdStr, ixoDid.Did)
 

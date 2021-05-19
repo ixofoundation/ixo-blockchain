@@ -41,7 +41,9 @@ func NewCmdCreateProject() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
 			projectDataStr := args[1]
-			ixoDid, err := didtypes.UnmarshalIxoDid(args[2])
+			ixoDidStr := args[2]
+
+			ixoDid, err := didtypes.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
@@ -50,7 +52,7 @@ func NewCmdCreateProject() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(
 				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
@@ -100,7 +102,7 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
 
@@ -138,7 +140,7 @@ func NewCmdCreateAgent() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
 
@@ -178,7 +180,7 @@ func NewCmdUpdateAgent() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
 
@@ -211,7 +213,7 @@ func NewCmdCreateClaim() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
 
@@ -250,7 +252,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
 
@@ -283,7 +285,7 @@ func NewCmdWithdrawFunds() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			clientCtx.WithFromAddress(ixoDid.Address())
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
 

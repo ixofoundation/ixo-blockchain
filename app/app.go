@@ -15,7 +15,9 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
 	"github.com/rakyll/statik/fs"
 	"net/http"
@@ -148,7 +150,7 @@ var (
 
 		// Custom ixo modules
 		did.AppModuleBasic{}, //TODO uncomment rest of ixo modules
-		//payments.AppModuleBasic{},
+		payments.AppModuleBasic{},
 		project.AppModuleBasic{},
 		bonds.AppModuleBasic{},
 		//treasury.AppModuleBasic{},
@@ -172,7 +174,7 @@ var (
 		bondstypes.BatchesIntermediaryAccount: nil,
 		bondstypes.BondsReserveAccount:        nil,
 		//treasury.ModuleName:              {authtypes.Minter, authtypes.Burner},
-		//payments.PayRemainderPool:        nil,
+		paymentstypes.PayRemainderPool:        nil,
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -347,7 +349,7 @@ func NewIxoApp(
 
 		// Custom ixo store keys
 		// TODO uncomment ixo modules store keys
-		did.StoreKey, //payments.StoreKey,
+		did.StoreKey, paymentstypes.StoreKey,
 		projecttypes.StoreKey,
 		bondstypes.StoreKey,
 		//treasury.StoreKey, oracles.StoreKey*/
@@ -474,6 +476,8 @@ func NewIxoApp(
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
 	app.projectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
 		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
+	app.paymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
+		app.BankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
 	// TODO add the rest of ixo modules keeper
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -502,7 +506,7 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		did.NewAppModule(app.didKeeper), //TODO uncomment rest of ixo modules
-		//payments.NewAppModule(app.paymentsKeeper, app.BankKeeper),
+		payments.NewAppModule(app.paymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.BankKeeper),
 		bonds.NewAppModule(app.bondsKeeper, app.AccountKeeper),
 		//treasury.NewAppModule(app.treasuryKeeper),
@@ -527,7 +531,7 @@ func NewIxoApp(
 		// Custom ixo modules
 		//TODO uncomment rest of ixo modules
 		bondstypes.ModuleName,
-		//payments.ModuleName,
+		paymentstypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -544,7 +548,7 @@ func NewIxoApp(
 		//TODO uncomment rest of ixo modules
 		did.ModuleName,
 		projecttypes.ModuleName,
-		//payments.ModuleName,
+		paymentstypes.ModuleName,
 		bondstypes.ModuleName, //treasury.ModuleName, oracles.ModuleName,
 	)
 
@@ -828,8 +832,8 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 			return defaultIxoAnteHandler(ctx, tx, simulate) //fallthrough
 		//case treasury.RouterKey:
 		//	fallthrough
-		//case payments.RouterKey:
-		//	return defaultIxoAnteHandler(ctx, tx, simulate)
+		case paymentstypes.RouterKey:
+			return defaultIxoAnteHandler(ctx, tx, simulate)
 		default:
 			return cosmosAnteHandler(ctx, tx, simulate)
 		}
