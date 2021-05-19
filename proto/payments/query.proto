@@ -29,33 +29,33 @@ service Query {
 }
 
 message QueryPaymentTemplateRequest {
-  string payment_template_id = 1;
+  string payment_template_id = 1 [(gogoproto.moretags) = "yaml:\"payment_template_id\""];
 }
 
 message QueryPaymentTemplateResponse {
-  PaymentTemplate payment_template = 1 [(gogoproto.nullable) = false];
+  PaymentTemplate payment_template = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"payment_template\""];
 }
 
 message QueryPaymentContractRequest {
-  string payment_contract_id = 1;
+  string payment_contract_id = 1 [(gogoproto.moretags) = "yaml:\"payment_contract_id\""];
 }
 
 message QueryPaymentContractResponse {
-  PaymentContract payment_contract = 1 [(gogoproto.nullable) = false];
+  PaymentContract payment_contract = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"payment_contract\""];
 }
 
 message QueryPaymentContractsByIdPrefixRequest {
-  string payment_contracts_id_prefix = 1;
+  string payment_contracts_id_prefix = 1 [(gogoproto.moretags) = "yaml:\"payment_contracts_id_prefix\""];
 }
 
 message QueryPaymentContractsByIdPrefixResponse {
-  repeated PaymentContract payment_contracts = 1 [(gogoproto.nullable) = false];
+  repeated PaymentContract payment_contracts = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"payment_contracts\""];
 }
 
 message QuerySubscriptionRequest {
-  string subscription_id = 1;
+  string subscription_id = 1 [(gogoproto.moretags) = "yaml:\"subscription_id\""];
 }
 
 message QuerySubscriptionResponse {
-  Subscription subscription = 1 [(gogoproto.nullable) = false];
+  Subscription subscription = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"subscription\""];
 }

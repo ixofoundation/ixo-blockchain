@@ -21,20 +21,20 @@ service Msg {
 message MsgCreateProject {
   option (gogoproto.goproto_stringer) = false;
 
-  string tx_hash = 1;
-  string sender_did = 2;
-  string project_did = 3;
-  string pub_key = 4;
-  bytes data = 5; //TODO (Stef) check about customtype
+  string tx_hash     = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did  = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  string pub_key     = 4 [(gogoproto.moretags) = "yaml:\"pub_key\""];
+  bytes data         = 5 [(gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgCreateProjectResponse {}
 
 message MsgUpdateProjectStatus {
-  string tx_hash = 1;
-  string sender_did = 2;
-  string project_did = 3;
-  UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false];
+  string tx_hash              = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did           = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did          = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgUpdateProjectStatusResponse{}
@@ -42,10 +42,10 @@ message MsgUpdateProjectStatusResponse{}
 message MsgCreateAgent {
   option (gogoproto.goproto_stringer) = false;
 
-  string tx_hash = 1;
-  string sender_did = 2;
-  string project_did = 3;
-  CreateAgentDoc data = 4 [(gogoproto.nullable) = false];
+  string tx_hash      = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did   = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did  = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  CreateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgCreateAgentResponse {}
@@ -53,10 +53,10 @@ message MsgCreateAgentResponse {}
 message MsgUpdateAgent {
   option (gogoproto.goproto_stringer) = false;
 
-  string tx_hash = 1;
-  string sender_did = 2;
-  string project_did = 3;
-  UpdateAgentDoc data = 4 [(gogoproto.nullable) = false];
+  string tx_hash      = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did   = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did  = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  UpdateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgUpdateAgentResponse {}
@@ -64,10 +64,10 @@ message MsgUpdateAgentResponse {}
 message MsgCreateClaim {
   option (gogoproto.goproto_stringer) = false;
 
-  string tx_hash = 1;
-  string sender_did = 2;
-  string project_did = 3;
-  CreateClaimDoc data = 4 [(gogoproto.nullable) = false];
+  string tx_hash      = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did   = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did  = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  CreateClaimDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgCreateClaimResponse {}
@@ -75,10 +75,10 @@ message MsgCreateClaimResponse {}
 message MsgCreateEvaluation {
   option (gogoproto.goproto_stringer) = false;
 
-  string tx_hash = 1;
-  string sender_did = 2;
-  string project_did = 3;
-  CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false];
+  string tx_hash           = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did        = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did       = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgCreateEvaluationResponse {}
@@ -86,8 +86,8 @@ message MsgCreateEvaluationResponse {}
 message MsgWithdrawFunds {
   option (gogoproto.goproto_stringer) = false;
 
-  string sender_did = 1;
-  WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false];
+  string sender_did     = 1 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgWithdrawFundsResponse {}

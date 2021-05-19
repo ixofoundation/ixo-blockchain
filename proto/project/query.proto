@@ -27,32 +27,32 @@ service Query {
 }
 
 message QueryProjectDocRequest {
-  string project_did = 1;
+  string project_did = 1 [(gogoproto.moretags) = "yaml:\"project_did\""];
 }
 
 message QueryProjectDocResponse {
-  ProjectDoc project_doc = 1;
+  ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
 }
 
 message QueryProjectAccountsRequest {
-  string project_did = 1;
+  string project_did = 1 [(gogoproto.moretags) = "yaml:\"project_did\""];
 }
 
 message QueryProjectAccountsResponse {
-  AccountMap account_map = 1;
+  AccountMap account_map = 1 [(gogoproto.moretags) = "yaml:\"account_map\""];
 }
 
 message QueryProjectTxRequest {
-  string project_did = 1;
+  string project_did = 1 [(gogoproto.moretags) = "yaml:\"project_did\""];
 }
 
 message QueryProjectTxResponse {
-  WithdrawalInfoDocs txs = 1;
+  WithdrawalInfoDocs txs = 1 [(gogoproto.moretags) = "yaml:\"txs\""];
 }
 
 message QueryParamsRequest {}
 
 message QueryParamsResponse {
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
 }
 
