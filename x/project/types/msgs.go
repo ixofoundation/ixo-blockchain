@@ -2,15 +2,12 @@ package types
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -56,22 +53,22 @@ func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
 	}
 }
 
-func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
-	chainID := viper.GetString(flags.FlagChainID)
-	accNum, accSeq := uint64(0), uint64(0)
-	stdFee := legacytx.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
-		ixotypes.IxoNativeToken, sdk.NewInt(fee))))
-	memo := viper.GetString(flags.FlagMemo)
-
-	return legacytx.StdSignMsg{
-		ChainID:       chainID,
-		AccountNumber: accNum,
-		Sequence:      accSeq,
-		Fee:           stdFee,
-		Msgs:          []sdk.Msg{&msg},
-		Memo:          memo,
-	}
-}
+//func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
+//	chainID := viper.GetString(flags.FlagChainID)
+//	accNum, accSeq := uint64(0), uint64(0)
+//	stdFee := legacytx.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
+//		ixotypes.IxoNativeToken, sdk.NewInt(fee))))
+//	memo := viper.GetString(flags.FlagMemo)
+//
+//	return legacytx.StdSignMsg{
+//		ChainID:       chainID,
+//		AccountNumber: accNum,
+//		Sequence:      accSeq,
+//		Fee:           stdFee,
+//		Msgs:          []sdk.Msg{&msg},
+//		Memo:          memo,
+//	}
+//}
 
 func (msg MsgCreateProject) Type() string { return TypeMsgCreateProject }
 

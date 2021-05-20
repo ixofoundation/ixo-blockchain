@@ -474,10 +474,10 @@ func NewIxoApp(
 	app.didKeeper = did.NewKeeper(app.appCodec, keys[did.StoreKey]) // not what Cosmos uses because keeper is different
 	app.bondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.didKeeper,
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
-	app.projectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
-		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
 	app.paymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
 		app.BankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
+	app.projectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
+		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
 	// TODO add the rest of ixo modules keeper
 
 	// NOTE: Any module instantiated in the module manager that is later modified

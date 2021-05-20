@@ -56,9 +56,8 @@ func NewCmdCreateProject() *cobra.Command {
 
 			msg := types.NewMsgCreateProject(
 				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
-			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectTotalFee)
 
-			res, err := ixotypes.SignAndBroadcastTxFromStdSignMsg(clientCtx, stdSignMsg, ixoDid)
+			res, err := ixotypes.SignAndBroadcastTxFromStdSignMsg(clientCtx, msg, ixoDid, cmd.Flags())
 			if err != nil {
 				return err
 			}

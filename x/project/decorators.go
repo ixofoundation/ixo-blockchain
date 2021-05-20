@@ -13,7 +13,6 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
@@ -165,7 +164,7 @@ func NewDeductFeeDecorator(ak keeper.AccountKeeper, bk bankkeeper.Keeper,
 }
 
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	_, ok := tx.(sdk.FeeTx)
+	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
@@ -195,13 +194,13 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	}
 
 	// confirm that fee is the exact amount expected
-	stdTx, ok := tx.(legacytx.StdTx) //(auth.StdTx)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-	}
+	//stdTx, ok := tx.(authsigning.Tx) //(legacytx.StdTx) //(auth.StdTx)
+	//if !ok {
+	//	return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
+	//}
 	expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
 		ixotypes.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTotalFee)))
-	if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
+	if !feeTx.GetFee().IsEqual(expectedTotalFee) {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee")
 	}
 
@@ -211,7 +210,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
 
 	// deduct the fees
-	if !stdTx.Fee.Amount.IsZero() {
+	if !feeTx.GetFee().IsZero() {
 		// fetch fee payer account
 		feePayerDidDoc, err := dfd.didKeeper.GetDidDoc(ctx, msg.SenderDid)
 		if err != nil {
