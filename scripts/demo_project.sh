@@ -21,6 +21,24 @@ fi
 
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
+CHAIN_ID="pandora-2"
+
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    --broadcast-mode block \
+    -y \
+    "$@"  # any extra arguments added at the end
+}
 
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 PROJECT_DID_FULL='{
@@ -100,52 +118,54 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixod tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering Francesco DID..."
-ixod tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering Shaun DID..."
-ixod tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$SHAUN_DID_FULL"
 
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-ixod tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create fee-for-service payment template
 echo "Creating fee-for-service payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-ixod tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
 echo "Creating project..."
-ixod tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 echo "Updating project to CREATED..."
-ixod tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
 echo "Updating project to PENDING..."
-ixod tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
 
 # Fund project and progress status to FUNDED
-PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
-echo "Funding project at [$PROJECT_ADDR] with uixo (using treasury 'oracle-transfer' using Francesco oracle)..."
-ixod tx treasury oracle-mint "$PROJECT_ADDR" 100000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID")
+# Delete longest match of pattern ': ' from the beginning
+PROJECT_ADDR=${FULL_PROJECT_ADDR##*: }
+echo "Funding project at [$PROJECT_ADDR] with uixo from Francesco..."
+ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
-ixod tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"
 
 # Progress project status to STARTED
 SENDER_DID="$SHAUN_DID"
 echo "Updating project to STARTED..."
-ixod tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL"
 
 # Create claim and evaluation
 echo "Creating a claim in project..."
 SENDER_DID="$SHAUN_DID"
-ixod tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL"
 echo "Creating an evaluation in project..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1
-ixod tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL"
 
 # OracleFeePercentage:  0.1 (10%)
 # NodeFeePercentage:    0.1 (10%)
@@ -167,9 +187,9 @@ ixod tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$P
 # Progress project status to PAIDOUT
 SENDER_DID="$SHAUN_DID"
 echo "Updating project to STOPPED..."
-ixod tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL"
 echo "Updating project to PAIDOUT..."
-ixod tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL"
 echo "Project withdrawals query..."
 ixod q project get-project-txs $PROJECT_DID
 
@@ -185,23 +205,23 @@ ixod q project get-project-txs $PROJECT_DID
 # - Shaun:                 11500000  # 500000 withdrawal
 
 echo "InitiatingNodePayFees"
-ixod q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
+ixod q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
 echo "IxoFees"
-ixod q auth account "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
+ixod q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
 echo "IxoPayFees"
-ixod q auth account "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
+ixod q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
 echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
-ixod q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
+ixod q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-ixod q auth account "$(ixod q did get-address-from-did $MIGUEL_DID)"
+ixod q bank balances "$(ixod q did get-address-from-did $MIGUEL_DID)"
 echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-ixod q auth account "$(ixod q did get-address-from-did $SHAUN_DID)"
+ixod q bank balances "$(ixod q did get-address-from-did $SHAUN_DID)"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
 echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
-DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
-ixod tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"is_refund\":true}"
+ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
 ixod q project get-project-txs $PROJECT_DID
 
@@ -211,8 +231,8 @@ ixod q project get-project-txs $PROJECT_DID
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
 echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
-DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
-ixod tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"is_refund\":true}"
+ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
 ixod q project get-project-txs $PROJECT_DID
 

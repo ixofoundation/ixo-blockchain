@@ -624,7 +624,7 @@ func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,
 
 	addr, found := accMap.Map[strAccountId]
 	if found {
-		return sdk.AccAddress(addr), nil
+		return sdk.AccAddressFromBech32(addr)
 	} else {
 		return createAccountInProjectAccounts(ctx, k, projectDid, accountId)
 	}
