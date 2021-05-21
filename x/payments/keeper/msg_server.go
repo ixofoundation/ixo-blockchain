@@ -17,8 +17,8 @@ type msgServer struct {
 
 // NewMsgServerImpl returns an implementation of the gov MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+func NewMsgServerImpl(keeper Keeper, bankKeeper bankkeeper.Keeper) types.MsgServer {
+	return &msgServer{Keeper: keeper, BankKeeper: bankKeeper}
 }
 
 func (k msgServer) SetPaymentContractAuthorisation(goCtx context.Context, msg *types.MsgSetPaymentContractAuthorisation) (*types.MsgSetPaymentContractAuthorisationResponse, error) {

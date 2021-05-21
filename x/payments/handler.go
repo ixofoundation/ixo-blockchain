@@ -47,7 +47,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 }
 
 func NewHandler(k keeper.Keeper, bk bankkeeper.Keeper) sdk.Handler {
-	msgServer := keeper.NewMsgServerImpl(k)
+	msgServer := keeper.NewMsgServerImpl(k, bk)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())

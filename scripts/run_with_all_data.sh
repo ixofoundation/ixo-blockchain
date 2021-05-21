@@ -23,7 +23,7 @@ yes $PASSWORD | ixod keys add fee4
 yes $PASSWORD | ixod keys add fee5
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
 yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 1000000000000uixo,1000000000000res,1000000000000rez
 
