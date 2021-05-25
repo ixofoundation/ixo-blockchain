@@ -2,8 +2,10 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/gogo/protobuf/proto"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"strings"
 
@@ -180,20 +182,23 @@ func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.
 	return msg
 }
 
-func (msg MsgCreateSubscription) SetPeriod (period Period) error {
-	if period == nil {
-		msg.Period = nil
-		return nil
+func (msg *MsgCreateSubscription) SetPeriod (period Period) error {
+	m, ok := period.(proto.Message)
+	if !ok {
+		return fmt.Errorf("can't proto marshal %T", m)
 	}
-	any, err := codectypes.NewAnyWithValue(period)
-	if err == nil {
-		msg.Period= any
+
+	any, err := codectypes.NewAnyWithValue(m)
+	if err != nil {
+		return err
 	}
-	return err
+
+	msg.Period = any
+	return nil
 }
 
 // TODO (Stef) Look at x/gov/types/msgs.go (m MsgSubmitProposal) ValidateBasic() - content is Any
-func (msg MsgCreateSubscription) GetPeriod() Period {
+func (msg *MsgCreateSubscription) GetPeriod() Period {
 	period, ok := msg.Period.GetCachedValue().(Period)
 	if !ok {
 		return nil

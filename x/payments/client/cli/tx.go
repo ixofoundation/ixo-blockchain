@@ -8,7 +8,9 @@ import (
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
+	"strconv"
 	"strings"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
@@ -18,6 +20,28 @@ const (
 	TRUE  = "true"
 	FALSE = "false"
 )
+
+// Period types
+const (
+	BlockPeriodType string = "payments/BlockPeriod"
+	TimePeriodType string = "payments/TimePeriod"
+)
+
+type period struct {
+	Type string
+	Value map[string]string
+}
+
+func parsePeriodString(periodStr string) (*period, error){
+	period := &period{}
+
+	err := json.Unmarshal([]byte(periodStr), period)
+	if err != nil {
+		return nil, err
+	}
+
+	return period, nil
+}
 
 func parseBool(boolStr, boolName string) (bool, error) {
 	boolStr = strings.ToLower(strings.TrimSpace(boolStr))
@@ -170,10 +194,21 @@ func NewCmdCreateSubscription() *cobra.Command {
 				return err
 			}
 
+			//var p *period
+			p, err := parsePeriodString(periodStr)
+
 			var period types.Period
-			err = json.Unmarshal([]byte(periodStr), &period)
-			if err != nil {
-				return err
+			switch p.Type {
+			case BlockPeriodType:
+				periodLength, _ := strconv.ParseInt(p.Value["period_length"], 10, 64)
+				periodStartBlock, _ := strconv.ParseInt(p.Value["period_start_block"], 10, 64)
+				period = &types.BlockPeriod{PeriodLength: periodLength, PeriodStartBlock: periodStartBlock}
+			case TimePeriodType:
+				periodDuration, _ := strconv.ParseInt(p.Value["period_duration_ns"], 10, 64)
+				periodStartTime, _ := time.Parse(time.RFC3339, p.Value["period_start_time"])
+				period = &types.TimePeriod{PeriodDurationNs: time.Duration(periodDuration), PeriodStartTime: periodStartTime}
+			default:
+				return sdkerrors.Wrapf(types.ErrInvalidArgument, "%s is not a valid Period", periodStr)
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -188,6 +223,7 @@ func NewCmdCreateSubscription() *cobra.Command {
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

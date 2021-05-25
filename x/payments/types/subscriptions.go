@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -24,7 +25,7 @@ const (
 //	Period             Period   `json:"period" yaml:"period"`
 //}
 
-func (s Subscription) GetPeriod() Period {
+func (s *Subscription) GetPeriod() Period {
 	period, ok := s.Period.GetCachedValue().(Period)
 	if !ok {
 		return nil
@@ -32,16 +33,19 @@ func (s Subscription) GetPeriod() Period {
 	return period
 }
 
-func (s Subscription) SetPeriod(period Period) error {
-	if period == nil {
-		s.Period = nil
-		return nil
+func (s *Subscription) SetPeriod(period Period) error {
+	m, ok := period.(proto.Message)
+	if !ok {
+		return fmt.Errorf("can't proto marshal %T", m)
 	}
-	any, err := codectypes.NewAnyWithValue(period)
-	if err == nil {
-		s.Period = any
+
+	any, err := codectypes.NewAnyWithValue(m)
+	if err != nil {
+		return err
 	}
-	return err
+
+	s.Period = any
+	return nil
 }
 
 func (s Subscription) Validate() error {
