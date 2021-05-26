@@ -16,6 +16,7 @@ service Msg {
   rpc CreateClaim(MsgCreateClaim) returns (MsgCreateClaimResponse);
   rpc CreateEvaluation(MsgCreateEvaluation) returns (MsgCreateEvaluationResponse);
   rpc WithdrawFunds(MsgWithdrawFunds) returns (MsgWithdrawFundsResponse);
+  rpc UpdateProjectDoc(MsgUpdateProjectDoc) returns (MsgUpdateProjectDocResponse);
 }
 
 message MsgCreateProject {
@@ -91,3 +92,12 @@ message MsgWithdrawFunds {
 }
 
 message MsgWithdrawFundsResponse {}
+
+message MsgUpdateProjectDoc {
+  string tx_hash     = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did  = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  bytes data         = 4 [(gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgUpdateProjectDocResponse {}

@@ -16,6 +16,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(MsgCreateClaim{}, "project/CreateClaim", nil)
 	cdc.RegisterConcrete(MsgCreateEvaluation{}, "project/CreateEvaluation", nil)
 	cdc.RegisterConcrete(MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
+	cdc.RegisterConcrete(MsgUpdateProjectDoc{}, "project/UpdateProjectDoc", nil)
 
 	cdc.RegisterConcrete(ProjectDoc{}, "project/ProjectDoc", nil)
 	cdc.RegisterConcrete(AccountMap{}, "project/AccountMap", nil)
@@ -31,6 +32,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgCreateClaim{},
 		&MsgCreateEvaluation{},
 		&MsgWithdrawFunds{},
+		&MsgUpdateProjectDoc{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

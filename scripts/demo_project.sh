@@ -143,6 +143,27 @@ ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
 echo "Updating project to PENDING..."
 ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
 
+# Updating project doc succeeds as project is in status PENDING and tx sender DID
+# is the same as project sender DID
+PROJECT_INFO2='{
+  "nodeDid":"nodeDid",
+  "requiredClaims":"500",
+  "serviceEndpoint":"serviceEndpoint",
+  "createdOn":"2020-01-01T01:01:01.000Z",
+  "createdBy":"Creator",
+  "status":"",
+  "fees":{
+    "@context":"",
+    "items": [
+      {"@type":"OracleFee", "id":"payment:template:oracle-fee"},
+      {"@type":"FeeForService", "id":"payment:template:fee-for-service"}
+    ]
+  },
+  "newField":"someNewField"
+}'
+echo "Updating project doc..."
+ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO2" "$PROJECT_DID_FULL"
+
 # Fund project and progress status to FUNDED
 FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID")
 # Delete longest match of pattern ': ' from the beginning
@@ -157,6 +178,10 @@ ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"
 SENDER_DID="$SHAUN_DID"
 echo "Updating project to STARTED..."
 ixod_tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL"
+
+# If we try updating the project-doc now, the tx fails as the project is in status STARTED
+echo "Updating project doc fails since project is in status STARTED..."
+ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 
 # Create claim and evaluation
 echo "Creating a claim in project..."

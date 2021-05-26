@@ -37,6 +37,9 @@ func NewHandler(k keeper.Keeper, pk paymentskeeper.Keeper, bk bankkeeper.Keeper)
 		case *types.MsgWithdrawFunds:
 			res, err := msgServer.WithdrawFunds(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUpdateProjectDoc:
+			res, err := msgServer.UpdateProjectDoc(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
 				"unrecognized project Msg type: %v", msg.Type())

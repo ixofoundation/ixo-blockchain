@@ -256,6 +256,8 @@
     - [MsgCreateProjectResponse](#project.MsgCreateProjectResponse)
     - [MsgUpdateAgent](#project.MsgUpdateAgent)
     - [MsgUpdateAgentResponse](#project.MsgUpdateAgentResponse)
+    - [MsgUpdateProjectDoc](#project.MsgUpdateProjectDoc)
+    - [MsgUpdateProjectDocResponse](#project.MsgUpdateProjectDocResponse)
     - [MsgUpdateProjectStatus](#project.MsgUpdateProjectStatus)
     - [MsgUpdateProjectStatusResponse](#project.MsgUpdateProjectStatusResponse)
     - [MsgWithdrawFunds](#project.MsgWithdrawFunds)
@@ -3656,7 +3658,7 @@ GenesisState defines the did module&#39;s genesis state.
 | sender_did | [string](#string) |  |  |
 | project_did | [string](#string) |  |  |
 | pub_key | [string](#string) |  |  |
-| data | [bytes](#bytes) |  | TODO (Stef) check about customtype |
+| data | [bytes](#bytes) |  |  |
 
 
 
@@ -3694,6 +3696,34 @@ GenesisState defines the did module&#39;s genesis state.
 <a name="project.MsgUpdateAgentResponse"></a>
 
 ### MsgUpdateAgentResponse
+
+
+
+
+
+
+
+<a name="project.MsgUpdateProjectDoc"></a>
+
+### MsgUpdateProjectDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="project.MsgUpdateProjectDocResponse"></a>
+
+### MsgUpdateProjectDocResponse
 
 
 
@@ -3776,6 +3806,7 @@ check all cases in NewHandler().
 | CreateClaim | [MsgCreateClaim](#project.MsgCreateClaim) | [MsgCreateClaimResponse](#project.MsgCreateClaimResponse) |  |
 | CreateEvaluation | [MsgCreateEvaluation](#project.MsgCreateEvaluation) | [MsgCreateEvaluationResponse](#project.MsgCreateEvaluationResponse) |  |
 | WithdrawFunds | [MsgWithdrawFunds](#project.MsgWithdrawFunds) | [MsgWithdrawFundsResponse](#project.MsgWithdrawFundsResponse) |  |
+| UpdateProjectDoc | [MsgUpdateProjectDoc](#project.MsgUpdateProjectDoc) | [MsgUpdateProjectDocResponse](#project.MsgUpdateProjectDocResponse) |  |
 
  
 

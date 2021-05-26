@@ -18,6 +18,7 @@ const (
 	TypeMsgCreateClaim         = "create-claim"
 	TypeMsgCreateEvaluation    = "create-evaluation"
 	TypeMsgWithdrawFunds       = "withdraw-funds"
+	TypeMsgUpdateProjectDoc    = "update-project-doc"
 
 	MsgCreateProjectTotalFee       = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
@@ -32,6 +33,7 @@ var (
 	_ ixotypes.IxoMsg = &MsgCreateClaim{}
 	_ ixotypes.IxoMsg = &MsgCreateEvaluation{}
 	_ ixotypes.IxoMsg = &MsgWithdrawFunds{}
+	_ ixotypes.IxoMsg = &MsgUpdateProjectDoc{}
 )
 
 //type MsgCreateProject struct {
@@ -468,4 +470,50 @@ func (msg MsgWithdrawFunds) String() string {
 	}
 
 	return string(b)
+}
+
+func NewMsgUpdateProjectDoc(senderDid did.Did, projectData json.RawMessage, projectDid did.Did) *MsgUpdateProjectDoc {
+	return &MsgUpdateProjectDoc{
+		TxHash:     "",
+		SenderDid:  senderDid,
+		ProjectDid: projectDid,
+		Data:       projectData,
+	}
+}
+
+func (msg MsgUpdateProjectDoc) Type() string  { return TypeMsgUpdateProjectDoc }
+func (msg MsgUpdateProjectDoc) Route() string { return RouterKey }
+
+func (msg MsgUpdateProjectDoc) ValidateBasic() error {
+	// Check that not empty
+	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
+		return err
+	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+		return err
+	}
+
+	// Check that data marshallable to map[string]json.RawMessage
+	var dataMap ProjectDataMap
+	err := json.Unmarshal(msg.Data, &dataMap)
+	if err != nil {
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project data map")
+	}
+
+	// Check that DIDs valid
+	if !did.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
+	} else if !did.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	}
+
+	return nil
+}
+
+func (msg MsgUpdateProjectDoc) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgUpdateProjectDoc) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgUpdateProjectDoc) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
