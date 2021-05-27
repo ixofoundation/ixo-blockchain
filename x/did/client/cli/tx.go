@@ -28,6 +28,11 @@ func NewCmdAddDidDoc() *cobra.Command {
 			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
@@ -64,6 +69,11 @@ func NewCmdAddCredential() *cobra.Command {
 			}
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
 			if err := msg.ValidateBasic() ; err != nil {
 				return err
 			}
