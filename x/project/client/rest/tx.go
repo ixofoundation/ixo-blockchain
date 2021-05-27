@@ -23,6 +23,7 @@ func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/project/create_claim", createClaimRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/project/create_evaluation", createEvaluationRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/project/withdraw_funds", withdrawFundsRequestHandler(clientCtx)).Methods("POST")
+	r.Handle("/project/update_project_doc", updateProjectDocRequestHandler(clientCtx)).Methods("PUT")
 }
 
 type createProjectReq struct {
@@ -226,6 +227,36 @@ func withdrawFundsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data)
+		if err := msg.ValidateBasic(); err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+type updateProjectDocReq struct {
+	BaseReq    rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	TxHash     string          `json:"txHash" yaml:"txHash"`
+	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	Data       json.RawMessage `json:"data" yaml:"data"`
+}
+
+func updateProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req updateProjectDocReq
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		req.BaseReq = req.BaseReq.Sanitize()
+		if !req.BaseReq.ValidateBasic(w) {
+			return
+		}
+
+		msg := types.NewMsgUpdateProjectDoc(req.SenderDid, req.Data, req.ProjectDid)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

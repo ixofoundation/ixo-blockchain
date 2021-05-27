@@ -90,7 +90,6 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 	return &types.MsgCreateProjectResponse{}, nil
 }
 
-// TODO (Stef) Why isn't there a bank keeper inside the keeper?
 func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpdateProjectStatus) (*types.MsgUpdateProjectStatusResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
@@ -494,6 +493,54 @@ func (s msgServer) WithdrawFunds(goCtx context.Context, msg *types.MsgWithdrawFu
 	})
 
 	return &types.MsgWithdrawFundsResponse{}, nil
+}
+
+func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateProjectDoc) (*types.MsgUpdateProjectDocResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	k := s.Keeper
+
+	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
+	if err != nil {
+		return nil, sdkerrors.Wrap(did.ErrInvalidDid, "could not find project")
+	}
+
+	// Get and validate project fees map
+	err = k.ValidateProjectFeesMap(ctx, projectDoc.GetProjectFeesMap())
+	if err != nil {
+		return nil, err
+	}
+
+	// Editor of project doc has to be the same as project creator
+	if msg.SenderDid != projectDoc.SenderDid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"only project creator can edit project doc")
+	}
+
+	// Project doc can be updated when in states Null, Created, Pending, or Funded
+	// and cannot be edited when in states Started, Stopped, and Paidout
+	status := types.ProjectStatusFromString(projectDoc.Status)
+	if status == types.StartedStatus || status == types.StoppedStatus || status == types.PaidoutStatus {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
+			"project doc cannot be updated when project is in status %s", projectDoc.Status)
+	}
+
+	projectDoc.Data = msg.Data
+	k.SetProjectDoc(ctx, projectDoc)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeUpdateProjectStatus,
+			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
+
+	return &types.MsgUpdateProjectDocResponse{}, nil
 }
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid did.Did,

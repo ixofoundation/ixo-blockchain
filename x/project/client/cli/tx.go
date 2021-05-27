@@ -28,6 +28,7 @@ func NewTxCmd() *cobra.Command {
 		NewCmdCreateClaim(),
 		NewCmdCreateEvaluation(),
 		NewCmdWithdrawFunds(),
+		NewCmdUpdateProjectDoc(),
 	)
 
 	return projectTxCmd
@@ -287,6 +288,35 @@ func NewCmdWithdrawFunds() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
+
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdUpdateProjectDoc() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-project-doc [sender-did] [project-data-json] [ixo-did]",
+		Short: "Update a project's data signed by the ixoDid of the project",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			senderDid := args[0]
+			projectDataStr := args[1]
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[2])
+			if err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+
+			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did)
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
