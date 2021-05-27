@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -317,6 +318,87 @@ func IxoSigVerificationGasConsumer(
 	default:
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidPubKey, "unrecognized public key type: %T", pubkey)
 	}
+}
+
+func SignAndBroadcastTxFromStdSignMsg(clientCtx client.Context,
+	msg sdk.Msg, ixoDid exported.IxoDid, flagSet *pflag.FlagSet) (*sdk.TxResponse, error) {
+
+	// sign the transaction - copied old Sign function here
+	//txBytes, err := Sign(clientCtx, msg, ixoDid)
+	//if err != nil {
+	//	return sdk.TxResponse{}, err
+	//}
+
+	// Signing legacy
+	//var privateKey ed25519.PrivKey
+	//privateKey.Key = append(base58.Decode(ixoDid.Secret.SignKey), base58.Decode(ixoDid.VerifyKey)...)
+	//
+	//sig, err := MakeSignature(msg.Bytes(), privateKey)
+	//if err != nil {
+	//	return &sdk.TxResponse{}, err
+	//}
+	//
+	//encoder := authclient.GetTxEncoder(clientCtx.LegacyAmino)
+	//txBytes , err := encoder(legacytx.NewStdTx(msg.Msgs, msg.Fee, []legacytx.StdSignature{sig}, msg.Memo))
+	//if err != nil {
+	//	return &sdk.TxResponse{}, err
+	//}
+
+	txf := tx.NewFactoryCLI(clientCtx, flagSet)
+	txf = txf.WithFees("1000000uixo").WithGasPrices("").WithGas(0)
+
+	tx, err := tx.BuildUnsignedTx(txf, msg)
+	if err != nil {
+		return nil, err
+	}
+
+	if !clientCtx.SkipConfirm {
+		out, err := clientCtx.TxConfig.TxJSONEncoder()(tx.GetTx())
+		if err != nil {
+			return nil, err
+		}
+
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
+
+		buf := bufio.NewReader(os.Stdin)
+		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
+
+		if err != nil || !ok {
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+			return nil, err
+		}
+	}
+
+	err = Sign(txf, clientCtx, tx, true, ixoDid)
+	if err != nil {
+		return nil, err
+	}
+
+	txBytes, err := clientCtx.TxConfig.TxEncoder()(tx.GetTx())
+	if err != nil {
+		return nil, err
+	}
+
+	// broadcast to a Tendermint node
+	res, err := clientCtx.BroadcastTx(txBytes)
+	if err != nil {
+		return &sdk.TxResponse{}, err
+	}
+
+	return res, nil
+}
+
+func MakeSignature(signBytes []byte,
+	privateKey ed25519.PrivKey) (legacytx.StdSignature, error) {
+	sig, err := privateKey.Sign(signBytes)
+	if err != nil {
+		return legacytx.StdSignature{}, err
+	}
+
+	return legacytx.StdSignature{
+		PubKey:    privateKey.PubKey(),
+		Signature: sig,
+	}, nil
 }
 
 //func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdSignature, params auth.Params) {

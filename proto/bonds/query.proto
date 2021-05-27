@@ -99,7 +99,7 @@ message QueryLastBatchRequest{
 }
 
 message QueryLastBatchResponse {
-  Batch batch = 1 [(gogoproto.moretags) = "yaml:\"batch\""];
+  Batch last_batch = 1 [(gogoproto.moretags) = "yaml:\"last_batch\""];
 }
 
 message QueryCurrentPriceRequest {
@@ -107,7 +107,7 @@ message QueryCurrentPriceRequest {
 }
 
 message QueryCurrentPriceResponse {
-  repeated cosmos.base.v1beta1.DecCoin buy_prices  = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"buy_prices\""];
+  repeated cosmos.base.v1beta1.DecCoin current_price  = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"current_price\""];
 }
 
 message QueryCurrentReserveRequest {
@@ -115,7 +115,7 @@ message QueryCurrentReserveRequest {
 }
 
 message QueryCurrentReserveResponse {
-  repeated cosmos.base.v1beta1.Coin coins = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"coins\""];
+  repeated cosmos.base.v1beta1.Coin current_reserve = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"current_reserve\""];
 }
 
 message QueryCustomPriceRequest {
@@ -124,7 +124,7 @@ message QueryCustomPriceRequest {
 }
 
 message QueryCustomPriceResponse {
-  repeated cosmos.base.v1beta1.DecCoin dec_coins = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"dec_coins\""];
+  repeated cosmos.base.v1beta1.DecCoin price = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"price\""];
 }
 
 message QueryBuyPriceRequest {

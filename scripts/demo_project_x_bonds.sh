@@ -19,8 +19,10 @@ if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
-PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
+PASSWORD="12345678"
+CHAIN_ID="pandora-2"
+
 yes 'y' | ixod keys delete fee --force > /dev/null 2>&1
 yes $PASSWORD | ixod keys add fee > /dev/null 2>&1
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
@@ -143,7 +145,7 @@ OWNER_DID=$(echo "$OWNER_DID_FULL" | cut -d \" -f 4)
 ixod_tx did add-did-doc "$ORACLE_DID_FULL" --broadcast-mode block
 ixod_tx did add-did-doc "$IXO_DID_FULL" --broadcast-mode block
 
-# Fund DID and owner accounts using ixo DID for gas fees
+# Fund DID and owner accounts using Miguel's tokens
 echo "Funding DID and owner accounts..."
 ADDR1=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_1_FULL")")
 ADDR2=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_2_FULL")")
@@ -156,17 +158,17 @@ ADDR8=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_8_F
 ADDR9=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_9_FULL")")
 ADDR10=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_10_FULL)")
 OWNER_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$OWNER_DID_FULL")")
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR1" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR2" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR3" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR4" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR5" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR6" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR7" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR8" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR9" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$ADDR10" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$OWNER_ADDR" 10000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+ixod_tx bank send miguel "$ADDR1" 10000000uixo
+ixod_tx bank send miguel "$ADDR2" 10000000uixo
+ixod_tx bank send miguel "$ADDR3" 10000000uixo
+ixod_tx bank send miguel "$ADDR4" 10000000uixo
+ixod_tx bank send miguel "$ADDR5" 10000000uixo
+ixod_tx bank send miguel "$ADDR6" 10000000uixo
+ixod_tx bank send miguel "$ADDR7" 10000000uixo
+ixod_tx bank send miguel "$ADDR8" 10000000uixo
+ixod_tx bank send miguel "$ADDR9" 10000000uixo
+ixod_tx bank send miguel "$ADDR10" 10000000uixo
+ixod_tx bank send miguel "$OWNER_ADDR" 10000000uixo
 
 # Each DID including the owner now has 10IXO for gas fees 
 # DID_1_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
@@ -188,14 +190,16 @@ ixod_tx did add-did-doc "$DID_9_FULL"
 ixod_tx did add-did-doc "$DID_10_FULL"
 ixod_tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block
 
+
 # Fund oracle and ixo DID for gas fees (commented out since oracle and ixo DID are funded at genesis)
 # echo "Funding oracle and ixo DID..."
 # yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $ORACLE_DID)" 1000000uixo --broadcast-mode=block
 # yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $IXO_DID)" 10000000000uixo --broadcast-mode=block
 
 # Fund Owner with 300xGBP (300000000uxgbp)
-echo "Funding Owner DID with 300xGBP (using treasury 'oracle-mint' using oracle)..."
-ixod_tx treasury oracle-mint "$OWNER_ADDR" 300000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+echo "Funding Owner DID with 300xGBP using Miguel's tokens..."
+ixod_tx bank send miguel "$OWNER_ADDR" 300000000uxgbp --broadcast-mode block
+
 
 # Owner now has 300xGBP to use in the project
 # Side note: we can now query the account using just the DID instead of using get_pubkey.js, since the DID has been registered.
@@ -233,6 +237,7 @@ ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATO
 echo "Creating fee-for-service payment template..."
 CREATOR="$IXO_DID_FULL"
 ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block
+ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create project and progress status to PENDING
 SENDER_DID="$OWNER_DID"
@@ -244,10 +249,10 @@ echo "Updating project to PENDING..."
 ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Fund project with 100xGBP and 1000 IXO (for fees)
-PROJECT_ADDR=$(ixod_q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
-echo "Funding project with uixo and uxgbp (using treasury 'oracle-mint' and 'oracle-transfer' using oracle)..."
-ixod_tx treasury oracle-mint "$PROJECT_ADDR" 100000000uxgbp "$ORACLE_DID_FULL" "proof" --broadcast-mode block
-ixod_tx treasury oracle-transfer "$IXO_DID" "$PROJECT_ADDR" 1000000000uixo "$ORACLE_DID_FULL" "proof" --broadcast-mode block
+PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
+echo "Funding project with uixo and uxgbp (using Miguel's tokens)..."
+ixod_tx bank send miguel "$PROJECT_ADDR" 100000000uxgbp --broadcast-mode block
+ixod_tx bank send miguel "$PROJECT_ADDR" 1000000000uixo --broadcast-mode block
 
 # Progress project status to FUNDED and STARTED
 SENDER_DID="$OWNER_DID"
@@ -268,6 +273,7 @@ ixod_tx project create-claim "tx_hash" "$DID_7" "claim7" "template_id" "$PROJECT
 ixod_tx project create-claim "tx_hash" "$DID_8" "claim8" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
 ixod_tx project create-claim "tx_hash" "$DID_9" "claim9" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
 ixod_tx project create-claim "tx_hash" "$DID_10" "claim10" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block
+
 
 # Create evaluations
 echo "Creating evaluations in project..."
@@ -300,7 +306,10 @@ ixod_tx bonds buy 122574uabc 1000000uxgbp "$BOND_DID" "$DID_5_FULL" --broadcast-
 
 # Make outcome payment
 echo "Owner makes outcome payment..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "$OWNER_DID_FULL" --broadcast-mode block
+ixod_tx bonds make-outcome-payment "$BOND_DID" 100000000 "$OWNER_DID_FULL" --broadcast-mode block
+
+# Owner updates bond state to SETTLE
+ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$OWNER_DID_FULL"
 
 # Withdraw reserve shares
 echo "Withdrawing shares (DID 1-5)..."

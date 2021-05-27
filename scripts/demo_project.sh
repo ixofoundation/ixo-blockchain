@@ -21,6 +21,7 @@ fi
 
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
+CHAIN_ID="pandora-2"
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -148,9 +149,11 @@ echo "Updating project to PENDING..."
 ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
 
 # Fund project and progress status to FUNDED
-PROJECT_ADDR=$(ixod_q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
-echo "Funding project at [$PROJECT_ADDR] with uixo (using treasury 'oracle-transfer' using Francesco oracle)..."
-ixod_tx treasury oracle-mint "$PROJECT_ADDR" 100000000uixo "$FRANCESCO_DID_FULL" "dummy proof"
+FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID")
+# Delete longest match of pattern ': ' from the beginning
+PROJECT_ADDR=${FULL_PROJECT_ADDR##*: }
+echo "Funding project at [$PROJECT_ADDR] with uixo from Francesco..."
+ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"
@@ -222,7 +225,7 @@ ixod_q auth account "$(ixod_q did get-address-from-did $SHAUN_DID)"
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
 echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
-DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
+DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"is_refund\":true}"
 ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID
@@ -233,7 +236,7 @@ ixod_q project get-project-txs $PROJECT_DID
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
 echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
-DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
+DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"is_refund\":true}"
 ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID

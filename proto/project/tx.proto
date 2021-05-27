@@ -1,0 +1,93 @@
+syntax = "proto3";
+package project;
+
+import "gogoproto/gogo.proto";
+import "project/project.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
+
+// To get a list of all module messages, go to your module's handler.go and
+// check all cases in NewHandler().
+service Msg {
+  rpc CreateProject(MsgCreateProject) returns (MsgCreateProjectResponse);
+  rpc UpdateProjectStatus(MsgUpdateProjectStatus) returns (MsgUpdateProjectStatusResponse);
+  rpc CreateAgent(MsgCreateAgent) returns (MsgCreateAgentResponse);
+  rpc UpdateAgent(MsgUpdateAgent) returns (MsgUpdateAgentResponse);
+  rpc CreateClaim(MsgCreateClaim) returns (MsgCreateClaimResponse);
+  rpc CreateEvaluation(MsgCreateEvaluation) returns (MsgCreateEvaluationResponse);
+  rpc WithdrawFunds(MsgWithdrawFunds) returns (MsgWithdrawFundsResponse);
+}
+
+message MsgCreateProject {
+  option (gogoproto.goproto_stringer) = false;
+
+  string tx_hash     = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did  = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  string pub_key     = 4 [(gogoproto.moretags) = "yaml:\"pub_key\""];
+  bytes data         = 5 [(gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgCreateProjectResponse {}
+
+message MsgUpdateProjectStatus {
+  string tx_hash              = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did           = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did          = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgUpdateProjectStatusResponse{}
+
+message MsgCreateAgent {
+  option (gogoproto.goproto_stringer) = false;
+
+  string tx_hash      = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did   = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did  = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  CreateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgCreateAgentResponse {}
+
+message MsgUpdateAgent {
+  option (gogoproto.goproto_stringer) = false;
+
+  string tx_hash      = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did   = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did  = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  UpdateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgUpdateAgentResponse {}
+
+message MsgCreateClaim {
+  option (gogoproto.goproto_stringer) = false;
+
+  string tx_hash      = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did   = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did  = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  CreateClaimDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgCreateClaimResponse {}
+
+message MsgCreateEvaluation {
+  option (gogoproto.goproto_stringer) = false;
+
+  string tx_hash           = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
+  string sender_did        = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  string project_did       = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
+  CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgCreateEvaluationResponse {}
+
+message MsgWithdrawFunds {
+  option (gogoproto.goproto_stringer) = false;
+
+  string sender_did     = 1 [(gogoproto.moretags) = "yaml:\"sender_did\""];
+  WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+}
+
+message MsgWithdrawFundsResponse {}

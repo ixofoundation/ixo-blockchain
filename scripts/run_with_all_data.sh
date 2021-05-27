@@ -23,7 +23,7 @@ yes $PASSWORD | ixod keys add fee4
 yes $PASSWORD | ixod keys add fee5
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
 yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 1000000000000uixo,1000000000000res,1000000000000rez
 
@@ -100,5 +100,9 @@ sed -i "107s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 #FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
 #TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 #sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
+
+# Set timeouts to 1s for shorter block times
+sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
+sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
 
 ixod start --pruning "nothing"

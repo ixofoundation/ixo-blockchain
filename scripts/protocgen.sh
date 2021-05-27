@@ -20,16 +20,12 @@ protoc_gen_doc
 
 proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
-  echo "hi"
-
   buf protoc \
   -I "proto" \
   -I "third_party/proto" \
   --gocosmos_out=plugins=interfacetype+grpc,\
 Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
-
-  echo "$dir .pb.go generated"
 
   # command to generate gRPC gateway (*.pb.gw.go in respective modules) files
   buf protoc \
@@ -38,7 +34,6 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   --grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
 
-  echo "$dir .pb.gw.go generated"
 done
 
 echo "done"

@@ -21,6 +21,7 @@ fi
 
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
+CHAIN_ID="pandora-2"
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -117,6 +118,7 @@ PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
 PAYER_ADDR="$(ixod_q did get-address-from-did $FRANCESCO_DID)"
+
 ixod_tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR"
 
 # Authorise payment contract
@@ -137,6 +139,7 @@ PERIOD='{
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
 ixod_tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR"
+#####GETTING ERROR HERE#####
 
 echo "Wait a few seconds for the subscription to get effected..."
 sleep 6

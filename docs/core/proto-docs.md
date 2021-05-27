@@ -170,6 +170,99 @@
   
     - [Msg](#did.Msg)
   
+- [payments/payments.proto](#payments/payments.proto)
+    - [BlockPeriod](#payments.BlockPeriod)
+    - [Discount](#payments.Discount)
+    - [DistributionShare](#payments.DistributionShare)
+    - [PaymentContract](#payments.PaymentContract)
+    - [PaymentTemplate](#payments.PaymentTemplate)
+    - [Subscription](#payments.Subscription)
+    - [TimePeriod](#payments.TimePeriod)
+  
+- [payments/genesis.proto](#payments/genesis.proto)
+    - [GenesisState](#payments.GenesisState)
+  
+- [payments/query.proto](#payments/query.proto)
+    - [QueryPaymentContractRequest](#payments.QueryPaymentContractRequest)
+    - [QueryPaymentContractResponse](#payments.QueryPaymentContractResponse)
+    - [QueryPaymentContractsByIdPrefixRequest](#payments.QueryPaymentContractsByIdPrefixRequest)
+    - [QueryPaymentContractsByIdPrefixResponse](#payments.QueryPaymentContractsByIdPrefixResponse)
+    - [QueryPaymentTemplateRequest](#payments.QueryPaymentTemplateRequest)
+    - [QueryPaymentTemplateResponse](#payments.QueryPaymentTemplateResponse)
+    - [QuerySubscriptionRequest](#payments.QuerySubscriptionRequest)
+    - [QuerySubscriptionResponse](#payments.QuerySubscriptionResponse)
+  
+    - [Query](#payments.Query)
+  
+- [payments/tx.proto](#payments/tx.proto)
+    - [MsgCreatePaymentContract](#payments.MsgCreatePaymentContract)
+    - [MsgCreatePaymentContractResponse](#payments.MsgCreatePaymentContractResponse)
+    - [MsgCreatePaymentTemplate](#payments.MsgCreatePaymentTemplate)
+    - [MsgCreatePaymentTemplateResponse](#payments.MsgCreatePaymentTemplateResponse)
+    - [MsgCreateSubscription](#payments.MsgCreateSubscription)
+    - [MsgCreateSubscriptionResponse](#payments.MsgCreateSubscriptionResponse)
+    - [MsgEffectPayment](#payments.MsgEffectPayment)
+    - [MsgEffectPaymentResponse](#payments.MsgEffectPaymentResponse)
+    - [MsgGrantDiscount](#payments.MsgGrantDiscount)
+    - [MsgGrantDiscountResponse](#payments.MsgGrantDiscountResponse)
+    - [MsgRevokeDiscount](#payments.MsgRevokeDiscount)
+    - [MsgRevokeDiscountResponse](#payments.MsgRevokeDiscountResponse)
+    - [MsgSetPaymentContractAuthorisation](#payments.MsgSetPaymentContractAuthorisation)
+    - [MsgSetPaymentContractAuthorisationResponse](#payments.MsgSetPaymentContractAuthorisationResponse)
+  
+    - [Msg](#payments.Msg)
+  
+- [project/project.proto](#project/project.proto)
+    - [AccountMap](#project.AccountMap)
+    - [AccountMap.MapEntry](#project.AccountMap.MapEntry)
+    - [Claim](#project.Claim)
+    - [Claims](#project.Claims)
+    - [CreateAgentDoc](#project.CreateAgentDoc)
+    - [CreateClaimDoc](#project.CreateClaimDoc)
+    - [CreateEvaluationDoc](#project.CreateEvaluationDoc)
+    - [GenesisAccountMap](#project.GenesisAccountMap)
+    - [GenesisAccountMap.MapEntry](#project.GenesisAccountMap.MapEntry)
+    - [Params](#project.Params)
+    - [ProjectDoc](#project.ProjectDoc)
+    - [UpdateAgentDoc](#project.UpdateAgentDoc)
+    - [UpdateProjectStatusDoc](#project.UpdateProjectStatusDoc)
+    - [WithdrawFundsDoc](#project.WithdrawFundsDoc)
+    - [WithdrawalInfoDoc](#project.WithdrawalInfoDoc)
+    - [WithdrawalInfoDocs](#project.WithdrawalInfoDocs)
+  
+- [project/genesis.proto](#project/genesis.proto)
+    - [GenesisState](#project.GenesisState)
+  
+- [project/query.proto](#project/query.proto)
+    - [QueryParamsRequest](#project.QueryParamsRequest)
+    - [QueryParamsResponse](#project.QueryParamsResponse)
+    - [QueryProjectAccountsRequest](#project.QueryProjectAccountsRequest)
+    - [QueryProjectAccountsResponse](#project.QueryProjectAccountsResponse)
+    - [QueryProjectDocRequest](#project.QueryProjectDocRequest)
+    - [QueryProjectDocResponse](#project.QueryProjectDocResponse)
+    - [QueryProjectTxRequest](#project.QueryProjectTxRequest)
+    - [QueryProjectTxResponse](#project.QueryProjectTxResponse)
+  
+    - [Query](#project.Query)
+  
+- [project/tx.proto](#project/tx.proto)
+    - [MsgCreateAgent](#project.MsgCreateAgent)
+    - [MsgCreateAgentResponse](#project.MsgCreateAgentResponse)
+    - [MsgCreateClaim](#project.MsgCreateClaim)
+    - [MsgCreateClaimResponse](#project.MsgCreateClaimResponse)
+    - [MsgCreateEvaluation](#project.MsgCreateEvaluation)
+    - [MsgCreateEvaluationResponse](#project.MsgCreateEvaluationResponse)
+    - [MsgCreateProject](#project.MsgCreateProject)
+    - [MsgCreateProjectResponse](#project.MsgCreateProjectResponse)
+    - [MsgUpdateAgent](#project.MsgUpdateAgent)
+    - [MsgUpdateAgentResponse](#project.MsgUpdateAgentResponse)
+    - [MsgUpdateProjectStatus](#project.MsgUpdateProjectStatus)
+    - [MsgUpdateProjectStatusResponse](#project.MsgUpdateProjectStatusResponse)
+    - [MsgWithdrawFunds](#project.MsgWithdrawFunds)
+    - [MsgWithdrawFundsResponse](#project.MsgWithdrawFundsResponse)
+  
+    - [Msg](#project.Msg)
+  
 - [Scalar Value Types](#scalar-value-types)
 
 
@@ -460,7 +553,7 @@ IntProto defines a Protobuf wrapper around an Int object.
 <a name="bonds.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the did module&#39;s genesis state.
+GenesisState defines the bonds module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
@@ -690,7 +783,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| buy_prices | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
+| current_price | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
 
 
 
@@ -720,7 +813,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| current_reserve | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 
 
 
@@ -751,7 +844,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| dec_coins | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
+| price | [cosmos.base.v1beta1.DecCoin](#cosmos.base.v1beta1.DecCoin) | repeated |  |
 
 
 
@@ -781,7 +874,7 @@ x/bonds/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| batch | [Batch](#bonds.Batch) |  |  |
+| last_batch | [Batch](#bonds.Batch) |  |  |
 
 
 
@@ -898,6 +991,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 | ----------- | ------------ | ------------- | ------------|
 | Bonds | [QueryBondsRequest](#bonds.QueryBondsRequest) | [QueryBondsResponse](#bonds.QueryBondsResponse) |  |
 | BondsDetailed | [QueryBondsDetailedRequest](#bonds.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#bonds.QueryBondsDetailedResponse) |  |
+| Params | [QueryParamsRequest](#bonds.QueryParamsRequest) | [QueryParamsResponse](#bonds.QueryParamsResponse) |  |
 | Bond | [QueryBondRequest](#bonds.QueryBondRequest) | [QueryBondResponse](#bonds.QueryBondResponse) |  |
 | Batch | [QueryBatchRequest](#bonds.QueryBatchRequest) | [QueryBatchResponse](#bonds.QueryBatchResponse) |  |
 | LastBatch | [QueryLastBatchRequest](#bonds.QueryLastBatchRequest) | [QueryLastBatchResponse](#bonds.QueryLastBatchResponse) |  |
@@ -908,7 +1002,6 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 | SellReturn | [QuerySellReturnRequest](#bonds.QuerySellReturnRequest) | [QuerySellReturnResponse](#bonds.QuerySellReturnResponse) |  |
 | SwapReturn | [QuerySwapReturnRequest](#bonds.QuerySwapReturnRequest) | [QuerySwapReturnResponse](#bonds.QuerySwapReturnResponse) |  |
 | AlphaMaximums | [QueryAlphaMaximumsRequest](#bonds.QueryAlphaMaximumsRequest) | [QueryAlphaMaximumsResponse](#bonds.QueryAlphaMaximumsResponse) |  |
-| Params | [QueryParamsRequest](#bonds.QueryParamsRequest) | [QueryParamsResponse](#bonds.QueryParamsResponse) |  |
 
  
 
@@ -2442,6 +2535,1247 @@ check all cases in NewHandler().
 | ----------- | ------------ | ------------- | ------------|
 | AddDid | [MsgAddDid](#did.MsgAddDid) | [MsgAddDidResponse](#did.MsgAddDidResponse) |  |
 | AddCredential | [MsgAddCredential](#did.MsgAddCredential) | [MsgAddCredentialResponse](#did.MsgAddCredentialResponse) |  |
+
+ 
+
+
+
+<a name="payments/payments.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## payments/payments.proto
+
+
+
+<a name="payments.BlockPeriod"></a>
+
+### BlockPeriod
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| period_length | [int64](#int64) |  |  |
+| period_start_block | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="payments.Discount"></a>
+
+### Discount
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| percent | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.DistributionShare"></a>
+
+### DistributionShare
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| percentage | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.PaymentContract"></a>
+
+### PaymentContract
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| payment_template_id | [string](#string) |  |  |
+| creator | [string](#string) |  |  |
+| payer | [string](#string) |  |  |
+| recipients | [DistributionShare](#payments.DistributionShare) | repeated |  |
+| cumulative_pay | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| current_remainder | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| can_deauthorise | [bool](#bool) |  |  |
+| authorised | [bool](#bool) |  |  |
+| discount_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.PaymentTemplate"></a>
+
+### PaymentTemplate
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| payment_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| payment_minimum | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| payment_maximum | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| discounts | [Discount](#payments.Discount) | repeated |  |
+
+
+
+
+
+
+<a name="payments.Subscription"></a>
+
+### Subscription
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| payment_contract_id | [string](#string) |  |  |
+| periods_so_far | [string](#string) |  |  |
+| max_periods | [string](#string) |  |  |
+| periods_accumulated | [string](#string) |  |  |
+| period | [google.protobuf.Any](#google.protobuf.Any) |  |  |
+
+
+
+
+
+
+<a name="payments.TimePeriod"></a>
+
+### TimePeriod
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| period_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
+| period_start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="payments/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## payments/genesis.proto
+
+
+
+<a name="payments.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the payments module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_templates | [PaymentTemplate](#payments.PaymentTemplate) | repeated |  |
+| payment_contracts | [PaymentContract](#payments.PaymentContract) | repeated |  |
+| subscriptions | [Subscription](#payments.Subscription) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="payments/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## payments/query.proto
+
+
+
+<a name="payments.QueryPaymentContractRequest"></a>
+
+### QueryPaymentContractRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_contract_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.QueryPaymentContractResponse"></a>
+
+### QueryPaymentContractResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_contract | [PaymentContract](#payments.PaymentContract) |  |  |
+
+
+
+
+
+
+<a name="payments.QueryPaymentContractsByIdPrefixRequest"></a>
+
+### QueryPaymentContractsByIdPrefixRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_contracts_id_prefix | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.QueryPaymentContractsByIdPrefixResponse"></a>
+
+### QueryPaymentContractsByIdPrefixResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_contracts | [PaymentContract](#payments.PaymentContract) | repeated |  |
+
+
+
+
+
+
+<a name="payments.QueryPaymentTemplateRequest"></a>
+
+### QueryPaymentTemplateRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_template_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.QueryPaymentTemplateResponse"></a>
+
+### QueryPaymentTemplateResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_template | [PaymentTemplate](#payments.PaymentTemplate) |  |  |
+
+
+
+
+
+
+<a name="payments.QuerySubscriptionRequest"></a>
+
+### QuerySubscriptionRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscription_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.QuerySubscriptionResponse"></a>
+
+### QuerySubscriptionResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscription | [Subscription](#payments.Subscription) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="payments.Query"></a>
+
+### Query
+To get a list of all module queries, go to your module&#39;s keeper/querier.go
+and check all cases in NewQuerier(). REST endpoints taken from previous
+payments/client/rest/query.go
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| PaymentTemplate | [QueryPaymentTemplateRequest](#payments.QueryPaymentTemplateRequest) | [QueryPaymentTemplateResponse](#payments.QueryPaymentTemplateResponse) |  |
+| PaymentContract | [QueryPaymentContractRequest](#payments.QueryPaymentContractRequest) | [QueryPaymentContractResponse](#payments.QueryPaymentContractResponse) |  |
+| PaymentContractsByIdPrefix | [QueryPaymentContractsByIdPrefixRequest](#payments.QueryPaymentContractsByIdPrefixRequest) | [QueryPaymentContractsByIdPrefixResponse](#payments.QueryPaymentContractsByIdPrefixResponse) |  |
+| Subscription | [QuerySubscriptionRequest](#payments.QuerySubscriptionRequest) | [QuerySubscriptionResponse](#payments.QuerySubscriptionResponse) |  |
+
+ 
+
+
+
+<a name="payments/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## payments/tx.proto
+
+
+
+<a name="payments.MsgCreatePaymentContract"></a>
+
+### MsgCreatePaymentContract
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| creator_did | [string](#string) |  |  |
+| payment_template_id | [string](#string) |  |  |
+| payment_contract_id | [string](#string) |  |  |
+| payer | [string](#string) |  |  |
+| recipients | [DistributionShare](#payments.DistributionShare) | repeated |  |
+| can_deauthorise | [bool](#bool) |  |  |
+| discount_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgCreatePaymentContractResponse"></a>
+
+### MsgCreatePaymentContractResponse
+
+
+
+
+
+
+
+<a name="payments.MsgCreatePaymentTemplate"></a>
+
+### MsgCreatePaymentTemplate
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| creator_did | [string](#string) |  |  |
+| payment_template | [PaymentTemplate](#payments.PaymentTemplate) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgCreatePaymentTemplateResponse"></a>
+
+### MsgCreatePaymentTemplateResponse
+
+
+
+
+
+
+
+<a name="payments.MsgCreateSubscription"></a>
+
+### MsgCreateSubscription
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| creator_did | [string](#string) |  |  |
+| subscription_id | [string](#string) |  |  |
+| payment_contract_id | [string](#string) |  |  |
+| max_periods | [string](#string) |  |  |
+| period | [google.protobuf.Any](#google.protobuf.Any) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgCreateSubscriptionResponse"></a>
+
+### MsgCreateSubscriptionResponse
+
+
+
+
+
+
+
+<a name="payments.MsgEffectPayment"></a>
+
+### MsgEffectPayment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender_did | [string](#string) |  |  |
+| payment_contract_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgEffectPaymentResponse"></a>
+
+### MsgEffectPaymentResponse
+
+
+
+
+
+
+
+<a name="payments.MsgGrantDiscount"></a>
+
+### MsgGrantDiscount
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender_did | [string](#string) |  |  |
+| payment_contract_id | [string](#string) |  |  |
+| discount_id | [string](#string) |  |  |
+| recipient | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgGrantDiscountResponse"></a>
+
+### MsgGrantDiscountResponse
+
+
+
+
+
+
+
+<a name="payments.MsgRevokeDiscount"></a>
+
+### MsgRevokeDiscount
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender_did | [string](#string) |  |  |
+| payment_contract_id | [string](#string) |  |  |
+| holder | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgRevokeDiscountResponse"></a>
+
+### MsgRevokeDiscountResponse
+
+
+
+
+
+
+
+<a name="payments.MsgSetPaymentContractAuthorisation"></a>
+
+### MsgSetPaymentContractAuthorisation
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_contract_id | [string](#string) |  |  |
+| payer_did | [string](#string) |  |  |
+| authorised | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="payments.MsgSetPaymentContractAuthorisationResponse"></a>
+
+### MsgSetPaymentContractAuthorisationResponse
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="payments.Msg"></a>
+
+### Msg
+To get a list of all module messages, go to your module&#39;s handler.go and
+check all cases in NewHandler().
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| SetPaymentContractAuthorisation | [MsgSetPaymentContractAuthorisation](#payments.MsgSetPaymentContractAuthorisation) | [MsgSetPaymentContractAuthorisationResponse](#payments.MsgSetPaymentContractAuthorisationResponse) |  |
+| CreatePaymentTemplate | [MsgCreatePaymentTemplate](#payments.MsgCreatePaymentTemplate) | [MsgCreatePaymentTemplateResponse](#payments.MsgCreatePaymentTemplateResponse) |  |
+| CreatePaymentContract | [MsgCreatePaymentContract](#payments.MsgCreatePaymentContract) | [MsgCreatePaymentContractResponse](#payments.MsgCreatePaymentContractResponse) |  |
+| CreateSubscription | [MsgCreateSubscription](#payments.MsgCreateSubscription) | [MsgCreateSubscriptionResponse](#payments.MsgCreateSubscriptionResponse) |  |
+| GrantDiscount | [MsgGrantDiscount](#payments.MsgGrantDiscount) | [MsgGrantDiscountResponse](#payments.MsgGrantDiscountResponse) |  |
+| RevokeDiscount | [MsgRevokeDiscount](#payments.MsgRevokeDiscount) | [MsgRevokeDiscountResponse](#payments.MsgRevokeDiscountResponse) |  |
+| EffectPayment | [MsgEffectPayment](#payments.MsgEffectPayment) | [MsgEffectPaymentResponse](#payments.MsgEffectPaymentResponse) |  |
+
+ 
+
+
+
+<a name="project/project.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## project/project.proto
+
+
+
+<a name="project.AccountMap"></a>
+
+### AccountMap
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| map | [AccountMap.MapEntry](#project.AccountMap.MapEntry) | repeated |  |
+
+
+
+
+
+
+<a name="project.AccountMap.MapEntry"></a>
+
+### AccountMap.MapEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.Claim"></a>
+
+### Claim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| template_id | [string](#string) |  |  |
+| claimer_did | [string](#string) |  |  |
+| status | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.Claims"></a>
+
+### Claims
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claims_list | [Claim](#project.Claim) | repeated |  |
+
+
+
+
+
+
+<a name="project.CreateAgentDoc"></a>
+
+### CreateAgentDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| agent_did | [string](#string) |  |  |
+| role | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.CreateClaimDoc"></a>
+
+### CreateClaimDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  |  |
+| claim_template_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.CreateEvaluationDoc"></a>
+
+### CreateEvaluationDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  |  |
+| status | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.GenesisAccountMap"></a>
+
+### GenesisAccountMap
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| map | [GenesisAccountMap.MapEntry](#project.GenesisAccountMap.MapEntry) | repeated |  |
+
+
+
+
+
+
+<a name="project.GenesisAccountMap.MapEntry"></a>
+
+### GenesisAccountMap.MapEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.Params"></a>
+
+### Params
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ixo_did | [string](#string) |  |  |
+| project_minimum_initial_funding | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| oracle_fee_percentage | [string](#string) |  |  |
+| node_fee_percentage | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.ProjectDoc"></a>
+
+### ProjectDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| pub_key | [string](#string) |  |  |
+| status | [string](#string) |  |  |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="project.UpdateAgentDoc"></a>
+
+### UpdateAgentDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| did | [string](#string) |  |  |
+| status | [string](#string) |  |  |
+| role | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.UpdateProjectStatusDoc"></a>
+
+### UpdateProjectStatusDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| status | [string](#string) |  |  |
+| eth_funding_txn_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.WithdrawFundsDoc"></a>
+
+### WithdrawFundsDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_did | [string](#string) |  |  |
+| recipient_did | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| is_refund | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="project.WithdrawalInfoDoc"></a>
+
+### WithdrawalInfoDoc
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_did | [string](#string) |  |  |
+| recipient_did | [string](#string) |  |  |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+
+
+
+
+
+
+<a name="project.WithdrawalInfoDocs"></a>
+
+### WithdrawalInfoDocs
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| docs_list | [WithdrawalInfoDoc](#project.WithdrawalInfoDoc) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="project/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## project/genesis.proto
+
+
+
+<a name="project.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the did module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_docs | [ProjectDoc](#project.ProjectDoc) | repeated |  |
+| account_maps | [GenesisAccountMap](#project.GenesisAccountMap) | repeated |  |
+| withdrawals_infos | [WithdrawalInfoDocs](#project.WithdrawalInfoDocs) | repeated |  |
+| claims | [Claims](#project.Claims) | repeated |  |
+| params | [Params](#project.Params) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="project/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## project/query.proto
+
+
+
+<a name="project.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="project.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#project.Params) |  |  |
+
+
+
+
+
+
+<a name="project.QueryProjectAccountsRequest"></a>
+
+### QueryProjectAccountsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.QueryProjectAccountsResponse"></a>
+
+### QueryProjectAccountsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_map | [AccountMap](#project.AccountMap) |  |  |
+
+
+
+
+
+
+<a name="project.QueryProjectDocRequest"></a>
+
+### QueryProjectDocRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.QueryProjectDocResponse"></a>
+
+### QueryProjectDocResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_doc | [ProjectDoc](#project.ProjectDoc) |  |  |
+
+
+
+
+
+
+<a name="project.QueryProjectTxRequest"></a>
+
+### QueryProjectTxRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| project_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="project.QueryProjectTxResponse"></a>
+
+### QueryProjectTxResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| txs | [WithdrawalInfoDocs](#project.WithdrawalInfoDocs) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="project.Query"></a>
+
+### Query
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| ProjectDoc | [QueryProjectDocRequest](#project.QueryProjectDocRequest) | [QueryProjectDocResponse](#project.QueryProjectDocResponse) |  |
+| ProjectAccounts | [QueryProjectAccountsRequest](#project.QueryProjectAccountsRequest) | [QueryProjectAccountsResponse](#project.QueryProjectAccountsResponse) |  |
+| ProjectTx | [QueryProjectTxRequest](#project.QueryProjectTxRequest) | [QueryProjectTxResponse](#project.QueryProjectTxResponse) |  |
+| Params | [QueryParamsRequest](#project.QueryParamsRequest) | [QueryParamsResponse](#project.QueryParamsResponse) |  |
+
+ 
+
+
+
+<a name="project/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## project/tx.proto
+
+
+
+<a name="project.MsgCreateAgent"></a>
+
+### MsgCreateAgent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| data | [CreateAgentDoc](#project.CreateAgentDoc) |  |  |
+
+
+
+
+
+
+<a name="project.MsgCreateAgentResponse"></a>
+
+### MsgCreateAgentResponse
+
+
+
+
+
+
+
+<a name="project.MsgCreateClaim"></a>
+
+### MsgCreateClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| data | [CreateClaimDoc](#project.CreateClaimDoc) |  |  |
+
+
+
+
+
+
+<a name="project.MsgCreateClaimResponse"></a>
+
+### MsgCreateClaimResponse
+
+
+
+
+
+
+
+<a name="project.MsgCreateEvaluation"></a>
+
+### MsgCreateEvaluation
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| data | [CreateEvaluationDoc](#project.CreateEvaluationDoc) |  |  |
+
+
+
+
+
+
+<a name="project.MsgCreateEvaluationResponse"></a>
+
+### MsgCreateEvaluationResponse
+
+
+
+
+
+
+
+<a name="project.MsgCreateProject"></a>
+
+### MsgCreateProject
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| pub_key | [string](#string) |  |  |
+| data | [bytes](#bytes) |  | TODO (Stef) check about customtype |
+
+
+
+
+
+
+<a name="project.MsgCreateProjectResponse"></a>
+
+### MsgCreateProjectResponse
+
+
+
+
+
+
+
+<a name="project.MsgUpdateAgent"></a>
+
+### MsgUpdateAgent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| data | [UpdateAgentDoc](#project.UpdateAgentDoc) |  |  |
+
+
+
+
+
+
+<a name="project.MsgUpdateAgentResponse"></a>
+
+### MsgUpdateAgentResponse
+
+
+
+
+
+
+
+<a name="project.MsgUpdateProjectStatus"></a>
+
+### MsgUpdateProjectStatus
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tx_hash | [string](#string) |  |  |
+| sender_did | [string](#string) |  |  |
+| project_did | [string](#string) |  |  |
+| data | [UpdateProjectStatusDoc](#project.UpdateProjectStatusDoc) |  |  |
+
+
+
+
+
+
+<a name="project.MsgUpdateProjectStatusResponse"></a>
+
+### MsgUpdateProjectStatusResponse
+
+
+
+
+
+
+
+<a name="project.MsgWithdrawFunds"></a>
+
+### MsgWithdrawFunds
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender_did | [string](#string) |  |  |
+| data | [WithdrawFundsDoc](#project.WithdrawFundsDoc) |  |  |
+
+
+
+
+
+
+<a name="project.MsgWithdrawFundsResponse"></a>
+
+### MsgWithdrawFundsResponse
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="project.Msg"></a>
+
+### Msg
+To get a list of all module messages, go to your module&#39;s handler.go and
+check all cases in NewHandler().
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| CreateProject | [MsgCreateProject](#project.MsgCreateProject) | [MsgCreateProjectResponse](#project.MsgCreateProjectResponse) |  |
+| UpdateProjectStatus | [MsgUpdateProjectStatus](#project.MsgUpdateProjectStatus) | [MsgUpdateProjectStatusResponse](#project.MsgUpdateProjectStatusResponse) |  |
+| CreateAgent | [MsgCreateAgent](#project.MsgCreateAgent) | [MsgCreateAgentResponse](#project.MsgCreateAgentResponse) |  |
+| UpdateAgent | [MsgUpdateAgent](#project.MsgUpdateAgent) | [MsgUpdateAgentResponse](#project.MsgUpdateAgentResponse) |  |
+| CreateClaim | [MsgCreateClaim](#project.MsgCreateClaim) | [MsgCreateClaimResponse](#project.MsgCreateClaimResponse) |  |
+| CreateEvaluation | [MsgCreateEvaluation](#project.MsgCreateEvaluation) | [MsgCreateEvaluationResponse](#project.MsgCreateEvaluationResponse) |  |
+| WithdrawFunds | [MsgWithdrawFunds](#project.MsgWithdrawFunds) | [MsgWithdrawFundsResponse](#project.MsgWithdrawFundsResponse) |  |
 
  
 

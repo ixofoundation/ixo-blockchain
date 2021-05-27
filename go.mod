@@ -16,13 +16,15 @@ require (
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
 	github.com/tendermint/go-amino v0.16.0
 	github.com/tendermint/tendermint v0.34.1 //latest
 	github.com/tendermint/tm-db v0.6.3
-	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
-	google.golang.org/genproto v0.0.0-20210429181445-86c259c2b4ab
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	google.golang.org/genproto v0.0.0-20210518161634-ec7691c0a37d
 	google.golang.org/grpc v1.36.1
+	google.golang.org/protobuf v1.26.0
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4

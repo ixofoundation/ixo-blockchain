@@ -6,7 +6,7 @@ import "bonds/bonds.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
 
-// GenesisState defines the did module's genesis state.
+// GenesisState defines the bonds module's genesis state.
 message GenesisState {
   repeated Bond bonds    = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"bonds\""];
   repeated Batch batches = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"batches\""];

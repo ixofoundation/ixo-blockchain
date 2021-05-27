@@ -41,6 +41,7 @@ func paramsMapToObj(paramsFieldMap map[string]string) (functionParams types.Func
 	return functionParams, nil
 }
 
+// TODO Consider bypassing the use of a map to avoid non-determinism on the order of parameters at the client side
 func ParseFunctionParams(fnParamsStr string) (fnParams types.FunctionParams, err error) {
 	// Split (if not empty) and check number of parameters
 	paramValuePairs := splitParameters(fnParamsStr)
