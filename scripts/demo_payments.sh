@@ -117,7 +117,7 @@ PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
 PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixod_q did get-address-from-did $FRANCESCO_DID)"
+PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
 
 ixod_tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR"
 
@@ -139,7 +139,6 @@ PERIOD='{
 MAX_PERIODS=3
 CREATOR="$SHAUN_DID_FULL"
 ixod_tx payments create-subscription "$SUBSCRIPTION_ID" "$PAYMENT_CONTRACT_ID" "$MAX_PERIODS" "$PERIOD" "$CREATOR"
-#####GETTING ERROR HERE#####
 
 echo "Wait a few seconds for the subscription to get effected..."
 sleep 6

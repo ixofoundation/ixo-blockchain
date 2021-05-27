@@ -255,6 +255,12 @@ func (msg MsgCreateSubscription) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+func (m MsgCreateSubscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+	var period Period
+	return unpacker.UnpackAny(m.Period, &period)
+}
+
 //type MsgSetPaymentContractAuthorisation struct {
 //	PayerDid          did.Did `json:"payer_did" yaml:"payer_did"`
 //	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`

@@ -23,7 +23,7 @@ func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/project/create_claim", createClaimRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/project/create_evaluation", createEvaluationRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/project/withdraw_funds", withdrawFundsRequestHandler(clientCtx)).Methods("POST")
-	r.Handle("/project/update_project_doc", updateProjectDocRequestHandler(clientCtx)).Methods("PUT")
+	r.HandleFunc("/project/update_project_doc", updateProjectDocRequestHandler(clientCtx)).Methods("PUT")
 }
 
 type createProjectReq struct {
