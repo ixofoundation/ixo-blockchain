@@ -4,7 +4,7 @@ wait() {
   echo "Waiting for chain to start..."
   while :; do
     RET=$(ixod status 2>&1)
-    if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -15,7 +15,7 @@ wait() {
 }
 
 RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
@@ -37,7 +37,12 @@ ixod_tx() {
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
     -y \
-    "$@"  # any extra arguments added at the end
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
 }
 
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -216,7 +221,7 @@ ixod_tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL"
 echo "Updating project to PAIDOUT..."
 ixod_tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL"
 echo "Project withdrawals query..."
-ixod q project get-project-txs $PROJECT_DID
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
 # - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
@@ -230,17 +235,17 @@ ixod q project get-project-txs $PROJECT_DID
 # - Shaun:                 11500000  # 500000 withdrawal
 
 echo "InitiatingNodePayFees"
-ixod q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
+ixod_q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
 echo "IxoFees"
-ixod q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
+ixod_q auth account "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
 echo "IxoPayFees"
-ixod q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
+ixod_q auth account "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
 echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
-ixod q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
+ixod_q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-ixod q bank balances "$(ixod q did get-address-from-did $MIGUEL_DID)"
+ixod_q auth account "$(ixod_q did get-address-from-did $MIGUEL_DID)"
 echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-ixod q bank balances "$(ixod q did get-address-from-did $SHAUN_DID)"
+ixod_q auth account "$(ixod_q did get-address-from-did $SHAUN_DID)"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
@@ -248,7 +253,7 @@ echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
 DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"is_refund\":true}"
 ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
-ixod q project get-project-txs $PROJECT_DID
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected external account balances:
 # - Miguel:                 4495000 (5000uixo tx fee deducted)
@@ -259,7 +264,7 @@ echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
 DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"is_refund\":true}"
 ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
-ixod q project get-project-txs $PROJECT_DID
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
 # - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)

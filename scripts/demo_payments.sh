@@ -4,7 +4,7 @@ wait() {
   echo "Waiting for chain to start..."
   while :; do
     RET=$(ixod status 2>&1)
-    if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -15,7 +15,7 @@ wait() {
 }
 
 RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
@@ -37,7 +37,12 @@ ixod_tx() {
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
     -y \
-    "$@"  # any extra arguments added at the end
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
 }
 
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
@@ -112,7 +117,8 @@ PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
 PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
+PAYER_ADDR="$(ixod_q did get-address-from-did $FRANCESCO_DID)"
+
 ixod_tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR"
 
 # Authorise payment contract
