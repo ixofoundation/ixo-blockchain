@@ -4,7 +4,7 @@ wait() {
   echo "Waiting for chain to start..."
   while :; do
     RET=$(ixod status 2>&1)
-    if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -15,7 +15,7 @@ wait() {
 }
 
 RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
@@ -38,7 +38,12 @@ ixod_tx() {
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
     -y \
-    "$@"  # any extra arguments added at the end
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
 }
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -90,11 +95,11 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixod_tx did add-did-doc "$MIGUEL_DID_FULL" 
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering DID 2/3..."
-ixod_tx did add-did-doc "$FRANCESCO_DID_FULL" 
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering DID 3/3..."
-ixod_tx did add-did-doc "$SHAUN_DID_FULL" 
+ixod_tx did add-did-doc "$SHAUN_DID_FULL"
 
 # d0 := 1000000 // initial raise (reserve)
 # p0 := 1       // initial price (reserve per token)
@@ -126,81 +131,81 @@ ixod_tx bonds create-bond \
   --outcome-payment="300000000" \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
-  --controller-did="$FRANCESCO_DID" 
+  --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel buys 400000abc..."
-ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL" 
+ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 400000abc..."
-ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Shaun cannot buy 200001abc..."
-ixod_tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" 
+ixod_tx bonds buy 200001abc 500000res "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun cannot sell anything..."
-ixod_tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL" 
+ixod_tx bonds sell 20000abc "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun can buy 200000abc..."
-ixod_tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL" 
+ixod_tx bonds buy 200000abc 500000res "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun's account..."
-ixod q bank balances "$SHAUN_ADDR"
+ixod_q bank balances "$SHAUN_ADDR"
 
 echo "Bond state is now open..."  # since 1000000 (S0) reached
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Current price is 3..."
-ixod q bonds current-price "$BOND_DID"
+ixod_q bonds current-price "$BOND_DID"
 
 echo "Changing public alpha 0.5->0.51..."
 NEW_ALPHA="0.51"
-ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Current price is now approx 1.85..."
-ixod q bonds current-price "$BOND_DID"
+ixod_q bonds current-price "$BOND_DID"
 
 echo "Changing public alpha 0.51->0.4..."
 NEW_ALPHA="0.4"
-ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Current price is now approx 1.86..."
-ixod q bonds current-price "$BOND_DID"
+ixod_q bonds current-price "$BOND_DID"
 
 echo "Cannot change public alpha 0.4->0.6..."
 NEW_ALPHA="0.6"
-ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 
 echo "Miguel sells 400000abc..."
-ixod_tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL" 
+ixod_tx bonds sell 400000abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco makes outcome payment of 50000000 [1]..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL"
 echo "Francesco makes outcome payment of 100000000 [2]..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL"
 echo "Francesco makes outcome payment of 150000000 [3]..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 echo "Bond outcome payment reserve is now 300000000..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Francesco updates the bond state to SETTLE"
 ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Francesco withdraws share..."
-ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" 
+ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Shaun withdraws share..."
-ixod_tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" 
+ixod_tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL"
 echo "Shaun's account..."
-ixod q bank balances "$SHAUN_ADDR"
+ixod_q bank balances "$SHAUN_ADDR"
 
 echo "Bond reserve is now empty and supply is 0..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"

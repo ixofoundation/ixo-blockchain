@@ -4,7 +4,7 @@ wait() {
   echo "Waiting for chain to start..."
   while :; do
     RET=$(ixod status 2>&1)
-    if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -15,7 +15,7 @@ wait() {
 }
 
 RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
@@ -38,7 +38,12 @@ ixod_tx() {
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
     -y \
-    "$@"  # any extra arguments added at the end
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
 }
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
@@ -128,17 +133,17 @@ ixod_tx bonds create-bond \
   --creator-did="$MIGUEL_DID_FULL" \
   --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel buys 20000abc..."
 ixod_tx bonds buy 20000abc 100000res "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 20000abc..."
 ixod_tx bonds buy 20000abc 100000res "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Francesco updates the bond state to FAILED"
 ixod_tx bonds update-bond-state "FAILED" "$BOND_DID" "$FRANCESCO_DID_FULL"
@@ -146,12 +151,12 @@ ixod_tx bonds update-bond-state "FAILED" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Miguel withdraws share..."
 ixod_tx bonds withdraw-share "$BOND_DID" "$MIGUEL_DID_FULL" 
 echo "Miguel's account..."
-ixod q bank balances "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco withdraws share..."
 ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
-ixod q bank balances "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Bond reserve is now empty and supply is 0..."
-ixod q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"

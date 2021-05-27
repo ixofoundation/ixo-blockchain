@@ -4,7 +4,7 @@ wait() {
   echo "Waiting for chain to start..."
   while :; do
     RET=$(ixod status 2>&1)
-    if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -15,11 +15,14 @@ wait() {
 }
 
 RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
 GAS_PRICES="0.025uixo"
+PASSWORD="12345678"
+FEE=$(yes $PASSWORD | ixod keys show fee -a)
+
 ixod_tx() {
   # This function first approximates the gas (adjusted to 105%) and then
   # supplies this for the actual transaction broadcasting as the --gas.
@@ -30,11 +33,16 @@ ixod_tx() {
   APPROX=$(ixod tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --dry-run "$@" 2>&1)
   APPROX=${APPROX//gas estimate: /}
   echo "Gas estimate: $APPROX"
-  ixod tx $cmd --gas="$APPROX" --gas-prices="$GAS_PRICES" "$@"
+  ixod tx $cmd \
+    --gas="$APPROX" \
+    --gas-prices="$GAS_PRICES" \
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
 }
 
-PASSWORD="12345678"
-FEE=$(yes $PASSWORD | ixod keys show fee -a)
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{

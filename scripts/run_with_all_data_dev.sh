@@ -64,6 +64,12 @@ FROM="\"stake\""
 TO="\"$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
+# Set reserved bond tokens
+RESERVED_BOND_TOKENS=""  # example: " \"abc\", \"def\", \"ghi\" "
+FROM="\"reserved_bond_tokens\": \[\]"
+TO="\"reserved_bond_tokens\": \[$RESERVED_BOND_TOKENS\]"
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 # Set min-gas-prices (using fee token)
 FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
