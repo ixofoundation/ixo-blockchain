@@ -8,7 +8,6 @@ package types
 //	Params           Params                `json:"params" yaml:"params"`
 //}
 
-// TODO (Stef) Check whether this function is being called anywhere
 func NewGenesisState(projectDocs []ProjectDoc, accountMaps []GenesisAccountMap,
 	withdrawalInfos []WithdrawalInfoDocs, claims []Claims, params Params) *GenesisState {
 	return &GenesisState{
