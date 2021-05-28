@@ -26,7 +26,7 @@ message MsgCreateProject {
   string sender_did  = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
   string project_did = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
   string pub_key     = 4 [(gogoproto.moretags) = "yaml:\"pub_key\""];
-  bytes data         = 5 [(gogoproto.moretags) = "yaml:\"data\""];
+  bytes data         = 5 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgCreateProjectResponse {}
@@ -97,7 +97,7 @@ message MsgUpdateProjectDoc {
   string tx_hash     = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
   string sender_did  = 2 [(gogoproto.moretags) = "yaml:\"sender_did\""];
   string project_did = 3 [(gogoproto.moretags) = "yaml:\"project_did\""];
-  bytes data         = 4 [(gogoproto.moretags) = "yaml:\"data\""];
+  bytes data         = 4 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message MsgUpdateProjectDocResponse {}

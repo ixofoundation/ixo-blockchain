@@ -235,17 +235,17 @@ ixod_q project get-project-txs $PROJECT_DID
 # - Shaun:                 11500000  # 500000 withdrawal
 
 echo "InitiatingNodePayFees"
-ixod_q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
+ixod_q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
 echo "IxoFees"
-ixod_q auth account "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
+ixod_q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
 echo "IxoPayFees"
-ixod_q auth account "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
+ixod_q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
 echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
-ixod_q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
+ixod_q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-ixod_q auth account "$(ixod_q did get-address-from-did $MIGUEL_DID)"
+ixod_q bank balances "$(ixod q did get-address-from-did $MIGUEL_DID)"
 echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-ixod_q auth account "$(ixod_q did get-address-from-did $SHAUN_DID)"
+ixod_q bank balances "$(ixod q did get-address-from-did $SHAUN_DID)"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
