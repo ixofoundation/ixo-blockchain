@@ -5,10 +5,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
-func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid did.Did) types.Batch {
+func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid didexported.Did) types.Batch {
 	store := ctx.KVStore(k.storeKey)
 	if !k.BatchExists(ctx, bondDid) {
 		panic(fmt.Sprintf("batch not found for %s\n", bondDid))
@@ -21,7 +21,7 @@ func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid did.Did) types.Batch {
 	return batch
 }
 
-func (k Keeper) MustGetLastBatch(ctx sdk.Context, bondDid did.Did) types.Batch {
+func (k Keeper) MustGetLastBatch(ctx sdk.Context, bondDid didexported.Did) types.Batch {
 	store := ctx.KVStore(k.storeKey)
 	if !k.LastBatchExists(ctx, bondDid) {
 		panic(fmt.Sprintf("last batch not found for %s\n", bondDid))
@@ -34,27 +34,27 @@ func (k Keeper) MustGetLastBatch(ctx sdk.Context, bondDid did.Did) types.Batch {
 	return batch
 }
 
-func (k Keeper) BatchExists(ctx sdk.Context, bondDid did.Did) bool {
+func (k Keeper) BatchExists(ctx sdk.Context, bondDid didexported.Did) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetBatchKey(bondDid))
 }
 
-func (k Keeper) LastBatchExists(ctx sdk.Context, bondDid did.Did) bool {
+func (k Keeper) LastBatchExists(ctx sdk.Context, bondDid didexported.Did) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(types.GetLastBatchKey(bondDid))
 }
 
-func (k Keeper) SetBatch(ctx sdk.Context, bondDid did.Did, batch types.Batch) {
+func (k Keeper) SetBatch(ctx sdk.Context, bondDid didexported.Did, batch types.Batch) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.GetBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(&batch))
 }
 
-func (k Keeper) SetLastBatch(ctx sdk.Context, bondDid did.Did, batch types.Batch) {
+func (k Keeper) SetLastBatch(ctx sdk.Context, bondDid didexported.Did, batch types.Batch) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.GetLastBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(&batch))
 }
 
-func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, buyPrices, sellPrices sdk.DecCoins) {
+func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid didexported.Did, bo types.BuyOrder, buyPrices, sellPrices sdk.DecCoins) {
 	batch := k.MustGetBatch(ctx, bondDid)
 	batch.TotalBuyAmount = batch.TotalBuyAmount.Add(bo.BaseOrder.Amount)
 	batch.BuyPrices = buyPrices
@@ -66,7 +66,7 @@ func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder,
 	logger.Info(fmt.Sprintf("added buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid))
 }
 
-func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid did.Did, so types.SellOrder, buyPrices, sellPrices sdk.DecCoins) {
+func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid didexported.Did, so types.SellOrder, buyPrices, sellPrices sdk.DecCoins) {
 	batch := k.MustGetBatch(ctx, bondDid)
 	batch.TotalSellAmount = batch.TotalSellAmount.Add(so.BaseOrder.Amount)
 	batch.BuyPrices = buyPrices
@@ -78,7 +78,7 @@ func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid did.Did, so types.SellOrde
 	logger.Info(fmt.Sprintf("added sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid))
 }
 
-func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid did.Did, so types.SwapOrder) {
+func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid didexported.Did, so types.SwapOrder) {
 	batch := k.MustGetBatch(ctx, bondDid)
 	batch.Swaps = append(batch.Swaps, so)
 	k.SetBatch(ctx, bondDid, batch)
@@ -141,7 +141,7 @@ func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch typ
 	return buyPricesPT, sellPricesPT, nil
 }
 
-func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder) (buyPrices, sellPrices sdk.DecCoins, err error) {
+func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid didexported.Did, bo types.BuyOrder) (buyPrices, sellPrices sdk.DecCoins, err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
 
@@ -183,7 +183,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid did.Did, 
 	return buyPrices, sellPrices, nil
 }
 
-func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did, so types.SellOrder) (buyPrices, sellPrices sdk.DecCoins, err error) {
+func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid didexported.Did, so types.SellOrder) (buyPrices, sellPrices sdk.DecCoins, err error) {
 	batch := k.MustGetBatch(ctx, bondDid)
 
 	// Cannot burn more tokens than what exists
@@ -202,7 +202,7 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid did.Did,
 	return buyPrices, sellPrices, nil
 }
 
-func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) (err error) {
+func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo types.BuyOrder, prices sdk.DecCoins) (err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 	var extraEventAttributes []sdk.Attribute
 
@@ -352,7 +352,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid did.Did, bo types.Buy
 	return nil
 }
 
-func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.SellOrder, prices sdk.DecCoins) (err error) {
+func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so types.SellOrder, prices sdk.DecCoins) (err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// Get seller address
@@ -413,7 +413,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid did.Did, so types.Se
 	return nil
 }
 
-func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder) (err error, ok bool) {
+func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.SwapOrder) (err error, ok bool) {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// WARNING: do not return ok=true if money has already been transferred when error occurs
@@ -483,7 +483,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid did.Did, so types.SwapOrder
 	return nil, true
 }
 
-func (k Keeper) PerformBuyOrders(ctx sdk.Context, bondDid did.Did) {
+func (k Keeper) PerformBuyOrders(ctx sdk.Context, bondDid didexported.Did) {
 	batch := k.MustGetBatch(ctx, bondDid)
 
 	// Perform buys or return to buyer
@@ -502,7 +502,7 @@ func (k Keeper) PerformBuyOrders(ctx sdk.Context, bondDid did.Did) {
 	k.SetBatch(ctx, bondDid, batch)
 }
 
-func (k Keeper) PerformSellOrders(ctx sdk.Context, bondDid did.Did) {
+func (k Keeper) PerformSellOrders(ctx sdk.Context, bondDid didexported.Did) {
 	batch := k.MustGetBatch(ctx, bondDid)
 
 	// Perform sells or return to seller
@@ -521,7 +521,7 @@ func (k Keeper) PerformSellOrders(ctx sdk.Context, bondDid did.Did) {
 	k.SetBatch(ctx, bondDid, batch)
 }
 
-func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid did.Did) {
+func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid didexported.Did) {
 	logger := ctx.Logger()
 	batch := k.MustGetBatch(ctx, bondDid)
 
@@ -558,13 +558,13 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid did.Did) {
 	k.SetBatch(ctx, bondDid, batch)
 }
 
-func (k Keeper) PerformOrders(ctx sdk.Context, bondDid did.Did) {
+func (k Keeper) PerformOrders(ctx sdk.Context, bondDid didexported.Did) {
 	k.PerformBuyOrders(ctx, bondDid)
 	k.PerformSellOrders(ctx, bondDid)
 	k.PerformSwapOrders(ctx, bondDid)
 }
 
-func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.Did, bo types.BuyOrder, prices sdk.DecCoins) error {
+func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid didexported.Did, bo types.BuyOrder, prices sdk.DecCoins) error {
 	bond := k.MustGetBond(ctx, bondDid)
 
 	reservePrices := types.MultiplyDecCoinsByInt(prices, bo.BaseOrder.Amount.Amount)
@@ -582,7 +582,7 @@ func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid did.D
 	return nil
 }
 
-func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid did.Did) (cancelledOrders int) {
+func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid didexported.Did) (cancelledOrders int) {
 	logger := k.Logger(ctx)
 	batch := k.MustGetBatch(ctx, bondDid)
 
@@ -624,7 +624,7 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid did.Did) (cance
 	return cancelledOrders
 }
 
-func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid did.Did) (cancelledOrders int) {
+func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid didexported.Did) (cancelledOrders int) {
 	batch := k.MustGetBatch(ctx, bondDid)
 	cancelledOrders = 0
 
@@ -648,7 +648,7 @@ func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid did.Did) (can
 	return cancelledOrders
 }
 
-func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid did.Did) {
+func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
 	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
 	newPublicAlpha := batch.NextPublicAlpha

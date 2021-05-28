@@ -6,7 +6,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 )
 
-func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data *types.GenesisState) {
 	// Initialise bonds
 	for _, b := range data.Bonds {
 		keeper.SetBond(ctx, b.BondDid, b)
@@ -22,7 +22,7 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState)
 	keeper.SetParams(ctx, data.Params)
 }
 
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// Export bonds and batches
 	var bonds []types.Bond
 	var batches []types.Batch
@@ -37,7 +37,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 	// Export params
 	params := k.GetParams(ctx)
 
-	return types.GenesisState{
+	return &types.GenesisState{
 		Bonds:   bonds,
 		Batches: batches,
 		Params:  params,

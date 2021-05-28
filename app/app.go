@@ -23,6 +23,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -98,6 +99,7 @@ import (
 	//TODO uncomment
 	//"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	//"github.com/ixofoundation/ixo-blockchain/x/payments"
@@ -219,7 +221,7 @@ type ixoApp struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
 
 	// Custom ixo keepers
-	didKeeper      did.Keeper             `json:"did_keeper"`
+	didKeeper      didkeeper.Keeper             `json:"did_keeper"`
 	bondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	paymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
 	projectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
@@ -256,8 +258,7 @@ func NewIxoApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 
 		// Custom ixo store keys
-		// TODO uncomment ixo modules store keys
-		did.StoreKey, bondstypes.StoreKey,
+		didtypes.StoreKey, bondstypes.StoreKey,
 		paymentstypes.StoreKey,	projecttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -362,7 +363,7 @@ func NewIxoApp(
 	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
 	// add keepers (for custom ixo modules)
-	app.didKeeper = did.NewKeeper(app.appCodec, keys[did.StoreKey])
+	app.didKeeper = didkeeper.NewKeeper(app.appCodec, keys[didtypes.StoreKey])
 	app.bondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.didKeeper,
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
 	app.paymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
@@ -430,7 +431,7 @@ func NewIxoApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		// Custom ixo modules
-		did.ModuleName, bondstypes.ModuleName,
+		didtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName,
 	)
 
@@ -741,7 +742,7 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 		// Otherwise, route to Cosmos ante handler
 		msg := tx.GetMsgs()[0]
 		switch msg.Route() {
-		case did.RouterKey:
+		case didtypes.RouterKey:
 			return didAnteHandler(ctx, tx, simulate)
 		case projecttypes.RouterKey:
 			switch msg.Type() {

@@ -3,7 +3,8 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"strings"
 )
@@ -29,11 +30,11 @@ var (
 	_ ixotypes.IxoMsg = &MsgSwap{}
 )
 
-func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid did.Did,
+func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid didexported.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
 	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid did.Did) *MsgCreateBond {
+	allowSell, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid didexported.Did) *MsgCreateBond {
 
 	return &MsgCreateBond{
 		BondDid:                bondDid,
@@ -149,10 +150,10 @@ func (msg MsgCreateBond) ValidateBasic() error {
 	// Note: uniqueness of reserve tokens checked when parsing
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
-	} else if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.CreatorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID")
 	}
 
 	return nil
@@ -162,7 +163,7 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgCreateBond) GetSignerDid() did.Did { return msg.CreatorDid }
+func (msg MsgCreateBond) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -172,7 +173,7 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
 func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editorDid, bondDid did.Did) *MsgEditBond {
+	sanityMarginPercentage string, editorDid, bondDid didexported.Did) *MsgEditBond {
 	return &MsgEditBond{
 		BondDid:                bondDid,
 		Name:                   name,
@@ -219,10 +220,10 @@ func (msg MsgEditBond) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
-	} else if !did.IsValidDid(msg.EditorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "editor DID")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.EditorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "editor DID")
 	}
 
 	return nil
@@ -232,7 +233,7 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgEditBond) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgEditBond) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -241,7 +242,7 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid did.Did) *MsgSetNextAlpha {
+func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid didexported.Did) *MsgSetNextAlpha {
 	return &MsgSetNextAlpha{
 		BondDid:   bondDid,
 		Alpha:     alpha,
@@ -267,10 +268,10 @@ func (msg MsgSetNextAlpha) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
-	} else if !did.IsValidDid(msg.EditorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "editor did is invalid")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond did is invalid")
+	} else if !didtypes.IsValidDid(msg.EditorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "editor did is invalid")
 	}
 
 	return nil
@@ -280,7 +281,7 @@ func (msg MsgSetNextAlpha) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSetNextAlpha) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgSetNextAlpha) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgSetNextAlpha) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -289,7 +290,7 @@ func (msg MsgSetNextAlpha) Route() string { return RouterKey }
 
 func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
 
-func NewMsgUpdateBondState(state BondState, editorDid, bondDid did.Did) *MsgUpdateBondState {
+func NewMsgUpdateBondState(state BondState, editorDid, bondDid didexported.Did) *MsgUpdateBondState {
 	return &MsgUpdateBondState{
 		BondDid:   bondDid,
 		State:     state.String(),
@@ -311,10 +312,10 @@ func (msg MsgUpdateBondState) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond did is invalid")
-	} else if !did.IsValidDid(msg.EditorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "editor did is invalid")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond did is invalid")
+	} else if !didtypes.IsValidDid(msg.EditorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "editor did is invalid")
 	}
 
 	return nil
@@ -324,7 +325,7 @@ func (msg MsgUpdateBondState) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgUpdateBondState) GetSignerDid() did.Did { return msg.EditorDid }
+func (msg MsgUpdateBondState) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgUpdateBondState) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -333,8 +334,8 @@ func (msg MsgUpdateBondState) Route() string { return RouterKey }
 
 func (msg MsgUpdateBondState) Type() string { return TypeMsgUpdateBondState }
 
-func NewMsgBuy(buyerDid did.Did, amount sdk.Coin, maxPrices sdk.Coins,
-	bondDid did.Did) *MsgBuy {
+func NewMsgBuy(buyerDid didexported.Did, amount sdk.Coin, maxPrices sdk.Coins,
+	bondDid didexported.Did) *MsgBuy {
 	return &MsgBuy{
 		BuyerDid:  buyerDid,
 		Amount:    amount,
@@ -364,10 +365,10 @@ func (msg MsgBuy) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
-	} else if !did.IsValidDid(msg.BuyerDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "buyer DID")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.BuyerDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "buyer DID")
 	}
 
 	return nil
@@ -377,7 +378,7 @@ func (msg MsgBuy) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgBuy) GetSignerDid() did.Did { return msg.BuyerDid }
+func (msg MsgBuy) GetSignerDid() didexported.Did { return msg.BuyerDid }
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -386,7 +387,7 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return TypeMsgBuy }
 
-func NewMsgSell(sellerDid did.Did, amount sdk.Coin, bondDid did.Did) *MsgSell {
+func NewMsgSell(sellerDid didexported.Did, amount sdk.Coin, bondDid didexported.Did) *MsgSell {
 	return &MsgSell{
 		SellerDid: sellerDid,
 		Amount:    amount,
@@ -410,10 +411,10 @@ func (msg MsgSell) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
-	} else if !did.IsValidDid(msg.SellerDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "seller DID")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.SellerDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "seller DID")
 	}
 
 	return nil
@@ -423,7 +424,7 @@ func (msg MsgSell) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSell) GetSignerDid() did.Did { return msg.SellerDid }
+func (msg MsgSell) GetSignerDid() didexported.Did { return msg.SellerDid }
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -432,8 +433,8 @@ func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return TypeMsgSell }
 
-func NewMsgSwap(swapperDid did.Did, from sdk.Coin, toToken string,
-	bondDid did.Did) *MsgSwap {
+func NewMsgSwap(swapperDid didexported.Did, from sdk.Coin, toToken string,
+	bondDid didexported.Did) *MsgSwap {
 	return &MsgSwap{
 		SwapperDid: swapperDid,
 		From:       from,
@@ -476,10 +477,10 @@ func (msg MsgSwap) ValidateBasic() error {
 	// Note: From denom and amount must be valid since sdk.Coin
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID is invalid")
-	} else if !did.IsValidDid(msg.SwapperDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "swapper DID is invalid")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SwapperDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "swapper DID is invalid")
 	}
 
 	return nil
@@ -489,7 +490,7 @@ func (msg MsgSwap) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSwap) GetSignerDid() did.Did { return msg.SwapperDid }
+func (msg MsgSwap) GetSignerDid() didexported.Did { return msg.SwapperDid }
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -498,7 +499,7 @@ func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return TypeMsgSwap }
 
-func NewMsgMakeOutcomePayment(senderDid did.Did, amount sdk.Int, bondDid did.Did) *MsgMakeOutcomePayment {
+func NewMsgMakeOutcomePayment(senderDid didexported.Did, amount sdk.Int, bondDid didexported.Did) *MsgMakeOutcomePayment {
 	return &MsgMakeOutcomePayment{
 		SenderDid: senderDid,
 		Amount:    amount,
@@ -520,10 +521,10 @@ func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID")
 	}
 
 	return nil
@@ -533,7 +534,7 @@ func (msg MsgMakeOutcomePayment) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgMakeOutcomePayment) GetSignerDid() did.Did { return msg.SenderDid }
+func (msg MsgMakeOutcomePayment) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgMakeOutcomePayment) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -542,7 +543,7 @@ func (msg MsgMakeOutcomePayment) Route() string { return RouterKey }
 
 func (msg MsgMakeOutcomePayment) Type() string { return TypeMsgMakeOutcomePayment }
 
-func NewMsgWithdrawShare(recipientDid, bondDid did.Did) *MsgWithdrawShare {
+func NewMsgWithdrawShare(recipientDid, bondDid didexported.Did) *MsgWithdrawShare {
 	return &MsgWithdrawShare{
 		RecipientDid: recipientDid,
 		BondDid:      bondDid,
@@ -558,10 +559,10 @@ func (msg MsgWithdrawShare) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.BondDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "bond DID")
-	} else if !did.IsValidDid(msg.RecipientDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient DID")
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.RecipientDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "recipient DID")
 	}
 
 	return nil
@@ -571,7 +572,7 @@ func (msg MsgWithdrawShare) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgWithdrawShare) GetSignerDid() did.Did { return msg.RecipientDid }
+func (msg MsgWithdrawShare) GetSignerDid() didexported.Did { return msg.RecipientDid }
 func (msg MsgWithdrawShare) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }

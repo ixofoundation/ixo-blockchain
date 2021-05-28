@@ -1,6 +1,6 @@
 package types
 
-import "github.com/ixofoundation/ixo-blockchain/x/did"
+import didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 
 const (
 	ModuleName        = "project"
@@ -18,22 +18,22 @@ var (
 	ClaimsKey      = []byte{0x05}
 )
 
-func GetProjectKey(projectDid did.Did) []byte {
+func GetProjectKey(projectDid didexported.Did) []byte {
 	return append(ProjectKey, []byte(projectDid)...)
 }
 
-func GetAccountMapKey(projectDid did.Did) []byte {
+func GetAccountMapKey(projectDid didexported.Did) []byte {
 	return append(AccountMapKey, []byte(projectDid)...)
 }
 
-func GetWithdrawalsKey(projectDid did.Did) []byte {
+func GetWithdrawalsKey(projectDid didexported.Did) []byte {
 	return append(WithdrawalsKey, []byte(projectDid)...)
 }
 
-func GetClaimsKey(projectDid did.Did) []byte {
+func GetClaimsKey(projectDid didexported.Did) []byte {
 	return append(ClaimsKey, []byte(projectDid)...)
 }
 
-func GetClaimKey(projectDid did.Did, claimId string) []byte {
+func GetClaimKey(projectDid didexported.Did, claimId string) []byte {
 	return append(GetClaimsKey(projectDid), []byte(claimId)...)
 }

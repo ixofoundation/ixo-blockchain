@@ -32,6 +32,6 @@ func DefaultGenesisState() *GenesisState {
 }
 
 // ValidateGenesis performs no inspection
-func ValidateGenesis(data GenesisState) error {
+func ValidateGenesis(data *GenesisState) error {
 	return nil
 }

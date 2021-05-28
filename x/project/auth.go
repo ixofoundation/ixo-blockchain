@@ -6,6 +6,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
+
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
@@ -42,7 +45,7 @@ func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixotypes.PubKeyGetter {
 
 		projectDidDoc, err := keeper.GetProjectDoc(ctx, msg.GetSignerDid())
 		if err != nil {
-			return pubKey, sdkerrors.Wrap(did.ErrInvalidDid, "project DID not found")
+			return pubKey, sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID not found")
 		}
 
 		var pubKeyRaw ed25519.PubKey
@@ -51,7 +54,7 @@ func NewDefaultPubKeyGetter(keeper keeper.Keeper) ixotypes.PubKeyGetter {
 	}
 }
 
-func NewModulePubKeyGetter(keeper keeper.Keeper, didKeeper did.Keeper) ixotypes.PubKeyGetter {
+func NewModulePubKeyGetter(keeper keeper.Keeper, didKeeper didkeeper.Keeper) ixotypes.PubKeyGetter {
 	return func(ctx sdk.Context, msg ixotypes.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
 
 		// MsgCreateProject: pubkey from msg since project does not exist yet
@@ -117,7 +120,7 @@ func getProjectCreationSignBytes(ctx sdk.Context, tx legacytx.StdTx, acc authtyp
 }
 
 func NewProjectCreationAnteHandler(
-	ak authkeeper.AccountKeeper, bk bankkeeper.Keeper, didKeeper did.Keeper, signModeHandler signing.SignModeHandler,
+	ak authkeeper.AccountKeeper, bk bankkeeper.Keeper, didKeeper didkeeper.Keeper, signModeHandler signing.SignModeHandler,
 	pubKeyGetter ixotypes.PubKeyGetter) sdk.AnteHandler {
 	//ak auth.AccountKeeper, supplyKeeper supply.Keeper,
 	//bk bank.Keeper, didKeeper did.Keeper, pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {

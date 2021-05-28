@@ -5,7 +5,7 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"sort"
 )
 
@@ -220,12 +220,12 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	return nil
 }
 
-func NewBond(token, name, description string, creatorDid, controllerDid did.Did,
+func NewBond(token, name, description string, creatorDid, controllerDid didexported.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
 	sanityMarginPercentage sdk.Dec, allowSells, alphaBond bool, batchBlocks sdk.Uint,
-	outcomePayment sdk.Int, state BondState, bondDid did.Did) Bond {
+	outcomePayment sdk.Int, state BondState, bondDid didexported.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)

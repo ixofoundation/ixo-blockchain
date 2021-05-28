@@ -4,30 +4,30 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	bank "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	params "github.com/cosmos/cosmos-sdk/x/params/types"
-	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	//"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
 type Keeper struct {
-	BankKeeper    bank.Keeper
-	accountKeeper auth.AccountKeeper
-	StakingKeeper staking.Keeper
-	DidKeeper     did.Keeper
+	BankKeeper    bankkeeper.Keeper
+	accountKeeper authkeeper.AccountKeeper
+	StakingKeeper stakingkeeper.Keeper
+	DidKeeper     didkeeper.Keeper
 
 	storeKey   sdk.StoreKey
-	paramSpace params.Subspace
+	paramSpace paramstypes.Subspace
 
 	cdc codec.BinaryMarshaler
 }
 
-func NewKeeper(bankKeeper bank.Keeper, accountKeeper auth.AccountKeeper, stakingKeeper staking.Keeper,
-	didKeeper did.Keeper, storeKey sdk.StoreKey, paramSpace params.Subspace, cdc codec.BinaryMarshaler) Keeper {
+func NewKeeper(bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper, stakingKeeper stakingkeeper.Keeper,
+	didKeeper didkeeper.Keeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryMarshaler) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {

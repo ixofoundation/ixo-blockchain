@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	//"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 
 	//"github.com/cosmos/cosmos-sdk/client/context"
@@ -29,8 +29,8 @@ func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 type createProjectReq struct {
 	BaseReq    rest.BaseReq    `json:"base_req" yaml:"base_req"`
 	TxHash     string          `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did         `json:"projectDid" yaml:"projectDid"`
 	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 	Data       json.RawMessage `json:"data" yaml:"data"`
 }
@@ -60,8 +60,8 @@ func createProjectRequestHandler(clientCtx client.Context) http.HandlerFunc {
 type updateProjectStatusReq struct {
 	BaseReq    rest.BaseReq                 `json:"base_req" yaml:"base_req"`
 	TxHash     string                       `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did                      `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did                      `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did                      `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did                      `json:"projectDid" yaml:"projectDid"`
 	Data       types.UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 
@@ -90,8 +90,8 @@ func updateProjectStatusRequestHandler(clientCtx client.Context) http.HandlerFun
 type createAgentReq struct {
 	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
 	TxHash     string               `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did              `json:"projectDid" yaml:"projectDid"`
 	Data       types.CreateAgentDoc `json:"data" yaml:"data"`
 }
 
@@ -120,8 +120,8 @@ func createAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 type updateAgentReq struct {
 	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
 	TxHash     string               `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did              `json:"projectDid" yaml:"projectDid"`
 	Data       types.UpdateAgentDoc `json:"data" yaml:"data"`
 }
 
@@ -150,8 +150,8 @@ func updateAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 type createClaimReq struct {
 	BaseReq    rest.BaseReq         `json:"base_req" yaml:"base_req"`
 	TxHash     string               `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did              `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did              `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did              `json:"projectDid" yaml:"projectDid"`
 	Data       types.CreateClaimDoc `json:"data" yaml:"data"`
 }
 
@@ -181,8 +181,8 @@ func createClaimRequestHandler(clientCtx client.Context) http.HandlerFunc {
 type createEvaluationReq struct {
 	BaseReq    rest.BaseReq              `json:"base_req" yaml:"base_req"`
 	TxHash     string                    `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did                   `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did                   `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did                   `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did                   `json:"projectDid" yaml:"projectDid"`
 	Data       types.CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 
@@ -210,7 +210,7 @@ func createEvaluationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 type withdrawFundsReq struct {
 	BaseReq   rest.BaseReq           `json:"base_req" yaml:"base_req"`
-	SenderDid did.Did                `json:"senderDid" yaml:"senderDid"`
+	SenderDid didexported.Did                `json:"senderDid" yaml:"senderDid"`
 	Data      types.WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 
@@ -239,8 +239,8 @@ func withdrawFundsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 type updateProjectDocReq struct {
 	BaseReq    rest.BaseReq    `json:"base_req" yaml:"base_req"`
 	TxHash     string          `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	SenderDid  didexported.Did         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid didexported.Did         `json:"projectDid" yaml:"projectDid"`
 	Data       json.RawMessage `json:"data" yaml:"data"`
 }
 

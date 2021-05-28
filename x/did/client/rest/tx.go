@@ -12,9 +12,9 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 )
 
-func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
-	r.HandleFunc("/did/add_did", newAddDidRequestHandler(cliCtx)).Methods("POST")
-	r.HandleFunc("/did/add_credential", newAddCredentialRequestHandler(cliCtx)).Methods("POST")
+func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
+	r.HandleFunc("/did/add_did", newAddDidRequestHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/did/add_credential", newAddCredentialRequestHandler(clientCtx)).Methods("POST")
 }
 
 type addDidReq struct {
@@ -23,10 +23,10 @@ type addDidReq struct {
 	PubKey  string       `json:"pubKey" yaml:"pubKey"`
 }
 
-func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func newAddDidRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req addDidReq
-		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
 		}
 
@@ -41,7 +41,7 @@ func newAddDidRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc 
 			return
 		}
 
-		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 	}
 }
 
@@ -51,10 +51,10 @@ type addCredentialReq struct {
 	DidCredential types.DidCredential `json:"credential" yaml:"credential"`
 }
 
-func newAddCredentialRequestHandler(cliCtx /*context*/client.Context) http.HandlerFunc {
+func newAddCredentialRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req addCredentialReq
-		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino/*Codec*/, &req) {
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 			return
 		}
 
@@ -69,6 +69,6 @@ func newAddCredentialRequestHandler(cliCtx /*context*/client.Context) http.Handl
 			return
 		}
 
-		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, msg)
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 	}
 }

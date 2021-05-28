@@ -3,19 +3,18 @@ package types
 import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-)
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported")
 
 //type ProjectDoc struct {
 //	TxHash     string          `json:"txHash" yaml:"txHash"`
-//	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
-//	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did         `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did         `json:"senderDid" yaml:"senderDid"`
 //	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 //	Status     ProjectStatus   `json:"status" yaml:"status"`
 //	Data       json.RawMessage `json:"data" yaml:"data"`
 //}
 
-func NewProjectDoc(txHash string, projectDid, senderDid did.Did,
+func NewProjectDoc(txHash string, projectDid, senderDid didexported.Did,
 	pubKey string, status ProjectStatus, data json.RawMessage) ProjectDoc {
 	return ProjectDoc{
 		TxHash:     txHash,
@@ -57,11 +56,11 @@ func NewUpdateProjectStatusDoc(status ProjectStatus, ethFundingTxnID string) Upd
 }
 
 //type CreateAgentDoc struct {
-//	AgentDid did.Did `json:"did" yaml:"did"`
+//	AgentDid didexported.Did `json:"did" yaml:"did"`
 //	Role     string  `json:"role" yaml:"role"`
 //}
 
-func NewCreateAgentDoc(agentDid did.Did, role string) CreateAgentDoc {
+func NewCreateAgentDoc(agentDid didexported.Did, role string) CreateAgentDoc {
 	return CreateAgentDoc{
 		AgentDid: agentDid,
 		Role:     role,
@@ -69,12 +68,12 @@ func NewCreateAgentDoc(agentDid did.Did, role string) CreateAgentDoc {
 }
 
 //type UpdateAgentDoc struct {
-//	Did    did.Did     `json:"did" yaml:"did"`
+//	Did    didexported.Did     `json:"did" yaml:"did"`
 //	Status AgentStatus `json:"status" yaml:"status"`
 //	Role   string      `json:"role" yaml:"role"`
 //}
 
-func NewUpdateAgentDoc(did did.Did, status AgentStatus, role string) UpdateAgentDoc {
+func NewUpdateAgentDoc(did didexported.Did, status AgentStatus, role string) UpdateAgentDoc {
 	return UpdateAgentDoc{
 		Did:    did,
 		Status: status,
@@ -107,12 +106,12 @@ func NewCreateEvaluationDoc(claimId string, status ClaimStatus) CreateEvaluation
 }
 
 //type WithdrawalInfoDoc struct {
-//	ProjectDid   did.Did  `json:"projectDid" yaml:"projectDid"`
-//	RecipientDid did.Did  `json:"recipientDid" yaml:"recipientDid"`
+//	ProjectDid   didexported.Did  `json:"projectDid" yaml:"projectDid"`
+//	RecipientDid didexported.Did  `json:"recipientDid" yaml:"recipientDid"`
 //	Amount       sdk.Coin `json:"amount" yaml:"amount"`
 //}
 
-func NewWithdrawalInfoDoc(projectDid, recipientDid did.Did, amount sdk.Coin) WithdrawalInfoDoc {
+func NewWithdrawalInfoDoc(projectDid, recipientDid didexported.Did, amount sdk.Coin) WithdrawalInfoDoc {
 	return WithdrawalInfoDoc{
 		ProjectDid:   projectDid,
 		RecipientDid: recipientDid,
@@ -121,13 +120,13 @@ func NewWithdrawalInfoDoc(projectDid, recipientDid did.Did, amount sdk.Coin) Wit
 }
 
 //type WithdrawFundsDoc struct {
-//	ProjectDid   did.Did `json:"projectDid" yaml:"projectDid"`
-//	RecipientDid did.Did `json:"recipientDid" yaml:"recipientDid"`
+//	ProjectDid   didexported.Did `json:"projectDid" yaml:"projectDid"`
+//	RecipientDid didexported.Did `json:"recipientDid" yaml:"recipientDid"`
 //	Amount       sdk.Int `json:"amount" yaml:"amount"`
 //	IsRefund     bool    `json:"isRefund" yaml:"isRefund"`
 //}
 
-func NewWithdrawFundsDoc(projectDid, recipientDid did.Did, amount sdk.Int, isRefund bool) WithdrawFundsDoc {
+func NewWithdrawFundsDoc(projectDid, recipientDid didexported.Did, amount sdk.Int, isRefund bool) WithdrawFundsDoc {
 	return WithdrawFundsDoc{
 		ProjectDid:   projectDid,
 		RecipientDid: recipientDid,

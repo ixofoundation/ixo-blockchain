@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"net/http"
@@ -35,7 +35,7 @@ func queryProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 
-		key := did.Did(didAddr)
+		key := didexported.Did(didAddr)
 		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryProjectDoc, key), nil)
 		if err != nil {

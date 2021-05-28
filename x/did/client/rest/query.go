@@ -13,16 +13,16 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 )
 
-func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
+func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// The .* is necessary so that a slash in the did gets included as part of the did
-	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/pubKeyToAddr/{pubKey}", queryAddressFromBase58EncodedPubkeyRequestHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/did/{did}", queryDidDocRequestHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/did", queryAllDidsRequestHandlerFn(cliCtx)).Methods("GET")
-	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandlerFn(cliCtx)).Methods("GET")
+	r.HandleFunc("/didToAddr/{did:.*}", queryAddressFromDidRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/pubKeyToAddr/{pubKey}", queryAddressFromBase58EncodedPubkeyRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/did/{did}", queryDidDocRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/did", queryAllDidsRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/allDidDocs", queryAllDidDocsRequestHandlerFn(clientCtx)).Methods("GET")
 }
 
-func queryAddressFromBase58EncodedPubkeyRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
+func queryAddressFromBase58EncodedPubkeyRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
@@ -36,18 +36,18 @@ func queryAddressFromBase58EncodedPubkeyRequestHandlerFn(cliCtx client.Context) 
 
 		accAddress := exported.VerifyKeyToAddr(vars["pubKey"])
 
-		rest.PostProcessResponse(w, cliCtx, accAddress)
+		rest.PostProcessResponse(w, clientCtx, accAddress)
 	}
 }
 
-func queryAddressFromDidRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
+func queryAddressFromDidRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 		key := exported.Did(didAddr)
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryDidDoc, key), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -61,21 +61,21 @@ func queryAddressFromDidRequestHandlerFn(cliCtx client.Context) http.HandlerFunc
 		}
 
 		var didDoc types.BaseDidDoc
-		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
+		clientCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
 		addressFromDid := didDoc.Address()
 
-		rest.PostProcessResponse(w, cliCtx, addressFromDid)
+		rest.PostProcessResponse(w, clientCtx, addressFromDid)
 	}
 }
 
-func queryDidDocRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
+func queryDidDocRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 		key := exported.Did(didAddr)
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryDidDoc, key), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -89,18 +89,18 @@ func queryDidDocRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var didDoc types.BaseDidDoc
-		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
+		clientCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
 
 
-		rest.PostProcessResponse(w, cliCtx, didDoc)
+		rest.PostProcessResponse(w, clientCtx, didDoc)
 	}
 }
 
-func queryAllDidsRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
+func queryAllDidsRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 			keeper.QueryAllDids), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -114,17 +114,17 @@ func queryAllDidsRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var dids []exported.Did
-		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &dids)
+		clientCtx.LegacyAmino.MustUnmarshalJSON(res, &dids)
 
-		rest.PostProcessResponse(w, cliCtx, dids)
+		rest.PostProcessResponse(w, clientCtx, dids)
 	}
 }
 
-func queryAllDidDocsRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
+func queryAllDidDocsRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 			keeper.QueryAllDidDocs), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -139,8 +139,8 @@ func queryAllDidDocsRequestHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var didDocs []types.BaseDidDoc
-		cliCtx.LegacyAmino.MustUnmarshalJSON(res, &didDocs)
+		clientCtx.LegacyAmino.MustUnmarshalJSON(res, &didDocs)
 
-		rest.PostProcessResponse(w, cliCtx, didDocs)
+		rest.PostProcessResponse(w, clientCtx, didDocs)
 	}
 }

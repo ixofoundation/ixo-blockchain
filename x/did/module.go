@@ -58,7 +58,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxE
 		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
 	}
 
-	return types.ValidateGenesis(data)
+	return types.ValidateGenesis(&data)
 }
 
 // RegisterRESTRoutes registers the REST routes for the did module.
@@ -72,44 +72,15 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 }
 
 // GetTxCmd returns the root tx command for the did module.
-func (AppModuleBasic) GetTxCmd(/*cdc *codec.Codec*/) *cobra.Command {
-	didTxCmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      "did transaction sub commands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
-
-	didTxCmd.AddCommand(
-		cli.NewCmdAddDidDoc(),
-		cli.NewCmdAddCredential(),
-	)
-
-	return didTxCmd
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.NewTxCmd()
 }
 
 // GetQueryCmd returns the root query command for the did module.
-func (AppModuleBasic) GetQueryCmd(/*cdc *codec.Codec*/) *cobra.Command {
-	didQueryCmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      "did query sub commands",
-		DisableFlagParsing:         true,
-		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
-	}
-
-	didQueryCmd.AddCommand(
-		cli.GetCmdAddressFromBase58Pubkey(),
-		cli.GetCmdAddressFromDid(),
-		cli.GetCmdIxoDidFromMnemonic(),
-		cli.GetCmdDidDoc(),
-		cli.GetCmdAllDids(),
-		cli.GetCmdAllDidDocs(),
-	)
-
-	return didQueryCmd
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
 }
+
 //____________________________________________________________________________
 
 // AppModule implements an application module for the did module.

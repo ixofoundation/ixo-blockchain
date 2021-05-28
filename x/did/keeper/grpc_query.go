@@ -33,7 +33,7 @@ func (k Keeper) DidDoc(c context.Context, req *types.QueryDidDocRequest) (*types
 	return &types.QueryDidDocResponse{Diddoc: any}, nil
 }
 
-func (k Keeper) AllDids(c context.Context, req *types.QueryAllDidsRequest) (*types.QueryAllDidsResponse, error) {
+func (k Keeper) AllDids(c context.Context, _ *types.QueryAllDidsRequest) (*types.QueryAllDidsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
 	allDids := k.GetAllDids(ctx)
@@ -41,7 +41,7 @@ func (k Keeper) AllDids(c context.Context, req *types.QueryAllDidsRequest) (*typ
 	return &types.QueryAllDidsResponse{Dids: allDids}, nil
 }
 
-func (k Keeper) AllDidDocs(c context.Context, req *types.QueryAllDidDocsRequest) (*types.QueryAllDidDocsResponse, error) {
+func (k Keeper) AllDidDocs(c context.Context, _ *types.QueryAllDidDocsRequest) (*types.QueryAllDidDocsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var didDocs []exported.DidDoc
@@ -55,7 +55,7 @@ func (k Keeper) AllDidDocs(c context.Context, req *types.QueryAllDidDocsRequest)
 			panic(fmt.Errorf("cannot proto marshal %T", dd))
 		}
 		any, err := codectypes.NewAnyWithValue(msg)
-		if err != nil {
+		if err == nil {
 			anys[i] = any
 		}
 	}
@@ -84,7 +84,7 @@ func (k Keeper) AddressFromBase58EncodedPubkey(c context.Context, req *types.Que
 	}
 
 	if !types.IsValidPubKey(req.PubKey) {
-		return &types.QueryAddressFromBase58EncodedPubkeyResponse{}, errors.New("input is not a valid base-58 encoded pubKey")
+		return nil, errors.New("input is not a valid base-58 encoded pubKey")
 	}
 
 	accAddress := exported.VerifyKeyToAddr(req.PubKey)

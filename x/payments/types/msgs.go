@@ -6,7 +6,8 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,12 +36,12 @@ var (
 )
 
 //type MsgCreatePaymentTemplate struct {
-//	CreatorDid      did.Did         `json:"creator_did" yaml:"creator_did"`
+//	CreatorDid      didexported.Did         `json:"creator_did" yaml:"creator_did"`
 //	PaymentTemplate PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 //}
 
 func NewMsgCreatePaymentTemplate(template PaymentTemplate,
-	creatorDid did.Did) *MsgCreatePaymentTemplate {
+	creatorDid didexported.Did) *MsgCreatePaymentTemplate {
 	return &MsgCreatePaymentTemplate{
 		CreatorDid:      creatorDid,
 		PaymentTemplate: template,
@@ -56,8 +57,8 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
+	if !didtypes.IsValidDid(msg.CreatorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Validate PaymentTemplate
@@ -68,7 +69,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreatePaymentTemplate) GetSignerDid() did.Did { return msg.CreatorDid }
+func (msg MsgCreatePaymentTemplate) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -86,7 +87,7 @@ func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 }
 
 //type MsgCreatePaymentContract struct {
-//	CreatorDid        did.Did        `json:"creator_did" yaml:"creator_did"`
+//	CreatorDid        didexported.Did        `json:"creator_did" yaml:"creator_did"`
 //	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
 //	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 //	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
@@ -97,7 +98,7 @@ func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
 	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
-	discountId sdk.Uint, creatorDid did.Did) *MsgCreatePaymentContract {
+	discountId sdk.Uint, creatorDid didexported.Did) *MsgCreatePaymentContract {
 	return &MsgCreatePaymentContract{
 		CreatorDid:        creatorDid,
 		PaymentTemplateId: templateId,
@@ -120,8 +121,8 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
+	if !didtypes.IsValidDid(msg.CreatorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -140,7 +141,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreatePaymentContract) GetSignerDid() did.Did { return msg.CreatorDid }
+func (msg MsgCreatePaymentContract) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -158,7 +159,7 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 }
 
 //type MsgCreateSubscription struct {
-//	CreatorDid        did.Did  `json:"creator_did" yaml:"creator_did"`
+//	CreatorDid        didexported.Did  `json:"creator_did" yaml:"creator_did"`
 //	SubscriptionId    string   `json:"subscription_id" yaml:"subscription_id"`
 //	PaymentContractId string   `json:"payment_contract_id" yaml:"payment_contract_id"`
 //	MaxPeriods        sdk.Uint `json:"max_periods" yaml:"max_periods"`
@@ -166,7 +167,7 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 //}
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
-	period Period, creatorDid did.Did) *MsgCreateSubscription {
+	period Period, creatorDid didexported.Did) *MsgCreateSubscription {
 	msg := &MsgCreateSubscription{
 		CreatorDid:        creatorDid,
 		SubscriptionId:    subscriptionId,
@@ -215,8 +216,8 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.CreatorDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "creator DID is invalid")
+	if !didtypes.IsValidDid(msg.CreatorDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -238,7 +239,7 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreateSubscription) GetSignerDid() did.Did { return msg.CreatorDid }
+func (msg MsgCreateSubscription) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -262,13 +263,13 @@ func (m MsgCreateSubscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker)
 }
 
 //type MsgSetPaymentContractAuthorisation struct {
-//	PayerDid          did.Did `json:"payer_did" yaml:"payer_did"`
+//	PayerDid          didexported.Did `json:"payer_did" yaml:"payer_did"`
 //	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
 //	Authorised        bool    `json:"authorised" yaml:"authorised"`
 //}
 
 func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
-	payerDid did.Did) *MsgSetPaymentContractAuthorisation {
+	payerDid didexported.Did) *MsgSetPaymentContractAuthorisation {
 	return &MsgSetPaymentContractAuthorisation{
 		PayerDid:          payerDid,
 		PaymentContractId: contractId,
@@ -287,8 +288,8 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.PayerDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "payer DID is invalid")
+	if !didtypes.IsValidDid(msg.PayerDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "payer DID is invalid")
 
 	}
 
@@ -300,7 +301,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() did.Did { return msg.PayerDid }
+func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() didexported.Did { return msg.PayerDid }
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -318,14 +319,14 @@ func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
 }
 
 //type MsgGrantDiscount struct {
-//	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+//	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
 //	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 //	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 //	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
 //}
 
 func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
-	recipient sdk.AccAddress, creatorDid did.Did) *MsgGrantDiscount {
+	recipient sdk.AccAddress, creatorDid didexported.Did) *MsgGrantDiscount {
 	return &MsgGrantDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
@@ -345,8 +346,8 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -357,7 +358,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgGrantDiscount) GetSignerDid() did.Did { return msg.SenderDid }
+func (msg MsgGrantDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -375,13 +376,13 @@ func (msg MsgGrantDiscount) GetSignBytes() []byte {
 }
 
 //type MsgRevokeDiscount struct {
-//	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+//	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
 //	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 //	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
 //}
 
 func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
-	creatorDid did.Did) *MsgRevokeDiscount {
+	creatorDid didexported.Did) *MsgRevokeDiscount {
 	return &MsgRevokeDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
@@ -400,8 +401,8 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -412,7 +413,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgRevokeDiscount) GetSignerDid() did.Did { return msg.SenderDid }
+func (msg MsgRevokeDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -430,11 +431,11 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 }
 
 //type MsgEffectPayment struct {
-//	SenderDid         did.Did `json:"sender_did" yaml:"sender_did"`
+//	SenderDid         didexported.Did `json:"sender_did" yaml:"sender_did"`
 //	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
 //}
 
-func NewMsgEffectPayment(contractId string, creatorDid did.Did) *MsgEffectPayment {
+func NewMsgEffectPayment(contractId string, creatorDid didexported.Did) *MsgEffectPayment {
 	return &MsgEffectPayment{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
@@ -450,8 +451,8 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// Check that IDs valid
@@ -462,7 +463,7 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgEffectPayment) GetSignerDid() did.Did { return msg.SenderDid }
+func (msg MsgEffectPayment) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }

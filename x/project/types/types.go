@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
 type (
@@ -45,7 +45,7 @@ func (pfm ProjectFeesMap) GetPayTemplateId(feeType FeeType) (string, error) {
 	return "", fmt.Errorf("fee '%s' not found in fees map", feeType)
 }
 
-func (id InternalAccountID) ToAddressKey(projectDid did.Did) string {
+func (id InternalAccountID) ToAddressKey(projectDid didexported.Did) string {
 	return projectDid + "/" + string(id)
 }
 
@@ -105,11 +105,11 @@ const (
 //type Claim struct {
 //	Id         string      `json:"id" yaml:"id"`
 //	TemplateId string      `json:"template_id" yaml:"template_id"`
-//	ClaimerDid did.Did     `json:"claimer_did" yaml:"claimer_did"`
+//	ClaimerDid didexported.Did     `json:"claimer_did" yaml:"claimer_did"`
 //	Status     ClaimStatus `json:"status" yaml:"status"`
 //}
 
-func NewClaim(id string, templateId string, claimerDid did.Did) Claim {
+func NewClaim(id string, templateId string, claimerDid didexported.Did) Claim {
 	return Claim{
 		Id:         id,
 		TemplateId: templateId,

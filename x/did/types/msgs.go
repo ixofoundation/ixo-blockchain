@@ -65,7 +65,7 @@ func (msg MsgAddDid) ValidateBasic() error {
 }
 
 func (msg MsgAddDid) GetSignBytes() []byte {
-	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func NewMsgAddCredential(did string, credType []string, issuer string, issued string) *MsgAddCredential {
@@ -111,5 +111,5 @@ func (msg MsgAddCredential) ValidateBasic() error {
 }
 
 func (msg MsgAddCredential) GetSignBytes() []byte {
-	return sdk.MustSortJSON(amino.MustMarshalJSON(msg))
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }

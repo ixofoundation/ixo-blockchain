@@ -10,6 +10,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func NewTxCmd() *cobra.Command {
+	didTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "did transaction sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	didTxCmd.AddCommand(
+		NewCmdAddDidDoc(),
+		NewCmdAddCredential(),
+	)
+
+	return didTxCmd
+}
+
 func NewCmdAddDidDoc() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-did-doc [ixo-did]",
@@ -33,9 +50,6 @@ func NewCmdAddDidDoc() *cobra.Command {
 				return err
 			}
 
-			if err := msg.ValidateBasic() ; err != nil {
-				return err
-			}
 			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
@@ -74,9 +88,6 @@ func NewCmdAddCredential() *cobra.Command {
 				return err
 			}
 
-			if err := msg.ValidateBasic() ; err != nil {
-				return err
-			}
 			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}

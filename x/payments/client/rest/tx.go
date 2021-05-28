@@ -8,7 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	//"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"net/http"
 )
@@ -25,7 +26,7 @@ func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
 
 type createPaymentTemplateReq struct {
 	BaseReq         rest.BaseReq          `json:"base_req" yaml:"base_req"`
-	CreatorDid      did.Did               `json:"creator_did" yaml:"creator_did"`
+	CreatorDid      didexported.Did               `json:"creator_did" yaml:"creator_did"`
 	PaymentTemplate types.PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 }
 
@@ -52,7 +53,7 @@ func newCreatePaymentTemplateRequestHandlerFn(clientCtx client.Context) http.Han
 
 type createPaymentContractReq struct {
 	BaseReq           rest.BaseReq       `json:"base_req" yaml:"base_req"`
-	CreatorDid        did.Did            `json:"creator_did" yaml:"creator_did"`
+	CreatorDid        didexported.Did            `json:"creator_did" yaml:"creator_did"`
 	PaymentTemplateId string             `json:"payment_template_id" yaml:"payment_template_id"`
 	PaymentContractId string             `json:"payment_contract_id" yaml:"payment_contract_id"`
 	Payer             sdk.AccAddress     `json:"payer" yaml:"payer"`
@@ -86,7 +87,7 @@ func newCreatePaymentContractRequestHandlerFn(clientCtx client.Context) http.Han
 
 type createSubscriptionReq struct {
 	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	CreatorDid        did.Did      `json:"creator_did" yaml:"creator_did"`
+	CreatorDid        didexported.Did      `json:"creator_did" yaml:"creator_did"`
 	SubscriptionId    string       `json:"subscription_id" yaml:"subscription_id"`
 	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
 	MaxPeriods        sdk.Uint     `json:"max_periods" yaml:"max_periods"`
@@ -117,7 +118,7 @@ func newCreateSubscriptionRequestHandlerFn(clientCtx client.Context) http.Handle
 
 type setPaymentContractAuthorisationReq struct {
 	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	PayerDid          did.Did      `json:"payer_did" yaml:"payer_did"`
+	PayerDid          didexported.Did      `json:"payer_did" yaml:"payer_did"`
 	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
 	Authorised        bool         `json:"authorised" yaml:"authorised"`
 }
@@ -146,7 +147,7 @@ func newSetPaymentContractAuthorisationRequestHandlerFn(clientCtx client.Context
 
 type grantDiscountReq struct {
 	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
-	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
 	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
 	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
@@ -176,7 +177,7 @@ func newGrantDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc
 
 type revokeDiscountReq struct {
 	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
-	SenderDid         did.Did        `json:"sender_did" yaml:"sender_did"`
+	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
 	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
 	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
 }
@@ -205,7 +206,7 @@ func newRevokeDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFun
 
 type effectPaymentReq struct {
 	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	SenderDid         did.Did      `json:"sender_did" yaml:"sender_did"`
+	SenderDid         didexported.Did      `json:"sender_did" yaml:"sender_did"`
 	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
 }
 

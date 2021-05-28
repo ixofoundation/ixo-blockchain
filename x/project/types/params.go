@@ -7,7 +7,7 @@ import (
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	//"github.com/cosmos/cosmos-sdk/x/params" //TODO uncomment
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
 const (
@@ -25,7 +25,7 @@ var (
 
 //project parameters
 //type Params struct {
-//	IxoDid                       did.Did   `json:"ixo_did" yaml:"ixo_did"`
+//	IxoDid                       didexported.Did   `json:"ixo_did" yaml:"ixo_did"`
 //	ProjectMinimumInitialFunding sdk.Coins `json:"project_minimum_initial_funding" yaml:"project_minimum_initial_funding"`
 //	OracleFeePercentage          sdk.Dec   `json:"oracle_fee_percentage" yaml:"oracle_fee_percentage"`
 //	NodeFeePercentage            sdk.Dec   `json:"node_fee_percentage" yaml:"node_fee_percentage"`
@@ -36,7 +36,7 @@ func ParamKeyTable() params.KeyTable {
 	return params.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(projectMinimumInitialFunding sdk.Coins, ixoDid did.Did,
+func NewParams(projectMinimumInitialFunding sdk.Coins, ixoDid didexported.Did,
 	oracleFeePercentage, nodeFeePercentage sdk.Dec) Params {
 	return Params{
 		IxoDid:                       ixoDid,
@@ -49,7 +49,7 @@ func NewParams(projectMinimumInitialFunding sdk.Coins, ixoDid did.Did,
 
 // default project module parameters
 func DefaultParams() Params {
-	defaultIxoDid := did.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
+	defaultIxoDid := didexported.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
 	defaultMinInitFunding := sdk.NewCoins(sdk.NewCoin(
 		IxoNativeToken, sdk.OneInt()))
 	tenPercentFee := sdk.NewDec(10)
@@ -75,7 +75,7 @@ func DefaultParams() Params {
 //}
 
 func validateIxoDid(i interface{}) error {
-	v, ok := i.(did.Did)
+	v, ok := i.(didexported.Did)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}

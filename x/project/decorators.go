@@ -7,6 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 
@@ -15,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
 )
 
 // SetUpContextDecorator sets the GasMeter in the Context and wraps the next AnteHandler with a defer clause
@@ -149,12 +149,12 @@ type DeductFeeDecorator struct {
 	ak           keeper.AccountKeeper
 	//supplyKeeper authtypes.SupplyKeeper
 	bk           bankkeeper.Keeper
-	didKeeper    did.Keeper
+	didKeeper    didkeeper.Keeper
 	pkg          ixotypes.PubKeyGetter
 }
 
 func NewDeductFeeDecorator(ak keeper.AccountKeeper, bk bankkeeper.Keeper,
-	didKeeper did.Keeper, pkg ixotypes.PubKeyGetter) DeductFeeDecorator {
+	didKeeper didkeeper.Keeper, pkg ixotypes.PubKeyGetter) DeductFeeDecorator {
 	return DeductFeeDecorator{
 		ak:           ak,
 		bk:           bk,

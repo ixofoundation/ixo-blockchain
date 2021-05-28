@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 )
@@ -38,14 +37,14 @@ var (
 
 //type MsgCreateProject struct {
 //	TxHash     string          `json:"txHash" yaml:"txHash"`
-//	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did         `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did         `json:"projectDid" yaml:"projectDid"`
 //	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 //	Data       json.RawMessage `json:"data" yaml:"data"`
 //}
 
-func NewMsgCreateProject(senderDid did.Did, projectData json.RawMessage,
-	projectDid did.Did, pubKey string) *MsgCreateProject {
+func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
+	projectDid didexported.Did, pubKey string) *MsgCreateProject {
 	return &MsgCreateProject{
 		TxHash:     "",
 		SenderDid:  senderDid,
@@ -92,8 +91,8 @@ func (msg MsgCreateProject) ValidateBasic() error {
 	}
 
 	// Check that project DID matches the PubKey
-	unprefixedDid := exported.UnprefixedDid(msg.ProjectDid)
-	expectedUnprefixedDid := exported.UnprefixedDidFromPubKey(msg.PubKey)
+	unprefixedDid := didexported.UnprefixedDid(msg.ProjectDid)
+	expectedUnprefixedDid := didexported.UnprefixedDidFromPubKey(msg.PubKey)
 	if unprefixedDid != expectedUnprefixedDid {
 		return sdkerrors.Wrapf(didtypes.ErrDidPubKeyMismatch,
 			"did not deducable from pubKey; expected: %s received: %s",
@@ -103,7 +102,7 @@ func (msg MsgCreateProject) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreateProject) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgCreateProject) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -124,12 +123,12 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 
 //type MsgUpdateProjectStatus struct {
 //	TxHash     string                 `json:"txHash" yaml:"txHash"`
-//	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did                `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did                `json:"projectDid" yaml:"projectDid"`
 //	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 //}
 
-func NewMsgUpdateProjectStatus(senderDid did.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid did.Did) *MsgUpdateProjectStatus {
+func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid didexported.Did) *MsgUpdateProjectStatus {
 	return &MsgUpdateProjectStatus{
 		TxHash:     "",
 		SenderDid:  senderDid,
@@ -152,10 +151,10 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 	// TODO: perform some checks on the Data (of type UpdateProjectStatusDoc)
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	// IsValidProgressionFrom checked by the handler
@@ -167,19 +166,19 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgUpdateProjectStatus) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgUpdateProjectStatus) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
 
 //type MsgCreateAgent struct {
 //	TxHash     string         `json:"txHash" yaml:"txHash"`
-//	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did        `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did        `json:"projectDid" yaml:"projectDid"`
 //	Data       CreateAgentDoc `json:"data" yaml:"data"`
 //}
 
-func NewMsgCreateAgent(txHash string, senderDid did.Did, createAgentDoc CreateAgentDoc, projectDid did.Did) *MsgCreateAgent {
+func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc CreateAgentDoc, projectDid didexported.Did) *MsgCreateAgent {
 	return &MsgCreateAgent{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
@@ -201,18 +200,18 @@ func (msg MsgCreateAgent) ValidateBasic() error {
 	// TODO: perform some checks on the Data (of type CreateAgentDoc)
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
-	} else if !did.IsValidDid(msg.Data.AgentDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "agent DID is invalid")
+	if !didtypes.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
+	} else if !didtypes.IsValidDid(msg.Data.AgentDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "agent DID is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgCreateAgent) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -231,12 +230,12 @@ func (msg MsgCreateAgent) String() string {
 
 //type MsgUpdateAgent struct {
 //	TxHash     string         `json:"txHash" yaml:"txHash"`
-//	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did        `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did        `json:"projectDid" yaml:"projectDid"`
 //	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 //}
 
-func NewMsgUpdateAgent(txHash string, senderDid did.Did, updateAgentDoc UpdateAgentDoc, projectDid did.Did) *MsgUpdateAgent {
+func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc UpdateAgentDoc, projectDid didexported.Did) *MsgUpdateAgent {
 	return &MsgUpdateAgent{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
@@ -258,18 +257,18 @@ func (msg MsgUpdateAgent) ValidateBasic() error {
 	// TODO: perform some checks on the Data (of type UpdateAgentDoc)
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
-	} else if !did.IsValidDid(msg.Data.Did) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "agent DID is invalid")
+	if !didtypes.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
+	} else if !didtypes.IsValidDid(msg.Data.Did) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "agent DID is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgUpdateAgent) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgUpdateAgent) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -289,12 +288,12 @@ func (msg MsgUpdateAgent) String() string {
 
 //type MsgCreateClaim struct {
 //	TxHash     string         `json:"txHash" yaml:"txHash"`
-//	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did        `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did        `json:"projectDid" yaml:"projectDid"`
 //	Data       CreateClaimDoc `json:"data" yaml:"data"`
 //}
 
-func NewMsgCreateClaim(txHash string, senderDid did.Did, createClaimDoc CreateClaimDoc, projectDid did.Did) *MsgCreateClaim {
+func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc CreateClaimDoc, projectDid didexported.Did) *MsgCreateClaim {
 	return &MsgCreateClaim{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
@@ -321,16 +320,16 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 	// TODO: perform some additional checks on the Data (of type CreateClaimDoc)
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateClaim) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgCreateClaim) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -350,12 +349,12 @@ func (msg MsgCreateClaim) String() string {
 
 //type MsgCreateEvaluation struct {
 //	TxHash     string              `json:"txHash" yaml:"txHash"`
-//	SenderDid  did.Did             `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid did.Did             `json:"projectDid" yaml:"projectDid"`
+//	SenderDid  didexported.Did             `json:"senderDid" yaml:"senderDid"`
+//	ProjectDid didexported.Did             `json:"projectDid" yaml:"projectDid"`
 //	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 //}
 
-func NewMsgCreateEvaluation(txHash string, senderDid did.Did, createEvaluationDoc CreateEvaluationDoc, projectDid did.Did) *MsgCreateEvaluation {
+func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEvaluationDoc CreateEvaluationDoc, projectDid didexported.Did) *MsgCreateEvaluation {
 	return &MsgCreateEvaluation{
 		ProjectDid: projectDid,
 		TxHash:     txHash,
@@ -378,16 +377,16 @@ func (msg MsgCreateEvaluation) ValidateBasic() error {
 	// TODO: perform some checks on the Data (of type CreateEvaluationDoc)
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
 }
 
-func (msg MsgCreateEvaluation) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgCreateEvaluation) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -406,11 +405,11 @@ func (msg MsgCreateEvaluation) String() string {
 }
 
 //type MsgWithdrawFunds struct {
-//	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
+//	SenderDid didexported.Did          `json:"senderDid" yaml:"senderDid"`
 //	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 //}
 
-func NewMsgWithdrawFunds(senderDid did.Did, data WithdrawFundsDoc) *MsgWithdrawFunds {
+func NewMsgWithdrawFunds(senderDid didexported.Did, data WithdrawFundsDoc) *MsgWithdrawFunds {
 	return &MsgWithdrawFunds{
 		SenderDid: senderDid,
 		Data:      data,
@@ -433,17 +432,17 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 	// TODO: perform some checks on the Data (of type WithdrawFundsDoc)
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
-	} else if !did.IsValidDid(msg.Data.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.Data.RecipientDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "recipient DID is invalid")
+	if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
+	} else if !didtypes.IsValidDid(msg.Data.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.Data.RecipientDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "recipient DID is invalid")
 	}
 
 	// Check that the sender is also the recipient
 	if msg.SenderDid != msg.Data.RecipientDid {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender did must match recipient did")
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender did must match recipient did")
 	}
 
 	// Check that amount is positive
@@ -454,7 +453,7 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSignerDid() did.Did { return msg.Data.RecipientDid }
+func (msg MsgWithdrawFunds) GetSignerDid() didexported.Did { return msg.Data.RecipientDid }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
@@ -472,7 +471,7 @@ func (msg MsgWithdrawFunds) String() string {
 	return string(b)
 }
 
-func NewMsgUpdateProjectDoc(senderDid did.Did, projectData json.RawMessage, projectDid did.Did) *MsgUpdateProjectDoc {
+func NewMsgUpdateProjectDoc(senderDid didexported.Did, projectData json.RawMessage, projectDid didexported.Did) *MsgUpdateProjectDoc {
 	return &MsgUpdateProjectDoc{
 		TxHash:     "",
 		SenderDid:  senderDid,
@@ -500,10 +499,10 @@ func (msg MsgUpdateProjectDoc) ValidateBasic() error {
 	}
 
 	// Check that DIDs valid
-	if !did.IsValidDid(msg.ProjectDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "project DID is invalid")
-	} else if !did.IsValidDid(msg.SenderDid) {
-		return sdkerrors.Wrap(did.ErrInvalidDid, "sender DID is invalid")
+	if !didtypes.IsValidDid(msg.ProjectDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
+	} else if !didtypes.IsValidDid(msg.SenderDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
 	return nil
@@ -513,7 +512,7 @@ func (msg MsgUpdateProjectDoc) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgUpdateProjectDoc) GetSignerDid() did.Did { return msg.ProjectDid }
+func (msg MsgUpdateProjectDoc) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectDoc) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
