@@ -35,14 +35,6 @@ yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,100000
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 
-# Add genesis oracles
-MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
-SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-yes $PASSWORD | ixod add-genesis-oracle "$MIGUEL_DID" "uixo:mint"
-yes $PASSWORD | ixod add-genesis-oracle "$FRANCESCO_DID" "uixo:mint/burn/transfer,uxgbp:mint/burn/transfer"
-yes $PASSWORD | ixod add-genesis-oracle "$SHAUN_DID" "res:transfer,rez:transfer"
-
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
 FROM="\"ixo_did\": \"\""
@@ -76,10 +68,10 @@ TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 # TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
-ixod config chain-id pandora-2
-ixod config output json
-ixod config indent true
-ixod config trust-node true
+#ixod config chain-id pandora-2
+#ixod config output json
+#ixod config indent true
+#ixod config trust-node true
 
 ixod gentx miguel 1000000uixo --chain-id pandora-2
 
@@ -101,8 +93,8 @@ sed -i "107s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 #TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 #sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
-# Set timeouts to 1s for shorter block times
-sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
-sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
+# Uncomment the below to set timeouts to 1s for shorter block times
+#sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
+#sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
 
 ixod start --pruning "nothing"
