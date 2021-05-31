@@ -5,20 +5,18 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"strconv"
 )
 
 type msgServer struct {
 	Keeper
-	BankKeeper     bankkeeper.Keeper
 }
 
 // NewMsgServerImpl returns an implementation of the gov MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper, bankKeeper bankkeeper.Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper, BankKeeper: bankKeeper}
+func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+	return &msgServer{Keeper: keeper}
 }
 
 func (k msgServer) SetPaymentContractAuthorisation(goCtx context.Context, msg *types.MsgSetPaymentContractAuthorisation) (*types.MsgSetPaymentContractAuthorisationResponse, error) {
@@ -113,7 +111,7 @@ func (k msgServer) CreatePaymentTemplate(goCtx context.Context, msg *types.MsgCr
 
 func (k msgServer) CreatePaymentContract(goCtx context.Context, msg *types.MsgCreatePaymentContract) (*types.MsgCreatePaymentContractResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	bk := k.BankKeeper
+	bk := k.Keeper.bankKeeper
 
 	// Ensure that payment contract doesn't already exist
 	if k.PaymentContractExists(ctx, msg.PaymentContractId) {
@@ -367,7 +365,6 @@ func (k msgServer) RevokeDiscount(goCtx context.Context, msg *types.MsgRevokeDis
 
 func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPayment) (*types.MsgEffectPaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	bk := k.BankKeeper
 
 	// Get payment contract
 	contract, err := k.GetPaymentContract(ctx, msg.PaymentContractId)
@@ -392,7 +389,7 @@ func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPaym
 	}
 
 	// Effect payment
-	effected, err := k.Keeper.EffectPayment(ctx, bk, msg.PaymentContractId)
+	effected, err := k.Keeper.EffectPayment(ctx, msg.PaymentContractId)
 	if err != nil {
 		return nil, err
 	}

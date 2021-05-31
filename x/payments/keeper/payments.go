@@ -6,8 +6,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 
-	//"github.com/cosmos/cosmos-sdk/x/bank"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
@@ -247,8 +245,7 @@ func adjustForMaximums(template types.PaymentTemplate, cumulative sdk.Coins) {
 	}
 }
 
-func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
-	contractId string) (effected bool, err error) {
+func (k Keeper) EffectPayment(ctx sdk.Context, contractId string) (effected bool, err error) {
 
 	contract, err := k.GetPaymentContract(ctx, contractId)
 	if err != nil {
@@ -290,7 +287,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 
 	// Stop if payer doesn't have enough coins. However, this is not considered
 	// an error but the caller should be looking at the 'effected' bool result
-	if pay.IsAllGTE(bankKeeper.GetAllBalances(ctx, contractPayerAddr)) {
+	if pay.IsAllGTE(k.bankKeeper.GetAllBalances(ctx, contractPayerAddr)) {
 		return false, nil
 	}
 
@@ -327,7 +324,6 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 		outputs = append(outputs, banktypes.NewOutput(payRemainderPoolAddr, outputToPayRemainderPool))
 	}
 
-
 	// Construct list of inputs (pay and from PayRemainderPool if non zero)
 	inputs := []banktypes.Input{banktypes.NewInput(contractPayerAddr, pay)}
 	if !inputFromPayRemainderPool.IsZero() {
@@ -336,7 +332,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 	}
 
 	// Distribute the payment according to the outputs
-	err = bankKeeper.InputOutputCoins(ctx, inputs, outputs)
+	err = k.bankKeeper.InputOutputCoins(ctx, inputs, outputs)
 	if err != nil {
 		return false, err
 	}

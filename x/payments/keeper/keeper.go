@@ -3,9 +3,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"strings"
 )
@@ -14,13 +12,13 @@ type Keeper struct {
 	cdc                codec.BinaryMarshaler
 	storeKey           sdk.StoreKey
 	paramSpace         paramtypes.Subspace
-	bankKeeper         bankkeeper.Keeper
-	DidKeeper          didkeeper.Keeper
+	bankKeeper         types.BankKeeper
+	DidKeeper          types.DidKeeper
 	reservedIdPrefixes []string
 }
 
-func NewKeeper(cdc codec.BinaryMarshaler, storeKey sdk.StoreKey, bankKeeper bankkeeper.Keeper,
-	didKeeper didkeeper.Keeper, reservedIdPrefixes []string) Keeper {
+func NewKeeper(cdc codec.BinaryMarshaler, storeKey sdk.StoreKey, bankKeeper types.BankKeeper,
+	didKeeper types.DidKeeper, reservedIdPrefixes []string) Keeper {
 	return Keeper{
 		cdc:                cdc,
 		storeKey:           storeKey,

@@ -3,7 +3,6 @@ package payments
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -46,8 +45,8 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 
-func NewHandler(k keeper.Keeper, bk bankkeeper.Keeper) sdk.Handler {
-	msgServer := keeper.NewMsgServerImpl(k, bk)
+func NewHandler(k keeper.Keeper) sdk.Handler {
+	msgServer := keeper.NewMsgServerImpl(k)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())

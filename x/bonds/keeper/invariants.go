@@ -34,7 +34,7 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 
 		// Get supply of coins held in accounts (includes stake token)
 		supplyInAccounts := sdk.Coins{}
-		k.BankKeeper.IterateAllBalances(ctx, func(_ sdk.AccAddress, balance sdk.Coin) bool {
+		k.bankKeeper.IterateAllBalances(ctx, func(_ sdk.AccAddress, balance sdk.Coin) bool {
 			supplyInAccounts = supplyInAccounts.Add(balance)
 			return false
 		})

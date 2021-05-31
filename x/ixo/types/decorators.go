@@ -3,14 +3,14 @@ package types
 import (
 	"bytes"
 	"fmt"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authsigning"github.com/cosmos/cosmos-sdk/x/auth/signing"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 type SetPubKeyDecorator struct {
@@ -86,16 +86,16 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 // Call next AnteHandler if fees successfully deducted
 // CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
 type DeductFeeDecorator struct {
-	ak           ante.AccountKeeper
-	bk           types.BankKeeper
-	pkg          PubKeyGetter
+	ak  ante.AccountKeeper
+	bk  authtypes.BankKeeper
+	pkg PubKeyGetter
 }
 
-func NewDeductFeeDecorator(ak ante.AccountKeeper, bk types.BankKeeper, pkg PubKeyGetter) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak ante.AccountKeeper, bk authtypes.BankKeeper, pkg PubKeyGetter) DeductFeeDecorator {
 	return DeductFeeDecorator{
-		ak:           ak,
-		bk: 		  bk,
-		pkg:          pkg,
+		ak:  ak,
+		bk:  bk,
+		pkg: pkg,
 	}
 }
 
@@ -105,8 +105,8 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
-	if addr := dfd.ak.GetModuleAddress(types.FeeCollectorName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", types.FeeCollectorName))
+	if addr := dfd.ak.GetModuleAddress(authtypes.FeeCollectorName); addr == nil {
+		panic(fmt.Sprintf("%s module account has not been set", authtypes.FeeCollectorName))
 	}
 
 	// all messages must be of type IxoMsg
@@ -159,7 +159,7 @@ func NewSigGasConsumeDecorator(ak keeper.AccountKeeper, sigGasConsumer ante.Sign
 }
 
 func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	sigTx, ok := tx.(authsigning.SigVerifiableTx)//tx.(ante.SigVerifiableTx)
+	sigTx, ok := tx.(authsigning.SigVerifiableTx) //tx.(ante.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
 	}
@@ -222,16 +222,16 @@ func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type SigVerificationDecorator struct {
-	ak    		    keeper.AccountKeeper
+	ak              keeper.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
 	pkg             PubKeyGetter
 }
 
 func NewSigVerificationDecorator(ak keeper.AccountKeeper, signModeHandler authsigning.SignModeHandler, pkg PubKeyGetter) SigVerificationDecorator {
 	return SigVerificationDecorator{
-		ak:  ak,
+		ak:              ak,
 		signModeHandler: signModeHandler,
-		pkg: pkg,
+		pkg:             pkg,
 	}
 }
 

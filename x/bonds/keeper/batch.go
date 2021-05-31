@@ -207,7 +207,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	var extraEventAttributes []sdk.Attribute
 
 	// Get buyer address
-	buyerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, bo.BaseOrder.AccountDid)
+	buyerDidDoc, err := k.didKeeper.GetDidDoc(ctx, bo.BaseOrder.AccountDid)
 	if err != nil {
 		return err
 	}
@@ -219,14 +219,14 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	}
 
 	// Mint bond tokens
-	err = k.BankKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
+	err = k.bankKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
 		sdk.Coins{bo.BaseOrder.Amount})
 	if err != nil {
 		return err
 	}
 
 	// Send bond tokens bought to buyer
-	err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 		types.BondsMintBurnAccount, buyerAddr, sdk.Coins{bo.BaseOrder.Amount})
 	if err != nil {
 		return err
@@ -287,7 +287,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 		}
 
 		// Send reserve tokens to funding pool
-		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 			types.BatchesIntermediaryAccount, feeAddr, coinsToFundingPool)
 		if err != nil {
 			return err
@@ -307,7 +307,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 
 	// Add charged fee to fee address
 	if !txFees.IsZero() {
-		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 			types.BatchesIntermediaryAccount, feeAddr, txFees)
 		if err != nil {
 			return err
@@ -317,7 +317,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	// Add remainder to buyer address
 	returnToBuyer := bo.MaxPrices.Sub(totalPrices)
 	if !returnToBuyer.IsZero() {
-		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 			types.BatchesIntermediaryAccount, buyerAddr, returnToBuyer)
 		if err != nil {
 			return err
@@ -331,7 +331,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid))
 
 	// Get new bond token balance
-	bondTokenBalance := k.BankKeeper.GetBalance(ctx, buyerAddr, bond.Token).Amount //k.BankKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
+	bondTokenBalance := k.bankKeeper.GetBalance(ctx, buyerAddr, bond.Token).Amount //k.bankKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
 
 	event := sdk.NewEvent(
 		types.EventTypeOrderFulfill,
@@ -356,7 +356,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// Get seller address
-	sellerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
+	sellerDidDoc, err := k.didKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
 	if err != nil {
 		return err
 	}
@@ -397,7 +397,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid))
 
 	// Get new bond token balance
-	bondTokenBalance := k.BankKeeper.GetBalance(ctx, sellerAddr, bond.Token).Amount //k.BankKeeper.GetCoins(ctx, sellerAddr).AmountOf(bond.Token)
+	bondTokenBalance := k.bankKeeper.GetBalance(ctx, sellerAddr, bond.Token).Amount //k.bankKeeper.GetCoins(ctx, sellerAddr).AmountOf(bond.Token)
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,
@@ -419,7 +419,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 	// WARNING: do not return ok=true if money has already been transferred when error occurs
 
 	// Get swapper address
-	swapperDidDoc, err := k.DidKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
+	swapperDidDoc, err := k.didKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
 	if err != nil {
 		return err, true
 	}
@@ -459,7 +459,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 
 	// Add fee (taken from swapper) to fee address
 	if !txFee.IsZero() {
-		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 			types.BatchesIntermediaryAccount, feeAddr, sdk.Coins{txFee})
 		if err != nil {
 			return err, false
@@ -539,8 +539,8 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid didexported.Did) {
 					logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 					// Return from amount to swapper
-					swapperAddr := k.DidKeeper.MustGetDidDoc(ctx, so.BaseOrder.AccountDid).Address()
-					err := k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+					swapperAddr := k.didKeeper.MustGetDidDoc(ctx, so.BaseOrder.AccountDid).Address()
+					err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 						types.BatchesIntermediaryAccount, swapperAddr, sdk.Coins{so.BaseOrder.Amount})
 					if err != nil {
 						panic(err)
@@ -609,8 +609,8 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid didexported.Did
 				))
 
 				// Return reserve to buyer
-				buyerAddr := k.DidKeeper.MustGetDidDoc(ctx, bo.BaseOrder.AccountDid).Address()
-				err := k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+				buyerAddr := k.didKeeper.MustGetDidDoc(ctx, bo.BaseOrder.AccountDid).Address()
+				err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 					types.BatchesIntermediaryAccount, buyerAddr, bo.MaxPrices)
 				if err != nil {
 					panic(err)

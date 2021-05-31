@@ -16,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/spf13/pflag"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -47,9 +46,9 @@ func init() {
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (cryptotypes.PubKey, error)
 
-func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
+func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk authtypes.BankKeeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter,
-	signModeHandler authsigning.SignModeHandler,) sdk.AnteHandler {
+	signModeHandler authsigning.SignModeHandler) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler. Below, we will discuss the differences
@@ -127,7 +126,7 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 //	return signMsg.Fee, nil
 //}
 
-func GenerateOrBroadcastTxCLI(clientCtx client.Context, flagSet *pflag.FlagSet, ixoDid exported.IxoDid, msg sdk.Msg,) error {
+func GenerateOrBroadcastTxCLI(clientCtx client.Context, flagSet *pflag.FlagSet, ixoDid exported.IxoDid, msg sdk.Msg) error {
 	txf := tx.NewFactoryCLI(clientCtx, flagSet)
 	return GenerateOrBroadcastTxWithFactory(clientCtx, txf, ixoDid, msg)
 }

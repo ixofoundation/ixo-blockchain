@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -76,6 +74,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 	return cli.GetQueryCmd()
 }
+
 // RegisterInterfaces registers interfaces and implementations of the project module.
 func (a AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)
@@ -87,13 +86,13 @@ func (a AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry
 type AppModule struct {
 	AppModuleBasic
 	keeper         keeper.Keeper
-	paymentsKeeper paymentskeeper.Keeper
-	bankKeeper     bankkeeper.Keeper
+	paymentsKeeper types.PaymentsKeeper
+	bankKeeper     types.BankKeeper
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper keeper.Keeper, paymentsKeeper paymentskeeper.Keeper,
-	bankKeeper bankkeeper.Keeper) AppModule {
+func NewAppModule(keeper keeper.Keeper, paymentsKeeper types.PaymentsKeeper,
+	bankKeeper types.BankKeeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
@@ -113,7 +112,7 @@ func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the project module.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper, am.paymentsKeeper, am.bankKeeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
 }
 
 // QuerierRoute returns the project module's querier route name.
@@ -128,7 +127,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 
 // RegisterServices registers module services.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.bankKeeper, am.paymentsKeeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 

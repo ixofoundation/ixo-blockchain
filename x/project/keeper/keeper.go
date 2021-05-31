@@ -6,15 +6,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
-
-	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
@@ -23,20 +18,21 @@ type Keeper struct {
 	cdc            codec.BinaryMarshaler
 	storeKey       sdk.StoreKey
 	paramSpace     paramstypes.Subspace
-	AccountKeeper  authkeeper.AccountKeeper
-	DidKeeper      didkeeper.Keeper
-	paymentsKeeper paymentskeeper.Keeper
+	accountKeeper  types.AccountKeeper
+	didKeeper      types.DidKeeper
+	paymentsKeeper types.PaymentsKeeper
+	bankKeeper     types.BankKeeper
 }
 
 func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
-	accountKeeper authkeeper.AccountKeeper, didKeeper didkeeper.Keeper,
-	paymentsKeeper paymentskeeper.Keeper) Keeper {
+	accountKeeper types.AccountKeeper, didKeeper types.DidKeeper,
+	paymentsKeeper types.PaymentsKeeper) Keeper {
 	return Keeper{
 		cdc:            cdc,
 		storeKey:       key,
 		paramSpace:     paramSpace.WithKeyTable(types.ParamKeyTable()),
-		AccountKeeper:  accountKeeper,
-		DidKeeper:      didKeeper,
+		accountKeeper:  accountKeeper,
+		didKeeper:      didKeeper,
 		paymentsKeeper: paymentsKeeper,
 	}
 }
@@ -157,12 +153,12 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, projectDid didexported.Did,
 	accountId types.InternalAccountID) (authtypes.AccountI, error) {
 	address := authtypes.NewModuleAddress(accountId.ToAddressKey(projectDid))
 
-	if k.AccountKeeper.GetAccount(ctx, address) != nil {
+	if k.accountKeeper.GetAccount(ctx, address) != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
 	}
 
-	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
-	k.AccountKeeper.SetAccount(ctx, account)
+	account := k.accountKeeper.NewAccountWithAddress(ctx, address)
+	k.accountKeeper.SetAccount(ctx, account)
 
 	return account, nil
 }

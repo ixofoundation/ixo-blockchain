@@ -79,7 +79,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 }
 
 // RegisterInterfaces registers interfaces and implementations of the bonds module.
-func (AppModuleBasic) RegisterInterfaces (registry codectypes.InterfaceRegistry) {
+func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)
 }
 
@@ -90,7 +90,7 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper        keeper.Keeper
-	accountKeeper auth.AccountKeeper
+	accountKeeper types.AccountKeeper
 }
 
 // NewAppModule creates a new AppModule object

@@ -25,12 +25,12 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (*types.MsgCreateBondResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	feeAddr , err := sdk.AccAddressFromBech32(msg.FeeAddress)
+	feeAddr, err := sdk.AccAddressFromBech32(msg.FeeAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	if k.BankKeeper.BlockedAddr(feeAddr) {
+	if k.bankKeeper.BlockedAddr(feeAddr) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
 	}
 
@@ -39,7 +39,7 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 		return nil, sdkerrors.Wrap(types.ErrBondAlreadyExists, msg.BondDid)
 	} else if k.BondDidExists(ctx, msg.Token) {
 		return nil, sdkerrors.Wrap(types.ErrBondTokenIsTaken, msg.Token)
-	} else if msg.Token == k.StakingKeeper.GetParams(ctx).BondDenom {
+	} else if msg.Token == k.stakingKeeper.GetParams(ctx).BondDenom {
 		return nil, types.ErrBondTokenCannotBeStakingToken
 	}
 
@@ -385,7 +385,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 
 func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	buyerAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
+	buyerAddr := k.didKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -414,7 +414,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	}
 
 	// Take max that buyer is willing to pay (enforces maxPrice <= balance)
-	err := k.BankKeeper.SendCoinsFromAccountToModule(ctx, buyerAddr,
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, buyerAddr,
 		types.BatchesIntermediaryAccount, msg.MaxPrices)
 	if err != nil {
 		return nil, err
@@ -453,7 +453,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.MsgBuy) (*types.MsgBuyResponse, error) {
-	buyerAddr := keeper.DidKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
+	buyerAddr := keeper.didKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
@@ -479,14 +479,14 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 	}
 
 	// Mint bond tokens
-	err = keeper.BankKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
+	err = keeper.bankKeeper.MintCoins(ctx, types.BondsMintBurnAccount,
 		sdk.Coins{msg.Amount})
 	if err != nil {
 		return nil, err
 	}
 
 	// Send bond tokens to buyer
-	err = keeper.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+	err = keeper.bankKeeper.SendCoinsFromModuleToAccount(ctx,
 		types.BondsMintBurnAccount, buyerAddr, sdk.Coins{msg.Amount})
 	if err != nil {
 		return nil, err
@@ -514,7 +514,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 
 func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSellResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	sellerAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.SellerDid).Address()
+	sellerAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SellerDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -536,14 +536,14 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 	}
 
 	// Send coins to be burned from seller (enforces sellAmount <= balance)
-	err := k.BankKeeper.SendCoinsFromAccountToModule(ctx, sellerAddr,
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sellerAddr,
 		types.BondsMintBurnAccount, sdk.Coins{msg.Amount})
 	if err != nil {
 		return nil, err
 	}
 
 	// Burn bond tokens to be sold
-	err = k.BankKeeper.BurnCoins(ctx, types.BondsMintBurnAccount,
+	err = k.bankKeeper.BurnCoins(ctx, types.BondsMintBurnAccount,
 		sdk.Coins{msg.Amount})
 	if err != nil {
 		return nil, err
@@ -582,7 +582,7 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	swapperAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.SwapperDid).Address()
+	swapperAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SwapperDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -609,7 +609,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	// Take coins to be swapped from swapper (enforces swapAmount <= balance)
-	err := k.BankKeeper.SendCoinsFromAccountToModule(ctx, swapperAddr,
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, swapperAddr,
 		types.BatchesIntermediaryAccount, sdk.Coins{msg.From})
 	if err != nil {
 		return nil, err
@@ -644,7 +644,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeOutcomePayment) (*types.MsgMakeOutcomePaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	senderAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.SenderDid).Address()
+	senderAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SenderDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -682,7 +682,7 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 
 func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawShare) (*types.MsgWithdrawShareResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	recipientAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.RecipientDid).Address()
+	recipientAddr := k.didKeeper.MustGetDidDoc(ctx, msg.RecipientDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -695,21 +695,21 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	}
 
 	// Get number of bond tokens owned by the recipient
-	bondTokensOwnedAmount := k.BankKeeper.GetBalance(ctx, recipientAddr, bond.Token).Amount  //GetCoins(ctx, recipientAddr).AmountOf(bond.Token)
+	bondTokensOwnedAmount := k.bankKeeper.GetBalance(ctx, recipientAddr, bond.Token).Amount //GetCoins(ctx, recipientAddr).AmountOf(bond.Token)
 	if bondTokensOwnedAmount.IsZero() {
 		return nil, types.ErrNoBondTokensOwned
 	}
 	bondTokensOwned := sdk.NewCoin(bond.Token, bondTokensOwnedAmount)
 
 	// Send coins to be burned from recipient
-	err := k.BankKeeper.SendCoinsFromAccountToModule(
+	err := k.bankKeeper.SendCoinsFromAccountToModule(
 		ctx, recipientAddr, types.BondsMintBurnAccount, sdk.NewCoins(bondTokensOwned))
 	if err != nil {
 		return nil, err
 	}
 
 	// Burn bond tokens
-	err = k.BankKeeper.BurnCoins(ctx, types.BondsMintBurnAccount,
+	err = k.bankKeeper.BurnCoins(ctx, types.BondsMintBurnAccount,
 		sdk.NewCoins(sdk.NewCoin(bond.Token, bondTokensOwnedAmount)))
 	if err != nil {
 		return nil, err

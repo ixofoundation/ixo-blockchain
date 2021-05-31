@@ -5,20 +5,16 @@ import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	did "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"strconv"
 )
 
 type msgServer struct {
-	Keeper         Keeper
-	BankKeeper     bankkeeper.Keeper
-	PaymentsKeeper paymentskeeper.Keeper
+	Keeper Keeper
 }
 
 const (
@@ -29,11 +25,9 @@ const (
 
 // NewMsgServerImpl returns an implementation of the project MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper) types.MsgServer {
+func NewMsgServerImpl(k Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper:         k,
-		BankKeeper:     bk,
-		PaymentsKeeper: pk,
+		Keeper: k,
 	}
 }
 
@@ -94,7 +88,7 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpdateProjectStatus) (*types.MsgUpdateProjectStatusResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
-	bk := s.BankKeeper
+	bk := s.Keeper.bankKeeper
 
 	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
 	if err != nil {
@@ -117,7 +111,7 @@ func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpda
 			return nil, err
 		}
 
-		projectAcc := k.AccountKeeper.GetAccount(ctx, projectAddr)
+		projectAcc := k.accountKeeper.GetAccount(ctx, projectAddr)
 		if projectAcc == nil {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
 				"could not find project's account with address %s", projectAddr)
@@ -131,8 +125,8 @@ func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpda
 		minimumFunding := k.GetParams(ctx).ProjectMinimumInitialFunding
 		if !minimumFunding.DenomsSubsetOf(bk.GetAllBalances(ctx, projectAcc.GetAddress())) ||
 			minimumFunding.IsAnyGT(bk.GetAllBalances(ctx, projectAcc.GetAddress())) {
-		//if !minimumFunding.DenomsSubsetOf(projectAcc.GetCoins()) ||
-		//	minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
+			//if !minimumFunding.DenomsSubsetOf(projectAcc.GetCoins()) ||
+			//	minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"project has not reached minimum funding %s", minimumFunding)
 		}
@@ -166,7 +160,7 @@ func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpda
 	return &types.MsgUpdateProjectStatusResponse{}, nil
 }
 
-func payoutFees(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did) error {
+func payoutFees(ctx sdk.Context, k Keeper, bk types.BankKeeper, projectDid did.Did) error {
 
 	_, err := payAllFeesToAddress(ctx, k, bk, projectDid, IxoAccountPayFeesId, IxoAccountFeesId)
 	if err != nil {
@@ -188,7 +182,7 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid dide
 	return nil
 }
 
-func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did,
+func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk types.BankKeeper, projectDid did.Did,
 	sendingAddress types.InternalAccountID, receivingAddress types.InternalAccountID) (*sdk.Result, error) {
 	feesToPay := getIxoAmount(ctx, k, bk, projectDid, sendingAddress)
 
@@ -208,7 +202,7 @@ func payAllFeesToAddress(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projec
 	return nil, bk.SendCoins(ctx, sendingAccount, receivingAccount, sdk.Coins{feesToPay})
 }
 
-func getIxoAmount(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did, accountID types.InternalAccountID) sdk.Coin {
+func getIxoAmount(ctx sdk.Context, k Keeper, bk types.BankKeeper, projectDid did.Did, accountID types.InternalAccountID) sdk.Coin {
 	found := checkAccountInProjectAccounts(ctx, k, projectDid, accountID)
 	if found {
 		accAddr, _ := getAccountInProjectAccounts(ctx, k, projectDid, accountID)
@@ -327,8 +321,8 @@ func (s msgServer) CreateClaim(goCtx context.Context, msg *types.MsgCreateClaim)
 func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateEvaluation) (*types.MsgCreateEvaluationResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
-	bk := s.BankKeeper
-	pk := s.PaymentsKeeper
+	bk := s.Keeper.bankKeeper
+	pk := s.Keeper.paymentsKeeper
 
 	// Check if project exists
 	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
@@ -370,7 +364,7 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		}
 
 		// Get sender (oracle) address
-		senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
+		senderDidDoc, err := k.didKeeper.GetDidDoc(ctx, msg.SenderDid)
 		if err != nil {
 			return nil, err
 		}
@@ -399,7 +393,7 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 	templateId, err = feesMap.GetPayTemplateId(types.FeeForService)
 	if err == nil && msg.Data.Status == string(types.ApprovedClaim) {
 		// Get claimer address
-		claimerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, claim.ClaimerDid)
+		claimerDidDoc, err := k.didKeeper.GetDidDoc(ctx, claim.ClaimerDid)
 		if err != nil {
 			return nil, err
 		}
@@ -442,7 +436,7 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 func (s msgServer) WithdrawFunds(goCtx context.Context, msg *types.MsgWithdrawFunds) (*types.MsgWithdrawFundsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
-	bk := s.BankKeeper
+	bk := s.Keeper.bankKeeper
 
 	withdrawFundsDoc := msg.Data
 	projectDoc, err := k.GetProjectDoc(ctx, withdrawFundsDoc.ProjectDid)
@@ -544,8 +538,8 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 	return &types.MsgUpdateProjectDocResponse{}, nil
 }
 
-func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did,
-	fromAccountId types.InternalAccountID, recipientDid didexported.Did, amount sdk.Coin) error {
+func payoutAndRecon(ctx sdk.Context, k Keeper, bk types.BankKeeper, projectDid did.Did,
+	fromAccountId types.InternalAccountID, recipientDid did.Did, amount sdk.Coin) error {
 
 	ixoBalance := getIxoAmount(ctx, k, bk, projectDid, fromAccountId)
 	if ixoBalance.IsLT(amount) {
@@ -558,7 +552,7 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	}
 
 	// Get recipient address
-	recipientDidDoc, err := k.DidKeeper.GetDidDoc(ctx, recipientDid)
+	recipientDidDoc, err := k.didKeeper.GetDidDoc(ctx, recipientDid)
 	if err != nil {
 		return err
 	}
@@ -573,8 +567,8 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	return nil
 }
 
-func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper,
-	projectDid didexported.Did, senderAddr sdk.AccAddress, recipients paymentstypes.Distribution,
+func processPay(ctx sdk.Context, k Keeper, bk types.BankKeeper, pk types.PaymentsKeeper,
+	projectDid did.Did, senderAddr sdk.AccAddress, recipients paymentstypes.Distribution,
 	feeType types.FeeType, paymentTemplateId string) error {
 
 	// Validate recipients
@@ -619,7 +613,7 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk paymentskeep
 		//}
 
 		// Effect payment
-		effected, err := pk.EffectPayment(ctx, bk, contractId)
+		effected, err := pk.EffectPayment(ctx, contractId)
 		if err != nil {
 			return err
 		} else if !effected {
@@ -632,7 +626,7 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk paymentskeep
 	return nil
 }
 
-func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexported.Did,
+func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,
 	accountId types.InternalAccountID) bool {
 	strAccountId := string(accountId)
 	accMap := k.GetAccountMap(ctx, projectDid)
@@ -642,7 +636,7 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexpo
 }
 
 func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper,
-	projectDid didexported.Did, recipientDid didexported.Did, amount sdk.Coin) {
+	projectDid did.Did, recipientDid did.Did, amount sdk.Coin) {
 
 	withdrawalInfo := types.WithdrawalInfoDoc{
 		ProjectDid:   projectDid,
@@ -653,7 +647,7 @@ func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper,
 	k.AddProjectWithdrawalTransaction(ctx, projectDid, withdrawalInfo)
 }
 
-func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexported.Did,
+func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,
 	accountId types.InternalAccountID) (sdk.AccAddress, error) {
 	acc, err := k.CreateNewAccount(ctx, projectDid, accountId)
 	if err != nil {
@@ -665,7 +659,7 @@ func createAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexp
 	return acc.GetAddress(), nil
 }
 
-func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexported.Did,
+func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid did.Did,
 	accountId types.InternalAccountID) (sdk.AccAddress, error) {
 	strAccountId := string(accountId)
 	accMap := k.GetAccountMap(ctx, projectDid)
@@ -678,6 +672,6 @@ func getAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexport
 	}
 }
 
-func getProjectAccount(ctx sdk.Context, k Keeper, projectDid didexported.Did) (sdk.AccAddress, error) {
+func getProjectAccount(ctx sdk.Context, k Keeper, projectDid did.Did) (sdk.AccAddress, error) {
 	return getAccountInProjectAccounts(ctx, k, projectDid, types.InternalAccountID(projectDid))
 }

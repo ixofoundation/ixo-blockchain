@@ -67,7 +67,7 @@ func (k Keeper) EffectSubscriptionPayment(ctx sdk.Context, subscriptionId string
 	}
 
 	// Effect payment
-	effected, err := k.EffectPayment(ctx, k.bankKeeper, subscription.PaymentContractId)
+	effected, err := k.EffectPayment(ctx, subscription.PaymentContractId)
 	if err != nil {
 		return err
 	}

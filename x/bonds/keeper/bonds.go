@@ -80,7 +80,7 @@ func (k Keeper) DepositReserve(ctx sdk.Context, bondDid didexported.Did,
 	from sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens to bonds reserve account
-	err := k.BankKeeper.SendCoinsFromAccountToModule(
+	err := k.bankKeeper.SendCoinsFromAccountToModule(
 		ctx, from, types.BondsReserveAccount, amount)
 	if err != nil {
 		return err
@@ -96,7 +96,7 @@ func (k Keeper) DepositOutcomePayment(ctx sdk.Context, bondDid didexported.Did,
 	from sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens to bonds reserve account
-	err := k.BankKeeper.SendCoinsFromAccountToModule(
+	err := k.bankKeeper.SendCoinsFromAccountToModule(
 		ctx, from, types.BondsReserveAccount, amount)
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid didexported.Di
 	fromModule string, amount sdk.Coins) error {
 
 	// Send tokens to bonds reserve account
-	err := k.BankKeeper.SendCoinsFromModuleToModule(
+	err := k.bankKeeper.SendCoinsFromModuleToModule(
 		ctx, fromModule, types.BondsReserveAccount, amount)
 	if err != nil {
 		return err
@@ -128,7 +128,7 @@ func (k Keeper) WithdrawReserve(ctx sdk.Context, bondDid didexported.Did,
 	to sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens from bonds reserve account
-	err := k.BankKeeper.SendCoinsFromModuleToAccount(
+	err := k.bankKeeper.SendCoinsFromModuleToAccount(
 		ctx, types.BondsReserveAccount, to, amount)
 	if err != nil {
 		return err
