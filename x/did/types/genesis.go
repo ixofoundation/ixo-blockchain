@@ -35,3 +35,18 @@ func DefaultGenesisState() *GenesisState {
 func ValidateGenesis(data *GenesisState) error {
 	return nil
 }
+
+var _ types.UnpackInterfacesMessage = GenesisState{}
+
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+func (data GenesisState) UnpackInterfaces(unpacker types.AnyUnpacker) error {
+	for _, genesisDidDoc := range data.Diddocs {
+		var didDoc exported.DidDoc
+		err := unpacker.UnpackAny(genesisDidDoc, &didDoc)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
