@@ -49,7 +49,7 @@ type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (cryptotypes.PubKey, error)
 
 func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter,
-	signModeHandler authsigning.SignModeHandler,) sdk.AnteHandler {
+	signModeHandler authsigning.SignModeHandler) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler. Below, we will discuss the differences
@@ -127,7 +127,7 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 //	return signMsg.Fee, nil
 //}
 
-func GenerateOrBroadcastTxCLI(clientCtx client.Context, flagSet *pflag.FlagSet, ixoDid exported.IxoDid, msg sdk.Msg,) error {
+func GenerateOrBroadcastTxCLI(clientCtx client.Context, flagSet *pflag.FlagSet, ixoDid exported.IxoDid, msg sdk.Msg) error {
 	txf := tx.NewFactoryCLI(clientCtx, flagSet)
 	return GenerateOrBroadcastTxWithFactory(clientCtx, txf, ixoDid, msg)
 }
@@ -138,11 +138,6 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 	}
 
 	return BroadcastTx(clientCtx, txf, ixoDid, msg)
-}
-
-// GasEstimateResponse defines a response definition for tx gas estimation.
-type GasEstimateResponse struct {
-	GasEstimate uint64 `json:"gas_estimate" yaml:"gas_estimate"`
 }
 
 func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDid, msg sdk.Msg) error {
@@ -158,7 +153,7 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 		}
 
 		txf = txf.WithGas(adjusted)
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n", GasEstimateResponse{GasEstimate: txf.Gas()})
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", tx.GasEstimateResponse{GasEstimate: txf.Gas()})
 	}
 
 	if clientCtx.Simulate {

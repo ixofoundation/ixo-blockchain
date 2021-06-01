@@ -19,8 +19,9 @@ if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
-GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
+GAS_PRICES="0.025uixo"
+CHAIN_ID="pandora-2"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
 
 ixod_tx() {
@@ -30,12 +31,13 @@ ixod_tx() {
   cmd="$1 $2"
   shift
   shift
-  APPROX=$(ixod tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --dry-run "$@" 2>&1)
+  APPROX=$(ixod tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --chain-id="$CHAIN_ID" --dry-run "$@" 2>&1)
   APPROX=${APPROX//gas estimate: /}
   echo "Gas estimate: $APPROX"
   ixod tx $cmd \
     --gas="$APPROX" \
     --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
     "$@" | jq .
     # The $@ adds any extra arguments to the end
 }
