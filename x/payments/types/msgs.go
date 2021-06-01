@@ -183,7 +183,7 @@ func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.
 	return msg
 }
 
-func (msg *MsgCreateSubscription) SetPeriod (period Period) error {
+func (msg *MsgCreateSubscription) SetPeriod(period Period) error {
 	m, ok := period.(proto.Message)
 	if !ok {
 		return fmt.Errorf("can't proto marshal %T", m)
@@ -255,6 +255,8 @@ func (msg MsgCreateSubscription) String() string {
 func (msg MsgCreateSubscription) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
+
+var _ codectypes.UnpackInterfacesMessage = MsgCreateSubscription{}
 
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 func (m MsgCreateSubscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
