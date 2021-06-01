@@ -1,5 +1,9 @@
 package types
 
+import (
+	"github.com/cosmos/cosmos-sdk/codec/types"
+)
+
 //type GenesisState struct {
 //	PaymentTemplates []PaymentTemplate `json:"payment_templates" yaml:"payment_templates"`
 //	PaymentContracts []PaymentContract `json:"payment_contracts" yaml:"payment_contracts"`
@@ -46,4 +50,18 @@ func DefaultGenesisState() *GenesisState {
 		PaymentContracts: nil,
 		Subscriptions:    nil,
 	}
+}
+
+var _ types.UnpackInterfacesMessage = GenesisState{}
+
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+func (data GenesisState) UnpackInterfaces(unpacker types.AnyUnpacker) error {
+	for _, subscription := range data.Subscriptions {
+		err := subscription.UnpackInterfaces(unpacker)
+		if err != nil {
+			return nil
+		}
+	}
+
+	return nil
 }

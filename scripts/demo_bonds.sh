@@ -115,7 +115,6 @@ ixod_q bonds bond "$BOND_DID"
 echo "Editing bond..."
 ixod_tx bonds edit-bond \
   --name="New A B C" \
-  --token=abc \
   --bond-did="$BOND_DID" \
   --editor-did="$MIGUEL_DID_FULL"
 echo "Edited bond..."

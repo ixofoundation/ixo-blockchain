@@ -139,11 +139,6 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 	return BroadcastTx(clientCtx, txf, ixoDid, msg)
 }
 
-// GasEstimateResponse defines a response definition for tx gas estimation.
-type GasEstimateResponse struct {
-	GasEstimate uint64 `json:"gas_estimate" yaml:"gas_estimate"`
-}
-
 func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDid, msg sdk.Msg) error {
 	txf, err := tx.PrepareFactory(clientCtx, txf)
 	if err != nil {
@@ -157,7 +152,7 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 		}
 
 		txf = txf.WithGas(adjusted)
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n", GasEstimateResponse{GasEstimate: txf.Gas()})
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", tx.GasEstimateResponse{GasEstimate: txf.Gas()})
 	}
 
 	if clientCtx.Simulate {

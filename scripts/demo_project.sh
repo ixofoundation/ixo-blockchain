@@ -243,9 +243,13 @@ ixod_q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
 echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixod_q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
 echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-ixod_q bank balances "$(ixod q did get-address-from-did $MIGUEL_DID)"
+MIGUEL_FULL_ADDR="$(ixod q did get-address-from-did $MIGUEL_DID)"
+MIGUEL_ADDR=${MIGUEL_FULL_ADDR##*: }
+ixod_q bank balances "$MIGUEL_ADDR"
 echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-ixod_q bank balances "$(ixod q did get-address-from-did $SHAUN_DID)"
+SHAUN_FULL_ADDR="$(ixod q did get-address-from-did $SHAUN_DID)"
+SHAUN_ADDR=${MIGUEL_FULL_ADDR##*: }
+ixod_q bank balances "$SHAUN_ADDR"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner

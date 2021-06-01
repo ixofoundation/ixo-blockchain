@@ -70,6 +70,8 @@ func (s Subscription) Validate() error {
 	return period.Validate()
 }
 
+var _ codectypes.UnpackInterfacesMessage = Subscription{}
+
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 func (s Subscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 	var period Period
