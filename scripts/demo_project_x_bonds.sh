@@ -39,7 +39,8 @@ ixod_tx() {
   ixod tx $cmd \
     --gas-prices="$GAS_PRICES" \
     --chain-id="$CHAIN_ID" \
-    -y > /dev/null
+    -y \
+    "$@" | jq .
     # The $@ adds any extra arguments to the end
 
     # NOTE: broadcast-mode=block intentionally excluded
@@ -147,17 +148,17 @@ ixod_tx did add-did-doc "$IXO_DID_FULL" --broadcast-mode block
 
 # Fund DID and owner accounts using Miguel's tokens
 echo "Funding DID and owner accounts..."
-ADDR1=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_1_FULL")")
-ADDR2=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_2_FULL")")
-ADDR3=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_3_FULL")")
-ADDR4=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_4_FULL")")
-ADDR5=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_5_FULL")")
-ADDR6=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_6_FULL")")
-ADDR7=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_7_FULL")")
-ADDR8=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_8_FULL")")
-ADDR9=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_9_FULL")")
-ADDR10=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_10_FULL)")
-OWNER_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js "$OWNER_DID_FULL")")
+ADDR1=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_1_FULL")")
+ADDR2=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_2_FULL")")
+ADDR3=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_3_FULL")")
+ADDR4=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_4_FULL")")
+ADDR5=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_5_FULL")")
+ADDR6=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_6_FULL")")
+ADDR7=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_7_FULL")")
+ADDR8=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_8_FULL")")
+ADDR9=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$DID_9_FULL")")
+ADDR10=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_10_FULL)")
+OWNER_ADDR=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js "$OWNER_DID_FULL")")
 ixod_tx bank send miguel "$ADDR1" 10000000uixo
 ixod_tx bank send miguel "$ADDR2" 10000000uixo
 ixod_tx bank send miguel "$ADDR3" 10000000uixo
@@ -237,7 +238,6 @@ ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATO
 echo "Creating fee-for-service payment template..."
 CREATOR="$IXO_DID_FULL"
 ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block
-ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create project and progress status to PENDING
 SENDER_DID="$OWNER_DID"
@@ -249,7 +249,8 @@ echo "Updating project to PENDING..."
 ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Fund project with 100xGBP and 1000 IXO (for fees)
-PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
+FULL_PROJECT_ADDR="$(ixod q project get-project-accounts $PROJECT_DID)"
+PROJECT_ADDR=${FULL_PROJECT_ADDR##*$PROJECT_DID: }
 echo "Funding project with uixo and uxgbp (using Miguel's tokens)..."
 ixod_tx bank send miguel "$PROJECT_ADDR" 100000000uxgbp --broadcast-mode block
 ixod_tx bank send miguel "$PROJECT_ADDR" 1000000000uixo --broadcast-mode block

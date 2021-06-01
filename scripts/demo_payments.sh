@@ -117,7 +117,9 @@ PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
 PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
+FULL_PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
+# Delete longest match of pattern ': ' from the beginning
+PAYER_ADDR=${FULL_PAYER_ADDR##*: }
 ixod_tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR"
 
 # Authorise payment contract
