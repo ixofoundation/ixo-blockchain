@@ -30,15 +30,13 @@ const (
 )
 
 var (
-	fsBondGeneral = flag.NewFlagSet("", flag.ContinueOnError)
-	fsBondCreate  = flag.NewFlagSet("", flag.ContinueOnError)
-	fsBondEdit    = flag.NewFlagSet("", flag.ContinueOnError)
+	fsBondCreate = flag.NewFlagSet("", flag.ContinueOnError)
+	fsBondEdit   = flag.NewFlagSet("", flag.ContinueOnError)
 )
 
 func init() {
 
-	fsBondGeneral.String(FlagToken, "", "The bond's token")
-
+	fsBondCreate.String(FlagToken, "", "The bond's token")
 	fsBondCreate.String(FlagName, "", "The bond's name")
 	fsBondCreate.String(FlagDescription, "", "The bond's description")
 	fsBondCreate.String(FlagFunctionType, "", "The type of function that the bond will be")

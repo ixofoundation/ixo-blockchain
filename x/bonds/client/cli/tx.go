@@ -155,7 +155,6 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsBondGeneral)
 	cmd.Flags().AddFlagSet(fsBondCreate)
 
 	_ = cmd.MarkFlagRequired(FlagToken)
@@ -208,7 +207,6 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(fsBondGeneral)
 	cmd.Flags().AddFlagSet(fsBondEdit)
 
 	_ = cmd.MarkFlagRequired(FlagBondDid)
