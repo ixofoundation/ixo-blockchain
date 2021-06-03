@@ -30,10 +30,10 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgCreateProject struct {
-	TxHash     string                   `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty" yaml:"tx_hash"`
-	SenderDid  string                   `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"sender_did,omitempty" yaml:"sender_did"`
-	ProjectDid string                   `protobuf:"bytes,3,opt,name=project_did,json=projectDid,proto3" json:"project_did,omitempty" yaml:"project_did"`
-	PubKey     string                   `protobuf:"bytes,4,opt,name=pub_key,json=pubKey,proto3" json:"pub_key,omitempty" yaml:"pub_key"`
+	TxHash     string                   `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash,omitempty" yaml:"txHash"`
+	SenderDid  string                   `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid,omitempty" yaml:"senderDid"`
+	ProjectDid string                   `protobuf:"bytes,3,opt,name=project_did,json=projectDid,proto3" json:"projectDid,omitempty" yaml:"projectDid"`
+	PubKey     string                   `protobuf:"bytes,4,opt,name=pub_key,json=pubKey,proto3" json:"pubKey,omitempty" yaml:"pubKey"`
 	Data       encoding_json.RawMessage `protobuf:"bytes,5,opt,name=data,proto3,casttype=encoding/json.RawMessage" json:"data,omitempty" yaml:"data"`
 }
 
