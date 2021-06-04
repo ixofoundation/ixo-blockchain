@@ -109,7 +109,7 @@ import (
 )
 
 const (
-	appName              = "ixoApp"
+	appName              = "IxoApp"
 	Bech32MainPrefix     = "ixo"
 	Bech32PrefixAccAddr  = Bech32MainPrefix
 	Bech32PrefixAccPub   = Bech32MainPrefix + sdk.PrefixPublic
@@ -184,11 +184,11 @@ var (
 )
 
 // Verify app interface at compile time
-var _ simapp.App = (*ixoApp)(nil)
-var _ servertypes.Application = (*ixoApp)(nil)
+var _ simapp.App = (*IxoApp)(nil)
+var _ servertypes.Application = (*IxoApp)(nil)
 
 // Extended ABCI application
-type ixoApp struct {
+type IxoApp struct {
 	*baseapp.BaseApp                          `json:"_bam_base_app,omitempty"`
 	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
 	appCodec          codec.Marshaler         `json:"app_codec,omitempty"`
@@ -222,10 +222,10 @@ type ixoApp struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
 
 	// Custom ixo keepers
-	didKeeper      didkeeper.Keeper             `json:"did_keeper"`
-	bondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
-	paymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
-	projectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
+	DidKeeper      didkeeper.Keeper             `json:"did_keeper"`
+	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
+	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
+	ProjectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
 
 	// the module manager
 	mm *module.Manager `json:"mm,omitempty"`
@@ -239,7 +239,7 @@ func NewIxoApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
 	homePath string, invCheckPeriod uint, encodingConfig params.EncodingConfig,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
-) *ixoApp {
+) *IxoApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
 	appCodec := encodingConfig.Marshaler
@@ -265,7 +265,7 @@ func NewIxoApp(
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
-	app := &ixoApp{
+	app := &IxoApp{
 		BaseApp:           bApp,
 		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
@@ -364,13 +364,13 @@ func NewIxoApp(
 	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
 	// add keepers (for custom ixo modules)
-	app.didKeeper = didkeeper.NewKeeper(app.appCodec, keys[didtypes.StoreKey])
-	app.bondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.didKeeper,
+	app.DidKeeper = didkeeper.NewKeeper(app.appCodec, keys[didtypes.StoreKey])
+	app.BondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.DidKeeper,
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
-	app.paymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
-		app.BankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
-	app.projectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
-		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
+	app.PaymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
+		app.BankKeeper, app.DidKeeper, paymentsReservedIdPrefixes)
+	app.ProjectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
+		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.DidKeeper, app.PaymentsKeeper)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -397,10 +397,10 @@ func NewIxoApp(
 		transferModule,
 
 		// Custom ixo AppModules
-		did.NewAppModule(app.didKeeper),
-		bonds.NewAppModule(app.bondsKeeper, app.AccountKeeper),
-		payments.NewAppModule(app.paymentsKeeper, app.BankKeeper),
-		project.NewAppModule(app.projectKeeper, app.paymentsKeeper, app.BankKeeper),
+		did.NewAppModule(app.DidKeeper),
+		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
+		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
+		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -501,25 +501,25 @@ func NewIxoApp(
 // ixoapp. It is useful for tests and clients who do not want to construct the
 // full ixoapp.
 func MakeCodecs() (codec.Marshaler, *codec.LegacyAmino) {
-	config := MakeEncodingConfig()
+	config := MakeTestEncodingConfig()
 	return config.Marshaler, config.Amino
 }
 
 // Name returns the name of the App
-func (app *ixoApp) Name() string { return app.BaseApp.Name() }
+func (app *IxoApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
-func (app *ixoApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *IxoApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // EndBlocker application updates every end block
-func (app *ixoApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *IxoApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
 // InitChainer application update at chain initialization
-func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *IxoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
@@ -528,12 +528,12 @@ func (app *ixoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 }
 
 // LoadHeight loads a particular height
-func (app *ixoApp) LoadHeight(height int64) error {
+func (app *IxoApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height)
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
+func (app *IxoApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
@@ -543,7 +543,7 @@ func (app *ixoApp) ModuleAccountAddrs() map[string]bool {
 }
 
 // BlockedAddrs returns all the app's module account addresses black listed for receiving tokens.
-func (app *ixoApp) BlockedAddrs() map[string]bool {
+func (app *IxoApp) BlockedAddrs() map[string]bool {
 	blockedAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
@@ -552,64 +552,64 @@ func (app *ixoApp) BlockedAddrs() map[string]bool {
 	return blockedAddrs
 }
 
-// LegacyAmino returns ixoApp's amino codec.
+// LegacyAmino returns IxoApp's amino codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *ixoApp) LegacyAmino() *codec.LegacyAmino {
+func (app *IxoApp) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
 
-// AppCodec returns ixoApp's app codec.
+// AppCodec returns IxoApp's app codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *ixoApp) AppCodec() codec.Marshaler {
+func (app *IxoApp) AppCodec() codec.Marshaler {
 	return app.appCodec
 }
 
-// InterfaceRegistry returns ixoApp's InterfaceRegistry
-func (app *ixoApp) InterfaceRegistry() types.InterfaceRegistry {
+// InterfaceRegistry returns IxoApp's InterfaceRegistry
+func (app *IxoApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
 
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *ixoApp) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *IxoApp) GetKey(storeKey string) *sdk.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *ixoApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *IxoApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
 // GetMemKey returns the MemStoreKey for the provided mem key.
 //
 // NOTE: This is solely used for testing purposes.
-func (app *ixoApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
+func (app *IxoApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
 	return app.memKeys[storeKey]
 }
 
 // GetSubspace returns a param subspace for a given module name.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *ixoApp) GetSubspace(moduleName string) paramstypes.Subspace {
+func (app *IxoApp) GetSubspace(moduleName string) paramstypes.Subspace {
 	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
 	return subspace
 }
 
 // SimulationManager implements the SimulationApp interface
-func (app *ixoApp) SimulationManager() *module.SimulationManager {
+func (app *IxoApp) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
-func (app *ixoApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig srvconfig.APIConfig) {
+func (app *IxoApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig srvconfig.APIConfig) {
 	//panic("implement me")
 
 	clientCtx := apiSvr.ClientCtx
@@ -634,12 +634,12 @@ func (app *ixoApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig srvconfig.API
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
-func (app *ixoApp) RegisterTxService(clientCtx client.Context) {
+func (app *IxoApp) RegisterTxService(clientCtx client.Context) {
 	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
 }
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
-func (app *ixoApp) RegisterTendermintService(clientCtx client.Context) {
+func (app *IxoApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
@@ -663,7 +663,7 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler { //TODO encodingConfig
+func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler { //TODO encodingConfig
 
 	// The AnteHandler needs to get the signer's pubkey to verify signatures,
 	// charge gas fees (to the corresponding address), and for other purposes.
@@ -693,9 +693,9 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 	// of a project DID). The project module PubKeyGetter deals with this
 	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
 
-	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.didKeeper)
-	didPubKeyGetter := did.NewModulePubKeyGetter(app.didKeeper)
-	projectPubKeyGetter := project.NewModulePubKeyGetter(app.projectKeeper, app.didKeeper)
+	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
+	didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
+	projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
 
 	// Since we have parameterised pubkey getters, we can use the same default
 	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
@@ -737,7 +737,7 @@ func NewIxoAnteHandler(app *ixoApp, encodingConfig params.EncodingConfig) sdk.An
 	// this purpose, a custom project creation AnteHandler had to be created.
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.didKeeper, encodingConfig.TxConfig.SignModeHandler(),
+		app.AccountKeeper, app.BankKeeper, app.DidKeeper, encodingConfig.TxConfig.SignModeHandler(),
 		projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
