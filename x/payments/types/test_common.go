@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -17,16 +18,19 @@ type TestPeriod struct {
 }
 
 func (p TestPeriod) Reset() {
-	panic("implement me")
+	p = TestPeriod{}
 }
 
 func (p TestPeriod) String() string {
-	panic("implement me")
+	b, err := json.Marshal(p)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
 }
 
-func (p TestPeriod) ProtoMessage() {
-	panic("implement me")
-}
+func (TestPeriod) ProtoMessage() {}
 
 func NewTestPeriod(periodLength, periodStartBlock int64) TestPeriod {
 	return TestPeriod{

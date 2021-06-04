@@ -614,9 +614,6 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk paymentskeep
 				return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
 			}
 		}
-		//if !bk.HasCoins(ctx, projectAddr, template.PaymentAmount) { //TODO (Stef) Use IterateAllBalances?
-		//	return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
-		//}
 
 		// Effect payment
 		effected, err := pk.EffectPayment(ctx, bk, contractId)

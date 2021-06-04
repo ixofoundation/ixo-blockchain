@@ -31,6 +31,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+// Functions copied from Cosmos SDK
+
 // DefaultConsensusParams defines the default Tendermint consensus params used in
 // IxoApp testing.
 var DefaultConsensusParams = &abci.ConsensusParams{
