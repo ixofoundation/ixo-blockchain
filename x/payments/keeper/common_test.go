@@ -1,4 +1,4 @@
-package keeper
+package keeper_test
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -6,6 +6,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/ixofoundation/ixo-blockchain/cmd"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/tendermint/tendermint/crypto"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -105,7 +106,7 @@ func CreateTestInput() (*codec.LegacyAmino, *app.IxoApp, sdk.Context) {
 	appl := cmd.Setup(false)
 	ctx := appl.BaseApp.NewContext(false, tmproto.Header{})
 
-	appl.PaymentsKeeper = NewKeeper(
+	appl.PaymentsKeeper = keeper.NewKeeper(
 		appl.AppCodec(),
 		appl.GetKey(types.StoreKey),
 		appl.BankKeeper,

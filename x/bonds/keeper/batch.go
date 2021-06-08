@@ -207,7 +207,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	var extraEventAttributes []sdk.Attribute
 
 	// Get buyer address
-	buyerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, bo.BaseOrder.AccountDid)
+	buyerDidDoc, err := k.didKeeper.GetDidDoc(ctx, bo.BaseOrder.AccountDid)
 	if err != nil {
 		return err
 	}
@@ -356,7 +356,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// Get seller address
-	sellerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
+	sellerDidDoc, err := k.didKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
 	if err != nil {
 		return err
 	}
@@ -419,7 +419,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 	// WARNING: do not return ok=true if money has already been transferred when error occurs
 
 	// Get swapper address
-	swapperDidDoc, err := k.DidKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
+	swapperDidDoc, err := k.didKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
 	if err != nil {
 		return err, true
 	}
@@ -539,7 +539,7 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid didexported.Did) {
 					logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 					// Return from amount to swapper
-					swapperAddr := k.DidKeeper.MustGetDidDoc(ctx, so.BaseOrder.AccountDid).Address()
+					swapperAddr := k.didKeeper.MustGetDidDoc(ctx, so.BaseOrder.AccountDid).Address()
 					err := k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 						types.BatchesIntermediaryAccount, swapperAddr, sdk.Coins{so.BaseOrder.Amount})
 					if err != nil {
@@ -609,7 +609,7 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid didexported.Did
 				))
 
 				// Return reserve to buyer
-				buyerAddr := k.DidKeeper.MustGetDidDoc(ctx, bo.BaseOrder.AccountDid).Address()
+				buyerAddr := k.didKeeper.MustGetDidDoc(ctx, bo.BaseOrder.AccountDid).Address()
 				err := k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 					types.BatchesIntermediaryAccount, buyerAddr, bo.MaxPrices)
 				if err != nil {

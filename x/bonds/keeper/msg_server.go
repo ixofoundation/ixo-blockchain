@@ -385,7 +385,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 
 func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	buyerAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
+	buyerAddr := k.didKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -453,7 +453,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.MsgBuy) (*types.MsgBuyResponse, error) {
-	buyerAddr := keeper.DidKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
+	buyerAddr := keeper.didKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
 
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
@@ -514,7 +514,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 
 func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSellResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	sellerAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.SellerDid).Address()
+	sellerAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SellerDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -582,7 +582,7 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	swapperAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.SwapperDid).Address()
+	swapperAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SwapperDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -644,7 +644,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeOutcomePayment) (*types.MsgMakeOutcomePaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	senderAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.SenderDid).Address()
+	senderAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SenderDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -682,7 +682,7 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 
 func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawShare) (*types.MsgWithdrawShareResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	recipientAddr := k.DidKeeper.MustGetDidDoc(ctx, msg.RecipientDid).Address()
+	recipientAddr := k.didKeeper.MustGetDidDoc(ctx, msg.RecipientDid).Address()
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {

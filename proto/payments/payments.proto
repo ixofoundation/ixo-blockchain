@@ -68,3 +68,8 @@ message TimePeriod {
   google.protobuf.Duration period_duration_ns = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"period_duration_ns\""];
   google.protobuf.Timestamp period_start_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (gogoproto.moretags) = "yaml:\"period_start_time\""];
 }
+
+message TestPeriod {
+  int64 period_length      = 1[(gogoproto.moretags) = "yaml:\"period_length\""];
+  int64 period_start_block = 2[(gogoproto.moretags) = "yaml:\"period_start_block\""];
+}

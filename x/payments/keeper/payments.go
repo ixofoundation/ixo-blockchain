@@ -247,6 +247,17 @@ func adjustForMaximums(template types.PaymentTemplate, cumulative sdk.Coins) {
 	}
 }
 
+func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.AccAddress,
+	requiredFunds sdk.Coins) bool {
+	for _, reqCoin := range requiredFunds {
+		if !bankKeeper.HasBalance(ctx, payerAddr, reqCoin){
+			return false
+		}
+	}
+
+	return true
+}
+
 func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 	contractId string) (effected bool, err error) {
 
@@ -290,7 +301,7 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 
 	// Stop if payer doesn't have enough coins. However, this is not considered
 	// an error but the caller should be looking at the 'effected' bool result
-	if pay.IsAllGTE(bankKeeper.GetAllBalances(ctx, contractPayerAddr)) {
+	if !HasBalances(ctx, bankKeeper, contractPayerAddr, pay) {
 		return false, nil
 	}
 

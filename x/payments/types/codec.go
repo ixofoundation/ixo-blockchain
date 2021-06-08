@@ -37,6 +37,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		(*Period)(nil),
 		&BlockPeriod{},
 		&TimePeriod{},
+		&TestPeriod{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

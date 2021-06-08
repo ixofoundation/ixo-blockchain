@@ -1,4 +1,4 @@
-package keeper
+package keeper_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -7,26 +7,6 @@ import (
 	"testing"
 	"time"
 )
-
-//type KeeperTestSuite struct {
-//	suite.Suite
-//
-//	app *app.IxoApp
-//	ctx sdk.Context
-//
-//	queryClient types.QueryClient
-//}
-//
-//func (suite *KeeperTestSuite) SetupTest() {
-//	suite.app, suite.ctx = createTestApp(true)
-//
-//	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
-//	types.RegisterQueryServer(queryHelper, suite.app.AccountKeeper)
-//	suite.queryClient = types.NewQueryClient(queryHelper)
-//}
-
-
-
 
 func TestKeeperIdReserver(t *testing.T) {
 	_, app, _ := CreateTestInput()
@@ -47,7 +27,7 @@ func TestKeeperIdReserver(t *testing.T) {
 	require.False(t, app.PaymentsKeeper.SubscriptionIdReserved(testSubId2))
 
 	// Reserve 'test1' in general
-	app.PaymentsKeeper.reservedIdPrefixes = []string{"test1"}
+	app.PaymentsKeeper.ReservedIdPrefixes = []string{"test1"}
 
 	// Check that 'test1' IDs now reserved and 'test2' IDs still unreserved
 	require.True(t, app.PaymentsKeeper.PaymentTemplateIdReserved(testTemplateId1))
@@ -315,7 +295,7 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 	// Create and submit Subscription
 	testPeriod := types.NewTestPeriod(100, 0)
 	testSubscription := types.NewSubscription(validSubscriptionId1,
-		contract.Id, sdk.NewUint(10), testPeriod)
+		contract.Id, sdk.NewUint(10), &testPeriod)
 	app.PaymentsKeeper.SetSubscription(ctx, testSubscription)
 
 	// Set payer balance

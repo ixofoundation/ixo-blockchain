@@ -1,15 +1,13 @@
-package keeper
+package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestKeeper(t *testing.T) {
-	legacyAmino, appl, ctx := CreateTestInput()
-	legacyAmino.RegisterInterface((*exported.DidDoc)(nil), nil)
+	_, appl, ctx := CreateTestInput()
 	_, err := appl.DidKeeper.GetDidDoc(ctx, types.EmptyDid)
 	require.NotNil(t, err)
 

@@ -16,7 +16,7 @@ type Keeper struct {
 	paramSpace         paramtypes.Subspace
 	bankKeeper         bankkeeper.Keeper
 	DidKeeper          didkeeper.Keeper
-	reservedIdPrefixes []string
+	ReservedIdPrefixes []string
 }
 
 func NewKeeper(cdc codec.BinaryMarshaler, storeKey sdk.StoreKey, bankKeeper bankkeeper.Keeper,
@@ -26,7 +26,7 @@ func NewKeeper(cdc codec.BinaryMarshaler, storeKey sdk.StoreKey, bankKeeper bank
 		storeKey:           storeKey,
 		bankKeeper:         bankKeeper,
 		DidKeeper:          didKeeper,
-		reservedIdPrefixes: reservedIdPrefixes,
+		ReservedIdPrefixes: reservedIdPrefixes,
 	}
 }
 
@@ -34,7 +34,7 @@ func NewKeeper(cdc codec.BinaryMarshaler, storeKey sdk.StoreKey, bankKeeper bank
 // is using a reserved prefix (i.e. should not be used). The prefixPrefix
 // indicates whether we are referring to a template, contract, or subscription.
 func (k Keeper) idReserved(id string, prefixPrefix string) bool {
-	for _, prefix := range k.reservedIdPrefixes {
+	for _, prefix := range k.ReservedIdPrefixes {
 		if strings.HasPrefix(id, prefixPrefix+prefix) {
 			return true
 		}

@@ -1,7 +1,7 @@
-package keeper
+package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -10,7 +10,6 @@ import (
 
 func TestQueryDidDocs(t *testing.T) {
 	legacyAmino, appl, ctx := CreateTestInput()
-	legacyAmino.RegisterInterface((*exported.DidDoc)(nil), nil)
 	err := appl.DidKeeper.SetDidDoc(ctx, &types.ValidDidDoc)
 	require.Nil(t, err)
 
@@ -19,7 +18,7 @@ func TestQueryDidDocs(t *testing.T) {
 		Data: []byte{},
 	}
 
-	querier := NewQuerier(appl.DidKeeper, legacyAmino)
+	querier := keeper.NewQuerier(appl.DidKeeper, legacyAmino)
 	res, err := querier(ctx, []string{"queryDidDoc", types.ValidDidDoc.Did}, query)
 	require.Nil(t, err)
 

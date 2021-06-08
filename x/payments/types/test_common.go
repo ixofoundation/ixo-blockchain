@@ -1,36 +1,20 @@
 package types
 
 import (
-	"encoding/json"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // --------------------------------------------- TestPeriod
 
-var _ Period = TestPeriod{}
+var _ Period = &TestPeriod{}
 
 // TestPeriod Is identical to BlockPeriod but does
 // not take into consideration the context in periodEnded() and periodStarted()
-type TestPeriod struct {
-	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
-	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
-}
-
-func (p TestPeriod) Reset() {
-	p = TestPeriod{}
-}
-
-func (p TestPeriod) String() string {
-	b, err := json.Marshal(p)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(b)
-}
-
-func (TestPeriod) ProtoMessage() {}
+//type TestPeriod struct {
+//	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
+//	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
+//}
 
 func NewTestPeriod(periodLength, periodStartBlock int64) TestPeriod {
 	return TestPeriod{
@@ -68,5 +52,5 @@ func (p TestPeriod) periodEnded(ctx sdk.Context) bool {
 
 func (p TestPeriod) nextPeriod() Period {
 	p.PeriodStartBlock = p.periodEndBlock()
-	return p
+	return &p
 }

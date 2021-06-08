@@ -110,6 +110,7 @@
     - [PaymentContract](#payments.PaymentContract)
     - [PaymentTemplate](#payments.PaymentTemplate)
     - [Subscription](#payments.Subscription)
+    - [TestPeriod](#payments.TestPeriod)
     - [TimePeriod](#payments.TimePeriod)
   
 - [payments/genesis.proto](#payments/genesis.proto)
@@ -1671,6 +1672,22 @@ check all cases in NewHandler().
 | max_periods | [string](#string) |  |  |
 | periods_accumulated | [string](#string) |  |  |
 | period | [google.protobuf.Any](#google.protobuf.Any) |  |  |
+
+
+
+
+
+
+<a name="payments.TestPeriod"></a>
+
+### TestPeriod
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| period_length | [int64](#int64) |  |  |
+| period_start_block | [int64](#int64) |  |  |
 
 
 
