@@ -26,7 +26,7 @@ type Keeper struct {
 
 func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey, paramSpace paramstypes.Subspace,
 	accountKeeper types.AccountKeeper, didKeeper types.DidKeeper,
-	paymentsKeeper types.PaymentsKeeper) Keeper {
+	paymentsKeeper types.PaymentsKeeper, bankKeeper types.BankKeeper) Keeper {
 	return Keeper{
 		cdc:            cdc,
 		storeKey:       key,
@@ -34,6 +34,7 @@ func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey, paramSpace paramstyp
 		accountKeeper:  accountKeeper,
 		didKeeper:      didKeeper,
 		paymentsKeeper: paymentsKeeper,
+		bankKeeper:     bankKeeper,
 	}
 }
 

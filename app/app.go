@@ -162,7 +162,7 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName: 	{authtypes.Minter, authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 
 		// Custom ixo module accounts
 		bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
@@ -188,7 +188,7 @@ var _ servertypes.Application = (*ixoApp)(nil)
 
 // Extended ABCI application
 type ixoApp struct {
-	*baseapp.BaseApp                          `json:"_bam_base_app,omitempty"`
+	*baseapp.BaseApp  `json:"_bam_base_app,omitempty"`
 	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
 	appCodec          codec.Marshaler         `json:"app_codec,omitempty"`
 	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
@@ -221,7 +221,7 @@ type ixoApp struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
 
 	// Custom ixo keepers
-	didKeeper      didkeeper.Keeper             `json:"did_keeper"`
+	didKeeper      didkeeper.Keeper      `json:"did_keeper"`
 	bondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	paymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
 	projectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
@@ -259,7 +259,7 @@ func NewIxoApp(
 
 		// Custom ixo store keys
 		didtypes.StoreKey, bondstypes.StoreKey,
-		paymentstypes.StoreKey,	projecttypes.StoreKey,
+		paymentstypes.StoreKey, projecttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -369,7 +369,7 @@ func NewIxoApp(
 	app.paymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
 		app.BankKeeper, app.didKeeper, paymentsReservedIdPrefixes)
 	app.projectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
-		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper)
+		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.didKeeper, app.paymentsKeeper, app.BankKeeper)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
