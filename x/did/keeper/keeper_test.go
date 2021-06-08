@@ -1,26 +1,21 @@
 package keeper
 
-// TODO tests now generate app (simapp.Setup) instead of using CreateTestInput()
+import (
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
+	"github.com/stretchr/testify/require"
+	"testing"
+)
 
-//import (
-//	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-//	"testing"
-//
-//	"github.com/stretchr/testify/require"
-//
-//	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
-//)
-//
-//func TestKeeper(t *testing.T) {
-//	ctx, k, cdc := CreateTestInput()
-//	cdc.RegisterInterface((*exported.DidDoc)(nil), nil)
-//	_, err := k.GetDidDoc(ctx, types.EmptyDid)
-//	require.NotNil(t, err)
-//
-//	//err = k.SetDidDoc(ctx, &types.ValidDidDoc)
-//	err = k.SetDidDoc(ctx, types.ValidDidDoc)
-//	require.Nil(t, err)
-//
-//	_, err = k.GetDidDoc(ctx, types.ValidDidDoc.GetDid())
-//	require.Nil(t, err)
-//}
+func TestKeeper(t *testing.T) {
+	legacyAmino, appl, ctx := CreateTestInput()
+	legacyAmino.RegisterInterface((*exported.DidDoc)(nil), nil)
+	_, err := appl.DidKeeper.GetDidDoc(ctx, types.EmptyDid)
+	require.NotNil(t, err)
+
+	err = appl.DidKeeper.SetDidDoc(ctx, &types.ValidDidDoc)
+	require.Nil(t, err)
+
+	_, err = appl.DidKeeper.GetDidDoc(ctx, types.ValidDidDoc.GetDid())
+	require.Nil(t, err)
+}

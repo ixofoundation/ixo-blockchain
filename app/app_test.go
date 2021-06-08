@@ -13,7 +13,7 @@ import (
 )
 
 func TestIxodExportAndBlockedAddrs(t *testing.T) {
-	encCfg := MakeEncodingConfig()
+	encCfg := MakeTestEncodingConfig()
 	db := dbm.NewMemDB()
 	app := NewIxoApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true,
 		map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})

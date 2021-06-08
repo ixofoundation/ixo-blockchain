@@ -198,7 +198,6 @@ func (msg *MsgCreateSubscription) SetPeriod(period Period) error {
 	return nil
 }
 
-// TODO (Stef) Look at x/gov/types/msgs.go (m MsgSubmitProposal) ValidateBasic() - content is Any
 func (msg *MsgCreateSubscription) GetPeriod() Period {
 	period, ok := msg.Period.GetCachedValue().(Period)
 	if !ok {

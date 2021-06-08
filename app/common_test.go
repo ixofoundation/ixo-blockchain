@@ -30,9 +30,9 @@ var DefaultConsensusParams = &abci.ConsensusParams{
 	},
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*ixoApp, GenesisState) {
+func setup(withGenesis bool, invCheckPeriod uint) (*IxoApp, GenesisState) {
 	db := dbm.NewMemDB()
-	encCdc := MakeEncodingConfig()
+	encCdc := MakeTestEncodingConfig()
 	app := NewIxoApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)
@@ -40,7 +40,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*ixoApp, GenesisState) {
 	return app, GenesisState{}
 }
 
-func Setup(isCheckTx bool) *ixoApp {
+func Setup(isCheckTx bool) *IxoApp {
 	ixoApp, genesisState := setup(!isCheckTx, 5)
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
@@ -62,7 +62,7 @@ func Setup(isCheckTx bool) *ixoApp {
 	return ixoApp
 }
 
-func createTestApp(isCheckTx bool) (*ixoApp, sdk.Context) {
+func createTestApp(isCheckTx bool) (*IxoApp, sdk.Context) {
 	app := Setup(isCheckTx)
 
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
