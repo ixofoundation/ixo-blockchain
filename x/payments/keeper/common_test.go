@@ -6,7 +6,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/ixofoundation/ixo-blockchain/cmd"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/tendermint/tendermint/crypto"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -106,47 +105,5 @@ func CreateTestInput() (*codec.LegacyAmino, *app.IxoApp, sdk.Context) {
 	appl := cmd.Setup(false)
 	ctx := appl.BaseApp.NewContext(false, tmproto.Header{})
 
-	appl.PaymentsKeeper = keeper.NewKeeper(
-		appl.AppCodec(),
-		appl.GetKey(types.StoreKey),
-		appl.BankKeeper,
-		appl.DidKeeper,
-		[]string{types.ModuleName},
-	)
-
 	return appl.LegacyAmino(), appl, ctx
-
-	//storeKey := sdk.NewKVStoreKey(types.StoreKey)
-	//actStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
-	//keyDid := sdk.NewKVStoreKey(didtypes.StoreKey)
-	//
-	//db := dbm.NewMemDB()
-	//ms := store.NewCommitMultiStore(db)
-	//ms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, nil)
-	//ms.MountStoreWithDB(actStoreKey, sdk.StoreTypeIAVL, nil)
-	//ms.MountStoreWithDB(keyDid, sdk.StoreTypeIAVL, nil)
-	//
-	//_ = ms.LoadLatestVersion()
-	//ctx := sdk.NewContext(ms, /*abci.Header{}*/tmproto.Header{}, true, log.NewNopLogger())
-	//
-	//
-	//
-	//cdc := codec.NewLegacyAmino()
-	//module.NewBasicManager(auth.AppModuleBasic{}).RegisterLegacyAminoCodec(cdc)
-	//sdk.RegisterLegacyAminoCodec(cdc)
-	//cryptocodec.RegisterCrypto(cdc)
-	//types.RegisterLegacyAminoCodec(cdc)
-	//cdc.RegisterConcrete(types.TestPeriod{}, "payments/TestPeriod", nil)
-	//
-	//keyParams := sdk.NewKVStoreKey("subspace")
-	//tkeyParams := sdk.NewTransientStoreKey("transient_params")
-	//
-	//pk1 := paramskeeper.NewKeeper(cdc, keyParams, tkeyParams)
-	//
-	//accountKeeper := authkeeper.NewAccountKeeper(cdc, actStoreKey, pk1.Subspace(/*auth.DefaultParamspace*/authtypes.ModuleName), authtypes.ProtoBaseAccount)
-	//bankKeeper := bankkeeper.NewBaseKeeper(accountKeeper, pk1.Subspace(/*bank.DefaultParamspace*/banktypes.ModuleName), nil)
-	//didKeeper := did.NewKeeper(*cdc, keyDid)
-	//keeper := NewKeeper(cdc, storeKey, bankKeeper, didKeeper, nil)
-
-	//return ctx, keeper, cdc
 }

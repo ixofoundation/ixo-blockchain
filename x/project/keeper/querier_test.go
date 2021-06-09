@@ -1,7 +1,8 @@
-package keeper
+package keeper_test
 
 import (
 	"encoding/json"
+	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestQueryProjectDoc(t *testing.T) {
-	legacyAmino, appl, ctx := CreateTestInput(t, false)
+	legacyAmino, appl, ctx := CreateTestInput()
 
 	require.False(t, appl.ProjectKeeper.ProjectDocExists(ctx, types.ProjectDid))
 	appl.ProjectKeeper.SetProjectDoc(ctx, types.ValidProjectDoc)
@@ -21,7 +22,7 @@ func TestQueryProjectDoc(t *testing.T) {
 		Data: []byte{},
 	}
 
-	querier := NewQuerier(appl.ProjectKeeper, legacyAmino)
+	querier := keeper.NewQuerier(appl.ProjectKeeper, legacyAmino)
 	res, err := querier(ctx, []string{"queryProjectDoc", types.ProjectDid}, query)
 	require.Nil(t, err)
 
@@ -34,7 +35,7 @@ func TestQueryProjectDoc(t *testing.T) {
 }
 
 func TestQueryProjectAccounts(t *testing.T) {
-	legacyAmino, appl, ctx := CreateTestInput(t, false)
+	legacyAmino, appl, ctx := CreateTestInput()
 
 	require.False(t, appl.ProjectKeeper.ProjectDocExists(ctx, types.ProjectDid))
 	appl.ProjectKeeper.SetProjectDoc(ctx, types.ValidProjectDoc)
@@ -44,15 +45,15 @@ func TestQueryProjectAccounts(t *testing.T) {
 		Data: []byte{},
 	}
 
-	querier := NewQuerier(appl.ProjectKeeper, legacyAmino)
-	_, err := querier(ctx, []string{QueryProjectDoc, types.ProjectDid}, query)
+	querier := keeper.NewQuerier(appl.ProjectKeeper, legacyAmino)
+	_, err := querier(ctx, []string{keeper.QueryProjectDoc, types.ProjectDid}, query)
 	require.Nil(t, err)
 
 	account, err := appl.ProjectKeeper.CreateNewAccount(ctx, types.ProjectDid, types.ValidAccId1)
 	require.Nil(t, err)
 	appl.ProjectKeeper.AddAccountToProjectAccounts(ctx, types.ProjectDid, types.ValidAccId1, account)
 
-	res, err := querier(ctx, []string{QueryProjectAccounts, types.ProjectDid}, query)
+	res, err := querier(ctx, []string{keeper.QueryProjectAccounts, types.ProjectDid}, query)
 	require.Nil(t, err)
 
 	var data interface{}
@@ -67,7 +68,7 @@ func TestQueryProjectAccounts(t *testing.T) {
 }
 
 func TestQueryTxs(t *testing.T) {
-	legacyAmino, appl, ctx := CreateTestInput(t, false)
+	legacyAmino, appl, ctx := CreateTestInput()
 
 	require.False(t, appl.ProjectKeeper.ProjectDocExists(ctx, types.ProjectDid))
 	appl.ProjectKeeper.SetProjectDoc(ctx, types.ValidProjectDoc)
@@ -80,14 +81,14 @@ func TestQueryTxs(t *testing.T) {
 		Data: []byte{},
 	}
 
-	querier := NewQuerier(appl.ProjectKeeper, legacyAmino)
-	res, err := querier(ctx, []string{QueryProjectTx, types.ProjectDid}, query)
+	querier := keeper.NewQuerier(appl.ProjectKeeper, legacyAmino)
+	res, err := querier(ctx, []string{keeper.QueryProjectTx, types.ProjectDid}, query)
 	require.Nil(t, err)
 
-	var txs []types.WithdrawalInfoDoc
+	var txs types.WithdrawalInfoDocs
 	legacyAmino.MustUnmarshalJSON(res, &txs)
 
-	_, err = querier(ctx, []string{QueryProjectTx, "InvalidDid"}, query)
+	_, err = querier(ctx, []string{keeper.QueryProjectTx, "InvalidDid"}, query)
 	require.NotNil(t, err)
 
 }

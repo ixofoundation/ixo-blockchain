@@ -1,4 +1,4 @@
-package keeper
+package keeper_test
 
 import (
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestProjectDoc(t *testing.T) {
-	_, appl, ctx := CreateTestInput(t, false)
+	_, appl, ctx := CreateTestInput()
 
 	// Project starts off not existing
 	require.False(t, appl.ProjectKeeper.ProjectDocExists(ctx, types.ProjectDid))
@@ -37,7 +37,7 @@ func TestProjectDoc(t *testing.T) {
 }
 
 func TestValidateProjectFeesMap(t *testing.T) {
-	_, appl, ctx := CreateTestInput(t, false)
+	_, appl, ctx := CreateTestInput()
 
 	templateId1 := "payment:template:1"
 	templateId2 := "payment:template:2"
@@ -89,7 +89,7 @@ func TestValidateProjectFeesMap(t *testing.T) {
 }
 
 func TestKeeperAccountMap(t *testing.T) {
-	_, appl, ctx := CreateTestInput(t, false)
+	_, appl, ctx := CreateTestInput()
 
 	account, err := appl.ProjectKeeper.CreateNewAccount(ctx, types.ProjectDid, types.ValidAccId1)
 	require.Nil(t, err)
@@ -106,7 +106,7 @@ func TestKeeperAccountMap(t *testing.T) {
 }
 
 func TestKeeperWithdrawalInfo(t *testing.T) {
-	_, appl, ctx := CreateTestInput(t, false)
+	_, appl, ctx := CreateTestInput()
 
 	withdrawals, err := appl.ProjectKeeper.GetProjectWithdrawalTransactions(ctx, "")
 	require.NotNil(t, err)
