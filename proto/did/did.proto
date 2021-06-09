@@ -18,26 +18,26 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 //}
 
 message DidCredential {
-  repeated string credtype = 1 [(gogoproto.moretags) = "json:\"type\" yaml:\"type\""];
-  string issuer            = 2 [(gogoproto.moretags) = "json:\"issuer\" yaml:\"issuer\""];
-  string issued            = 3 [(gogoproto.moretags) = "json:\"issued\" yaml:\"issued\""];
-  Claim claim              = 4 [(gogoproto.moretags) = "json:\"claim\" yaml:\"claim\""];
+  repeated string cred_type = 1 [(gogoproto.jsontag) = "type", (gogoproto.moretags) = "yaml:\"type\""];
+  string issuer             = 2 [(gogoproto.moretags) = "yaml:\"issuer\""];
+  string issued             = 3 [(gogoproto.moretags) = "yaml:\"issued\""];
+  Claim claim               = 4 [(gogoproto.moretags) = "yaml:\"claim\""];
 }
 
 message Claim {
-  string id         = 1 [(gogoproto.moretags) = "json:\"id\" yaml:\"id\""];
-  bool KYCvalidated = 2 [(gogoproto.moretags) = "json:\"KYCValidated\" yaml:\"KYCValidated\""];
+  string id         = 1 [(gogoproto.moretags) = "yaml:\"id\""];
+  bool KYC_validated = 2 [(gogoproto.jsontag) = "KYCValidated", (gogoproto.moretags) = "yaml:\"KYCValidated\""];
 }
 
 message IxoDid {
-  string did                 = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
-  string verifyKey           = 2 [(gogoproto.moretags) = "json:\"verifyKey\" yaml:\"verifyKey\""];
-  string encryptionPublicKey = 3 [(gogoproto.moretags) = "json:\"encryptionPublicKey\" yaml:\"encryptionPublicKey\""];
-  Secret secret              = 4 [(gogoproto.moretags) = "json:\"secret\" yaml:\"secret\""];
+  string did                   = 1 [(gogoproto.moretags) = "yaml:\"did\""];
+  string verify_key            = 2 [(gogoproto.jsontag) = "verifyKey", (gogoproto.moretags) = "yaml:\"verifyKey\""];
+  string encryption_public_key = 3 [(gogoproto.jsontag) = "encryptionPublicKey", (gogoproto.moretags) = "yaml:\"encryptionPublicKey\""];
+  Secret secret                = 4 [(gogoproto.moretags) = "yaml:\"secret\""];
 }
 
 message Secret {
-  string seed                 = 1 [(gogoproto.moretags) = "json:\"seed\" yaml:\"seed\""];
-  string signKey              = 2 [(gogoproto.moretags) = "json:\"signKey\" yaml:\"signKey\""];
-  string encryptionPrivateKey = 3 [(gogoproto.moretags) = "json:\"encryptionPrivateKey\" yaml:\"encryptionPrivateKey\""];
+  string seed                   = 1 [(gogoproto.moretags) = "yaml:\"seed\""];
+  string sign_key               = 2 [(gogoproto.jsontag) = "signKey", (gogoproto.moretags) = "yaml:\"signKey\""];
+  string encryption_private_key = 3 [(gogoproto.jsontag) = "encryptionPrivateKey", (gogoproto.moretags) = "yaml:\"encryptionPrivateKey\""];
 }

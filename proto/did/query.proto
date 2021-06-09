@@ -37,7 +37,7 @@ service Query {
 // x/did/client/rest/query.go
 message QueryDidDocRequest {
   // did defines the DID for the requested DidDoc
-  string did = 1 [ (gogoproto.moretags) = "json:\"did\" yaml:\"did\"" ];
+  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
 }
 
 message QueryDidDocResponse {

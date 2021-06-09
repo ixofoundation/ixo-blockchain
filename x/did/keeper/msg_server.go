@@ -53,11 +53,11 @@ func (k msgServer) AddCredential(goCtx context.Context, msg *types.MsgAddCredent
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeAddCredential,
-			sdk.NewAttribute(types.AttributeKeyCredType, fmt.Sprint(msg.DidCredential.Credtype)),
+			sdk.NewAttribute(types.AttributeKeyCredType, fmt.Sprint(msg.DidCredential.CredType)),
 			sdk.NewAttribute(types.AttributeKeyIssuer, msg.DidCredential.Issuer),
 			sdk.NewAttribute(types.AttributeKeyIssued, msg.DidCredential.Issued),
 			sdk.NewAttribute(types.AttributeKeyClaimID, msg.DidCredential.Claim.Id),
-			sdk.NewAttribute(types.AttributeKeyKYCValidated, strconv.FormatBool(msg.DidCredential.Claim.KYCvalidated)),
+			sdk.NewAttribute(types.AttributeKeyKYCValidated, strconv.FormatBool(msg.DidCredential.Claim.KYCValidated)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

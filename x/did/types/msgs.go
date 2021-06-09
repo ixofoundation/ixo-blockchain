@@ -70,12 +70,12 @@ func (msg MsgAddDid) GetSignBytes() []byte {
 
 func NewMsgAddCredential(did string, credType []string, issuer string, issued string) *MsgAddCredential {
 	didCredential := DidCredential{
-		Credtype: credType,
+		CredType: credType,
 		Issuer:   issuer,
 		Issued:   issued,
 		Claim: &Claim{
 			Id:           did,
-			KYCvalidated: true,
+			KYCValidated: true,
 		},
 	}
 

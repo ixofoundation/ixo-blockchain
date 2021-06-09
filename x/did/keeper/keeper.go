@@ -109,7 +109,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential typ
 	credentials := baseDidDoc.GetCredentials()
 
 	for _, data := range credentials {
-		if data.Issuer == credential.Issuer && data.Credtype[0] == credential.Credtype[0] && data.Credtype[1] == credential.Credtype[1] && data.Claim.KYCvalidated == credential.Claim.KYCvalidated {
+		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] && data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
 			return sdkerrors.Wrap(types.ErrInvalidCredentials, "credentials already exist")
 		}
 	}

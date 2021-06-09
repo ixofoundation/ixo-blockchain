@@ -63,7 +63,7 @@ func newAddCredentialRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgAddCredential(req.Did, req.DidCredential.Credtype, req.Did, req.DidCredential.Issued)
+		msg := types.NewMsgAddCredential(req.Did, req.DidCredential.CredType, req.Did, req.DidCredential.Issued)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) { //err := msg.ValidateBasic(); err != nil {
 			//rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

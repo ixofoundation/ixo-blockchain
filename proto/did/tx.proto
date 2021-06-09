@@ -23,7 +23,7 @@ message MsgAddDid {
 message MsgAddDidResponse {}
 
 message MsgAddCredential {
-  DidCredential didCredential = 1 [(gogoproto.moretags) = "json:\"credential\" yaml:\"credential\""];
+  DidCredential did_credential = 1 [(gogoproto.jsontag) = "credential", (gogoproto.moretags) = "yaml:\"credential\""];
 }
 
 message MsgAddCredentialResponse {}

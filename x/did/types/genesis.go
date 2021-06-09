@@ -22,7 +22,7 @@ func NewGenesisState(dd []exported.DidDoc) *GenesisState {
 	}
 
 	return &GenesisState{
-		Diddocs: didDocs,
+		DidDocs: didDocs,
 	}
 }
 
@@ -40,7 +40,7 @@ var _ types.UnpackInterfacesMessage = GenesisState{}
 
 // UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
 func (data GenesisState) UnpackInterfaces(unpacker types.AnyUnpacker) error {
-	for _, genesisDidDoc := range data.Diddocs {
+	for _, genesisDidDoc := range data.DidDocs {
 		var didDoc exported.DidDoc
 		err := unpacker.UnpackAny(genesisDidDoc, &didDoc)
 		if err != nil {
