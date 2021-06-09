@@ -8,11 +8,11 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
 
 message UpdateProjectStatusDoc {
   string status             = 1 [(gogoproto.moretags) = "yaml:\"status\""];
-  string eth_funding_txn_id = 2 [(gogoproto.moretags) = "yaml:\"eth_funding_txn_id\""];
+  string eth_funding_txn_id = 2 [(gogoproto.jsontag) = "ethFundingTxnID", (gogoproto.moretags) = "yaml:\"ethFundingTxnID\""];
 }
 
 message CreateAgentDoc {
-  string agent_did = 1 [(gogoproto.moretags) = "yaml:\"agent_did\""];
+  string agent_did = 1 [(gogoproto.moretags) = "yaml:\"did\""];
   string role      = 2 [(gogoproto.moretags) = "yaml:\"role\""];
 }
 
@@ -23,34 +23,34 @@ message UpdateAgentDoc {
 }
 
 message CreateClaimDoc {
-  string claim_id          = 1 [(gogoproto.moretags) = "yaml:\"claim_id\""];
-  string claim_template_id = 2 [(gogoproto.moretags) = "yaml:\"claim_template_id\""];
+  string claim_id          = 1 [(gogoproto.moretags) = "yaml:\"claimID\""];
+  string claim_template_id = 2 [(gogoproto.moretags) = "yaml:\"claimTemplateID\""];
 }
 
 message CreateEvaluationDoc {
-  string claim_id = 1 [(gogoproto.moretags) = "yaml:\"claim_id\""];
+  string claim_id = 1 [(gogoproto.jsontag) = "claimID", (gogoproto.moretags) = "yaml:\"claimID\""];
   string status   = 2 [(gogoproto.moretags) = "yaml:\"status\""];
 }
 
 message WithdrawFundsDoc {
-  string project_did   = 1 [(gogoproto.moretags) = "yaml:\"project_did\""];
-  string recipient_did = 2 [(gogoproto.moretags) = "yaml:\"recipient_did\""];
+  string project_did   = 1 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
+  string recipient_did = 2 [(gogoproto.jsontag) = "recipientDid", (gogoproto.moretags) = "yaml:\"recipientDid\""];
   string amount        = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"amount\""];
-  bool is_refund       = 4 [(gogoproto.moretags) = "yaml:\"is_refund\""];
+  bool is_refund       = 4 [(gogoproto.jsontag) = "isRefund", (gogoproto.moretags) = "yaml:\"isRefund\""];
 }
 
 message ProjectDoc {
-  string tx_hash     = 1 [(gogoproto.moretags) = "yaml:\"tx_hash\""];
-  string project_did = 2 [(gogoproto.moretags) = "yaml:\"project_did\""];
-  string sender_did  = 3 [(gogoproto.moretags) = "yaml:\"sender_did\""];
-  string pub_key     = 4 [(gogoproto.moretags) = "yaml:\"pub_key\""];
+  string tx_hash     = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
+  string project_did = 2 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
+  string sender_did  = 3 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
+  string pub_key     = 4 [(gogoproto.jsontag) = "pubKey", (gogoproto.moretags) = "yaml:\"pubKey\""];
   string status      = 5 [(gogoproto.moretags) = "yaml:\"status\""];
   bytes data         = 6 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 message WithdrawalInfoDoc {
-  string project_did              = 1 [(gogoproto.moretags) = "yaml:\"project_did\""];
-  string recipient_did            = 2 [(gogoproto.moretags) = "yaml:\"recipient_did\""];
+  string project_did              = 1 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
+  string recipient_did            = 2 [(gogoproto.jsontag) = "recipientDid", (gogoproto.moretags) = "yaml:\"recipientDid\""];
   cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"amount\""];
 }
 
