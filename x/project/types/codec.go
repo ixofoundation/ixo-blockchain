@@ -9,18 +9,18 @@ import (
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(MsgCreateProject{}, "project/CreateProject", nil)
-	cdc.RegisterConcrete(MsgUpdateProjectStatus{}, "project/UpdateProjectStatus", nil)
-	cdc.RegisterConcrete(MsgCreateAgent{}, "project/CreateAgent", nil)
-	cdc.RegisterConcrete(MsgUpdateAgent{}, "project/UpdateAgent", nil)
-	cdc.RegisterConcrete(MsgCreateClaim{}, "project/CreateClaim", nil)
-	cdc.RegisterConcrete(MsgCreateEvaluation{}, "project/CreateEvaluation", nil)
-	cdc.RegisterConcrete(MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
-	cdc.RegisterConcrete(MsgUpdateProjectDoc{}, "project/UpdateProjectDoc", nil)
+	cdc.RegisterConcrete(&MsgCreateProject{}, "project/CreateProject", nil)
+	cdc.RegisterConcrete(&MsgUpdateProjectStatus{}, "project/UpdateProjectStatus", nil)
+	cdc.RegisterConcrete(&MsgCreateAgent{}, "project/CreateAgent", nil)
+	cdc.RegisterConcrete(&MsgUpdateAgent{}, "project/UpdateAgent", nil)
+	cdc.RegisterConcrete(&MsgCreateClaim{}, "project/CreateClaim", nil)
+	cdc.RegisterConcrete(&MsgCreateEvaluation{}, "project/CreateEvaluation", nil)
+	cdc.RegisterConcrete(&MsgWithdrawFunds{}, "project/WithdrawFunds", nil)
+	cdc.RegisterConcrete(&MsgUpdateProjectDoc{}, "project/UpdateProjectDoc", nil)
 
-	cdc.RegisterConcrete(ProjectDoc{}, "project/ProjectDoc", nil)
-	cdc.RegisterConcrete(AccountMap{}, "project/AccountMap", nil)
-	cdc.RegisterConcrete(WithdrawalInfoDoc{}, "project/WithdrawalInfo", nil)
+	cdc.RegisterConcrete(&ProjectDoc{}, "project/ProjectDoc", nil)
+	cdc.RegisterConcrete(&AccountMap{}, "project/AccountMap", nil)
+	cdc.RegisterConcrete(&WithdrawalInfoDoc{}, "project/WithdrawalInfo", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {

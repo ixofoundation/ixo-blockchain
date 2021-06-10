@@ -10,16 +10,16 @@ import (
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*Period)(nil), nil)
-	cdc.RegisterConcrete(BlockPeriod{}, "payments/BlockPeriod", nil)
-	cdc.RegisterConcrete(TimePeriod{}, "payments/TimePeriod", nil)
+	cdc.RegisterConcrete(&BlockPeriod{}, "payments/BlockPeriod", nil)
+	cdc.RegisterConcrete(&TimePeriod{}, "payments/TimePeriod", nil)
 
-	cdc.RegisterConcrete(MsgCreatePaymentTemplate{}, "payments/MsgCreatePaymentTemplate", nil)
-	cdc.RegisterConcrete(MsgCreatePaymentContract{}, "payments/MsgCreatePaymentContract", nil)
-	cdc.RegisterConcrete(MsgCreateSubscription{}, "payments/MsgCreateSubscription", nil)
-	cdc.RegisterConcrete(MsgSetPaymentContractAuthorisation{}, "payments/MsgSetPaymentContractAuthorisation", nil)
-	cdc.RegisterConcrete(MsgGrantDiscount{}, "payments/MsgGrantDiscount", nil)
-	cdc.RegisterConcrete(MsgRevokeDiscount{}, "payments/MsgRevokeDiscount", nil)
-	cdc.RegisterConcrete(MsgEffectPayment{}, "payments/MsgEffectPayment", nil)
+	cdc.RegisterConcrete(&MsgCreatePaymentTemplate{}, "payments/MsgCreatePaymentTemplate", nil)
+	cdc.RegisterConcrete(&MsgCreatePaymentContract{}, "payments/MsgCreatePaymentContract", nil)
+	cdc.RegisterConcrete(&MsgCreateSubscription{}, "payments/MsgCreateSubscription", nil)
+	cdc.RegisterConcrete(&MsgSetPaymentContractAuthorisation{}, "payments/MsgSetPaymentContractAuthorisation", nil)
+	cdc.RegisterConcrete(&MsgGrantDiscount{}, "payments/MsgGrantDiscount", nil)
+	cdc.RegisterConcrete(&MsgRevokeDiscount{}, "payments/MsgRevokeDiscount", nil)
+	cdc.RegisterConcrete(&MsgEffectPayment{}, "payments/MsgEffectPayment", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
