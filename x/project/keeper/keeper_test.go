@@ -1,12 +1,11 @@
 package keeper_test
 
 import (
-	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
+	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestProjectDoc(t *testing.T) {

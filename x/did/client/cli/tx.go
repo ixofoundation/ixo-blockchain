@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/spf13/cobra"
 )
 

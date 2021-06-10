@@ -12,10 +12,11 @@ import (
 	authsign "github.com/cosmos/cosmos-sdk/x/auth/signing"
 )
 
+// Copied from Cosmos SDK
+
 // SimAppChainID hardcoded chainID for simulation
 const (
 	DefaultGenTxGas = 1000000
-	SimAppChainID   = "simulation-app"
 )
 
 // GenTx generates a signed mock transaction.

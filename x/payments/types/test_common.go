@@ -11,10 +11,6 @@ var _ Period = &TestPeriod{}
 
 // TestPeriod Is identical to BlockPeriod but does
 // not take into consideration the context in periodEnded() and periodStarted()
-//type TestPeriod struct {
-//	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
-//	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
-//}
 
 func NewTestPeriod(periodLength, periodStartBlock int64) TestPeriod {
 	return TestPeriod{

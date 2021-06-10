@@ -2,13 +2,12 @@ package rest
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-
+	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 )

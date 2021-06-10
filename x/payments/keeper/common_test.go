@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/ixofoundation/ixo-blockchain/cmd"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -86,15 +85,6 @@ func ValidateVariables() error {
 	}
 
 	return nil
-}
-
-// returns context and app with params set on account keeper
-func createTestApp(isCheckTx bool) (*app.IxoApp, sdk.Context) {
-	appl := cmd.Setup(isCheckTx)
-	ctx := appl.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	appl.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
-
-	return appl, ctx
 }
 
 func CreateTestInput() (*codec.LegacyAmino, *app.IxoApp, sdk.Context) {

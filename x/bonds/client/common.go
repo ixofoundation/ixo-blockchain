@@ -1,10 +1,11 @@
 package client
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	types "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"strings"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 )
 
 func splitParameters(fnParamsStr string) (paramValuePairs []string) {

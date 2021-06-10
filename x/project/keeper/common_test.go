@@ -9,9 +9,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/ixofoundation/ixo-blockchain/cmd"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-
 	abci "github.com/tendermint/tendermint/abci/types"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 

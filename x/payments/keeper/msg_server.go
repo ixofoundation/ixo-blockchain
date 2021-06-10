@@ -3,11 +3,12 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"strconv"
 )
 
 type msgServer struct {

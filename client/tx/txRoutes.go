@@ -4,6 +4,10 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	clientrest "github.com/cosmos/cosmos-sdk/client/rest"
 	clienttx "github.com/cosmos/cosmos-sdk/client/tx"
@@ -16,9 +20,6 @@ import (
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
-	"io/ioutil"
-	"net/http"
-	"strings"
 )
 
 var (
@@ -76,11 +77,11 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 		output := SignDataResponse{}
 
 		switch ixoMsg.Type(){
-		// TODO (Stef) Case not working
 		case projecttypes.TypeMsgCreateProject:
 			var stdSignMsg legacytx.StdSignMsg
 			stdSignMsg = ixoMsg.(*projecttypes.MsgCreateProject).ToStdSignMsg(
 				projecttypes.MsgCreateProjectTotalFee)
+			stdSignMsg.ChainID = clientCtx.ChainID
 
 			output.SignBytes = string(stdSignMsg.Bytes())
 			output.Fee       = stdSignMsg.Fee

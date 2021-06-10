@@ -2,6 +2,7 @@ package project
 
 import (
 	"encoding/json"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"

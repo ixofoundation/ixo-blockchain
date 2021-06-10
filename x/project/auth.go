@@ -2,31 +2,24 @@ package project
 
 import (
 	"encoding/hex"
+
 	"github.com/btcsuite/btcutil/base58"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/did"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
-
-	//"github.com/cosmos/cosmos-sdk/types/tx"
-	//"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	//"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	//"github.com/tendermint/tendermint/crypto"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	//"github.com/tendermint/tendermint/crypto/ed25519"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 )
 
 var (
@@ -92,7 +85,7 @@ func deductProjectFundingFees(bankKeeper bankkeeper.Keeper, ctx sdk.Context,
 
 	// Validate the account has enough "spendable" coins as this will cover cases
 	// such as vesting accounts.
-	spendableCoins := bankKeeper.SpendableCoins(ctx, acc.GetAddress()) //acc.SpendableCoins(blockTime)
+	spendableCoins := bankKeeper.SpendableCoins(ctx, acc.GetAddress())
 	if _, hasNeg := spendableCoins.SafeSub(fees); hasNeg {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "insufficient funds to pay for fees; %s < %s", spendableCoins, fees)
 	}

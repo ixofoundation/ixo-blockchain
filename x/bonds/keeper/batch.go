@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
@@ -331,7 +332,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid))
 
 	// Get new bond token balance
-	bondTokenBalance := k.BankKeeper.GetBalance(ctx, buyerAddr, bond.Token).Amount //k.BankKeeper.GetCoins(ctx, buyerAddr).AmountOf(bond.Token)
+	bondTokenBalance := k.BankKeeper.GetBalance(ctx, buyerAddr, bond.Token).Amount
 
 	event := sdk.NewEvent(
 		types.EventTypeOrderFulfill,
@@ -397,7 +398,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid))
 
 	// Get new bond token balance
-	bondTokenBalance := k.BankKeeper.GetBalance(ctx, sellerAddr, bond.Token).Amount //k.BankKeeper.GetCoins(ctx, sellerAddr).AmountOf(bond.Token)
+	bondTokenBalance := k.BankKeeper.GetBalance(ctx, sellerAddr, bond.Token).Amount
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeOrderFulfill,

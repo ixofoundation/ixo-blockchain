@@ -1,17 +1,15 @@
 package rest
 
 import (
+	"net/http"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	//"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	//"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"net/http"
 )
 
 func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
@@ -26,7 +24,7 @@ func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
 
 type createPaymentTemplateReq struct {
 	BaseReq         rest.BaseReq          `json:"base_req" yaml:"base_req"`
-	CreatorDid      didexported.Did               `json:"creator_did" yaml:"creator_did"`
+	CreatorDid      didexported.Did        `json:"creator_did" yaml:"creator_did"`
 	PaymentTemplate types.PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 }
 
@@ -53,7 +51,7 @@ func newCreatePaymentTemplateRequestHandlerFn(clientCtx client.Context) http.Han
 
 type createPaymentContractReq struct {
 	BaseReq           rest.BaseReq       `json:"base_req" yaml:"base_req"`
-	CreatorDid        didexported.Did            `json:"creator_did" yaml:"creator_did"`
+	CreatorDid        didexported.Did    `json:"creator_did" yaml:"creator_did"`
 	PaymentTemplateId string             `json:"payment_template_id" yaml:"payment_template_id"`
 	PaymentContractId string             `json:"payment_contract_id" yaml:"payment_contract_id"`
 	Payer             sdk.AccAddress     `json:"payer" yaml:"payer"`
@@ -86,12 +84,12 @@ func newCreatePaymentContractRequestHandlerFn(clientCtx client.Context) http.Han
 }
 
 type createSubscriptionReq struct {
-	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	CreatorDid        didexported.Did      `json:"creator_did" yaml:"creator_did"`
-	SubscriptionId    string       `json:"subscription_id" yaml:"subscription_id"`
-	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
-	MaxPeriods        sdk.Uint     `json:"max_periods" yaml:"max_periods"`
-	Period            types.Period `json:"period" yaml:"period"`
+	BaseReq           rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	CreatorDid        didexported.Did `json:"creator_did" yaml:"creator_did"`
+	SubscriptionId    string          `json:"subscription_id" yaml:"subscription_id"`
+	PaymentContractId string          `json:"payment_contract_id" yaml:"payment_contract_id"`
+	MaxPeriods        sdk.Uint        `json:"max_periods" yaml:"max_periods"`
+	Period            types.Period    `json:"period" yaml:"period"`
 }
 
 func newCreateSubscriptionRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
@@ -117,10 +115,10 @@ func newCreateSubscriptionRequestHandlerFn(clientCtx client.Context) http.Handle
 }
 
 type setPaymentContractAuthorisationReq struct {
-	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	PayerDid          didexported.Did      `json:"payer_did" yaml:"payer_did"`
-	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
-	Authorised        bool         `json:"authorised" yaml:"authorised"`
+	BaseReq           rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	PayerDid          didexported.Did `json:"payer_did" yaml:"payer_did"`
+	PaymentContractId string          `json:"payment_contract_id" yaml:"payment_contract_id"`
+	Authorised        bool            `json:"authorised" yaml:"authorised"`
 }
 
 func newSetPaymentContractAuthorisationRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
@@ -146,11 +144,11 @@ func newSetPaymentContractAuthorisationRequestHandlerFn(clientCtx client.Context
 }
 
 type grantDiscountReq struct {
-	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
-	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
+	BaseReq           rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	SenderDid         didexported.Did `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string          `json:"payment_contract_id" yaml:"payment_contract_id"`
+	DiscountId        sdk.Uint        `json:"discount_id" yaml:"discount_id"`
+	Recipient         sdk.AccAddress  `json:"recipient" yaml:"recipient"`
 }
 
 func newGrantDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
@@ -176,10 +174,10 @@ func newGrantDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc
 }
 
 type revokeDiscountReq struct {
-	BaseReq           rest.BaseReq   `json:"base_req" yaml:"base_req"`
-	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
+	BaseReq           rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	SenderDid         didexported.Did `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string          `json:"payment_contract_id" yaml:"payment_contract_id"`
+	Holder            sdk.AccAddress  `json:"holder" yaml:"holder"`
 }
 
 func newRevokeDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
@@ -205,9 +203,9 @@ func newRevokeDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFun
 }
 
 type effectPaymentReq struct {
-	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
-	SenderDid         didexported.Did      `json:"sender_did" yaml:"sender_did"`
-	PaymentContractId string       `json:"payment_contract_id" yaml:"payment_contract_id"`
+	BaseReq           rest.BaseReq    `json:"base_req" yaml:"base_req"`
+	SenderDid         didexported.Did `json:"sender_did" yaml:"sender_did"`
+	PaymentContractId string          `json:"payment_contract_id" yaml:"payment_contract_id"`
 }
 
 func newEffectPaymentRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {

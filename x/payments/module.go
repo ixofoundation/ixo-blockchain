@@ -3,24 +3,21 @@ package payments
 import (
 	"context"
 	"encoding/json"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
-
-	"github.com/ixofoundation/ixo-blockchain/x/payments/client/cli"
-
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
-	abci "github.com/tendermint/tendermint/abci/types"
-
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/client/cli"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
+	"github.com/spf13/cobra"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // Type check to ensure the interface is properly implemented

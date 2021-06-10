@@ -35,11 +35,6 @@ var (
 	_ ixotypes.IxoMsg = &MsgEffectPayment{}
 )
 
-//type MsgCreatePaymentTemplate struct {
-//	CreatorDid      didexported.Did         `json:"creator_did" yaml:"creator_did"`
-//	PaymentTemplate PaymentTemplate `json:"payment_template" yaml:"payment_template"`
-//}
-
 func NewMsgCreatePaymentTemplate(template PaymentTemplate,
 	creatorDid didexported.Did) *MsgCreatePaymentTemplate {
 	return &MsgCreatePaymentTemplate{
@@ -85,16 +80,6 @@ func (msg MsgCreatePaymentTemplate) String() string {
 func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
-
-//type MsgCreatePaymentContract struct {
-//	CreatorDid        didexported.Did        `json:"creator_did" yaml:"creator_did"`
-//	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
-//	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-//	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
-//	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
-//	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
-//	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-//}
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
 	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
@@ -157,14 +142,6 @@ func (msg MsgCreatePaymentContract) String() string {
 func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
-
-//type MsgCreateSubscription struct {
-//	CreatorDid        didexported.Did  `json:"creator_did" yaml:"creator_did"`
-//	SubscriptionId    string   `json:"subscription_id" yaml:"subscription_id"`
-//	PaymentContractId string   `json:"payment_contract_id" yaml:"payment_contract_id"`
-//	MaxPeriods        sdk.Uint `json:"max_periods" yaml:"max_periods"`
-//	Period            Period   `json:"period" yaml:"period"`
-//}
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
 	period Period, creatorDid didexported.Did) *MsgCreateSubscription {
@@ -263,12 +240,6 @@ func (m MsgCreateSubscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker)
 	return unpacker.UnpackAny(m.Period, &period)
 }
 
-//type MsgSetPaymentContractAuthorisation struct {
-//	PayerDid          didexported.Did `json:"payer_did" yaml:"payer_did"`
-//	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
-//	Authorised        bool    `json:"authorised" yaml:"authorised"`
-//}
-
 func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
 	payerDid didexported.Did) *MsgSetPaymentContractAuthorisation {
 	return &MsgSetPaymentContractAuthorisation{
@@ -318,13 +289,6 @@ func (msg MsgSetPaymentContractAuthorisation) String() string {
 func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
-
-//type MsgGrantDiscount struct {
-//	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
-//	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-//	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-//	Recipient         sdk.AccAddress `json:"recipient" yaml:"recipient"`
-//}
 
 func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
 	recipient sdk.AccAddress, creatorDid didexported.Did) *MsgGrantDiscount {
@@ -376,12 +340,6 @@ func (msg MsgGrantDiscount) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//type MsgRevokeDiscount struct {
-//	SenderDid         didexported.Did        `json:"sender_did" yaml:"sender_did"`
-//	PaymentContractId string         `json:"payment_contract_id" yaml:"payment_contract_id"`
-//	Holder            sdk.AccAddress `json:"holder" yaml:"holder"`
-//}
-
 func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
 	creatorDid didexported.Did) *MsgRevokeDiscount {
 	return &MsgRevokeDiscount{
@@ -430,11 +388,6 @@ func (msg MsgRevokeDiscount) String() string {
 func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
-
-//type MsgEffectPayment struct {
-//	SenderDid         didexported.Did `json:"sender_did" yaml:"sender_did"`
-//	PaymentContractId string  `json:"payment_contract_id" yaml:"payment_contract_id"`
-//}
 
 func NewMsgEffectPayment(contractId string, creatorDid didexported.Did) *MsgEffectPayment {
 	return &MsgEffectPayment{

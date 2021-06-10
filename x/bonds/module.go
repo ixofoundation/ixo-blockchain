@@ -4,22 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 
-	//"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/gorilla/mux"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/cli"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/spf13/cobra"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

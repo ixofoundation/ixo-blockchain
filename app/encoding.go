@@ -7,7 +7,7 @@ import (
 
 // MakeTestEncodingConfig creates an EncodingConfig for testing
 func MakeTestEncodingConfig() params.EncodingConfig {
-	encodingConfig := params.MakeEncodingConfig()
+	encodingConfig := params.MakeTestEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)

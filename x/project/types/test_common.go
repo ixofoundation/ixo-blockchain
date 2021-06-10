@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 )

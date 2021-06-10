@@ -2,13 +2,13 @@ package app
 
 import (
 	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 // This will fail half the time with the second output being 173
@@ -27,12 +27,12 @@ func ExampleTxSendSizeSecp256k1() {
 		Inputs:  []banktypes.Input{banktypes.NewInput(addr1, coins)},
 		Outputs: []banktypes.Output{banktypes.NewOutput(addr2, coins)},
 	}
-	fee := legacytx.NewStdFee(gas,coins) //auth.NewStdFee(gas, coins)
-	signBytes := legacytx.StdSignBytes("example-chain-ID", //auth.StdSignBytes("example-chain-ID",
+	fee := legacytx.NewStdFee(gas,coins)
+	signBytes := legacytx.StdSignBytes("example-chain-ID",
 		1, 1, 0, fee, []sdk.Msg{&msg1}, "")
 	sig, _ := priv1.Sign(signBytes)
-	sigs := legacytx.StdSignature{nil, sig}                  //[]auth.StdSignature{{nil, sig}}
-	tx := legacytx.NewStdTx([]sdk.Msg{&msg1}, fee, []legacytx.StdSignature{sigs}, "") //auth.NewStdTx([]sdk.Msg{msg1}, fee, sigs, "")
+	sigs := legacytx.StdSignature{nil, sig}
+	tx := legacytx.NewStdTx([]sdk.Msg{&msg1}, fee, []legacytx.StdSignature{sigs}, "")
 	fmt.Println(len(cdc.Amino.MustMarshalBinaryBare([]sdk.Msg{&msg1})))
 	fmt.Println(len(cdc.Amino.MustMarshalBinaryBare(tx)))
 	// output: 80

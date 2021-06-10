@@ -3,17 +3,15 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/cosmos/cosmos-sdk/client"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/gorilla/mux"
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
-	"net/http"
-
-	//"github.com/cosmos/cosmos-sdk/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gorilla/mux"
-
-	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
 type AccDetails struct {

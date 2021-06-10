@@ -1,72 +1,38 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
-	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/server/api"
-	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
-	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/testutil/testdata"
-	"github.com/cosmos/cosmos-sdk/version"
-	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	ibcclient "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client"
-	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-blockchain/app/params"
-	"github.com/ixofoundation/ixo-blockchain/client/tx"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds"
-	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
-	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"github.com/ixofoundation/ixo-blockchain/x/project"
-	"github.com/rakyll/statik/fs"
-	"github.com/spf13/cast"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 	"io"
 	"net/http"
-
-	//"github.com/cosmos/cosmos-sdk/x/auth/signing"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	"github.com/cosmos/cosmos-sdk/x/capability"
-	"github.com/cosmos/cosmos-sdk/x/evidence"
-	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
-	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/cosmos/cosmos-sdk/x/upgrade"
-	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
-	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/server/api"
+	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/capability"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
+	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
@@ -74,38 +40,64 @@ import (
 	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/cosmos/cosmos-sdk/x/evidence"
+	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
+	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
 	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
+	ibcclient "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client"
+	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
 	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
 	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/keeper"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	sdkparams "github.com/cosmos/cosmos-sdk/x/params"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	//simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
-	//"github.com/cosmos/cosmos-sdk/x/supply"
-	abci "github.com/tendermint/tendermint/abci/types"
-	//TODO uncomment
-	//"github.com/ixofoundation/ixo-blockchain/x/bonds"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
+	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/app/params"
+	"github.com/ixofoundation/ixo-blockchain/client/tx"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds"
+	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	"github.com/ixofoundation/ixo-blockchain/x/payments"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project"
 	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
-	//"github.com/ixofoundation/ixo-blockchain/x/payments"
 	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
-	//"github.com/ixofoundation/ixo-blockchain/x/treasury"
+	"github.com/rakyll/statik/fs"
+	"github.com/spf13/cast"
+	abci "github.com/tendermint/tendermint/abci/types"
+	tmjson "github.com/tendermint/tendermint/libs/json"
+	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	dbm "github.com/tendermint/tm-db"
 )
 
 const (
@@ -163,7 +155,7 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName: 	{authtypes.Minter, authtypes.Burner},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 
 		// Custom ixo module accounts
 		bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
@@ -189,7 +181,7 @@ var _ servertypes.Application = (*IxoApp)(nil)
 
 // Extended ABCI application
 type IxoApp struct {
-	*baseapp.BaseApp                          `json:"_bam_base_app,omitempty"`
+	*baseapp.BaseApp  `json:"_bam_base_app,omitempty"`
 	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
 	appCodec          codec.Marshaler         `json:"app_codec,omitempty"`
 	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
@@ -222,7 +214,7 @@ type IxoApp struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
 
 	// Custom ixo keepers
-	DidKeeper      didkeeper.Keeper             `json:"did_keeper"`
+	DidKeeper      didkeeper.Keeper      `json:"did_keeper"`
 	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
 	ProjectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
@@ -260,7 +252,7 @@ func NewIxoApp(
 
 		// Custom ixo store keys
 		didtypes.StoreKey, bondstypes.StoreKey,
-		paymentstypes.StoreKey,	projecttypes.StoreKey,
+		paymentstypes.StoreKey, projecttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -375,7 +367,7 @@ func NewIxoApp(
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
-		// Standard Cosmos appmodules
+		// Standard Cosmos AppModules
 		genutil.NewAppModule(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
 			encodingConfig.TxConfig,

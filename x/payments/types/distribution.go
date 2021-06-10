@@ -1,9 +1,10 @@
 package types
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strings"
 )
 
 var oneHundred = sdk.NewDec(100)
@@ -55,11 +56,6 @@ func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
 
 	return distributions
 }
-
-//type DistributionShare struct {
-//	Address    sdk.AccAddress `json:"address" yaml:"address"`
-//	Percentage sdk.Dec        `json:"percentage" yaml:"percentage"`
-//}
 
 func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) DistributionShare {
 	return DistributionShare{

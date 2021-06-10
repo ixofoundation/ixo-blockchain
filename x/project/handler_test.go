@@ -1,6 +1,8 @@
 package project_test
 
 import (
+	"testing"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -11,11 +13,8 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"testing"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )

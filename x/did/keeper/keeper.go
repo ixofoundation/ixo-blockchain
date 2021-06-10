@@ -4,10 +4,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	//"github.com/golang/protobuf/ptypes/any"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
-	//codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 type Keeper struct {
@@ -109,7 +107,8 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential typ
 	credentials := baseDidDoc.GetCredentials()
 
 	for _, data := range credentials {
-		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] && data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
+		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] &&
+		   data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
 			return sdkerrors.Wrap(types.ErrInvalidCredentials, "credentials already exist")
 		}
 	}

@@ -1,9 +1,10 @@
 package keeper_test
 
 import (
+	"testing"
+
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestKeeper(t *testing.T) {

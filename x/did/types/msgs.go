@@ -3,11 +3,10 @@ package types
 import (
 	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (

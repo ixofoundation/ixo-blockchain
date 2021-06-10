@@ -1,6 +1,6 @@
 package types
 
-// TODO uncomment - uncommenting this file will create an import cycle between did and ixo modules
+// uncommenting this file will create an import cycle between did and ixo modules
 
 //import (
 //	sdk "github.com/cosmos/cosmos-sdk/types"

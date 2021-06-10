@@ -6,7 +6,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
-	types "github.com/ixofoundation/ixo-blockchain/x/project/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
 func NewHandler(k keeper.Keeper, pk paymentskeeper.Keeper, bk bankkeeper.Keeper) sdk.Handler {

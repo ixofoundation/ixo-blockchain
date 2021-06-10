@@ -3,10 +3,10 @@ package cli
 import (
 	"context"
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"strings"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/pkg/errors"

@@ -4,12 +4,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 )
 
-//type GenesisState struct {
-//	PaymentTemplates []PaymentTemplate `json:"payment_templates" yaml:"payment_templates"`
-//	PaymentContracts []PaymentContract `json:"payment_contracts" yaml:"payment_contracts"`
-//	Subscriptions    []Subscription    `json:"subscriptions" yaml:"subscriptions"`
-//}
-
 func NewGenesisState(templates []PaymentTemplate, contracts []PaymentContract,
 	subscriptions []Subscription) *GenesisState {
 	return &GenesisState{

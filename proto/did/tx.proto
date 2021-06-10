@@ -1,7 +1,6 @@
 syntax = "proto3";
 package did;
 
-// import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "gogoproto/gogo.proto";
 import "did/did.proto";
 

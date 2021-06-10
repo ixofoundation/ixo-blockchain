@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"

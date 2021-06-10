@@ -2,20 +2,14 @@ package app
 
 import (
 	"encoding/json"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	//"github.com/cosmos/cosmos-sdk/x/staking/exported"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	"log"
 
-	//abci "github.com/tendermint/tendermint/abci/types"
-	//tmtypes "github.com/tendermint/tendermint/types"
-
-	//"github.com/cosmos/cosmos-sdk/codec"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	//"github.com/cosmos/cosmos-sdk/x/slashing"
+	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 // ExportAppStateAndValidators exports the state of ixo for a genesis file.

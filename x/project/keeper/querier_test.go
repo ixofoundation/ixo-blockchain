@@ -2,13 +2,12 @@ package keeper_test
 
 import (
 	"encoding/json"
-	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	"testing"
 
+	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
-
-	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
 func TestQueryProjectDoc(t *testing.T) {

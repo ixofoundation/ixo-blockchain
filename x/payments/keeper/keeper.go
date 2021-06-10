@@ -1,13 +1,14 @@
 package keeper
 
 import (
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"strings"
 )
 
 type Keeper struct {

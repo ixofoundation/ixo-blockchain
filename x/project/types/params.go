@@ -2,11 +2,9 @@ package types
 
 import (
 	"fmt"
-	//"fmt" //TODO uncomment
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
-
-	//"github.com/cosmos/cosmos-sdk/x/params" //TODO uncomment
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
@@ -22,14 +20,6 @@ var (
 	KeyOracleFeePercentage          = []byte("OracleFeePercentage")
 	KeyNodeFeePercentage            = []byte("NodeFeePercentage")
 )
-
-//project parameters
-//type Params struct {
-//	IxoDid                       didexported.Did   `json:"ixo_did" yaml:"ixo_did"`
-//	ProjectMinimumInitialFunding sdk.Coins `json:"project_minimum_initial_funding" yaml:"project_minimum_initial_funding"`
-//	OracleFeePercentage          sdk.Dec   `json:"oracle_fee_percentage" yaml:"oracle_fee_percentage"`
-//	NodeFeePercentage            sdk.Dec   `json:"node_fee_percentage" yaml:"node_fee_percentage"`
-//}
 
 // ParamTable for project module.
 func ParamKeyTable() params.KeyTable {
@@ -61,18 +51,6 @@ func DefaultParams() Params {
 		NodeFeePercentage:            tenPercentFee,         // 10.0 (10%)
 	}
 }
-
-//func (p Params) String() string {
-//	return fmt.Sprintf(`Project Params:
-// Ixo Did:                         %s
-// Project Minimum Initial Funding: %s
-// Oracle Fee Percentage:           %s
-// Node Fee Percentage:             %s
-//
-//`,
-//		p.ProjectMinimumInitialFunding, p.IxoDid,
-//		p.OracleFeePercentage, p.NodeFeePercentage)
-//}
 
 func validateIxoDid(i interface{}) error {
 	v, ok := i.(didexported.Did)

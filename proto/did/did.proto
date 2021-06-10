@@ -5,18 +5,6 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
-// message Did {
-//  option (gogoproto.goproto_stringer) = false;
-//
-//  string did = 1;
-//}
-
-// message DidDoc {
-//  option (gogoproto.goproto_stringer) = false;
-//
-//  repeated google.protobuf.Any accounts = 1;
-//}
-
 message DidCredential {
   repeated string cred_type = 1 [(gogoproto.jsontag) = "type", (gogoproto.moretags) = "yaml:\"type\""];
   string issuer             = 2 [(gogoproto.moretags) = "yaml:\"issuer\""];

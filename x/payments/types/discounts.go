@@ -37,11 +37,6 @@ func (ds Discounts) Validate() error {
 	return nil
 }
 
-//type Discount struct {
-//	Id      sdk.Uint `json:"id" yaml:"id"`
-//	Percent sdk.Dec  `json:"percent" yaml:"percent"`
-//}
-
 func NewDiscount(id sdk.Uint, percent sdk.Dec) Discount {
 	return Discount{
 		Id:      id,

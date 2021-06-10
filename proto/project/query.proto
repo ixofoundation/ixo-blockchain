@@ -14,15 +14,15 @@ service Query {
   }
 
   rpc ProjectAccounts(QueryProjectAccountsRequest) returns (QueryProjectAccountsResponse){
-    option (google.api.http).get = "/ixo/projectAccounts/{project_did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+    option (google.api.http).get = "/ixo/projectAccounts/{project_did}";
   }
 
   rpc ProjectTx(QueryProjectTxRequest) returns (QueryProjectTxResponse){
-    option (google.api.http).get = "/ixo/projectTxs/{project_did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+    option (google.api.http).get = "/ixo/projectTxs/{project_did}";
   }
 
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse){
-    option (google.api.http).get = "/ixo/projectParams"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+    option (google.api.http).get = "/ixo/projectParams";
   }
 }
 

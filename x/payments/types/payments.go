@@ -1,18 +1,11 @@
 package types
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strings"
 )
-
-//type PaymentTemplate struct {
-//	Id             string    `json:"id" yaml:"id"`
-//	PaymentAmount  sdk.Coins `json:"payment_amount" yaml:"payment_amount"`
-//	PaymentMinimum sdk.Coins `json:"payment_minimum" yaml:"payment_minimum"`
-//	PaymentMaximum sdk.Coins `json:"payment_maximum" yaml:"payment_maximum"`
-//	Discounts      Discounts `json:"discounts" yaml:"discounts"`
-//}
 
 func NewPaymentTemplate(id string, paymentAmount, paymentMinimum,
 	paymentMaximum sdk.Coins, discounts Discounts) PaymentTemplate {
@@ -66,19 +59,6 @@ func (pt PaymentTemplate) Validate() error {
 
 	return nil
 }
-
-//type PaymentContract struct {
-//	Id                string         `json:"id" yaml:"id"`
-//	PaymentTemplateId string         `json:"payment_template_id" yaml:"payment_template_id"`
-//	Creator           sdk.AccAddress `json:"creator" yaml:"creator"`
-//	Payer             sdk.AccAddress `json:"payer" yaml:"payer"`
-//	Recipients        Distribution   `json:"recipients" yaml:"recipients"`
-//	CumulativePay     sdk.Coins      `json:"cumulative_pay" yaml:"cumulative_pay"`
-//	CurrentRemainder  sdk.Coins      `json:"current_remainder" yaml:"current_remainder"`
-//	CanDeauthorise    bool           `json:"can_deauthorise" yaml:"can_deauthorise"`
-//	Authorised        bool           `json:"authorised" yaml:"authorised"`
-//	DiscountId        sdk.Uint       `json:"discount_id" yaml:"discount_id"`
-//}
 
 func NewPaymentContract(id, templateId string, creator, payer sdk.AccAddress,
 	recipients Distribution, canDeauthorise, authorised bool,

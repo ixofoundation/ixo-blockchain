@@ -2,17 +2,17 @@ package cli
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/spf13/cobra"
 )
 
@@ -91,7 +91,7 @@ func NewCmdCreatePaymentTemplate() *cobra.Command {
 			}
 
 			var template types.PaymentTemplate
-			err = json.Unmarshal([]byte(templateJsonStr), &template) //UnmarshalJSON([]byte(templateJsonStr), &template)
+			err = json.Unmarshal([]byte(templateJsonStr), &template)
 			if err != nil {
 				return err
 			}

@@ -3,11 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/spf13/cobra"
 )
 

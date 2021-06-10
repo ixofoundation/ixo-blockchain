@@ -2,13 +2,14 @@ package rest
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"net/http"
 )
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
@@ -241,13 +242,6 @@ func queryParamsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
 			return
 		}
-
-		//var params types.Params
-		//if err := clientCtx.LegacyAmino.UnmarshalJSON(res, &params); err != nil {
-		//	w.WriteHeader(http.StatusInternalServerError)
-		//	_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
-		//	return
-		//}
 
 		rest.PostProcessResponse(w, clientCtx, res)
 	}

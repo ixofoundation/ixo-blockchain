@@ -3,19 +3,17 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
-
-	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 

@@ -8,14 +8,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/gogo/protobuf/proto"
-
 	naclBox "golang.org/x/crypto/nacl/box"
-	"io"
 )
 
 var DidPrefix = "did:ixo:"

@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 )
 
@@ -101,13 +102,6 @@ const (
 	ApprovedClaim ClaimStatus = "1"
 	RejectedClaim ClaimStatus = "2"
 )
-
-//type Claim struct {
-//	Id         string      `json:"id" yaml:"id"`
-//	TemplateId string      `json:"template_id" yaml:"template_id"`
-//	ClaimerDid didexported.Did     `json:"claimer_did" yaml:"claimer_did"`
-//	Status     ClaimStatus `json:"status" yaml:"status"`
-//}
 
 func NewClaim(id string, templateId string, claimerDid didexported.Did) Claim {
 	return Claim{

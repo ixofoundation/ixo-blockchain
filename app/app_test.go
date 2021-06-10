@@ -6,10 +6,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
-
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func TestIxodExportAndBlockedAddrs(t *testing.T) {

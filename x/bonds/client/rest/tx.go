@@ -1,6 +1,9 @@
 package rest
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,8 +12,6 @@ import (
 	"github.com/gorilla/mux"
 	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"net/http"
-	"strings"
 )
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {

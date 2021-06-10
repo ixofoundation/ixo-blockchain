@@ -17,18 +17,10 @@ message PaymentTemplate {
   repeated Discount discounts                       = 5 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"discounts\""];
 }
 
-//message Discounts {
-//  repeated Discount discounts_list = 1 [(gogoproto.nullable) = false];
-//}
-
 message Discount {
   string id      = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"id\""];
   string percent = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"percent\""];
 }
-
-//message Distribution {
-//  repeated DistributionShare distribution_share = 1 [(gogoproto.nullable) = false];
-//}
 
 message DistributionShare {
   string address    = 1 [(gogoproto.moretags) = "yaml:\"address\""];

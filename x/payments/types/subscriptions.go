@@ -2,11 +2,12 @@ package types
 
 import (
 	"fmt"
+	"time"
+
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
-	"time"
 )
 
 const (
@@ -15,15 +16,6 @@ const (
 )
 
 // --------------------------------------------- Subscription and Period
-
-//type Subscription struct {
-//	Id                 string   `json:"id" yaml:"id"`
-//	PaymentContractId  string   `json:"payment_contract_id" yaml:"payment_contract_id"`
-//	PeriodsSoFar       sdk.Uint `json:"periods_so_far" yaml:"periods_so_far"`
-//	MaxPeriods         sdk.Uint `json:"max_periods" yaml:"max_periods"`
-//	PeriodsAccumulated sdk.Uint `json:"periods_accumulated" yaml:"periods_accumulated"`
-//	Period             Period   `json:"period" yaml:"period"`
-//}
 
 func (s *Subscription) GetPeriod() Period {
 	period, ok := s.Period.GetCachedValue().(Period)
@@ -157,11 +149,6 @@ type Period interface {
 
 var _ Period = &BlockPeriod{}
 
-//type BlockPeriod struct {
-//	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
-//	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
-//}
-
 func NewBlockPeriod(periodLength, periodStartBlock int64) BlockPeriod {
 	return BlockPeriod{
 		PeriodLength:     periodLength,
@@ -205,11 +192,6 @@ func (p BlockPeriod) nextPeriod() Period {
 // --------------------------------------------- TimePeriod
 
 var _ Period = &TimePeriod{}
-
-//type TimePeriod struct {
-//	PeriodDurationNs time.Duration `json:"period_duration_ns" yaml:"period_duration_ns"`
-//	PeriodStartTime  time.Time     `json:"period_start_time" yaml:"period_start_time"`
-//}
 
 func NewTimePeriod(periodDurationNs time.Duration, periodStartTime time.Time) TimePeriod {
 	return TimePeriod{

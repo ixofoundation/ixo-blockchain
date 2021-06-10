@@ -3,19 +3,17 @@ package project
 import (
 	"bytes"
 	"fmt"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
-
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	//"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
 // SetUpContextDecorator sets the GasMeter in the Context and wraps the next AnteHandler with a defer clause
@@ -147,7 +145,6 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 // CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
 type DeductFeeDecorator struct {
 	ak           keeper.AccountKeeper
-	//supplyKeeper authtypes.SupplyKeeper
 	bk           bankkeeper.Keeper
 	didKeeper    didkeeper.Keeper
 	pkg          ixotypes.PubKeyGetter
@@ -194,10 +191,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	}
 
 	// confirm that fee is the exact amount expected
-	//stdTx, ok := tx.(authsigning.Tx) //(legacytx.StdTx) //(auth.StdTx)
-	//if !ok {
-	//	return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-	//}
 	expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
 		ixotypes.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTotalFee)))
 	if !feeTx.GetFee().IsEqual(expectedTotalFee) {
@@ -299,12 +292,7 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		}
 
 		// check signature, return account with incremented nonce
-		//stdTx, ok := tx.(legacytx.StdTx)//(auth.StdTx)
-		//if !ok {
-		//	return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-		//}
-
-		/// retrieve pubkey
+		// retrieve pubkey
 		pubKey := acc.GetPubKey()
 		if !simulate && pubKey == nil {
 			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "pubkey on account is not set")
@@ -359,108 +347,3 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 
 	return next(ctx, tx, simulate)
 }
-
-//TODO Option 2: Uses legacy functions
-//func (svd SigVerificationDecorator) AnteHandle2(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-//	// no need to verify signatures on recheck tx
-//	if ctx.IsReCheckTx() {
-//		return next(ctx, tx, simulate)
-//	}
-//	sigTx, ok := tx.(authsigning.SigVerifiableTx)
-//	if !ok {
-//		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-//	}
-//
-//	// stdSigs contains the sequence number, account number, and signatures.
-//	// When simulating, this would just be a 0-length slice.
-//	sigs, err := sigTx.GetSignaturesV2()
-//	if (err != nil) {
-//		return ctx, err
-//	}
-//
-//	// message must be of type MsgCreateProject
-//	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
-//	if !ok {
-//		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
-//	}
-//
-//	// Get signer did pubKey
-//	pubKey, err := svd.pkg(ctx, msg)
-//	if err != nil {
-//		return ctx, err
-//	}
-//
-//	// Fetch signer (account underlying DID). Account expected to not exist
-//	signerAddrs := []sdk.AccAddress{sdk.AccAddress(pubKey.Address())}
-//
-//	// check that signer length and signature length are the same
-//	if len(sigs) != len(signerAddrs) {
-//		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "invalid number of signer;  expected: %d, got %d", len(signerAddrs), len(sigs))
-//	}
-//
-//	for i, sig := range sigs {
-//		acc, err := ante.GetSignerAcc(ctx, svd.ak, signerAddrs[i])
-//		if err != nil {
-//			return ctx, err
-//		}
-//
-//		// check signature, return account with incremented nonce
-//		stdTx, ok := tx.(legacytx.StdTx) //(auth.StdTx)
-//		if !ok {
-//			return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-//		}
-//
-//		/// retrieve pubkey
-//		pubKey := acc.GetPubKey()
-//		if !simulate && pubKey == nil {
-//			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "pubkey on account is not set")
-//		}
-//
-//		genesis := ctx.BlockHeight() == 0
-//		chainID := ctx.ChainID()
-//		var accNum uint64
-//		if !genesis {
-//			// Fixed account number used so that sign bytes do not depend on it
-//			accNum = uint64(0)
-//		}
-//
-//		if !simulate {
-//			err := VerifySignatureProjectCreation(chainID, accNum, acc.GetSequence(), stdTx, pubKey, sig.Data)
-//			if err != nil {
-//				return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("signature verification failed; please verify account number (%d) and chain-id (%s)", accNum, chainID))
-//			}
-//		}
-//	}
-//
-//	return next(ctx, tx, simulate)
-//}
-//
-//// VerifySignature verifies a transaction signature contained in SignatureData abstracting over different signing modes
-//// and single vs multi-signatures.
-//func VerifySignatureProjectCreation(
-//	chainID string, accNum uint64, sequence uint64, tx legacytx.StdTx, pubKey crypto.PubKey, sigData signing.SignatureData,
-//	) error {
-//	switch data := sigData.(type) {
-//	case *signing.SingleSignatureData:
-//		signBytes := legacytx.StdSignBytes(chainID, accNum, sequence, 0, tx.Fee, tx.Msgs, tx.Memo)
-//		if !pubKey.VerifySignature(signBytes, data.Signature) {
-//			return fmt.Errorf("unable to verify single signer signature")
-//		}
-//		return nil
-//
-//	case *signing.MultiSignatureData:
-//		multiPK, ok := pubKey.(multisig.PubKey)
-//		if !ok {
-//			return fmt.Errorf("expected %T, got %T", (multisig.PubKey)(nil), pubKey)
-//		}
-//		err := multiPK.VerifyMultisignature(func(mode signing.SignMode) ([]byte, error) {
-//			return legacytx.StdSignBytes(chainID, accNum, sequence, 0, tx.Fee, tx.Msgs, tx.Memo), nil
-//		}, data)
-//		if err != nil {
-//			return err
-//		}
-//		return nil
-//	default:
-//		return fmt.Errorf("unexpected SignatureData %T", sigData)
-//	}
-//}

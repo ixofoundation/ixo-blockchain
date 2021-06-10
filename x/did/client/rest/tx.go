@@ -1,14 +1,13 @@
 package rest
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
+	"net/http"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"net/http"
-
-	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 )
 

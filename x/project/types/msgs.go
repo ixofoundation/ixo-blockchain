@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -38,14 +39,6 @@ var (
 	_ ixotypes.IxoMsg = &MsgUpdateProjectDoc{}
 )
 
-//type MsgCreateProject struct {
-//	TxHash     string          `json:"txHash" yaml:"txHash"`
-//	SenderDid  didexported.Did         `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid didexported.Did         `json:"projectDid" yaml:"projectDid"`
-//	PubKey     string          `json:"pubKey" yaml:"pubKey"`
-//	Data       json.RawMessage `json:"data" yaml:"data"`
-//}
-
 func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
 	projectDid didexported.Did, pubKey string) *MsgCreateProject {
 	return &MsgCreateProject{
@@ -58,14 +51,12 @@ func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
 }
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
-	chainID := viper.GetString(flags.FlagChainID)
 	accNum, accSeq := uint64(0), uint64(0)
 	stdFee := legacytx.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
 		ixotypes.IxoNativeToken, sdk.NewInt(fee))))
 	memo := viper.GetString(flags.FlagMemo)
 
 	return legacytx.StdSignMsg{
-		ChainID:       chainID,
 		AccountNumber: accNum,
 		Sequence:      accSeq,
 		Fee:           stdFee,
@@ -124,13 +115,6 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-//type MsgUpdateProjectStatus struct {
-//	TxHash     string                 `json:"txHash" yaml:"txHash"`
-//	SenderDid  didexported.Did                `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid didexported.Did                `json:"projectDid" yaml:"projectDid"`
-//	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
-//}
-
 func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid didexported.Did) *MsgUpdateProjectStatus {
 	return &MsgUpdateProjectStatus{
 		TxHash:     "",
@@ -173,13 +157,6 @@ func (msg MsgUpdateProjectStatus) GetSignerDid() didexported.Did { return msg.Pr
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
 }
-
-//type MsgCreateAgent struct {
-//	TxHash     string         `json:"txHash" yaml:"txHash"`
-//	SenderDid  didexported.Did        `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid didexported.Did        `json:"projectDid" yaml:"projectDid"`
-//	Data       CreateAgentDoc `json:"data" yaml:"data"`
-//}
 
 func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc CreateAgentDoc, projectDid didexported.Did) *MsgCreateAgent {
 	return &MsgCreateAgent{
@@ -231,13 +208,6 @@ func (msg MsgCreateAgent) String() string {
 	return string(b)
 }
 
-//type MsgUpdateAgent struct {
-//	TxHash     string         `json:"txHash" yaml:"txHash"`
-//	SenderDid  didexported.Did        `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid didexported.Did        `json:"projectDid" yaml:"projectDid"`
-//	Data       UpdateAgentDoc `json:"data" yaml:"data"`
-//}
-
 func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc UpdateAgentDoc, projectDid didexported.Did) *MsgUpdateAgent {
 	return &MsgUpdateAgent{
 		ProjectDid: projectDid,
@@ -288,13 +258,6 @@ func (msg MsgUpdateAgent) String() string {
 
 	return string(b)
 }
-
-//type MsgCreateClaim struct {
-//	TxHash     string         `json:"txHash" yaml:"txHash"`
-//	SenderDid  didexported.Did        `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid didexported.Did        `json:"projectDid" yaml:"projectDid"`
-//	Data       CreateClaimDoc `json:"data" yaml:"data"`
-//}
 
 func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc CreateClaimDoc, projectDid didexported.Did) *MsgCreateClaim {
 	return &MsgCreateClaim{
@@ -350,13 +313,6 @@ func (msg MsgCreateClaim) String() string {
 	return string(b)
 }
 
-//type MsgCreateEvaluation struct {
-//	TxHash     string              `json:"txHash" yaml:"txHash"`
-//	SenderDid  didexported.Did             `json:"senderDid" yaml:"senderDid"`
-//	ProjectDid didexported.Did             `json:"projectDid" yaml:"projectDid"`
-//	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
-//}
-
 func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEvaluationDoc CreateEvaluationDoc, projectDid didexported.Did) *MsgCreateEvaluation {
 	return &MsgCreateEvaluation{
 		ProjectDid: projectDid,
@@ -406,11 +362,6 @@ func (msg MsgCreateEvaluation) String() string {
 
 	return string(b)
 }
-
-//type MsgWithdrawFunds struct {
-//	SenderDid didexported.Did          `json:"senderDid" yaml:"senderDid"`
-//	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
-//}
 
 func NewMsgWithdrawFunds(senderDid didexported.Did, data WithdrawFundsDoc) *MsgWithdrawFunds {
 	return &MsgWithdrawFunds{

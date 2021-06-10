@@ -1175,7 +1175,7 @@ check all cases in NewHandler().
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  |  |
-| KYCvalidated | [bool](#bool) |  |  |
+| KYC_validated | [bool](#bool) |  |  |
 
 
 
@@ -1190,7 +1190,7 @@ check all cases in NewHandler().
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| credtype | [string](#string) | repeated |  |
+| cred_type | [string](#string) | repeated |  |
 | issuer | [string](#string) |  |  |
 | issued | [string](#string) |  |  |
 | claim | [Claim](#did.Claim) |  |  |
@@ -1209,8 +1209,8 @@ check all cases in NewHandler().
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | did | [string](#string) |  |  |
-| verifyKey | [string](#string) |  |  |
-| encryptionPublicKey | [string](#string) |  |  |
+| verify_key | [string](#string) |  |  |
+| encryption_public_key | [string](#string) |  |  |
 | secret | [Secret](#did.Secret) |  |  |
 
 
@@ -1227,8 +1227,8 @@ check all cases in NewHandler().
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | seed | [string](#string) |  |  |
-| signKey | [string](#string) |  |  |
-| encryptionPrivateKey | [string](#string) |  |  |
+| sign_key | [string](#string) |  |  |
+| encryption_private_key | [string](#string) |  |  |
 
 
 
@@ -1260,7 +1260,7 @@ check all cases in NewHandler().
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | did | [string](#string) |  |  |
-| pubKey | [string](#string) |  |  |
+| pub_key | [string](#string) |  |  |
 | credentials | [DidCredential](#did.DidCredential) | repeated |  |
 
 
@@ -1292,7 +1292,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diddocs | [google.protobuf.Any](#google.protobuf.Any) | repeated | DidDoc is an interface so we use Any here, like evidence GenesisState |
+| did_docs | [google.protobuf.Any](#google.protobuf.Any) | repeated | DidDoc is an interface so we use Any here, like evidence GenesisState |
 
 
 
@@ -1496,7 +1496,7 @@ did/client/rest/query.go
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| didCredential | [DidCredential](#did.DidCredential) |  |  |
+| did_credential | [DidCredential](#did.DidCredential) |  |  |
 
 
 

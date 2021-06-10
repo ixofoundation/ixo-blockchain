@@ -4,40 +4,38 @@ import (
 	"bufio"
 	"encoding/hex"
 	"fmt"
+	"os"
+
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	"github.com/cosmos/cosmos-sdk/crypto/types/multisig"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/spf13/pflag"
-
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	"github.com/cosmos/cosmos-sdk/crypto/types/multisig"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"os"
+	"github.com/spf13/pflag"
 )
 
 var (
 	expectedMinGasPrices       = "0.025" + IxoNativeToken
 	approximationGasAdjustment = float64(1.5)
+	fees                       = "1000000" + IxoNativeToken
 	// TODO: parameterise (or remove) hard-coded gas prices and adjustments
 
 	// simulation signature values used to estimate gas consumption
 	simEd25519Pubkey ed25519.PubKey
 	simEd25519Sig    [ed25519.SignatureSize]byte
 )
-
-//TODO check that all signing is working correctly
 
 func init() {
 	// This decodes a valid hex string into a ed25519Pubkey for use in transaction simulation
@@ -102,31 +100,6 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 	)
 }
 
-//TODO uncomment
-//func ApproximateFeeForTx(cliCtx context.CLIContext, tx auth.StdTx, chainId string) (auth.StdFee, error) {
-//
-//	// Set up a transaction builder
-//	cdc := cliCtx.Codec
-//	txEncoder := auth.DefaultTxEncoder
-//	gasAdjustment := approximationGasAdjustment
-//	fees := sdk.NewCoins(sdk.NewCoin(IxoNativeToken, sdk.OneInt()))
-//	txBldr := auth.NewTxBuilder(txEncoder(cdc), 0, 0, 0, gasAdjustment, true, chainId, tx.Memo, fees, nil)
-//
-//	// Approximate gas consumption
-//	txBldr, err := utils.EnrichWithGas(txBldr, cliCtx, tx.Msgs)
-//	if err != nil {
-//		return auth.StdFee{}, err
-//	}
-//
-//	// Clear fees and set gas-prices to deduce updated fee = (gas * gas-prices)
-//	signMsg, err := txBldr.WithFees("").WithGasPrices(expectedMinGasPrices).BuildSignMsg(tx.Msgs)
-//	if err != nil {
-//		return auth.StdFee{}, err
-//	}
-//
-//	return signMsg.Fee, nil
-//}
-
 func GenerateOrBroadcastTxCLI(clientCtx client.Context, flagSet *pflag.FlagSet, ixoDid exported.IxoDid, msg sdk.Msg) error {
 	txf := tx.NewFactoryCLI(clientCtx, flagSet)
 	return GenerateOrBroadcastTxWithFactory(clientCtx, txf, ixoDid, msg)
@@ -182,7 +155,7 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 		}
 	}
 
-	err = Sign(txf, clientCtx, tx, true, ixoDid) //Sign(txf, clientCtx.GetFromName(), tx, ixoDid, msg) //like old local BuildAndSign
+	err = Sign(txf, clientCtx, tx, true, ixoDid)
 	if err != nil {
 		return err
 	}
@@ -198,7 +171,7 @@ func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDi
 		return err
 	}
 
-	return clientCtx.PrintProto(res) //PrintOutput(res)
+	return clientCtx.PrintProto(res)
 }
 
 func checkMultipleSigners(mode signing.SignMode, tx authsigning.Tx) error {
@@ -216,7 +189,7 @@ func Sign(txf tx.Factory, clientCtx client.Context, txBuilder client.TxBuilder, 
 	signMode := txf.SignMode()
 	if signMode == signing.SignMode_SIGN_MODE_UNSPECIFIED {
 		// use the SignModeHandler's default mode if unspecified
-		signMode = clientCtx.TxConfig.SignModeHandler().DefaultMode() //clientCtx.TxConfig used instead of txf.txConfig
+		signMode = clientCtx.TxConfig.SignModeHandler().DefaultMode()
 	}
 	err := checkMultipleSigners(signMode, txBuilder.GetTx())
 	if err != nil {
@@ -257,7 +230,7 @@ func Sign(txf tx.Factory, clientCtx client.Context, txBuilder client.TxBuilder, 
 		return err
 	}
 
-	bytesToSign, err := clientCtx.TxConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx()) //txf.txConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())
+	bytesToSign, err := clientCtx.TxConfig.SignModeHandler().GetSignBytes(signMode, signerData, txBuilder.GetTx())
 	if err != nil {
 		return err
 	}
@@ -318,29 +291,8 @@ func IxoSigVerificationGasConsumer(
 func SignAndBroadcastTxFromStdSignMsg(clientCtx client.Context,
 	msg sdk.Msg, ixoDid exported.IxoDid, flagSet *pflag.FlagSet) (*sdk.TxResponse, error) {
 
-	// sign the transaction - copied old Sign function here
-	//txBytes, err := Sign(clientCtx, msg, ixoDid)
-	//if err != nil {
-	//	return sdk.TxResponse{}, err
-	//}
-
-	// Signing legacy
-	//var privateKey ed25519.PrivKey
-	//privateKey.Key = append(base58.Decode(ixoDid.Secret.SignKey), base58.Decode(ixoDid.VerifyKey)...)
-	//
-	//sig, err := MakeSignature(msg.Bytes(), privateKey)
-	//if err != nil {
-	//	return &sdk.TxResponse{}, err
-	//}
-	//
-	//encoder := authclient.GetTxEncoder(clientCtx.LegacyAmino)
-	//txBytes , err := encoder(legacytx.NewStdTx(msg.Msgs, msg.Fee, []legacytx.StdSignature{sig}, msg.Memo))
-	//if err != nil {
-	//	return &sdk.TxResponse{}, err
-	//}
-
 	txf := tx.NewFactoryCLI(clientCtx, flagSet)
-	txf = txf.WithFees("1000000uixo").WithGasPrices("").WithGas(0)
+	txf = txf.WithFees(fees).WithGasPrices("").WithGas(0)
 
 	tx, err := tx.BuildUnsignedTx(txf, msg)
 	if err != nil {
@@ -382,34 +334,3 @@ func SignAndBroadcastTxFromStdSignMsg(clientCtx client.Context,
 
 	return res, nil
 }
-
-func MakeSignature(signBytes []byte,
-	privateKey ed25519.PrivKey) (legacytx.StdSignature, error) {
-	sig, err := privateKey.Sign(signBytes)
-	if err != nil {
-		return legacytx.StdSignature{}, err
-	}
-
-	return legacytx.StdSignature{
-		PubKey:    privateKey.PubKey(),
-		Signature: sig,
-	}, nil
-}
-
-//func consumeSimSigGas(gasmeter sdk.GasMeter, pubkey crypto.PubKey, sig auth.StdSignature, params auth.Params) {
-//	simSig := auth.StdSignature{PubKey: pubkey}
-//	if len(sig.Signature) == 0 {
-//		simSig.Signature = simEd25519Sig[:]
-//	}
-//
-//	sigBz := ModuleCdc.MustMarshalBinaryLengthPrefixed(simSig)
-//	cost := sdk.Gas(len(sigBz) + 6)
-//
-//	// If the pubkey is a multi-signature pubkey, then we estimate for the maximum
-//	// number of signers.
-//	if _, ok := pubkey.(multisig.PubKeyMultisigThreshold); ok {
-//		cost *= params.TxSigLimit
-//	}
-//
-//	gasmeter.ConsumeGas(params.TxSizeCostPerByte*cost, "txSize")
-//}

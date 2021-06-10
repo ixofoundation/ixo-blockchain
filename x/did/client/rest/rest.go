@@ -3,7 +3,6 @@ package rest
 import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rest"
-
 	"github.com/gorilla/mux"
 )
 

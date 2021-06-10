@@ -2,13 +2,13 @@ package rest
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"net/http"
-
-	"github.com/cosmos/cosmos-sdk/types/rest"
 )
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {

@@ -2,13 +2,14 @@ package app
 
 import (
 	"encoding/json"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-	"time"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in

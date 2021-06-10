@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
+
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func CheckNotEmpty(value string, name string) (valid bool, err error) {
