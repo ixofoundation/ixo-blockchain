@@ -12,7 +12,7 @@ message UpdateProjectStatusDoc {
 }
 
 message CreateAgentDoc {
-  string agent_did = 1 [(gogoproto.moretags) = "yaml:\"did\""];
+  string agent_did = 1 [(gogoproto.jsontag) = "did", (gogoproto.moretags) = "yaml:\"did\""];
   string role      = 2 [(gogoproto.moretags) = "yaml:\"role\""];
 }
 
@@ -23,8 +23,8 @@ message UpdateAgentDoc {
 }
 
 message CreateClaimDoc {
-  string claim_id          = 1 [(gogoproto.moretags) = "yaml:\"claimID\""];
-  string claim_template_id = 2 [(gogoproto.moretags) = "yaml:\"claimTemplateID\""];
+  string claim_id          = 1 [(gogoproto.jsontag) = "claimID", (gogoproto.moretags) = "yaml:\"claimID\""];
+  string claim_template_id = 2 [(gogoproto.jsontag) = "claimTemplateID", (gogoproto.moretags) = "yaml:\"claimTemplateID\""];
 }
 
 message CreateEvaluationDoc {

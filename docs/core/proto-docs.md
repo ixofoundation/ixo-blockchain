@@ -1292,7 +1292,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did_docs | [google.protobuf.Any](#google.protobuf.Any) | repeated | DidDoc is an interface so we use Any here, like evidence GenesisState |
+| did_docs | [google.protobuf.Any](#google.protobuf.Any) | repeated | DidDoc is an interface so we use Any here |
 
 
 
@@ -2420,7 +2420,7 @@ check all cases in NewHandler().
 <a name="project.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the did module&#39;s genesis state.
+GenesisState defines the project module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |

@@ -119,7 +119,15 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 				WithGasAdjustment(gasAdjustment).
 				WithFees(fees.String())
 
+			txfForGasCalc, err = clienttx.PrepareFactory(clientCtx, txfForGasCalc)
+			if rest.CheckInternalServerError(w, err) {
+				return
+			}
+
 			_, gasAmt, err := clienttx.CalculateGas(clientCtx.QueryWithData, txfForGasCalc, msg)
+			if rest.CheckBadRequestError(w, err) {
+				return
+			}
 			txf = txf.WithGas(gasAmt)
 
 			tx, err := clienttx.BuildUnsignedTx(txf, msg)
