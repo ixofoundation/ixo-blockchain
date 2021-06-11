@@ -39,7 +39,7 @@ message MsgCreateBond {
   string sanity_rate                                      = 15 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_rate\""];
   string sanity_margin_percentage                         = 16 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_margin_percentage\""];
   bool allow_sells                                        = 17 [(gogoproto.moretags) = "yaml:\"allow_sells\""];
-  bool alpha_bond                                         = 18 [(gogoproto.moretags) = "yaml:\"alpha_bonds\""];
+  bool alpha_bond                                         = 18 [(gogoproto.moretags) = "yaml:\"alpha_bond\""];
   string batch_blocks                                     = 19 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"batch_blocks\""];
   string outcome_payment                                  = 20 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"outcome_payment\""];
 }

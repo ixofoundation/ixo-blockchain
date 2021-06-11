@@ -46,7 +46,7 @@ message Bond {
 }
 
 message BaseOrder {
-  string account_did              = 1 [(gogoproto.moretags) = "yaml:\"account_did\""];
+  string account_did              = 1 [(gogoproto.jsontag) = "sender_did", (gogoproto.moretags) = "yaml:\"sender_did\""];
   cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"amount\""];
   bool cancelled                  = 3 [(gogoproto.moretags) = "yaml:\"cancelled\""];
   string cancel_reason            = 4 [(gogoproto.moretags) = "yaml:\"cancel_reason\""];
