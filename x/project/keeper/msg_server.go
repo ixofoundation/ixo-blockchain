@@ -547,6 +547,10 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did,
 	fromAccountId types.InternalAccountID, recipientDid didexported.Did, amount sdk.Coin) error {
+	
+	if amount.IsZero() {
+		return nil
+	}
 
 	ixoBalance := getIxoAmount(ctx, k, bk, projectDid, fromAccountId)
 	if ixoBalance.IsLT(amount) {
