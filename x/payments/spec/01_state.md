@@ -14,7 +14,7 @@ type PaymentTemplate struct {
 	PaymentAmount  sdk.Coins
 	PaymentMinimum sdk.Coins
 	PaymentMaximum sdk.Coins
-	Discounts      Discounts
+	Discounts      []Discount
 }
 ```
 
@@ -53,9 +53,9 @@ type Discount struct {
 type PaymentContract struct {
 	Id                string
 	PaymentTemplateId string
-	Creator           sdk.AccAddress
-	Payer             sdk.AccAddress
-	Recipients        Distribution
+	Creator           string
+	Payer             string
+	Recipients        []DistributionShare
 	CumulativePay     sdk.Coins
 	CurrentRemainder  sdk.Coins
 	CanDeauthorise    bool
@@ -84,7 +84,7 @@ The contract identifies the contract creator, payer, and recipients:
 type Distribution []DistributionShare
 
 type DistributionShare struct {
-	Address    sdk.AccAddress
+	Address    string
 	Percentage sdk.Dec
 }
 ```
@@ -126,7 +126,7 @@ type Subscription struct {
 	PeriodsSoFar       sdk.Uint
 	MaxPeriods         sdk.Uint
 	PeriodsAccumulated sdk.Uint
-	Period             Period
+	Period             *sdk.Any
 }
 ```
 
@@ -153,6 +153,8 @@ each block and subscriptions for which enough time has passed are invoked.
 
 ```go
 type Period interface {
+	proto.Message 
+	
 	GetPeriodUnit() string
 	Validate() error
 	periodStarted(ctx sdk.Context) bool

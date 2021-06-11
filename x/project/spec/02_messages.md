@@ -17,8 +17,8 @@ This message creates a project with arbitrary `Data`.
 ```go
 type MsgCreateProject struct {
 	TxHash     string          `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did         `json:"projectDid" yaml:"projectDid"`
+	SenderDid  string          `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string          `json:"projectDid" yaml:"projectDid"`
 	PubKey     string          `json:"pubKey" yaml:"pubKey"`
 	Data       json.RawMessage `json:"data" yaml:"data"`
 }
@@ -27,6 +27,7 @@ type MsgCreateProject struct {
 This message is expected to fail if:
 - senderDid is incorrect
 - PubKey is incorrect
+- data is unmarshallable to `map[string]json.RawMessage`
 
 This message creates and stores the `Project` object at appropriate indexes.
 
@@ -91,13 +92,56 @@ This message is expected to fail if:
 ```go
 type MsgUpdateProjectStatus struct {
 	TxHash     string                 `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did                `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did                `json:"projectDid" yaml:"projectDid"`
+	SenderDid  string                `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string                `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
 }
 ```
 
 This message stores the updated `MsgUpdateProjectStatus` object.
+
+## MsgUpdateProjectDoc
+
+| **Field**  | **Type**          | **Description** |
+|:-----------|:------------------|:----------------|
+| TxHash     | `string`          | Hash of the project request
+| SenderDid  | `did.Did`         | Sender account DID
+| ProjectDid | `did.Did`         | Sender's Project DID
+| Data       | `json.RawMessage` | What the data is passing
+
+```go
+type MsgUpdateProjectDoc struct {
+	TxHash     string          `json:"txHash" yaml:"txHash"`
+	SenderDid  string          `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string          `json:"projectDid" yaml:"projectDid"`
+	Data       json.RawMessage `json:"data" yaml:"data"`
+}
+```
+
+This message is expected to fail if:
+- senderDid is wrong
+- projectDid is wrong
+- data is unmarshallable to `map[string]json.RawMessage`
+
+This message stores the updated `MsgUpdateProjectDoc` object.
+
+## MsgCreateAgent
+
+| **Field**  | **Type**         | **Description** |
+|:-----------|:-----------------|:----------------|
+| TxHash     | `string`         | Hash of the project request
+| SenderDid  | `did.Did`        | Sender account DID
+| ProjectDid | `did.Did`        | Sender's Project DID
+| Data       | `CreateAgentDoc` | AgentDoc data
+
+```go
+type MsgCreateAgent struct {
+	TxHash     string         `json:"txHash" yaml:"txHash"`
+	SenderDid  string         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string         `json:"projectDid" yaml:"projectDid"`
+	Data       CreateAgentDoc `json:"data" yaml:"data"`
+}
+```
 
 ## MsgUpdateAgent
 
@@ -111,8 +155,8 @@ This message stores the updated `MsgUpdateProjectStatus` object.
 ```go
 type MsgUpdateAgent struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  string         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string         `json:"projectDid" yaml:"projectDid"`
 	Data       UpdateAgentDoc `json:"data" yaml:"data"`
 }
 ```
@@ -137,8 +181,8 @@ This message is expected to fail if:
 ```go
 type MsgCreateClaim struct {
 	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did        `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did        `json:"projectDid" yaml:"projectDid"`
+	SenderDid  string         `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string         `json:"projectDid" yaml:"projectDid"`
 	Data       CreateClaimDoc `json:"data" yaml:"data"`
 }
 ```
@@ -161,8 +205,8 @@ This message is expected to fail if:
 ```go
 type MsgCreateEvaluation struct {
 	TxHash     string              `json:"txHash" yaml:"txHash"`
-	SenderDid  did.Did             `json:"senderDid" yaml:"senderDid"`
-	ProjectDid did.Did             `json:"projectDid" yaml:"projectDid"`
+	SenderDid  string              `json:"senderDid" yaml:"senderDid"`
+	ProjectDid string              `json:"projectDid" yaml:"projectDid"`
 	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
 }
 ```
@@ -178,7 +222,7 @@ This is used by project agents to withdraw their funds from the project.
 
 ```go
 type MsgWithdrawFunds struct {
-	SenderDid did.Did          `json:"senderDid" yaml:"senderDid"`
+	SenderDid string          `json:"senderDid" yaml:"senderDid"`
 	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
 }
 ```

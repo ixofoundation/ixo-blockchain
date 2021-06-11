@@ -41,30 +41,30 @@ A bond may also specify non-zero fees, which are calculated based on the size of
 
 ```go
 type Bond struct {
-	Token                        string
-	Name                         string
-	Description                  string
-	CreatorDid                   did.Did
-	ControllerDid                did.Did
-	FunctionType                 string
-	FunctionParameters           FunctionParams
-	ReserveTokens                []string
-	TxFeePercentage              sdk.Dec
-	ExitFeePercentage            sdk.Dec
-	FeeAddress                   sdk.AccAddress
-	MaxSupply                    sdk.Coin
-	OrderQuantityLimits          sdk.Coins
-	SanityRate                   sdk.Dec
-	SanityMarginPercentage       sdk.Dec
-	CurrentSupply                sdk.Coin
-	CurrentReserve               sdk.Coins
-	CurrentOutcomePaymentReserve sdk.Coins
-	AllowSells                   bool
-	AlphaBond                    bool
-	BatchBlocks                  sdk.Uint
-	OutcomePayment               sdk.Int
-	State                        string
-	BondDid                      did.Did
+    Token                        string                                   
+    Name                         string                                   
+    Description                  string                                   
+    CreatorDid                   string                                   
+    ControllerDid                string                                   
+    FunctionType                 string                                   
+    FunctionParameters           FunctionParams                           
+    ReserveTokens                []string                                 
+    TxFeePercentage              sdk.Dec   
+    ExitFeePercentage            sdk.Dec   
+    FeeAddress                   string                                   
+    MaxSupply                    sdk.Coin                               
+    OrderQuantityLimits          sdk.Coins 
+    SanityRate                   sdk.Dec   
+    SanityMarginPercentage       sdk.Dec   
+    CurrentSupply                sdk.Coin                               
+    CurrentReserve               sdk.Coins 
+    CurrentOutcomePaymentReserve sdk.Coins 
+    AllowSells                   bool                                     
+    AlphaBond                    bool                                     
+    BatchBlocks                  sdk.Uint  
+    OutcomePayment               sdk.Int   
+    State                        string                                   
+    BondDid                      string                                   
 }
 ```
 
@@ -80,7 +80,7 @@ For alpha bonds, the batch also stores the next alpha value, if it was changed t
 
 ```go
 type Batch struct {
-	BondDid         did.Did
+	BondDid         string
 	BlocksRemaining sdk.Uint
 	NextPublicAlpha sdk.Dec
 	TotalBuyAmount  sdk.Coin

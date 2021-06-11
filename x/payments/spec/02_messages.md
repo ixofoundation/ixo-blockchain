@@ -16,7 +16,7 @@ Refer to [01_state.md](./01_state.md) for information about payment templates.
 
 ```go
 type MsgCreatePaymentTemplate struct {
-	CreatorDid      did.Did
+	CreatorDid      string
 	PaymentTemplate PaymentTemplate
 }
 ``` 
@@ -49,11 +49,11 @@ Refer to [01_state.md](./01_state.md) for information about payment contracts.
 
 ```go
 type MsgCreatePaymentContract struct {
-	CreatorDid        did.Did
+	CreatorDid        string
 	PaymentTemplateId string
 	PaymentContractId string
-	Payer             sdk.AccAddress
-	Recipients        Distribution
+	Payer             string
+	Recipients        []DistributionShare
 	CanDeauthorise    bool
 	DiscountId        sdk.Uint
 }
@@ -96,11 +96,11 @@ to [01_state.md](./01_state.md) for information about subscriptions.
 
 ```go
 type MsgCreateSubscription struct {
-	CreatorDid        did.Did
+	CreatorDid        string
 	SubscriptionId    string
 	PaymentContractId string
 	MaxPeriods        sdk.Uint
-	Period            Period
+	Period            *sdk.Any
 }
 ```
 
@@ -138,7 +138,7 @@ or disable effecting of the payment contract.
 
 ```go
 type MsgSetPaymentContractAuthorisation struct {
-	PayerDid          did.Did
+	PayerDid          string
 	PaymentContractId string
 	Authorised        bool
 }
@@ -168,10 +168,10 @@ This message grants a discount to a recipient for a particular payment contract.
 
 ```go
 type MsgGrantDiscount struct {
-	SenderDid         did.Did
+	SenderDid         string
 	PaymentContractId string
 	DiscountId        sdk.Uint
-	Recipient         sdk.AccAddress
+	Recipient         string
 }
 ```
 
@@ -199,9 +199,9 @@ contract.
 
 ```go
 type MsgRevokeDiscount struct {
-	SenderDid         did.Did
+	SenderDid         string
 	PaymentContractId string
-	Holder            sdk.AccAddress
+	Holder            string
 }
 ```
 

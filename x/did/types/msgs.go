@@ -79,7 +79,7 @@ func NewMsgAddCredential(did string, credType []string, issuer string, issued st
 	}
 
 	return &MsgAddCredential{
-		DidCredential: &didCredential,
+		DidCredential: didCredential,
 	}
 }
 

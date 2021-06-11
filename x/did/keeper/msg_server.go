@@ -45,7 +45,7 @@ func (k msgServer) AddDid(goCtx context.Context, msg *types.MsgAddDid) (*types.M
 
 func (k msgServer) AddCredential(goCtx context.Context, msg *types.MsgAddCredential) (*types.MsgAddCredentialResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err := k.AddCredentials(ctx, msg.DidCredential.Claim.Id, *msg.DidCredential)
+	err := k.AddCredentials(ctx, msg.DidCredential.Claim.Id, msg.DidCredential)
 	if err != nil {
 		return nil, err
 	}
