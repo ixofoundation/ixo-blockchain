@@ -4,19 +4,19 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/ixofoundation/ixo-blockchain/cmd"
+	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
+	"github.com/stretchr/testify/require"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
-	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
 func CreateTestInput() (*codec.LegacyAmino, *app.IxoApp, sdk.Context) {

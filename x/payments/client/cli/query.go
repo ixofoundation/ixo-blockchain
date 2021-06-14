@@ -39,7 +39,7 @@ func GetCmdPaymentTemplate() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			templateId := args[0]
 
 			queryClient := types.NewQueryClient(clientCtx)

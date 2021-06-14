@@ -176,6 +176,7 @@ func txCommand() *cobra.Command {
 
 	return cmd
 }
+
 type appCreator struct {
 	encCfg params.EncodingConfig
 }
@@ -225,13 +226,6 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		baseapp.SetSnapshotInterval(cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval))),
 		baseapp.SetSnapshotKeepRecent(cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))),
 	)
-
-	//return app.NewIxoApp(
-	//	logger, db, traceStore, true, map[int64]bool{}, invCheckPeriod,
-	//	baseapp.SetPruning(pruningOpts),
-	//	baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
-	//	baseapp.SetHaltHeight(uint64(viper.GetInt(server.FlagHaltHeight))),
-	//)
 }
 
 func (a appCreator) appExport(

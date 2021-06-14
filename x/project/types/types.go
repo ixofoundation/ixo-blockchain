@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	InternalAccountID          string
+	InternalAccountID string
 	//AccountMap                 map[InternalAccountID]sdk.AccAddress
 	//GenesisAccountMap          map[string]sdk.AccAddress
 	ProjectStatus              string

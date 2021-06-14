@@ -69,7 +69,7 @@ func NewCmdCreateProject() *cobra.Command {
 			}
 
 			return clientCtx.PrintProto(res)
-			},
+		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)

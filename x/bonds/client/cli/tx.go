@@ -13,7 +13,6 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
-
 )
 
 func NewTxCmd() *cobra.Command {

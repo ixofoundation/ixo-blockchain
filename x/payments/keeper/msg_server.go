@@ -13,7 +13,7 @@ import (
 
 type msgServer struct {
 	Keeper
-	BankKeeper     bankkeeper.Keeper
+	BankKeeper bankkeeper.Keeper
 }
 
 // NewMsgServerImpl returns an implementation of the gov MsgServer interface

@@ -74,6 +74,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 	return cli.GetQueryCmd()
 }
+
 // RegisterInterfaces registers interfaces and implementations of the project module.
 func (a AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)

@@ -468,7 +468,7 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	// If hatch phase for augmented function, use fixed p0 price
 	if bond.FunctionType == AugmentedFunction && bond.State == HatchState.String() {
 		args := bond.FunctionParameters.AsMap()
-		if bond.State == HatchState.String(){
+		if bond.State == HatchState.String() {
 			price := args["p0"].Mul(mint.ToDec())
 			return bond.GetNewReserveDecCoins(price), nil
 		}

@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"fmt"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authsigning"github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 )
 
 type SetPubKeyDecorator struct {
@@ -87,16 +87,16 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 // Call next AnteHandler if fees successfully deducted
 // CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
 type DeductFeeDecorator struct {
-	ak           ante.AccountKeeper
-	bk           types.BankKeeper
-	pkg          PubKeyGetter
+	ak  ante.AccountKeeper
+	bk  types.BankKeeper
+	pkg PubKeyGetter
 }
 
 func NewDeductFeeDecorator(ak ante.AccountKeeper, bk types.BankKeeper, pkg PubKeyGetter) DeductFeeDecorator {
 	return DeductFeeDecorator{
-		ak:           ak,
-		bk: 		  bk,
-		pkg:          pkg,
+		ak:  ak,
+		bk:  bk,
+		pkg: pkg,
 	}
 }
 
@@ -160,7 +160,7 @@ func NewSigGasConsumeDecorator(ak keeper.AccountKeeper, sigGasConsumer ante.Sign
 }
 
 func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	sigTx, ok := tx.(authsigning.SigVerifiableTx)//tx.(ante.SigVerifiableTx)
+	sigTx, ok := tx.(authsigning.SigVerifiableTx) //tx.(ante.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
 	}
@@ -223,16 +223,16 @@ func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type SigVerificationDecorator struct {
-	ak    		    keeper.AccountKeeper
+	ak              keeper.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
 	pkg             PubKeyGetter
 }
 
 func NewSigVerificationDecorator(ak keeper.AccountKeeper, signModeHandler authsigning.SignModeHandler, pkg PubKeyGetter) SigVerificationDecorator {
 	return SigVerificationDecorator{
-		ak:  ak,
+		ak:              ak,
 		signModeHandler: signModeHandler,
-		pkg: pkg,
+		pkg:             pkg,
 	}
 }
 

@@ -132,8 +132,8 @@ func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpda
 		minimumFunding := k.GetParams(ctx).ProjectMinimumInitialFunding
 		if !minimumFunding.DenomsSubsetOf(bk.GetAllBalances(ctx, projectAcc.GetAddress())) ||
 			minimumFunding.IsAnyGT(bk.GetAllBalances(ctx, projectAcc.GetAddress())) {
-		//if !minimumFunding.DenomsSubsetOf(projectAcc.GetCoins()) ||
-		//	minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
+			//if !minimumFunding.DenomsSubsetOf(projectAcc.GetCoins()) ||
+			//	minimumFunding.IsAnyGT(projectAcc.GetCoins()) {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
 				"project has not reached minimum funding %s", minimumFunding)
 		}
@@ -547,7 +547,7 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did,
 	fromAccountId types.InternalAccountID, recipientDid didexported.Did, amount sdk.Coin) error {
-	
+
 	if amount.IsZero() {
 		return nil
 	}

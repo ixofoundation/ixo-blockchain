@@ -392,7 +392,7 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper, legacyQue
 	if bond.FunctionType != types.AugmentedFunction {
 		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
 	} else if !bond.AlphaBond {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,"bond is not an alpha bond")
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
 	}
 
 	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec

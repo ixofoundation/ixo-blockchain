@@ -106,4 +106,3 @@ func fromJsonString(jsonIxoDid string) (exported.IxoDid, error) {
 func UnmarshalIxoDid(jsonIxoDid string) (exported.IxoDid, error) {
 	return fromJsonString(jsonIxoDid)
 }
-

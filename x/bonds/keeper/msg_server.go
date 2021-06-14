@@ -26,7 +26,7 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (*types.MsgCreateBondResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	feeAddr , err := sdk.AccAddressFromBech32(msg.FeeAddress)
+	feeAddr, err := sdk.AccAddressFromBech32(msg.FeeAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -696,7 +696,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	}
 
 	// Get number of bond tokens owned by the recipient
-	bondTokensOwnedAmount := k.BankKeeper.GetBalance(ctx, recipientAddr, bond.Token).Amount  //GetCoins(ctx, recipientAddr).AmountOf(bond.Token)
+	bondTokensOwnedAmount := k.BankKeeper.GetBalance(ctx, recipientAddr, bond.Token).Amount 
 	if bondTokensOwnedAmount.IsZero() {
 		return nil, types.ErrNoBondTokensOwned
 	}

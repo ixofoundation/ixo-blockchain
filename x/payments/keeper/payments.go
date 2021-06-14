@@ -249,7 +249,7 @@ func adjustForMaximums(template types.PaymentTemplate, cumulative sdk.Coins) {
 func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.AccAddress,
 	requiredFunds sdk.Coins) bool {
 	for _, reqCoin := range requiredFunds {
-		if !bankKeeper.HasBalance(ctx, payerAddr, reqCoin){
+		if !bankKeeper.HasBalance(ctx, payerAddr, reqCoin) {
 			return false
 		}
 	}
@@ -336,7 +336,6 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 		payRemainderPoolAddr := authtypes.NewModuleAddress(types.PayRemainderPool)
 		outputs = append(outputs, banktypes.NewOutput(payRemainderPoolAddr, outputToPayRemainderPool))
 	}
-
 
 	// Construct list of inputs (pay and from PayRemainderPool if non zero)
 	inputs := []banktypes.Input{banktypes.NewInput(contractPayerAddr, pay)}

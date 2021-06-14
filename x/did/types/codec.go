@@ -37,7 +37,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 var (
-	amino     = codec.NewLegacyAmino()
+	amino = codec.NewLegacyAmino()
 
 	// ModuleCdc references the global x/did module codec. Note, the codec should
 	// ONLY be used in certain instances of tests and for JSON encoding as Amino is

@@ -43,7 +43,7 @@ func TestExample1(t *testing.T) {
 	R0 := d0.Mul(sdk.OneDec().Sub(theta)) // initial reserve (raise minus funding)
 	S0 := d0.Quo(p0)                      // initial supply
 
-	kappa := sdk.NewDec(3)         // price exponent
+	kappa := sdk.NewDec(3)              // price exponent
 	V0, err := Invariant(R0, S0, kappa) // invariant
 	require.NoError(t, err)
 

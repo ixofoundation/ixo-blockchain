@@ -155,7 +155,7 @@ func TestKeeperEffectPayment(t *testing.T) {
 	require.True(t, effected)
 
 	// Check balance
-	newBalance := app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance := app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err := sdk.ParseCoinsNormalized("9uixo,7res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -173,7 +173,7 @@ func TestKeeperEffectPayment(t *testing.T) {
 	require.True(t, effected)
 
 	// Check balance
-	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err = sdk.ParseCoinsNormalized("8uixo,5res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -188,7 +188,7 @@ func TestKeeperEffectPayment(t *testing.T) {
 	require.True(t, effected)
 
 	// Check balance
-	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err = sdk.ParseCoinsNormalized("7uixo,3res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -216,7 +216,7 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 	require.Nil(t, err)
 	payer, err := sdk.AccAddressFromBech32(contract.Payer)
 	require.Nil(t, err)
-	err = app.BankKeeper.SetBalances(ctx, payer, balance)//k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+	err = app.BankKeeper.SetBalances(ctx, payer, balance)
 	require.Nil(t, err)
 
 	// Set discount
@@ -236,7 +236,7 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 	require.True(t, effected)
 
 	// Check balance
-	newBalance := app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance := app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err := sdk.ParseCoinsNormalized("9uixo,7res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -254,7 +254,7 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 	require.True(t, effected)
 
 	// Check balance
-	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err = sdk.ParseCoinsNormalized("8uixo,5res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -269,7 +269,7 @@ func TestKeeperEffectPaymentWithDiscounts(t *testing.T) {
 	require.True(t, effected)
 
 	// Check balance
-	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err = sdk.ParseCoinsNormalized("7uixo,3res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -303,7 +303,7 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 	require.Nil(t, err)
 	payer, err := sdk.AccAddressFromBech32(contract.Payer)
 	require.Nil(t, err)
-	err = app.BankKeeper.SetBalances(ctx, payer, balance)//k.bankKeeper.SetCoins(ctx, contract.Payer, balance)
+	err = app.BankKeeper.SetBalances(ctx, payer, balance)
 	require.Nil(t, err)
 
 	// At this point, cumulative: /
@@ -318,7 +318,7 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 	require.Nil(t, err)
 
 	// Check balance
-	newBalance := app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance := app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err := sdk.ParseCoinsNormalized("9uixo,7res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -335,7 +335,7 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 	require.Nil(t, err)
 
 	// Check balance
-	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err = sdk.ParseCoinsNormalized("8uixo,5res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())
@@ -349,7 +349,7 @@ func TestKeeperEffectSubscriptionPayment(t *testing.T) {
 	require.Nil(t, err)
 
 	// Check balance
-	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)//k.bankKeeper.GetCoins(ctx, contract.Payer)
+	newBalance = app.BankKeeper.GetAllBalances(ctx, payer)
 	expected, err = sdk.ParseCoinsNormalized("7uixo,3res")
 	require.Nil(t, err)
 	require.Equal(t, expected.String(), newBalance.String())

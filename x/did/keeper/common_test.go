@@ -8,7 +8,6 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
-
 func CreateTestInput() (*codec.LegacyAmino, *app.IxoApp, sdk.Context) {
 	appl := cmd.Setup(false)
 	ctx := appl.BaseApp.NewContext(false, tmproto.Header{})

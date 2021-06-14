@@ -12,7 +12,6 @@ const (
 	IxoNativeToken = "uixo"
 )
 
-
 // Parameter store keys
 var (
 	KeyIxoDid                       = []byte("IxoDid")

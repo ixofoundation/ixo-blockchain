@@ -76,7 +76,7 @@ func NewSetPubKeyDecorator(ak keeper.AccountKeeper, pkg ixotypes.PubKeyGetter) S
 }
 
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	_, ok := tx.(authsigning.SigVerifiableTx)//(ante.SigVerifiableTx)
+	_, ok := tx.(authsigning.SigVerifiableTx) 
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 	}
@@ -144,19 +144,19 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 // Call next AnteHandler if fees successfully deducted
 // CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
 type DeductFeeDecorator struct {
-	ak           keeper.AccountKeeper
-	bk           bankkeeper.Keeper
-	didKeeper    didkeeper.Keeper
-	pkg          ixotypes.PubKeyGetter
+	ak        keeper.AccountKeeper
+	bk        bankkeeper.Keeper
+	didKeeper didkeeper.Keeper
+	pkg       ixotypes.PubKeyGetter
 }
 
 func NewDeductFeeDecorator(ak keeper.AccountKeeper, bk bankkeeper.Keeper,
 	didKeeper didkeeper.Keeper, pkg ixotypes.PubKeyGetter) DeductFeeDecorator {
 	return DeductFeeDecorator{
-		ak:           ak,
-		bk:           bk,
-		didKeeper:    didKeeper,
-		pkg:          pkg,
+		ak:        ak,
+		bk:        bk,
+		didKeeper: didKeeper,
+		pkg:       pkg,
 	}
 }
 
@@ -237,14 +237,14 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 type SigVerificationDecorator struct {
 	ak              keeper.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
-	pkg 			ixotypes.PubKeyGetter
+	pkg             ixotypes.PubKeyGetter
 }
 
 func NewSigVerificationDecorator(ak keeper.AccountKeeper, signModeHandler authsigning.SignModeHandler, pkg ixotypes.PubKeyGetter) SigVerificationDecorator {
 	return SigVerificationDecorator{
-		ak:  ak,
+		ak:              ak,
 		signModeHandler: signModeHandler,
-		pkg: pkg,
+		pkg:             pkg,
 	}
 }
 
@@ -261,7 +261,7 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	// stdSigs contains the sequence number, account number, and signatures.
 	// When simulating, this would just be a 0-length slice.
 	sigs, err := sigTx.GetSignaturesV2()
-	if (err != nil) {
+	if err != nil {
 		return ctx, err
 	}
 

@@ -24,7 +24,7 @@ func registerTxHandlers(cliCtx client.Context, r *mux.Router) {
 
 type createPaymentTemplateReq struct {
 	BaseReq         rest.BaseReq          `json:"base_req" yaml:"base_req"`
-	CreatorDid      didexported.Did        `json:"creator_did" yaml:"creator_did"`
+	CreatorDid      didexported.Did       `json:"creator_did" yaml:"creator_did"`
 	PaymentTemplate types.PaymentTemplate `json:"payment_template" yaml:"payment_template"`
 }
 

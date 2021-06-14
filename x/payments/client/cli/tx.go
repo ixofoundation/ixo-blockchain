@@ -24,15 +24,15 @@ const (
 // Period types
 const (
 	BlockPeriodType string = "payments/BlockPeriod"
-	TimePeriodType string = "payments/TimePeriod"
+	TimePeriodType  string = "payments/TimePeriod"
 )
 
 type period struct {
-	Type string
+	Type  string
 	Value map[string]string
 }
 
-func parsePeriodString(periodStr string) (*period, error){
+func parsePeriodString(periodStr string) (*period, error) {
 	period := &period{}
 
 	err := json.Unmarshal([]byte(periodStr), period)

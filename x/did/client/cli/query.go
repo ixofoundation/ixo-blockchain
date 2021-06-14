@@ -35,7 +35,7 @@ func GetQueryCmd() *cobra.Command {
 }
 
 func GetCmdAddressFromBase58Pubkey() *cobra.Command {
-	cmd :=  &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-address-from-pubkey [base-58-encoded-pubkey]",
 		Short: "Get the address for a base-58 encoded ed25519 public key",
 		Args:  cobra.ExactArgs(1),

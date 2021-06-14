@@ -90,7 +90,6 @@ func queryDidDocRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 		var didDoc types.BaseDidDoc
 		clientCtx.LegacyAmino.MustUnmarshalJSON(res, &didDoc)
 
-
 		rest.PostProcessResponse(w, clientCtx, didDoc)
 	}
 }

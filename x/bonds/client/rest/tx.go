@@ -379,7 +379,8 @@ func swapRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)	}
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
 }
 
 type makeOutcomePaymentReq struct {
@@ -413,7 +414,8 @@ func makeOutcomePaymentRequestHandler(clientCtx client.Context) http.HandlerFunc
 			return
 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)	}
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
 }
 
 type withdrawShareReq struct {
@@ -439,5 +441,6 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)	}
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
 }

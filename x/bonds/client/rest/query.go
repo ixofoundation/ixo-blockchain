@@ -18,7 +18,7 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/bonds/params", queryParamsRequestHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}", RestBondDid), queryBondHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/batch", RestBondDid), queryBatchHandler(clientCtx)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid),	queryLastBatchHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid), queryLastBatchHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_price", RestBondDid), queryCurrentPriceHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_reserve", RestBondDid), queryCurrentReserveHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/price/{%s}", RestBondDid, RestBondAmount), queryCustomPriceHandler(clientCtx)).Methods("GET")

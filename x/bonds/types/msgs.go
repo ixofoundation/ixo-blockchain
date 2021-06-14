@@ -49,7 +49,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		ReserveTokens:          reserveTokens,
 		TxFeePercentage:        txFeePercentage,
 		ExitFeePercentage:      exitFeePercentage,
-		FeeAddress: 			feeAddress.String(),
+		FeeAddress:             feeAddress.String(),
 		MaxSupply:              maxSupply,
 		OrderQuantityLimits:    orderQuantityLimits,
 		SanityRate:             sanityRate,

@@ -10,7 +10,7 @@ import (
 
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc codec.BinaryMarshaler
+	cdc      codec.BinaryMarshaler
 }
 
 func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey) Keeper {
@@ -27,7 +27,7 @@ func (k Keeper) MarshalDidDoc(did exported.DidDoc) ([]byte, error) {
 
 // UnmarshalDidDoc returns a DidDoc interface from raw encoded did document
 // bytes of a Proto-based DidDoc type
-func (k Keeper) UnmarshalDidDoc(bz []byte) (exported.DidDoc, error){
+func (k Keeper) UnmarshalDidDoc(bz []byte) (exported.DidDoc, error) {
 	var dd exported.DidDoc
 	return dd, k.cdc.UnmarshalInterface(bz, &dd)
 }
@@ -74,7 +74,6 @@ func (k Keeper) MustGetDidDoc(ctx sdk.Context, did exported.Did) exported.DidDoc
 	return didDoc
 }
 
-
 func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err error) {
 	existedDidDoc, err := k.GetDidDoc(ctx, did.GetDid())
 	if existedDidDoc != nil {
@@ -108,7 +107,7 @@ func (k Keeper) AddCredentials(ctx sdk.Context, did exported.Did, credential typ
 
 	for _, data := range credentials {
 		if data.Issuer == credential.Issuer && data.CredType[0] == credential.CredType[0] &&
-		   data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
+			data.CredType[1] == credential.CredType[1] && data.Claim.KYCValidated == credential.Claim.KYCValidated {
 			return sdkerrors.Wrap(types.ErrInvalidCredentials, "credentials already exist")
 		}
 	}

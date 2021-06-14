@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported")
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+)
 
 func NewProjectDoc(txHash string, projectDid, senderDid didexported.Did,
 	pubKey string, status ProjectStatus, data json.RawMessage) ProjectDoc {
