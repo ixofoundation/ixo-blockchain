@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bufio"
@@ -21,7 +21,6 @@ import (
 )
 
 const (
-	flagClientHome   = "home-client"
 	flagVestingStart = "vesting-start-time"
 	flagVestingEnd   = "vesting-end-time"
 	flagVestingAmt   = "vesting-amount"
@@ -48,35 +47,21 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 			config.SetRoot(clientCtx.HomeDir)
 
-			//config := ctx.Config
-			//config.SetRoot(viper.GetString(cli.HomeFlag))
-
 			addr, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				inBuf := bufio.NewReader(cmd.InOrStdin())
 				keyringBackend, _ := cmd.Flags().GetString(flags.FlagKeyringBackend)
-
-				// attempt to lookup address from Keybase if no address was provided
-				kb, err := keyring.New(
-					sdk.KeyringServiceName(),
-					keyringBackend,
-					clientCtx.HomeDir, //flagClientHome?
-					inBuf,
-				)
-
-				// attempt to lookup address from Keybase if no address was provided
-				//kb, err := keys.NewKeyring(
-				//	sdk.KeyringServiceName(),
-				//	viper.GetString(flags.FlagKeyringBackend),
-				//	viper.GetString(flagClientHome),
-				//	inBuf,
-				//)
-
 				if err != nil {
 					return err
 				}
 
-				info, err := kb.Key(args[0]) //kb.Get(args[0])
+				// attempt to lookup address from Keybase if no address was provided
+				kb, err := keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.HomeDir, inBuf)
+				if err != nil {
+					return err
+				}
+
+				info, err := kb.Key(args[0])
 				if err != nil {
 					return fmt.Errorf("failed to get address from Keybase: %w", err)
 				}
@@ -89,9 +74,6 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 				return fmt.Errorf("failed to parse coins: %w", err)
 			}
 
-			//vestingStart := viper.GetInt64(flagVestingStart)
-			//vestingEnd := viper.GetInt64(flagVestingEnd)
-			//vestingAmt, err := sdk.ParseCoins(viper.GetString(flagVestingAmt))
 			vestingStart, err := cmd.Flags().GetInt64(flagVestingStart)
 			if err != nil {
 				return err
@@ -199,8 +181,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 	}
 
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
-	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)") //TODO not sure if it's necessary (in cosmos-sdk, not in gaia)
-	//cmd.Flags().String(flagClientHome, defaultClientHome, "client's home directory")
+	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|kwallet|pass|test)")
 	cmd.Flags().String(flagVestingAmt, "", "amount of coins for vesting accounts")
 	cmd.Flags().Int64(flagVestingStart, 0, "schedule start time (unix epoch) for vesting accounts")
 	cmd.Flags().Int64(flagVestingEnd, 0, "schedule end time (unix epoch) for vesting accounts")

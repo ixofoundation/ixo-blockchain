@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ixofoundation/ixo-blockchain/cmd/ixod/cmd"
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/server"
@@ -8,13 +9,8 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/app"
 )
 
-// ixod custom flags
-const flagInvCheckPeriod = "inv-check-period"
-
-var invCheckPeriod uint
-
 func main() {
-	rootCmd, _ := NewRootCmd()
+	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
 		switch e := err.(type) {
 		case server.ErrorCode:

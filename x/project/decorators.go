@@ -76,7 +76,7 @@ func NewSetPubKeyDecorator(ak keeper.AccountKeeper, pkg ixotypes.PubKeyGetter) S
 }
 
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	_, ok := tx.(authsigning.SigVerifiableTx) 
+	_, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 	}
