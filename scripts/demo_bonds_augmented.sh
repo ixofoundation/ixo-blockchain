@@ -155,10 +155,10 @@ ixod_tx bonds buy 100000abc 200000000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
-echo "Current price is approx 1200000..."
+echo "Current price is approx 1200100..."
 ixod_q bonds current-price "$BOND_DID"
 
-echo "Max supply reached..."
+echo "Max supply reached, buying tokens fails..."
 ixod_tx bonds buy 1abc 2000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 
 echo "Francesco makes outcome payment of 60000000000..."

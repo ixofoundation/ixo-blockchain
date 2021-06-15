@@ -201,7 +201,6 @@ ixod_tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block
 echo "Funding Owner DID with 300xGBP using Miguel's tokens..."
 ixod_tx bank send miguel "$OWNER_ADDR" 300000000uxgbp --broadcast-mode block
 
-
 # Owner now has 300xGBP to use in the project
 # Side note: we can now query the account using just the DID instead of using get_pubkey.js, since the DID has been registered.
 # ixod_q account "$(ixod_q did get-address-from-did $OWNER_DID)"

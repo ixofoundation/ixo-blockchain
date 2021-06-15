@@ -254,7 +254,7 @@ ixod_q bank balances "$SHAUN_ADDR"
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
 echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
-DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"is_refund\":true}"
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
 ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID
@@ -265,7 +265,7 @@ ixod_q project get-project-txs $PROJECT_DID
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
 echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
-DATA="{\"project_did\":\"$PROJECT_DID\",\"recipient_did\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"is_refund\":true}"
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
 ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID
