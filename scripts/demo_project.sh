@@ -200,19 +200,19 @@ ixod_tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$P
 # OracleFeePercentage:  0.1 (10%)
 # NodeFeePercentage:    0.1 (10%)
 
-# Fee for service:   2000000 uixo
-# Oracle pay:        5000000 uixo
+# Fee for service:   2,000,000 uixo
+# Oracle pay:        5,000,000 uixo
 
 # Expected project account balances:
-# - InitiatingNodePayFees:    50000  # 0.1 of 0.1 of oracle pay
+# - InitiatingNodePayFees:   50,000  # 0.1 of 0.1 of oracle pay
 # - IxoFees:                      0
-# - IxoPayFees:              450000  # 0.9 of 0.1 of oracle pay
-# - project:               93000000  # 100IXO - (5+2)IXO
+# - IxoPayFees:             450,000  # 0.9 of 0.1 of oracle pay
+# - project:             93,000,000  # 100IXO - (5+2)IXO
 # Expected external account balances:
-# - Miguel:                 4500000  # 0.9 of oracle pay
-# - Shaun:                 11000000  # 1.0 of fee-for-service (+ 10000000 original - 1000000 project creation fee)
+# - Miguel:       1,000,004,495,000  # 1,000,000,000,000 original +  0.9 of oracle pay - 5,000 tx fee
+# - Shaun:        1,000,000,995,000  # 1,000,000,000,000 original + 1.0 of fee-for-service - 1,000,000 project creation fee - 5,000 tx fee
 
-# Sum of fee accounts: 500000
+# Sum of fee accounts: 500,000
 
 # Progress project status to PAIDOUT
 SENDER_DID="$SHAUN_DID"
@@ -224,15 +224,15 @@ echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
 # - InitiatingNodePayFees:        0
 # - IxoFees:                      0
 # - IxoPayFees:                   0
-# - project:               93000000
+# - project:             93,000,000
 # Expected external account balances:
-# - Miguel:                 4500000
-# - Shaun:                 11500000  # 500000 withdrawal
+# - Miguel:       1,000,004,495,000
+# - Shaun:        1,000,001,495,000  # 500000 withdrawal
 
 echo "InitiatingNodePayFees"
 ixod_q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
@@ -240,15 +240,15 @@ echo "IxoFees"
 ixod_q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
 echo "IxoPayFees"
 ixod_q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
-echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+echo "(project) did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 ixod_q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
-echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+echo "(Miguel) did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 MIGUEL_FULL_ADDR="$(ixod q did get-address-from-did $MIGUEL_DID)"
 MIGUEL_ADDR=${MIGUEL_FULL_ADDR##*: }
 ixod_q bank balances "$MIGUEL_ADDR"
-echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+echo "(Shaun) did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
 SHAUN_FULL_ADDR="$(ixod q did get-address-from-did $SHAUN_DID)"
-SHAUN_ADDR=${MIGUEL_FULL_ADDR##*: }
+SHAUN_ADDR=${SHAUN_FULL_ADDR##*: }
 ixod_q bank balances "$SHAUN_ADDR"
 
 # Withdraw funds (from main project account, i.e. as refund)
@@ -260,7 +260,7 @@ echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID
 
 # Expected external account balances:
-# - Miguel:                 4495000 (5000uixo tx fee deducted)
+# - Miguel:       1,000,004,490,000 (5,000uixo tx fee deducted)
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
@@ -271,13 +271,13 @@ echo "Project withdrawals query..."
 ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
-# - 1000000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 1,000,000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
 # - InitiatingNodePayFees:        0
 # - IxoFees:                      0
 # - IxoPayFees:                   0
-# - project:               92000000  # 1000000 has been withdrawn
+# - project:             92,000,000  # 1,000,000 has been withdrawn
 # Expected external account balances:
-# - Miguel:                 4495000
-# - Shaun:                 12495000  # 1000000 withdrawal + 5000 fee deducted
+# - Miguel:       1,000,004,490,000
+# - Shaun:        1,000,002,490,000  # + 1,000,000 withdrawal - 5,000 fee deducted

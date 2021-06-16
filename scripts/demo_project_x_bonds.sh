@@ -172,10 +172,10 @@ ixod_tx bank send miguel "$ADDR10" 10000000uixo
 ixod_tx bank send miguel "$OWNER_ADDR" 10000000uixo
 
 # Each DID including the owner now has 10IXO for gas fees 
-# DID_1_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
-# ixod_q account $DID_1_ADDR
-# OWNER_ADDR=$(ixod_q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
-# ixod_q account $OWNER_ADDR
+# DID_1_ADDR=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js $DID_1_FULL)")
+# ixod_q bank balances $DID_1_ADDR
+# OWNER_ADDR=$(ixod q did get-address-from-pubkey "$(node utils/get_pubkey.js $OWNER_DID_FULL)")
+# ixod_q bank balances $OWNER_ADDR
 
 # Ledger the 10 DIDs and owner DID
 echo "Ledgering DIDs..."
@@ -192,9 +192,8 @@ ixod_tx did add-did-doc "$DID_10_FULL"
 ixod_tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block
 
 
-# Fund oracle and ixo DID for gas fees (commented out since oracle and ixo DID are funded at genesis)
-# echo "Funding oracle and ixo DID..."
-# yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $ORACLE_DID)" 1000000uixo --broadcast-mode=block
+# Fund ixo DID for gas fees (commented out since ixo DID is funded at genesis)
+# echo "Funding ixo DID..."
 # yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $IXO_DID)" 10000000000uixo --broadcast-mode=block
 
 # Fund Owner with 300xGBP (300000000uxgbp)
@@ -203,7 +202,9 @@ ixod_tx bank send miguel "$OWNER_ADDR" 300000000uxgbp --broadcast-mode block
 
 # Owner now has 300xGBP to use in the project
 # Side note: we can now query the account using just the DID instead of using get_pubkey.js, since the DID has been registered.
-# ixod_q account "$(ixod_q did get-address-from-did $OWNER_DID)"
+# FULL_OWNER_ADDR="$(ixod q did get-address-from-did $OWNER_DID)"
+# OWNER_ADDR=${FULL_OWNER_ADDR##*: }
+# ixod_q bank balances "$OWNER_ADDR"
 
 # Create bond
 echo "Creating bond..."
@@ -290,7 +291,9 @@ ixod_tx project create-evaluation "tx_hash" "$DID_9" "claim9" "$STATUS" "$PROJEC
 ixod_tx project create-evaluation "tx_hash" "$DID_10" "claim10" "$STATUS" "$PROJECT_DID_FULL" --broadcast-mode block
 
 # Each of the 10 DIDs now has 1xGBP (1000000uxgbp)
-# ixod_q account "$(ixod_q did get-address-from-did "$DID_1")"
+# FULL_DID_ADDR="$(ixod q did get-address-from-did $DID_1)"
+# DID_ADDR=${FULL_DID_ADDR##*: }
+# ixod_q bank balances "$DID_ADDR"
 
 # Perform bond buys
 echo "DID 1 buys 1ABC..."
