@@ -21,6 +21,7 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
+CHAIN_ID="pandora-2"
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -196,16 +197,6 @@ ixod_tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block
 echo "Adding KYC credential 1/1..."
 ixod_tx did add-kyc-credential "$MIGUEL_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block
 
-# ----------------------------------------------------------------------------------------- mints/burns
-# Mint and burn ixo tokens
-echo "Minting 1000uixo tokens to Miguel using Miguel oracle..."
-ixod_tx treasury oracle-mint "$MIGUEL_DID" 1000uixo "$MIGUEL_DID_FULL" "dummy proof"
-echo "Burning 1000uixo tokens from Francesco using Francesco oracle..."
-ixod_tx treasury oracle-burn "$FRANCESCO_DID" 1000uixo "$FRANCESCO_DID_FULL" "dummy proof"
-
-echo "Sleeping for a bit..."
-sleep 7 # to make sure mints/burns were processed before proceeding
-
 # ----------------------------------------------------------------------------------------- bonds
 # Power function with m:12,n:2,c:100, rez reserve, non-zero fees, and batch_blocks=1
 echo "Creating bond 1/4..."
@@ -226,7 +217,8 @@ ixod_tx bonds create-bond \
   --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND1_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block
+  --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" --broadcast-mode block
 
 # Power function with m:10,n:3,c:0, res reserve, zero fees, and batch_blocks=3
 echo "Creating bond 2/4..."
@@ -247,7 +239,8 @@ ixod_tx bonds create-bond \
   --allow-sells \
   --batch-blocks=3 \
   --bond-did="$BOND2_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block
+  --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" --broadcast-mode block
 
 # Swapper function between res and rez with zero fees, and batch_blocks=2
 echo "Creating bond 3/4..."
@@ -269,7 +262,8 @@ ixod_tx bonds create-bond \
   --batch-blocks=2 \
   --bond-did="$BOND3_DID" \
   --controller-did="$FRANCESCO_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block
+  --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" --broadcast-mode block
 
 # Swapper function between token1 and token2 with non-zero fees, and batch_blocks=1
 echo "Creating bond 4/4..."
@@ -290,7 +284,8 @@ ixod_tx bonds create-bond \
   --allow-sells \
   --batch-blocks=1 \
   --bond-did="$BOND4_DID" \
-  --creator-did="$MIGUEL_DID_FULL" --broadcast-mode block
+  --creator-did="$MIGUEL_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" --broadcast-mode block
 
 # Buy 5token1, 5token2 from Miguel
 echo "Buying 5token1 from Miguel..."
@@ -333,10 +328,8 @@ ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT2_DID_FULL"
 
 # Fund project (using treasury 'send' and 'oracle-transfer')
 PROJECT_2_ADDR=$(ixod_q project get-project-accounts $PROJECT2_DID | grep $PROJECT2_DID | cut -d \" -f 4)
-echo "Funding project 2 [$PROJECT_2_ADDR] (using treasury 'send' from Miguel)..."
-ixod_tx treasury send "$PROJECT_2_ADDR" 5000000000uixo "$MIGUEL_DID_FULL" --broadcast-mode block
-echo "Funding project 2 [$PROJECT_2_ADDR] (using treasury 'oracle-transfer' from Miguel using Francesco oracle)..."
-ixod_tx treasury oracle-transfer "$MIGUEL_DID" "$PROJECT_2_ADDR" 5000000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block
+echo "Funding project 2 [$PROJECT_2_ADDR] (using Miguel's tokens)..."
+ixod_tx bank send miguel "$PROJECT_2_ADDR" 10000000000uixo --broadcast-mode block
 echo "Updating project 2 to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT2_DID_FULL" --broadcast-mode block
@@ -384,5 +377,6 @@ PAYMENT_TEMPLATE_ID="payment:template:template1" # from PAYMENT_TEMPLATE
 PAYMENT_CONTRACT_ID="payment:contract:contract1"
 DISCOUNT_ID=0
 CREATOR="$SHAUN_DID_FULL"
-PAYER_ADDR="$(ixod_q did get-address-from-did $FRANCESCO_DID)"
+FULL_PAYER_ADDR="$(ixod q did get-address-from-did $FRANCESCO_DID)"
+PAYER_ADDR=${FULL_PAYER_ADDR##*: }
 ixod_tx payments create-payment-contract "$PAYMENT_CONTRACT_ID" "$PAYMENT_TEMPLATE_ID" "$PAYER_ADDR" "$PAYMENT_RECIPIENTS" True "$DISCOUNT_ID" "$CREATOR" --broadcast-mode block

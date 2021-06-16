@@ -194,7 +194,7 @@ ixod_tx did add-did-doc "$OWNER_DID_FULL" --broadcast-mode block
 
 # Fund ixo DID for gas fees (commented out since ixo DID is funded at genesis)
 # echo "Funding ixo DID..."
-# yes $PASSWORD | ixod_tx send "$(ixodkeys show miguel -a)" "$(ixod_q did get-address-from-did $IXO_DID)" 10000000000uixo --broadcast-mode=block
+# yes $PASSWORD | ixod_tx bank send miguel "$(ixod_q did get-address-from-did $IXO_DID)" 10000000000uixo --broadcast-mode=block
 
 # Fund Owner with 300xGBP (300000000uxgbp)
 echo "Funding Owner DID with 300xGBP using Miguel's tokens..."
