@@ -232,7 +232,7 @@ ixod_q project get-project-txs $PROJECT_DID
 # - project:             93,000,000
 # Expected external account balances:
 # - Miguel:       1,000,004,495,000
-# - Shaun:        1,000,001,495,000  # 500000 withdrawal
+# - Shaun:        1,000,001,495,000  # 500,000 withdrawal
 
 echo "InitiatingNodePayFees"
 ixod_q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"

@@ -103,7 +103,7 @@ func queryProjectTxsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		var txs []types.WithdrawalInfoDoc
+		var txs types.WithdrawalInfoDocs
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 			return

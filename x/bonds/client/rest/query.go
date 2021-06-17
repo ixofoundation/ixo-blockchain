@@ -36,6 +36,7 @@ func queryBondsHandler(clientCtx client.Context) http.HandlerFunc {
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
+
 		rest.PostProcessResponse(w, clientCtx, res)
 	}
 }

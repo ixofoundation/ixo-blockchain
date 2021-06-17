@@ -110,7 +110,7 @@ func GetCmdProjectTxs() *cobra.Command {
 			}
 
 			if len(res.GetTxs().DocsList) == 0 {
-				return errors.New("projectTxs does not exist for a projectDid")
+				return errors.New("project does not have any transactions")
 			}
 
 			return clientCtx.PrintProto(res)
