@@ -2,7 +2,7 @@
 
 PASSWORD="12345678"
 
-ixod init local --chain-id pandora-2
+ixod init local --chain-id pandora-3
 
 echo "Backing up existing genesis file..."
 cp "$HOME"/.ixod/config/genesis.json "$HOME"/.ixod/config/genesis.json.backup
@@ -74,12 +74,12 @@ TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 # TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
-#ixod config chain-id pandora-2
+#ixod config chain-id pandora-3
 #ixod config output json
 #ixod config indent true
 #ixod config trust-node true
 
-ixod gentx miguel 1000000uixo --chain-id pandora-2
+ixod gentx miguel 1000000uixo --chain-id pandora-3
 
 ixod collect-gentxs
 ixod validate-genesis

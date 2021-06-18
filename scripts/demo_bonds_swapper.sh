@@ -21,7 +21,7 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-2"
+CHAIN_ID="pandora-3"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
 
 ixod_tx() {

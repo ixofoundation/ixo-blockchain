@@ -21,7 +21,7 @@ fi
 
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
-CHAIN_ID="pandora-2"
+CHAIN_ID="pandora-3"
 
 yes 'y' | ixod keys delete fee --force > /dev/null 2>&1
 yes $PASSWORD | ixod keys add fee > /dev/null 2>&1

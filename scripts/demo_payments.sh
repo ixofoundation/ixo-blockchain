@@ -21,7 +21,7 @@ fi
 
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
-CHAIN_ID="pandora-2"
+CHAIN_ID="pandora-3"
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
