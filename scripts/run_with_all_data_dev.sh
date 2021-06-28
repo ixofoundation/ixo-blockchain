@@ -62,6 +62,18 @@ FROM="\"reserved_bond_tokens\": \[\]"
 TO="\"reserved_bond_tokens\": \[$RESERVED_BOND_TOKENS\]"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
+# Set max deposit period to 30s for faster governance
+MAX_DEPOSIT_PERIOD="30s"  # example: "172800s"
+FROM="\"max_deposit_period\": \"172800s\""
+TO="\"max_deposit_period\": \"$MAX_DEPOSIT_PERIOD\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
+# Set voting period to 30s for faster governance
+MAX_VOTING_PERIOD="30s"  # example: "172800s"
+FROM="\"voting_period\": \"172800s\""
+TO="\"voting_period\": \"$MAX_VOTING_PERIOD\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 # Set min-gas-prices (using fee token)
 FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
