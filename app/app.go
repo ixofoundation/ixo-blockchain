@@ -729,8 +729,8 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// this purpose, a custom project creation AnteHandler had to be created.
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.DidKeeper, encodingConfig.TxConfig.SignModeHandler(),
-		projectPubKeyGetter)
+		app.AccountKeeper, app.BankKeeper, app.DidKeeper,
+		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
