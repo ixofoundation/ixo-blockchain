@@ -112,8 +112,7 @@ func (pc PaymentContract) Validate() error {
 	}
 
 	// Validate recipient distribution
-	var recipients Distribution = pc.Recipients
-	if err := recipients.Validate(); err != nil {
+	if err := Distribution(pc.Recipients).Validate(); err != nil {
 		return err
 	}
 
