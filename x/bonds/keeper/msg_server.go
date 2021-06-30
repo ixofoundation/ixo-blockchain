@@ -696,7 +696,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	}
 
 	// Get number of bond tokens owned by the recipient
-	bondTokensOwnedAmount := k.BankKeeper.GetBalance(ctx, recipientAddr, bond.Token).Amount 
+	bondTokensOwnedAmount := k.BankKeeper.GetBalance(ctx, recipientAddr, bond.Token).Amount
 	if bondTokensOwnedAmount.IsZero() {
 		return nil, types.ErrNoBondTokensOwned
 	}
