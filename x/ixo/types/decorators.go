@@ -160,7 +160,7 @@ func NewSigGasConsumeDecorator(ak keeper.AccountKeeper, sigGasConsumer ante.Sign
 }
 
 func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	sigTx, ok := tx.(authsigning.SigVerifiableTx) //tx.(ante.SigVerifiableTx)
+	sigTx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
 	}
@@ -280,7 +280,6 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		}
 
 		// retrieve signBytes of tx
-		//signBytes :=  sigTx.GetSignBytes(ctx, signerAccs[i])
 
 		// retrieve pubkey
 		pubKey := acc.GetPubKey()

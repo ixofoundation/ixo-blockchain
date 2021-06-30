@@ -16,6 +16,5 @@ type GenesisState map[string]json.RawMessage
 
 // NewDefaultGenesisState generates the default state for the application.
 func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
-	//encCfg := MakeTestEncodingConfig()
 	return ModuleBasics.DefaultGenesis(cdc)
 }

@@ -655,7 +655,7 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler { //TODO encodingConfig
+func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler {
 
 	// The AnteHandler needs to get the signer's pubkey to verify signatures,
 	// charge gas fees (to the corresponding address), and for other purposes.
@@ -729,8 +729,8 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// this purpose, a custom project creation AnteHandler had to be created.
 
 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.DidKeeper, encodingConfig.TxConfig.SignModeHandler(),
-		projectPubKeyGetter)
+		app.AccountKeeper, app.BankKeeper, app.DidKeeper,
+		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
 
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key

@@ -70,8 +70,7 @@ func NewModulePubKeyGetter(keeper keeper.Keeper, didKeeper didkeeper.Keeper) ixo
 // Identical to Cosmos DeductFees function, but tokens sent to project account
 func deductProjectFundingFees(bankKeeper bankkeeper.Keeper, ctx sdk.Context,
 	acc authtypes.AccountI, projectAddr sdk.AccAddress, fees sdk.Coins) error {
-	//blockTime := ctx.BlockHeader().Time
-	coins := bankKeeper.GetAllBalances(ctx, acc.GetAddress()) //acc.GetCoins()
+	coins := bankKeeper.GetAllBalances(ctx, acc.GetAddress())
 
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount %s", fees)
@@ -115,8 +114,6 @@ func getProjectCreationSignBytes(ctx sdk.Context, tx legacytx.StdTx, acc authtyp
 func NewProjectCreationAnteHandler(
 	ak authkeeper.AccountKeeper, bk bankkeeper.Keeper, didKeeper didkeeper.Keeper, signModeHandler signing.SignModeHandler,
 	pubKeyGetter ixotypes.PubKeyGetter) sdk.AnteHandler {
-	//ak auth.AccountKeeper, supplyKeeper supply.Keeper,
-	//bk bank.Keeper, didKeeper did.Keeper, pubKeyGetter ixo.PubKeyGetter) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler, and especially a custom AnteHandler for

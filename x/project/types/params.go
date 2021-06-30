@@ -2,14 +2,11 @@ package types
 
 import (
 	"fmt"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-)
-
-const (
-	IxoNativeToken = "uixo"
 )
 
 // Parameter store keys
@@ -40,7 +37,7 @@ func NewParams(projectMinimumInitialFunding sdk.Coins, ixoDid didexported.Did,
 func DefaultParams() Params {
 	defaultIxoDid := didexported.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
 	defaultMinInitFunding := sdk.NewCoins(sdk.NewCoin(
-		IxoNativeToken, sdk.OneInt()))
+		ixotypes.IxoNativeToken, sdk.OneInt()))
 	tenPercentFee := sdk.NewDec(10)
 
 	return Params{

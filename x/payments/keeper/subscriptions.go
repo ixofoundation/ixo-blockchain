@@ -3,24 +3,24 @@ package keeper
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	types2 "github.com/ixofoundation/ixo-blockchain/x/payments/types"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 )
 
 // -------------------------------------------------------- Subscriptions Get/Set
 
 func (k Keeper) GetSubscriptionIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types2.SubscriptionKeyPrefix)
+	return sdk.KVStorePrefixIterator(store, types.SubscriptionKeyPrefix)
 }
 
-func (k Keeper) MustGetSubscriptionByKey(ctx sdk.Context, key []byte) types2.Subscription {
+func (k Keeper) MustGetSubscriptionByKey(ctx sdk.Context, key []byte) types.Subscription {
 	store := ctx.KVStore(k.storeKey)
 	if !store.Has(key) {
 		panic("subscription not found")
 	}
 
 	bz := store.Get(key)
-	var subscription types2.Subscription
+	var subscription types.Subscription
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &subscription)
 
 	return subscription
@@ -28,27 +28,27 @@ func (k Keeper) MustGetSubscriptionByKey(ctx sdk.Context, key []byte) types2.Sub
 
 func (k Keeper) SubscriptionExists(ctx sdk.Context, subscriptionId string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(types2.GetSubscriptionKey(subscriptionId))
+	return store.Has(types.GetSubscriptionKey(subscriptionId))
 }
 
-func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types2.Subscription, error) {
+func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.Subscription, error) {
 	store := ctx.KVStore(k.storeKey)
-	key := types2.GetSubscriptionKey(subscriptionId)
+	key := types.GetSubscriptionKey(subscriptionId)
 
 	bz := store.Get(key)
 	if bz == nil {
-		return types2.Subscription{}, fmt.Errorf("invalid subscription")
+		return types.Subscription{}, fmt.Errorf("invalid subscription")
 	}
 
-	var subscription types2.Subscription
+	var subscription types.Subscription
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &subscription)
 
 	return subscription, nil
 }
 
-func (k Keeper) SetSubscription(ctx sdk.Context, subscription types2.Subscription) {
+func (k Keeper) SetSubscription(ctx sdk.Context, subscription types.Subscription) {
 	store := ctx.KVStore(k.storeKey)
-	key := types2.GetSubscriptionKey(subscription.Id)
+	key := types.GetSubscriptionKey(subscription.Id)
 	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&subscription))
 }
 
@@ -63,7 +63,7 @@ func (k Keeper) EffectSubscriptionPayment(ctx sdk.Context, subscriptionId string
 
 	// Check if should effect
 	if !subscription.ShouldEffect(ctx) {
-		return types2.ErrTriedToEffectSubscriptionPaymentWhenShouldnt
+		return types.ErrTriedToEffectSubscriptionPaymentWhenShouldnt
 	}
 
 	// Effect payment

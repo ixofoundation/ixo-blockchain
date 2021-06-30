@@ -8,8 +8,7 @@ import "payments/payments.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
 
 // To get a list of all module queries, go to your module's keeper/querier.go
-// and check all cases in NewQuerier(). REST endpoints taken from previous
-// payments/client/rest/query.go
+// and check all cases in NewQuerier(). REST endpoints taken from payments/client/rest/query.go
 service Query {
   rpc PaymentTemplate(QueryPaymentTemplateRequest) returns (QueryPaymentTemplateResponse){
     option (google.api.http).get = "/ixo/payments/templates/{payment_template_id}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html

@@ -9,8 +9,7 @@ import "did/did.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
 // To get a list of all module queries, go to your module's keeper/querier.go
-// and check all cases in NewQuerier(). REST endpoints taken from previous
-// did/client/rest/query.go
+// and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/query.go
 service Query {
   rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
     option (google.api.http).get = "/did/{did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
@@ -33,48 +32,38 @@ service Query {
   }
 }
 
-// Request/response types from old x/did/client/cli/query.go and
-// x/did/client/rest/query.go
 message QueryDidDocRequest {
-  // did defines the DID for the requested DidDoc
   string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
 }
 
 message QueryDidDocResponse {
-  // diddoc returns the requested DidDoc
   google.protobuf.Any diddoc = 1 [(gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\""];
 }
 
-message QueryAllDidsRequest {} // no input needed
+message QueryAllDidsRequest {}
 
 message QueryAllDidsResponse {
-  // dids returns a list of all DIDs
   repeated string dids = 1 [(gogoproto.moretags) = "json:\"dids\" yaml:\"dids\""];
 }
 
-message QueryAllDidDocsRequest {} // no input needed
+message QueryAllDidDocsRequest {}
 
 message QueryAllDidDocsResponse {
-  // diddocs returns a list of all DidDocs
   repeated google.protobuf.Any diddocs = 1 [(gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\""];
 }
 
 message QueryAddressFromDidRequest {
-  // did defines the DID for the requested address
   string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
 }
 
 message QueryAddressFromDidResponse {
-  // address returns the address for a given DID
   string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
 }
 
 message QueryAddressFromBase58EncodedPubkeyRequest {
-  // pubKey defines the PubKey for the requested address
   string pubKey = 1 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
 }
 
 message QueryAddressFromBase58EncodedPubkeyResponse {
-  // address returns the address for a given PubKey
   string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
 }

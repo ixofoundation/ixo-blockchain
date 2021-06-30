@@ -64,8 +64,6 @@ service Query {
   }
 }
 
-// Request/response types from old x/bonds/client/cli/query.go and
-// x/bonds/client/rest/query.go
 message QueryBondsRequest {}
 
 message QueryBondsResponse {

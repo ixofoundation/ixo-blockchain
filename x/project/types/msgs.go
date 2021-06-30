@@ -109,8 +109,6 @@ func (msg MsgCreateProject) String() string {
 	return string(b)
 }
 
-//func (msg MsgCreateProject) GetPubKey() string { return msg.PubKey }
-
 func (msg MsgCreateProject) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }

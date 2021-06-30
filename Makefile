@@ -3,6 +3,7 @@
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
+TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::') # grab everything after the space in "github.com/tendermint/tendermint v0.34.7"
 DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 
@@ -27,11 +28,11 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 ldflags = \
     -X github.com/cosmos/cosmos-sdk/version.Name=ixo \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=ixod \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=ixocli \
-	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-	-X "github.com/ixofoundation/ixo-blockchain/version.BuildTags=$(build_tags_comma_sep)"
+    -X github.com/cosmos/cosmos-sdk/version.AppName=ixod \
+    -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+    -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+    -X "github.com/ixofoundation/ixo-blockchain/version.BuildTags=$(build_tags_comma_sep)" \
+    -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
 
 ifeq ($(WITH_CLEVELDB),yes)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
