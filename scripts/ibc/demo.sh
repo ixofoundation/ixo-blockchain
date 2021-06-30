@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
 # This script is not meant to be run automatically, but one line at a time
+#
 # Also, in order for this script to work with Starport, cmd/ixod needs to be
 # renamed to cmd/ixo-blockchaind. Not sure how we can avoid having to do this.
+#
+# The steps should be run from the project folder (ixo-blockchain) not ibc/
 
 HOME_1="./data_1"
 HOME_2="./data_2"
