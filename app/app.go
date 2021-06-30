@@ -655,7 +655,7 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler { //TODO encodingConfig
+func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler {
 
 	// The AnteHandler needs to get the signer's pubkey to verify signatures,
 	// charge gas fees (to the corresponding address), and for other purposes.
