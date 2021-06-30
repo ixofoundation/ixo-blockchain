@@ -52,8 +52,7 @@ func (pt PaymentTemplate) Validate() error {
 	}
 
 	// Validate discounts
-	var discounts Discounts = pt.Discounts
-	if err := discounts.Validate(); err != nil {
+	if err := Discounts(pt.Discounts).Validate(); err != nil {
 		return err
 	}
 
