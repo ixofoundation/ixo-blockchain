@@ -3,10 +3,11 @@ package exported
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 var (

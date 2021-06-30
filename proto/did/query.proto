@@ -1,0 +1,69 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
+import "did/did.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
+
+// To get a list of all module queries, go to your module's keeper/querier.go
+// and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/query.go
+service Query {
+  rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
+    option (google.api.http).get = "/did/{did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+  }
+
+  rpc AllDids(QueryAllDidsRequest) returns (QueryAllDidsResponse) {
+    option (google.api.http).get = "/did";
+  }
+
+  rpc AllDidDocs(QueryAllDidDocsRequest) returns (QueryAllDidDocsResponse) {
+    option (google.api.http).get = "/allDidDocs";
+  }
+
+  rpc AddressFromDid(QueryAddressFromDidRequest) returns (QueryAddressFromDidResponse) {
+    option (google.api.http).get = "/didToAddr/{did=**}";
+  }
+
+  rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest) returns (QueryAddressFromBase58EncodedPubkeyResponse) {
+    option (google.api.http).get = "/pubKeyToAddr/{pubKey}";
+  }
+}
+
+message QueryDidDocRequest {
+  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+}
+
+message QueryDidDocResponse {
+  google.protobuf.Any diddoc = 1 [(gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\""];
+}
+
+message QueryAllDidsRequest {}
+
+message QueryAllDidsResponse {
+  repeated string dids = 1 [(gogoproto.moretags) = "json:\"dids\" yaml:\"dids\""];
+}
+
+message QueryAllDidDocsRequest {}
+
+message QueryAllDidDocsResponse {
+  repeated google.protobuf.Any diddocs = 1 [(gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\""];
+}
+
+message QueryAddressFromDidRequest {
+  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+}
+
+message QueryAddressFromDidResponse {
+  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+}
+
+message QueryAddressFromBase58EncodedPubkeyRequest {
+  string pubKey = 1 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
+}
+
+message QueryAddressFromBase58EncodedPubkeyResponse {
+  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+}

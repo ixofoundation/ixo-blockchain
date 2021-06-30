@@ -1,80 +1,113 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"strings"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
+func GetQueryCmd() *cobra.Command {
+	didQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "did query sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	didQueryCmd.AddCommand(
+		GetCmdAddressFromBase58Pubkey(),
+		GetCmdAddressFromDid(),
+		GetCmdIxoDidFromMnemonic(),
+		GetCmdDidDoc(),
+		GetCmdAllDids(),
+		GetCmdAllDidDocs(),
+	)
+
+	return didQueryCmd
+}
+
 func GetCmdAddressFromBase58Pubkey() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-address-from-pubkey [base-58-encoded-pubkey]",
 		Short: "Get the address for a base-58 encoded ed25519 public key",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !types.IsValidPubKey(args[0]) {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			pubKey := args[0]
+
+			if !types.IsValidPubKey(pubKey) {
 				return errors.New("input is not a valid base-58 encoded pubKey")
 			}
 
-			accAddress := exported.VerifyKeyToAddr(args[0])
-			fmt.Println(accAddress.String())
-			return nil
+			accAddress := exported.VerifyKeyToAddr(pubKey)
+
+			return clientCtx.PrintString(accAddress.String())
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdAddressFromDid(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdAddressFromDid() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-address-from-did [did]",
 		Short: "Query address for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 			didAddr := args[0]
-			key := exported.Did(didAddr)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryDidDoc, key), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.AddressFromDid(context.Background(),
+				&types.QueryAddressFromDidRequest{Did: didAddr})
 			if err != nil {
 				return err
 			}
 
-			if len(res) == 0 {
+			if len(res.Address) == 0 {
 				return errors.New("response bytes are empty")
 			}
 
-			var didDoc types.BaseDidDoc
-			err = cdc.UnmarshalJSON(res, &didDoc)
-			if err != nil {
-				return err
-			}
-			addressFromDid := didDoc.Address()
-
-			fmt.Println(addressFromDid.String())
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 func GetCmdIxoDidFromMnemonic() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "get-ixo-did-from-mnemonic [mnemonic]",
 		Short: "Get an ixo DID from a 12-word secret mnemonic",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(strings.Split(args[0], " ")) != 12 {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			mnemonic := args[0]
+
+			if len(strings.Split(mnemonic, " ")) != 12 {
 				return errors.New("input is not a 12-word mnemonic")
 			}
 
-			ixoDid, err := exported.FromMnemonic(args[0])
+			ixoDid, err := exported.FromMnemonic(mnemonic)
 			if err != nil {
 				return err
 			}
@@ -84,106 +117,92 @@ func GetCmdIxoDidFromMnemonic() *cobra.Command {
 				panic(err)
 			}
 
-			fmt.Println(fmt.Sprintf("%v", string(output)))
-			return nil
+			return clientCtx.PrintString(string(output))
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdDidDoc(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdDidDoc() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-did-doc [did]",
 		Short: "Query DidDoc for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			didAddr := args[0]
-			key := exported.Did(didAddr)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryDidDoc, key), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			if len(res) == 0 {
+			didAddr := args[0]
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.DidDoc(context.Background(),
+				&types.QueryDidDocRequest{Did: didAddr})
+			if err != nil {
+				return err
+			}
+
+			if len(res.Diddoc.String()) == 0 {
 				return errors.New("response bytes are empty")
 			}
 
-			var didDoc types.BaseDidDoc
-			err = cdc.UnmarshalJSON(res, &didDoc)
-			if err != nil {
-				return err
-			}
-
-			output, err := cdc.MarshalJSONIndent(didDoc, "", "  ")
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdAllDids(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdAllDids() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-all-dids",
 		Short: "Query all DIDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryAllDids, "ALL"), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			var didDids []exported.Did
-			err = cdc.UnmarshalJSON(res, &didDids)
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.AllDids(context.Background(),
+				&types.QueryAllDidsRequest{})
 			if err != nil {
 				return err
 			}
 
-			output, err := cdc.MarshalJSONIndent(didDids, "", "  ")
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdAllDidDocs(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdAllDidDocs() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-all-did-docs",
 		Short: "Query all DID documents",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryAllDidDocs, "ALL"), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			var didDocs []types.BaseDidDoc
-			err = cdc.UnmarshalJSON(res, &didDocs)
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.AllDidDocs(context.Background(),
+				&types.QueryAllDidDocsRequest{})
 			if err != nil {
 				return err
 			}
 
-			output, err := cdc.MarshalJSONIndent(didDocs, "", "  ")
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }

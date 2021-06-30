@@ -2,18 +2,20 @@ package exported
 
 import (
 	"bytes"
+	ed25519Local "crypto/ed25519"
 	cryptoRand "crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/btcsuite/btcutil/base58"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
-	ed25519tm "github.com/tendermint/tendermint/crypto/ed25519"
-	"golang.org/x/crypto/ed25519"
+	"github.com/gogo/protobuf/proto"
 	naclBox "golang.org/x/crypto/nacl/box"
-	"io"
 )
 
 var DidPrefix = "did:ixo:"
@@ -34,6 +36,8 @@ func UnprefixedDidFromPubKey(pubKey string) string {
 }
 
 type DidDoc interface {
+	proto.Message
+
 	SetDid(did Did) error
 	GetDid() Did
 	SetPubKey(pubkey string) error
@@ -117,8 +121,8 @@ func (id IxoDid) String() string {
 }
 
 func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
-	var pubKey ed25519tm.PubKeyEd25519
-	copy(pubKey[:], base58.Decode(verifyKey))
+	var pubKey ed25519.PubKey
+	pubKey.Key = base58.Decode(verifyKey)
 	return sdk.AccAddress(pubKey.Address())
 }
 
@@ -154,7 +158,7 @@ func Gen() (IxoDid, error) {
 }
 
 func FromSeed(seed [32]byte) (IxoDid, error) {
-	publicKeyBytes, privateKeyBytes, err := ed25519.GenerateKey(bytes.NewReader(seed[0:32]))
+	publicKeyBytes, privateKeyBytes, err := ed25519Local.GenerateKey(bytes.NewReader(seed[0:32]))
 	if err != nil {
 		return IxoDid{}, err
 	}
@@ -180,26 +184,15 @@ func FromSeed(seed [32]byte) (IxoDid, error) {
 }
 
 func (id IxoDid) SignMessage(msg []byte) ([]byte, error) {
-	var privateKey ed25519tm.PrivKeyEd25519
-	copy(privateKey[:], base58.Decode(id.Secret.SignKey))
-	copy(privateKey[32:], base58.Decode(id.VerifyKey))
+	var privateKey ed25519.PrivKey
+	privateKey.Key = append(base58.Decode(id.Secret.SignKey), base58.Decode(id.VerifyKey)...)
+
 	return privateKey.Sign(msg)
 }
 
 func (id IxoDid) VerifySignedMessage(msg []byte, sig []byte) bool {
-	var publicKey ed25519tm.PubKeyEd25519
-	copy(publicKey[:], base58.Decode(id.VerifyKey))
-	return publicKey.VerifyBytes(msg, sig)
-}
+	var publicKey ed25519.PubKey
+	publicKey.Key = base58.Decode(id.VerifyKey)
 
-type Claim struct {
-	Id           Did  `json:"id" yaml:"id"`
-	KYCValidated bool `json:"KYCValidated" yaml:"KYCValidated"`
-}
-
-type DidCredential struct {
-	CredType []string `json:"type" yaml:"type"`
-	Issuer   Did      `json:"issuer" yaml:"issuer"`
-	Issued   string   `json:"issued" yaml:"issued"`
-	Claim    Claim    `json:"claim" yaml:"claim"`
+	return publicKey.VerifySignature(msg, sig)
 }

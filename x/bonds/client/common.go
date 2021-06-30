@@ -1,10 +1,11 @@
 package client
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
-	"strings"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 )
 
 func splitParameters(fnParamsStr string) (paramValuePairs []string) {
@@ -41,6 +42,7 @@ func paramsMapToObj(paramsFieldMap map[string]string) (functionParams types.Func
 	return functionParams, nil
 }
 
+// TODO Consider bypassing the use of a map to avoid non-determinism on the order of parameters at the client side
 func ParseFunctionParams(fnParamsStr string) (fnParams types.FunctionParams, err error) {
 	// Split (if not empty) and check number of parameters
 	paramValuePairs := splitParameters(fnParamsStr)
@@ -61,7 +63,7 @@ func ParseFunctionParams(fnParamsStr string) (fnParams types.FunctionParams, err
 }
 
 func ParseTwoPartCoin(amount, denom string) (coin sdk.Coin, err error) {
-	coin, err = sdk.ParseCoin(amount + denom)
+	coin, err = sdk.ParseCoinNormalized(amount + denom)
 	if err != nil {
 		return sdk.Coin{}, err
 	} else if denom != coin.Denom {

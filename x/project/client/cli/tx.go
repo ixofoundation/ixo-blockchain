@@ -2,55 +2,89 @@ package cli
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
-func GetCmdCreateProject(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewTxCmd() *cobra.Command {
+	projectTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "project transaction sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	projectTxCmd.AddCommand(
+		NewCmdCreateProject(),
+		NewCmdCreateAgent(),
+		NewCmdUpdateProjectStatus(),
+		NewCmdUpdateAgent(),
+		NewCmdCreateClaim(),
+		NewCmdCreateEvaluation(),
+		NewCmdWithdrawFunds(),
+		NewCmdUpdateProjectDoc(),
+	)
+
+	return projectTxCmd
+}
+
+func NewCmdCreateProject() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "create-project [sender-did] [project-data-json] [ixo-did]",
 		Short: "Create a new ProjectDoc signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
 			projectDataStr := args[1]
-			ixoDid, err := did.UnmarshalIxoDid(args[2])
+			ixoDidStr := args[2]
+
+			ixoDid, err := didtypes.UnmarshalIxoDid(ixoDidStr)
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(
 				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
-			stdSignMsg := msg.ToStdSignMsg(types.MsgCreateProjectTotalFee)
-
-			res, err := ixo.SignAndBroadcastTxFromStdSignMsg(cliCtx, stdSignMsg, ixoDid)
+			err = msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
 
-			return cliCtx.PrintOutput(res)
+			res, err := ixotypes.SignAndBroadcastTxFromStdSignMsg(clientCtx, msg, ixoDid, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdUpdateProjectStatus() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "update-project-status [sender-did] [status] [ixo-did]",
 		Short: "Update the status of a project signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
 			status := args[1]
-			ixoDid, err := did.UnmarshalIxoDid(args[2])
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
@@ -69,18 +103,28 @@ func GetCmdUpdateProjectStatus(cdc *codec.Codec) *cobra.Command {
 			updateProjectStatusDoc := types.NewUpdateProjectStatusDoc(
 				projectStatus, "")
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdCreateAgent() *cobra.Command {
+	cmd := &cobra.Command{
 		Use: "create-agent [tx-hash] [sender-did] [agent-did] " +
 			"[role] [project-did]",
 		Short: "Create a new agent on a project signed by the ixoDid of the project",
@@ -96,23 +140,33 @@ func GetCmdCreateAgent(cdc *codec.Codec) *cobra.Command {
 
 			createAgentDoc := types.NewCreateAgentDoc(agentDid, role)
 
-			ixoDid, err := did.UnmarshalIxoDid(args[4])
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[4])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdUpdateAgent() *cobra.Command {
+	cmd := &cobra.Command{
 		Use: "update-agent [tx-hash] [sender-did] [agent-did] " +
 			"[status] [ixo-did]",
 		Short: "Update the status of an agent on a project signed by the ixoDid of the project",
@@ -130,23 +184,33 @@ func GetCmdUpdateAgent(cdc *codec.Codec) *cobra.Command {
 			updateAgentDoc := types.NewUpdateAgentDoc(
 				agentDid, agentStatus, agentRole)
 
-			ixoDid, err := did.UnmarshalIxoDid(args[5])
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[5])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdCreateClaim() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "create-claim [tx-hash] [sender-did] [claim-id] [claim-template-id] [ixo-did]",
 		Short: "Create a new claim on a project signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(5),
@@ -157,23 +221,33 @@ func GetCmdCreateClaim(cdc *codec.Codec) *cobra.Command {
 			claimTemplateId := args[3]
 			createClaimDoc := types.NewCreateClaimDoc(claimId, claimTemplateId)
 
-			ixoDid, err := did.UnmarshalIxoDid(args[4])
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[4])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdCreateEvaluation() *cobra.Command {
+	cmd := &cobra.Command{
 		Use: "create-evaluation [tx-hash] [sender-did] [claim-id] " +
 			"[status] [ixo-did]",
 		Short: "Create a new claim evaluation on a project signed by the ixoDid of the project",
@@ -190,28 +264,38 @@ func GetCmdCreateEvaluation(cdc *codec.Codec) *cobra.Command {
 			createEvaluationDoc := types.NewCreateEvaluationDoc(
 				claimId, claimStatus)
 
-			ixoDid, err := did.UnmarshalIxoDid(args[4])
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[4])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdWithdrawFunds() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "withdraw-funds [sender-did] [data]",
 		Short: "Withdraw funds.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ixoDid, err := did.UnmarshalIxoDid(args[0])
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[0])
 			if err != nil {
 				return err
 			}
@@ -222,12 +306,55 @@ func GetCmdWithdrawFunds(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdUpdateProjectDoc() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-project-doc [sender-did] [project-data-json] [ixo-did]",
+		Short: "Update a project's data signed by the ixoDid of the project",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			senderDid := args[0]
+			projectDataStr := args[1]
+			ixoDid, err := didtypes.UnmarshalIxoDid(args[2])
+			if err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+
+			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

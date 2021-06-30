@@ -3,16 +3,15 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gorilla/mux"
-
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
+	"github.com/gorilla/mux"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
 type AccDetails struct {
@@ -21,21 +20,21 @@ type AccDetails struct {
 	Balance sdk.Int `json:"balance" yaml:"balance"`
 }
 
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/project/{did}", queryProjectDocRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/projectAccounts/{projectDid}", queryProjectAccountsRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/projectTxs/{projectDid}", queryProjectTxsRequestHandler(cliCtx)).Methods("GET")
-	r.HandleFunc("/projectParams", queryParamsRequestHandler(cliCtx)).Methods("GET")
+func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
+	r.HandleFunc("/project/{did}", queryProjectDocRequestHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/projectAccounts/{projectDid}", queryProjectAccountsRequestHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/projectTxs/{projectDid}", queryProjectTxsRequestHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/projectParams", queryParamsRequestHandler(clientCtx)).Methods("GET")
 }
 
-func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		didAddr := vars["did"]
 
-		key := did.Did(didAddr)
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
+		key := didexported.Did(didAddr)
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
 			keeper.QueryProjectDoc, key), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -49,20 +48,20 @@ func queryProjectDocRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var projectDoc types.ProjectDoc
-		cliCtx.Codec.MustUnmarshalJSON(res, &projectDoc)
+		clientCtx.LegacyAmino.MustUnmarshalJSON(res, &projectDoc)
 
 		bz, err := json.Marshal(projectDoc)
 		_, _ = w.Write(bz)
 	}
 }
 
-func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryProjectAccountsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		projectDid := vars["projectDid"]
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
 			types.QuerierRoute, keeper.QueryProjectAccounts, projectDid), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -90,13 +89,13 @@ func queryProjectAccountsRequestHandler(cliCtx context.CLIContext) http.HandlerF
 
 }
 
-func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryProjectTxsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		vars := mux.Vars(r)
 		projectDid := vars["projectDid"]
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+		res, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
 			types.QuerierRoute, keeper.QueryProjectTx, projectDid), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -104,12 +103,12 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		var txs []types.WithdrawalInfoDoc
+		var txs types.WithdrawalInfoDocs
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		} else {
-			cliCtx.Codec.MustUnmarshalJSON(res, &txs)
+			clientCtx.LegacyAmino.MustUnmarshalJSON(res, &txs)
 		}
 
 		bz, err := json.Marshal(txs)
@@ -118,10 +117,10 @@ func queryProjectTxsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 }
 
-func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryParamsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
+		bz, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
 			keeper.QueryParams), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -130,12 +129,12 @@ func queryParamsRequestHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var params types.Params
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &params); err != nil {
+		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &params); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, params)
+		rest.PostProcessResponse(w, clientCtx, params)
 	}
 }

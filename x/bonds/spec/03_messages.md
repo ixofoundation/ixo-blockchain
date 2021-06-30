@@ -31,18 +31,18 @@ Bonds can be created by any address using `MsgCreateBond`.
 
 ```go
 type MsgCreateBond struct {
-    BondDid                did.Did
+	BondDid                string
 	Token                  string
 	Name                   string
 	Description            string
 	FunctionType           string
 	FunctionParameters     FunctionParams
-	CreatorDid             did.Did
-	ControllerDid          did.Did
+	CreatorDid             string
+	ControllerDid          string
 	ReserveTokens          []string
 	TxFeePercentage        sdk.Dec
 	ExitFeePercentage      sdk.Dec
-	FeeAddress             sdk.AccAddress
+	FeeAddress             string
 	MaxSupply              sdk.Coin
 	OrderQuantityLimits    sdk.Coins
 	SanityRate             sdk.Dec
@@ -114,13 +114,13 @@ This message is expected to fail if:
 
 ```go
 type MsgEditBond struct {
-	BondDid                did.Did
+	BondDid                string
 	Name                   string
 	Description            string
 	OrderQuantityLimits    string
 	SanityRate             string
 	SanityMarginPercentage string
-	EditorDid              did.Did
+	EditorDid              string
 }
 ```
 
@@ -150,9 +150,9 @@ This message is expected to fail if:
 
 ```go
 type MsgSetNextAlpha struct {
-	BondDid   did.Did
+	BondDid   string
 	Alpha     sdk.Dec
-	EditorDid did.Did
+	EditorDid string
 }
 ```
 
@@ -177,9 +177,9 @@ This message is expected to fail if:
 
 ```go
 type MsgUpdateBondState struct {
-	BondDid   did.Did
-	State     BondState
-	EditorDid did.Did
+	BondDid   string
+	State     string
+	EditorDid string
 }
 ```
 
@@ -216,10 +216,10 @@ The batch-adjusted current supply in the case of buys is the current supply of t
 
 ```go
 type MsgBuy struct {
-	BuyerDid  did.Did
+	BuyerDid  string
 	Amount    sdk.Coin
 	MaxPrices sdk.Coins
-	BondDid   did.Did
+	BondDid   string
 }
 ```
 
@@ -262,9 +262,9 @@ The batch-adjusted current supply in the case of sells is the current supply of 
 
 ```go
 type MsgSell struct {
-	SellerDid did.Did
+	SellerDid string
 	Amount    sdk.Coin
-	BondDid   did.Did
+	BondDid   string
 }
 ```
 
@@ -291,8 +291,8 @@ This message is expected to fail if:
 
 ```go
 type MsgSwap struct {
-	SwapperDid did.Did
-	BondDid    did.Did
+	SwapperDid string
+	BondDid    string
 	From       sdk.Coin
 	ToToken    string
 }
@@ -318,9 +318,9 @@ This message is expected to fail if:
 
 ```go
 type MsgMakeOutcomePayment struct {
-	SenderDid did.Did
+	SenderDid string
 	Amount    sdk.Int
-	BondDid   did.Did
+	BondDid   string
 }
 ```
 
@@ -346,7 +346,7 @@ This message is expected to fail if:
 
 ```go
 type MsgWithdrawShare struct {
-	RecipientDid did.Did
-	BondDid      did.Did
+	RecipientDid string
+ 	BondDid      string
 }
 ```

@@ -3,8 +3,8 @@
 wait() {
   echo "Waiting for chain to start..."
   while :; do
-    RET=$(ixocli status 2>&1)
-    if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    RET=$(ixod status 2>&1)
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -14,14 +14,37 @@ wait() {
   done
 }
 
-RET=$(ixocli status 2>&1)
-if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+RET=$(ixod status 2>&1)
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-FEE=$(yes $PASSWORD | ixocli keys show fee -a)
+CHAIN_ID="pandora-3"
+FEE=$(yes $PASSWORD | ixod keys show fee -a)
+
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    --broadcast-mode block \
+    -y \
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
 
 BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
@@ -62,12 +85,12 @@ FRANCESCO_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering DID 2/2..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 
 echo "Creating bond..."
-ixocli tx bonds create-bond \
+ixod_tx bonds create-bond \
   --token=abc \
   --name="A B C" \
   --description="Description about A B C" \
@@ -85,36 +108,34 @@ ixocli tx bonds create-bond \
   --batch-blocks=1 \
   --bond-did="$BOND_DID" \
   --creator-did="$MIGUEL_DID_FULL" \
-  --controller-did="$FRANCESCO_DID" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+  --controller-did="$FRANCESCO_DID"
 echo "Created bond..."
-ixocli q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Editing bond..."
-ixocli tx bonds edit-bond \
+ixod_tx bonds edit-bond \
   --name="New A B C" \
   --bond-did="$BOND_DID" \
-  --editor-did="$MIGUEL_DID_FULL" \
-  --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+  --editor-did="$MIGUEL_DID_FULL"
 echo "Edited bond..."
-ixocli q bonds bond "$BOND_DID"
+ixod_q bonds bond "$BOND_DID"
 
 echo "Miguel buys 10abc..."
-ixocli tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco buys 10abc..."
-ixocli tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds buy 10abc 1000000res "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"
 
 echo "Miguel sells 10abc..."
-ixocli tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds sell 10abc "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
-ixocli q auth account "$MIGUEL_ADDR"
+ixod_q bank balances "$MIGUEL_ADDR"
 
 echo "Francesco sells 10abc..."
-ixocli tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx bonds sell 10abc "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Francesco's account..."
-ixocli q auth account "$FRANCESCO_ADDR"
+ixod_q bank balances "$FRANCESCO_ADDR"

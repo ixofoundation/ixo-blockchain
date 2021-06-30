@@ -2,16 +2,19 @@ package project
 
 import (
 	"encoding/json"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data types.GenesisState) {
 	// Marshal/Unmarshal account maps into array of AccountMap
 	accountMapsBz, err := json.Marshal(data.AccountMaps)
 	if err != nil {
 		panic(err)
 	}
-	var accountMaps []AccountMap
+	var accountMaps []types.AccountMap
 	err = json.Unmarshal(accountMapsBz, &accountMaps)
 	if err != nil {
 		panic(err)
@@ -24,9 +27,9 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 			data.ProjectDocs[i].ProjectDid, accountMaps[i])
 		keeper.SetProjectWithdrawalTransactions(ctx,
 			data.ProjectDocs[i].ProjectDid, data.WithdrawalsInfos[i])
-		for j := range data.Claims[i] {
+		for j := range data.Claims[i].ClaimsList {
 			keeper.SetClaim(ctx,
-				data.ProjectDocs[i].ProjectDid, data.Claims[i][j])
+				data.ProjectDocs[i].ProjectDid, data.Claims[i].ClaimsList[j])
 		}
 	}
 
@@ -34,12 +37,12 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	keeper.SetParams(ctx, data.Params)
 }
 
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// Export project docs, account maps, project withdrawals
-	var projectDocs []ProjectDoc
-	var accountMaps []AccountMap
-	var withdrawalInfos [][]WithdrawalInfoDoc
-	var claims [][]Claim
+	var projectDocs []types.ProjectDoc
+	var accountMaps []types.AccountMap
+	var withdrawalInfos []types.WithdrawalInfoDocs
+	var claims []types.Claims
 
 	iterator := k.GetProjectDocIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
@@ -47,11 +50,11 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		accountMap := k.GetAccountMap(ctx, projectDoc.ProjectDid)
 		withdrawalInfo, _ := k.GetProjectWithdrawalTransactions(ctx, projectDoc.ProjectDid)
 
-		var subClaims []Claim
+		var subClaims types.Claims
 		claimIter := k.GetClaimIterator(ctx, projectDoc.ProjectDid)
 		for ; claimIter.Valid(); claimIter.Next() {
 			claim := k.MustGetClaimByKey(ctx, claimIter.Key())
-			subClaims = append(subClaims, claim)
+			subClaims = types.AppendClaims(subClaims, claim)
 		}
 
 		projectDocs = append(projectDocs, projectDoc)
@@ -67,13 +70,13 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	var genesisAccountMaps []GenesisAccountMap
+	var genesisAccountMaps []types.GenesisAccountMap
 	err = json.Unmarshal(accountMapsBz, &genesisAccountMaps)
 	if err != nil {
 		panic(err)
 	}
 
-	return GenesisState{
+	return &types.GenesisState{
 		ProjectDocs:      projectDocs,
 		AccountMaps:      genesisAccountMaps,
 		WithdrawalsInfos: withdrawalInfos,

@@ -1,19 +1,34 @@
 package cli
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/ixofoundation/ixo-blockchain/x/did/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	"github.com/spf13/cobra"
-
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
-
-	"github.com/ixofoundation/ixo-blockchain/x/did/internal/types"
 )
 
-func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewTxCmd() *cobra.Command {
+	didTxCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "did transaction sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	didTxCmd.AddCommand(
+		NewCmdAddDidDoc(),
+		NewCmdAddCredential(),
+	)
+
+	return didTxCmd
+}
+
+func NewCmdAddDidDoc() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "add-did-doc [ixo-did]",
 		Short: "Add a new IxoDid",
 		Args:  cobra.ExactArgs(1),
@@ -23,17 +38,28 @@ func GetCmdAddDidDoc(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func NewCmdAddCredential() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "add-kyc-credential [did] [signer-did-doc]",
 		Short: "Add a new KYC Credential for a Did by the signer",
 		Args:  cobra.ExactArgs(2),
@@ -50,11 +76,22 @@ func GetCmdAddCredential(cdc *codec.Codec) *cobra.Command {
 
 			credTypes := []string{"Credential", "ProofOfKYC"}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(ixoDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
+			if err != nil {
+				return err
+			}
 
 			msg := types.NewMsgAddCredential(didAddr, credTypes, ixoDid.Did, issued)
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, ixoDid)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

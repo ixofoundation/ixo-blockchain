@@ -1,21 +1,51 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	"encoding/json"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
 
-func Setup(isCheckTx bool) *ixoApp {
+// DefaultConsensusParams defines the default Tendermint consensus params used in
+// SimApp testing.
+var DefaultConsensusParams = &abci.ConsensusParams{
+	Block: &abci.BlockParams{
+		MaxBytes: 200000,
+		MaxGas:   2000000,
+	},
+	Evidence: &tmproto.EvidenceParams{
+		MaxAgeNumBlocks: 302400,
+		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
+		MaxBytes:        10000,
+	},
+	Validator: &tmproto.ValidatorParams{
+		PubKeyTypes: []string{
+			tmtypes.ABCIPubKeyTypeEd25519,
+		},
+	},
+}
+
+func setup(withGenesis bool, invCheckPeriod uint) (*IxoApp, GenesisState) {
 	db := dbm.NewMemDB()
-	ixoApp := NewIxoApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
-	cdc := MakeCodec()
+	encCdc := MakeTestEncodingConfig()
+	app := NewIxoApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
+	if withGenesis {
+		return app, NewDefaultGenesisState(encCdc.Marshaler)
+	}
+	return app, GenesisState{}
+}
+
+func Setup(isCheckTx bool) *IxoApp {
+	ixoApp, genesisState := setup(!isCheckTx, 5)
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
-		genesisState := NewDefaultGenesisState()
-		stateBytes, err := codec.MarshalJSONIndent(cdc, genesisState)
+		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
 		}
@@ -23,8 +53,9 @@ func Setup(isCheckTx bool) *ixoApp {
 		// Initialize the chain
 		ixoApp.InitChain(
 			abci.RequestInitChain{
-				Validators:    []abci.ValidatorUpdate{},
-				AppStateBytes: stateBytes,
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: DefaultConsensusParams,
+				AppStateBytes:   stateBytes,
 			},
 		)
 	}
@@ -32,10 +63,18 @@ func Setup(isCheckTx bool) *ixoApp {
 	return ixoApp
 }
 
-func createTestApp(isCheckTx bool) (*ixoApp, sdk.Context) {
+func createTestApp(isCheckTx bool) (*IxoApp, sdk.Context) {
 	app := Setup(isCheckTx)
 
-	ctx := app.BaseApp.NewContext(isCheckTx, abci.Header{})
+	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 
 	return app, ctx
+}
+
+// EmptyAppOptions is a stub implementing AppOptions
+type EmptyAppOptions struct{}
+
+// Get implements AppOptions
+func (ao EmptyAppOptions) Get(o string) interface{} {
+	return nil
 }

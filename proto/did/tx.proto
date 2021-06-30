@@ -1,0 +1,28 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+import "did/did.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
+
+// To get a list of all module messages, go to your module's handler.go and
+// check all cases in NewHandler().
+service Msg {
+  rpc AddDid(MsgAddDid) returns (MsgAddDidResponse);
+
+  rpc AddCredential(MsgAddCredential) returns (MsgAddCredentialResponse);
+}
+
+message MsgAddDid {
+  string did    = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+  string pubKey = 2 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
+}
+
+message MsgAddDidResponse {}
+
+message MsgAddCredential {
+  DidCredential did_credential = 1 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "credential", (gogoproto.moretags) = "yaml:\"credential\""];
+}
+
+message MsgAddCredentialResponse {}

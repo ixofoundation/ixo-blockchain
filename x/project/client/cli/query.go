@@ -1,148 +1,147 @@
 package cli
 
 import (
-	"encoding/json"
+	"context"
 	"errors"
-	"fmt"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/spf13/cobra"
-
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/project/internal/types"
 )
 
-func GetCmdProjectDoc(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetQueryCmd() *cobra.Command {
+	projectQueryCmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      "project query sub commands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	projectQueryCmd.AddCommand(
+		GetCmdProjectDoc(),
+		GetCmdProjectAccounts(),
+		GetCmdProjectTxs(),
+		GetParamsRequestHandler(),
+	)
+
+	return projectQueryCmd
+}
+
+func GetCmdProjectDoc() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-project-doc [did]",
 		Short: "Query ProjectDoc for a DID",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			didAddr := args[0]
-			key := did.Did(didAddr)
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryProjectDoc, key), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.ProjectDoc(context.Background(), &types.QueryProjectDocRequest{ProjectDid: didAddr})
 			if err != nil {
 				return err
 			}
 
-			var projectDoc types.ProjectDoc
-			err = cdc.UnmarshalJSON(res, &projectDoc)
-			if err != nil {
-				return err
-			}
-
-			output, err := json.MarshalIndent(projectDoc, "", "  ")
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdProjectAccounts(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdProjectAccounts() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-project-accounts [did]",
 		Short: "Get a Project accounts of a Project by Did",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			projectDid := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryProjectAccounts, projectDid), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.ProjectAccounts(context.Background(), &types.QueryProjectAccountsRequest{ProjectDid: projectDid})
 			if err != nil {
 				return err
 			}
 
-			if len(res) == 0 {
+			if len(res.GetAccountMap().Map) == 0 {
 				return errors.New("project does not exist")
 			}
 
-			var f interface{}
-			err = json.Unmarshal(res, &f)
-			if err != nil {
-				return err
-			}
-			accMap := f.(map[string]interface{})
-
-			output, err := json.MarshalIndent(accMap, "", "  ")
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetCmdProjectTxs(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdProjectTxs() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "get-project-txs [project-did]",
 		Short: "Get a Project txs for a projectDid",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			projectDid := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute,
-				keeper.QueryProjectTx, projectDid), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.ProjectTx(context.Background(), &types.QueryProjectTxRequest{ProjectDid: projectDid})
 			if err != nil {
 				return err
 			}
 
-			var txs []types.WithdrawalInfoDoc
-			if len(res) == 0 {
-				return errors.New("projectTxs does not exist for a projectDid")
-			} else {
-				err = cdc.UnmarshalJSON(res, &txs)
-				if err != nil {
-					return err
-				}
+			if len(res.GetTxs().DocsList) == 0 {
+				return errors.New("project does not have any transactions")
 			}
 
-			output, err := json.MarshalIndent(txs, "", "  ")
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(string(output))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-func GetParamsRequestHandler(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetParamsRequestHandler() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "params",
 		Short: "Query params",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute,
-				keeper.QueryParams), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			var params types.Params
-			if err := cdc.UnmarshalJSON(bz, &params); err != nil {
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
+			if err != nil {
 				return err
 			}
 
-			fmt.Println(string(bz))
-			return nil
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }

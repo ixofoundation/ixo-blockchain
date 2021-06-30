@@ -2,36 +2,35 @@ package rest
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-
-	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/internal/types"
+	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 )
 
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/payments/templates/{%s}", RestPaymentTemplateId),
-		queryPaymentTemplateHandler(cliCtx)).Methods("GET")
+		queryPaymentTemplateHandler(clientCtx)).Methods("GET")
 
 	r.HandleFunc(fmt.Sprintf("/payments/contracts/{%s}", RestPaymentContractId),
-		queryPaymentContractHandler(cliCtx)).Methods("GET")
+		queryPaymentContractHandler(clientCtx)).Methods("GET")
 
 	r.HandleFunc(fmt.Sprintf("/payments/contracts_by_id_prefix/{%s}", RestPaymentContractsIdPrefix),
-		queryPaymentContractsByIdPrefixHandler(cliCtx)).Methods("GET")
+		queryPaymentContractsByIdPrefixHandler(clientCtx)).Methods("GET")
 
 	r.HandleFunc(fmt.Sprintf("/payments/subscriptions/{%s}", RestSubscriptionId),
-		querySubscriptionHandler(cliCtx)).Methods("GET")
+		querySubscriptionHandler(clientCtx)).Methods("GET")
 }
 
-func queryPaymentTemplateHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryPaymentTemplateHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		templateId := vars[RestPaymentTemplateId]
 
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+		bz, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
 			types.QuerierRoute, keeper.QueryPaymentTemplate, templateId), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -40,22 +39,22 @@ func queryPaymentTemplateHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var template types.PaymentTemplate
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &template); err != nil {
+		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &template); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, template)
+		rest.PostProcessResponse(w, clientCtx, template)
 	}
 }
 
-func queryPaymentContractHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryPaymentContractHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		contractId := vars[RestPaymentContractId]
 
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+		bz, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
 			types.QuerierRoute, keeper.QueryPaymentContract, contractId), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -64,22 +63,22 @@ func queryPaymentContractHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var contract types.PaymentContract
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &contract); err != nil {
+		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &contract); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, contract)
+		rest.PostProcessResponse(w, clientCtx, contract)
 	}
 }
 
-func queryPaymentContractsByIdPrefixHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func queryPaymentContractsByIdPrefixHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		contractIdPrefix := vars[RestPaymentContractsIdPrefix]
 
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+		bz, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
 			types.QuerierRoute, keeper.QueryPaymentContractsByIdPrefix, contractIdPrefix), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -88,22 +87,22 @@ func queryPaymentContractsByIdPrefixHandler(cliCtx context.CLIContext) http.Hand
 		}
 
 		var contracts []types.PaymentContract
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &contracts); err != nil {
+		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &contracts); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, contracts)
+		rest.PostProcessResponse(w, clientCtx, contracts)
 	}
 }
 
-func querySubscriptionHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func querySubscriptionHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		subscriptionId := vars[RestSubscriptionId]
 
-		bz, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
+		bz, _, err := clientCtx.QueryWithData(fmt.Sprintf("custom/%s/%s/%s",
 			types.QuerierRoute, keeper.QuerySubscription, subscriptionId), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -112,12 +111,12 @@ func querySubscriptionHandler(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		var subscription types.Subscription
-		if err := cliCtx.Codec.UnmarshalJSON(bz, &subscription); err != nil {
+		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &subscription); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
 			return
 		}
 
-		rest.PostProcessResponse(w, cliCtx, subscription)
+		rest.PostProcessResponse(w, clientCtx, subscription)
 	}
 }

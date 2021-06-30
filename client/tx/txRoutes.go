@@ -1,28 +1,29 @@
 package tx
 
 import (
-	"encoding/base64"
 	"encoding/hex"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/ixofoundation/ixo-blockchain/x/project"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	clienttx "github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	"github.com/gorilla/mux"
+	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
-func RegisterTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
-	r.HandleFunc("/txs/sign_data", SignDataRequest(cliCtx)).Methods("POST")
-	r.HandleFunc("/txs/decode", DecodeTxRequestHandlerFn(cliCtx)).Methods("POST")
+var (
+	approximationGasAdjustment = float64(1.5)
+	expectedMinGasPrices       = "0.025" + ixotypes.IxoNativeToken
+)
+
+func RegisterTxRoutes(clientCtx client.Context, r *mux.Router) {
+	r.HandleFunc("/txs/sign_data", SignDataRequest(clientCtx)).Methods("POST")
 }
 
 type SignDataReq struct {
@@ -31,148 +32,112 @@ type SignDataReq struct {
 }
 
 type SignDataResponse struct {
-	SignBytes string      `json:"sign_bytes" yaml:"sign_bytes"`
-	Fee       auth.StdFee `json:"fee" yaml:"fee"`
+	SignBytes string          `json:"sign_bytes" yaml:"sign_bytes"`
+	Fee       legacytx.StdFee `json:"fee" yaml:"fee"`
 }
 
-func SignDataRequest(cliCtx context.CLIContext) http.HandlerFunc {
+func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req SignDataReq
 
 		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
-		err = cliCtx.Codec.UnmarshalJSON(body, &req)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		err = clientCtx.LegacyAmino.UnmarshalJSON(body, &req)
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		msgBytes, err := hex.DecodeString(strings.TrimPrefix(req.Msg, "0x"))
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		if rest.CheckInternalServerError(w, err) {
 			return
 		}
 
 		var msg sdk.Msg
-		err = cliCtx.Codec.UnmarshalJSON(msgBytes, &msg)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+		err = clientCtx.LegacyAmino.UnmarshalJSON(msgBytes, &msg)
+		if rest.CheckBadRequestError(w, err) {
 			return
 		}
 
 		// all messages must be of type ixo.IxoMsg
-		ixoMsg, ok := msg.(ixo.IxoMsg)
+		ixoMsg, ok := msg.(ixotypes.IxoMsg)
 		if !ok {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "msg must be ixo.IxoMsg")
 			return
 		}
-		msgs := []sdk.Msg{ixoMsg}
 
-		// obtain stdSignMsg (create-project is a special case)
-		var stdSignMsg auth.StdSignMsg
+		output := SignDataResponse{}
+
 		switch ixoMsg.Type() {
-		case project.TypeMsgCreateProject:
-			stdSignMsg = ixoMsg.(project.MsgCreateProject).ToStdSignMsg(
-				project.MsgCreateProjectTotalFee)
+		case projecttypes.TypeMsgCreateProject:
+			var stdSignMsg legacytx.StdSignMsg
+			stdSignMsg = ixoMsg.(*projecttypes.MsgCreateProject).ToStdSignMsg(
+				projecttypes.MsgCreateProjectTotalFee)
+			stdSignMsg.ChainID = clientCtx.ChainID
+
+			output.SignBytes = string(stdSignMsg.Bytes())
+			output.Fee = stdSignMsg.Fee
 		default:
 			// Deduce and set signer address
-			signerAddress := did.VerifyKeyToAddr(req.PubKey)
-			cliCtx = cliCtx.WithFromAddress(signerAddress)
+			signerAddress := didexported.VerifyKeyToAddr(req.PubKey)
+			clientCtx = clientCtx.WithFromAddress(signerAddress)
 
-			// Create tx builder with:
-			// - TxEncoder set to GetTxEncoder(...)
-			// - Acc no. and sequence set to 0 (set by PrepareTxBuilder)
-			// - Gas and gas adjustment set to 0 (set by ApproximateFeeForTx)
-			// - Simulate set to false
-			// - Chain ID obtained using viper.GetString(...)
-			// - Memo set to empty string (custom memo not supported)
-			// - Fees and gas prices set to nil (set by ApproximateFeeForTx)
-			chainId := viper.GetString(flags.FlagChainID)
-			txBldr := types.NewTxBuilder(
-				utils.GetTxEncoder(cliCtx.Codec),
-				0, 0, 0, 0, false, chainId, "", nil, nil)
+			// Set gas adjustment and fees
+			gasAdjustment := approximationGasAdjustment
+			fees := sdk.NewCoins(sdk.NewCoin(ixotypes.IxoNativeToken, sdk.OneInt()))
 
-			txBldr, err = utils.PrepareTxBuilder(txBldr, cliCtx)
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			chainId := clientCtx.ChainID
+			txf := clienttx.Factory{}.
+				WithTxConfig(clientCtx.TxConfig).
+				WithAccountRetriever(clientCtx.AccountRetriever).
+				WithKeybase(clientCtx.Keyring).
+				WithChainID(chainId).
+				WithSimulateAndExecute(false).
+				WithMemo("").
+				WithGasPrices(expectedMinGasPrices)
+
+			txf, err := clienttx.PrepareFactory(clientCtx, txf)
+			if rest.CheckInternalServerError(w, err) {
 				return
 			}
 
-			// Build the transaction
-			stdSignMsg, err = txBldr.BuildSignMsg(msgs)
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			txfForGasCalc := clienttx.Factory{}.
+				WithTxConfig(clientCtx.TxConfig).
+				WithAccountRetriever(clientCtx.AccountRetriever).
+				WithKeybase(clientCtx.Keyring).
+				WithChainID(chainId).
+				WithSimulateAndExecute(true).
+				WithMemo("").
+				WithGasAdjustment(gasAdjustment).
+				WithFees(fees.String())
+
+			txfForGasCalc, err = clienttx.PrepareFactory(clientCtx, txfForGasCalc)
+			if rest.CheckInternalServerError(w, err) {
 				return
 			}
 
-			// Create dummy tx with blank signature for fee approximation
-			signature := auth.StdSignature{}
-			tx := auth.NewStdTx(stdSignMsg.Msgs, stdSignMsg.Fee,
-				[]auth.StdSignature{signature}, stdSignMsg.Memo)
-
-			// Approximate fee
-			fee, err := ixo.ApproximateFeeForTx(cliCtx, tx, txBldr.ChainID())
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			_, gasAmt, err := clienttx.CalculateGas(clientCtx.QueryWithData, txfForGasCalc, msg)
+			if rest.CheckBadRequestError(w, err) {
 				return
 			}
-			stdSignMsg.Fee = fee
+			txf = txf.WithGas(gasAmt)
+
+			tx, err := clienttx.BuildUnsignedTx(txf, msg)
+			if rest.CheckBadRequestError(w, err) {
+				return
+			}
+
+			stdFee := legacytx.NewStdFee(gasAmt, tx.GetTx().GetFee())
+			bytes := legacytx.StdSignBytes(txf.ChainID(), txf.AccountNumber(), txf.Sequence(),
+				txf.TimeoutHeight(), stdFee, []sdk.Msg{msg}, txf.Memo())
+
+			// Produce response from sign bytes and fees
+			output.SignBytes = string(bytes)
+			output.Fee = stdFee
 		}
 
-		// Produce response from sign bytes and fees
-		output := SignDataResponse{
-			SignBytes: string(stdSignMsg.Bytes()),
-			Fee:       stdSignMsg.Fee,
-		}
-
-		rest.PostProcessResponseBare(w, cliCtx, output)
-	}
-}
-
-type (
-	// DecodeReq defines a tx decoding request.
-	DecodeReq struct {
-		Tx string `json:"tx"`
-	}
-
-	// DecodeResp defines a tx decoding response.
-	DecodeResp auth.StdTx
-)
-
-func DecodeTxRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req DecodeReq
-
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		err = cliCtx.Codec.UnmarshalJSON(body, &req)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		txBytes, err := base64.StdEncoding.DecodeString(req.Tx)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		var stdTx auth.StdTx
-		err = cliCtx.Codec.UnmarshalBinaryLengthPrefixed(txBytes, &stdTx)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		response := DecodeResp(stdTx)
-		rest.PostProcessResponse(w, cliCtx, response)
+		rest.PostProcessResponseBare(w, clientCtx, output)
 	}
 }

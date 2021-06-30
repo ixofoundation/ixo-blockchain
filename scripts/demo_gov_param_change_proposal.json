@@ -1,0 +1,17 @@
+{
+  "title": "Staking Param Change",
+  "description": "Enable IBC",
+  "changes": [
+    {
+      "subspace": "transfer",
+      "key": "SendEnabled",
+      "value": true
+    },
+    {
+      "subspace": "transfer",
+      "key": "ReceiveEnabled",
+      "value": false
+    }
+  ],
+  "deposit": "1000uixo"
+}

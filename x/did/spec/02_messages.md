@@ -6,14 +6,14 @@ In this section we describe the processing of the DID messages and the correspon
 
 This message is used to create a DID with an associated PubKey.
 
-| **Field** | **Type**       | **Description** |
-|:----------|:---------------|:----------------|
-| Did       | `exported.DID` | The DID being added 
-| PubKey    | `publicKey`    | The PubKey to be associated with the DID
+| **Field** | **Type**    | **Description** |
+|:----------|:------------|:----------------|
+| Did       | `Did`       | The DID being added 
+| PubKey    | `publicKey` | The PubKey to be associated with the DID
 
 ```go
 type MsgAddDid struct {
-	Did    exported.Did
+	Did    string
 	PubKey string
 }
 ```
@@ -27,12 +27,12 @@ This message creates and stores the DID with its PubKey at appropriate indexes.
 
 The owner of a DID can add a credential to their DID using `MsgAddCredential`.
 
-| **Field**     | **Type**                 | **Description** |
-|:--------------|:-------------------------|:----------------|
-| DidCredential | `exported.DidCredential` | The credential being added 
+| **Field**     | **Type**        | **Description** |
+|:--------------|:----------------|:----------------|
+| DidCredential | `DidCredential` | The credential being added 
 
 ```go
 type MsgAddCredential struct {
-	DidCredential exported.DidCredential
+	DidCredential DidCredential
 }
 ```

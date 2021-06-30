@@ -1,11 +1,13 @@
 package rest
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/rest"
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func RegisterHandlers(cliCtx client.Context, rtr *mux.Router) {
+	r := rest.WithHTTPDeprecationHeaders(rtr)
 	registerQueryRoutes(cliCtx, r)
-	registerTxRoutes(cliCtx, r)
+	registerTxHandlers(cliCtx, r)
 }

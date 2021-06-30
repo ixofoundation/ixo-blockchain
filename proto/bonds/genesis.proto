@@ -1,0 +1,13 @@
+syntax = "proto3";
+package bonds;
+
+import "gogoproto/gogo.proto";
+import "bonds/bonds.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+
+message GenesisState {
+  repeated Bond bonds    = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"bonds\""];
+  repeated Batch batches = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"batches\""];
+  Params params          = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
+}

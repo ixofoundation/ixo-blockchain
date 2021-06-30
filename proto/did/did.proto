@@ -1,0 +1,31 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
+
+message DidCredential {
+  repeated string cred_type = 1 [(gogoproto.jsontag) = "type", (gogoproto.moretags) = "yaml:\"type\""];
+  string issuer             = 2 [(gogoproto.moretags) = "yaml:\"issuer\""];
+  string issued             = 3 [(gogoproto.moretags) = "yaml:\"issued\""];
+  Claim claim               = 4 [(gogoproto.moretags) = "yaml:\"claim\""];
+}
+
+message Claim {
+  string id         = 1 [(gogoproto.moretags) = "yaml:\"id\""];
+  bool KYC_validated = 2 [(gogoproto.jsontag) = "KYCValidated", (gogoproto.moretags) = "yaml:\"KYCValidated\""];
+}
+
+message IxoDid {
+  string did                   = 1 [(gogoproto.moretags) = "yaml:\"did\""];
+  string verify_key            = 2 [(gogoproto.jsontag) = "verifyKey", (gogoproto.moretags) = "yaml:\"verifyKey\""];
+  string encryption_public_key = 3 [(gogoproto.jsontag) = "encryptionPublicKey", (gogoproto.moretags) = "yaml:\"encryptionPublicKey\""];
+  Secret secret                = 4 [(gogoproto.moretags) = "yaml:\"secret\""];
+}
+
+message Secret {
+  string seed                   = 1 [(gogoproto.moretags) = "yaml:\"seed\""];
+  string sign_key               = 2 [(gogoproto.jsontag) = "signKey", (gogoproto.moretags) = "yaml:\"signKey\""];
+  string encryption_private_key = 3 [(gogoproto.jsontag) = "encryptionPrivateKey", (gogoproto.moretags) = "yaml:\"encryptionPrivateKey\""];
+}

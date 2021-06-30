@@ -3,17 +3,17 @@ package project
 import (
 	"bytes"
 	"fmt"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authexported "github.com/cosmos/cosmos-sdk/x/auth/exported"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/tendermint/tendermint/crypto"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
 // SetUpContextDecorator sets the GasMeter in the Context and wraps the next AnteHandler with a defer clause
@@ -65,10 +65,10 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 
 type SetPubKeyDecorator struct {
 	ak  keeper.AccountKeeper
-	pkg ixo.PubKeyGetter
+	pkg ixotypes.PubKeyGetter
 }
 
-func NewSetPubKeyDecorator(ak keeper.AccountKeeper, pkg ixo.PubKeyGetter) SetPubKeyDecorator {
+func NewSetPubKeyDecorator(ak keeper.AccountKeeper, pkg ixotypes.PubKeyGetter) SetPubKeyDecorator {
 	return SetPubKeyDecorator{
 		ak:  ak,
 		pkg: pkg,
@@ -76,13 +76,13 @@ func NewSetPubKeyDecorator(ak keeper.AccountKeeper, pkg ixo.PubKeyGetter) SetPub
 }
 
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	_, ok := tx.(ante.SigVerifiableTx)
+	_, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 	}
 
 	// message must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
+	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
@@ -95,7 +95,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 
 	// Fetch signer (project itself). Account expected to not exist
 	signerAddr := sdk.AccAddress(pubKey.Address())
-	_, err = auth.GetSignerAcc(ctx, spkd.ak, signerAddr)
+	_, err = ante.GetSignerAcc(ctx, spkd.ak, signerAddr)
 	if err == nil {
 		return ctx, fmt.Errorf("expected project account to not exist")
 	}
@@ -104,7 +104,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	signerAcc := spkd.ak.NewAccountWithAddress(ctx, signerAddr)
 	spkd.ak.SetAccount(ctx, signerAcc)
 
-	pubkeys := []crypto.PubKey{pubKey}
+	pubkeys := []cryptotypes.PubKey{pubKey}
 	signers := []sdk.AccAddress{signerAddr}
 
 	for i, pk := range pubkeys {
@@ -113,7 +113,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 			if !simulate {
 				continue
 			}
-			pk = simEd25519Pubkey
+			pk = &simEd25519Pubkey
 		}
 		// Only make check if simulate=false
 		if !simulate && !bytes.Equal(pk.Address(), signers[i]) {
@@ -144,36 +144,34 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 // Call next AnteHandler if fees successfully deducted
 // CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
 type DeductFeeDecorator struct {
-	ak           keeper.AccountKeeper
-	supplyKeeper authtypes.SupplyKeeper
-	bk           bank.Keeper
-	didKeeper    did.Keeper
-	pkg          ixo.PubKeyGetter
+	ak        keeper.AccountKeeper
+	bk        bankkeeper.Keeper
+	didKeeper didkeeper.Keeper
+	pkg       ixotypes.PubKeyGetter
 }
 
-func NewDeductFeeDecorator(ak keeper.AccountKeeper, sk authtypes.SupplyKeeper,
-	bk bank.Keeper, didKeeper did.Keeper, pkg ixo.PubKeyGetter) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak keeper.AccountKeeper, bk bankkeeper.Keeper,
+	didKeeper didkeeper.Keeper, pkg ixotypes.PubKeyGetter) DeductFeeDecorator {
 	return DeductFeeDecorator{
-		ak:           ak,
-		supplyKeeper: sk,
-		bk:           bk,
-		didKeeper:    didKeeper,
-		pkg:          pkg,
+		ak:        ak,
+		bk:        bk,
+		didKeeper: didKeeper,
+		pkg:       pkg,
 	}
 }
 
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	_, ok := tx.(ante.FeeTx)
+	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
-	if addr := dfd.supplyKeeper.GetModuleAddress(auth.FeeCollectorName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", auth.FeeCollectorName))
+	if addr := dfd.ak.GetModuleAddress(authtypes.FeeCollectorName); addr == nil {
+		panic(fmt.Sprintf("%s module account has not been set", authtypes.FeeCollectorName))
 	}
 
 	// all messages must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
+	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
@@ -193,34 +191,30 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	}
 
 	// confirm that fee is the exact amount expected
-	stdTx, ok := tx.(auth.StdTx)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-	}
 	expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
-		ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTotalFee)))
-	if !stdTx.Fee.Amount.IsEqual(expectedTotalFee) {
+		ixotypes.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTotalFee)))
+	if !feeTx.GetFee().IsEqual(expectedTotalFee) {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee")
 	}
 
 	// Calculate transaction fee and project funding
 	transactionFee := sdk.NewCoins(sdk.NewCoin(
-		ixo.IxoNativeToken, sdk.NewInt(MsgCreateProjectTransactionFee)))
+		ixotypes.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTransactionFee)))
 	projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
 
 	// deduct the fees
-	if !stdTx.Fee.Amount.IsZero() {
+	if !feeTx.GetFee().IsZero() {
 		// fetch fee payer account
 		feePayerDidDoc, err := dfd.didKeeper.GetDidDoc(ctx, msg.SenderDid)
 		if err != nil {
 			return ctx, err
 		}
-		feePayerAcc, err := auth.GetSignerAcc(ctx, dfd.ak, feePayerDidDoc.Address())
+		feePayerAcc, err := ante.GetSignerAcc(ctx, dfd.ak, feePayerDidDoc.Address())
 		if err != nil {
 			return ctx, err
 		}
 
-		err = auth.DeductFees(dfd.supplyKeeper, ctx, feePayerAcc, transactionFee)
+		err = ante.DeductFees(dfd.bk, ctx, feePayerAcc, transactionFee)
 		if err != nil {
 			return ctx, err
 		}
@@ -241,14 +235,16 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type SigVerificationDecorator struct {
-	ak  keeper.AccountKeeper
-	pkg ixo.PubKeyGetter
+	ak              keeper.AccountKeeper
+	signModeHandler authsigning.SignModeHandler
+	pkg             ixotypes.PubKeyGetter
 }
 
-func NewSigVerificationDecorator(ak keeper.AccountKeeper, pkg ixo.PubKeyGetter) SigVerificationDecorator {
+func NewSigVerificationDecorator(ak keeper.AccountKeeper, signModeHandler authsigning.SignModeHandler, pkg ixotypes.PubKeyGetter) SigVerificationDecorator {
 	return SigVerificationDecorator{
-		ak:  ak,
-		pkg: pkg,
+		ak:              ak,
+		signModeHandler: signModeHandler,
+		pkg:             pkg,
 	}
 }
 
@@ -257,22 +253,25 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	if ctx.IsReCheckTx() {
 		return next(ctx, tx, simulate)
 	}
-	sigTx, ok := tx.(ante.SigVerifiableTx)
+	sigTx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
 	}
 
 	// stdSigs contains the sequence number, account number, and signatures.
 	// When simulating, this would just be a 0-length slice.
-	sigs := sigTx.GetSignatures()
+	sigs, err := sigTx.GetSignaturesV2()
+	if err != nil {
+		return ctx, err
+	}
 
 	// message must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(MsgCreateProject)
+	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
 	}
 
-	// Get did pubKey
+	// Get signer did pubKey
 	pubKey, err := svd.pkg(ctx, msg)
 	if err != nil {
 		return ctx, err
@@ -280,7 +279,6 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 
 	// Fetch signer (account underlying DID). Account expected to not exist
 	signerAddrs := []sdk.AccAddress{sdk.AccAddress(pubKey.Address())}
-	signerAccs := make([]authexported.Account, len(signerAddrs))
 
 	// check that signer length and signature length are the same
 	if len(sigs) != len(signerAddrs) {
@@ -288,29 +286,62 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	}
 
 	for i, sig := range sigs {
-		signerAccs[i], err = ante.GetSignerAcc(ctx, svd.ak, signerAddrs[i])
+		acc, err := ante.GetSignerAcc(ctx, svd.ak, signerAddrs[i])
 		if err != nil {
 			return ctx, err
 		}
 
 		// check signature, return account with incremented nonce
-		stdTx, ok := tx.(auth.StdTx)
-		if !ok {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid transaction type")
-		}
-
-		// retrieve signBytes of tx
-		signBytes := getProjectCreationSignBytes(ctx, stdTx, signerAccs[i])
-
 		// retrieve pubkey
-		pubKey := signerAccs[i].GetPubKey()
+		pubKey := acc.GetPubKey()
 		if !simulate && pubKey == nil {
 			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "pubkey on account is not set")
 		}
 
-		// verify signature
-		if !simulate && !pubKey.VerifyBytes(signBytes, sig) {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "signature verification failed; verify correct account sequence and chain-id")
+		// Check account sequence number.
+		// When using Amino StdSignatures, we actually don't have the Sequence in
+		// the SignatureV2 struct (it's only in the SignDoc). In this case, we
+		// cannot check sequence directly, and must do it via signature
+		// verification (in the VerifySignature call below).
+		onlyAminoSigners := ante.OnlyLegacyAminoSigners(sig.Data)
+		if !onlyAminoSigners {
+			if sig.Sequence != acc.GetSequence() {
+				return ctx, sdkerrors.Wrapf(
+					sdkerrors.ErrWrongSequence,
+					"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
+				)
+			}
+		}
+
+		genesis := ctx.BlockHeight() == 0
+		chainID := ctx.ChainID()
+		var accNum uint64
+		if !genesis {
+			// Fixed account number used so that sign bytes do not depend on it
+			accNum = uint64(0)
+		}
+
+		signerData := authsigning.SignerData{
+			ChainID:       chainID,
+			AccountNumber: accNum,
+			Sequence:      acc.GetSequence(),
+		}
+
+		if !simulate {
+			err := authsigning.VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, tx)
+
+			if err != nil {
+				var errMsg string
+				if onlyAminoSigners {
+					// If all signers are using SIGN_MODE_LEGACY_AMINO, we rely on VerifySignature to check account sequence number,
+					// and therefore communicate sequence number as a potential cause of error.
+					errMsg = fmt.Sprintf("signature verification failed; please verify account number (%d), sequence (%d) and chain-id (%s)", accNum, acc.GetSequence(), chainID)
+				} else {
+					errMsg = fmt.Sprintf("signature verification failed; please verify account number (%d) and chain-id (%s)", accNum, chainID)
+				}
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+
+			}
 		}
 	}
 

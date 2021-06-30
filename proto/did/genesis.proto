@@ -1,0 +1,11 @@
+syntax = "proto3";
+package did;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
+
+message GenesisState {
+  repeated google.protobuf.Any did_docs = 1 [(gogoproto.moretags) = "yaml:\"did_docs\""];
+}

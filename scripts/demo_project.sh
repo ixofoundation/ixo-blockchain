@@ -3,8 +3,8 @@
 wait() {
   echo "Waiting for chain to start..."
   while :; do
-    RET=$(ixocli status 2>&1)
-    if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+    RET=$(ixod status 2>&1)
+    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
       sleep 1
     else
       echo "A few more seconds..."
@@ -14,13 +14,36 @@ wait() {
   done
 }
 
-RET=$(ixocli status 2>&1)
-if [[ ($RET == ERROR*) || ($RET == *'"latest_block_height": "0"'*) ]]; then
+RET=$(ixod status 2>&1)
+if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
   wait
 fi
 
 GAS_PRICES="0.025uixo"
 PASSWORD="12345678"
+CHAIN_ID="pandora-3"
+
+ixod_tx() {
+  # Helper function to broadcast a transaction and supply the necessary args
+
+  # Get module ($1) and specific tx ($1), which forms the tx command
+  cmd="$1 $2"
+  shift
+  shift
+
+  # Broadcast the transaction
+  ixod tx $cmd \
+    --gas-prices="$GAS_PRICES" \
+    --chain-id="$CHAIN_ID" \
+    --broadcast-mode block \
+    -y \
+    "$@" | jq .
+    # The $@ adds any extra arguments to the end
+}
+
+ixod_q() {
+  ixod q "$@" --output=json | jq .
+}
 
 PROJECT_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 PROJECT_DID_FULL='{
@@ -100,130 +123,161 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-ixocli tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
 echo "Ledgering Francesco DID..."
-ixocli tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering Shaun DID..."
-ixocli tx did add-did-doc "$SHAUN_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx did add-did-doc "$SHAUN_DID_FULL"
 
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-ixocli tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create fee-for-service payment template
 echo "Creating fee-for-service payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-ixocli tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
 echo "Creating project..."
-ixocli tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 echo "Updating project to CREATED..."
-ixocli tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
 echo "Updating project to PENDING..."
-ixocli tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
+
+# Updating project doc succeeds as project is in status PENDING and tx sender DID
+# is the same as project sender DID
+PROJECT_INFO2='{
+  "nodeDid":"nodeDid",
+  "requiredClaims":"500",
+  "serviceEndpoint":"serviceEndpoint",
+  "createdOn":"2020-01-01T01:01:01.000Z",
+  "createdBy":"Creator",
+  "status":"",
+  "fees":{
+    "@context":"",
+    "items": [
+      {"@type":"OracleFee", "id":"payment:template:oracle-fee"},
+      {"@type":"FeeForService", "id":"payment:template:fee-for-service"}
+    ]
+  },
+  "newField":"someNewField"
+}'
+echo "Updating project doc..."
+ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO2" "$PROJECT_DID_FULL"
 
 # Fund project and progress status to FUNDED
-PROJECT_ADDR=$(ixocli q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID" | cut -d \" -f 4)
-echo "Funding project at [$PROJECT_ADDR] with uixo (using treasury 'oracle-transfer' using Francesco oracle)..."
-ixocli tx treasury oracle-mint "$PROJECT_ADDR" 100000000uixo "$FRANCESCO_DID_FULL" "dummy proof" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID")
+# Delete longest match of pattern ': ' from the beginning
+PROJECT_ADDR=${FULL_PROJECT_ADDR##*: }
+echo "Funding project at [$PROJECT_ADDR] with uixo from Francesco..."
+ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"
 
 # Progress project status to STARTED
 SENDER_DID="$SHAUN_DID"
 echo "Updating project to STARTED..."
-ixocli tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL"
+
+# If we try updating the project-doc now, the tx fails as the project is in status STARTED
+echo "Updating project doc fails since project is in status STARTED..."
+ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 
 # Create claim and evaluation
 echo "Creating a claim in project..."
 SENDER_DID="$SHAUN_DID"
-ixocli tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL"
 echo "Creating an evaluation in project..."
 SENDER_DID="$MIGUEL_DID"
 STATUS="1" # create-evaluation updates status of claim from 0 to 1
-ixocli tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL"
 
 # OracleFeePercentage:  0.1 (10%)
 # NodeFeePercentage:    0.1 (10%)
 
-# Fee for service:   2000000 uixo
-# Oracle pay:        5000000 uixo
+# Fee for service:   2,000,000 uixo
+# Oracle pay:        5,000,000 uixo
 
 # Expected project account balances:
-# - InitiatingNodePayFees:    50000  # 0.1 of 0.1 of oracle pay
+# - InitiatingNodePayFees:   50,000  # 0.1 of 0.1 of oracle pay
 # - IxoFees:                      0
-# - IxoPayFees:              450000  # 0.9 of 0.1 of oracle pay
-# - project:               93000000  # 100IXO - (5+2)IXO
+# - IxoPayFees:             450,000  # 0.9 of 0.1 of oracle pay
+# - project:             93,000,000  # 100IXO - (5+2)IXO
 # Expected external account balances:
-# - Miguel:                 4500000  # 0.9 of oracle pay
-# - Shaun:                 11000000  # 1.0 of fee-for-service (+ 10000000 original - 1000000 project creation fee)
+# - Miguel:       1,000,004,495,000  # 1,000,000,000,000 original +  0.9 of oracle pay - 5,000 tx fee
+# - Shaun:        1,000,000,995,000  # 1,000,000,000,000 original + 1.0 of fee-for-service - 1,000,000 project creation fee - 5,000 tx fee
 
-# Sum of fee accounts: 500000
+# Sum of fee accounts: 500,000
 
 # Progress project status to PAIDOUT
 SENDER_DID="$SHAUN_DID"
 echo "Updating project to STOPPED..."
-ixocli tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL"
 echo "Updating project to PAIDOUT..."
-ixocli tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL"
 echo "Project withdrawals query..."
-ixocli q project get-project-txs $PROJECT_DID
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
 # - InitiatingNodePayFees:        0
 # - IxoFees:                      0
 # - IxoPayFees:                   0
-# - project:               93000000
+# - project:             93,000,000
 # Expected external account balances:
-# - Miguel:                 4500000
-# - Shaun:                 11500000  # 500000 withdrawal
+# - Miguel:       1,000,004,495,000
+# - Shaun:        1,000,001,495,000  # 500,000 withdrawal
 
 echo "InitiatingNodePayFees"
-ixocli q auth account "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
+ixod_q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
 echo "IxoFees"
-ixocli q auth account "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
+ixod_q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
 echo "IxoPayFees"
-ixocli q auth account "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
-echo "did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
-ixocli q auth account "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
-echo "did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-ixocli q auth account "$(ixocli q did get-address-from-did $MIGUEL_DID)"
-echo "did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-ixocli q auth account "$(ixocli q did get-address-from-did $SHAUN_DID)"
+ixod_q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
+echo "(project) did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+ixod_q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
+echo "(Miguel) did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+MIGUEL_FULL_ADDR="$(ixod q did get-address-from-did $MIGUEL_DID)"
+MIGUEL_ADDR=${MIGUEL_FULL_ADDR##*: }
+ixod_q bank balances "$MIGUEL_ADDR"
+echo "(Shaun) did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+SHAUN_FULL_ADDR="$(ixod q did get-address-from-did $SHAUN_DID)"
+SHAUN_ADDR=${SHAUN_FULL_ADDR##*: }
+ixod_q bank balances "$SHAUN_ADDR"
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> FAIL since Miguel is not the project owner
 echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
-ixocli tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
-ixocli q project get-project-txs $PROJECT_DID
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected external account balances:
-# - Miguel:                 4495000 (5000uixo tx fee deducted)
+# - Miguel:       1,000,004,490,000 (5,000uixo tx fee deducted)
 
 # Withdraw funds (from main project account, i.e. as refund)
 # --> SUCCESS since Shaun is the project owner
 echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
 DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
-ixocli tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA" --broadcast-mode block --gas-prices="$GAS_PRICES" -y
+ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
 echo "Project withdrawals query..."
-ixocli q project get-project-txs $PROJECT_DID
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
-# - 500000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
-# - 1000000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# - 1,000,000 to shaun DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
 # Expected project account balances:
 # - InitiatingNodePayFees:        0
 # - IxoFees:                      0
 # - IxoPayFees:                   0
-# - project:               92000000  # 1000000 has been withdrawn
+# - project:             92,000,000  # 1,000,000 has been withdrawn
 # Expected external account balances:
-# - Miguel:                 4495000
-# - Shaun:                 12495000  # 1000000 withdrawal + 5000 fee deducted
+# - Miguel:       1,000,004,490,000
+# - Shaun:        1,000,002,490,000  # + 1,000,000 withdrawal - 5,000 fee deducted

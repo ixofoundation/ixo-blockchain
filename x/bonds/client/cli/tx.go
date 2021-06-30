@@ -2,22 +2,20 @@ package cli
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
+	"strings"
+
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	client2 "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/internal/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	"github.com/ixofoundation/ixo-blockchain/x/ixo"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"strings"
+	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 )
 
-func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+func NewTxCmd() *cobra.Command {
 	bondsTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Bonds transaction subcommands",
@@ -26,49 +24,49 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	bondsTxCmd.AddCommand(flags.PostCommands(
-		GetCmdCreateBond(cdc),
-		GetCmdEditBond(cdc),
-		GetCmdSetNextAlpha(cdc),
-		GetCmdUpdateBondState(cdc),
-		GetCmdBuy(cdc),
-		GetCmdSell(cdc),
-		GetCmdSwap(cdc),
-		GetCmdMakeOutcomePayment(cdc),
-		GetCmdWithdrawShare(cdc),
-	)...)
+	bondsTxCmd.AddCommand(
+		NewCmdCreateBond(),
+		NewCmdEditBond(),
+		NewCmdSetNextAlpha(),
+		NewCmdUpdateBondState(),
+		NewCmdBuy(),
+		NewCmdSell(),
+		NewCmdSwap(),
+		NewCmdMakeOutcomePayment(),
+		NewCmdWithdrawShare(),
+	)
 
 	return bondsTxCmd
 }
 
-func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
+func NewCmdCreateBond() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-bond",
 		Short: "Create bond",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			_token := viper.GetString(FlagToken)
-			_name := viper.GetString(FlagName)
-			_description := viper.GetString(FlagDescription)
-			_functionType := viper.GetString(FlagFunctionType)
-			_functionParameters := viper.GetString(FlagFunctionParameters)
-			_reserveTokens := viper.GetString(FlagReserveTokens)
-			_txFeePercentage := viper.GetString(FlagTxFeePercentage)
-			_exitFeePercentage := viper.GetString(FlagExitFeePercentage)
-			_feeAddress := viper.GetString(FlagFeeAddress)
-			_maxSupply := viper.GetString(FlagMaxSupply)
-			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
-			_sanityRate := viper.GetString(FlagSanityRate)
-			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
-			_allowSells := viper.GetBool(FlagAllowSells)
-			_alphaBond := viper.GetBool(FlagAlphaBond)
-			_batchBlocks := viper.GetString(FlagBatchBlocks)
-			_outcomePayment := viper.GetString(FlagOutcomePayment)
-			_bondDid := viper.GetString(FlagBondDid)
-			_creatorDid := viper.GetString(FlagCreatorDid)
-			_controllerDid := viper.GetString(FlagControllerDid)
+			_token, _ := cmd.Flags().GetString(FlagToken)
+			_name, _ := cmd.Flags().GetString(FlagName)
+			_description, _ := cmd.Flags().GetString(FlagDescription)
+			_functionType, _ := cmd.Flags().GetString(FlagFunctionType)
+			_functionParameters, _ := cmd.Flags().GetString(FlagFunctionParameters)
+			_reserveTokens, _ := cmd.Flags().GetString(FlagReserveTokens)
+			_txFeePercentage, _ := cmd.Flags().GetString(FlagTxFeePercentage)
+			_exitFeePercentage, _ := cmd.Flags().GetString(FlagExitFeePercentage)
+			_feeAddress, _ := cmd.Flags().GetString(FlagFeeAddress)
+			_maxSupply, _ := cmd.Flags().GetString(FlagMaxSupply)
+			_orderQuantityLimits, _ := cmd.Flags().GetString(FlagOrderQuantityLimits)
+			_sanityRate, _ := cmd.Flags().GetString(FlagSanityRate)
+			_sanityMarginPercentage, _ := cmd.Flags().GetString(FlagSanityMarginPercentage)
+			_allowSells, _ := cmd.Flags().GetBool(FlagAllowSells)
+			_alphaBond, _ := cmd.Flags().GetBool(FlagAlphaBond)
+			_batchBlocks, _ := cmd.Flags().GetString(FlagBatchBlocks)
+			_outcomePayment, _ := cmd.Flags().GetString(FlagOutcomePayment)
+			_bondDid, _ := cmd.Flags().GetString(FlagBondDid)
+			_creatorDid, _ := cmd.Flags().GetString(FlagCreatorDid)
+			_controllerDid, _ := cmd.Flags().GetString(FlagControllerDid)
 
 			// Parse function parameters
-			functionParams, err := client2.ParseFunctionParams(_functionParameters)
+			functionParams, err := bondsclient.ParseFunctionParams(_functionParameters)
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
@@ -95,13 +93,13 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse max supply
-			maxSupply, err := sdk.ParseCoin(_maxSupply)
+			maxSupply, err := sdk.ParseCoinNormalized(_maxSupply) //sdk.ParseCoin(_maxSupply)
 			if err != nil {
 				return err
 			}
 
 			// Parse order quantity limits
-			orderQuantityLimits, err := sdk.ParseCoins(_orderQuantityLimits)
+			orderQuantityLimits, err := sdk.ParseCoinsNormalized(_orderQuantityLimits) //sdk.ParseCoins(_orderQuantityLimits)
 			if err != nil {
 				return err
 			}
@@ -125,7 +123,7 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse creator's ixo DID
-			creatorDid, err := did.UnmarshalIxoDid(_creatorDid)
+			creatorDid, err := didtypes.UnmarshalIxoDid(_creatorDid)
 			if err != nil {
 				return err
 			}
@@ -142,16 +140,22 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 				}
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(creatorDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(creatorDid.Address())
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				creatorDid.Did, _controllerDid, _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
 				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
 				_allowSells, _alphaBond, batchBlocks, outcomePayment, _bondDid)
-
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, creatorDid)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), creatorDid, msg)
 		},
 	}
 
@@ -176,34 +180,43 @@ func GetCmdCreateBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagCreatorDid)
 	_ = cmd.MarkFlagRequired(FlagControllerDid)
 
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
+func NewCmdEditBond() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-bond",
 		Short: "Edit bond",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_name := viper.GetString(FlagName)
-			_description := viper.GetString(FlagDescription)
-			_orderQuantityLimits := viper.GetString(FlagOrderQuantityLimits)
-			_sanityRate := viper.GetString(FlagSanityRate)
-			_sanityMarginPercentage := viper.GetString(FlagSanityMarginPercentage)
-			_bondDid := viper.GetString(FlagBondDid)
-			_editorDid := viper.GetString(FlagEditorDid)
+			_name, _ := cmd.Flags().GetString(FlagName)
+			_description, _ := cmd.Flags().GetString(FlagDescription)
+			_orderQuantityLimits, _ := cmd.Flags().GetString(FlagOrderQuantityLimits)
+			_sanityRate, _ := cmd.Flags().GetString(FlagSanityRate)
+			_sanityMarginPercentage, _ := cmd.Flags().GetString(FlagSanityMarginPercentage)
+			_bondDid, _ := cmd.Flags().GetString(FlagBondDid)
+			_editorDid, _ := cmd.Flags().GetString(FlagEditorDid)
 
 			// Parse editor's ixo DID
-			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(editorDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
 				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid)
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
 		},
 	}
 
@@ -212,10 +225,11 @@ func GetCmdEditBond(cdc *codec.Codec) *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagBondDid)
 	_ = cmd.MarkFlagRequired(FlagEditorDid)
 
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
+func NewCmdSetNextAlpha() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "set-next-alpha [new-alpha] [bond-did] [editor-did]",
 		Example: "set-next-alpha 0.5 U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
@@ -233,23 +247,32 @@ func GetCmdSetNextAlpha(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse editor's ixo DID
-			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(editorDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdUpdateBondState(cdc *codec.Codec) *cobra.Command {
+func NewCmdUpdateBondState() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "update-bond-state [new-state] [bond-did] [editor-did]",
 		Example: "update-bond-state SETTLE U7GK8p8rVhJMKhBVRCJJ8c <editor-ixo-did>",
@@ -261,23 +284,32 @@ func GetCmdUpdateBondState(cdc *codec.Codec) *cobra.Command {
 			_editorDid := args[2]
 
 			// Parse editor's ixo DID
-			editorDid, err := did.UnmarshalIxoDid(_editorDid)
+			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(editorDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgUpdateBondState(types.BondState(_state), editorDid.Did, _bondDid)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, editorDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
+func NewCmdBuy() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "buy [bond-token-with-amount] [max-prices] [bond-did] [buyer-did]",
 		Example: "" +
@@ -287,35 +319,44 @@ func GetCmdBuy(cdc *codec.Codec) *cobra.Command {
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			bondCoinWithAmount, err := sdk.ParseCoin(args[0])
+			bondCoinWithAmount, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
 			}
 
-			maxPrices, err := sdk.ParseCoins(args[1])
+			maxPrices, err := sdk.ParseCoinsNormalized(args[1])
 			if err != nil {
 				return err
 			}
 
 			// Parse buyer's ixo DID
-			buyerDid, err := did.UnmarshalIxoDid(args[3])
+			buyerDid, err := didtypes.UnmarshalIxoDid(args[3])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(buyerDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(buyerDid.Address())
 
 			msg := types.NewMsgBuy(
 				buyerDid.Did, bondCoinWithAmount, maxPrices, args[2])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, buyerDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), buyerDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdSell(cdc *codec.Codec) *cobra.Command {
+func NewCmdSell() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sell [bond-token-with-amount] [bond-did] [seller-did]",
 		Example: "sell 10abc U7GK8p8rVhJMKhBVRCJJ8c <seller-ixo-did>",
@@ -323,29 +364,38 @@ func GetCmdSell(cdc *codec.Codec) *cobra.Command {
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			bondCoinWithAmount, err := sdk.ParseCoin(args[0])
+			bondCoinWithAmount, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
 			}
 
 			// Parse seller's ixo DID
-			sellerDid, err := did.UnmarshalIxoDid(args[2])
+			sellerDid, err := didtypes.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(sellerDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(sellerDid.Address())
 
 			msg := types.NewMsgSell(sellerDid.Did, bondCoinWithAmount, args[1])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sellerDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sellerDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
+func NewCmdSwap() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "swap [from-amount] [from-token] [to-token] [bond-did] [swapper-did]",
 		Example: "" +
@@ -356,29 +406,38 @@ func GetCmdSwap(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			// Check that from amount and token can be parsed to a coin
-			from, err := client2.ParseTwoPartCoin(args[0], args[1])
+			from, err := bondsclient.ParseTwoPartCoin(args[0], args[1])
 			if err != nil {
 				return err
 			}
 
 			// Parse swapper's ixo DID
-			swapperDid, err := did.UnmarshalIxoDid(args[4])
+			swapperDid, err := didtypes.UnmarshalIxoDid(args[4])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(swapperDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(swapperDid.Address())
 
 			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, swapperDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), swapperDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdMakeOutcomePayment(cdc *codec.Codec) *cobra.Command {
+func NewCmdMakeOutcomePayment() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "make-outcome-payment [bond-did] [amount] [sender-did]",
 		Example: "make-outcome-payment U7GK8p8rVhJMKhBVRCJJ8c 100 <sender-ixo-did>",
@@ -392,23 +451,32 @@ func GetCmdMakeOutcomePayment(cdc *codec.Codec) *cobra.Command {
 			}
 
 			// Parse sender's ixo DID
-			sender, err := did.UnmarshalIxoDid(args[2])
+			sender, err := didtypes.UnmarshalIxoDid(args[2])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(sender.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(sender.Address())
 
 			msg := types.NewMsgMakeOutcomePayment(sender.Did, amount, args[0])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, sender)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sender, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
-func GetCmdWithdrawShare(cdc *codec.Codec) *cobra.Command {
+func NewCmdWithdrawShare() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "withdraw-share [bond-did] [recipient-did]",
 		Example: "withdraw-share U7GK8p8rVhJMKhBVRCJJ8c <recipient-ixo-did>",
@@ -417,18 +485,27 @@ func GetCmdWithdrawShare(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			// Parse recipient's ixo DID
-			recipientDid, err := did.UnmarshalIxoDid(args[1])
+			recipientDid, err := didtypes.UnmarshalIxoDid(args[1])
 			if err != nil {
 				return err
 			}
 
-			cliCtx := context.NewCLIContext().WithCodec(cdc).
-				WithFromAddress(recipientDid.Address())
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(recipientDid.Address())
 
 			msg := types.NewMsgWithdrawShare(recipientDid.Did, args[0])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			return ixo.GenerateOrBroadcastMsgs(cliCtx, msg, recipientDid)
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), recipientDid, msg)
 		},
 	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

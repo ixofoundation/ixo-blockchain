@@ -1,0 +1,179 @@
+syntax = "proto3";
+package bonds;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/coin.proto";
+import "bonds/bonds.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+
+// To get a list of all module queries, go to the module's keeper/querier.go
+// and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest/query.go
+service Query {
+  rpc Bonds(QueryBondsRequest) returns (QueryBondsResponse){
+    option (google.api.http).get = "/ixo/bonds"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+  }
+
+  rpc BondsDetailed(QueryBondsDetailedRequest) returns (QueryBondsDetailedResponse) {
+    option (google.api.http).get = "/ixo/bonds_detailed";
+  }
+
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/ixo/bonds/params";
+  }
+
+  rpc Bond(QueryBondRequest) returns (QueryBondResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}";
+  }
+
+  rpc Batch(QueryBatchRequest) returns (QueryBatchResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/batch";
+  }
+
+  rpc LastBatch(QueryLastBatchRequest) returns (QueryLastBatchResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/last_batch";
+  }
+
+  rpc CurrentPrice(QueryCurrentPriceRequest) returns (QueryCurrentPriceResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/current_price";
+  }
+
+  rpc CurrentReserve(QueryCurrentReserveRequest) returns (QueryCurrentReserveResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/current_reserve";
+  }
+
+  rpc CustomPrice (QueryCustomPriceRequest) returns (QueryCustomPriceResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/price/{bond_amount}";
+  }
+
+  rpc BuyPrice(QueryBuyPriceRequest) returns (QueryBuyPriceResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/buy_price/{bond_amount}";
+  }
+
+  rpc SellReturn(QuerySellReturnRequest) returns (QuerySellReturnResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/sell_return/{bond_amount}";
+  }
+
+  rpc SwapReturn(QuerySwapReturnRequest) returns (QuerySwapReturnResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}";
+  }
+
+  rpc AlphaMaximums(QueryAlphaMaximumsRequest) returns (QueryAlphaMaximumsResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/alpha_maximums";
+  }
+}
+
+message QueryBondsRequest {}
+
+message QueryBondsResponse {
+  repeated string bonds = 1 [(gogoproto.moretags) = "yaml:\"bonds\""];
+}
+
+message QueryBondsDetailedRequest {}
+
+message QueryBondsDetailedResponse {
+  repeated BondDetails bonds_detailed = 1 [(gogoproto.moretags) = "yaml:\"bonds_detailed\""];
+}
+
+message QueryBondRequest {
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryBondResponse {
+  Bond bond = 1 [(gogoproto.moretags) = "yaml:\"bond\""];
+}
+
+message QueryBatchRequest{
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryBatchResponse {
+  Batch batch = 1 [(gogoproto.moretags) = "yaml:\"batch\""];
+}
+
+message QueryLastBatchRequest{
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryLastBatchResponse {
+  Batch last_batch = 1 [(gogoproto.moretags) = "yaml:\"last_batch\""];
+}
+
+message QueryCurrentPriceRequest {
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryCurrentPriceResponse {
+  repeated cosmos.base.v1beta1.DecCoin current_price  = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"current_price\""];
+}
+
+message QueryCurrentReserveRequest {
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryCurrentReserveResponse {
+  repeated cosmos.base.v1beta1.Coin current_reserve = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"current_reserve\""];
+}
+
+message QueryCustomPriceRequest {
+  string bond_did    = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string bond_amount = 2 [(gogoproto.moretags) = "yaml:\"bond_amount\""];
+}
+
+message QueryCustomPriceResponse {
+  repeated cosmos.base.v1beta1.DecCoin price = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"price\""];
+}
+
+message QueryBuyPriceRequest {
+  string bond_did    = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string bond_amount = 2 [(gogoproto.moretags) = "yaml:\"bond_amount\""];
+}
+
+message QueryBuyPriceResponse {
+  cosmos.base.v1beta1.Coin adjusted_supply       = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"adjusted_supply\""];
+  repeated cosmos.base.v1beta1.Coin prices       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"prices\""];
+  repeated cosmos.base.v1beta1.Coin tx_fees      = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"tx_fees\""];
+  repeated cosmos.base.v1beta1.Coin total_prices = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_prices\""];
+  repeated cosmos.base.v1beta1.Coin total_fees   = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_fees\""];
+}
+
+message QuerySellReturnRequest {
+  string bond_did    = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string bond_amount = 2 [(gogoproto.moretags) = "yaml:\"bond_amount\""];
+}
+
+message QuerySellReturnResponse {
+  cosmos.base.v1beta1.Coin adjusted_supply        = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"adjusted_supply\""];
+  repeated cosmos.base.v1beta1.Coin returns       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"returns\""];
+  repeated cosmos.base.v1beta1.Coin tx_fees       = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"tx_fees\""];
+  repeated cosmos.base.v1beta1.Coin exit_fees     = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"exit_fees\""];
+  repeated cosmos.base.v1beta1.Coin total_returns = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_returns\""];
+  repeated cosmos.base.v1beta1.Coin total_fees    = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_fees\""];
+}
+
+message QuerySwapReturnRequest {
+  string bond_did               = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+  string from_token_with_amount = 2 [(gogoproto.moretags) = "yaml:\"from_token_with_amount\""];
+  string to_token               = 3 [(gogoproto.moretags) = "yaml:\"to_token\""];
+}
+
+message QuerySwapReturnResponse {
+  repeated cosmos.base.v1beta1.Coin total_returns = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_returns\""];
+  repeated cosmos.base.v1beta1.Coin total_fees    = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_fees\""];
+}
+
+message QueryAlphaMaximumsRequest {
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryAlphaMaximumsResponse {
+  string max_system_alpha_increase = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_system_alpha_increase\""];
+  string max_system_alpha          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_system_alpha\""];
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1 [(gogoproto.moretags) = "yaml:\"params\""];
+}
