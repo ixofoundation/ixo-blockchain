@@ -9,12 +9,12 @@ This is the official repository for the Sustainability Hub (ixo-Hub)
 > This document will have all details necessary to help getting started with ixo-Hub
 
 ## Documentation
-- Guide for setting up a Relayer on the Pandora Test Network: [here](https://github.com/ixofoundation/docs/blob/master/developer-tools/test-networks/join-a-test-network.md)
+- Guide for setting up a Relayer on the Pandora test network and Internet of Impact Hub main network: [here](https://github.com/ixofoundation/genesis)
 - Blockchain Module Specifications can be found under `x/<module>/spec`
 
 ## Building and Running
 
-**Note**: Requires [Go 1.13+](https://golang.org/dl/)
+**Note**: Requires [Go 1.15+](https://golang.org/dl/)
 
 To build and run the application:
 
