@@ -6,6 +6,7 @@
 1. **[Messages](02_messages.md)**
     - [MsgCreateProject](02_messages.md#MsgCreateProject)
     - [MsgUpdateProjectStatus](02_messages.md#MsgUpdateProjectStatus)
+    - [MsgUpdateProjectDoc](02_messages.md#MsgUpdateProjectDoc)
     - [MsgUpdateAgent](02_messages.md#MsgUpdateAgent)
     - [MsgCreateClaim](02_messages.md#MsgCreateClaim)
     - [MsgCreateEvaluation](02_messages.md#MsgCreateEvaluation)
