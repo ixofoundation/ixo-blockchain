@@ -589,8 +589,7 @@ func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, pk paymentskeep
 	}
 
 	// Get project address
-	projectAddr, err := getAccountInProjectAccounts(
-		ctx, k, projectDid, types.InternalAccountID(projectDid))
+	projectAddr, err := getProjectAccount(ctx, k, projectDid)
 	if err != nil {
 		return err
 	}
