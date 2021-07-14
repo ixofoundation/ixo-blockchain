@@ -16,3 +16,4 @@
 1. **[Fees](04_fees.md)**
     - [General Approach](04_fees.md#general-approach)
     - [Specific Fees](04_fees.md#specific-fees)
+1. **[Entity Accounts](05_entity_accounts.md)**
