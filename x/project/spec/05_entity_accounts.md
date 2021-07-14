@@ -12,7 +12,9 @@ entity/project:
   specified in the genesis file)
 - `<projectDid>`: this is the project's funding account, and it is where tokens
   are actually paid out of upon a claim evaluation.
-- Additionally, one entity/project account per agent is also created.
+- Additionally, one entity/project account per agent is also created. Any
+  payments intended for the particular agent is sent to their corresponding
+  entity account. At project payout, their tokens can be withdrawn.
 
 Note that the above-mentioned defaults can be configured from the Genesis file.
 
