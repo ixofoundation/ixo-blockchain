@@ -110,6 +110,20 @@ If the project does not have enough funds to effect the payment contract, an err
 
 If an oracle fee payment template ID was provided during project creation, the oracle fee applies whenever an oracle (a.k.a evaluator) evaluates a claim using `MsgCreateEvaluation`. It is paid by the project, with the oracle and other fee project addresses as the contract recipients.
 
+The following is the logic used to calculate how the payment is distributed between the oracle and the entity accounts. Taking the total share of the payment to be 100%:
+
+- The oracle (service provider) share is `100% - OracleFeePercentage`
+- The node share is `OracleFeePercentage x (NodeFeePercentage)`
+- The ixo.world share is `OracleFeePercentage x (100% - NodeFeePercentage)`
+
+For example, if `OracleFeePercentage=20%` and `NodeFeePercentage=50%`:
+
+- The oracle (service provider) share is `80%`
+- The node share is `10%`
+- The ixo.world share is `10%`
+
 ### Fee for Service
 
 If a fee-for-service payment template ID was provided during project creation, the fee-for-service applies whenever a claimer's claim gets approved (claim status set to approved `= 1`) during `MsgCreateEvaluation` handling. It is paid by the project, with the claimer as the contract recipient.
+
+In contrast with the `OracleFee`, the claimer gets the full `FeeForService` (0% percentage sent to a node or ixo.world).
