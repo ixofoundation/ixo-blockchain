@@ -374,8 +374,8 @@ This message is expected to fail if:
 
 ```go
 type MsgWithdrawReserve struct {
-    WithdrawerDid string
+	WithdrawerDid string
 	Amount        sdk.Coin
- 	BondDid       string
+	BondDid       string
 }
 ```
