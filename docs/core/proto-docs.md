@@ -412,7 +412,7 @@
 <a name="bonds.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the bonds module&#39;s genesis state.
+
 
 
 | Field | Type | Label | Description |
@@ -1354,12 +1354,12 @@ check all cases in NewHandler().
 <a name="did.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the did module&#39;s genesis state.
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did_docs | [google.protobuf.Any](#google.protobuf.Any) | repeated | DidDoc is an interface so we use Any here |
+| did_docs | [google.protobuf.Any](#google.protobuf.Any) | repeated |  |
 
 
 
@@ -1390,7 +1390,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pubKey | [string](#string) |  | pubKey defines the PubKey for the requested address |
+| pubKey | [string](#string) |  |  |
 
 
 
@@ -1405,7 +1405,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address returns the address for a given PubKey |
+| address | [string](#string) |  |  |
 
 
 
@@ -1420,7 +1420,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  | did defines the DID for the requested address |
+| did | [string](#string) |  |  |
 
 
 
@@ -1435,7 +1435,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address returns the address for a given DID |
+| address | [string](#string) |  |  |
 
 
 
@@ -1460,7 +1460,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diddocs | [google.protobuf.Any](#google.protobuf.Any) | repeated | diddocs returns a list of all DidDocs |
+| diddocs | [google.protobuf.Any](#google.protobuf.Any) | repeated |  |
 
 
 
@@ -1485,7 +1485,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| dids | [string](#string) | repeated | dids returns a list of all DIDs |
+| dids | [string](#string) | repeated |  |
 
 
 
@@ -1500,7 +1500,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  | did defines the DID for the requested DidDoc |
+| did | [string](#string) |  |  |
 
 
 
@@ -1515,7 +1515,7 @@ GenesisState defines the did module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| diddoc | [google.protobuf.Any](#google.protobuf.Any) |  | diddoc returns the requested DidDoc |
+| diddoc | [google.protobuf.Any](#google.protobuf.Any) |  |  |
 
 
 
@@ -1794,7 +1794,7 @@ check all cases in NewHandler().
 <a name="payments.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the payments module&#39;s genesis state.
+
 
 
 | Field | Type | Label | Description |
@@ -2484,7 +2484,7 @@ check all cases in NewHandler().
 <a name="project.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the project module&#39;s genesis state.
+
 
 
 | Field | Type | Label | Description |

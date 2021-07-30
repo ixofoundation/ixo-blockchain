@@ -23,7 +23,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the bonds module's genesis state.
 type GenesisState struct {
 	Bonds   []Bond  `protobuf:"bytes,1,rep,name=bonds,proto3" json:"bonds" yaml:"bonds"`
 	Batches []Batch `protobuf:"bytes,2,rep,name=batches,proto3" json:"batches" yaml:"batches"`

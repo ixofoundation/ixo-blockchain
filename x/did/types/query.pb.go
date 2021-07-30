@@ -31,7 +31,6 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type QueryDidDocRequest struct {
-	// did defines the DID for the requested DidDoc
 	Did string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" json:"did" yaml:"did"`
 }
 
@@ -76,7 +75,6 @@ func (m *QueryDidDocRequest) GetDid() string {
 }
 
 type QueryDidDocResponse struct {
-	// diddoc returns the requested DidDoc
 	Diddoc *types.Any `protobuf:"bytes,1,opt,name=diddoc,proto3" json:"diddoc,omitempty" json:"did_doc" yaml:"did_doc"`
 }
 
@@ -157,7 +155,6 @@ func (m *QueryAllDidsRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_QueryAllDidsRequest proto.InternalMessageInfo
 
 type QueryAllDidsResponse struct {
-	// dids returns a list of all DIDs
 	Dids []string `protobuf:"bytes,1,rep,name=dids,proto3" json:"dids,omitempty" json:"dids" yaml:"dids"`
 }
 
@@ -238,7 +235,6 @@ func (m *QueryAllDidDocsRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_QueryAllDidDocsRequest proto.InternalMessageInfo
 
 type QueryAllDidDocsResponse struct {
-	// diddocs returns a list of all DidDocs
 	Diddocs []*types.Any `protobuf:"bytes,1,rep,name=diddocs,proto3" json:"diddocs,omitempty" json:"did_docs" yaml:"did_docs"`
 }
 
@@ -283,7 +279,6 @@ func (m *QueryAllDidDocsResponse) GetDiddocs() []*types.Any {
 }
 
 type QueryAddressFromDidRequest struct {
-	// did defines the DID for the requested address
 	Did string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" json:"did" yaml:"did"`
 }
 
@@ -328,7 +323,6 @@ func (m *QueryAddressFromDidRequest) GetDid() string {
 }
 
 type QueryAddressFromDidResponse struct {
-	// address returns the address for a given DID
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty" json:"address" yaml:"address"`
 }
 
@@ -373,7 +367,6 @@ func (m *QueryAddressFromDidResponse) GetAddress() string {
 }
 
 type QueryAddressFromBase58EncodedPubkeyRequest struct {
-	// pubKey defines the PubKey for the requested address
 	PubKey string `protobuf:"bytes,1,opt,name=pubKey,proto3" json:"pubKey,omitempty" json:"pubKey" yaml:"pubKey"`
 }
 
@@ -422,7 +415,6 @@ func (m *QueryAddressFromBase58EncodedPubkeyRequest) GetPubKey() string {
 }
 
 type QueryAddressFromBase58EncodedPubkeyResponse struct {
-	// address returns the address for a given PubKey
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty" json:"address" yaml:"address"`
 }
 
