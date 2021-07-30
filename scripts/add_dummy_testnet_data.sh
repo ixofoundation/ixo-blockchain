@@ -50,6 +50,7 @@ FEE1=$(yes $PASSWORD | ixod keys show fee -a)
 FEE2=$(yes $PASSWORD | ixod keys show fee2 -a)
 FEE3=$(yes $PASSWORD | ixod keys show fee3 -a)
 FEE4=$(yes $PASSWORD | ixod keys show fee4 -a)
+RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
 BOND1_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
 BOND2_DID="did:ixo:JHcN95bkS4aAWk3TKXapA2"
@@ -210,6 +211,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0.5 \
   --exit-fee-percentage=0.1 \
   --fee-address="$FEE1" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=1000000token1 \
   --order-quantity-limits="" \
   --sanity-rate="0" \
@@ -232,6 +234,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE2" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=1000000token2 \
   --order-quantity-limits="" \
   --sanity-rate="0" \
@@ -254,6 +257,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE3" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=1000000token3 \
   --order-quantity-limits="" \
   --sanity-rate="0" \
@@ -277,6 +281,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=2.5 \
   --exit-fee-percentage=5 \
   --fee-address="$FEE4" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=1000000token4 \
   --order-quantity-limits="" \
   --sanity-rate="0" \
