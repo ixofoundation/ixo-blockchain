@@ -20,6 +20,8 @@
 - [bonds/query.proto](#bonds/query.proto)
     - [QueryAlphaMaximumsRequest](#bonds.QueryAlphaMaximumsRequest)
     - [QueryAlphaMaximumsResponse](#bonds.QueryAlphaMaximumsResponse)
+    - [QueryAvailableReserveRequest](#bonds.QueryAvailableReserveRequest)
+    - [QueryAvailableReserveResponse](#bonds.QueryAvailableReserveResponse)
     - [QueryBatchRequest](#bonds.QueryBatchRequest)
     - [QueryBatchResponse](#bonds.QueryBatchResponse)
     - [QueryBondRequest](#bonds.QueryBondRequest)
@@ -64,6 +66,8 @@
     - [MsgSwapResponse](#bonds.MsgSwapResponse)
     - [MsgUpdateBondState](#bonds.MsgUpdateBondState)
     - [MsgUpdateBondStateResponse](#bonds.MsgUpdateBondStateResponse)
+    - [MsgWithdrawReserve](#bonds.MsgWithdrawReserve)
+    - [MsgWithdrawReserveResponse](#bonds.MsgWithdrawReserveResponse)
     - [MsgWithdrawShare](#bonds.MsgWithdrawShare)
     - [MsgWithdrawShareResponse](#bonds.MsgWithdrawShareResponse)
   
@@ -271,14 +275,17 @@
 | tx_fee_percentage | [string](#string) |  |  |
 | exit_fee_percentage | [string](#string) |  |  |
 | fee_address | [string](#string) |  |  |
+| reserve_withdrawal_address | [string](#string) |  |  |
 | max_supply | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | order_quantity_limits | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | sanity_rate | [string](#string) |  |  |
 | sanity_margin_percentage | [string](#string) |  |  |
 | current_supply | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | current_reserve | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| available_reserve | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | current_outcome_payment_reserve | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | allow_sells | [bool](#bool) |  |  |
+| allow_reserve_withdrawals | [bool](#bool) |  |  |
 | alpha_bond | [bool](#bool) |  |  |
 | batch_blocks | [string](#string) |  |  |
 | outcome_payment | [string](#string) |  |  |
@@ -466,6 +473,36 @@ GenesisState defines the bonds module&#39;s genesis state.
 
 
 
+<a name="bonds.QueryAvailableReserveRequest"></a>
+
+### QueryAvailableReserveRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="bonds.QueryAvailableReserveResponse"></a>
+
+### QueryAvailableReserveResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| available_reserve | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
 <a name="bonds.QueryBatchRequest"></a>
 
 ### QueryBatchRequest
@@ -554,8 +591,7 @@ GenesisState defines the bonds module&#39;s genesis state.
 <a name="bonds.QueryBondsRequest"></a>
 
 ### QueryBondsRequest
-Request/response types from old x/bonds/client/cli/query.go and
-x/bonds/client/rest/query.go
+
 
 
 
@@ -849,6 +885,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 | LastBatch | [QueryLastBatchRequest](#bonds.QueryLastBatchRequest) | [QueryLastBatchResponse](#bonds.QueryLastBatchResponse) |  |
 | CurrentPrice | [QueryCurrentPriceRequest](#bonds.QueryCurrentPriceRequest) | [QueryCurrentPriceResponse](#bonds.QueryCurrentPriceResponse) |  |
 | CurrentReserve | [QueryCurrentReserveRequest](#bonds.QueryCurrentReserveRequest) | [QueryCurrentReserveResponse](#bonds.QueryCurrentReserveResponse) |  |
+| AvailableReserve | [QueryAvailableReserveRequest](#bonds.QueryAvailableReserveRequest) | [QueryAvailableReserveResponse](#bonds.QueryAvailableReserveResponse) |  |
 | CustomPrice | [QueryCustomPriceRequest](#bonds.QueryCustomPriceRequest) | [QueryCustomPriceResponse](#bonds.QueryCustomPriceResponse) |  |
 | BuyPrice | [QueryBuyPriceRequest](#bonds.QueryBuyPriceRequest) | [QueryBuyPriceResponse](#bonds.QueryBuyPriceResponse) |  |
 | SellReturn | [QuerySellReturnRequest](#bonds.QuerySellReturnRequest) | [QuerySellReturnResponse](#bonds.QuerySellReturnResponse) |  |
@@ -914,11 +951,13 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 | tx_fee_percentage | [string](#string) |  |  |
 | exit_fee_percentage | [string](#string) |  |  |
 | fee_address | [string](#string) |  |  |
+| reserve_withdrawal_address | [string](#string) |  |  |
 | max_supply | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
 | order_quantity_limits | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | sanity_rate | [string](#string) |  |  |
 | sanity_margin_percentage | [string](#string) |  |  |
 | allow_sells | [bool](#bool) |  |  |
+| allow_reserve_withdrawals | [bool](#bool) |  |  |
 | alpha_bond | [bool](#bool) |  |  |
 | batch_blocks | [string](#string) |  |  |
 | outcome_payment | [string](#string) |  |  |
@@ -1105,6 +1144,33 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 
 
 
+<a name="bonds.MsgWithdrawReserve"></a>
+
+### MsgWithdrawReserve
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| withdrawer_did | [string](#string) |  |  |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| bond_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="bonds.MsgWithdrawReserveResponse"></a>
+
+### MsgWithdrawReserveResponse
+
+
+
+
+
+
+
 <a name="bonds.MsgWithdrawShare"></a>
 
 ### MsgWithdrawShare
@@ -1154,6 +1220,7 @@ check all cases in NewHandler().
 | Swap | [MsgSwap](#bonds.MsgSwap) | [MsgSwapResponse](#bonds.MsgSwapResponse) |  |
 | MakeOutcomePayment | [MsgMakeOutcomePayment](#bonds.MsgMakeOutcomePayment) | [MsgMakeOutcomePaymentResponse](#bonds.MsgMakeOutcomePaymentResponse) |  |
 | WithdrawShare | [MsgWithdrawShare](#bonds.MsgWithdrawShare) | [MsgWithdrawShareResponse](#bonds.MsgWithdrawShareResponse) |  |
+| WithdrawReserve | [MsgWithdrawReserve](#bonds.MsgWithdrawReserve) | [MsgWithdrawReserveResponse](#bonds.MsgWithdrawReserveResponse) |  |
 
  
 
@@ -1378,7 +1445,7 @@ GenesisState defines the did module&#39;s genesis state.
 <a name="did.QueryAllDidDocsRequest"></a>
 
 ### QueryAllDidDocsRequest
-no input needed
+
 
 
 
@@ -1403,7 +1470,7 @@ no input needed
 <a name="did.QueryAllDidsRequest"></a>
 
 ### QueryAllDidsRequest
-no input needed
+
 
 
 
@@ -1428,8 +1495,7 @@ no input needed
 <a name="did.QueryDidDocRequest"></a>
 
 ### QueryDidDocRequest
-Request/response types from old x/did/client/cli/query.go and
-x/did/client/rest/query.go
+
 
 
 | Field | Type | Label | Description |
@@ -1466,8 +1532,7 @@ x/did/client/rest/query.go
 
 ### Query
 To get a list of all module queries, go to your module&#39;s keeper/querier.go
-and check all cases in NewQuerier(). REST endpoints taken from previous
-did/client/rest/query.go
+and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/query.go
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -1889,8 +1954,7 @@ GenesisState defines the payments module&#39;s genesis state.
 
 ### Query
 To get a list of all module queries, go to your module&#39;s keeper/querier.go
-and check all cases in NewQuerier(). REST endpoints taken from previous
-payments/client/rest/query.go
+and check all cases in NewQuerier(). REST endpoints taken from payments/client/rest/query.go
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
