@@ -21,6 +21,7 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/last_batch", RestBondDid), queryLastBatchHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_price", RestBondDid), queryCurrentPriceHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/current_reserve", RestBondDid), queryCurrentReserveHandler(clientCtx)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/available_reserve", RestBondDid), queryAvailableReserveHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/price/{%s}", RestBondDid, RestBondAmount), queryCustomPriceHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/buy_price/{%s}", RestBondDid, RestBondAmount), queryBuyPriceHandler(clientCtx)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/bonds/{%s}/sell_return/{%s}", RestBondDid, RestBondAmount), querySellReturnHandler(clientCtx)).Methods("GET")
@@ -126,6 +127,22 @@ func queryCurrentPriceHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 func queryCurrentReserveHandler(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bondDid := vars[RestBondDid]
+
+		res, _, err := clientCtx.QueryWithData(
+			fmt.Sprintf("custom/%s/%s/%s",
+				types.QuerierRoute, keeper.QueryCurrentReserve, bondDid), nil)
+		if rest.CheckNotFoundError(w, err) {
+			return
+		}
+
+		rest.PostProcessResponse(w, clientCtx, res)
+	}
+}
+
+func queryAvailableReserveHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		bondDid := vars[RestBondDid]

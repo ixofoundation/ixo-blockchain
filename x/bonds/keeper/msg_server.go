@@ -31,6 +31,11 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 		return nil, err
 	}
 
+	reserveWithdrawalAddress, err := sdk.AccAddressFromBech32(msg.ReserveWithdrawalAddress)
+	if err != nil {
+		return nil, err
+	}
+
 	if k.BankKeeper.BlockedAddr(feeAddr) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
 	}
@@ -98,8 +103,9 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
 		msg.ControllerDid, msg.FunctionType, msg.FunctionParameters,
 		msg.ReserveTokens, msg.TxFeePercentage, msg.ExitFeePercentage,
-		feeAddr, msg.MaxSupply, msg.OrderQuantityLimits, msg.SanityRate,
-		msg.SanityMarginPercentage, msg.AllowSells, msg.AlphaBond, msg.BatchBlocks,
+		feeAddr, reserveWithdrawalAddress, msg.MaxSupply, msg.OrderQuantityLimits,
+		msg.SanityRate, msg.SanityMarginPercentage, msg.AllowSells,
+		msg.AllowReserveWithdrawals, msg.AlphaBond, msg.BatchBlocks,
 		msg.OutcomePayment, state, msg.BondDid)
 
 	k.SetBond(ctx, bond.BondDid, bond)
@@ -125,11 +131,13 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 			sdk.NewAttribute(types.AttributeKeyTxFeePercentage, msg.TxFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyExitFeePercentage, msg.ExitFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyFeeAddress, msg.FeeAddress),
+			sdk.NewAttribute(types.AttributeKeyReserveWithdrawalAddress, msg.ReserveWithdrawalAddress),
 			sdk.NewAttribute(types.AttributeKeyMaxSupply, msg.MaxSupply.String()),
 			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits.String()),
 			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate.String()),
 			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyAllowSells, strconv.FormatBool(msg.AllowSells)),
+			sdk.NewAttribute(types.AttributeKeyAllowReserveWithdrawals, strconv.FormatBool(msg.AllowReserveWithdrawals)),
 			sdk.NewAttribute(types.AttributeKeyAlphaBond, strconv.FormatBool(msg.AlphaBond)),
 			sdk.NewAttribute(types.AttributeKeyBatchBlocks, msg.BatchBlocks.String()),
 			sdk.NewAttribute(types.AttributeKeyOutcomePayment, msg.OutcomePayment.String()),
@@ -360,13 +368,17 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 	}
 
 	// If state is settle or failed, move all outcome payment to reserve, so
-	// that it is available for share withdrawal (MsgWithdrawShare)
+	// that it is available for share withdrawal (MsgWithdrawShare). Also, set
+	// reserve balance to available reserve balance.
 	if msg.State == types.SettleState.String() || msg.State == types.FailedState.String() {
 		if !batch.Empty() {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
 				"cannot update bond state to SETTLE/FAILED while there are orders in the batch")
 		}
 		k.MoveOutcomePaymentToReserve(ctx, bond.BondDid)
+
+		bond = k.MustGetBond(ctx, bond.BondDid) // get updated bond
+		k.setReserveBalances(ctx, bond.BondDid, bond.AvailableReserve)
 	}
 
 	// Update bond state
@@ -474,7 +486,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 	}
 
 	// Use max prices as the amount to send to the liquidity pool (i.e. price)
-	err := keeper.DepositReserve(ctx, bond.BondDid, buyerAddr, msg.MaxPrices)
+	err := keeper.DepositIntoReserve(ctx, bond.BondDid, buyerAddr, msg.MaxPrices)
 	if err != nil {
 		return nil, err
 	}
@@ -723,7 +735,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	reserveOwed, _ := reserveOwedDec.TruncateDecimal()
 
 	// Send coins owed to recipient
-	err = k.WithdrawReserve(ctx, bond.BondDid, recipientAddr, reserveOwed)
+	err = k.WithdrawFromReserve(ctx, bond.BondDid, recipientAddr, reserveOwed)
 	if err != nil {
 		return nil, err
 	}
@@ -746,4 +758,68 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	})
 
 	return &types.MsgWithdrawShareResponse{}, nil
+}
+
+func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdrawReserve) (*types.MsgWithdrawReserveResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	bond, found := k.GetBond(ctx, msg.BondDid)
+	if !found {
+		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
+	}
+
+	reserveWithdrawalAddress, err := sdk.AccAddressFromBech32(bond.ReserveWithdrawalAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if bond.FunctionType != types.AugmentedFunction {
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
+			"bond is not an augmented bonding curve")
+	} else if !bond.AlphaBond {
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
+			"bond is not an alpha bond")
+	}
+
+	if !bond.AllowReserveWithdrawals {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"bond does not allow reserve withdrawals")
+	}
+
+	if bond.ControllerDid != msg.WithdrawerDid {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			"recipient must be the controller of the bond")
+	}
+
+	// Check that amount is available
+	if !msg.Amount.IsAllLTE(bond.AvailableReserve) {
+		return nil, sdkerrors.Wrapf(types.ErrInsufficientReserveForWithdraw,
+			"available reserve: %s", bond.AvailableReserve.String())
+	}
+
+	// Send coins to withdrawer
+	err = k.BankKeeper.SendCoinsFromModuleToAccount(
+		ctx, types.BondsReserveAccount, reserveWithdrawalAddress, msg.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update total amount withdrawn from reserve
+	k.setAvailableReserve(ctx, bond.BondDid, bond.AvailableReserve.Sub(msg.Amount))
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.EventTypeWithdrawReserve,
+			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+			sdk.NewAttribute(types.AttributeKeyAddress, bond.ReserveWithdrawalAddress),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.String()),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.WithdrawerDid),
+		),
+	})
+
+	return &types.MsgWithdrawReserveResponse{}, nil
 }

@@ -28,6 +28,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdLastBatch(),
 		GetCmdCurrentPrice(),
 		GetCmdCurrentReserve(),
+		GetCmdAvailableReserve(),
 		GetCmdCustomPrice(),
 		GetCmdBuyPrice(),
 		GetCmdSellReturn(),
@@ -222,6 +223,34 @@ func GetCmdCurrentReserve() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.CurrentReserve(context.Background(), &types.QueryCurrentReserveRequest{BondDid: bondDid})
+			if err != nil {
+				fmt.Printf("%s", err.Error())
+				return nil
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func GetCmdAvailableReserve() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "available-reserve [bond-did]",
+		Example: "available-reserve U7GK8p8rVhJMKhBVRCJJ8c",
+		Short:   "Query current available balance(s) of the reserve pool",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			bondDid := args[0]
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.AvailableReserve(context.Background(), &types.QueryAvailableReserveRequest{BondDid: bondDid})
 			if err != nil {
 				fmt.Printf("%s", err.Error())
 				return nil

@@ -24,30 +24,33 @@ func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/bonds/swap", swapRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/bonds/make_outcome_payment", makeOutcomePaymentRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/bonds/withdraw_share", withdrawShareRequestHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/bonds/withdraw_reserve", withdrawReserveRequestHandler(clientCtx)).Methods("POST")
 }
 
 type createBondReq struct {
-	BaseReq                rest.BaseReq `json:"base_req" yaml:"base_req"`
-	Token                  string       `json:"token" yaml:"token"`
-	Name                   string       `json:"name" yaml:"name"`
-	Description            string       `json:"description" yaml:"description"`
-	FunctionType           string       `json:"function_type" yaml:"function_type"`
-	FunctionParameters     string       `json:"function_parameters" yaml:"function_parameters"`
-	ReserveTokens          string       `json:"reserve_tokens" yaml:"reserve_tokens"`
-	TxFeePercentage        string       `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
-	ExitFeePercentage      string       `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
-	FeeAddress             string       `json:"fee_address" yaml:"fee_address"`
-	MaxSupply              string       `json:"max_supply" yaml:"max_supply"`
-	OrderQuantityLimits    string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
-	SanityRate             string       `json:"sanity_rate" yaml:"sanity_rate"`
-	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
-	AllowSells             string       `json:"allow_sells" yaml:"allow_sells"`
-	AlphaBond              string       `json:"alpha_bond" yaml:"alpha_bond"`
-	BatchBlocks            string       `json:"batch_blocks" yaml:"batch_blocks"`
-	OutcomePayment         string       `json:"outcome_payment" yaml:"outcome_payment"`
-	BondDid                string       `json:"bond_did" yaml:"bond_did"`
-	CreatorDid             string       `json:"creator_did" yaml:"creator_did"`
-	ControllerDid          string       `json:"controller_did" yaml:"controller_did"`
+	BaseReq                  rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Token                    string       `json:"token" yaml:"token"`
+	Name                     string       `json:"name" yaml:"name"`
+	Description              string       `json:"description" yaml:"description"`
+	FunctionType             string       `json:"function_type" yaml:"function_type"`
+	FunctionParameters       string       `json:"function_parameters" yaml:"function_parameters"`
+	ReserveTokens            string       `json:"reserve_tokens" yaml:"reserve_tokens"`
+	TxFeePercentage          string       `json:"tx_fee_percentage" yaml:"tx_fee_percentage"`
+	ExitFeePercentage        string       `json:"exit_fee_percentage" yaml:"exit_fee_percentage"`
+	FeeAddress               string       `json:"fee_address" yaml:"fee_address"`
+	ReserveWithdrawalAddress string       `json:"reserve_withdrawal_address" yaml:"reserve_withdrawal_address"`
+	MaxSupply                string       `json:"max_supply" yaml:"max_supply"`
+	OrderQuantityLimits      string       `json:"order_quantity_limits" yaml:"order_quantity_limits"`
+	SanityRate               string       `json:"sanity_rate" yaml:"sanity_rate"`
+	SanityMarginPercentage   string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
+	AllowSells               string       `json:"allow_sells" yaml:"allow_sells"`
+	AllowReserveWithdrawals  string       `json:"allow_reserve_withdrawals" yaml:"allow_reserve_withdrawals"`
+	AlphaBond                string       `json:"alpha_bond" yaml:"alpha_bond"`
+	BatchBlocks              string       `json:"batch_blocks" yaml:"batch_blocks"`
+	OutcomePayment           string       `json:"outcome_payment" yaml:"outcome_payment"`
+	BondDid                  string       `json:"bond_did" yaml:"bond_did"`
+	CreatorDid               string       `json:"creator_did" yaml:"creator_did"`
+	ControllerDid            string       `json:"controller_did" yaml:"controller_did"`
 }
 
 func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -93,6 +96,12 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
+		// Parse reserve withdrawal address
+		reserveWithdrawalAddress, err := sdk.AccAddressFromBech32(req.ReserveWithdrawalAddress)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
 		// Parse max supply
 		maxSupply, err := sdk.ParseCoinNormalized(req.MaxSupply)
 		if rest.CheckBadRequestError(w, err) {
@@ -126,6 +135,19 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			allowSells = false
 		} else {
 			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBoolean, "allow_sells")
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		// Parse allowReserveWithdrawals
+		var allowReserveWithdrawals bool
+		allowReserveWithdrawalsStrLower := strings.ToLower(req.AllowReserveWithdrawals)
+		if allowReserveWithdrawalsStrLower == "true" {
+			allowReserveWithdrawals = true
+		} else if allowReserveWithdrawalsStrLower == "false" {
+			allowReserveWithdrawals = false
+		} else {
+			err := sdkerrors.Wrap(types.ErrArgumentMissingOrNonBoolean, "allow_reserve_withdrawals")
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -166,10 +188,11 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			req.CreatorDid, req.ControllerDid, req.FunctionType, functionParams, reserveTokens,
-			txFeePercentageDec, exitFeePercentageDec, feeAddress, maxSupply,
-			orderQuantityLimits, sanityRate, sanityMarginPercentage,
-			allowSells, alphaBond, batchBlocks, outcomePayment, req.BondDid)
+			req.CreatorDid, req.ControllerDid, req.FunctionType, functionParams,
+			reserveTokens, txFeePercentageDec, exitFeePercentageDec, feeAddress,
+			reserveWithdrawalAddress, maxSupply, orderQuantityLimits, sanityRate,
+			sanityMarginPercentage, allowSells, allowReserveWithdrawals, alphaBond,
+			batchBlocks, outcomePayment, req.BondDid)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -437,6 +460,39 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgWithdrawShare(req.RecipientDid, req.BondDid)
+		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
+			return
+		}
+
+		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
+	}
+}
+
+type withdrawReserveReq struct {
+	BaseReq      rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid      string       `json:"bond_did" yaml:"bond_did"`
+	Amount       string       `json:"amount" yaml:"amount"`
+	RecipientDid string       `json:"recipient_did" yaml:"recipient_did"`
+}
+
+func withdrawReserveRequestHandler(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req withdrawReserveReq
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			return
+		}
+
+		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+
+		amount, err := sdk.ParseCoinsNormalized(req.Amount)
+		if rest.CheckBadRequestError(w, err) {
+			return
+		}
+
+		msg := types.NewMsgWithdrawReserve(req.RecipientDid, amount, req.BondDid)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}

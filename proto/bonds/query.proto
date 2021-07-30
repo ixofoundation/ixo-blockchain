@@ -43,6 +43,10 @@ service Query {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/current_reserve";
   }
 
+  rpc AvailableReserve(QueryAvailableReserveRequest) returns (QueryAvailableReserveResponse) {
+    option (google.api.http).get = "/ixo/bonds/{bond_did}/available_reserve";
+  }
+
   rpc CustomPrice (QueryCustomPriceRequest) returns (QueryCustomPriceResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/price/{bond_amount}";
   }
@@ -114,6 +118,14 @@ message QueryCurrentReserveRequest {
 
 message QueryCurrentReserveResponse {
   repeated cosmos.base.v1beta1.Coin current_reserve = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"current_reserve\""];
+}
+
+message QueryAvailableReserveRequest {
+  string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message QueryAvailableReserveResponse {
+  repeated cosmos.base.v1beta1.Coin available_reserve = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"available_reserve\""];
 }
 
 message QueryCustomPriceRequest {

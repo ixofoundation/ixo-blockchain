@@ -6,27 +6,29 @@ import (
 )
 
 const (
-	FlagToken                  = "token"
-	FlagName                   = "name"
-	FlagDescription            = "description"
-	FlagFunctionType           = "function-type"
-	FlagFunctionParameters     = "function-parameters"
-	FlagReserveTokens          = "reserve-tokens"
-	FlagTxFeePercentage        = "tx-fee-percentage"
-	FlagExitFeePercentage      = "exit-fee-percentage"
-	FlagFeeAddress             = "fee-address"
-	FlagMaxSupply              = "max-supply"
-	FlagOrderQuantityLimits    = "order-quantity-limits"
-	FlagSanityRate             = "sanity-rate"
-	FlagSanityMarginPercentage = "sanity-margin-percentage"
-	FlagAllowSells             = "allow-sells"
-	FlagAlphaBond              = "alpha-bond"
-	FlagBatchBlocks            = "batch-blocks"
-	FlagOutcomePayment         = "outcome-payment"
-	FlagBondDid                = "bond-did"
-	FlagCreatorDid             = "creator-did"
-	FlagControllerDid          = "controller-did"
-	FlagEditorDid              = "editor-did"
+	FlagToken                    = "token"
+	FlagName                     = "name"
+	FlagDescription              = "description"
+	FlagFunctionType             = "function-type"
+	FlagFunctionParameters       = "function-parameters"
+	FlagReserveTokens            = "reserve-tokens"
+	FlagTxFeePercentage          = "tx-fee-percentage"
+	FlagExitFeePercentage        = "exit-fee-percentage"
+	FlagFeeAddress               = "fee-address"
+	FlagReserveWithdrawalAddress = "reserve-withdrawal-address"
+	FlagMaxSupply                = "max-supply"
+	FlagOrderQuantityLimits      = "order-quantity-limits"
+	FlagSanityRate               = "sanity-rate"
+	FlagSanityMarginPercentage   = "sanity-margin-percentage"
+	FlagAllowSells               = "allow-sells"
+	FlagAllowReserveWithdrawals  = "allow-reserve-withdrawals"
+	FlagAlphaBond                = "alpha-bond"
+	FlagBatchBlocks              = "batch-blocks"
+	FlagOutcomePayment           = "outcome-payment"
+	FlagBondDid                  = "bond-did"
+	FlagCreatorDid               = "creator-did"
+	FlagControllerDid            = "controller-did"
+	FlagEditorDid                = "editor-did"
 )
 
 var (
@@ -45,11 +47,13 @@ func init() {
 	fsBondCreate.String(FlagTxFeePercentage, "", "The percentage fee charged on buys and sells")
 	fsBondCreate.String(FlagExitFeePercentage, "", "The percentage fee charged on sells")
 	fsBondCreate.String(FlagFeeAddress, "", "The address that will hold any charged fees")
+	fsBondCreate.String(FlagReserveWithdrawalAddress, "", "The address that reserve can be withdrawn to by the bond controller")
 	fsBondCreate.String(FlagMaxSupply, "", "The maximum supply that can be achieved")
 	fsBondCreate.String(FlagOrderQuantityLimits, "", "The max number of tokens bought/sold/swapped per order")
 	fsBondCreate.String(FlagSanityRate, "", "For swappers, this is the typical t1 per t2 rate")
 	fsBondCreate.String(FlagSanityMarginPercentage, "", "For swappers, this is the acceptable deviation from the sanity rate")
 	fsBondCreate.Bool(FlagAllowSells, false, "Whether or not sells will be allowed (including the flag enables sells)")
+	fsBondCreate.Bool(FlagAllowReserveWithdrawals, false, "Whether or not reserve withdrawals will be allowed (including the flag enables reserve withdrawals)")
 	fsBondCreate.Bool(FlagAlphaBond, false, "Whether or not augmented bonding curve is an alpha bond (including the flag enables alpha)")
 	fsBondCreate.String(FlagBatchBlocks, "", "The duration in terms of blocks of each orders batch")
 	fsBondCreate.String(FlagOutcomePayment, "", "The payment that would be required to transition the bond to settlement")

@@ -52,4 +52,6 @@ var (
 	ErrInvalidAlpha                         = sdkerrors.Register(DefaultCodespace, 42, "alpha value is invalid")
 	ErrNumericOverflow                      = sdkerrors.Register(DefaultCodespace, 43, "numeric overflow")
 	ErrInvalidStateProgression              = sdkerrors.Register(DefaultCodespace, 44, "invalid state progression requested")
+	ErrCannotAllowSellsAndWithdrawals       = sdkerrors.Register(DefaultCodespace, 45, "cannot allow both sells and reserve withdrawals")
+	ErrInsufficientReserveForWithdraw       = sdkerrors.Register(DefaultCodespace, 46, "requested withdraw amount is greater than available reserve")
 )

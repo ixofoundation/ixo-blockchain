@@ -19,6 +19,7 @@ service Msg {
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc MakeOutcomePayment(MsgMakeOutcomePayment) returns (MsgMakeOutcomePaymentResponse);
   rpc WithdrawShare(MsgWithdrawShare) returns (MsgWithdrawShareResponse);
+  rpc WithdrawReserve(MsgWithdrawReserve) returns (MsgWithdrawReserveResponse);
 }
 
 message MsgCreateBond {
@@ -34,14 +35,16 @@ message MsgCreateBond {
   string tx_fee_percentage                                = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"tx_fee_percentage\""];
   string exit_fee_percentage                              = 11 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"exit_fee_percentage\""];
   string fee_address                                      = 12 [(gogoproto.moretags) = "yaml:\"fee_address\""];
-  cosmos.base.v1beta1.Coin max_supply                     = 13 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_supply\""];
-  repeated cosmos.base.v1beta1.Coin order_quantity_limits = 14 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"order_quantity_limits\""];
-  string sanity_rate                                      = 15 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_rate\""];
-  string sanity_margin_percentage                         = 16 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_margin_percentage\""];
-  bool allow_sells                                        = 17 [(gogoproto.moretags) = "yaml:\"allow_sells\""];
-  bool alpha_bond                                         = 18 [(gogoproto.moretags) = "yaml:\"alpha_bond\""];
-  string batch_blocks                                     = 19 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"batch_blocks\""];
-  string outcome_payment                                  = 20 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"outcome_payment\""];
+  string reserve_withdrawal_address                       = 13 [(gogoproto.moretags) = "yaml:\"reserve_withdrawal_address\""];
+  cosmos.base.v1beta1.Coin max_supply                     = 14 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_supply\""];
+  repeated cosmos.base.v1beta1.Coin order_quantity_limits = 15 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"order_quantity_limits\""];
+  string sanity_rate                                      = 16 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_rate\""];
+  string sanity_margin_percentage                         = 17 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sanity_margin_percentage\""];
+  bool allow_sells                                        = 18 [(gogoproto.moretags) = "yaml:\"allow_sells\""];
+  bool allow_reserve_withdrawals                          = 19 [(gogoproto.moretags) = "yaml:\"allow_reserve_withdrawals\""];
+  bool alpha_bond                                         = 20 [(gogoproto.moretags) = "yaml:\"alpha_bond\""];
+  string batch_blocks                                     = 21 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"batch_blocks\""];
+  string outcome_payment                                  = 22 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"outcome_payment\""];
 }
 
 message MsgCreateBondResponse {}
@@ -114,3 +117,11 @@ message MsgWithdrawShare {
 }
 
 message MsgWithdrawShareResponse {}
+
+message MsgWithdrawReserve {
+  string withdrawer_did                    = 1 [(gogoproto.moretags) = "yaml:\"withdrawer_did\""];
+  repeated cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"amount\""];
+  string bond_did                          = 3 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+}
+
+message MsgWithdrawReserveResponse {}

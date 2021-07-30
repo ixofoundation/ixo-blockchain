@@ -34,6 +34,7 @@ func NewTxCmd() *cobra.Command {
 		NewCmdSwap(),
 		NewCmdMakeOutcomePayment(),
 		NewCmdWithdrawShare(),
+		NewCmdWithdrawReserve(),
 	)
 
 	return bondsTxCmd
@@ -53,11 +54,13 @@ func NewCmdCreateBond() *cobra.Command {
 			_txFeePercentage, _ := cmd.Flags().GetString(FlagTxFeePercentage)
 			_exitFeePercentage, _ := cmd.Flags().GetString(FlagExitFeePercentage)
 			_feeAddress, _ := cmd.Flags().GetString(FlagFeeAddress)
+			_reserveWithdrawalAddress, _ := cmd.Flags().GetString(FlagReserveWithdrawalAddress)
 			_maxSupply, _ := cmd.Flags().GetString(FlagMaxSupply)
 			_orderQuantityLimits, _ := cmd.Flags().GetString(FlagOrderQuantityLimits)
 			_sanityRate, _ := cmd.Flags().GetString(FlagSanityRate)
 			_sanityMarginPercentage, _ := cmd.Flags().GetString(FlagSanityMarginPercentage)
 			_allowSells, _ := cmd.Flags().GetBool(FlagAllowSells)
+			_allowReserveWithdrawals, _ := cmd.Flags().GetBool(FlagAllowReserveWithdrawals)
 			_alphaBond, _ := cmd.Flags().GetBool(FlagAlphaBond)
 			_batchBlocks, _ := cmd.Flags().GetString(FlagBatchBlocks)
 			_outcomePayment, _ := cmd.Flags().GetString(FlagOutcomePayment)
@@ -88,6 +91,12 @@ func NewCmdCreateBond() *cobra.Command {
 
 			// Parse fee address
 			feeAddress, err := sdk.AccAddressFromBech32(_feeAddress)
+			if err != nil {
+				return err
+			}
+
+			// Parse reserve withdrawal address
+			reserveWithdrawalAddress, err := sdk.AccAddressFromBech32(_reserveWithdrawalAddress)
 			if err != nil {
 				return err
 			}
@@ -149,8 +158,10 @@ func NewCmdCreateBond() *cobra.Command {
 			msg := types.NewMsgCreateBond(_token, _name, _description,
 				creatorDid.Did, _controllerDid, _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
-				maxSupply, orderQuantityLimits, sanityRate, sanityMarginPercentage,
-				_allowSells, _alphaBond, batchBlocks, outcomePayment, _bondDid)
+				reserveWithdrawalAddress, maxSupply, orderQuantityLimits,
+				sanityRate, sanityMarginPercentage, _allowSells,
+				_allowReserveWithdrawals, _alphaBond, batchBlocks,
+				outcomePayment, _bondDid)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -170,10 +181,13 @@ func NewCmdCreateBond() *cobra.Command {
 	_ = cmd.MarkFlagRequired(FlagTxFeePercentage)
 	_ = cmd.MarkFlagRequired(FlagExitFeePercentage)
 	_ = cmd.MarkFlagRequired(FlagFeeAddress)
+	_ = cmd.MarkFlagRequired(FlagReserveWithdrawalAddress)
 	_ = cmd.MarkFlagRequired(FlagMaxSupply)
 	_ = cmd.MarkFlagRequired(FlagOrderQuantityLimits)
 	_ = cmd.MarkFlagRequired(FlagSanityRate)
 	_ = cmd.MarkFlagRequired(FlagSanityMarginPercentage)
+	//_ = cmd.MarkFlagRequired(FlagAllowSells) // If not specified, assume False
+	//_ = cmd.MarkFlagRequired(FlagAllowReserveWithdrawals) // If not specified, assume False
 	_ = cmd.MarkFlagRequired(FlagBatchBlocks)
 	// _ = cmd.MarkFlagRequired(FlagOutcomePayment) // Optional
 	_ = cmd.MarkFlagRequired(FlagBondDid)
@@ -503,6 +517,45 @@ func NewCmdWithdrawShare() *cobra.Command {
 			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), recipientDid, msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdWithdrawReserve() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "withdraw-reserve [bond-did] [amount] [withdrawer-did]",
+		Example: "withdraw-reserve U7GK8p8rVhJMKhBVRCJJ8c 1000res <withdrawer-ixo-did>",
+		Short:   "Withdraw reserve from a bond",
+		Args:    cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			amount, err := sdk.ParseCoinsNormalized(args[1])
+			if err != nil {
+				return err
+			}
+
+			// Parse withdrawer's ixo DID
+			withdrawerDid, err := didtypes.UnmarshalIxoDid(args[2])
+			if err != nil {
+				return err
+			}
+
+			cliCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			cliCtx = cliCtx.WithFromAddress(withdrawerDid.Address())
+
+			msg := types.NewMsgWithdrawReserve(withdrawerDid.Did, amount, args[0])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), withdrawerDid, msg)
 		},
 	}
 

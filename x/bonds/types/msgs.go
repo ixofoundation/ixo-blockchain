@@ -20,44 +20,52 @@ const (
 	TypeMsgSwap               = "swap"
 	TypeMsgMakeOutcomePayment = "make_outcome_payment"
 	TypeMsgWithdrawShare      = "withdraw_share"
+	TypeMsgWithdrawReserve    = "withdraw_reserve"
 )
 
 var (
 	_ ixotypes.IxoMsg = &MsgCreateBond{}
 	_ ixotypes.IxoMsg = &MsgEditBond{}
 	_ ixotypes.IxoMsg = &MsgSetNextAlpha{}
+	_ ixotypes.IxoMsg = &MsgUpdateBondState{}
 	_ ixotypes.IxoMsg = &MsgBuy{}
 	_ ixotypes.IxoMsg = &MsgSell{}
 	_ ixotypes.IxoMsg = &MsgSwap{}
+	_ ixotypes.IxoMsg = &MsgMakeOutcomePayment{}
+	_ ixotypes.IxoMsg = &MsgWithdrawShare{}
+	_ ixotypes.IxoMsg = &MsgWithdrawReserve{}
 )
 
 func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid didexported.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
-	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress, maxSupply sdk.Coin,
-	orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSell, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int, bondDid didexported.Did) *MsgCreateBond {
+	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
+	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
+	allowSell, allowReserveWithdrawals, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int,
+	bondDid didexported.Did) *MsgCreateBond {
 
 	return &MsgCreateBond{
-		BondDid:                bondDid,
-		Token:                  token,
-		Name:                   name,
-		Description:            description,
-		CreatorDid:             creatorDid,
-		ControllerDid:          controllerDid,
-		FunctionType:           functionType,
-		FunctionParameters:     functionParameters,
-		ReserveTokens:          reserveTokens,
-		TxFeePercentage:        txFeePercentage,
-		ExitFeePercentage:      exitFeePercentage,
-		FeeAddress:             feeAddress.String(),
-		MaxSupply:              maxSupply,
-		OrderQuantityLimits:    orderQuantityLimits,
-		SanityRate:             sanityRate,
-		SanityMarginPercentage: sanityMarginPercentage,
-		AllowSells:             allowSell,
-		AlphaBond:              alphaBond,
-		BatchBlocks:            batchBlocks,
-		OutcomePayment:         outcomePayment,
+		BondDid:                  bondDid,
+		Token:                    token,
+		Name:                     name,
+		Description:              description,
+		CreatorDid:               creatorDid,
+		ControllerDid:            controllerDid,
+		FunctionType:             functionType,
+		FunctionParameters:       functionParameters,
+		ReserveTokens:            reserveTokens,
+		TxFeePercentage:          txFeePercentage,
+		ExitFeePercentage:        exitFeePercentage,
+		FeeAddress:               feeAddress.String(),
+		ReserveWithdrawalAddress: reserveWithdrawalAddress.String(),
+		MaxSupply:                maxSupply,
+		OrderQuantityLimits:      orderQuantityLimits,
+		SanityRate:               sanityRate,
+		SanityMarginPercentage:   sanityMarginPercentage,
+		AllowSells:               allowSell,
+		AllowReserveWithdrawals:  allowReserveWithdrawals,
+		AlphaBond:                alphaBond,
+		BatchBlocks:              batchBlocks,
+		OutcomePayment:           outcomePayment,
 	}
 }
 
@@ -79,6 +87,8 @@ func (msg MsgCreateBond) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve tokens")
 	} else if strings.TrimSpace(msg.FeeAddress) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "fee address")
+	} else if strings.TrimSpace(msg.ReserveWithdrawalAddress) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve withdrawal address")
 	} else if strings.TrimSpace(msg.FunctionType) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "function type")
 	}
@@ -155,6 +165,11 @@ func (msg MsgCreateBond) ValidateBasic() error {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
 	} else if !didtypes.IsValidDid(msg.CreatorDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID")
+	}
+
+	// Check that allowSells and allowReserveWithdrawals are not both True
+	if msg.AllowSells && msg.AllowReserveWithdrawals {
+		return ErrCannotAllowSellsAndWithdrawals
 	}
 
 	return nil
@@ -581,3 +596,48 @@ func (msg MsgWithdrawShare) GetSigners() []sdk.AccAddress {
 func (msg MsgWithdrawShare) Route() string { return RouterKey }
 
 func (msg MsgWithdrawShare) Type() string { return TypeMsgWithdrawShare }
+
+func NewMsgWithdrawReserve(withdrawerDid didexported.Did, amount sdk.Coins,
+	bondDid didexported.Did) *MsgWithdrawReserve {
+	return &MsgWithdrawReserve{
+		WithdrawerDid: withdrawerDid,
+		Amount:        amount,
+		BondDid:       bondDid,
+	}
+}
+
+func (msg MsgWithdrawReserve) ValidateBasic() error {
+	// Check if empty
+	if strings.TrimSpace(msg.WithdrawerDid) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "withdrawer DID")
+	} else if strings.TrimSpace(msg.BondDid) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
+	}
+
+	// Validate amount
+	if !msg.Amount.IsValid() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
+	}
+
+	// Check that DIDs valid
+	if !didtypes.IsValidDid(msg.BondDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
+	} else if !didtypes.IsValidDid(msg.WithdrawerDid) {
+		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "withdrawer DID")
+	}
+
+	return nil
+}
+
+func (msg MsgWithdrawReserve) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgWithdrawReserve) GetSignerDid() didexported.Did { return msg.WithdrawerDid }
+func (msg MsgWithdrawReserve) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+}
+
+func (msg MsgWithdrawReserve) Route() string { return RouterKey }
+
+func (msg MsgWithdrawReserve) Type() string { return TypeMsgWithdrawReserve }

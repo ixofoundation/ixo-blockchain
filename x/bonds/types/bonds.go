@@ -223,10 +223,10 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 
 func NewBond(token, name, description string, creatorDid, controllerDid didexported.Did,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
-	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress sdk.AccAddress,
-	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate,
-	sanityMarginPercentage sdk.Dec, allowSells, alphaBond bool, batchBlocks sdk.Uint,
-	outcomePayment sdk.Int, state BondState, bondDid didexported.Did) Bond {
+	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
+	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
+	allowSells, allowReserveWithdrawals, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int,
+	state BondState, bondDid didexported.Did) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
@@ -244,14 +244,17 @@ func NewBond(token, name, description string, creatorDid, controllerDid didexpor
 		TxFeePercentage:              txFeePercentage,
 		ExitFeePercentage:            exitFeePercentage,
 		FeeAddress:                   feeAddress.String(),
+		ReserveWithdrawalAddress:     reserveWithdrawalAddress.String(),
 		MaxSupply:                    maxSupply,
 		OrderQuantityLimits:          orderQuantityLimits,
 		SanityRate:                   sanityRate,
 		SanityMarginPercentage:       sanityMarginPercentage,
 		CurrentSupply:                sdk.NewCoin(token, sdk.ZeroInt()),
 		CurrentReserve:               nil,
+		AvailableReserve:             nil,
 		CurrentOutcomePaymentReserve: nil,
 		AllowSells:                   allowSells,
+		AllowReserveWithdrawals:      allowReserveWithdrawals,
 		AlphaBond:                    alphaBond,
 		BatchBlocks:                  batchBlocks,
 		OutcomePayment:               outcomePayment,

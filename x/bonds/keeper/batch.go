@@ -373,7 +373,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 
 	// Send total returns to seller (totalReturns should never be zero)
 	// TODO: investigate possibility of zero totalReturns
-	err = k.WithdrawReserve(ctx, bond.BondDid, sellerAddr, totalReturns)
+	err = k.WithdrawFromReserve(ctx, bond.BondDid, sellerAddr, totalReturns)
 	if err != nil {
 		return err
 	}
@@ -385,7 +385,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 
 	// Send total fee to fee address
 	if !totalFees.IsZero() {
-		err = k.WithdrawReserve(ctx, bond.BondDid, feeAddr, totalFees)
+		err = k.WithdrawFromReserve(ctx, bond.BondDid, feeAddr, totalFees)
 		if err != nil {
 			return err
 		}
@@ -441,7 +441,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 	}
 
 	// Give resultant tokens to swapper (reserveReturns should never be zero)
-	err = k.WithdrawReserve(ctx, bond.BondDid, swapperAddr, reserveReturns)
+	err = k.WithdrawFromReserve(ctx, bond.BondDid, swapperAddr, reserveReturns)
 	if err != nil {
 		return err, false
 	}
