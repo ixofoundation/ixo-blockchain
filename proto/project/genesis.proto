@@ -6,7 +6,6 @@ import "project/project.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
 
-// GenesisState defines the project module's genesis state.
 message GenesisState {
   repeated ProjectDoc project_docs              = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"project_docs\""];
   repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"account_maps\""];
