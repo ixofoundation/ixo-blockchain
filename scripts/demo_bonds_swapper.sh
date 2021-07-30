@@ -23,6 +23,7 @@ PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
 CHAIN_ID="pandora-3"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
+RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -99,6 +100,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0.5 \
   --exit-fee-percentage=0.1 \
   --fee-address="$FEE" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=1000000abc \
   --order-quantity-limits="10abc,5000res,5000rez" \
   --sanity-rate="0.5" \

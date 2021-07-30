@@ -23,6 +23,7 @@ PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
 CHAIN_ID="pandora-3"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
+RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -121,10 +122,12 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=20000000abc \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
+  --allow-reserve-withdrawals \
   --alpha-bond \
   --batch-blocks=1 \
   --outcome-payment="300000000" \
@@ -138,6 +141,19 @@ echo "Miguel buys 400000abc..."
 ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
+
+echo "Current reserve..."
+ixod_q bonds current-reserve "$BOND_DID"
+echo "Available reserve..."
+ixod_q bonds available-reserve "$BOND_DID"
+echo "Withdrawing 400000res using the controller DID..."
+ixod_tx bonds withdraw-reserve "$BOND_DID" 400000res "$FRANCESCO_DID_FULL"
+echo "Reserve withdraw account..."
+ixod_q bank balances "$RESERVE_OUT"
+echo "Current reserve..."
+ixod_q bonds current-reserve "$BOND_DID"
+echo "Available reserve..."
+ixod_q bonds available-reserve "$BOND_DID"
 
 echo "Francesco buys 400000abc..."
 ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL"
@@ -164,6 +180,19 @@ NEW_ALPHA="0.51"
 ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL"
 echo "Current price is now approx 1.85..."
 ixod_q bonds current-price "$BOND_DID"
+
+echo "Current reserve..."
+ixod_q bonds current-reserve "$BOND_DID"
+echo "Available reserve..."
+ixod_q bonds available-reserve "$BOND_DID"
+echo "Withdrawing 5000res more using the controller DID..."
+ixod_tx bonds withdraw-reserve "$BOND_DID" 5000res "$FRANCESCO_DID_FULL"
+echo "Reserve withdraw account..."
+ixod_q bank balances "$RESERVE_OUT"
+echo "Current reserve..."
+ixod_q bonds current-reserve "$BOND_DID"
+echo "Available reserve..."
+ixod_q bonds available-reserve "$BOND_DID"
 
 echo "Changing public alpha 0.51->0.4..."
 NEW_ALPHA="0.4"

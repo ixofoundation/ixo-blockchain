@@ -121,6 +121,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0.2 \
   --fee-address="$FEE" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=300000abc \
   --order-quantity-limits="" \
   --sanity-rate="0" \

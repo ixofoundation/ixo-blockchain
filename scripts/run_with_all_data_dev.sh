@@ -12,6 +12,7 @@ yes 'y' | ixod keys delete fee2 --force
 yes 'y' | ixod keys delete fee3 --force
 yes 'y' | ixod keys delete fee4 --force
 yes 'y' | ixod keys delete fee5 --force
+yes 'y' | ixod keys delete reserveOut --force
 
 yes $PASSWORD | ixod keys add miguel
 yes $PASSWORD | ixod keys add francesco
@@ -21,6 +22,7 @@ yes $PASSWORD | ixod keys add fee2
 yes $PASSWORD | ixod keys add fee3
 yes $PASSWORD | ixod keys add fee4
 yes $PASSWORD | ixod keys add fee5
+yes $PASSWORD | ixod keys add reserveOut
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
 yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
@@ -105,7 +107,7 @@ TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 # Uncomment the below to set timeouts to 1s for shorter block times
-#sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
-#sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
+sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
+sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
 
 ixod start --pruning "nothing"
