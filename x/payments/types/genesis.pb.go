@@ -23,7 +23,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the payments module's genesis state.
 type GenesisState struct {
 	PaymentTemplates []PaymentTemplate `protobuf:"bytes,1,rep,name=payment_templates,json=paymentTemplates,proto3" json:"payment_templates" yaml:"payment_templates"`
 	PaymentContracts []PaymentContract `protobuf:"bytes,2,rep,name=payment_contracts,json=paymentContracts,proto3" json:"payment_contracts" yaml:"payment_contracts"`

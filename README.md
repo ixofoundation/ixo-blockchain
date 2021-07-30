@@ -44,3 +44,16 @@ bash ./scripts/demo_project.sh   # Option 3
 ...
 # Look in the scripts folder for more options!
 ```
+
+- To generate `.pb.go` and `.pb.gw.go` files from `.proto` files:
+```bash
+make proto-gen
+```
+
+- To build and run the application using Starport (demos will not work if the
+  blockchain is started using this method, and the `./cmd/ixod` package has to
+  be refactored to `./cmd/ixo-blockchaind`):
+
+```bash
+starport serve
+```

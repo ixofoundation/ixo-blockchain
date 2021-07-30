@@ -23,7 +23,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// GenesisState defines the project module's genesis state.
 type GenesisState struct {
 	ProjectDocs      []ProjectDoc         `protobuf:"bytes,1,rep,name=project_docs,json=projectDocs,proto3" json:"project_docs" yaml:"project_docs"`
 	AccountMaps      []GenesisAccountMap  `protobuf:"bytes,2,rep,name=account_maps,json=accountMaps,proto3" json:"account_maps" yaml:"account_maps"`
