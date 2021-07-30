@@ -773,12 +773,15 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 		return nil, err
 	}
 
+	// Confirm that function type is an alpha bond and state is OPEN
 	if bond.FunctionType != types.AugmentedFunction {
 		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
 			"bond is not an augmented bonding curve")
 	} else if !bond.AlphaBond {
 		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
 			"bond is not an alpha bond")
+	} else if bond.State != types.OpenState.String() {
+		return nil, types.ErrInvalidStateForAction
 	}
 
 	if !bond.AllowReserveWithdrawals {

@@ -112,7 +112,7 @@ The owner of a bond can edit some of the bond's parameters using `MsgEditBond`.
 | EditorDid              | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
-- bond being interacted with does not exist
+- bond does not exist
 - any editable field violates the restrictions set for the same field in `MsgCreateBond`
 - all editable fields are `"[do-not-modify]"`
 - editor is not the bond creator
@@ -143,7 +143,7 @@ The controller of a bond can set the next public alpha value for Augmented Bondi
 | EditorDid | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
-- bond being interacted with does not exist
+- bond does not exist
 - public alpha value falls outside of 0.0001 <= alpha <= 0.9999
 - public alpha value violates any of the below rules
   - `newPublicAlpha != publicAlpha`
@@ -175,7 +175,7 @@ The controller of a bond can change a bond's state to SETTLE or FAILED using `Ms
 | EditorDid | `did.Did`   | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
-- bond being interacted with does not exist
+- bond does not exist
 - state is not SETTLE or FAILED
 - state is not a valid transition from the current bond state
 - editor is not the bond controller
@@ -207,9 +207,8 @@ In the case of `augmented_function` bonds, if the bond state is `HATCH`, a fixed
 | BondDid   | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
-- bond being interacted with does not exist
+- bond does not exist or bond state is not HATCH or OPEN
 - amount is not an amount of an existing bond
-- bond state is not HATCH or OPEN
 - max prices is greater than the balance of the buyer
 - max prices are not amounts of the bond's reserve tokens
 - denominations in max prices are not the bond's reserve tokens
@@ -254,9 +253,8 @@ In general, but especially in the case of swapper function bonds, buying tokens 
 | BondDid   | `did.Did`  | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
-- bond being interacted with does not exist
+- bond does not exist or bond state is not OPEN
 - amount is not an amount of an existing bond
-- bond state is not OPEN
 - amount is greater than the balance of the seller
 - amount is greater than the bond's current supply
 - amount causes the bond's batch-adjusted current supply to become negative
@@ -368,7 +366,7 @@ If the bond allows it, i.e. if the `AllowReserveWithdrawals` flag is set to True
 | BondDid       | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 
 This message is expected to fail if:
-- bond does not exist
+- bond does not exist or bond state is not OPEN
 - withdrawer is not the bond's controller
 - bond DID or withdrawer DID is not a valid DID
 - amount is not a valid amount
