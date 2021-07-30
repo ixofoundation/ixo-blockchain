@@ -12,23 +12,23 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 // and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/query.go
 service Query {
   rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
-    option (google.api.http).get = "/did/{did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+    option (google.api.http).get = "/ixo/did/{did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
   }
 
   rpc AllDids(QueryAllDidsRequest) returns (QueryAllDidsResponse) {
-    option (google.api.http).get = "/did";
+    option (google.api.http).get = "/ixo/did";
   }
 
   rpc AllDidDocs(QueryAllDidDocsRequest) returns (QueryAllDidDocsResponse) {
-    option (google.api.http).get = "/allDidDocs";
+    option (google.api.http).get = "/ixo/allDidDocs";
   }
 
   rpc AddressFromDid(QueryAddressFromDidRequest) returns (QueryAddressFromDidResponse) {
-    option (google.api.http).get = "/didToAddr/{did=**}";
+    option (google.api.http).get = "/ixo/didToAddr/{did=**}";
   }
 
   rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest) returns (QueryAddressFromBase58EncodedPubkeyResponse) {
-    option (google.api.http).get = "/pubKeyToAddr/{pubKey}";
+    option (google.api.http).get = "/ixo/pubKeyToAddr/{pubKey}";
   }
 }
 
