@@ -131,10 +131,15 @@ func AvailableReserveInvariant(k Keeper) sdk.Invariant {
 		reservePool := k.accountKeeper.GetModuleAddress(types.BondsReserveAccount)
 		actualAvailableReserve := k.BankKeeper.GetAllBalances(ctx, reservePool)
 
+		// If no bonds (iterator invalid) then invariant automatically holds
+		iterator := k.GetBondIterator(ctx)
+		if !iterator.Valid() {
+			return "", false
+		}
+
 		// Calculate sum of available reserves reported by bonds, including any
 		// outcome payment reserve, since this has already reached the reserve
 		// but is not considered a part of the available reserve
-		iterator := k.GetBondIterator(ctx)
 		availableReserveSum := sdk.NewCoins()
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
