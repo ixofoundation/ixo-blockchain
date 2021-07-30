@@ -149,7 +149,7 @@ func queryAvailableReserveHandler(clientCtx client.Context) http.HandlerFunc {
 
 		res, _, err := clientCtx.QueryWithData(
 			fmt.Sprintf("custom/%s/%s/%s",
-				types.QuerierRoute, keeper.QueryCurrentReserve, bondDid), nil)
+				types.QuerierRoute, keeper.QueryAvailableReserve, bondDid), nil)
 		if rest.CheckNotFoundError(w, err) {
 			return
 		}
