@@ -33,9 +33,14 @@ Any Cosmos application chain that implements the Bonds module is able to perform
 3. **[Messages](03_messages.md)**
     - [MsgCreateBond](03_messages.md#msgcreatebond)
     - [MsgEditBond](03_messages.md#msgeditbond)
+    - [MsgSetNextAlpha](03_messages.md#msgsetnextalpha)
+    - [MsgUpdateBondState](03_messages.md#msgupdatebondstate)
     - [MsgBuy](03_messages.md#msgbuy)
     - [MsgSell](03_messages.md#msgsell)
     - [MsgSwap](03_messages.md#msgswap)
+    - [MsgMakeOutcomePayment](03_messages.md#msgmakeoutcomepayment)
+    - [MsgWithdrawShare](03_messages.md#msgwithdrawshare)
+    - [MsgWithdrawReserve](03_messages.md#msgwithdrawreserve)
 4. **[End-Block](04_end_block.md)**
     - [Buys](04_end_block.md#buys)
     - [Sells](04_end_block.md#sells)

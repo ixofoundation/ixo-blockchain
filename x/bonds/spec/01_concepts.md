@@ -51,15 +51,18 @@ type Bond struct {
     ReserveTokens                []string                                 
     TxFeePercentage              sdk.Dec   
     ExitFeePercentage            sdk.Dec   
-    FeeAddress                   string                                   
+    FeeAddress                   string
+	ReserveWithdrawalAddress     string
     MaxSupply                    sdk.Coin                               
     OrderQuantityLimits          sdk.Coins 
     SanityRate                   sdk.Dec   
     SanityMarginPercentage       sdk.Dec   
     CurrentSupply                sdk.Coin                               
-    CurrentReserve               sdk.Coins 
+    CurrentReserve               sdk.Coins
+    AvailableReserve             sdk.Coins
     CurrentOutcomePaymentReserve sdk.Coins 
-    AllowSells                   bool                                     
+    AllowSells                   bool
+    AllowReserveWithdrawals      bool
     AlphaBond                    bool                                     
     BatchBlocks                  sdk.Uint  
     OutcomePayment               sdk.Int   
