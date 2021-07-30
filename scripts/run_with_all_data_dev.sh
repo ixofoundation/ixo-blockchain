@@ -110,4 +110,4 @@ sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 #sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
 #sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
 
-ixod start --pruning "nothing"
+ixod start --pruning "nothing" --inv-check-period 1
