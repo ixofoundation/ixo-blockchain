@@ -480,15 +480,15 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_DidDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 0}, []string{"did"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_DidDoc_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"ixo", "did"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_AllDids_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"did"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_AllDids_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ixo", "did"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_AllDidDocs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"allDidDocs"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_AllDidDocs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ixo", "allDidDocs"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_AddressFromDid_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 3, 0, 4, 1, 5, 1}, []string{"didToAddr", "did"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_AddressFromDid_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 3, 0, 4, 1, 5, 2}, []string{"ixo", "didToAddr", "did"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_AddressFromBase58EncodedPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"pubKeyToAddr", "pubKey"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_AddressFromBase58EncodedPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"ixo", "pubKeyToAddr", "pubKey"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (
