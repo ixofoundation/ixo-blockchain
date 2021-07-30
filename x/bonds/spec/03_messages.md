@@ -45,7 +45,7 @@ type MsgCreateBond struct {
 	TxFeePercentage          sdk.Dec
 	ExitFeePercentage        sdk.Dec
 	FeeAddress               string
-    ReserveWithdrawalAddress string
+	ReserveWithdrawalAddress string
 	MaxSupply                sdk.Coin
 	OrderQuantityLimits      sdk.Coins
 	SanityRate               sdk.Dec
