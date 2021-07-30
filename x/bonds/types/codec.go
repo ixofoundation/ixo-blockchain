@@ -25,6 +25,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSwap{}, "bonds/MsgSwap", nil)
 	cdc.RegisterConcrete(&MsgMakeOutcomePayment{}, "bonds/MsgMakeOutcomePayment", nil)
 	cdc.RegisterConcrete(&MsgWithdrawShare{}, "bonds/MsgWithdrawShare", nil)
+	cdc.RegisterConcrete(&MsgWithdrawReserve{}, "bonds/MsgWithdrawReserve", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -38,6 +39,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgSwap{},
 		&MsgMakeOutcomePayment{},
 		&MsgWithdrawShare{},
+		&MsgWithdrawReserve{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

@@ -26,6 +26,7 @@ CHAIN_ID="pandora-3"
 yes 'y' | ixod keys delete fee --force > /dev/null 2>&1
 yes $PASSWORD | ixod keys add fee > /dev/null 2>&1
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
+RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -218,6 +219,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=20000000uabc \
   --order-quantity-limits="" \
   --sanity-rate="0" \

@@ -147,6 +147,25 @@ func (k Keeper) CurrentReserve(c context.Context, req *types.QueryCurrentReserve
 	return &types.QueryCurrentReserveResponse{CurrentReserve: reserveBalances}, nil
 }
 
+func (k Keeper) AvailableReserve(c context.Context, req *types.QueryAvailableReserveRequest) (*types.QueryAvailableReserveResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	bondDid := req.BondDid
+
+	bond, found := k.GetBond(ctx, bondDid)
+	if !found {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+	}
+
+	availableReserve := zeroReserveTokensIfEmpty(bond.AvailableReserve, bond)
+
+	return &types.QueryAvailableReserveResponse{AvailableReserve: availableReserve}, nil
+}
+
 func (k Keeper) CustomPrice(c context.Context, req *types.QueryCustomPriceRequest) (*types.QueryCustomPriceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

@@ -25,29 +25,31 @@ The bonds module emits the following events:
 
 ### MsgCreateBond
 
-| Type        | Attribute Key            | Attribute Value          |
-|-------------|--------------------------|--------------------------|
-| create_bond | bond                     | {token}                  |
-| create_bond | name                     | {name}                   |
-| create_bond | description              | {description}            |
-| create_bond | function_type            | {functionType}           |
-| create_bond | function_parameters [0]  | {functionParameters}     |
-| create_bond | reserve_tokens [1]       | {reserveTokens}          |
-| create_bond | tx_fee_percentage        | {txFeePercentage}        |
-| create_bond | exit_fee_percentage      | {exitFeePercentage}      |
-| create_bond | fee_address              | {feeAddress}             |
-| create_bond | max_supply               | {maxSupply}              |
-| create_bond | order_quantity_limits    | {orderQuantityLimits}    |
-| create_bond | sanity_rate              | {sanityRate}             |
-| create_bond | sanity_margin_percentage | {sanityMarginPercentage} |
-| create_bond | allow_sells              | {allowSells}             |
-| create_bond | alpha_bond               | {alphaBond}              |
-| create_bond | signers [2]              | {signers}                |
-| create_bond | batch_blocks             | {batchBlocks}            |
-| create_bond | state                    | {state}                  |
-| message     | module                   | bonds                    |
-| message     | action                   | create_bond              |
-| message     | sender                   | {senderAddress}          |
+| Type        | Attribute Key              | Attribute Value            |
+|-------------|----------------------------|----------------------------|
+| create_bond | bond                       | {token}                    |
+| create_bond | name                       | {name}                     |
+| create_bond | description                | {description}              |
+| create_bond | function_type              | {functionType}             |
+| create_bond | function_parameters [0]    | {functionParameters}       |
+| create_bond | reserve_tokens [1]         | {reserveTokens}            |
+| create_bond | tx_fee_percentage          | {txFeePercentage}          |
+| create_bond | exit_fee_percentage        | {exitFeePercentage}        |
+| create_bond | fee_address                | {feeAddress}               |
+| create_bond | reserve_withdrawal_address | {reserveWithdrawalAddress} |
+| create_bond | max_supply                 | {maxSupply}                |
+| create_bond | order_quantity_limits      | {orderQuantityLimits}      |
+| create_bond | sanity_rate                | {sanityRate}               |
+| create_bond | sanity_margin_percentage   | {sanityMarginPercentage}   |
+| create_bond | allow_sells                | {allowSells}               |
+| create_bond | allow_reserve_withdrawals  | {allowReserveWithdrawals}  |
+| create_bond | alpha_bond                 | {alphaBond}                |
+| create_bond | signers [2]                | {signers}                  |
+| create_bond | batch_blocks               | {batchBlocks}              |
+| create_bond | state                      | {state}                    |
+| message     | module                     | bonds                      |
+| message     | action                     | create_bond                |
+| message     | sender                     | {creatorDid}               |
 
 * [0] Example formatting: `"{m:12,n:2,c:100}"`
 * [1] Example formatting: `"[res,rez]"`
@@ -65,7 +67,7 @@ The bonds module emits the following events:
 | edit_bond | sanity_margin_percentage | {sanityMarginPercentage} |
 | message   | module                   | bonds                    |
 | message   | action                   | edit_bond                |
-| message   | sender                   | {senderAddress}          |
+| message   | sender                   | {editorDid}              |
 
 ### MsgBuy
 
@@ -78,7 +80,7 @@ The bonds module emits the following events:
 | init_swapper | charged_prices | {chargedPrices} |
 | message      | module         | bonds           |
 | message      | action         | buy             |
-| message      | sender         | {senderAddress} |
+| message      | sender         | {buyerDid}      |
 
 #### Otherwise
 
@@ -93,7 +95,7 @@ The bonds module emits the following events:
 | order_cancel | cancel_reason | {cancelReason}  |
 | message      | module        | bonds           |
 | message      | action        | buy             |
-| message      | sender        | {senderAddress} |
+| message      | sender        | {buyerDid}      |
 
 ### MsgSell
 
@@ -103,7 +105,7 @@ The bonds module emits the following events:
 | sell    | amount        | {amount}        |
 | message | module        | bonds           |
 | message | action        | buy             |
-| message | sender        | {senderAddress} |
+| message | sender        | {sellerDid}     |
 
 ### MsgSwap
 
@@ -115,7 +117,7 @@ The bonds module emits the following events:
 | swap    | to_token      | {toToken}       |
 | message | module        | bonds           |
 | message | action        | swap            |
-| message | sender        | {senderAddress} |
+| message | sender        | {swapperDid}    |
 
 ### MsgMakeOutcomePayment
 
@@ -125,7 +127,7 @@ The bonds module emits the following events:
 | make_outcome_payment | address       | {senderAddress}      |
 | message              | module        | bonds                |
 | message              | action        | make_outcome_payment |
-| message              | sender        | {senderAddress}      |
+| message              | sender        | {senderDid}          |
 
 ### MsgWithdrawShare
 
@@ -136,4 +138,15 @@ The bonds module emits the following events:
 | withdraw_share | amount        | {reserveOwed}      |
 | message        | module        | bonds              |
 | message        | action        | withdraw_share     |
-| message        | sender        | {recipientAddress} |
+| message        | sender        | {recipientDid}     |
+
+### MsgWithdrawReserve
+
+| Type             | Attribute Key | Attribute Value            |
+|------------------|---------------|----------------------------|
+| withdraw_reserve | bond          | {token}                    |
+| withdraw_reserve | address       | {reserveWithdrawalAddress} |
+| withdraw_reserve | amount        | {amountWithdrawn}          |
+| message          | module        | bonds                      |
+| message          | action        | withdraw_share             |
+| message          | sender        | {withdrawerDid}            |

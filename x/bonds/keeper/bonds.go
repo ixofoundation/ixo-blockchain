@@ -77,7 +77,7 @@ func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid didexporte
 	store.Set(types.GetBondDidsKey(bondToken), amino.MustMarshalBinaryBare(bondDid))
 }
 
-func (k Keeper) DepositReserve(ctx sdk.Context, bondDid didexported.Did,
+func (k Keeper) DepositIntoReserve(ctx sdk.Context, bondDid didexported.Did,
 	from sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens to bonds reserve account
@@ -88,8 +88,9 @@ func (k Keeper) DepositReserve(ctx sdk.Context, bondDid didexported.Did,
 	}
 
 	// Update bond reserve
-	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount...))
+	bond := k.MustGetBond(ctx, bondDid)
+	k.setReserveBalances(ctx, bondDid, bond.CurrentReserve.Add(amount...))
+	k.setAvailableReserve(ctx, bondDid, bond.AvailableReserve.Add(amount...))
 	return nil
 }
 
@@ -119,13 +120,14 @@ func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid didexported.Di
 		return err
 	}
 
-	// Update bond reserve
-	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Add(amount...))
+	// Update bond reserve and available reserve
+	bond := k.MustGetBond(ctx, bondDid)
+	k.setReserveBalances(ctx, bondDid, bond.CurrentReserve.Add(amount...))
+	k.setAvailableReserve(ctx, bondDid, bond.AvailableReserve.Add(amount...))
 	return nil
 }
 
-func (k Keeper) WithdrawReserve(ctx sdk.Context, bondDid didexported.Did,
+func (k Keeper) WithdrawFromReserve(ctx sdk.Context, bondDid didexported.Did,
 	to sdk.AccAddress, amount sdk.Coins) error {
 
 	// Send tokens from bonds reserve account
@@ -135,9 +137,10 @@ func (k Keeper) WithdrawReserve(ctx sdk.Context, bondDid didexported.Did,
 		return err
 	}
 
-	// Update bond reserve
-	k.setReserveBalances(ctx, bondDid,
-		k.MustGetBond(ctx, bondDid).CurrentReserve.Sub(amount))
+	// Update bond reserve and available reserve
+	bond := k.MustGetBond(ctx, bondDid)
+	k.setReserveBalances(ctx, bondDid, bond.CurrentReserve.Sub(amount))
+	k.setAvailableReserve(ctx, bondDid, bond.AvailableReserve.Sub(amount))
 	return nil
 }
 
@@ -145,15 +148,23 @@ func (k Keeper) MoveOutcomePaymentToReserve(ctx sdk.Context, bondDid didexported
 
 	bond := k.MustGetBond(ctx, bondDid)
 	newReserve := bond.CurrentReserve.Add(bond.CurrentOutcomePaymentReserve...)
+	newAvailableReserve := bond.AvailableReserve.Add(bond.CurrentOutcomePaymentReserve...)
 
-	// Update bond reserve and outcome payment reserve
+	// Update bond reserve, available reserve and outcome payment reserve
 	k.setReserveBalances(ctx, bondDid, newReserve)
+	k.setAvailableReserve(ctx, bondDid, newAvailableReserve)
 	k.setOutcomePaymentReserveBalances(ctx, bondDid, nil)
 }
 
 func (k Keeper) setReserveBalances(ctx sdk.Context, bondDid didexported.Did, balance sdk.Coins) {
 	bond := k.MustGetBond(ctx, bondDid)
 	bond.CurrentReserve = balance
+	k.SetBond(ctx, bondDid, bond)
+}
+
+func (k Keeper) setAvailableReserve(ctx sdk.Context, bondDid didexported.Did, availableReserve sdk.Coins) {
+	bond := k.MustGetBond(ctx, bondDid)
+	bond.AvailableReserve = availableReserve
 	k.SetBond(ctx, bondDid, bond)
 }
 
@@ -165,6 +176,10 @@ func (k Keeper) setOutcomePaymentReserveBalances(ctx sdk.Context, bondDid didexp
 
 func (k Keeper) GetReserveBalances(ctx sdk.Context, bondDid didexported.Did) sdk.Coins {
 	return k.MustGetBond(ctx, bondDid).CurrentReserve
+}
+
+func (k Keeper) GetAvailableReserve(ctx sdk.Context, bondDid didexported.Did) sdk.Coins {
+	return k.MustGetBond(ctx, bondDid).AvailableReserve
 }
 
 func (k Keeper) GetSupplyAdjustedForBuy(ctx sdk.Context, bondDid didexported.Did) sdk.Coin {

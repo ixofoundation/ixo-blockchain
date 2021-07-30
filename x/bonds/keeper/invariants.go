@@ -15,6 +15,8 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 		SupplyInvariant(k))
 	ir.RegisterRoute(types.ModuleName, "bonds-reserve",
 		ReserveInvariant(k))
+	ir.RegisterRoute(types.ModuleName, "bonds-available-reserve",
+		AvailableReserveInvariant(k))
 }
 
 // AllInvariants runs all invariants of the bonds module.
@@ -24,7 +26,11 @@ func AllInvariants(k Keeper) sdk.Invariant {
 		if stop {
 			return res, stop
 		}
-		return ReserveInvariant(k)(ctx)
+		res, stop = ReserveInvariant(k)(ctx)
+		if stop {
+			return res, stop
+		}
+		return AvailableReserveInvariant(k)(ctx)
 	}
 }
 
@@ -115,5 +121,34 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 		broken := count != 0
 		return sdk.FormatInvariant(types.ModuleName, "reserve", fmt.Sprintf(
 			"%d Bonds reserve invariants broken\n%s", count, msg)), broken
+	}
+}
+
+func AvailableReserveInvariant(k Keeper) sdk.Invariant {
+	return func(ctx sdk.Context) (string, bool) {
+
+		// Get actual available reserve
+		reservePool := k.accountKeeper.GetModuleAddress(types.BondsReserveAccount)
+		actualAvailableReserve := k.BankKeeper.GetAllBalances(ctx, reservePool)
+
+		// If no bonds (iterator invalid) then invariant automatically holds
+		iterator := k.GetBondIterator(ctx)
+		if !iterator.Valid() {
+			return "", false
+		}
+
+		// Calculate sum of available reserves reported by bonds, including any
+		// outcome payment reserve, since this has already reached the reserve
+		// but is not considered a part of the available reserve
+		availableReserveSum := sdk.NewCoins()
+		for ; iterator.Valid(); iterator.Next() {
+			bond := k.MustGetBondByKey(ctx, iterator.Key())
+			availableReserveSum = availableReserveSum.Add(bond.AvailableReserve...)
+			availableReserveSum = availableReserveSum.Add(bond.CurrentOutcomePaymentReserve...)
+		}
+
+		broken := !availableReserveSum.IsEqual(actualAvailableReserve)
+		return sdk.FormatInvariant(types.ModuleName, "available-reserve",
+			"Bonds available reserve invariant broken"), broken
 	}
 }

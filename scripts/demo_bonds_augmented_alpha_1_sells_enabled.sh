@@ -23,6 +23,7 @@ PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
 CHAIN_ID="pandora-3"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
+RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args
@@ -121,6 +122,7 @@ ixod_tx bonds create-bond \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE" \
+  --reserve-withdrawal-address="$RESERVE_OUT" \
   --max-supply=20000000abc \
   --order-quantity-limits="" \
   --sanity-rate="0" \
@@ -139,6 +141,9 @@ echo "Miguel buys 400000abc..."
 ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$MIGUEL_DID_FULL"
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
+
+echo "Withdrawing of reserve using the controller DID not possible..."
+ixod_tx bonds withdraw-reserve "$BOND_DID" 1res "$FRANCESCO_DID_FULL"
 
 echo "Francesco buys 400000abc..."
 ixod_tx bonds buy 400000abc 500000res "$BOND_DID" "$FRANCESCO_DID_FULL"

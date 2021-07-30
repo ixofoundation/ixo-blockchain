@@ -10,19 +10,20 @@ import (
 )
 
 const (
-	QueryBonds          = "bonds"
-	QueryBondsDetailed  = "bonds_detailed"
-	QueryBond           = "bond"
-	QueryBatch          = "batch"
-	QueryLastBatch      = "last_batch"
-	QueryCurrentPrice   = "current_price"
-	QueryCurrentReserve = "current_reserve"
-	QueryCustomPrice    = "custom_price"
-	QueryBuyPrice       = "buy_price"
-	QuerySellReturn     = "sell_return"
-	QuerySwapReturn     = "swap_return"
-	QueryAlphaMaximums  = "alpha_maximums"
-	QueryParams         = "params"
+	QueryBonds            = "bonds"
+	QueryBondsDetailed    = "bonds_detailed"
+	QueryBond             = "bond"
+	QueryBatch            = "batch"
+	QueryLastBatch        = "last_batch"
+	QueryCurrentPrice     = "current_price"
+	QueryCurrentReserve   = "current_reserve"
+	QueryAvailableReserve = "available_reserve"
+	QueryCustomPrice      = "custom_price"
+	QueryBuyPrice         = "buy_price"
+	QuerySellReturn       = "sell_return"
+	QuerySwapReturn       = "swap_return"
+	QueryAlphaMaximums    = "alpha_maximums"
+	QueryParams           = "params"
 )
 
 // NewQuerier is the module level router for state queries
@@ -43,6 +44,8 @@ func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier 
 			return queryCurrentPrice(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryCurrentReserve:
 			return queryCurrentReserve(ctx, path[1:], keeper, legacyQuerierCdc)
+		case QueryAvailableReserve:
+			return queryAvailableReserve(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryCustomPrice:
 			return queryCustomPrice(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryBuyPrice:
@@ -210,6 +213,23 @@ func queryCurrentReserve(ctx sdk.Context, path []string, keeper Keeper, legacyQu
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, reserveBalances)
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return bz, nil
+}
+
+func queryAvailableReserve(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
+	bondDid := path[0]
+
+	bond, found := keeper.GetBond(ctx, bondDid)
+	if !found {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+	}
+
+	availableReserve := zeroReserveTokensIfEmpty(bond.AvailableReserve, bond)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, availableReserve)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
