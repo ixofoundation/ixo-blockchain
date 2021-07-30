@@ -469,10 +469,10 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type withdrawReserveReq struct {
-	BaseReq      rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondDid      string       `json:"bond_did" yaml:"bond_did"`
-	Amount       string       `json:"amount" yaml:"amount"`
-	RecipientDid string       `json:"recipient_did" yaml:"recipient_did"`
+	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid       string       `json:"bond_did" yaml:"bond_did"`
+	Amount        string       `json:"amount" yaml:"amount"`
+	WithdrawerDid string       `json:"withdrawer_did" yaml:"withdrawer_did"`
 }
 
 func withdrawReserveRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -492,7 +492,7 @@ func withdrawReserveRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawReserve(req.RecipientDid, amount, req.BondDid)
+		msg := types.NewMsgWithdrawReserve(req.WithdrawerDid, amount, req.BondDid)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
