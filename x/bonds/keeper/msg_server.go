@@ -788,7 +788,7 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 
 	if bond.ControllerDid != msg.WithdrawerDid {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
-			"recipient must be the controller of the bond")
+			"withdrawer must be the controller of the bond")
 	}
 
 	// Check that amount is available
