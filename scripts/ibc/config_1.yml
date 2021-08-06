@@ -26,7 +26,7 @@ init:
   app:
     minimum-gas-prices: "0.025uixo"
 genesis:
-  chain_id: "pandora-3.1"
+  chain_id: "pandora-4.1"
   app_state:
     staking:
       params:

@@ -23,7 +23,7 @@ if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
 fi
 
 GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-3"
+CHAIN_ID="pandora-4"
 
 ixod_tx() {
   # Helper function to broadcast a transaction and supply the necessary args

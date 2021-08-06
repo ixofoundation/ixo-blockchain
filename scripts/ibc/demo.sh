@@ -13,8 +13,8 @@ CONFIG_1="./scripts/ibc/config_1.yml"
 CONFIG_2="./scripts/ibc/config_2.yml"
 GAS_PRICES_1="0.025uixo"
 GAS_PRICES_2="0.025uatom"
-CHAIN_ID_1="pandora-3.1"
-CHAIN_ID_2="pandora-3.2"
+CHAIN_ID_1="pandora-4.1"
+CHAIN_ID_2="pandora-4.2"
 RPC_1_HTTP="http://localhost:26659"
 RPC_2_HTTP="http://localhost:26661"
 RPC_1_TCP="tcp://localhost:26659"
@@ -108,26 +108,26 @@ ixod2_tx bank send charlie ixo1q65z2ky63ks52mcztgjr7dm62lwpm46gkg5422 1000000uat
 # Connect the two chains
 starport relayer connect
 
-# Send tokens from pandora-3.1 to pandora-3.2
+# Send tokens from pandora-4.1 to pandora-4.2
 # [[update channel ID if need be]]
 # [[receiver address is arbitrary]]
 ixod1_tx ibc-transfer transfer transfer channel-0 ixo16qeg5rzwhamydtlarc9v6e3ld46x9lxv5tkh4u 123uixo --from=alice
 
-# Send tokens from pandora-3.2 to pandora-3.1
+# Send tokens from pandora-4.2 to pandora-4.1
 # [[update channel ID if need be]]
 # [[receiver address is arbitrary]]
 ixod2_tx ibc-transfer transfer transfer channel-0 ixo1fe3v2dwp6mr25hflwljdddp8vh3cseymp3kmpv 123uatom --from=charlie
 
-# Query balance on pandora-3.1
+# Query balance on pandora-4.1
 ixod1_q bank balances ixo1fe3v2dwp6mr25hflwljdddp8vh3cseymp3kmpv
 
-# Query balance on pandora-3.2
+# Query balance on pandora-4.2
 ixod2_q bank balances ixo16qeg5rzwhamydtlarc9v6e3ld46x9lxv5tkh4u
 
-# Query denom traces on pandora-3.1
+# Query denom traces on pandora-4.1
 ixod1_q ibc-transfer denom-traces
 
-# Query denom traces on pandora-3.2
+# Query denom traces on pandora-4.2
 ixod2_q ibc-transfer denom-traces
 
 # Clean up when you're done!
