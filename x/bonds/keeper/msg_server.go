@@ -807,7 +807,9 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 		return nil, err
 	}
 
-	// Update total amount withdrawn from reserve
+	// Update total amount withdrawn from reserve. We do not use the WithdrawReserve
+	// function here since we only want the available reserve to be updated. The
+	// CurrentReserve (virtual reserve) reported by the bond will be unchanged.
 	k.setAvailableReserve(ctx, bond.BondDid, bond.AvailableReserve.Sub(msg.Amount))
 
 	ctx.EventManager().EmitEvents(sdk.Events{
