@@ -42,7 +42,7 @@ paths:
                       type: string
                       format: byte
       tags:
-        - Query
+        - Bonds
   /bonds/params:
     get:
       operationId: BondsParams
@@ -84,7 +84,7 @@ paths:
                       type: string
                       format: byte
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}':
     get:
       operationId: Bond
@@ -256,9 +256,6 @@ paths:
                         type: string
                       bond_did:
                         type: string
-
-
-
         default:
           description: An unexpected error response
           schema:
@@ -287,7 +284,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/alpha_maximums':
     get:
       operationId: AlphaMaximums
@@ -334,7 +331,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/available_reserve':
     get:
       operationId: AvailableReserve
@@ -391,7 +388,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/batch':
     get:
       operationId: Batch
@@ -624,7 +621,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/buy_price/{bond_amount}':
     get:
       operationId: BuyPrice
@@ -754,7 +751,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/current_price':
     get:
       operationId: CurrentPrice
@@ -812,7 +809,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/current_reserve':
     get:
       operationId: CurrentReserve
@@ -869,7 +866,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/last_batch':
     get:
       operationId: LastBatch
@@ -1102,7 +1099,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/price/{bond_amount}':
     get:
       operationId: CustomPrice
@@ -1164,7 +1161,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/sell_return/{bond_amount}':
     get:
       operationId: SellReturn
@@ -1311,7 +1308,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   '/bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}':
     get:
       operationId: SwapReturn
@@ -1396,7 +1393,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Bonds
   /bonds_detailed:
     get:
       operationId: BondsDetailed
@@ -1489,7 +1486,7 @@ paths:
                       type: string
                       format: byte
       tags:
-        - Query
+        - Bonds
   /allDidDocs:
     get:
       operationId: AllDidDocs
@@ -1700,7 +1697,7 @@ paths:
                           "value": "1.212s"
                         }
       tags:
-        - Query
+        - Did
   /did:
     get:
       operationId: AllDids
@@ -1906,7 +1903,7 @@ paths:
                           "value": "1.212s"
                         }
       tags:
-        - Query
+        - Did
   '/did/{did}':
     get:
       operationId: DidDoc
@@ -2125,7 +2122,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Did
   '/didToAddr/{did}':
     get:
       operationId: AddressFromDid
@@ -2334,7 +2331,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Did
   '/pubKeyToAddr/{pubKey}':
     get:
       operationId: AddressFromBase58EncodedPubkey
@@ -2543,7 +2540,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Did
   '/payments/contracts/{payment_contract_id}':
     get:
       operationId: PaymentContract
@@ -2812,7 +2809,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Payments
   '/payments/contracts_by_id_prefix/{payment_contracts_id_prefix}':
     get:
       operationId: PaymentContractsByIdPrefix
@@ -3085,7 +3082,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Payments
   '/payments/subscriptions/{subscription_id}':
     get:
       operationId: Subscription
@@ -3317,7 +3314,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Payments
   '/payments/templates/{payment_template_id}':
     get:
       operationId: PaymentTemplate
@@ -3589,7 +3586,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Payments
   '/project/{project_did}':
     get:
       operationId: ProjectDoc
@@ -3638,7 +3635,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Project
   '/projectAccounts/{project_did}':
     get:
       operationId: ProjectAccounts
@@ -3680,7 +3677,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Project
   /projectParams:
     get:
       operationId: ProjectParams
@@ -3741,7 +3738,7 @@ paths:
                       type: string
                       format: byte
       tags:
-        - Query
+        - Project
   '/projectTxs/{project_did}':
     get:
       operationId: ProjectTx
@@ -3804,7 +3801,7 @@ paths:
           required: true
           type: string
       tags:
-        - Query
+        - Project
   '/txs/sign_data':
     post:
       description: Get signature bytes for a particular message
