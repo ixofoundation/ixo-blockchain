@@ -3,20 +3,20 @@
 The project module has a number of entity/project accounts created per
 entity/project:
 
-- `InitiatingNodePayFees`: upon a claim evaluation, \[by default\] 10% of 10% of
-  the evaluation payment is sent to this address.
-- `IxoPayFees`: upon a claim evaluation, \[by default\] 90% of 10% of the
-  evaluation payment is sent to this address.
-- `IxoFees`: at project payout, any amount in the above address is moved to this
-  address. In turn, any amount now in IxoFees is sent to the ixo DID (as
+- `InitiatingNodePayFees`: when an oracle service is delivered, \[by default\] 10% of
+  the oracle fee payment is sent to this address.
+- `IxoPayFees`: when an oracle service is delivered, \[by default\] 80% of the
+  oracle fee payment is sent to this address.
+- `IxoFees`: at project payout, any amount in the `IxoPayFees` account is moved to this
+  account address. In turn, any amount now in IxoFees is sent to pay the network fee to ixo (the account associated with a DID which is
   specified in the genesis file)
-- `<projectDid>`: this is the project's funding account, and it is where tokens
-  are actually paid out of upon a claim evaluation.
-- Additionally, one entity/project account per agent is also created. Any
+- `<projectDid>`: this is the project's funding account, from which tokens
+  are paid to the oracle service.
+- Additionally, one entity/project account for each agent is also created. Any
   payments intended for the particular agent is sent to their corresponding
-  entity account. At project payout, their tokens can be withdrawn.
+  entity account. At project payout, the agent's tokens can be withdrawn.
 
-Note that the above-mentioned defaults can be configured from the Genesis file.
+The fee defaults can be configured from the Genesis file.
 
 Example accounts for a project with DID `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c` and one
 agent with DID `did:ixo:RYLHkfNpbA8Losy68jt4yF`:
