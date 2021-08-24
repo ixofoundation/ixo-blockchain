@@ -9,7 +9,7 @@ The did module emits the following events:
 | Type               | Attribute Key | Attribute Value |
 |--------------------|---------------|-----------------|
 | EventTypeAddDidDoc | did           | {did}           |
-| EventTypeAddDidDoc | pub_key       | {pub_key}       |
+| EventTypeAddDidDoc | pub_key       | {pubKey}        |
 
 ## MsgAddCredential
 
@@ -18,5 +18,5 @@ The did module emits the following events:
 | EventTypeAddCredential | cred_type     | {credType}      |
 | EventTypeAddCredential | issuer        | {issuer}        |
 | EventTypeAddCredential | issued        | {issued}        |
-| EventTypeAddCredential | claim         | {claim}         |
-| EventTypeAddCredential | true          | {bool}          |
+| EventTypeAddCredential | claim         | {claimId}       |
+| EventTypeAddCredential | kyc_validated | {bool}          |

@@ -1,5 +1,5 @@
 # State
 
-## DIDs
+## DidDocs
 
-The instance of a DID is stored with its DID-specific parameters.
+The instance of a DidDoc is stored with its DidDoc-specific parameters. This record is accessed by a DidDoc's DID.
