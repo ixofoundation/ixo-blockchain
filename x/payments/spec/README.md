@@ -13,6 +13,7 @@
     - [MsgSetPaymentContractAuthorisation](02_messages.md#MsgSetPaymentContractAuthorisation)
     - [MsgGrantDiscount](02_messages.md#MsgGrantDiscount)
     - [MsgRevokeDiscount](02_messages.md#MsgRevokeDiscount)
+    - [MsgEffectPayment](02_messages.md#MsgEffectPayment)
 1. **[End-Block](03_end_block.md)**
 1. **[Events](04_events.md)**
     - [EndBlocker](04_events.md#endblocker)

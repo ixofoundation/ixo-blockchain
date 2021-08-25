@@ -214,3 +214,31 @@ This message is expected to fail if:
     - Valid ID example: `payment:contract:abc_012-def/345:ghi`
 - Payment contract does not exist (by ID)
 - Sender does not match the payment contract creator
+
+## MsgEffectPayment
+
+This message puts into effect a particular payment contract.
+
+| **Field**         | **Type**         | **Description** |
+|:------------------|:-----------------|:----------------|
+| SenderDid         | `did.Did`        | DID of the message sender (e.g. `did:ixo:4XJLBfGtWSGKSz4BeRxdun`)
+| PaymentContractId | `string`         | ID of the contract being effected (e.g. `payment:contract:contract1`)
+
+```go
+type MsgEffectPayment struct {
+    SenderDid         string
+    PaymentContractId string
+}
+```
+
+This message is expected to fail if:
+
+- Sender DID is empty or invalid
+- Payment contract ID violates `^payment:contract:[a-zA-Z][a-zA-Z0-9/_:-]*$`
+    - ID must start with "payment:contract:", followed by a letter, followed by
+      any mix of alphanumeric characters and the `/`, `_`, `:`, `-` characters.
+    - Valid ID example: `payment:contract:abc_012-def/345:ghi`
+- Payment contract does not exist (by ID)
+- Sender does not match the payment contract creator
+- Payment is not effected (e.g. if max pay has been reached or if payer does
+  not have enough coins)
