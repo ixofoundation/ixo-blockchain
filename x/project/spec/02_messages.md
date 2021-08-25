@@ -1,10 +1,14 @@
 # Messages
 
-In this section we describe the processing of the project messages. 
+In this section we describe the processing of the project messages and the
+corresponding updates to the state. All created/modified state objects specified
+by each message are defined within the [state](01_state.md) section.
 
 ## MsgCreateProject
 
-This message creates a project with arbitrary `Data`.
+This message creates and stores a new project doc with arbitrary `Data` at
+appropriate indexes. Refer to [01_state.md](./01_state.md) for information
+about project docs.
 
 | **Field**  | **Type**          | **Description** |
 |:-----------|:------------------|:----------------|
@@ -16,89 +20,57 @@ This message creates a project with arbitrary `Data`.
 
 ```go
 type MsgCreateProject struct {
-	TxHash     string          `json:"txHash" yaml:"txHash"`
-	SenderDid  string          `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string          `json:"projectDid" yaml:"projectDid"`
-	PubKey     string          `json:"pubKey" yaml:"pubKey"`
-	Data       json.RawMessage `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    PubKey     string
+    Data       json.RawMessage
 }
 ```
 
 This message is expected to fail if:
-- senderDid is incorrect
-- PubKey is incorrect
-- data is unmarshallable to `map[string]json.RawMessage`
-
-This message creates and stores the `Project` object at appropriate indexes.
-
-### Non-Arbitrary Project Data
-
-Despite being mostly arbitrary, a project's `Data ("data")` field is in some cases expected to follow concrete formats. Currently, there is only one such case, which is when we want to specify payment templates to be used when charging project-related fees.
-
-The two (optional) project-related fees currently supported are:
-- Oracle Fee (`OracleFee`)
-- Fee for Service (`FeeForService`)
-
-The following is an example where both an `OracleFee` and `FeeForService` are specified:
-```json
-"data": {
-    ...
-    "fees": {
-        "@context": "...",
-        "items": [
-            {
-                "@type": "OracleFee",
-                "id":"payment:template:oracle-fee-template-1"
-            },
-            {
-                "@type": "FeeForService", 
-                "id":"payment:template:fee-for-service-template-1"
-            }
-        ]
-    }
-    ...
-}
-```
-
-If we do not specify fees, a blank `items` array is required:
-```json
-"data": {
-    ...
-    "fees": {
-        "@context": "...",
-        "items": []
-    }
-    ...
-}
-```
-
-The payment templates (e.g. `payment:template:oracle-fee-template-1`) are expected to exist before the project is created (refer to payments module for payment template creation).
-
-For information around how these payment templates are used, refer to the [Fees page](04_fees.md) of this module's spec.
+- A project doc with DID ProjectDid already exists
+- SenderDid is empty or invalid
+- PubKey is empty or does not match ProjectDid
+- Data is unmarshallable to `map[string]json.RawMessage`
+- Project fees in Data are invalid
 
 ## MsgUpdateProjectStatus
+
+This message updates a project's current status.
 
 | **Field**  | **Type**                 | **Description** |
 |:-----------|:-------------------------|:----------------|
 | TxHash     | `string`                 | Hash of the project request
 | SenderDid  | `did.Did`                | Sender account DID
 | ProjectDid | `did.Did`                | Sender's Project DID
-| Data       | `UpdateProjectStatusDoc` |  Updated data to this project
-
-This message is expected to fail if:
-- senderDid is wrong
-- projectDid is wrong
+| Data       | `UpdateProjectStatusDoc` | Updated data to this project
 
 ```go
 type MsgUpdateProjectStatus struct {
-	TxHash     string                 `json:"txHash" yaml:"txHash"`
-	SenderDid  string                `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string                `json:"projectDid" yaml:"projectDid"`
-	Data       UpdateProjectStatusDoc `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    Data       UpdateProjectStatusDoc
 }
 ```
 
-This message stores the updated `MsgUpdateProjectStatus` object.
+An `UpdateProjectStatusDoc` contains the new project status as well as TODO.
+
+```go
+type UpdateProjectStatusDoc struct {
+    Status          string
+    EthFundingTxnId string
+}
+```
+
+This message is expected to fail if:
+- Project doc having DID ProjectDID does not exist
+- SenderDid is empty or invalid
+- ProjectDid is empty or invalid
+- The status change constitutes an invalid status progression
+- The new status is FUNDED and the project has not yet reached minimum funding
+- The new status is PAIDOUT and paying out fees fails
 
 ## MsgUpdateProjectDoc
 
