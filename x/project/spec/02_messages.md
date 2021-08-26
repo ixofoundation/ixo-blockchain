@@ -14,9 +14,9 @@ about project docs.
 |:-----------|:------------------|:----------------|
 | TxHash     | `string`          | Hash of the project request
 | SenderDid  | `did.Did`         | Sender account DID
-| ProjectDid | `did.Did`         | Sender's Project DID
+| ProjectDid | `did.Did`         | New project's DID
 | PubKey     | `string`          | PubKey of ixo account
-| Data       | `json.RawMessage` | What the data is passing
+| Data       | `json.RawMessage` | Data relevant to the project
 
 ```go
 type MsgCreateProject struct {
@@ -43,8 +43,8 @@ This message updates a project's current status.
 |:-----------|:-------------------------|:----------------|
 | TxHash     | `string`                 | Hash of the project request
 | SenderDid  | `did.Did`                | Sender account DID
-| ProjectDid | `did.Did`                | Sender's Project DID
-| Data       | `UpdateProjectStatusDoc` | Updated data to this project
+| ProjectDid | `did.Did`                | Project DID whose status is to be changed
+| Data       | `UpdateProjectStatusDoc` | Updated status data to this project
 
 ```go
 type MsgUpdateProjectStatus struct {
@@ -65,7 +65,7 @@ type UpdateProjectStatusDoc struct {
 ```
 
 This message is expected to fail if:
-- Project doc having DID ProjectDID does not exist
+- Project doc having DID ProjectDid does not exist
 - SenderDid is empty or invalid
 - ProjectDid is empty or invalid
 - The status change constitutes an invalid status progression
@@ -74,30 +74,36 @@ This message is expected to fail if:
 
 ## MsgUpdateProjectDoc
 
+This message updates a project's Data field.
+
 | **Field**  | **Type**          | **Description** |
 |:-----------|:------------------|:----------------|
 | TxHash     | `string`          | Hash of the project request
 | SenderDid  | `did.Did`         | Sender account DID
-| ProjectDid | `did.Did`         | Sender's Project DID
-| Data       | `json.RawMessage` | What the data is passing
+| ProjectDid | `did.Did`         | Project DID whose Data field is to be updated
+| Data       | `json.RawMessage` | Updated data relevant to the project
 
 ```go
 type MsgUpdateProjectDoc struct {
-	TxHash     string          `json:"txHash" yaml:"txHash"`
-	SenderDid  string          `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string          `json:"projectDid" yaml:"projectDid"`
-	Data       json.RawMessage `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    Data       json.RawMessage
 }
 ```
 
 This message is expected to fail if:
-- senderDid is wrong
-- projectDid is wrong
-- data is unmarshallable to `map[string]json.RawMessage`
-
-This message stores the updated `MsgUpdateProjectDoc` object.
+- SenderDid is empty or invalid
+- SenderDid does not match project creator DID
+- ProjectDid is empty or invalid
+- Project doc having DID ProjectDid does not exist
+- Project is in status STARTED, STOPPED, or PAIDOUT
+- Data is unmarshallable to `map[string]json.RawMessage`
+- Project fees in updated Data are invalid
 
 ## MsgCreateAgent
+
+This message TODO
 
 | **Field**  | **Type**         | **Description** |
 |:-----------|:-----------------|:----------------|
@@ -108,14 +114,23 @@ This message stores the updated `MsgUpdateProjectDoc` object.
 
 ```go
 type MsgCreateAgent struct {
-	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  string         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string         `json:"projectDid" yaml:"projectDid"`
-	Data       CreateAgentDoc `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    Data       CreateAgentDoc
+}
+```
+
+```go
+type CreateAgentDoc struct {
+    AgentDid string
+    Role     string
 }
 ```
 
 ## MsgUpdateAgent
+
+This message TODO
 
 | **Field**  | **Type**         | **Description** |
 |:-----------|:-----------------|:----------------|
@@ -126,16 +141,18 @@ type MsgCreateAgent struct {
 
 ```go
 type MsgUpdateAgent struct {
-	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  string         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string         `json:"projectDid" yaml:"projectDid"`
-	Data       UpdateAgentDoc `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    Data       UpdateAgentDoc
 }
 ```
 
 ## MsgCreateClaim
 
-This will create a claim for the specified project.
+This message creates a claim for a specified project, and is to be signed by the
+ixoDid of the project. Refer to [01_state.md](./01_state.md) for information
+about claims.
 
 | **Field**  | **Type**         | **Description** |
 |:-----------|:-----------------|:----------------|
@@ -145,23 +162,36 @@ This will create a claim for the specified project.
 | Data       | `CreateClaimDoc` |  Claim Doc for the project
 
 This message is expected to fail if:
-- senderDid is wrong
-- projectDid is wrong
-- claim ID (in Data) is wrong
-- claim template ID (in Data) is wrong
+- Project doc having DID ProjectDid does not exist
+- Project is not in status STARTED
+- SenderDid is empty or invalid
+- ProjectDid is empty
+- ClaimId (in Data) already exists
+- ClaimTemplateId (in Data) is empty
 
 ```go
 type MsgCreateClaim struct {
-	TxHash     string         `json:"txHash" yaml:"txHash"`
-	SenderDid  string         `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string         `json:"projectDid" yaml:"projectDid"`
-	Data       CreateClaimDoc `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    Data       CreateClaimDoc
+}
+```
+
+A `CreateClaimDoc` contains an ID uniquely identifying the claim, and TODO. Upon
+creating a claim, its default status is "0" i.e. Pending.
+
+```go
+type CreateClaimDoc struct {
+    ClaimId         string
+    ClaimTemplateId string
 }
 ```
 
 ## MsgCreateEvaluation
 
-This will create a claim evaluation for the specified project.
+This message creates an evaluation for a specified claim on a specified project, and
+is to be signed by the ixoDid of the project. 
 
 | **Field**  | **Type**              | **Description** |
 |:-----------|:----------------------|:----------------|
@@ -171,15 +201,33 @@ This will create a claim evaluation for the specified project.
 | Data       | `CreateEvaluationDoc` | Evalution Doc for the project
 
 This message is expected to fail if:
-- senderDid is wrong
-- projectDid is wrong
+- Project doc having DID ProjectDid does not exist
+- Project is not in status STARTED
+- Claim with ClaimId (in Data) does not exist
+- Claim with ClaimId (in Data) is not in status Pending (status `0`)
+- Oracle fee is present in project fees map, and ixo address, node (relayer)
+  address, or sender (oracle) address cannot be found, or if payment cannot be
+  processed
+- SenderDid is empty or invalid
+- ProjectDid is empty or invalid
 
 ```go
 type MsgCreateEvaluation struct {
-	TxHash     string              `json:"txHash" yaml:"txHash"`
-	SenderDid  string              `json:"senderDid" yaml:"senderDid"`
-	ProjectDid string              `json:"projectDid" yaml:"projectDid"`
-	Data       CreateEvaluationDoc `json:"data" yaml:"data"`
+    TxHash     string
+    SenderDid  string
+    ProjectDid string
+    Data       CreateEvaluationDoc
+}
+```
+
+A `CreateEvaluationDoc` contains the claim ID of the claim being evaluated, and a
+new status indicating whether the claim is accepted (status `1`) or rejected
+(status `2`).
+
+```go
+type CreateEvaluationDoc struct {
+    ClaimId string
+    Status  string
 }
 ```
 
@@ -189,12 +237,21 @@ This is used by project agents to withdraw their funds from the project.
 
 | **Field** | **Type**           | **Description** |
 |:----------|:-------------------|:----------------|
-| SenderDid | `did.Did`          |  Hash of the project request
+| SenderDid | `did.Did`          | Hash of the project request
 | Data      | `WithdrawFundsDoc` | Amount to which data is transferring
 
 ```go
 type MsgWithdrawFunds struct {
-	SenderDid string          `json:"senderDid" yaml:"senderDid"`
-	Data      WithdrawFundsDoc `json:"data" yaml:"data"`
+    SenderDid string
+    Data      WithdrawFundsDoc
+}
+```
+
+```go
+type WithdrawFundsDoc struct {
+    ProjectDid   string
+    RecipientDid string
+    Amount       sdk.Int
+    IsRefund     bool
 }
 ```

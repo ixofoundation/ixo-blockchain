@@ -22,7 +22,7 @@ data associated to the project.
 
 **Status**: indicates the project's current status, which in turn dictates the
 functionalities that are currently available on the project. The possible
-statuses a project can be in are
+statuses a project can be in are:
 - the null status
 - CREATED
 - PENDING
@@ -78,3 +78,25 @@ If we do not specify fees, a blank `items` array is required:
 The payment templates (e.g. `payment:template:oracle-fee-template-1`) are expected to exist before the project is created (refer to payments module for payment template creation).
 
 For information around how these payment templates are used, refer to the [Fees page](04_fees.md) of this module's spec.
+
+## Claim
+
+```go
+type Claim struct {
+    Id         string
+    TemplateId string
+    ClaimerDid string
+    Status     string
+}
+```
+
+A claim can be created on a project that is in status STARTED. Apart from an ID
+identifying the claim, a claim also stores a template ID, the claimer's DID, and the
+claim's current status.
+
+** TemplateId: TODO
+
+** Status: indicates the claim's current status, which can be one of three:
+- Pending (status `0`)
+- Approved (status `1`)
+- Rejected (status `2`)
