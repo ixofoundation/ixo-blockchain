@@ -94,9 +94,9 @@ A claim can be created on a project that is in status STARTED. Apart from an ID
 identifying the claim, a claim also stores a template ID, the claimer's DID, and the
 claim's current status.
 
-** TemplateId: TODO
+**TemplateId**: TODO
 
-** Status: indicates the claim's current status, which can be one of three:
+**Status**: indicates the claim's current status, which can be one of three:
 - Pending (status `0`)
 - Approved (status `1`)
 - Rejected (status `2`)

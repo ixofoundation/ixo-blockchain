@@ -148,6 +148,14 @@ type MsgUpdateAgent struct {
 }
 ```
 
+```go
+type UpdateAgentDoc struct {
+    Did    string
+    Status string
+    Role   string
+}
+```
+
 ## MsgCreateClaim
 
 This message creates a claim for a specified project, and is to be signed by the
@@ -160,14 +168,6 @@ about claims.
 | SenderDid  | `did.Did`        | Sender account DID
 | ProjectDid | `did.Did`        | Sender's Project DID
 | Data       | `CreateClaimDoc` |  Claim Doc for the project
-
-This message is expected to fail if:
-- Project doc having DID ProjectDid does not exist
-- Project is not in status STARTED
-- SenderDid is empty or invalid
-- ProjectDid is empty
-- ClaimId (in Data) already exists
-- ClaimTemplateId (in Data) is empty
 
 ```go
 type MsgCreateClaim struct {
@@ -188,6 +188,14 @@ type CreateClaimDoc struct {
 }
 ```
 
+This message is expected to fail if:
+- Project doc having DID ProjectDid does not exist
+- Project is not in status STARTED
+- SenderDid is empty or invalid
+- ProjectDid is empty
+- ClaimId (in Data) already exists
+- ClaimTemplateId (in Data) is empty
+
 ## MsgCreateEvaluation
 
 This message creates an evaluation for a specified claim on a specified project, and
@@ -199,17 +207,6 @@ is to be signed by the ixoDid of the project.
 | SenderDid  | `did.Did`             | Sender account DID
 | ProjectDid | `did.Did`             | Sender's Project DID
 | Data       | `CreateEvaluationDoc` | Evalution Doc for the project
-
-This message is expected to fail if:
-- Project doc having DID ProjectDid does not exist
-- Project is not in status STARTED
-- Claim with ClaimId (in Data) does not exist
-- Claim with ClaimId (in Data) is not in status Pending (status `0`)
-- Oracle fee is present in project fees map, and ixo address, node (relayer)
-  address, or sender (oracle) address cannot be found, or if payment cannot be
-  processed
-- SenderDid is empty or invalid
-- ProjectDid is empty or invalid
 
 ```go
 type MsgCreateEvaluation struct {
@@ -231,13 +228,24 @@ type CreateEvaluationDoc struct {
 }
 ```
 
+This message is expected to fail if:
+- Project doc having DID ProjectDid does not exist
+- Project is not in status STARTED
+- Claim with ClaimId (in Data) does not exist
+- Claim with ClaimId (in Data) is not in status Pending (status `0`)
+- Oracle fee is present in project fees map, and ixo address, node (relayer)
+  address, or sender (oracle) address cannot be found, or if payment cannot be
+  processed
+- SenderDid is empty or invalid
+- ProjectDid is empty or invalid
+
 ## MsgWithdrawFunds
 
-This is used by project agents to withdraw their funds from the project.
+This message allows project agents to withdraw their funds from the project.
 
 | **Field** | **Type**           | **Description** |
 |:----------|:-------------------|:----------------|
-| SenderDid | `did.Did`          | Hash of the project request
+| SenderDid | `did.Did`          | Sender account DID
 | Data      | `WithdrawFundsDoc` | Amount to which data is transferring
 
 ```go
@@ -247,6 +255,10 @@ type MsgWithdrawFunds struct {
 }
 ```
 
+The `WithdrawFundsDoc` specifies the project DID from which funds are to be withdrawn,
+the recipient of the funds, the amount of funds to be withdrawn, and whether the
+withdrawal is a refund to be sent to the project creator.
+
 ```go
 type WithdrawFundsDoc struct {
     ProjectDid   string
@@ -255,3 +267,14 @@ type WithdrawFundsDoc struct {
     IsRefund     bool
 }
 ```
+
+This message is expected to fail if:
+- Project doc having DID ProjectDid does not exist
+- Project is not in status PAIDOUT
+- IsRefund is set to true and RecipientDid is not the project creator
+- Project account has insufficient funds
+- Sending funds to recipient fails
+- SenderDid is empty or invalid
+- SenderDid does not match RecipientDid
+- RecipientDid (in Data) is empty or invalid
+- Amount (in Data) is not positive
