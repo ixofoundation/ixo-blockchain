@@ -10,6 +10,7 @@ This is the official repository for the Sustainability Hub (ixo-Hub)
 
 ## Documentation
 - Guide for setting up a Relayer on the Pandora test network and Internet of Impact Hub main network: [here](https://github.com/ixofoundation/genesis)
+- Swagger API documentation can be found under `client/docs/swagger-ui` and `client/docs/swagger-ui-legacy`
 - Blockchain Module Specifications can be found under `x/<module>/spec`
 
 ## Building and Running
