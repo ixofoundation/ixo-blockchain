@@ -1,13 +1,13 @@
 # Fees
 
-As discussed in the messages page, a project doc's [arbitrary data](02_messages.md#non-arbitrary-project-data) is expected to include a `fees` field which follows a specific format, which is represented by the following struct:
+As discussed in the [state](./01_state.md) page, a project doc's arbitrary data is expected to include a `fees` field which follows a specific format, which is represented by the following struct:
 
 ```go
 type ProjectFeesMap struct {
-	Context string `json:"@context" yaml:"@context"`
-	Items   []struct {
-		Type              FeeType `json:"@type" yaml:"@type"`
-		PaymentTemplateId string  `json:"id" yaml:"id"`
+    Context string
+    Items   []struct {
+        Type              FeeType
+        PaymentTemplateId string
 	}
 }
 ```
