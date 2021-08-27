@@ -83,15 +83,15 @@ For alpha bonds, the batch also stores the next alpha value, if it was changed t
 
 ```go
 type Batch struct {
-	BondDid         string
-	BlocksRemaining sdk.Uint
-	NextPublicAlpha sdk.Dec
-	TotalBuyAmount  sdk.Coin
-	TotalSellAmount sdk.Coin
-	BuyPrices       sdk.DecCoins
-	SellPrices      sdk.DecCoins
-	Buys            []BuyOrder
-	Sells           []SellOrder
-	Swaps           []SwapOrder
+    BondDid         string
+    BlocksRemaining sdk.Uint
+    NextPublicAlpha sdk.Dec
+    TotalBuyAmount  sdk.Coin
+    TotalSellAmount sdk.Coin
+    BuyPrices       sdk.DecCoins
+    SellPrices      sdk.DecCoins
+    Buys            []BuyOrder
+    Sells           []SellOrder
+    Swaps           []SwapOrder
 }
 ```

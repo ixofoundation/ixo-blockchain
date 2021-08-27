@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This document specifies the bonds bodule; a custom Cosmos SDK module.
+This document specifies the bonds module; a custom Cosmos SDK module.
 
 The bonds module provides universal token bonding curve functions to mint, burn or swap any token in a Cosmos blockchain. Once the Inter-Blockchain Communication (IBC) protocol is available, this should enable cross-network exchanges of tokens at algorithmically-determined prices.
 

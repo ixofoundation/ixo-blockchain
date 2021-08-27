@@ -33,28 +33,28 @@ Bonds can be created by any address using `MsgCreateBond`.
 
 ```go
 type MsgCreateBond struct {
-	BondDid                  string
-	Token                    string
-	Name                     string
-	Description              string
-	FunctionType             string
-	FunctionParameters       FunctionParams
-	CreatorDid               string
-	ControllerDid            string
-	ReserveTokens            []string
-	TxFeePercentage          sdk.Dec
-	ExitFeePercentage        sdk.Dec
-	FeeAddress               string
-	ReserveWithdrawalAddress string
-	MaxSupply                sdk.Coin
-	OrderQuantityLimits      sdk.Coins
-	SanityRate               sdk.Dec
-	SanityMarginPercentage   sdk.Dec
-	AllowSells               bool
+    BondDid                  string
+    Token                    string
+    Name                     string
+    Description              string
+    FunctionType             string
+    FunctionParameters       FunctionParams
+    CreatorDid               string
+    ControllerDid            string
+    ReserveTokens            []string
+    TxFeePercentage          sdk.Dec
+    ExitFeePercentage        sdk.Dec
+    FeeAddress               string
+    ReserveWithdrawalAddress string
+    MaxSupply                sdk.Coin
+    OrderQuantityLimits      sdk.Coins
+    SanityRate               sdk.Dec
+    SanityMarginPercentage   sdk.Dec
+    AllowSells               bool
     AllowReserveWithdrawals  bool
-	AlphaBond                bool
-	BatchBlocks              sdk.Uint
-	OutcomePayment           sdk.Int
+    AlphaBond                bool
+    BatchBlocks              sdk.Uint
+    OutcomePayment           sdk.Int
 }
 ```
 
@@ -120,13 +120,13 @@ This message is expected to fail if:
 
 ```go
 type MsgEditBond struct {
-	BondDid                string
-	Name                   string
-	Description            string
-	OrderQuantityLimits    string
-	SanityRate             string
-	SanityMarginPercentage string
-	EditorDid              string
+    BondDid                string
+    Name                   string
+    Description            string
+    OrderQuantityLimits    string
+    SanityRate             string
+    SanityMarginPercentage string
+    EditorDid              string
 }
 ```
 
@@ -156,9 +156,9 @@ This message is expected to fail if:
 
 ```go
 type MsgSetNextAlpha struct {
-	BondDid   string
-	Alpha     sdk.Dec
-	EditorDid string
+    BondDid   string
+    Alpha     sdk.Dec
+    EditorDid string
 }
 ```
 
@@ -183,9 +183,9 @@ This message is expected to fail if:
 
 ```go
 type MsgUpdateBondState struct {
-	BondDid   string
-	State     string
-	EditorDid string
+    BondDid   string
+    State     string
+    EditorDid string
 }
 ```
 
@@ -221,10 +221,10 @@ The batch-adjusted current supply in the case of buys is the current supply of t
 
 ```go
 type MsgBuy struct {
-	BuyerDid  string
-	Amount    sdk.Coin
-	MaxPrices sdk.Coins
-	BondDid   string
+    BuyerDid  string
+    Amount    sdk.Coin
+    MaxPrices sdk.Coins
+    BondDid   string
 }
 ```
 
@@ -266,9 +266,9 @@ The batch-adjusted current supply in the case of sells is the current supply of 
 
 ```go
 type MsgSell struct {
-	SellerDid string
-	Amount    sdk.Coin
-	BondDid   string
+    SellerDid string
+    Amount    sdk.Coin
+    BondDid   string
 }
 ```
 
@@ -295,10 +295,10 @@ This message is expected to fail if:
 
 ```go
 type MsgSwap struct {
-	SwapperDid string
-	BondDid    string
-	From       sdk.Coin
-	ToToken    string
+    SwapperDid string
+    BondDid    string
+    From       sdk.Coin
+    ToToken    string
 }
 ```
 
@@ -322,9 +322,9 @@ This message is expected to fail if:
 
 ```go
 type MsgMakeOutcomePayment struct {
-	SenderDid string
-	Amount    sdk.Int
-	BondDid   string
+    SenderDid string
+    Amount    sdk.Int
+    BondDid   string
 }
 ```
 
@@ -350,8 +350,8 @@ This message is expected to fail if:
 
 ```go
 type MsgWithdrawShare struct {
-	RecipientDid string
- 	BondDid      string
+    RecipientDid string
+    BondDid      string
 }
 ```
 
@@ -374,8 +374,8 @@ This message is expected to fail if:
 
 ```go
 type MsgWithdrawReserve struct {
-	WithdrawerDid string
-	Amount        sdk.Coin
-	BondDid       string
+    WithdrawerDid string
+    Amount        sdk.Coin
+    BondDid       string
 }
 ```
