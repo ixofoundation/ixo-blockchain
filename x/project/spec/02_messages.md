@@ -13,9 +13,9 @@ about project docs.
 | **Field**  | **Type**          | **Description** |
 |:-----------|:------------------|:----------------|
 | TxHash     | `string`          | Hash of the project request
-| SenderDid  | `did.Did`         | Sender account DID
-| ProjectDid | `did.Did`         | New project's DID
-| PubKey     | `string`          | PubKey of ixo account
+| SenderDid  | `did.Did`         | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`         | New project DID (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| PubKey     | `string`          | PubKey of project's ixo account (e.g. `FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW`)
 | Data       | `json.RawMessage` | Data relevant to the project
 
 ```go
@@ -42,8 +42,8 @@ This message updates a project's current status.
 | **Field**  | **Type**                 | **Description** |
 |:-----------|:-------------------------|:----------------|
 | TxHash     | `string`                 | Hash of the project request
-| SenderDid  | `did.Did`                | Sender account DID
-| ProjectDid | `did.Did`                | Project DID whose status is to be changed
+| SenderDid  | `did.Did`                | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`                | Project DID whose status is to be changed (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | Data       | `UpdateProjectStatusDoc` | Updated status data to this project
 
 ```go
@@ -79,8 +79,8 @@ This message updates a project's Data field.
 | **Field**  | **Type**          | **Description** |
 |:-----------|:------------------|:----------------|
 | TxHash     | `string`          | Hash of the project request
-| SenderDid  | `did.Did`         | Sender account DID
-| ProjectDid | `did.Did`         | Project DID whose Data field is to be updated
+| SenderDid  | `did.Did`         | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`         | Project DID whose Data field is to be updated (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | Data       | `json.RawMessage` | Updated data relevant to the project
 
 ```go
@@ -158,16 +158,15 @@ type UpdateAgentDoc struct {
 
 ## MsgCreateClaim
 
-This message creates a claim for a specified project, and is to be signed by the
-ixoDid of the project. Refer to [01_state.md](./01_state.md) for information
-about claims.
+This message creates a claim for a specified project. Refer to
+[01_state.md](./01_state.md) for information about claims.
 
 | **Field**  | **Type**         | **Description** |
 |:-----------|:-----------------|:----------------|
 | TxHash     | `string`         | Hash of the project request
-| SenderDid  | `did.Did`        | Sender account DID
-| ProjectDid | `did.Did`        | Sender's Project DID
-| Data       | `CreateClaimDoc` |  Claim Doc for the project
+| SenderDid  | `did.Did`        | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`        | Project DID on which a claim is to be created (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| Data       | `CreateClaimDoc` | Claim Doc for the project
 
 ```go
 type MsgCreateClaim struct {
@@ -179,7 +178,7 @@ type MsgCreateClaim struct {
 ```
 
 A `CreateClaimDoc` contains an ID uniquely identifying the claim, and TODO. Upon
-creating a claim, its default status is "0" i.e. Pending.
+creating a claim, its default status is `0` i.e. Pending.
 
 ```go
 type CreateClaimDoc struct {
@@ -198,14 +197,13 @@ This message is expected to fail if:
 
 ## MsgCreateEvaluation
 
-This message creates an evaluation for a specified claim on a specified project, and
-is to be signed by the ixoDid of the project. 
+This message creates an evaluation for a specified claim on a specified project.
 
 | **Field**  | **Type**              | **Description** |
 |:-----------|:----------------------|:----------------|
 | TxHash     | `string`              | Hash of the project request
-| SenderDid  | `did.Did`             | Sender account DID
-| ProjectDid | `did.Did`             | Sender's Project DID
+| SenderDid  | `did.Did`             | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`             | Project DID (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | Data       | `CreateEvaluationDoc` | Evalution Doc for the project
 
 ```go
@@ -245,8 +243,8 @@ This message allows project agents to withdraw their funds from the project.
 
 | **Field** | **Type**           | **Description** |
 |:----------|:-------------------|:----------------|
-| SenderDid | `did.Did`          | Sender account DID
-| Data      | `WithdrawFundsDoc` | Amount to which data is transferring
+| SenderDid | `did.Did`          | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| Data      | `WithdrawFundsDoc` | Details about the funds to be withdrawn
 
 ```go
 type MsgWithdrawFunds struct {

@@ -13,10 +13,10 @@ type ProjectDoc struct {
 }
 ```
 
-A project doc contains basic details about a project. Apart from the ProjectDid
+A project doc contains basic details about a project. Apart from the project DID
 identifying the project doc, the project doc stores a tx hash, the project creator's
-DID, the project's public key, the project's current status, and other user-specified
-data associated to the project.
+DID, the project's public key (associated with the project's DID), the project's
+current status, and other user-specified data associated to the project.
 
 **TxHash**: TODO
 
