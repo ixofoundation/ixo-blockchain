@@ -531,7 +531,7 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventTypeUpdateProjectStatus,
+			types.EventTypeUpdateProjectDoc,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
 			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
