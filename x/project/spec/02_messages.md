@@ -103,13 +103,14 @@ This message is expected to fail if:
 
 ## MsgCreateAgent
 
-This message TODO
+This message creates an agent on a specified project. An agent is any account
+interacting with the project. Each agent has a project account.
 
 | **Field**  | **Type**         | **Description** |
 |:-----------|:-----------------|:----------------|
 | TxHash     | `string`         | Hash of the project request
-| SenderDid  | `did.Did`        | Sender account DID
-| ProjectDid | `did.Did`        | Sender's Project DID
+| SenderDid  | `did.Did`        | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`        | Project DID to which agent will be added (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | Data       | `CreateAgentDoc` | AgentDoc data
 
 ```go
@@ -128,15 +129,18 @@ type CreateAgentDoc struct {
 }
 ```
 
+The role of an agent must be one of `SA` (can list claims), `EA` (can evaluate
+claims), or `IA`. TODO
+
 ## MsgUpdateAgent
 
-This message TODO
+This message updates the status of an agent on a project.
 
 | **Field**  | **Type**         | **Description** |
 |:-----------|:-----------------|:----------------|
 | TxHash     | `string`         | Hash of the project request
-| SenderDid  | `did.Did`        | Sender account DID
-| ProjectDid | `did.Did`        | Sender's Project DID
+| SenderDid  | `did.Did`        | Sender account DID (e.g. `did:ixo:U4tSpzzv91HHqWW1YmFkHJ`)
+| ProjectDid | `did.Did`        | Project DID whose agent status will be updated (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
 | Data       | `UpdateAgentDoc` | AgentDoc data
 
 ```go
@@ -155,6 +159,10 @@ type UpdateAgentDoc struct {
     Role   string
 }
 ```
+
+Similarly to `MsgCreateAgent`, the role of an agent must be one of `SA`, `EA`,
+or `IA`. The status must be one of `0` (Pending), `1` (Approved), or `2` (Revoked).
+
 
 ## MsgCreateClaim
 
