@@ -14,11 +14,13 @@ type ProjectDoc struct {
 ```
 
 A project doc contains basic details about a project. Apart from the project DID
-identifying the project doc, the project doc stores a tx hash, the project creator's
-DID, the project's public key (associated with the project's DID), the project's
-current status, and other user-specified data associated to the project.
+identifying the project doc, the project doc stores a transaction hash, the project
+creator's DID, the project's public key (associated with the project's DID), the
+project's current status, and other user-specified data associated to the project.
 
-**TxHash**: TODO
+**TxHash**: a value usually set by ixo-cellnode if it is the component that is
+creating the project. If creating a project using `ixod`, the value of this field 
+is not very relevant.
 
 **Status**: indicates the project's current status, which in turn dictates the
 functionalities that are currently available on the project. The possible
@@ -31,7 +33,16 @@ statuses a project can be in are:
 - STOPPED
 - PAIDOUT.
 
-Newly created projects are in the null status by default.
+Newly created projects are in the null status by default. The following are the
+valid transitions between the states.
+<pre>
+- Null    -> CREATED
+- CREATED -> PENDING
+- PENDING -> CREATED or FUNDED
+- FUNDED  -> STARTED
+- STARTED -> STOPPED
+- STOPPED -> PAIDOUT
+</pre>
 
 **Data**: a JSON object containing data relevant to the project. Despite being
 mostly arbitrary, a project's `Data ("data")` field is in some cases expected to
@@ -79,7 +90,48 @@ The payment templates (e.g. `payment:template:oracle-fee-template-1`) are expect
 
 For information around how these payment templates are used, refer to the [Fees page](04_fees.md) of this module's spec.
 
-## Claim
+## GenesisAccountMap
+
+```go
+type GenesisAccountMap struct {
+    Map map[string]string
+}
+```
+
+A genesis account map maps a project's account names to the accounts' addresses.
+It keeps track of the addresses for the `InitiatingNodePayFees`, `IxoPayFees`,
+and `IxoFees` accounts, as well as the accounts of the project's agents. For
+more detail on project accounts, refer to the
+[Entity Accounts page](05_entity_accounts.md) of this module's spec.
+
+## WithdrawalInfoDocs
+
+```go
+type WithdrawalInfoDocs struct {
+    DocsList []WithdrawalInfoDoc
+}
+```
+
+```go
+type WithdrawalInfoDoc struct {
+    ProjectDid   string
+    RecipientDid string
+    Amount       types.Coin
+}
+```
+
+A withdrawal info doc stores details of any withdrawal performed on a project and
+stores the project's DID, the recipient's DID, and the amount withdrawn.
+`WithdrawalInfoDocs` stores a list of these withdrawal docs for a specific project.
+
+
+## Claims
+
+```go
+type Claims struct {
+    ClaimsList []Claim
+}
+```
 
 ```go
 type Claim struct {
@@ -92,7 +144,8 @@ type Claim struct {
 
 A claim can be created on a project that is in status STARTED. Apart from an ID
 identifying the claim, a claim also stores a template ID, the claimer's DID, and the
-claim's current status.
+claim's current status. `Claims` stores a list of all claims for a specific
+project.
 
 **TemplateId**: TODO
 
