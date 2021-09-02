@@ -80,4 +80,4 @@ The project module emits the following events:
 | withdraw_funds | project_did   | {project_did}   |
 | withdraw_funds | recipient_did | {recipient_did} |
 | withdraw_funds | amount        | {amount}        |
-| withdraw_funds | is-refund     | {is_refund}     |
+| withdraw_funds | is_refund     | {is_refund}     |

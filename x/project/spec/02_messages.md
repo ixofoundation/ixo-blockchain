@@ -163,7 +163,6 @@ type UpdateAgentDoc struct {
 Similarly to `MsgCreateAgent`, the role of an agent must be one of `SA`, `EA`,
 or `IA`. The status must be one of `0` (Pending), `1` (Approved), or `2` (Revoked).
 
-
 ## MsgCreateClaim
 
 This message creates a claim for a specified project. Refer to
