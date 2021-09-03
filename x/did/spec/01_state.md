@@ -1,6 +1,6 @@
 # State
 
-## DidDocs
+## DID Docs
 
 ```go
 type DidDoc interface {

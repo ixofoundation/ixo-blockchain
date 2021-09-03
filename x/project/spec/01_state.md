@@ -1,6 +1,14 @@
 # State
 
-## ProjectDoc
+The project module stores four lists of the following four types of data, as
+well as module parameters (see the [Params spec page](06_params.md)):
+
+1. [Project docs](#project-docs)
+2. [Genesis account maps](#genesis-account-maps)
+3. [Withdrawal info docs](#withdrawal-info-docs)
+4. [Claims](#claims)
+
+## Project Docs
 
 ```go
 type ProjectDoc struct {
@@ -90,7 +98,7 @@ The payment templates (e.g. `payment:template:oracle-fee-template-1`) are expect
 
 For information around how these payment templates are used, refer to the [Fees page](04_fees.md) of this module's spec.
 
-## GenesisAccountMap
+## Genesis Account Maps
 
 ```go
 type GenesisAccountMap struct {
@@ -104,7 +112,7 @@ and `IxoFees` accounts, as well as the accounts of the project's agents. For
 more detail on project accounts, refer to the
 [Entity Accounts page](05_entity_accounts.md) of this module's spec.
 
-## WithdrawalInfoDocs
+## Withdrawal Info Docs
 
 ```go
 type WithdrawalInfoDocs struct {
