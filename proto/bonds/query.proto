@@ -8,140 +8,173 @@ import "bonds/bonds.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
 
-// To get a list of all module queries, go to the module's keeper/querier.go
-// and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest/query.go
+// Query defines the gRPC querier service.
 service Query {
+  // Bonds returns all existing bonds.
   rpc Bonds(QueryBondsRequest) returns (QueryBondsResponse){
     option (google.api.http).get = "/ixo/bonds"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
   }
 
+  // BondsDetailed returns a list of all existing bonds with details about their current state.
   rpc BondsDetailed(QueryBondsDetailedRequest) returns (QueryBondsDetailedResponse) {
     option (google.api.http).get = "/ixo/bonds_detailed";
   }
 
+  // Params queries the paramaters of x/bonds module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/ixo/bonds/params";
   }
 
+  // Bond queries info of a specific bond.
   rpc Bond(QueryBondRequest) returns (QueryBondResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}";
   }
 
+  // Batch queries info of a specific bond's current batch.
   rpc Batch(QueryBatchRequest) returns (QueryBatchResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/batch";
   }
 
+  // LastBatch queries info of a specific bond's last batch.
   rpc LastBatch(QueryLastBatchRequest) returns (QueryLastBatchResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/last_batch";
   }
 
+  // CurrentPrice queries the current price/s of a specific bond.
   rpc CurrentPrice(QueryCurrentPriceRequest) returns (QueryCurrentPriceResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/current_price";
   }
 
+  // CurrentReserve queries the current balance/s of the reserve pool for a specific bond.
   rpc CurrentReserve(QueryCurrentReserveRequest) returns (QueryCurrentReserveResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/current_reserve";
   }
 
+  // AvailableReserve queries current available balance/s of the reserve pool for a specific bond.
   rpc AvailableReserve(QueryAvailableReserveRequest) returns (QueryAvailableReserveResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/available_reserve";
   }
 
+  // CustomPrice queries price/s of a specific bond at a specific supply.
   rpc CustomPrice (QueryCustomPriceRequest) returns (QueryCustomPriceResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/price/{bond_amount}";
   }
 
+  // BuyPrice queries price/s of buying an amount of tokens from a specific bond.
   rpc BuyPrice(QueryBuyPriceRequest) returns (QueryBuyPriceResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/buy_price/{bond_amount}";
   }
 
+  // SellReturn queries return/s on selling an amount of tokens of a specific bond.
   rpc SellReturn(QuerySellReturnRequest) returns (QuerySellReturnResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/sell_return/{bond_amount}";
   }
 
+  // SwapReturn queries return/s on swapping an amount of tokens to another token of a specific bond.
   rpc SwapReturn(QuerySwapReturnRequest) returns (QuerySwapReturnResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}";
   }
 
+  // AlphaMaximums queries alpha maximums for a specific augmented bonding curve.
   rpc AlphaMaximums(QueryAlphaMaximumsRequest) returns (QueryAlphaMaximumsResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/alpha_maximums";
   }
 }
 
+// QueryBondsRequest is the request type for the Query/Bonds RPC method.
 message QueryBondsRequest {}
 
+// QueryBondsResponse is the response type for the Query/Bonds RPC method.
 message QueryBondsResponse {
   repeated string bonds = 1 [(gogoproto.moretags) = "yaml:\"bonds\""];
 }
 
+// QueryBondsDetailedRequest is the request type for the Query/BondsDetailed RPC method.
 message QueryBondsDetailedRequest {}
 
+// QueryBondsDetailedResponse is the response type for the Query/BondsDetailed RPC method.
 message QueryBondsDetailedResponse {
   repeated BondDetails bonds_detailed = 1 [(gogoproto.moretags) = "yaml:\"bonds_detailed\""];
 }
 
+// QueryBondRequest is the request type for the Query/Bond RPC method.
 message QueryBondRequest {
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryBondResponse is the response type for the Query/Bond RPC method.
 message QueryBondResponse {
   Bond bond = 1 [(gogoproto.moretags) = "yaml:\"bond\""];
 }
 
+// QueryBatchRequest is the request type for the Query/Batch RPC method.
 message QueryBatchRequest{
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryBatchResponse is the response type for the Query/Batch RPC method.
 message QueryBatchResponse {
   Batch batch = 1 [(gogoproto.moretags) = "yaml:\"batch\""];
 }
 
+// QueryLastBatchRequest is the request type for the Query/LastBatch RPC method.
 message QueryLastBatchRequest{
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryLastBatchResponse is the response type for the Query/LastBatch RPC method.
 message QueryLastBatchResponse {
   Batch last_batch = 1 [(gogoproto.moretags) = "yaml:\"last_batch\""];
 }
 
+// QueryCurrentPriceRequest is the request type for the Query/CurrentPrice RPC method.
 message QueryCurrentPriceRequest {
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryCurrentPriceResponse is the response type for the Query/CurrentPrice RPC method.
 message QueryCurrentPriceResponse {
   repeated cosmos.base.v1beta1.DecCoin current_price  = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"current_price\""];
 }
 
+// QueryCurrentReserveRequest is the request type for the Query/CurrentReserve RPC method.
 message QueryCurrentReserveRequest {
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryCurrentReserveResponse is the response type for the Query/CurrentReserve RPC method.
 message QueryCurrentReserveResponse {
   repeated cosmos.base.v1beta1.Coin current_reserve = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"current_reserve\""];
 }
 
+// QueryAvailableReserveRequest is the request type for the Query/AvailableReserve RPC method.
 message QueryAvailableReserveRequest {
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryAvailableReserveResponse is the response type for the Query/AvailableReserve RPC method.
 message QueryAvailableReserveResponse {
   repeated cosmos.base.v1beta1.Coin available_reserve = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"available_reserve\""];
 }
 
+// QueryCustomPriceRequest is the request type for the Query/CustomPrice RPC method.
 message QueryCustomPriceRequest {
   string bond_did    = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
   string bond_amount = 2 [(gogoproto.moretags) = "yaml:\"bond_amount\""];
 }
 
+// QueryCustomPriceResponse is the response type for the Query/CustomPrice RPC method.
 message QueryCustomPriceResponse {
   repeated cosmos.base.v1beta1.DecCoin price = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"price\""];
 }
 
+// QueryCustomPriceRequest is the request type for the Query/BuyPrice RPC method.
 message QueryBuyPriceRequest {
   string bond_did    = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
   string bond_amount = 2 [(gogoproto.moretags) = "yaml:\"bond_amount\""];
 }
 
+// QueryCustomPriceResponse is the response type for the Query/BuyPrice RPC method.
 message QueryBuyPriceResponse {
   cosmos.base.v1beta1.Coin adjusted_supply       = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"adjusted_supply\""];
   repeated cosmos.base.v1beta1.Coin prices       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"prices\""];
@@ -150,11 +183,13 @@ message QueryBuyPriceResponse {
   repeated cosmos.base.v1beta1.Coin total_fees   = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_fees\""];
 }
 
+// QuerySellReturnRequest is the request type for the Query/SellReturn RPC method.
 message QuerySellReturnRequest {
   string bond_did    = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
   string bond_amount = 2 [(gogoproto.moretags) = "yaml:\"bond_amount\""];
 }
 
+// QuerySellReturnResponse is the response type for the Query/SellReturn RPC method.
 message QuerySellReturnResponse {
   cosmos.base.v1beta1.Coin adjusted_supply        = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"adjusted_supply\""];
   repeated cosmos.base.v1beta1.Coin returns       = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"returns\""];
@@ -164,28 +199,34 @@ message QuerySellReturnResponse {
   repeated cosmos.base.v1beta1.Coin total_fees    = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_fees\""];
 }
 
+// QuerySwapReturnRequest is the request type for the Query/SwapReturn RPC method.
 message QuerySwapReturnRequest {
   string bond_did               = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
   string from_token_with_amount = 2 [(gogoproto.moretags) = "yaml:\"from_token_with_amount\""];
   string to_token               = 3 [(gogoproto.moretags) = "yaml:\"to_token\""];
 }
 
+// QuerySwapReturnResponse is the response type for the Query/SwapReturn RPC method.
 message QuerySwapReturnResponse {
   repeated cosmos.base.v1beta1.Coin total_returns = 1 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_returns\""];
   repeated cosmos.base.v1beta1.Coin total_fees    = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"total_fees\""];
 }
 
+// QueryAlphaMaximumsRequest is the request type for the Query/AlphaMaximums RPC method.
 message QueryAlphaMaximumsRequest {
   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
 }
 
+// QueryAlphaMaximumsResponse is the response type for the Query/AlphaMaximums RPC method.
 message QueryAlphaMaximumsResponse {
   string max_system_alpha_increase = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_system_alpha_increase\""];
   string max_system_alpha          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_system_alpha\""];
 }
 
+// QueryParamsRequest is the request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
+// QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryParamsResponse {
   Params params = 1 [(gogoproto.moretags) = "yaml:\"params\""];
 }
