@@ -6,6 +6,7 @@ import "did/did.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
+// BaseDidDoc defines a base DID document type. It implements the DidDoc interface.
 message BaseDidDoc {
   option (gogoproto.goproto_stringer) = false;
   option (gogoproto.goproto_getters)  = false;
