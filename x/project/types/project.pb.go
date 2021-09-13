@@ -26,6 +26,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// UpdateProjectStatusDoc contains details required to update a project's status.
 type UpdateProjectStatusDoc struct {
 	Status          string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty" yaml:"status"`
 	EthFundingTxnId string `protobuf:"bytes,2,opt,name=eth_funding_txn_id,json=ethFundingTxnId,proto3" json:"ethFundingTxnID" yaml:"ethFundingTxnID"`
@@ -78,6 +79,7 @@ func (m *UpdateProjectStatusDoc) GetEthFundingTxnId() string {
 	return ""
 }
 
+// CreateAgentDoc contains details required to create an agent.
 type CreateAgentDoc struct {
 	AgentDid string `protobuf:"bytes,1,opt,name=agent_did,json=agentDid,proto3" json:"did" yaml:"did"`
 	Role     string `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty" yaml:"role"`
@@ -130,6 +132,7 @@ func (m *CreateAgentDoc) GetRole() string {
 	return ""
 }
 
+// UpdateAgentDoc contains details required to update an agent.
 type UpdateAgentDoc struct {
 	Did    string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" yaml:"did"`
 	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty" yaml:"status"`
@@ -190,6 +193,7 @@ func (m *UpdateAgentDoc) GetRole() string {
 	return ""
 }
 
+// CreateClaimDoc contains details required to create a claim on a project.
 type CreateClaimDoc struct {
 	ClaimId         string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claimID" yaml:"claimID"`
 	ClaimTemplateId string `protobuf:"bytes,2,opt,name=claim_template_id,json=claimTemplateId,proto3" json:"claimTemplateID" yaml:"claimTemplateID"`
@@ -242,6 +246,7 @@ func (m *CreateClaimDoc) GetClaimTemplateId() string {
 	return ""
 }
 
+// CreateEvaluationDoc contains details required to create an evaluation for a specific claim on a project.
 type CreateEvaluationDoc struct {
 	ClaimId string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claimID" yaml:"claimID"`
 	Status  string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty" yaml:"status"`
@@ -294,6 +299,7 @@ func (m *CreateEvaluationDoc) GetStatus() string {
 	return ""
 }
 
+// WithdrawFundsDoc contains details required to withdraw funds from a specific project.
 type WithdrawFundsDoc struct {
 	ProjectDid   string                                 `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"projectDid" yaml:"projectDid"`
 	RecipientDid string                                 `protobuf:"bytes,2,opt,name=recipient_did,json=recipientDid,proto3" json:"recipientDid" yaml:"recipientDid"`
@@ -355,6 +361,7 @@ func (m *WithdrawFundsDoc) GetIsRefund() bool {
 	return false
 }
 
+// ProjectDoc defines a project (or entity) type with all of its parameters.
 type ProjectDoc struct {
 	TxHash     string                   `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	ProjectDid string                   `protobuf:"bytes,2,opt,name=project_did,json=projectDid,proto3" json:"projectDid" yaml:"projectDid"`
@@ -439,6 +446,7 @@ func (m *ProjectDoc) GetData() encoding_json.RawMessage {
 	return nil
 }
 
+// WithdrawalInfoDoc contains details required to withdraw from a specific project.
 type WithdrawalInfoDoc struct {
 	ProjectDid   string     `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"projectDid" yaml:"projectDid"`
 	RecipientDid string     `protobuf:"bytes,2,opt,name=recipient_did,json=recipientDid,proto3" json:"recipientDid" yaml:"recipientDid"`
@@ -499,6 +507,7 @@ func (m *WithdrawalInfoDoc) GetAmount() types.Coin {
 	return types.Coin{}
 }
 
+// Params defines the parameters for the project module.
 type Params struct {
 	IxoDid                       string                                   `protobuf:"bytes,1,opt,name=ixo_did,json=ixoDid,proto3" json:"ixo_did,omitempty" yaml:"ixo_did"`
 	ProjectMinimumInitialFunding github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=project_minimum_initial_funding,json=projectMinimumInitialFunding,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"project_minimum_initial_funding" yaml:"project_minimum_initial_funding"`
@@ -553,6 +562,7 @@ func (m *Params) GetProjectMinimumInitialFunding() github_com_cosmos_cosmos_sdk_
 	return nil
 }
 
+// Claim contains details required to start a claim on a project.
 type Claim struct {
 	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
 	TemplateId string `protobuf:"bytes,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty" yaml:"template_id"`
@@ -621,6 +631,7 @@ func (m *Claim) GetStatus() string {
 	return ""
 }
 
+// GenesisAccountMap is a type used at genesis that maps a specific project's account names to the accounts' addresses.
 type GenesisAccountMap struct {
 	Map map[string]string `protobuf:"bytes,1,rep,name=map,proto3" json:"map,omitempty" yaml:"map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
@@ -665,6 +676,7 @@ func (m *GenesisAccountMap) GetMap() map[string]string {
 	return nil
 }
 
+// AccountMap maps a specific project's account names to the accounts' addresses.
 type AccountMap struct {
 	Map map[string]string `protobuf:"bytes,1,rep,name=map,proto3" json:"map,omitempty" yaml:"map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
@@ -709,6 +721,7 @@ func (m *AccountMap) GetMap() map[string]string {
 	return nil
 }
 
+// WithdrawalInfoDocs contains a list of type WithdrawalInfoDoc.
 type WithdrawalInfoDocs struct {
 	DocsList []WithdrawalInfoDoc `protobuf:"bytes,1,rep,name=docs_list,json=docsList,proto3" json:"docs_list" yaml:"docs_list"`
 }
@@ -753,6 +766,7 @@ func (m *WithdrawalInfoDocs) GetDocsList() []WithdrawalInfoDoc {
 	return nil
 }
 
+// Claims contains a list of type Claim.
 type Claims struct {
 	ClaimsList []Claim `protobuf:"bytes,1,rep,name=claims_list,json=claimsList,proto3" json:"claims_list" yaml:"claims_list"`
 }

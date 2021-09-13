@@ -29,6 +29,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// QueryPaymentTemplateRequest is the request type for the Query/PaymentTemplate RPC method.
 type QueryPaymentTemplateRequest struct {
 	PaymentTemplateId string `protobuf:"bytes,1,opt,name=payment_template_id,json=paymentTemplateId,proto3" json:"payment_template_id,omitempty" yaml:"payment_template_id"`
 }
@@ -73,6 +74,7 @@ func (m *QueryPaymentTemplateRequest) GetPaymentTemplateId() string {
 	return ""
 }
 
+// QueryPaymentTemplateResponse is the response type for the Query/PaymentTemplate RPC method.
 type QueryPaymentTemplateResponse struct {
 	PaymentTemplate PaymentTemplate `protobuf:"bytes,1,opt,name=payment_template,json=paymentTemplate,proto3" json:"payment_template" yaml:"payment_template"`
 }
@@ -117,6 +119,7 @@ func (m *QueryPaymentTemplateResponse) GetPaymentTemplate() PaymentTemplate {
 	return PaymentTemplate{}
 }
 
+// QueryPaymentContractRequest is the request type for the Query/PaymentContract RPC method.
 type QueryPaymentContractRequest struct {
 	PaymentContractId string `protobuf:"bytes,1,opt,name=payment_contract_id,json=paymentContractId,proto3" json:"payment_contract_id,omitempty" yaml:"payment_contract_id"`
 }
@@ -161,6 +164,7 @@ func (m *QueryPaymentContractRequest) GetPaymentContractId() string {
 	return ""
 }
 
+// QueryPaymentContractResponse is the response type for the Query/PaymentContract RPC method.
 type QueryPaymentContractResponse struct {
 	PaymentContract PaymentContract `protobuf:"bytes,1,opt,name=payment_contract,json=paymentContract,proto3" json:"payment_contract" yaml:"payment_contract"`
 }
@@ -205,6 +209,7 @@ func (m *QueryPaymentContractResponse) GetPaymentContract() PaymentContract {
 	return PaymentContract{}
 }
 
+// QueryPaymentContractsByIdPrefixRequest is the request type for the Query/PaymentContractsByIdPrefix RPC method.
 type QueryPaymentContractsByIdPrefixRequest struct {
 	PaymentContractsIdPrefix string `protobuf:"bytes,1,opt,name=payment_contracts_id_prefix,json=paymentContractsIdPrefix,proto3" json:"payment_contracts_id_prefix,omitempty" yaml:"payment_contracts_id_prefix"`
 }
@@ -251,6 +256,7 @@ func (m *QueryPaymentContractsByIdPrefixRequest) GetPaymentContractsIdPrefix() s
 	return ""
 }
 
+// QueryPaymentContractsByIdPrefixResponse is the response type for the Query/PaymentContractsByIdPrefix RPC method.
 type QueryPaymentContractsByIdPrefixResponse struct {
 	PaymentContracts []PaymentContract `protobuf:"bytes,1,rep,name=payment_contracts,json=paymentContracts,proto3" json:"payment_contracts" yaml:"payment_contracts"`
 }
@@ -297,6 +303,7 @@ func (m *QueryPaymentContractsByIdPrefixResponse) GetPaymentContracts() []Paymen
 	return nil
 }
 
+// QuerySubscriptionRequest is the request type for the Query/Subscription RPC method.
 type QuerySubscriptionRequest struct {
 	SubscriptionId string `protobuf:"bytes,1,opt,name=subscription_id,json=subscriptionId,proto3" json:"subscription_id,omitempty" yaml:"subscription_id"`
 }
@@ -341,6 +348,7 @@ func (m *QuerySubscriptionRequest) GetSubscriptionId() string {
 	return ""
 }
 
+// QuerySubscriptionResponse is the response type for the Query/Subscription RPC method.
 type QuerySubscriptionResponse struct {
 	Subscription Subscription `protobuf:"bytes,1,opt,name=subscription,proto3" json:"subscription" yaml:"subscription"`
 }
@@ -454,9 +462,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	// PaymentTemplate queries info of a specific payment template.
 	PaymentTemplate(ctx context.Context, in *QueryPaymentTemplateRequest, opts ...grpc.CallOption) (*QueryPaymentTemplateResponse, error)
+	// PaymentContract queries info of a specific payment contract.
 	PaymentContract(ctx context.Context, in *QueryPaymentContractRequest, opts ...grpc.CallOption) (*QueryPaymentContractResponse, error)
+	// PaymentContractsByIdPrefix lists all payment contracts having an id with a specific prefix.
 	PaymentContractsByIdPrefix(ctx context.Context, in *QueryPaymentContractsByIdPrefixRequest, opts ...grpc.CallOption) (*QueryPaymentContractsByIdPrefixResponse, error)
+	// Subscription queries info of a specific Subscription.
 	Subscription(ctx context.Context, in *QuerySubscriptionRequest, opts ...grpc.CallOption) (*QuerySubscriptionResponse, error)
 }
 
@@ -506,9 +518,13 @@ func (c *queryClient) Subscription(ctx context.Context, in *QuerySubscriptionReq
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	// PaymentTemplate queries info of a specific payment template.
 	PaymentTemplate(context.Context, *QueryPaymentTemplateRequest) (*QueryPaymentTemplateResponse, error)
+	// PaymentContract queries info of a specific payment contract.
 	PaymentContract(context.Context, *QueryPaymentContractRequest) (*QueryPaymentContractResponse, error)
+	// PaymentContractsByIdPrefix lists all payment contracts having an id with a specific prefix.
 	PaymentContractsByIdPrefix(context.Context, *QueryPaymentContractsByIdPrefixRequest) (*QueryPaymentContractsByIdPrefixResponse, error)
+	// Subscription queries info of a specific Subscription.
 	Subscription(context.Context, *QuerySubscriptionRequest) (*QuerySubscriptionResponse, error)
 }
 

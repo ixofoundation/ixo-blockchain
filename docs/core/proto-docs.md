@@ -217,7 +217,8 @@
 <a name="bonds.BaseOrder"></a>
 
 ### BaseOrder
-
+BaseOrder defines a base order type. It contains all the necessary fields for specifying
+a buy, sell, or swap order.
 
 
 | Field | Type | Label | Description |
@@ -235,7 +236,7 @@
 <a name="bonds.Batch"></a>
 
 ### Batch
-
+Batch holds a collection of outstanding buy, sell, and swap orders on a particular bond.
 
 
 | Field | Type | Label | Description |
@@ -259,7 +260,7 @@
 <a name="bonds.Bond"></a>
 
 ### Bond
-
+Bond defines a token bonding curve type with all of its parameters.
 
 
 | Field | Type | Label | Description |
@@ -300,7 +301,7 @@
 <a name="bonds.BondDetails"></a>
 
 ### BondDetails
-
+BondDetails contains details about the current state of a given bond.
 
 
 | Field | Type | Label | Description |
@@ -318,7 +319,8 @@
 <a name="bonds.BuyOrder"></a>
 
 ### BuyOrder
-
+BuyOrder defines a type for submitting a buy order on a bond, together with the maximum
+amount of reserve tokens the buyer is willing to pay.
 
 
 | Field | Type | Label | Description |
@@ -334,7 +336,7 @@
 <a name="bonds.FunctionParam"></a>
 
 ### FunctionParam
-
+FunctionParam is a key-value pair used for specifying a specific bond parameter.
 
 
 | Field | Type | Label | Description |
@@ -350,7 +352,7 @@
 <a name="bonds.Params"></a>
 
 ### Params
-
+Params defines the parameters for the bonds module.
 
 
 | Field | Type | Label | Description |
@@ -365,7 +367,7 @@
 <a name="bonds.SellOrder"></a>
 
 ### SellOrder
-
+SellOrder defines a type for submitting a sell order on a bond.
 
 
 | Field | Type | Label | Description |
@@ -380,7 +382,7 @@
 <a name="bonds.SwapOrder"></a>
 
 ### SwapOrder
-
+SwapOrder defines a type for submitting a swap order between two tokens on a bond.
 
 
 | Field | Type | Label | Description |
@@ -412,7 +414,7 @@
 <a name="bonds.GenesisState"></a>
 
 ### GenesisState
-
+GenesisState defines the bonds module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
@@ -445,7 +447,7 @@
 <a name="bonds.QueryAlphaMaximumsRequest"></a>
 
 ### QueryAlphaMaximumsRequest
-
+QueryAlphaMaximumsRequest is the request type for the Query/AlphaMaximums RPC method.
 
 
 | Field | Type | Label | Description |
@@ -460,7 +462,7 @@
 <a name="bonds.QueryAlphaMaximumsResponse"></a>
 
 ### QueryAlphaMaximumsResponse
-
+QueryAlphaMaximumsResponse is the response type for the Query/AlphaMaximums RPC method.
 
 
 | Field | Type | Label | Description |
@@ -476,7 +478,7 @@
 <a name="bonds.QueryAvailableReserveRequest"></a>
 
 ### QueryAvailableReserveRequest
-
+QueryAvailableReserveRequest is the request type for the Query/AvailableReserve RPC method.
 
 
 | Field | Type | Label | Description |
@@ -491,7 +493,7 @@
 <a name="bonds.QueryAvailableReserveResponse"></a>
 
 ### QueryAvailableReserveResponse
-
+QueryAvailableReserveResponse is the response type for the Query/AvailableReserve RPC method.
 
 
 | Field | Type | Label | Description |
@@ -506,7 +508,7 @@
 <a name="bonds.QueryBatchRequest"></a>
 
 ### QueryBatchRequest
-
+QueryBatchRequest is the request type for the Query/Batch RPC method.
 
 
 | Field | Type | Label | Description |
@@ -521,7 +523,7 @@
 <a name="bonds.QueryBatchResponse"></a>
 
 ### QueryBatchResponse
-
+QueryBatchResponse is the response type for the Query/Batch RPC method.
 
 
 | Field | Type | Label | Description |
@@ -536,7 +538,7 @@
 <a name="bonds.QueryBondRequest"></a>
 
 ### QueryBondRequest
-
+QueryBondRequest is the request type for the Query/Bond RPC method.
 
 
 | Field | Type | Label | Description |
@@ -551,7 +553,7 @@
 <a name="bonds.QueryBondResponse"></a>
 
 ### QueryBondResponse
-
+QueryBondResponse is the response type for the Query/Bond RPC method.
 
 
 | Field | Type | Label | Description |
@@ -566,7 +568,7 @@
 <a name="bonds.QueryBondsDetailedRequest"></a>
 
 ### QueryBondsDetailedRequest
-
+QueryBondsDetailedRequest is the request type for the Query/BondsDetailed RPC method.
 
 
 
@@ -576,7 +578,7 @@
 <a name="bonds.QueryBondsDetailedResponse"></a>
 
 ### QueryBondsDetailedResponse
-
+QueryBondsDetailedResponse is the response type for the Query/BondsDetailed RPC method.
 
 
 | Field | Type | Label | Description |
@@ -591,7 +593,7 @@
 <a name="bonds.QueryBondsRequest"></a>
 
 ### QueryBondsRequest
-
+QueryBondsRequest is the request type for the Query/Bonds RPC method.
 
 
 
@@ -601,7 +603,7 @@
 <a name="bonds.QueryBondsResponse"></a>
 
 ### QueryBondsResponse
-
+QueryBondsResponse is the response type for the Query/Bonds RPC method.
 
 
 | Field | Type | Label | Description |
@@ -616,7 +618,7 @@
 <a name="bonds.QueryBuyPriceRequest"></a>
 
 ### QueryBuyPriceRequest
-
+QueryCustomPriceRequest is the request type for the Query/BuyPrice RPC method.
 
 
 | Field | Type | Label | Description |
@@ -632,7 +634,7 @@
 <a name="bonds.QueryBuyPriceResponse"></a>
 
 ### QueryBuyPriceResponse
-
+QueryCustomPriceResponse is the response type for the Query/BuyPrice RPC method.
 
 
 | Field | Type | Label | Description |
@@ -651,7 +653,7 @@
 <a name="bonds.QueryCurrentPriceRequest"></a>
 
 ### QueryCurrentPriceRequest
-
+QueryCurrentPriceRequest is the request type for the Query/CurrentPrice RPC method.
 
 
 | Field | Type | Label | Description |
@@ -666,7 +668,7 @@
 <a name="bonds.QueryCurrentPriceResponse"></a>
 
 ### QueryCurrentPriceResponse
-
+QueryCurrentPriceResponse is the response type for the Query/CurrentPrice RPC method.
 
 
 | Field | Type | Label | Description |
@@ -681,7 +683,7 @@
 <a name="bonds.QueryCurrentReserveRequest"></a>
 
 ### QueryCurrentReserveRequest
-
+QueryCurrentReserveRequest is the request type for the Query/CurrentReserve RPC method.
 
 
 | Field | Type | Label | Description |
@@ -696,7 +698,7 @@
 <a name="bonds.QueryCurrentReserveResponse"></a>
 
 ### QueryCurrentReserveResponse
-
+QueryCurrentReserveResponse is the response type for the Query/CurrentReserve RPC method.
 
 
 | Field | Type | Label | Description |
@@ -711,7 +713,7 @@
 <a name="bonds.QueryCustomPriceRequest"></a>
 
 ### QueryCustomPriceRequest
-
+QueryCustomPriceRequest is the request type for the Query/CustomPrice RPC method.
 
 
 | Field | Type | Label | Description |
@@ -727,7 +729,7 @@
 <a name="bonds.QueryCustomPriceResponse"></a>
 
 ### QueryCustomPriceResponse
-
+QueryCustomPriceResponse is the response type for the Query/CustomPrice RPC method.
 
 
 | Field | Type | Label | Description |
@@ -742,7 +744,7 @@
 <a name="bonds.QueryLastBatchRequest"></a>
 
 ### QueryLastBatchRequest
-
+QueryLastBatchRequest is the request type for the Query/LastBatch RPC method.
 
 
 | Field | Type | Label | Description |
@@ -757,7 +759,7 @@
 <a name="bonds.QueryLastBatchResponse"></a>
 
 ### QueryLastBatchResponse
-
+QueryLastBatchResponse is the response type for the Query/LastBatch RPC method.
 
 
 | Field | Type | Label | Description |
@@ -772,7 +774,7 @@
 <a name="bonds.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-
+QueryParamsRequest is the request type for the Query/Params RPC method.
 
 
 
@@ -782,7 +784,7 @@
 <a name="bonds.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-
+QueryParamsResponse is the response type for the Query/Params RPC method.
 
 
 | Field | Type | Label | Description |
@@ -797,7 +799,7 @@
 <a name="bonds.QuerySellReturnRequest"></a>
 
 ### QuerySellReturnRequest
-
+QuerySellReturnRequest is the request type for the Query/SellReturn RPC method.
 
 
 | Field | Type | Label | Description |
@@ -813,7 +815,7 @@
 <a name="bonds.QuerySellReturnResponse"></a>
 
 ### QuerySellReturnResponse
-
+QuerySellReturnResponse is the response type for the Query/SellReturn RPC method.
 
 
 | Field | Type | Label | Description |
@@ -833,7 +835,7 @@
 <a name="bonds.QuerySwapReturnRequest"></a>
 
 ### QuerySwapReturnRequest
-
+QuerySwapReturnRequest is the request type for the Query/SwapReturn RPC method.
 
 
 | Field | Type | Label | Description |
@@ -850,7 +852,7 @@
 <a name="bonds.QuerySwapReturnResponse"></a>
 
 ### QuerySwapReturnResponse
-
+QuerySwapReturnResponse is the response type for the Query/SwapReturn RPC method.
 
 
 | Field | Type | Label | Description |
@@ -872,25 +874,24 @@
 <a name="bonds.Query"></a>
 
 ### Query
-To get a list of all module queries, go to the module&#39;s keeper/querier.go
-and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest/query.go
+Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Bonds | [QueryBondsRequest](#bonds.QueryBondsRequest) | [QueryBondsResponse](#bonds.QueryBondsResponse) |  |
-| BondsDetailed | [QueryBondsDetailedRequest](#bonds.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#bonds.QueryBondsDetailedResponse) |  |
-| Params | [QueryParamsRequest](#bonds.QueryParamsRequest) | [QueryParamsResponse](#bonds.QueryParamsResponse) |  |
-| Bond | [QueryBondRequest](#bonds.QueryBondRequest) | [QueryBondResponse](#bonds.QueryBondResponse) |  |
-| Batch | [QueryBatchRequest](#bonds.QueryBatchRequest) | [QueryBatchResponse](#bonds.QueryBatchResponse) |  |
-| LastBatch | [QueryLastBatchRequest](#bonds.QueryLastBatchRequest) | [QueryLastBatchResponse](#bonds.QueryLastBatchResponse) |  |
-| CurrentPrice | [QueryCurrentPriceRequest](#bonds.QueryCurrentPriceRequest) | [QueryCurrentPriceResponse](#bonds.QueryCurrentPriceResponse) |  |
-| CurrentReserve | [QueryCurrentReserveRequest](#bonds.QueryCurrentReserveRequest) | [QueryCurrentReserveResponse](#bonds.QueryCurrentReserveResponse) |  |
-| AvailableReserve | [QueryAvailableReserveRequest](#bonds.QueryAvailableReserveRequest) | [QueryAvailableReserveResponse](#bonds.QueryAvailableReserveResponse) |  |
-| CustomPrice | [QueryCustomPriceRequest](#bonds.QueryCustomPriceRequest) | [QueryCustomPriceResponse](#bonds.QueryCustomPriceResponse) |  |
-| BuyPrice | [QueryBuyPriceRequest](#bonds.QueryBuyPriceRequest) | [QueryBuyPriceResponse](#bonds.QueryBuyPriceResponse) |  |
-| SellReturn | [QuerySellReturnRequest](#bonds.QuerySellReturnRequest) | [QuerySellReturnResponse](#bonds.QuerySellReturnResponse) |  |
-| SwapReturn | [QuerySwapReturnRequest](#bonds.QuerySwapReturnRequest) | [QuerySwapReturnResponse](#bonds.QuerySwapReturnResponse) |  |
-| AlphaMaximums | [QueryAlphaMaximumsRequest](#bonds.QueryAlphaMaximumsRequest) | [QueryAlphaMaximumsResponse](#bonds.QueryAlphaMaximumsResponse) |  |
+| Bonds | [QueryBondsRequest](#bonds.QueryBondsRequest) | [QueryBondsResponse](#bonds.QueryBondsResponse) | Bonds returns all existing bonds. |
+| BondsDetailed | [QueryBondsDetailedRequest](#bonds.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#bonds.QueryBondsDetailedResponse) | BondsDetailed returns a list of all existing bonds with details about their current state. |
+| Params | [QueryParamsRequest](#bonds.QueryParamsRequest) | [QueryParamsResponse](#bonds.QueryParamsResponse) | Params queries the paramaters of x/bonds module. |
+| Bond | [QueryBondRequest](#bonds.QueryBondRequest) | [QueryBondResponse](#bonds.QueryBondResponse) | Bond queries info of a specific bond. |
+| Batch | [QueryBatchRequest](#bonds.QueryBatchRequest) | [QueryBatchResponse](#bonds.QueryBatchResponse) | Batch queries info of a specific bond&#39;s current batch. |
+| LastBatch | [QueryLastBatchRequest](#bonds.QueryLastBatchRequest) | [QueryLastBatchResponse](#bonds.QueryLastBatchResponse) | LastBatch queries info of a specific bond&#39;s last batch. |
+| CurrentPrice | [QueryCurrentPriceRequest](#bonds.QueryCurrentPriceRequest) | [QueryCurrentPriceResponse](#bonds.QueryCurrentPriceResponse) | CurrentPrice queries the current price/s of a specific bond. |
+| CurrentReserve | [QueryCurrentReserveRequest](#bonds.QueryCurrentReserveRequest) | [QueryCurrentReserveResponse](#bonds.QueryCurrentReserveResponse) | CurrentReserve queries the current balance/s of the reserve pool for a specific bond. |
+| AvailableReserve | [QueryAvailableReserveRequest](#bonds.QueryAvailableReserveRequest) | [QueryAvailableReserveResponse](#bonds.QueryAvailableReserveResponse) | AvailableReserve queries current available balance/s of the reserve pool for a specific bond. |
+| CustomPrice | [QueryCustomPriceRequest](#bonds.QueryCustomPriceRequest) | [QueryCustomPriceResponse](#bonds.QueryCustomPriceResponse) | CustomPrice queries price/s of a specific bond at a specific supply. |
+| BuyPrice | [QueryBuyPriceRequest](#bonds.QueryBuyPriceRequest) | [QueryBuyPriceResponse](#bonds.QueryBuyPriceResponse) | BuyPrice queries price/s of buying an amount of tokens from a specific bond. |
+| SellReturn | [QuerySellReturnRequest](#bonds.QuerySellReturnRequest) | [QuerySellReturnResponse](#bonds.QuerySellReturnResponse) | SellReturn queries return/s on selling an amount of tokens of a specific bond. |
+| SwapReturn | [QuerySwapReturnRequest](#bonds.QuerySwapReturnRequest) | [QuerySwapReturnResponse](#bonds.QuerySwapReturnResponse) | SwapReturn queries return/s on swapping an amount of tokens to another token of a specific bond. |
+| AlphaMaximums | [QueryAlphaMaximumsRequest](#bonds.QueryAlphaMaximumsRequest) | [QueryAlphaMaximumsResponse](#bonds.QueryAlphaMaximumsResponse) | AlphaMaximums queries alpha maximums for a specific augmented bonding curve. |
 
  
 
@@ -906,7 +907,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgBuy"></a>
 
 ### MsgBuy
-
+MsgBuy defines a message for buying from a bond.
 
 
 | Field | Type | Label | Description |
@@ -924,7 +925,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgBuyResponse"></a>
 
 ### MsgBuyResponse
-
+MsgBuyResponse defines the Msg/Buy response type.
 
 
 
@@ -934,7 +935,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgCreateBond"></a>
 
 ### MsgCreateBond
-
+MsgCreateBond defines a message for creating a new bond.
 
 
 | Field | Type | Label | Description |
@@ -970,7 +971,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgCreateBondResponse"></a>
 
 ### MsgCreateBondResponse
-
+MsgCreateBondResponse defines the Msg/CreateBond response type.
 
 
 
@@ -980,7 +981,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgEditBond"></a>
 
 ### MsgEditBond
-
+MsgEditBond defines a message for editing an existing bond.
 
 
 | Field | Type | Label | Description |
@@ -1001,7 +1002,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgEditBondResponse"></a>
 
 ### MsgEditBondResponse
-
+MsgEditBondResponse defines the Msg/EditBond response type.
 
 
 
@@ -1011,7 +1012,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgMakeOutcomePayment"></a>
 
 ### MsgMakeOutcomePayment
-
+MsgMakeOutcomePayment defines a message for making an outcome payment to a bond.
 
 
 | Field | Type | Label | Description |
@@ -1028,7 +1029,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgMakeOutcomePaymentResponse"></a>
 
 ### MsgMakeOutcomePaymentResponse
-
+MsgMakeOutcomePaymentResponse defines the Msg/MakeOutcomePayment response type.
 
 
 
@@ -1038,7 +1039,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgSell"></a>
 
 ### MsgSell
-
+MsgSell defines a message for selling from a bond.
 
 
 | Field | Type | Label | Description |
@@ -1055,7 +1056,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgSellResponse"></a>
 
 ### MsgSellResponse
-
+MsgSellResponse defines the Msg/Sell response type.
 
 
 
@@ -1065,7 +1066,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgSetNextAlpha"></a>
 
 ### MsgSetNextAlpha
-
+MsgSetNextAlpha defines a message for editing a bond&#39;s alpha parameter.
 
 
 | Field | Type | Label | Description |
@@ -1092,7 +1093,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgSwap"></a>
 
 ### MsgSwap
-
+MsgSwap defines a message for swapping from one reserve bond token to another.
 
 
 | Field | Type | Label | Description |
@@ -1110,7 +1111,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgSwapResponse"></a>
 
 ### MsgSwapResponse
-
+MsgSwapResponse defines the Msg/Swap response type.
 
 
 
@@ -1120,7 +1121,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgUpdateBondState"></a>
 
 ### MsgUpdateBondState
-
+MsgUpdateBondState defines a message for updating a bond&#39;s current state.
 
 
 | Field | Type | Label | Description |
@@ -1137,7 +1138,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgUpdateBondStateResponse"></a>
 
 ### MsgUpdateBondStateResponse
-
+MsgUpdateBondStateResponse defines the Msg/UpdateBondState response type.
 
 
 
@@ -1147,7 +1148,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgWithdrawReserve"></a>
 
 ### MsgWithdrawReserve
-
+MsgWithdrawReserve defines a message for withdrawing reserve from a bond.
 
 
 | Field | Type | Label | Description |
@@ -1164,7 +1165,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgWithdrawReserveResponse"></a>
 
 ### MsgWithdrawReserveResponse
-
+MsgWithdrawReserveResponse defines the Msg/WithdrawReserve response type.
 
 
 
@@ -1174,7 +1175,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgWithdrawShare"></a>
 
 ### MsgWithdrawShare
-
+MsgWithdrawShare defines a message for withdrawing a share from a bond that is in the SETTLE stage.
 
 
 | Field | Type | Label | Description |
@@ -1190,7 +1191,7 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.MsgWithdrawShareResponse"></a>
 
 ### MsgWithdrawShareResponse
-
+MsgWithdrawShareResponse defines the Msg/WithdrawShare response type.
 
 
 
@@ -1206,21 +1207,20 @@ and check all cases in NewQuerier(). REST endpoints taken from bonds/client/rest
 <a name="bonds.Msg"></a>
 
 ### Msg
-To get a list of all module messages, go to your module&#39;s handler.go and
-check all cases in NewHandler().
+Msg defines the bonds Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateBond | [MsgCreateBond](#bonds.MsgCreateBond) | [MsgCreateBondResponse](#bonds.MsgCreateBondResponse) |  |
-| EditBond | [MsgEditBond](#bonds.MsgEditBond) | [MsgEditBondResponse](#bonds.MsgEditBondResponse) |  |
-| SetNextAlpha | [MsgSetNextAlpha](#bonds.MsgSetNextAlpha) | [MsgSetNextAlphaResponse](#bonds.MsgSetNextAlphaResponse) |  |
-| UpdateBondState | [MsgUpdateBondState](#bonds.MsgUpdateBondState) | [MsgUpdateBondStateResponse](#bonds.MsgUpdateBondStateResponse) |  |
-| Buy | [MsgBuy](#bonds.MsgBuy) | [MsgBuyResponse](#bonds.MsgBuyResponse) |  |
-| Sell | [MsgSell](#bonds.MsgSell) | [MsgSellResponse](#bonds.MsgSellResponse) |  |
-| Swap | [MsgSwap](#bonds.MsgSwap) | [MsgSwapResponse](#bonds.MsgSwapResponse) |  |
-| MakeOutcomePayment | [MsgMakeOutcomePayment](#bonds.MsgMakeOutcomePayment) | [MsgMakeOutcomePaymentResponse](#bonds.MsgMakeOutcomePaymentResponse) |  |
-| WithdrawShare | [MsgWithdrawShare](#bonds.MsgWithdrawShare) | [MsgWithdrawShareResponse](#bonds.MsgWithdrawShareResponse) |  |
-| WithdrawReserve | [MsgWithdrawReserve](#bonds.MsgWithdrawReserve) | [MsgWithdrawReserveResponse](#bonds.MsgWithdrawReserveResponse) |  |
+| CreateBond | [MsgCreateBond](#bonds.MsgCreateBond) | [MsgCreateBondResponse](#bonds.MsgCreateBondResponse) | CreateBond defines a method for creating a bond. |
+| EditBond | [MsgEditBond](#bonds.MsgEditBond) | [MsgEditBondResponse](#bonds.MsgEditBondResponse) | EditBond defines a method for editing a bond. |
+| SetNextAlpha | [MsgSetNextAlpha](#bonds.MsgSetNextAlpha) | [MsgSetNextAlphaResponse](#bonds.MsgSetNextAlphaResponse) | SetNextAlpha defines a method for editing a bond&#39;s alpha parameter. |
+| UpdateBondState | [MsgUpdateBondState](#bonds.MsgUpdateBondState) | [MsgUpdateBondStateResponse](#bonds.MsgUpdateBondStateResponse) | UpdateBondState defines a method for updating a bond&#39;s current state. |
+| Buy | [MsgBuy](#bonds.MsgBuy) | [MsgBuyResponse](#bonds.MsgBuyResponse) | Buy defines a method for buying from a bond. |
+| Sell | [MsgSell](#bonds.MsgSell) | [MsgSellResponse](#bonds.MsgSellResponse) | Sell defines a method for selling from a bond. |
+| Swap | [MsgSwap](#bonds.MsgSwap) | [MsgSwapResponse](#bonds.MsgSwapResponse) | Swap defines a method for swapping from one reserve bond token to another. |
+| MakeOutcomePayment | [MsgMakeOutcomePayment](#bonds.MsgMakeOutcomePayment) | [MsgMakeOutcomePaymentResponse](#bonds.MsgMakeOutcomePaymentResponse) | MakeOutcomePayment defines a method for making an outcome payment to a bond. |
+| WithdrawShare | [MsgWithdrawShare](#bonds.MsgWithdrawShare) | [MsgWithdrawShareResponse](#bonds.MsgWithdrawShareResponse) | WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage. |
+| WithdrawReserve | [MsgWithdrawReserve](#bonds.MsgWithdrawReserve) | [MsgWithdrawReserveResponse](#bonds.MsgWithdrawReserveResponse) | WithdrawReserve defines a method for withdrawing reserve from a bond. |
 
  
 
@@ -1236,7 +1236,7 @@ check all cases in NewHandler().
 <a name="did.Claim"></a>
 
 ### Claim
-
+TODO
 
 
 | Field | Type | Label | Description |
@@ -1252,7 +1252,7 @@ check all cases in NewHandler().
 <a name="did.DidCredential"></a>
 
 ### DidCredential
-
+TODO
 
 
 | Field | Type | Label | Description |
@@ -1270,7 +1270,7 @@ check all cases in NewHandler().
 <a name="did.IxoDid"></a>
 
 ### IxoDid
-
+TODO
 
 
 | Field | Type | Label | Description |
@@ -1288,7 +1288,7 @@ check all cases in NewHandler().
 <a name="did.Secret"></a>
 
 ### Secret
-
+TODO
 
 
 | Field | Type | Label | Description |
@@ -1321,7 +1321,7 @@ check all cases in NewHandler().
 <a name="did.BaseDidDoc"></a>
 
 ### BaseDidDoc
-
+BaseDidDoc defines a base DID document type. It implements the DidDoc interface.
 
 
 | Field | Type | Label | Description |
@@ -1354,7 +1354,7 @@ check all cases in NewHandler().
 <a name="did.GenesisState"></a>
 
 ### GenesisState
-
+GenesisState defines the did module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
@@ -1385,7 +1385,7 @@ check all cases in NewHandler().
 <a name="did.QueryAddressFromBase58EncodedPubkeyRequest"></a>
 
 ### QueryAddressFromBase58EncodedPubkeyRequest
-
+QueryAddressFromBase58EncodedPubkeyRequest is the request type for the Query/AddressFromBase58EncodedPubkey RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1400,7 +1400,7 @@ check all cases in NewHandler().
 <a name="did.QueryAddressFromBase58EncodedPubkeyResponse"></a>
 
 ### QueryAddressFromBase58EncodedPubkeyResponse
-
+QueryAddressFromBase58EncodedPubkeyResponse is the response type for the Query/AddressFromBase58EncodedPubkey RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1415,7 +1415,7 @@ check all cases in NewHandler().
 <a name="did.QueryAddressFromDidRequest"></a>
 
 ### QueryAddressFromDidRequest
-
+QueryAddressFromDidRequest is the request type for the Query/AddressFromDid RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1430,7 +1430,7 @@ check all cases in NewHandler().
 <a name="did.QueryAddressFromDidResponse"></a>
 
 ### QueryAddressFromDidResponse
-
+QueryAddressFromDidResponse is the response type for the Query/AddressFromDid RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1445,7 +1445,7 @@ check all cases in NewHandler().
 <a name="did.QueryAllDidDocsRequest"></a>
 
 ### QueryAllDidDocsRequest
-
+QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC method.
 
 
 
@@ -1455,7 +1455,7 @@ check all cases in NewHandler().
 <a name="did.QueryAllDidDocsResponse"></a>
 
 ### QueryAllDidDocsResponse
-
+QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1470,7 +1470,7 @@ check all cases in NewHandler().
 <a name="did.QueryAllDidsRequest"></a>
 
 ### QueryAllDidsRequest
-
+QueryAllDidsRequest is the request type for the Query/AllDids RPC method.
 
 
 
@@ -1480,7 +1480,7 @@ check all cases in NewHandler().
 <a name="did.QueryAllDidsResponse"></a>
 
 ### QueryAllDidsResponse
-
+QueryAllDidsResponse is the response type for the Query/AllDids RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1495,7 +1495,7 @@ check all cases in NewHandler().
 <a name="did.QueryDidDocRequest"></a>
 
 ### QueryDidDocRequest
-
+QueryDidDocRequest is the request type for the Query/DidDoc RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1510,7 +1510,7 @@ check all cases in NewHandler().
 <a name="did.QueryDidDocResponse"></a>
 
 ### QueryDidDocResponse
-
+QueryDidDocResponse is the response type for the Query/DidDoc RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1531,16 +1531,15 @@ check all cases in NewHandler().
 <a name="did.Query"></a>
 
 ### Query
-To get a list of all module queries, go to your module&#39;s keeper/querier.go
-and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/query.go
+Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| DidDoc | [QueryDidDocRequest](#did.QueryDidDocRequest) | [QueryDidDocResponse](#did.QueryDidDocResponse) |  |
-| AllDids | [QueryAllDidsRequest](#did.QueryAllDidsRequest) | [QueryAllDidsResponse](#did.QueryAllDidsResponse) |  |
-| AllDidDocs | [QueryAllDidDocsRequest](#did.QueryAllDidDocsRequest) | [QueryAllDidDocsResponse](#did.QueryAllDidDocsResponse) |  |
-| AddressFromDid | [QueryAddressFromDidRequest](#did.QueryAddressFromDidRequest) | [QueryAddressFromDidResponse](#did.QueryAddressFromDidResponse) |  |
-| AddressFromBase58EncodedPubkey | [QueryAddressFromBase58EncodedPubkeyRequest](#did.QueryAddressFromBase58EncodedPubkeyRequest) | [QueryAddressFromBase58EncodedPubkeyResponse](#did.QueryAddressFromBase58EncodedPubkeyResponse) |  |
+| DidDoc | [QueryDidDocRequest](#did.QueryDidDocRequest) | [QueryDidDocResponse](#did.QueryDidDocResponse) | DidDoc queries info of a specific DID&#39;s DidDoc. |
+| AllDids | [QueryAllDidsRequest](#did.QueryAllDidsRequest) | [QueryAllDidsResponse](#did.QueryAllDidsResponse) | AllDids returns a list of all existing DIDs. |
+| AllDidDocs | [QueryAllDidDocsRequest](#did.QueryAllDidDocsRequest) | [QueryAllDidDocsResponse](#did.QueryAllDidDocsResponse) | AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with their DidDoc info). |
+| AddressFromDid | [QueryAddressFromDidRequest](#did.QueryAddressFromDidRequest) | [QueryAddressFromDidResponse](#did.QueryAddressFromDidResponse) | AddressFromDid retrieves the cosmos address associated to an ixo DID. |
+| AddressFromBase58EncodedPubkey | [QueryAddressFromBase58EncodedPubkeyRequest](#did.QueryAddressFromBase58EncodedPubkeyRequest) | [QueryAddressFromBase58EncodedPubkeyResponse](#did.QueryAddressFromBase58EncodedPubkeyResponse) | AddressFromBase58EncodedPubkey retrieves the cosmos address associated to an ixo DID&#39;s pubkey. |
 
  
 
@@ -1556,7 +1555,7 @@ and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/q
 <a name="did.MsgAddCredential"></a>
 
 ### MsgAddCredential
-
+MsgAddCredential defines a message for adding a credential to the signer&#39;s DID.
 
 
 | Field | Type | Label | Description |
@@ -1571,7 +1570,7 @@ and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/q
 <a name="did.MsgAddCredentialResponse"></a>
 
 ### MsgAddCredentialResponse
-
+MsgAddCredentialResponse defines the Msg/AddCredential response type.
 
 
 
@@ -1581,7 +1580,7 @@ and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/q
 <a name="did.MsgAddDid"></a>
 
 ### MsgAddDid
-
+MsgAddDid defines a message for adding a DID.
 
 
 | Field | Type | Label | Description |
@@ -1597,7 +1596,7 @@ and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/q
 <a name="did.MsgAddDidResponse"></a>
 
 ### MsgAddDidResponse
-
+MsgAddDidResponse defines the Msg/AddDid response type.
 
 
 
@@ -1613,13 +1612,12 @@ and check all cases in NewQuerier(). REST endpoints taken from did/client/rest/q
 <a name="did.Msg"></a>
 
 ### Msg
-To get a list of all module messages, go to your module&#39;s handler.go and
-check all cases in NewHandler().
+Msg defines the did Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| AddDid | [MsgAddDid](#did.MsgAddDid) | [MsgAddDidResponse](#did.MsgAddDidResponse) |  |
-| AddCredential | [MsgAddCredential](#did.MsgAddCredential) | [MsgAddCredentialResponse](#did.MsgAddCredentialResponse) |  |
+| AddDid | [MsgAddDid](#did.MsgAddDid) | [MsgAddDidResponse](#did.MsgAddDidResponse) | AddDid defines a method for adding a DID. |
+| AddCredential | [MsgAddCredential](#did.MsgAddCredential) | [MsgAddCredentialResponse](#did.MsgAddCredentialResponse) | AddCredential defines a method for adding a credential to the signer&#39;s DID. |
 
  
 
@@ -1635,7 +1633,8 @@ check all cases in NewHandler().
 <a name="payments.BlockPeriod"></a>
 
 ### BlockPeriod
-
+BlockPeriod implements the Period interface and specifies a period in terms of number
+of blocks.
 
 
 | Field | Type | Label | Description |
@@ -1651,7 +1650,7 @@ check all cases in NewHandler().
 <a name="payments.Discount"></a>
 
 ### Discount
-
+Discount contains details about a discount which can be granted to payers.
 
 
 | Field | Type | Label | Description |
@@ -1667,7 +1666,7 @@ check all cases in NewHandler().
 <a name="payments.DistributionShare"></a>
 
 ### DistributionShare
-
+DistributionShare specifies the share of a specific payment an address will receive.
 
 
 | Field | Type | Label | Description |
@@ -1683,7 +1682,8 @@ check all cases in NewHandler().
 <a name="payments.PaymentContract"></a>
 
 ### PaymentContract
-
+PaymentContract specifies an agreement between a payer and payee/s which can be invoked
+once or multiple times to effect payment/s.
 
 
 | Field | Type | Label | Description |
@@ -1707,7 +1707,7 @@ check all cases in NewHandler().
 <a name="payments.PaymentTemplate"></a>
 
 ### PaymentTemplate
-
+PaymentTemplate contains details about a payment, with no info about the payer or payee.
 
 
 | Field | Type | Label | Description |
@@ -1726,7 +1726,7 @@ check all cases in NewHandler().
 <a name="payments.Subscription"></a>
 
 ### Subscription
-
+Subscription specifies details of a payment to be effected periodically.
 
 
 | Field | Type | Label | Description |
@@ -1746,7 +1746,8 @@ check all cases in NewHandler().
 <a name="payments.TestPeriod"></a>
 
 ### TestPeriod
-
+TestPeriod implements the Period interface and is identical to BlockPeriod, except it
+ignores the context in periodEnded() and periodStarted().
 
 
 | Field | Type | Label | Description |
@@ -1762,7 +1763,7 @@ check all cases in NewHandler().
 <a name="payments.TimePeriod"></a>
 
 ### TimePeriod
-
+TimePeriod implements the Period interface and specifies a period in terms of time.
 
 
 | Field | Type | Label | Description |
@@ -1794,7 +1795,7 @@ check all cases in NewHandler().
 <a name="payments.GenesisState"></a>
 
 ### GenesisState
-
+GenesisState defines the payments module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
@@ -1827,7 +1828,7 @@ check all cases in NewHandler().
 <a name="payments.QueryPaymentContractRequest"></a>
 
 ### QueryPaymentContractRequest
-
+QueryPaymentContractRequest is the request type for the Query/PaymentContract RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1842,7 +1843,7 @@ check all cases in NewHandler().
 <a name="payments.QueryPaymentContractResponse"></a>
 
 ### QueryPaymentContractResponse
-
+QueryPaymentContractResponse is the response type for the Query/PaymentContract RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1857,7 +1858,7 @@ check all cases in NewHandler().
 <a name="payments.QueryPaymentContractsByIdPrefixRequest"></a>
 
 ### QueryPaymentContractsByIdPrefixRequest
-
+QueryPaymentContractsByIdPrefixRequest is the request type for the Query/PaymentContractsByIdPrefix RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1872,7 +1873,7 @@ check all cases in NewHandler().
 <a name="payments.QueryPaymentContractsByIdPrefixResponse"></a>
 
 ### QueryPaymentContractsByIdPrefixResponse
-
+QueryPaymentContractsByIdPrefixResponse is the response type for the Query/PaymentContractsByIdPrefix RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1887,7 +1888,7 @@ check all cases in NewHandler().
 <a name="payments.QueryPaymentTemplateRequest"></a>
 
 ### QueryPaymentTemplateRequest
-
+QueryPaymentTemplateRequest is the request type for the Query/PaymentTemplate RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1902,7 +1903,7 @@ check all cases in NewHandler().
 <a name="payments.QueryPaymentTemplateResponse"></a>
 
 ### QueryPaymentTemplateResponse
-
+QueryPaymentTemplateResponse is the response type for the Query/PaymentTemplate RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1917,7 +1918,7 @@ check all cases in NewHandler().
 <a name="payments.QuerySubscriptionRequest"></a>
 
 ### QuerySubscriptionRequest
-
+QuerySubscriptionRequest is the request type for the Query/Subscription RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1932,7 +1933,7 @@ check all cases in NewHandler().
 <a name="payments.QuerySubscriptionResponse"></a>
 
 ### QuerySubscriptionResponse
-
+QuerySubscriptionResponse is the response type for the Query/Subscription RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1953,15 +1954,14 @@ check all cases in NewHandler().
 <a name="payments.Query"></a>
 
 ### Query
-To get a list of all module queries, go to your module&#39;s keeper/querier.go
-and check all cases in NewQuerier(). REST endpoints taken from payments/client/rest/query.go
+Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| PaymentTemplate | [QueryPaymentTemplateRequest](#payments.QueryPaymentTemplateRequest) | [QueryPaymentTemplateResponse](#payments.QueryPaymentTemplateResponse) |  |
-| PaymentContract | [QueryPaymentContractRequest](#payments.QueryPaymentContractRequest) | [QueryPaymentContractResponse](#payments.QueryPaymentContractResponse) |  |
-| PaymentContractsByIdPrefix | [QueryPaymentContractsByIdPrefixRequest](#payments.QueryPaymentContractsByIdPrefixRequest) | [QueryPaymentContractsByIdPrefixResponse](#payments.QueryPaymentContractsByIdPrefixResponse) |  |
-| Subscription | [QuerySubscriptionRequest](#payments.QuerySubscriptionRequest) | [QuerySubscriptionResponse](#payments.QuerySubscriptionResponse) |  |
+| PaymentTemplate | [QueryPaymentTemplateRequest](#payments.QueryPaymentTemplateRequest) | [QueryPaymentTemplateResponse](#payments.QueryPaymentTemplateResponse) | PaymentTemplate queries info of a specific payment template. |
+| PaymentContract | [QueryPaymentContractRequest](#payments.QueryPaymentContractRequest) | [QueryPaymentContractResponse](#payments.QueryPaymentContractResponse) | PaymentContract queries info of a specific payment contract. |
+| PaymentContractsByIdPrefix | [QueryPaymentContractsByIdPrefixRequest](#payments.QueryPaymentContractsByIdPrefixRequest) | [QueryPaymentContractsByIdPrefixResponse](#payments.QueryPaymentContractsByIdPrefixResponse) | PaymentContractsByIdPrefix lists all payment contracts having an id with a specific prefix. |
+| Subscription | [QuerySubscriptionRequest](#payments.QuerySubscriptionRequest) | [QuerySubscriptionResponse](#payments.QuerySubscriptionResponse) | Subscription queries info of a specific Subscription. |
 
  
 
@@ -1977,7 +1977,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgCreatePaymentContract"></a>
 
 ### MsgCreatePaymentContract
-
+MsgCreatePaymentContract defines a message for creating a payment contract.
 
 
 | Field | Type | Label | Description |
@@ -1998,7 +1998,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgCreatePaymentContractResponse"></a>
 
 ### MsgCreatePaymentContractResponse
-
+MsgCreatePaymentContractResponse defines the Msg/CreatePaymentContract response type.
 
 
 
@@ -2008,7 +2008,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgCreatePaymentTemplate"></a>
 
 ### MsgCreatePaymentTemplate
-
+MsgCreatePaymentTemplate defines a message for creating a payment template.
 
 
 | Field | Type | Label | Description |
@@ -2024,7 +2024,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgCreatePaymentTemplateResponse"></a>
 
 ### MsgCreatePaymentTemplateResponse
-
+MsgCreatePaymentTemplateResponse defines the Msg/CreatePaymentTemplate response type.
 
 
 
@@ -2034,7 +2034,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgCreateSubscription"></a>
 
 ### MsgCreateSubscription
-
+MsgCreateSubscription defines a message for creating a subscription.
 
 
 | Field | Type | Label | Description |
@@ -2053,7 +2053,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgCreateSubscriptionResponse"></a>
 
 ### MsgCreateSubscriptionResponse
-
+MsgCreateSubscriptionResponse defines the Msg/CreateSubscription response type.
 
 
 
@@ -2063,7 +2063,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgEffectPayment"></a>
 
 ### MsgEffectPayment
-
+MsgEffectPayment defines a message for putting a specific payment contract into effect.
 
 
 | Field | Type | Label | Description |
@@ -2079,7 +2079,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgEffectPaymentResponse"></a>
 
 ### MsgEffectPaymentResponse
-
+MsgEffectPaymentResponse defines the Msg/EffectPayment response type.
 
 
 
@@ -2089,7 +2089,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgGrantDiscount"></a>
 
 ### MsgGrantDiscount
-
+MsgGrantDiscount defines a message for granting a discount to a payer on a specific payment contract.
 
 
 | Field | Type | Label | Description |
@@ -2107,7 +2107,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgGrantDiscountResponse"></a>
 
 ### MsgGrantDiscountResponse
-
+MsgGrantDiscountResponse defines the Msg/GrantDiscount response type.
 
 
 
@@ -2117,7 +2117,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgRevokeDiscount"></a>
 
 ### MsgRevokeDiscount
-
+MsgRevokeDiscount defines a message for revoking a discount previously granted to a payer.
 
 
 | Field | Type | Label | Description |
@@ -2134,7 +2134,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgRevokeDiscountResponse"></a>
 
 ### MsgRevokeDiscountResponse
-
+MsgRevokeDiscountResponse defines the Msg/RevokeDiscount response type.
 
 
 
@@ -2144,7 +2144,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgSetPaymentContractAuthorisation"></a>
 
 ### MsgSetPaymentContractAuthorisation
-
+MsgSetPaymentContractAuthorisation defines a message for authorising or deauthorising a payment contract.
 
 
 | Field | Type | Label | Description |
@@ -2161,7 +2161,7 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.MsgSetPaymentContractAuthorisationResponse"></a>
 
 ### MsgSetPaymentContractAuthorisationResponse
-
+MsgSetPaymentContractAuthorisationResponse defines the Msg/SetPaymentContractAuthorisation response type.
 
 
 
@@ -2177,18 +2177,17 @@ and check all cases in NewQuerier(). REST endpoints taken from payments/client/r
 <a name="payments.Msg"></a>
 
 ### Msg
-To get a list of all module messages, go to your module&#39;s handler.go and
-check all cases in NewHandler().
+Msg defines the payments Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| SetPaymentContractAuthorisation | [MsgSetPaymentContractAuthorisation](#payments.MsgSetPaymentContractAuthorisation) | [MsgSetPaymentContractAuthorisationResponse](#payments.MsgSetPaymentContractAuthorisationResponse) |  |
-| CreatePaymentTemplate | [MsgCreatePaymentTemplate](#payments.MsgCreatePaymentTemplate) | [MsgCreatePaymentTemplateResponse](#payments.MsgCreatePaymentTemplateResponse) |  |
-| CreatePaymentContract | [MsgCreatePaymentContract](#payments.MsgCreatePaymentContract) | [MsgCreatePaymentContractResponse](#payments.MsgCreatePaymentContractResponse) |  |
-| CreateSubscription | [MsgCreateSubscription](#payments.MsgCreateSubscription) | [MsgCreateSubscriptionResponse](#payments.MsgCreateSubscriptionResponse) |  |
-| GrantDiscount | [MsgGrantDiscount](#payments.MsgGrantDiscount) | [MsgGrantDiscountResponse](#payments.MsgGrantDiscountResponse) |  |
-| RevokeDiscount | [MsgRevokeDiscount](#payments.MsgRevokeDiscount) | [MsgRevokeDiscountResponse](#payments.MsgRevokeDiscountResponse) |  |
-| EffectPayment | [MsgEffectPayment](#payments.MsgEffectPayment) | [MsgEffectPaymentResponse](#payments.MsgEffectPaymentResponse) |  |
+| SetPaymentContractAuthorisation | [MsgSetPaymentContractAuthorisation](#payments.MsgSetPaymentContractAuthorisation) | [MsgSetPaymentContractAuthorisationResponse](#payments.MsgSetPaymentContractAuthorisationResponse) | SetPaymentContractAuthorisation defines a method for authorising or deauthorising a payment contract. |
+| CreatePaymentTemplate | [MsgCreatePaymentTemplate](#payments.MsgCreatePaymentTemplate) | [MsgCreatePaymentTemplateResponse](#payments.MsgCreatePaymentTemplateResponse) | CreatePaymentTemplate defines a method for creating a payment template. |
+| CreatePaymentContract | [MsgCreatePaymentContract](#payments.MsgCreatePaymentContract) | [MsgCreatePaymentContractResponse](#payments.MsgCreatePaymentContractResponse) | CreatePaymentContract defines a method for creating a payment contract. |
+| CreateSubscription | [MsgCreateSubscription](#payments.MsgCreateSubscription) | [MsgCreateSubscriptionResponse](#payments.MsgCreateSubscriptionResponse) | CreateSubscription defines a method for creating a subscription. |
+| GrantDiscount | [MsgGrantDiscount](#payments.MsgGrantDiscount) | [MsgGrantDiscountResponse](#payments.MsgGrantDiscountResponse) | GrantDiscount defines a method for granting a discount to a payer on a specific payment contract. |
+| RevokeDiscount | [MsgRevokeDiscount](#payments.MsgRevokeDiscount) | [MsgRevokeDiscountResponse](#payments.MsgRevokeDiscountResponse) | RevokeDiscount defines a method for revoking a discount previously granted to a payer. |
+| EffectPayment | [MsgEffectPayment](#payments.MsgEffectPayment) | [MsgEffectPaymentResponse](#payments.MsgEffectPaymentResponse) | EffectPayment defines a method for putting a specific payment contract into effect. |
 
  
 
@@ -2204,7 +2203,7 @@ check all cases in NewHandler().
 <a name="project.AccountMap"></a>
 
 ### AccountMap
-
+AccountMap maps a specific project&#39;s account names to the accounts&#39; addresses.
 
 
 | Field | Type | Label | Description |
@@ -2235,7 +2234,7 @@ check all cases in NewHandler().
 <a name="project.Claim"></a>
 
 ### Claim
-
+Claim contains details required to start a claim on a project.
 
 
 | Field | Type | Label | Description |
@@ -2253,7 +2252,7 @@ check all cases in NewHandler().
 <a name="project.Claims"></a>
 
 ### Claims
-
+Claims contains a list of type Claim.
 
 
 | Field | Type | Label | Description |
@@ -2268,7 +2267,7 @@ check all cases in NewHandler().
 <a name="project.CreateAgentDoc"></a>
 
 ### CreateAgentDoc
-
+CreateAgentDoc contains details required to create an agent.
 
 
 | Field | Type | Label | Description |
@@ -2284,7 +2283,7 @@ check all cases in NewHandler().
 <a name="project.CreateClaimDoc"></a>
 
 ### CreateClaimDoc
-
+CreateClaimDoc contains details required to create a claim on a project.
 
 
 | Field | Type | Label | Description |
@@ -2300,7 +2299,7 @@ check all cases in NewHandler().
 <a name="project.CreateEvaluationDoc"></a>
 
 ### CreateEvaluationDoc
-
+CreateEvaluationDoc contains details required to create an evaluation for a specific claim on a project.
 
 
 | Field | Type | Label | Description |
@@ -2316,7 +2315,7 @@ check all cases in NewHandler().
 <a name="project.GenesisAccountMap"></a>
 
 ### GenesisAccountMap
-
+GenesisAccountMap is a type used at genesis that maps a specific project&#39;s account names to the accounts&#39; addresses.
 
 
 | Field | Type | Label | Description |
@@ -2347,7 +2346,7 @@ check all cases in NewHandler().
 <a name="project.Params"></a>
 
 ### Params
-
+Params defines the parameters for the project module.
 
 
 | Field | Type | Label | Description |
@@ -2365,7 +2364,7 @@ check all cases in NewHandler().
 <a name="project.ProjectDoc"></a>
 
 ### ProjectDoc
-
+ProjectDoc defines a project (or entity) type with all of its parameters.
 
 
 | Field | Type | Label | Description |
@@ -2385,7 +2384,7 @@ check all cases in NewHandler().
 <a name="project.UpdateAgentDoc"></a>
 
 ### UpdateAgentDoc
-
+UpdateAgentDoc contains details required to update an agent.
 
 
 | Field | Type | Label | Description |
@@ -2402,7 +2401,7 @@ check all cases in NewHandler().
 <a name="project.UpdateProjectStatusDoc"></a>
 
 ### UpdateProjectStatusDoc
-
+UpdateProjectStatusDoc contains details required to update a project&#39;s status.
 
 
 | Field | Type | Label | Description |
@@ -2418,7 +2417,7 @@ check all cases in NewHandler().
 <a name="project.WithdrawFundsDoc"></a>
 
 ### WithdrawFundsDoc
-
+WithdrawFundsDoc contains details required to withdraw funds from a specific project.
 
 
 | Field | Type | Label | Description |
@@ -2436,7 +2435,7 @@ check all cases in NewHandler().
 <a name="project.WithdrawalInfoDoc"></a>
 
 ### WithdrawalInfoDoc
-
+WithdrawalInfoDoc contains details required to withdraw from a specific project.
 
 
 | Field | Type | Label | Description |
@@ -2453,7 +2452,7 @@ check all cases in NewHandler().
 <a name="project.WithdrawalInfoDocs"></a>
 
 ### WithdrawalInfoDocs
-
+WithdrawalInfoDocs contains a list of type WithdrawalInfoDoc.
 
 
 | Field | Type | Label | Description |
@@ -2484,7 +2483,7 @@ check all cases in NewHandler().
 <a name="project.GenesisState"></a>
 
 ### GenesisState
-
+GenesisState defines the project module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
@@ -2519,7 +2518,7 @@ check all cases in NewHandler().
 <a name="project.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-
+QueryParamsRequest is the request type for the Query/Params RPC method.
 
 
 
@@ -2529,7 +2528,7 @@ check all cases in NewHandler().
 <a name="project.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-
+QueryParamsResponse is the response type for the Query/Params RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2544,7 +2543,7 @@ check all cases in NewHandler().
 <a name="project.QueryProjectAccountsRequest"></a>
 
 ### QueryProjectAccountsRequest
-
+QueryProjectAccountsRequest is the request type for the Query/ProjectAccounts RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2559,7 +2558,7 @@ check all cases in NewHandler().
 <a name="project.QueryProjectAccountsResponse"></a>
 
 ### QueryProjectAccountsResponse
-
+QueryProjectAccountsResponse is the response type for the Query/ProjectAccounts RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2574,7 +2573,7 @@ check all cases in NewHandler().
 <a name="project.QueryProjectDocRequest"></a>
 
 ### QueryProjectDocRequest
-
+QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2589,7 +2588,7 @@ check all cases in NewHandler().
 <a name="project.QueryProjectDocResponse"></a>
 
 ### QueryProjectDocResponse
-
+QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2604,7 +2603,7 @@ check all cases in NewHandler().
 <a name="project.QueryProjectTxRequest"></a>
 
 ### QueryProjectTxRequest
-
+QueryProjectTxRequest is the request type for the Query/ProjectTx RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2619,7 +2618,7 @@ check all cases in NewHandler().
 <a name="project.QueryProjectTxResponse"></a>
 
 ### QueryProjectTxResponse
-
+QueryProjectTxResponse is the response type for the Query/ProjectTx RPC method.
 
 
 | Field | Type | Label | Description |
@@ -2640,14 +2639,14 @@ check all cases in NewHandler().
 <a name="project.Query"></a>
 
 ### Query
-
+Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ProjectDoc | [QueryProjectDocRequest](#project.QueryProjectDocRequest) | [QueryProjectDocResponse](#project.QueryProjectDocResponse) |  |
-| ProjectAccounts | [QueryProjectAccountsRequest](#project.QueryProjectAccountsRequest) | [QueryProjectAccountsResponse](#project.QueryProjectAccountsResponse) |  |
-| ProjectTx | [QueryProjectTxRequest](#project.QueryProjectTxRequest) | [QueryProjectTxResponse](#project.QueryProjectTxResponse) |  |
-| Params | [QueryParamsRequest](#project.QueryParamsRequest) | [QueryParamsResponse](#project.QueryParamsResponse) |  |
+| ProjectDoc | [QueryProjectDocRequest](#project.QueryProjectDocRequest) | [QueryProjectDocResponse](#project.QueryProjectDocResponse) | ProjectDoc queries info of a specific project. |
+| ProjectAccounts | [QueryProjectAccountsRequest](#project.QueryProjectAccountsRequest) | [QueryProjectAccountsResponse](#project.QueryProjectAccountsResponse) | ProjectAccounts lists a specific project&#39;s accounts. |
+| ProjectTx | [QueryProjectTxRequest](#project.QueryProjectTxRequest) | [QueryProjectTxResponse](#project.QueryProjectTxResponse) | ProjectTx lists a specific project&#39;s transactions. |
+| Params | [QueryParamsRequest](#project.QueryParamsRequest) | [QueryParamsResponse](#project.QueryParamsResponse) | Params queries the paramaters of x/project module. |
 
  
 
@@ -2663,7 +2662,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateAgent"></a>
 
 ### MsgCreateAgent
-
+MsgCreateAgent defines a message for creating an agent on a project.
 
 
 | Field | Type | Label | Description |
@@ -2681,7 +2680,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateAgentResponse"></a>
 
 ### MsgCreateAgentResponse
-
+MsgCreateAgentResponse defines the Msg/CreateAgent response type.
 
 
 
@@ -2691,7 +2690,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateClaim"></a>
 
 ### MsgCreateClaim
-
+MsgCreateClaim defines a message for creating a claim on a project.
 
 
 | Field | Type | Label | Description |
@@ -2709,7 +2708,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateClaimResponse"></a>
 
 ### MsgCreateClaimResponse
-
+MsgCreateClaimResponse defines the Msg/CreateClaim response type.
 
 
 
@@ -2719,7 +2718,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateEvaluation"></a>
 
 ### MsgCreateEvaluation
-
+MsgCreateEvaluation defines a message for creating an evaluation for a specific claim on a project.
 
 
 | Field | Type | Label | Description |
@@ -2737,7 +2736,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateEvaluationResponse"></a>
 
 ### MsgCreateEvaluationResponse
-
+MsgCreateEvaluationResponse defines the Msg/CreateEvaluation response type.
 
 
 
@@ -2747,7 +2746,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateProject"></a>
 
 ### MsgCreateProject
-
+MsgCreateProject defines a message for creating a project.
 
 
 | Field | Type | Label | Description |
@@ -2766,7 +2765,7 @@ check all cases in NewHandler().
 <a name="project.MsgCreateProjectResponse"></a>
 
 ### MsgCreateProjectResponse
-
+MsgCreateProjectResponse defines the Msg/CreateProject response type.
 
 
 
@@ -2776,7 +2775,7 @@ check all cases in NewHandler().
 <a name="project.MsgUpdateAgent"></a>
 
 ### MsgUpdateAgent
-
+MsgUpdateAgent defines a message for updating an agent on a project.
 
 
 | Field | Type | Label | Description |
@@ -2794,7 +2793,7 @@ check all cases in NewHandler().
 <a name="project.MsgUpdateAgentResponse"></a>
 
 ### MsgUpdateAgentResponse
-
+MsgUpdateAgentResponse defines the Msg/UpdateAgent response type.
 
 
 
@@ -2804,7 +2803,7 @@ check all cases in NewHandler().
 <a name="project.MsgUpdateProjectDoc"></a>
 
 ### MsgUpdateProjectDoc
-
+MsgUpdateProjectDoc defines a message for updating a project&#39;s data.
 
 
 | Field | Type | Label | Description |
@@ -2822,7 +2821,7 @@ check all cases in NewHandler().
 <a name="project.MsgUpdateProjectDocResponse"></a>
 
 ### MsgUpdateProjectDocResponse
-
+MsgUpdateProjectDocResponse defines the Msg/UpdateProjectDoc response type.
 
 
 
@@ -2832,7 +2831,7 @@ check all cases in NewHandler().
 <a name="project.MsgUpdateProjectStatus"></a>
 
 ### MsgUpdateProjectStatus
-
+MsgUpdateProjectStatus defines a message for updating a project&#39;s current status.
 
 
 | Field | Type | Label | Description |
@@ -2850,7 +2849,7 @@ check all cases in NewHandler().
 <a name="project.MsgUpdateProjectStatusResponse"></a>
 
 ### MsgUpdateProjectStatusResponse
-
+MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.
 
 
 
@@ -2860,7 +2859,7 @@ check all cases in NewHandler().
 <a name="project.MsgWithdrawFunds"></a>
 
 ### MsgWithdrawFunds
-
+MsgWithdrawFunds defines a message for project agents to withdraw their funds from a project.
 
 
 | Field | Type | Label | Description |
@@ -2876,7 +2875,7 @@ check all cases in NewHandler().
 <a name="project.MsgWithdrawFundsResponse"></a>
 
 ### MsgWithdrawFundsResponse
-
+MsgWithdrawFundsResponse defines the Msg/WithdrawFunds response type.
 
 
 
@@ -2892,19 +2891,18 @@ check all cases in NewHandler().
 <a name="project.Msg"></a>
 
 ### Msg
-To get a list of all module messages, go to your module&#39;s handler.go and
-check all cases in NewHandler().
+Msg defines the project Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateProject | [MsgCreateProject](#project.MsgCreateProject) | [MsgCreateProjectResponse](#project.MsgCreateProjectResponse) |  |
-| UpdateProjectStatus | [MsgUpdateProjectStatus](#project.MsgUpdateProjectStatus) | [MsgUpdateProjectStatusResponse](#project.MsgUpdateProjectStatusResponse) |  |
-| CreateAgent | [MsgCreateAgent](#project.MsgCreateAgent) | [MsgCreateAgentResponse](#project.MsgCreateAgentResponse) |  |
-| UpdateAgent | [MsgUpdateAgent](#project.MsgUpdateAgent) | [MsgUpdateAgentResponse](#project.MsgUpdateAgentResponse) |  |
-| CreateClaim | [MsgCreateClaim](#project.MsgCreateClaim) | [MsgCreateClaimResponse](#project.MsgCreateClaimResponse) |  |
-| CreateEvaluation | [MsgCreateEvaluation](#project.MsgCreateEvaluation) | [MsgCreateEvaluationResponse](#project.MsgCreateEvaluationResponse) |  |
-| WithdrawFunds | [MsgWithdrawFunds](#project.MsgWithdrawFunds) | [MsgWithdrawFundsResponse](#project.MsgWithdrawFundsResponse) |  |
-| UpdateProjectDoc | [MsgUpdateProjectDoc](#project.MsgUpdateProjectDoc) | [MsgUpdateProjectDocResponse](#project.MsgUpdateProjectDocResponse) |  |
+| CreateProject | [MsgCreateProject](#project.MsgCreateProject) | [MsgCreateProjectResponse](#project.MsgCreateProjectResponse) | CreateProject defines a method for creating a project. |
+| UpdateProjectStatus | [MsgUpdateProjectStatus](#project.MsgUpdateProjectStatus) | [MsgUpdateProjectStatusResponse](#project.MsgUpdateProjectStatusResponse) | UpdateProjectStatus defines a method for updating a project&#39;s current status. |
+| CreateAgent | [MsgCreateAgent](#project.MsgCreateAgent) | [MsgCreateAgentResponse](#project.MsgCreateAgentResponse) | CreateAgent defines a method for creating an agent on a project. |
+| UpdateAgent | [MsgUpdateAgent](#project.MsgUpdateAgent) | [MsgUpdateAgentResponse](#project.MsgUpdateAgentResponse) | UpdateAgent defines a method for updating an agent on a project. |
+| CreateClaim | [MsgCreateClaim](#project.MsgCreateClaim) | [MsgCreateClaimResponse](#project.MsgCreateClaimResponse) | CreateClaim defines a method for creating a claim on a project. |
+| CreateEvaluation | [MsgCreateEvaluation](#project.MsgCreateEvaluation) | [MsgCreateEvaluationResponse](#project.MsgCreateEvaluationResponse) | CreateEvaluation defines a method for creating an evaluation for a specific claim on a project. |
+| WithdrawFunds | [MsgWithdrawFunds](#project.MsgWithdrawFunds) | [MsgWithdrawFundsResponse](#project.MsgWithdrawFundsResponse) | WithdrawFunds defines a method for project agents to withdraw their funds from a project. |
+| UpdateProjectDoc | [MsgUpdateProjectDoc](#project.MsgUpdateProjectDoc) | [MsgUpdateProjectDocResponse](#project.MsgUpdateProjectDocResponse) | UpdateProjectDoc defines a method for updating a project&#39;s data. |
 
  
 

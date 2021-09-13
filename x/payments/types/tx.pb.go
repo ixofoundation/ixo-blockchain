@@ -30,6 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgSetPaymentContractAuthorisation defines a message for authorising or deauthorising a payment contract.
 type MsgSetPaymentContractAuthorisation struct {
 	PaymentContractId string `protobuf:"bytes,1,opt,name=payment_contract_id,json=paymentContractId,proto3" json:"payment_contract_id,omitempty" yaml:"payment_contract_id"`
 	PayerDid          string `protobuf:"bytes,2,opt,name=payer_did,json=payerDid,proto3" json:"payer_did,omitempty" yaml:"payer_did"`
@@ -89,6 +90,7 @@ func (m *MsgSetPaymentContractAuthorisation) GetAuthorised() bool {
 	return false
 }
 
+// MsgSetPaymentContractAuthorisationResponse defines the Msg/SetPaymentContractAuthorisation response type.
 type MsgSetPaymentContractAuthorisationResponse struct {
 }
 
@@ -129,6 +131,7 @@ func (m *MsgSetPaymentContractAuthorisationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetPaymentContractAuthorisationResponse proto.InternalMessageInfo
 
+// MsgCreatePaymentTemplate defines a message for creating a payment template.
 type MsgCreatePaymentTemplate struct {
 	CreatorDid      string          `protobuf:"bytes,1,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty" yaml:"creator_did"`
 	PaymentTemplate PaymentTemplate `protobuf:"bytes,2,opt,name=payment_template,json=paymentTemplate,proto3" json:"payment_template" yaml:"payment_template"`
@@ -180,6 +183,7 @@ func (m *MsgCreatePaymentTemplate) GetPaymentTemplate() PaymentTemplate {
 	return PaymentTemplate{}
 }
 
+// MsgCreatePaymentTemplateResponse defines the Msg/CreatePaymentTemplate response type.
 type MsgCreatePaymentTemplateResponse struct {
 }
 
@@ -216,6 +220,7 @@ func (m *MsgCreatePaymentTemplateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePaymentTemplateResponse proto.InternalMessageInfo
 
+// MsgCreatePaymentContract defines a message for creating a payment contract.
 type MsgCreatePaymentContract struct {
 	CreatorDid        string                                  `protobuf:"bytes,1,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty" yaml:"creator_did"`
 	PaymentTemplateId string                                  `protobuf:"bytes,2,opt,name=payment_template_id,json=paymentTemplateId,proto3" json:"payment_template_id,omitempty" yaml:"payment_template_id"`
@@ -300,6 +305,7 @@ func (m *MsgCreatePaymentContract) GetCanDeauthorise() bool {
 	return false
 }
 
+// MsgCreatePaymentContractResponse defines the Msg/CreatePaymentContract response type.
 type MsgCreatePaymentContractResponse struct {
 }
 
@@ -336,6 +342,7 @@ func (m *MsgCreatePaymentContractResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePaymentContractResponse proto.InternalMessageInfo
 
+// MsgCreateSubscription defines a message for creating a subscription.
 type MsgCreateSubscription struct {
 	CreatorDid        string                                  `protobuf:"bytes,1,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty" yaml:"creator_did"`
 	SubscriptionId    string                                  `protobuf:"bytes,2,opt,name=subscription_id,json=subscriptionId,proto3" json:"subscription_id,omitempty" yaml:"subscription_id"`
@@ -376,6 +383,7 @@ func (m *MsgCreateSubscription) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateSubscription proto.InternalMessageInfo
 
+// MsgCreateSubscriptionResponse defines the Msg/CreateSubscription response type.
 type MsgCreateSubscriptionResponse struct {
 }
 
@@ -412,6 +420,7 @@ func (m *MsgCreateSubscriptionResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateSubscriptionResponse proto.InternalMessageInfo
 
+// MsgGrantDiscount defines a message for granting a discount to a payer on a specific payment contract.
 type MsgGrantDiscount struct {
 	SenderDid         string                                  `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3" json:"sender_did,omitempty" yaml:"sender_did"`
 	PaymentContractId string                                  `protobuf:"bytes,2,opt,name=payment_contract_id,json=paymentContractId,proto3" json:"payment_contract_id,omitempty" yaml:"payment_contract_id"`
@@ -472,6 +481,7 @@ func (m *MsgGrantDiscount) GetRecipient() string {
 	return ""
 }
 
+// MsgGrantDiscountResponse defines the Msg/GrantDiscount response type.
 type MsgGrantDiscountResponse struct {
 }
 
@@ -508,6 +518,7 @@ func (m *MsgGrantDiscountResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgGrantDiscountResponse proto.InternalMessageInfo
 
+// MsgRevokeDiscount defines a message for revoking a discount previously granted to a payer.
 type MsgRevokeDiscount struct {
 	SenderDid         string `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3" json:"sender_did,omitempty" yaml:"sender_did"`
 	PaymentContractId string `protobuf:"bytes,2,opt,name=payment_contract_id,json=paymentContractId,proto3" json:"payment_contract_id,omitempty" yaml:"payment_contract_id"`
@@ -567,6 +578,7 @@ func (m *MsgRevokeDiscount) GetHolder() string {
 	return ""
 }
 
+// MsgRevokeDiscountResponse defines the Msg/RevokeDiscount response type.
 type MsgRevokeDiscountResponse struct {
 }
 
@@ -603,6 +615,7 @@ func (m *MsgRevokeDiscountResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRevokeDiscountResponse proto.InternalMessageInfo
 
+// MsgEffectPayment defines a message for putting a specific payment contract into effect.
 type MsgEffectPayment struct {
 	SenderDid         string `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3" json:"sender_did,omitempty" yaml:"sender_did"`
 	PaymentContractId string `protobuf:"bytes,2,opt,name=payment_contract_id,json=paymentContractId,proto3" json:"payment_contract_id,omitempty" yaml:"payment_contract_id"`
@@ -654,6 +667,7 @@ func (m *MsgEffectPayment) GetPaymentContractId() string {
 	return ""
 }
 
+// MsgEffectPaymentResponse defines the Msg/EffectPayment response type.
 type MsgEffectPaymentResponse struct {
 }
 
@@ -787,12 +801,19 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// SetPaymentContractAuthorisation defines a method for authorising or deauthorising a payment contract.
 	SetPaymentContractAuthorisation(ctx context.Context, in *MsgSetPaymentContractAuthorisation, opts ...grpc.CallOption) (*MsgSetPaymentContractAuthorisationResponse, error)
+	// CreatePaymentTemplate defines a method for creating a payment template.
 	CreatePaymentTemplate(ctx context.Context, in *MsgCreatePaymentTemplate, opts ...grpc.CallOption) (*MsgCreatePaymentTemplateResponse, error)
+	// CreatePaymentContract defines a method for creating a payment contract.
 	CreatePaymentContract(ctx context.Context, in *MsgCreatePaymentContract, opts ...grpc.CallOption) (*MsgCreatePaymentContractResponse, error)
+	// CreateSubscription defines a method for creating a subscription.
 	CreateSubscription(ctx context.Context, in *MsgCreateSubscription, opts ...grpc.CallOption) (*MsgCreateSubscriptionResponse, error)
+	// GrantDiscount defines a method for granting a discount to a payer on a specific payment contract.
 	GrantDiscount(ctx context.Context, in *MsgGrantDiscount, opts ...grpc.CallOption) (*MsgGrantDiscountResponse, error)
+	// RevokeDiscount defines a method for revoking a discount previously granted to a payer.
 	RevokeDiscount(ctx context.Context, in *MsgRevokeDiscount, opts ...grpc.CallOption) (*MsgRevokeDiscountResponse, error)
+	// EffectPayment defines a method for putting a specific payment contract into effect.
 	EffectPayment(ctx context.Context, in *MsgEffectPayment, opts ...grpc.CallOption) (*MsgEffectPaymentResponse, error)
 }
 
@@ -869,12 +890,19 @@ func (c *msgClient) EffectPayment(ctx context.Context, in *MsgEffectPayment, opt
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// SetPaymentContractAuthorisation defines a method for authorising or deauthorising a payment contract.
 	SetPaymentContractAuthorisation(context.Context, *MsgSetPaymentContractAuthorisation) (*MsgSetPaymentContractAuthorisationResponse, error)
+	// CreatePaymentTemplate defines a method for creating a payment template.
 	CreatePaymentTemplate(context.Context, *MsgCreatePaymentTemplate) (*MsgCreatePaymentTemplateResponse, error)
+	// CreatePaymentContract defines a method for creating a payment contract.
 	CreatePaymentContract(context.Context, *MsgCreatePaymentContract) (*MsgCreatePaymentContractResponse, error)
+	// CreateSubscription defines a method for creating a subscription.
 	CreateSubscription(context.Context, *MsgCreateSubscription) (*MsgCreateSubscriptionResponse, error)
+	// GrantDiscount defines a method for granting a discount to a payer on a specific payment contract.
 	GrantDiscount(context.Context, *MsgGrantDiscount) (*MsgGrantDiscountResponse, error)
+	// RevokeDiscount defines a method for revoking a discount previously granted to a payer.
 	RevokeDiscount(context.Context, *MsgRevokeDiscount) (*MsgRevokeDiscountResponse, error)
+	// EffectPayment defines a method for putting a specific payment contract into effect.
 	EffectPayment(context.Context, *MsgEffectPayment) (*MsgEffectPaymentResponse, error)
 }
 

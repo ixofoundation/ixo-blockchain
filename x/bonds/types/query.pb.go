@@ -31,6 +31,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// QueryBondsRequest is the request type for the Query/Bonds RPC method.
 type QueryBondsRequest struct {
 }
 
@@ -67,6 +68,7 @@ func (m *QueryBondsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryBondsRequest proto.InternalMessageInfo
 
+// QueryBondsResponse is the response type for the Query/Bonds RPC method.
 type QueryBondsResponse struct {
 	Bonds []string `protobuf:"bytes,1,rep,name=bonds,proto3" json:"bonds,omitempty" yaml:"bonds"`
 }
@@ -111,6 +113,7 @@ func (m *QueryBondsResponse) GetBonds() []string {
 	return nil
 }
 
+// QueryBondsDetailedRequest is the request type for the Query/BondsDetailed RPC method.
 type QueryBondsDetailedRequest struct {
 }
 
@@ -147,6 +150,7 @@ func (m *QueryBondsDetailedRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryBondsDetailedRequest proto.InternalMessageInfo
 
+// QueryBondsDetailedResponse is the response type for the Query/BondsDetailed RPC method.
 type QueryBondsDetailedResponse struct {
 	BondsDetailed []*BondDetails `protobuf:"bytes,1,rep,name=bonds_detailed,json=bondsDetailed,proto3" json:"bonds_detailed,omitempty" yaml:"bonds_detailed"`
 }
@@ -191,6 +195,7 @@ func (m *QueryBondsDetailedResponse) GetBondsDetailed() []*BondDetails {
 	return nil
 }
 
+// QueryBondRequest is the request type for the Query/Bond RPC method.
 type QueryBondRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -235,6 +240,7 @@ func (m *QueryBondRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryBondResponse is the response type for the Query/Bond RPC method.
 type QueryBondResponse struct {
 	Bond *Bond `protobuf:"bytes,1,opt,name=bond,proto3" json:"bond,omitempty" yaml:"bond"`
 }
@@ -279,6 +285,7 @@ func (m *QueryBondResponse) GetBond() *Bond {
 	return nil
 }
 
+// QueryBatchRequest is the request type for the Query/Batch RPC method.
 type QueryBatchRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -323,6 +330,7 @@ func (m *QueryBatchRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryBatchResponse is the response type for the Query/Batch RPC method.
 type QueryBatchResponse struct {
 	Batch *Batch `protobuf:"bytes,1,opt,name=batch,proto3" json:"batch,omitempty" yaml:"batch"`
 }
@@ -367,6 +375,7 @@ func (m *QueryBatchResponse) GetBatch() *Batch {
 	return nil
 }
 
+// QueryLastBatchRequest is the request type for the Query/LastBatch RPC method.
 type QueryLastBatchRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -411,6 +420,7 @@ func (m *QueryLastBatchRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryLastBatchResponse is the response type for the Query/LastBatch RPC method.
 type QueryLastBatchResponse struct {
 	LastBatch *Batch `protobuf:"bytes,1,opt,name=last_batch,json=lastBatch,proto3" json:"last_batch,omitempty" yaml:"last_batch"`
 }
@@ -455,6 +465,7 @@ func (m *QueryLastBatchResponse) GetLastBatch() *Batch {
 	return nil
 }
 
+// QueryCurrentPriceRequest is the request type for the Query/CurrentPrice RPC method.
 type QueryCurrentPriceRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -499,6 +510,7 @@ func (m *QueryCurrentPriceRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryCurrentPriceResponse is the response type for the Query/CurrentPrice RPC method.
 type QueryCurrentPriceResponse struct {
 	CurrentPrice github_com_cosmos_cosmos_sdk_types.DecCoins `protobuf:"bytes,1,rep,name=current_price,json=currentPrice,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.DecCoins" json:"current_price" yaml:"current_price"`
 }
@@ -543,6 +555,7 @@ func (m *QueryCurrentPriceResponse) GetCurrentPrice() github_com_cosmos_cosmos_s
 	return nil
 }
 
+// QueryCurrentReserveRequest is the request type for the Query/CurrentReserve RPC method.
 type QueryCurrentReserveRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -587,6 +600,7 @@ func (m *QueryCurrentReserveRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryCurrentReserveResponse is the response type for the Query/CurrentReserve RPC method.
 type QueryCurrentReserveResponse struct {
 	CurrentReserve []types.Coin `protobuf:"bytes,1,rep,name=current_reserve,json=currentReserve,proto3" json:"current_reserve" yaml:"current_reserve"`
 }
@@ -631,6 +645,7 @@ func (m *QueryCurrentReserveResponse) GetCurrentReserve() []types.Coin {
 	return nil
 }
 
+// QueryAvailableReserveRequest is the request type for the Query/AvailableReserve RPC method.
 type QueryAvailableReserveRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -675,6 +690,7 @@ func (m *QueryAvailableReserveRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryAvailableReserveResponse is the response type for the Query/AvailableReserve RPC method.
 type QueryAvailableReserveResponse struct {
 	AvailableReserve []types.Coin `protobuf:"bytes,1,rep,name=available_reserve,json=availableReserve,proto3" json:"available_reserve" yaml:"available_reserve"`
 }
@@ -719,6 +735,7 @@ func (m *QueryAvailableReserveResponse) GetAvailableReserve() []types.Coin {
 	return nil
 }
 
+// QueryCustomPriceRequest is the request type for the Query/CustomPrice RPC method.
 type QueryCustomPriceRequest struct {
 	BondDid    string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	BondAmount string `protobuf:"bytes,2,opt,name=bond_amount,json=bondAmount,proto3" json:"bond_amount,omitempty" yaml:"bond_amount"`
@@ -771,6 +788,7 @@ func (m *QueryCustomPriceRequest) GetBondAmount() string {
 	return ""
 }
 
+// QueryCustomPriceResponse is the response type for the Query/CustomPrice RPC method.
 type QueryCustomPriceResponse struct {
 	Price github_com_cosmos_cosmos_sdk_types.DecCoins `protobuf:"bytes,1,rep,name=price,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.DecCoins" json:"price" yaml:"price"`
 }
@@ -815,6 +833,7 @@ func (m *QueryCustomPriceResponse) GetPrice() github_com_cosmos_cosmos_sdk_types
 	return nil
 }
 
+// QueryCustomPriceRequest is the request type for the Query/BuyPrice RPC method.
 type QueryBuyPriceRequest struct {
 	BondDid    string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	BondAmount string `protobuf:"bytes,2,opt,name=bond_amount,json=bondAmount,proto3" json:"bond_amount,omitempty" yaml:"bond_amount"`
@@ -867,6 +886,7 @@ func (m *QueryBuyPriceRequest) GetBondAmount() string {
 	return ""
 }
 
+// QueryCustomPriceResponse is the response type for the Query/BuyPrice RPC method.
 type QueryBuyPriceResponse struct {
 	AdjustedSupply types.Coin                               `protobuf:"bytes,1,opt,name=adjusted_supply,json=adjustedSupply,proto3" json:"adjusted_supply" yaml:"adjusted_supply"`
 	Prices         github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=prices,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"prices" yaml:"prices"`
@@ -943,6 +963,7 @@ func (m *QueryBuyPriceResponse) GetTotalFees() github_com_cosmos_cosmos_sdk_type
 	return nil
 }
 
+// QuerySellReturnRequest is the request type for the Query/SellReturn RPC method.
 type QuerySellReturnRequest struct {
 	BondDid    string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	BondAmount string `protobuf:"bytes,2,opt,name=bond_amount,json=bondAmount,proto3" json:"bond_amount,omitempty" yaml:"bond_amount"`
@@ -995,6 +1016,7 @@ func (m *QuerySellReturnRequest) GetBondAmount() string {
 	return ""
 }
 
+// QuerySellReturnResponse is the response type for the Query/SellReturn RPC method.
 type QuerySellReturnResponse struct {
 	AdjustedSupply types.Coin                               `protobuf:"bytes,1,opt,name=adjusted_supply,json=adjustedSupply,proto3" json:"adjusted_supply" yaml:"adjusted_supply"`
 	Returns        github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=returns,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"returns" yaml:"returns"`
@@ -1079,6 +1101,7 @@ func (m *QuerySellReturnResponse) GetTotalFees() github_com_cosmos_cosmos_sdk_ty
 	return nil
 }
 
+// QuerySwapReturnRequest is the request type for the Query/SwapReturn RPC method.
 type QuerySwapReturnRequest struct {
 	BondDid             string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	FromTokenWithAmount string `protobuf:"bytes,2,opt,name=from_token_with_amount,json=fromTokenWithAmount,proto3" json:"from_token_with_amount,omitempty" yaml:"from_token_with_amount"`
@@ -1139,6 +1162,7 @@ func (m *QuerySwapReturnRequest) GetToToken() string {
 	return ""
 }
 
+// QuerySwapReturnResponse is the response type for the Query/SwapReturn RPC method.
 type QuerySwapReturnResponse struct {
 	TotalReturns github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=total_returns,json=totalReturns,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"total_returns" yaml:"total_returns"`
 	TotalFees    github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=total_fees,json=totalFees,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"total_fees" yaml:"total_fees"`
@@ -1191,6 +1215,7 @@ func (m *QuerySwapReturnResponse) GetTotalFees() github_com_cosmos_cosmos_sdk_ty
 	return nil
 }
 
+// QueryAlphaMaximumsRequest is the request type for the Query/AlphaMaximums RPC method.
 type QueryAlphaMaximumsRequest struct {
 	BondDid string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 }
@@ -1235,6 +1260,7 @@ func (m *QueryAlphaMaximumsRequest) GetBondDid() string {
 	return ""
 }
 
+// QueryAlphaMaximumsResponse is the response type for the Query/AlphaMaximums RPC method.
 type QueryAlphaMaximumsResponse struct {
 	MaxSystemAlphaIncrease github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,1,opt,name=max_system_alpha_increase,json=maxSystemAlphaIncrease,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"max_system_alpha_increase" yaml:"max_system_alpha_increase"`
 	MaxSystemAlpha         github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=max_system_alpha,json=maxSystemAlpha,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"max_system_alpha" yaml:"max_system_alpha"`
@@ -1273,6 +1299,7 @@ func (m *QueryAlphaMaximumsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAlphaMaximumsResponse proto.InternalMessageInfo
 
+// QueryParamsRequest is the request type for the Query/Params RPC method.
 type QueryParamsRequest struct {
 }
 
@@ -1309,6 +1336,7 @@ func (m *QueryParamsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
 
+// QueryParamsResponse is the response type for the Query/Params RPC method.
 type QueryParamsResponse struct {
 	Params *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty" yaml:"params"`
 }
@@ -1505,19 +1533,33 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	// Bonds returns all existing bonds.
 	Bonds(ctx context.Context, in *QueryBondsRequest, opts ...grpc.CallOption) (*QueryBondsResponse, error)
+	// BondsDetailed returns a list of all existing bonds with details about their current state.
 	BondsDetailed(ctx context.Context, in *QueryBondsDetailedRequest, opts ...grpc.CallOption) (*QueryBondsDetailedResponse, error)
+	// Params queries the paramaters of x/bonds module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// Bond queries info of a specific bond.
 	Bond(ctx context.Context, in *QueryBondRequest, opts ...grpc.CallOption) (*QueryBondResponse, error)
+	// Batch queries info of a specific bond's current batch.
 	Batch(ctx context.Context, in *QueryBatchRequest, opts ...grpc.CallOption) (*QueryBatchResponse, error)
+	// LastBatch queries info of a specific bond's last batch.
 	LastBatch(ctx context.Context, in *QueryLastBatchRequest, opts ...grpc.CallOption) (*QueryLastBatchResponse, error)
+	// CurrentPrice queries the current price/s of a specific bond.
 	CurrentPrice(ctx context.Context, in *QueryCurrentPriceRequest, opts ...grpc.CallOption) (*QueryCurrentPriceResponse, error)
+	// CurrentReserve queries the current balance/s of the reserve pool for a specific bond.
 	CurrentReserve(ctx context.Context, in *QueryCurrentReserveRequest, opts ...grpc.CallOption) (*QueryCurrentReserveResponse, error)
+	// AvailableReserve queries current available balance/s of the reserve pool for a specific bond.
 	AvailableReserve(ctx context.Context, in *QueryAvailableReserveRequest, opts ...grpc.CallOption) (*QueryAvailableReserveResponse, error)
+	// CustomPrice queries price/s of a specific bond at a specific supply.
 	CustomPrice(ctx context.Context, in *QueryCustomPriceRequest, opts ...grpc.CallOption) (*QueryCustomPriceResponse, error)
+	// BuyPrice queries price/s of buying an amount of tokens from a specific bond.
 	BuyPrice(ctx context.Context, in *QueryBuyPriceRequest, opts ...grpc.CallOption) (*QueryBuyPriceResponse, error)
+	// SellReturn queries return/s on selling an amount of tokens of a specific bond.
 	SellReturn(ctx context.Context, in *QuerySellReturnRequest, opts ...grpc.CallOption) (*QuerySellReturnResponse, error)
+	// SwapReturn queries return/s on swapping an amount of tokens to another token of a specific bond.
 	SwapReturn(ctx context.Context, in *QuerySwapReturnRequest, opts ...grpc.CallOption) (*QuerySwapReturnResponse, error)
+	// AlphaMaximums queries alpha maximums for a specific augmented bonding curve.
 	AlphaMaximums(ctx context.Context, in *QueryAlphaMaximumsRequest, opts ...grpc.CallOption) (*QueryAlphaMaximumsResponse, error)
 }
 
@@ -1657,19 +1699,33 @@ func (c *queryClient) AlphaMaximums(ctx context.Context, in *QueryAlphaMaximumsR
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	// Bonds returns all existing bonds.
 	Bonds(context.Context, *QueryBondsRequest) (*QueryBondsResponse, error)
+	// BondsDetailed returns a list of all existing bonds with details about their current state.
 	BondsDetailed(context.Context, *QueryBondsDetailedRequest) (*QueryBondsDetailedResponse, error)
+	// Params queries the paramaters of x/bonds module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// Bond queries info of a specific bond.
 	Bond(context.Context, *QueryBondRequest) (*QueryBondResponse, error)
+	// Batch queries info of a specific bond's current batch.
 	Batch(context.Context, *QueryBatchRequest) (*QueryBatchResponse, error)
+	// LastBatch queries info of a specific bond's last batch.
 	LastBatch(context.Context, *QueryLastBatchRequest) (*QueryLastBatchResponse, error)
+	// CurrentPrice queries the current price/s of a specific bond.
 	CurrentPrice(context.Context, *QueryCurrentPriceRequest) (*QueryCurrentPriceResponse, error)
+	// CurrentReserve queries the current balance/s of the reserve pool for a specific bond.
 	CurrentReserve(context.Context, *QueryCurrentReserveRequest) (*QueryCurrentReserveResponse, error)
+	// AvailableReserve queries current available balance/s of the reserve pool for a specific bond.
 	AvailableReserve(context.Context, *QueryAvailableReserveRequest) (*QueryAvailableReserveResponse, error)
+	// CustomPrice queries price/s of a specific bond at a specific supply.
 	CustomPrice(context.Context, *QueryCustomPriceRequest) (*QueryCustomPriceResponse, error)
+	// BuyPrice queries price/s of buying an amount of tokens from a specific bond.
 	BuyPrice(context.Context, *QueryBuyPriceRequest) (*QueryBuyPriceResponse, error)
+	// SellReturn queries return/s on selling an amount of tokens of a specific bond.
 	SellReturn(context.Context, *QuerySellReturnRequest) (*QuerySellReturnResponse, error)
+	// SwapReturn queries return/s on swapping an amount of tokens to another token of a specific bond.
 	SwapReturn(context.Context, *QuerySwapReturnRequest) (*QuerySwapReturnResponse, error)
+	// AlphaMaximums queries alpha maximums for a specific augmented bonding curve.
 	AlphaMaximums(context.Context, *QueryAlphaMaximumsRequest) (*QueryAlphaMaximumsResponse, error)
 }
 

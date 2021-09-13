@@ -23,6 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// TODO
 type DidCredential struct {
 	CredType []string `protobuf:"bytes,1,rep,name=cred_type,json=credType,proto3" json:"type" yaml:"type"`
 	Issuer   string   `protobuf:"bytes,2,opt,name=issuer,proto3" json:"issuer,omitempty" yaml:"issuer"`
@@ -91,6 +92,7 @@ func (m *DidCredential) GetClaim() *Claim {
 	return nil
 }
 
+// TODO
 type Claim struct {
 	Id           string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
 	KYCValidated bool   `protobuf:"varint,2,opt,name=KYC_validated,json=KYCValidated,proto3" json:"KYCValidated" yaml:"KYCValidated"`
@@ -143,6 +145,7 @@ func (m *Claim) GetKYCValidated() bool {
 	return false
 }
 
+// TODO
 type IxoDid struct {
 	Did                 string  `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" yaml:"did"`
 	VerifyKey           string  `protobuf:"bytes,2,opt,name=verify_key,json=verifyKey,proto3" json:"verifyKey" yaml:"verifyKey"`
@@ -211,6 +214,7 @@ func (m *IxoDid) GetSecret() *Secret {
 	return nil
 }
 
+// TODO
 type Secret struct {
 	Seed                 string `protobuf:"bytes,1,opt,name=seed,proto3" json:"seed,omitempty" yaml:"seed"`
 	SignKey              string `protobuf:"bytes,2,opt,name=sign_key,json=signKey,proto3" json:"signKey" yaml:"signKey"`

@@ -30,6 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
 type QueryProjectDocRequest struct {
 	ProjectDid string `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"project_did,omitempty" yaml:"project_did"`
 }
@@ -74,6 +75,7 @@ func (m *QueryProjectDocRequest) GetProjectDid() string {
 	return ""
 }
 
+// QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
 type QueryProjectDocResponse struct {
 	ProjectDoc *ProjectDoc `protobuf:"bytes,1,opt,name=project_doc,json=projectDoc,proto3" json:"project_doc,omitempty" yaml:"project_doc"`
 }
@@ -118,6 +120,7 @@ func (m *QueryProjectDocResponse) GetProjectDoc() *ProjectDoc {
 	return nil
 }
 
+// QueryProjectAccountsRequest is the request type for the Query/ProjectAccounts RPC method.
 type QueryProjectAccountsRequest struct {
 	ProjectDid string `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"project_did,omitempty" yaml:"project_did"`
 }
@@ -162,6 +165,7 @@ func (m *QueryProjectAccountsRequest) GetProjectDid() string {
 	return ""
 }
 
+// QueryProjectAccountsResponse is the response type for the Query/ProjectAccounts RPC method.
 type QueryProjectAccountsResponse struct {
 	AccountMap *AccountMap `protobuf:"bytes,1,opt,name=account_map,json=accountMap,proto3" json:"account_map,omitempty" yaml:"account_map"`
 }
@@ -206,6 +210,7 @@ func (m *QueryProjectAccountsResponse) GetAccountMap() *AccountMap {
 	return nil
 }
 
+// QueryProjectTxRequest is the request type for the Query/ProjectTx RPC method.
 type QueryProjectTxRequest struct {
 	ProjectDid string `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"project_did,omitempty" yaml:"project_did"`
 }
@@ -250,6 +255,7 @@ func (m *QueryProjectTxRequest) GetProjectDid() string {
 	return ""
 }
 
+// QueryProjectTxResponse is the response type for the Query/ProjectTx RPC method.
 type QueryProjectTxResponse struct {
 	Txs *WithdrawalInfoDocs `protobuf:"bytes,1,opt,name=txs,proto3" json:"txs,omitempty" yaml:"txs"`
 }
@@ -294,6 +300,7 @@ func (m *QueryProjectTxResponse) GetTxs() *WithdrawalInfoDocs {
 	return nil
 }
 
+// QueryParamsRequest is the request type for the Query/Params RPC method.
 type QueryParamsRequest struct {
 }
 
@@ -330,6 +337,7 @@ func (m *QueryParamsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
 
+// QueryParamsResponse is the response type for the Query/Params RPC method.
 type QueryParamsResponse struct {
 	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params" yaml:"params"`
 }
@@ -439,9 +447,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	// ProjectDoc queries info of a specific project.
 	ProjectDoc(ctx context.Context, in *QueryProjectDocRequest, opts ...grpc.CallOption) (*QueryProjectDocResponse, error)
+	// ProjectAccounts lists a specific project's accounts.
 	ProjectAccounts(ctx context.Context, in *QueryProjectAccountsRequest, opts ...grpc.CallOption) (*QueryProjectAccountsResponse, error)
+	// ProjectTx lists a specific project's transactions.
 	ProjectTx(ctx context.Context, in *QueryProjectTxRequest, opts ...grpc.CallOption) (*QueryProjectTxResponse, error)
+	// Params queries the paramaters of x/project module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 }
 
@@ -491,9 +503,13 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	// ProjectDoc queries info of a specific project.
 	ProjectDoc(context.Context, *QueryProjectDocRequest) (*QueryProjectDocResponse, error)
+	// ProjectAccounts lists a specific project's accounts.
 	ProjectAccounts(context.Context, *QueryProjectAccountsRequest) (*QueryProjectAccountsResponse, error)
+	// ProjectTx lists a specific project's transactions.
 	ProjectTx(context.Context, *QueryProjectTxRequest) (*QueryProjectTxResponse, error)
+	// Params queries the paramaters of x/project module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 }
 

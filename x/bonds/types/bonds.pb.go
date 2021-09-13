@@ -25,6 +25,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// FunctionParam is a key-value pair used for specifying a specific bond parameter.
 type FunctionParam struct {
 	Param string                                 `protobuf:"bytes,1,opt,name=param,proto3" json:"param,omitempty" yaml:"param"`
 	Value github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=value,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"value" yaml:"value"`
@@ -70,6 +71,7 @@ func (m *FunctionParam) GetParam() string {
 	return ""
 }
 
+// BondDetails contains details about the current state of a given bond.
 type BondDetails struct {
 	BondDid   string                                      `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"did" yaml:"did"`
 	SpotPrice github_com_cosmos_cosmos_sdk_types.DecCoins `protobuf:"bytes,2,rep,name=spot_price,json=spotPrice,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.DecCoins" json:"spot_price" yaml:"spot_price"`
@@ -138,6 +140,7 @@ func (m *BondDetails) GetReserve() github_com_cosmos_cosmos_sdk_types.Coins {
 	return nil
 }
 
+// Bond defines a token bonding curve type with all of its parameters.
 type Bond struct {
 	Token                        string                                   `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty" yaml:"token"`
 	Name                         string                                   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" yaml:"name"`
@@ -348,6 +351,8 @@ func (m *Bond) GetBondDid() string {
 	return ""
 }
 
+// BaseOrder defines a base order type. It contains all the necessary fields for specifying
+// a buy, sell, or swap order.
 type BaseOrder struct {
 	AccountDid   string     `protobuf:"bytes,1,opt,name=account_did,json=accountDid,proto3" json:"account_did,omitempty" yaml:"account_did"`
 	Amount       types.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount" yaml:"amount"`
@@ -416,6 +421,8 @@ func (m *BaseOrder) GetCancelReason() string {
 	return ""
 }
 
+// BuyOrder defines a type for submitting a buy order on a bond, together with the maximum
+// amount of reserve tokens the buyer is willing to pay.
 type BuyOrder struct {
 	BaseOrder BaseOrder                                `protobuf:"bytes,1,opt,name=base_order,json=baseOrder,proto3" json:"base_order" yaml:"base_order"`
 	MaxPrices github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=max_prices,json=maxPrices,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"max_prices" yaml:"max_prices"`
@@ -468,6 +475,7 @@ func (m *BuyOrder) GetMaxPrices() github_com_cosmos_cosmos_sdk_types.Coins {
 	return nil
 }
 
+// SellOrder defines a type for submitting a sell order on a bond.
 type SellOrder struct {
 	BaseOrder BaseOrder `protobuf:"bytes,1,opt,name=base_order,json=baseOrder,proto3" json:"base_order" yaml:"base_order"`
 }
@@ -512,6 +520,7 @@ func (m *SellOrder) GetBaseOrder() BaseOrder {
 	return BaseOrder{}
 }
 
+// SwapOrder defines a type for submitting a swap order between two tokens on a bond.
 type SwapOrder struct {
 	BaseOrder BaseOrder `protobuf:"bytes,1,opt,name=base_order,json=baseOrder,proto3" json:"base_order" yaml:"base_order"`
 	ToToken   string    `protobuf:"bytes,2,opt,name=to_token,json=toToken,proto3" json:"to_token,omitempty" yaml:"to_token"`
@@ -564,6 +573,7 @@ func (m *SwapOrder) GetToToken() string {
 	return ""
 }
 
+// Batch holds a collection of outstanding buy, sell, and swap orders on a particular bond.
 type Batch struct {
 	BondDid         string                                      `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	BlocksRemaining github_com_cosmos_cosmos_sdk_types.Uint     `protobuf:"bytes,2,opt,name=blocks_remaining,json=blocksRemaining,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"blocks_remaining" yaml:"blocks_remaining"`
@@ -666,6 +676,7 @@ func (m *Batch) GetSwaps() []SwapOrder {
 	return nil
 }
 
+// Params defines the parameters for the bonds module.
 type Params struct {
 	ReservedBondTokens []string `protobuf:"bytes,1,rep,name=reserved_bond_tokens,json=reservedBondTokens,proto3" json:"reserved_bond_tokens,omitempty" yaml:"reserved_bond_tokens"`
 }
