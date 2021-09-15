@@ -11,6 +11,7 @@ paths:
   /bonds:
     get:
       operationId: Bonds
+      description: Get a list of all bond DIDs
       responses:
         '200':
           description: A successful response.
@@ -50,6 +51,7 @@ paths:
   /bonds/params:
     get:
       operationId: BondsParams
+      description: Get bonds module's parameters
       responses:
         '200':
           description: A successful response.
@@ -92,6 +94,7 @@ paths:
   '/bonds/{bond_did}':
     get:
       operationId: Bond
+      description: Get a specific bond's details
       responses:
         '200':
           description: A successful response.
@@ -292,6 +295,7 @@ paths:
   '/bonds/{bond_did}/alpha_maximums':
     get:
       operationId: AlphaMaximums
+      description: Get a bond's maximum alpha values
       responses:
         '200':
           description: A successful response.
@@ -339,6 +343,7 @@ paths:
   '/bonds/{bond_did}/available_reserve':
     get:
       operationId: AvailableReserve
+      description: Get a bond's available reserve
       responses:
         '200':
           description: A successful response.
@@ -396,6 +401,7 @@ paths:
   '/bonds/{bond_did}/batch':
     get:
       operationId: Batch
+      description: Get current content of a bond's order batch
       responses:
         '200':
           description: A successful response.
@@ -629,6 +635,7 @@ paths:
   '/bonds/{bond_did}/buy_price/{bond_amount}':
     get:
       operationId: BuyPrice
+      description: Get the buying price for an amount of bond tokens for a bond
       responses:
         '200':
           description: A successful response.
@@ -759,6 +766,7 @@ paths:
   '/bonds/{bond_did}/current_price':
     get:
       operationId: CurrentPrice
+      description: Get the current (spot) price for a bond
       responses:
         '200':
           description: A successful response.
@@ -817,6 +825,7 @@ paths:
   '/bonds/{bond_did}/current_reserve':
     get:
       operationId: CurrentReserve
+      description: Get the current reserve of a bond
       responses:
         '200':
           description: A successful response.
@@ -874,6 +883,7 @@ paths:
   '/bonds/{bond_did}/last_batch':
     get:
       operationId: LastBatch
+      description: Get the content of the bond's last finalised batch
       responses:
         '200':
           description: A successful response.
@@ -1107,6 +1117,7 @@ paths:
   '/bonds/{bond_did}/price/{bond_amount}':
     get:
       operationId: CustomPrice
+      description: Get the spot price at a specific token supply for a bond
       responses:
         '200':
           description: A successful response.
@@ -1169,6 +1180,7 @@ paths:
   '/bonds/{bond_did}/sell_return/{bond_amount}':
     get:
       operationId: SellReturn
+      description: Get the returns for selling a number of bond tokens for a bond
       responses:
         '200':
           description: A successful response.
@@ -1316,6 +1328,7 @@ paths:
   '/bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}':
     get:
       operationId: SwapReturn
+      description: Calculate the returns for swapping in a number of tokens using a swapper bond
       responses:
         '200':
           description: A successful response.
@@ -1401,6 +1414,7 @@ paths:
   /bonds_detailed:
     get:
       operationId: BondsDetailed
+      description: Get a list of bonds with some detail
       responses:
         '200':
           description: A successful response.
@@ -1494,6 +1508,7 @@ paths:
   /allDidDocs:
     get:
       operationId: AllDidDocs
+      description: Get a list of all DID Docs
       responses:
         '200':
           description: A successful response.
@@ -1705,6 +1720,7 @@ paths:
   /did:
     get:
       operationId: AllDids
+      description: Get a list of all DIDs
       responses:
         '200':
           description: A successful response.
@@ -1911,6 +1927,7 @@ paths:
   '/did/{did}':
     get:
       operationId: DidDoc
+      description: Get a specific DID Doc by the DID
       responses:
         '200':
           description: A successful response.
@@ -2130,6 +2147,7 @@ paths:
   '/didToAddr/{did}':
     get:
       operationId: AddressFromDid
+      description: Convert a registered DID to an address
       responses:
         '200':
           description: A successful response.
@@ -2339,6 +2357,7 @@ paths:
   '/pubKeyToAddr/{pubKey}':
     get:
       operationId: AddressFromBase58EncodedPubkey
+      description: Convert a base58 encoded public key to an address
       responses:
         '200':
           description: A successful response.
@@ -2548,6 +2567,7 @@ paths:
   '/payments/contracts/{payment_contract_id}':
     get:
       operationId: PaymentContract
+      description: Get a payments contract by its ID
       responses:
         '200':
           description: A successful response.
@@ -2817,6 +2837,7 @@ paths:
   '/payments/contracts_by_id_prefix/{payment_contracts_id_prefix}':
     get:
       operationId: PaymentContractsByIdPrefix
+      description: Get a list of payment contracts by ID prefix
       responses:
         '200':
           description: A successful response.
@@ -3090,6 +3111,7 @@ paths:
   '/payments/subscriptions/{subscription_id}':
     get:
       operationId: Subscription
+      description: Get a subscription by its ID
       responses:
         '200':
           description: A successful response.
@@ -3322,6 +3344,7 @@ paths:
   '/payments/templates/{payment_template_id}':
     get:
       operationId: PaymentTemplate
+      description: Get a payments template by its ID
       responses:
         '200':
           description: A successful response.
@@ -3594,6 +3617,7 @@ paths:
   '/project/{project_did}':
     get:
       operationId: ProjectDoc
+      description: Get a project document by its project DID
       responses:
         '200':
           description: A successful response.
@@ -3643,6 +3667,7 @@ paths:
   '/projectAccounts/{project_did}':
     get:
       operationId: ProjectAccounts
+      description: Get a specific project's list of project accounts
       responses:
         '200':
           description: A successful response.
@@ -3685,6 +3710,7 @@ paths:
   /projectParams:
     get:
       operationId: ProjectParams
+      description: Get the project module's parameters
       responses:
         '200':
           description: A successful response.
@@ -3746,6 +3772,7 @@ paths:
   '/projectTxs/{project_did}':
     get:
       operationId: ProjectTx
+      description: Get the list of project transactions for a project
       responses:
         '200':
           description: A successful response.
