@@ -3,6 +3,10 @@ info:
   title: ixo modules - legacy endpoints docs
   description: A REST interface for state queries
   version: 1.0.0
+host: testnet.ixo.world
+basePath: /rest
+schemes:
+  - https
 paths:
   /bonds:
     get:
