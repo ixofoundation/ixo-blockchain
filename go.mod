@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/cosmos/cosmos-sdk v0.42.6 // latest
+	github.com/cosmos/cosmos-sdk v0.42.9 // latest
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
@@ -19,7 +19,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tendermint/go-amino v0.16.0
-	github.com/tendermint/tendermint v0.34.11 //latest
+	github.com/tendermint/tendermint v0.34.13
 	github.com/tendermint/tm-db v0.6.4
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b
@@ -28,5 +28,7 @@ require (
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
+
+replace github.com/tendermint/tendermint => github.com/tendermint/tendermint v0.34.13
 
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
