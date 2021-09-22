@@ -16,6 +16,10 @@ build_tags =
 ifeq ($(WITH_CLEVELDB),yes)
   build_tags += gcc
 endif
+ifeq ($(LEDGER_ENABLED),yes)
+  build_tags += ledger
+endif
+
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
 
