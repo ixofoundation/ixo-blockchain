@@ -71,10 +71,10 @@ type Bond struct {
 }
 ```
 The following is a list of all possible bond states:
-- HATCH
-- OPEN
-- SETTLED
-- FAILED.
+- `"HATCH"`
+- `"OPEN"`
+- `"SETTLED"`
+- `"FAILED"`
 
 By default, a newly created bond will be in state OPEN, unless the bond is an augmented bonding curve, in which case the initial state is HATCH.
 The following are the valid transitions between bond states.
