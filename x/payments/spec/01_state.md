@@ -10,11 +10,11 @@ The payments module stores three lists of the following three types of data:
 
 ```go
 type PaymentTemplate struct {
-	Id             string
-	PaymentAmount  sdk.Coins
-	PaymentMinimum sdk.Coins
-	PaymentMaximum sdk.Coins
-	Discounts      []Discount
+    Id             string
+    PaymentAmount  sdk.Coins
+    PaymentMinimum sdk.Coins
+    PaymentMaximum sdk.Coins
+    Discounts      []Discount
 }
 ```
 
@@ -42,8 +42,8 @@ to certain payers by specifying the ID of the discount in the contract.
 type Discounts []Discount
 
 type Discount struct {
-	Id      sdk.Uint
-	Percent sdk.Dec
+    Id      sdk.Uint
+    Percent sdk.Dec
 }
 ```
 
@@ -51,16 +51,16 @@ type Discount struct {
 
 ```go
 type PaymentContract struct {
-	Id                string
-	PaymentTemplateId string
-	Creator           string
-	Payer             string
-	Recipients        []DistributionShare
-	CumulativePay     sdk.Coins
-	CurrentRemainder  sdk.Coins
-	CanDeauthorise    bool
-	Authorised        bool
-	DiscountId        sdk.Uint
+    Id                string
+    PaymentTemplateId string
+    Creator           string
+    Payer             string
+    Recipients        []DistributionShare
+    CumulativePay     sdk.Coins
+    CurrentRemainder  sdk.Coins
+    CanDeauthorise    bool
+    Authorised        bool
+    DiscountId        sdk.Uint
 }
 ```
 
@@ -84,8 +84,8 @@ The contract identifies the contract creator, payer, and recipients:
 type Distribution []DistributionShare
 
 type DistributionShare struct {
-	Address    string
-	Percentage sdk.Dec
+    Address    string
+    Percentage sdk.Dec
 }
 ```
 
@@ -105,9 +105,10 @@ In terms of authorisation, the contract stores two values:
   once it has been authorised. This is specified by the creator of the contract.
   The payer should pay attention since if this value is _False_, then the payer
   cannot decide to halt any payments due to this contract in the future.
-- **Authorised**: by default a contract is not authorised (otherwise the
-  contract creator can just steal money from any address). The contract's payer
-  needs to explicitly authorise the contract in a subsequent transaction.
+- **Authorised**: indicates whether or not the payer has authorised the contract
+  to go ahead. By default a contract is not authorised (otherwise the contract
+  creator can just steal money from any address). The contract's payer needs to
+  explicitly authorise the contract in a subsequent transaction.
 
 Lastly, the contract can point to a discount by ID, as specified in the payment
 template:
@@ -121,12 +122,12 @@ template:
 
 ```go
 type Subscription struct {
-	Id                 string
-	PaymentContractId  string
-	PeriodsSoFar       sdk.Uint
-	MaxPeriods         sdk.Uint
-	PeriodsAccumulated sdk.Uint
-	Period             *sdk.Any
+    Id                 string
+    PaymentContractId  string
+    PeriodsSoFar       sdk.Uint
+    MaxPeriods         sdk.Uint
+    PeriodsAccumulated sdk.Uint
+    Period             *sdk.Any
 }
 ```
 
@@ -135,13 +136,13 @@ top of payment contracts (by linking to a payment contract ID), adding info that
 describes a periodic payment. All active subscriptions are checked at the end of
 each block and subscriptions for which enough time has passed are invoked.
 
-- **PeriodsSoFar**: just keeps track of the number of periods that have elapsed
-  (i.e. how many payments should have been effected). This is initialised to 0.
+- **PeriodsSoFar**: keeps track of the number of periods that have elapsed (i.e.
+  how many payments should have been effected). This is initialised to 0.
 - **MaxPeriods**: places a limit on the number of periods, otherwise the
   subscription will go on forever, effecting payment with each period. However,
   the minimum and maximum payment specified by the payment template are still
   enforced and are able to override this max periods amount. Similarly, the max
-  periods can override the minimum and maximum if it is more restrictive.
+  periods can override the minimum and maximum payment if it is more restrictive.
 - **PeriodsAccumulated**: number of unpaid periods. If the subscription payment
   fails to get effected because of insufficient funds, the `PeriodsSoFar` value
   is still updated, but we also increment the `PeriodsAccumulated` value. The
@@ -153,22 +154,22 @@ each block and subscriptions for which enough time has passed are invoked.
 
 ```go
 type Period interface {
-	proto.Message 
+    proto.Message
 	
-	GetPeriodUnit() string
-	Validate() error
-	periodStarted(ctx sdk.Context) bool
-	periodEnded(ctx sdk.Context) bool
-	nextPeriod() Period
+    GetPeriodUnit() string
+    Validate() error
+    periodStarted(ctx sdk.Context) bool
+    periodEnded(ctx sdk.Context) bool
+    nextPeriod() Period
 }
 
 type BlockPeriod struct {
-	PeriodLength     int64 `json:"period_length" yaml:"period_length"`
-	PeriodStartBlock int64 `json:"period_start_block" yaml:"period_start_block"`
+    PeriodLength     int64
+    PeriodStartBlock int64
 }
 
 type TimePeriod struct {
-	PeriodDurationNs time.Duration `json:"period_duration_ns" yaml:"period_duration_ns"`
-	PeriodStartTime  time.Time     `json:"period_start_time" yaml:"period_start_time"`
+    PeriodDurationNs time.Duration
+    PeriodStartTime  time.Time
 }
 ```

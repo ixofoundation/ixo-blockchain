@@ -37,7 +37,7 @@ External parameters, such as market supply and demand, are complex and typically
 
 Pricing is defined by the function type and function parameters, which can define either the pricing function of the bond as a function of the supply, or simply indicate that the bond is a token swapper, where pricing is instead defined by the first buyer and any swaps performed thereafter.
 
-A bond may also specify non-zero fees, which are calculated based on the size of an order and sent to the specified fee address, order quantity limits to limit the size of orders, disable the ability to sell tokens, specify multiple signers that will need to sign for any editing of the bond details, and in the case of swapper bonds, sanity values to set a range of valid exchange rate between the two reserve tokens. Lastly, a bond has a string state value, which in most cases is _open_, but in certain function types it has more meaning, such as for augmented bonding curves, in which case it can be _open_ \[for open phase\] and _hatch_ \[for hatch phase\]. This state is _not_ specified by the creator during bond creation.
+A bond may also specify non-zero fees, which are calculated based on the size of an order and sent to the specified fee address, order quantity limits to limit the size of orders, disable the ability to sell tokens, specify multiple signers that will need to sign for any editing of the bond details, and in the case of swapper bonds, sanity values to set a range of valid exchange rate between the two reserve tokens. Lastly, a bond has a string state value, which in most cases is OPEN, but in certain function types it has more meaning, such as for augmented bonding curves, in which case it can be OPEN \[for open phase\] and HATCH \[for hatch phase\]. This state is _not_ specified by the creator during bond creation.
 
 ```go
 type Bond struct {
@@ -70,6 +70,19 @@ type Bond struct {
     BondDid                      string                                   
 }
 ```
+The following is a list of all possible bond states:
+- `"HATCH"`
+- `"OPEN"`
+- `"SETTLED"`
+- `"FAILED"`
+
+By default, a newly created bond will be in state OPEN, unless the bond is an augmented bonding curve, in which case the initial state is HATCH.
+The following are the valid transitions between bond states.
+<pre>
+- HATCH -> OPEN or FAILED
+- OPEN  -> SETTLE or FAILED
+</pre>
+No valid transitions exist from the SETTLE and FAILED states.
 
 ## Batching
 
@@ -83,15 +96,15 @@ For alpha bonds, the batch also stores the next alpha value, if it was changed t
 
 ```go
 type Batch struct {
-	BondDid         string
-	BlocksRemaining sdk.Uint
-	NextPublicAlpha sdk.Dec
-	TotalBuyAmount  sdk.Coin
-	TotalSellAmount sdk.Coin
-	BuyPrices       sdk.DecCoins
-	SellPrices      sdk.DecCoins
-	Buys            []BuyOrder
-	Sells           []SellOrder
-	Swaps           []SwapOrder
+    BondDid         string
+    BlocksRemaining sdk.Uint
+    NextPublicAlpha sdk.Dec
+    TotalBuyAmount  sdk.Coin
+    TotalSellAmount sdk.Coin
+    BuyPrices       sdk.DecCoins
+    SellPrices      sdk.DecCoins
+    Buys            []BuyOrder
+    Sells           []SellOrder
+    Swaps           []SwapOrder
 }
 ```

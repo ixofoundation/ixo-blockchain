@@ -7,6 +7,7 @@
     - [MsgCreateProject](02_messages.md#MsgCreateProject)
     - [MsgUpdateProjectStatus](02_messages.md#MsgUpdateProjectStatus)
     - [MsgUpdateProjectDoc](02_messages.md#MsgUpdateProjectDoc)
+    - [MsgCreateAgent](02_messages.md#MsgCreateAgent)
     - [MsgUpdateAgent](02_messages.md#MsgUpdateAgent)
     - [MsgCreateClaim](02_messages.md#MsgCreateClaim)
     - [MsgCreateEvaluation](02_messages.md#MsgCreateEvaluation)

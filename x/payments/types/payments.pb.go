@@ -31,6 +31,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// PaymentTemplate contains details about a payment, with no info about the payer or payee.
 type PaymentTemplate struct {
 	Id             string                                   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
 	PaymentAmount  github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=payment_amount,json=paymentAmount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"payment_amount" yaml:"payment_amount"`
@@ -107,6 +108,7 @@ func (m *PaymentTemplate) GetDiscounts() []Discount {
 	return nil
 }
 
+// Discount contains details about a discount which can be granted to payers.
 type Discount struct {
 	Id      github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,1,opt,name=id,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"id" yaml:"id"`
 	Percent github_com_cosmos_cosmos_sdk_types.Dec  `protobuf:"bytes,2,opt,name=percent,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"percent" yaml:"percent"`
@@ -145,6 +147,7 @@ func (m *Discount) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Discount proto.InternalMessageInfo
 
+// DistributionShare specifies the share of a specific payment an address will receive.
 type DistributionShare struct {
 	Address    string                                 `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty" yaml:"address"`
 	Percentage github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=percentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"percentage" yaml:"percentage"`
@@ -190,6 +193,8 @@ func (m *DistributionShare) GetAddress() string {
 	return ""
 }
 
+// PaymentContract specifies an agreement between a payer and payee/s which can be invoked
+// once or multiple times to effect payment/s.
 type PaymentContract struct {
 	Id                string                                   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
 	PaymentTemplateId string                                   `protobuf:"bytes,2,opt,name=payment_template_id,json=paymentTemplateId,proto3" json:"payment_template_id,omitempty" yaml:"payment_template_id"`
@@ -299,6 +304,7 @@ func (m *PaymentContract) GetAuthorised() bool {
 	return false
 }
 
+// Subscription specifies details of a payment to be effected periodically.
 type Subscription struct {
 	Id                 string                                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
 	PaymentContractId  string                                  `protobuf:"bytes,2,opt,name=payment_contract_id,json=paymentContractId,proto3" json:"payment_contract_id,omitempty" yaml:"payment_contract_id"`
@@ -341,6 +347,8 @@ func (m *Subscription) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Subscription proto.InternalMessageInfo
 
+// BlockPeriod implements the Period interface and specifies a period in terms of number
+// of blocks.
 type BlockPeriod struct {
 	PeriodLength     int64 `protobuf:"varint,1,opt,name=period_length,json=periodLength,proto3" json:"period_length,omitempty" yaml:"period_length"`
 	PeriodStartBlock int64 `protobuf:"varint,2,opt,name=period_start_block,json=periodStartBlock,proto3" json:"period_start_block,omitempty" yaml:"period_start_block"`
@@ -393,6 +401,7 @@ func (m *BlockPeriod) GetPeriodStartBlock() int64 {
 	return 0
 }
 
+// TimePeriod implements the Period interface and specifies a period in terms of time.
 type TimePeriod struct {
 	PeriodDurationNs time.Duration `protobuf:"bytes,1,opt,name=period_duration_ns,json=periodDurationNs,proto3,stdduration" json:"period_duration_ns" yaml:"period_duration_ns"`
 	PeriodStartTime  time.Time     `protobuf:"bytes,2,opt,name=period_start_time,json=periodStartTime,proto3,stdtime" json:"period_start_time" yaml:"period_start_time"`
@@ -445,6 +454,8 @@ func (m *TimePeriod) GetPeriodStartTime() time.Time {
 	return time.Time{}
 }
 
+// TestPeriod implements the Period interface and is identical to BlockPeriod, except it
+// ignores the context in periodEnded() and periodStarted().
 type TestPeriod struct {
 	PeriodLength     int64 `protobuf:"varint,1,opt,name=period_length,json=periodLength,proto3" json:"period_length,omitempty" yaml:"period_length"`
 	PeriodStartBlock int64 `protobuf:"varint,2,opt,name=period_start_block,json=periodStartBlock,proto3" json:"period_start_block,omitempty" yaml:"period_start_block"`

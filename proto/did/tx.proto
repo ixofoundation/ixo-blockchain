@@ -6,23 +6,28 @@ import "did/did.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
-// To get a list of all module messages, go to your module's handler.go and
-// check all cases in NewHandler().
+// Msg defines the did Msg service.
 service Msg {
+  // AddDid defines a method for adding a DID.
   rpc AddDid(MsgAddDid) returns (MsgAddDidResponse);
 
+  // AddCredential defines a method for adding a credential to the signer's DID.
   rpc AddCredential(MsgAddCredential) returns (MsgAddCredentialResponse);
 }
 
+// MsgAddDid defines a message for adding a DID.
 message MsgAddDid {
   string did    = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
   string pubKey = 2 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
 }
 
+// MsgAddDidResponse defines the Msg/AddDid response type.
 message MsgAddDidResponse {}
 
+// MsgAddCredential defines a message for adding a credential to the signer's DID.
 message MsgAddCredential {
   DidCredential did_credential = 1 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "credential", (gogoproto.moretags) = "yaml:\"credential\""];
 }
 
+// MsgAddCredentialResponse defines the Msg/AddCredential response type.
 message MsgAddCredentialResponse {}

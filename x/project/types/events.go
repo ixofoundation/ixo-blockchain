@@ -3,6 +3,7 @@ package types
 const (
 	EventTypeCreateProject       = "create_project"
 	EventTypeUpdateProjectStatus = "update_project_status"
+	EventTypeUpdateProjectDoc    = "update_project_doc"
 	EventTypeCreateAgent         = "create_agent"
 	EventTypeUpdateAgent         = "update_agent"
 	EventTypeCreateClaim         = "create_claim"

@@ -9,7 +9,7 @@ entity/project:
   oracle fee payment is sent to this address.
 - `IxoFees`: at project payout, any amount in the `IxoPayFees` account is moved to this
   account address. In turn, any amount now in IxoFees is sent to pay the network fee to ixo (the account associated with a DID which is
-  specified in the genesis file)
+  specified in the genesis file).
 - `<projectDid>`: this is the project's funding account, from which tokens
   are paid to the oracle service.
 - Additionally, one entity/project account for each agent is also created. Any

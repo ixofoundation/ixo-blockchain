@@ -29,6 +29,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgCreateProject defines a message for creating a project.
 type MsgCreateProject struct {
 	TxHash     string                   `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string                   `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -104,6 +105,7 @@ func (m *MsgCreateProject) GetData() encoding_json.RawMessage {
 	return nil
 }
 
+// MsgCreateProjectResponse defines the Msg/CreateProject response type.
 type MsgCreateProjectResponse struct {
 }
 
@@ -140,6 +142,7 @@ func (m *MsgCreateProjectResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateProjectResponse proto.InternalMessageInfo
 
+// MsgUpdateProjectStatus defines a message for updating a project's current status.
 type MsgUpdateProjectStatus struct {
 	TxHash     string                 `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string                 `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -208,6 +211,7 @@ func (m *MsgUpdateProjectStatus) GetData() UpdateProjectStatusDoc {
 	return UpdateProjectStatusDoc{}
 }
 
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.
 type MsgUpdateProjectStatusResponse struct {
 }
 
@@ -244,6 +248,7 @@ func (m *MsgUpdateProjectStatusResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateProjectStatusResponse proto.InternalMessageInfo
 
+// MsgCreateAgent defines a message for creating an agent on a project.
 type MsgCreateAgent struct {
 	TxHash     string         `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string         `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -311,6 +316,7 @@ func (m *MsgCreateAgent) GetData() CreateAgentDoc {
 	return CreateAgentDoc{}
 }
 
+// MsgCreateAgentResponse defines the Msg/CreateAgent response type.
 type MsgCreateAgentResponse struct {
 }
 
@@ -347,6 +353,7 @@ func (m *MsgCreateAgentResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateAgentResponse proto.InternalMessageInfo
 
+// MsgUpdateAgent defines a message for updating an agent on a project.
 type MsgUpdateAgent struct {
 	TxHash     string         `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string         `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -414,6 +421,7 @@ func (m *MsgUpdateAgent) GetData() UpdateAgentDoc {
 	return UpdateAgentDoc{}
 }
 
+// MsgUpdateAgentResponse defines the Msg/UpdateAgent response type.
 type MsgUpdateAgentResponse struct {
 }
 
@@ -450,6 +458,7 @@ func (m *MsgUpdateAgentResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateAgentResponse proto.InternalMessageInfo
 
+// MsgCreateClaim defines a message for creating a claim on a project.
 type MsgCreateClaim struct {
 	TxHash     string         `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string         `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -517,6 +526,7 @@ func (m *MsgCreateClaim) GetData() CreateClaimDoc {
 	return CreateClaimDoc{}
 }
 
+// MsgCreateClaimResponse defines the Msg/CreateClaim response type.
 type MsgCreateClaimResponse struct {
 }
 
@@ -553,6 +563,7 @@ func (m *MsgCreateClaimResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateClaimResponse proto.InternalMessageInfo
 
+// MsgCreateEvaluation defines a message for creating an evaluation for a specific claim on a project.
 type MsgCreateEvaluation struct {
 	TxHash     string              `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string              `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -620,6 +631,7 @@ func (m *MsgCreateEvaluation) GetData() CreateEvaluationDoc {
 	return CreateEvaluationDoc{}
 }
 
+// MsgCreateEvaluationResponse defines the Msg/CreateEvaluation response type.
 type MsgCreateEvaluationResponse struct {
 }
 
@@ -656,6 +668,7 @@ func (m *MsgCreateEvaluationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateEvaluationResponse proto.InternalMessageInfo
 
+// MsgWithdrawFunds defines a message for project agents to withdraw their funds from a project.
 type MsgWithdrawFunds struct {
 	SenderDid string           `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
 	Data      WithdrawFundsDoc `protobuf:"bytes,2,opt,name=data,proto3" json:"data" yaml:"data"`
@@ -707,6 +720,7 @@ func (m *MsgWithdrawFunds) GetData() WithdrawFundsDoc {
 	return WithdrawFundsDoc{}
 }
 
+// MsgWithdrawFundsResponse defines the Msg/WithdrawFunds response type.
 type MsgWithdrawFundsResponse struct {
 }
 
@@ -743,6 +757,7 @@ func (m *MsgWithdrawFundsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawFundsResponse proto.InternalMessageInfo
 
+// MsgUpdateProjectDoc defines a message for updating a project's data.
 type MsgUpdateProjectDoc struct {
 	TxHash     string                   `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid  string                   `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3" json:"senderDid" yaml:"senderDid"`
@@ -811,6 +826,7 @@ func (m *MsgUpdateProjectDoc) GetData() encoding_json.RawMessage {
 	return nil
 }
 
+// MsgUpdateProjectDocResponse defines the Msg/UpdateProjectDoc response type.
 type MsgUpdateProjectDocResponse struct {
 }
 
@@ -930,13 +946,21 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateProject defines a method for creating a project.
 	CreateProject(ctx context.Context, in *MsgCreateProject, opts ...grpc.CallOption) (*MsgCreateProjectResponse, error)
+	// UpdateProjectStatus defines a method for updating a project's current status.
 	UpdateProjectStatus(ctx context.Context, in *MsgUpdateProjectStatus, opts ...grpc.CallOption) (*MsgUpdateProjectStatusResponse, error)
+	// CreateAgent defines a method for creating an agent on a project.
 	CreateAgent(ctx context.Context, in *MsgCreateAgent, opts ...grpc.CallOption) (*MsgCreateAgentResponse, error)
+	// UpdateAgent defines a method for updating an agent on a project.
 	UpdateAgent(ctx context.Context, in *MsgUpdateAgent, opts ...grpc.CallOption) (*MsgUpdateAgentResponse, error)
+	// CreateClaim defines a method for creating a claim on a project.
 	CreateClaim(ctx context.Context, in *MsgCreateClaim, opts ...grpc.CallOption) (*MsgCreateClaimResponse, error)
+	// CreateEvaluation defines a method for creating an evaluation for a specific claim on a project.
 	CreateEvaluation(ctx context.Context, in *MsgCreateEvaluation, opts ...grpc.CallOption) (*MsgCreateEvaluationResponse, error)
+	// WithdrawFunds defines a method for project agents to withdraw their funds from a project.
 	WithdrawFunds(ctx context.Context, in *MsgWithdrawFunds, opts ...grpc.CallOption) (*MsgWithdrawFundsResponse, error)
+	// UpdateProjectDoc defines a method for updating a project's data.
 	UpdateProjectDoc(ctx context.Context, in *MsgUpdateProjectDoc, opts ...grpc.CallOption) (*MsgUpdateProjectDocResponse, error)
 }
 
@@ -1022,13 +1046,21 @@ func (c *msgClient) UpdateProjectDoc(ctx context.Context, in *MsgUpdateProjectDo
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// CreateProject defines a method for creating a project.
 	CreateProject(context.Context, *MsgCreateProject) (*MsgCreateProjectResponse, error)
+	// UpdateProjectStatus defines a method for updating a project's current status.
 	UpdateProjectStatus(context.Context, *MsgUpdateProjectStatus) (*MsgUpdateProjectStatusResponse, error)
+	// CreateAgent defines a method for creating an agent on a project.
 	CreateAgent(context.Context, *MsgCreateAgent) (*MsgCreateAgentResponse, error)
+	// UpdateAgent defines a method for updating an agent on a project.
 	UpdateAgent(context.Context, *MsgUpdateAgent) (*MsgUpdateAgentResponse, error)
+	// CreateClaim defines a method for creating a claim on a project.
 	CreateClaim(context.Context, *MsgCreateClaim) (*MsgCreateClaimResponse, error)
+	// CreateEvaluation defines a method for creating an evaluation for a specific claim on a project.
 	CreateEvaluation(context.Context, *MsgCreateEvaluation) (*MsgCreateEvaluationResponse, error)
+	// WithdrawFunds defines a method for project agents to withdraw their funds from a project.
 	WithdrawFunds(context.Context, *MsgWithdrawFunds) (*MsgWithdrawFundsResponse, error)
+	// UpdateProjectDoc defines a method for updating a project's data.
 	UpdateProjectDoc(context.Context, *MsgUpdateProjectDoc) (*MsgUpdateProjectDocResponse, error)
 }
 

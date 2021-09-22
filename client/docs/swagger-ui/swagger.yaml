@@ -6,6 +6,7 @@ info:
 paths:
   /ixo/bonds:
     get:
+      summary: Bonds returns all existing bonds.
       operationId: Bonds
       responses:
         '200':
@@ -17,6 +18,9 @@ paths:
                 type: array
                 items:
                   type: string
+            description: >-
+              QueryBondsResponse is the response type for the Query/Bonds RPC
+              method.
         default:
           description: An unexpected error response
           schema:
@@ -43,6 +47,7 @@ paths:
         - Query
   /ixo/bonds/params:
     get:
+      summary: Params queries the paramaters of x/bonds module.
       operationId: BondsParams
       responses:
         '200':
@@ -57,6 +62,10 @@ paths:
                     type: array
                     items:
                       type: string
+                description: Params defines the parameters for the bonds module.
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
         default:
           description: An unexpected error response
           schema:
@@ -83,6 +92,7 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}':
     get:
+      summary: Bond queries info of a specific bond.
       operationId: Bond
       responses:
         '200':
@@ -114,6 +124,9 @@ paths:
                           type: string
                         value:
                           type: string
+                      description: >-
+                        FunctionParam is a key-value pair used for specifying a
+                        specific bond parameter.
                   reserve_tokens:
                     type: array
                     items:
@@ -245,6 +258,12 @@ paths:
                     type: string
                   bond_did:
                     type: string
+                description: >-
+                  Bond defines a token bonding curve type with all of its
+                  parameters.
+            description: >-
+              QueryBondResponse is the response type for the Query/Bond RPC
+              method.
         default:
           description: An unexpected error response
           schema:
@@ -276,6 +295,9 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/alpha_maximums':
     get:
+      summary: >-
+        AlphaMaximums queries alpha maximums for a specific augmented bonding
+        curve.
       operationId: AlphaMaximums
       responses:
         '200':
@@ -287,6 +309,9 @@ paths:
                 type: string
               max_system_alpha:
                 type: string
+            description: >-
+              QueryAlphaMaximumsResponse is the response type for the
+              Query/AlphaMaximums RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -318,6 +343,9 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/available_reserve':
     get:
+      summary: >-
+        AvailableReserve queries current available balance/s of the reserve pool
+        for a specific bond.
       operationId: AvailableReserve
       responses:
         '200':
@@ -342,6 +370,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QueryAvailableReserveResponse is the response type for the
+              Query/AvailableReserve RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -373,6 +404,7 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/batch':
     get:
+      summary: Batch queries info of a specific bond's current batch.
       operationId: Batch
       responses:
         '200':
@@ -486,6 +518,12 @@ paths:
                               format: boolean
                             cancel_reason:
                               type: string
+                          description: >-
+                            BaseOrder defines a base order type. It contains all
+                            the necessary fields for specifying
+
+                            the general details about a buy, sell, or swap
+                            order.
                         max_prices:
                           type: array
                           items:
@@ -504,6 +542,11 @@ paths:
                               the custom method
 
                               signatures required by gogoproto.
+                      description: >-
+                        BuyOrder defines a type for submitting a buy order on a
+                        bond, together with the maximum
+
+                        amount of reserve tokens the buyer is willing to pay.
                   sells:
                     type: array
                     items:
@@ -535,6 +578,15 @@ paths:
                               format: boolean
                             cancel_reason:
                               type: string
+                          description: >-
+                            BaseOrder defines a base order type. It contains all
+                            the necessary fields for specifying
+
+                            the general details about a buy, sell, or swap
+                            order.
+                      description: >-
+                        SellOrder defines a type for submitting a sell order on
+                        a bond.
                   swaps:
                     type: array
                     items:
@@ -566,8 +618,23 @@ paths:
                               format: boolean
                             cancel_reason:
                               type: string
+                          description: >-
+                            BaseOrder defines a base order type. It contains all
+                            the necessary fields for specifying
+
+                            the general details about a buy, sell, or swap
+                            order.
                         to_token:
                           type: string
+                      description: >-
+                        SwapOrder defines a type for submitting a swap order
+                        between two tokens on a bond.
+                description: >-
+                  Batch holds a collection of outstanding buy, sell, and swap
+                  orders on a particular bond.
+            description: >-
+              QueryBatchResponse is the response type for the Query/Batch RPC
+              method.
         default:
           description: An unexpected error response
           schema:
@@ -599,6 +666,9 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/buy_price/{bond_amount}':
     get:
+      summary: >-
+        BuyPrice queries price/s of buying an amount of tokens from a specific
+        bond.
       operationId: BuyPrice
       responses:
         '200':
@@ -689,6 +759,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QueryCustomPriceResponse is the response type for the
+              Query/BuyPrice RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -724,6 +797,7 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/current_price':
     get:
+      summary: CurrentPrice queries the current price/s of a specific bond.
       operationId: CurrentPrice
       responses:
         '200':
@@ -749,6 +823,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QueryCurrentPriceResponse is the response type for the
+              Query/CurrentPrice RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -780,6 +857,9 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/current_reserve':
     get:
+      summary: >-
+        CurrentReserve queries the current balance/s of the reserve pool for a
+        specific bond.
       operationId: CurrentReserve
       responses:
         '200':
@@ -804,6 +884,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QueryCurrentReserveResponse is the response type for the
+              Query/CurrentReserve RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -835,6 +918,7 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/last_batch':
     get:
+      summary: LastBatch queries info of a specific bond's last batch.
       operationId: LastBatch
       responses:
         '200':
@@ -948,6 +1032,12 @@ paths:
                               format: boolean
                             cancel_reason:
                               type: string
+                          description: >-
+                            BaseOrder defines a base order type. It contains all
+                            the necessary fields for specifying
+
+                            the general details about a buy, sell, or swap
+                            order.
                         max_prices:
                           type: array
                           items:
@@ -966,6 +1056,11 @@ paths:
                               the custom method
 
                               signatures required by gogoproto.
+                      description: >-
+                        BuyOrder defines a type for submitting a buy order on a
+                        bond, together with the maximum
+
+                        amount of reserve tokens the buyer is willing to pay.
                   sells:
                     type: array
                     items:
@@ -997,6 +1092,15 @@ paths:
                               format: boolean
                             cancel_reason:
                               type: string
+                          description: >-
+                            BaseOrder defines a base order type. It contains all
+                            the necessary fields for specifying
+
+                            the general details about a buy, sell, or swap
+                            order.
+                      description: >-
+                        SellOrder defines a type for submitting a sell order on
+                        a bond.
                   swaps:
                     type: array
                     items:
@@ -1028,8 +1132,23 @@ paths:
                               format: boolean
                             cancel_reason:
                               type: string
+                          description: >-
+                            BaseOrder defines a base order type. It contains all
+                            the necessary fields for specifying
+
+                            the general details about a buy, sell, or swap
+                            order.
                         to_token:
                           type: string
+                      description: >-
+                        SwapOrder defines a type for submitting a swap order
+                        between two tokens on a bond.
+                description: >-
+                  Batch holds a collection of outstanding buy, sell, and swap
+                  orders on a particular bond.
+            description: >-
+              QueryLastBatchResponse is the response type for the
+              Query/LastBatch RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -1061,6 +1180,7 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/price/{bond_amount}':
     get:
+      summary: CustomPrice queries price/s of a specific bond at a specific supply.
       operationId: CustomPrice
       responses:
         '200':
@@ -1086,6 +1206,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QueryCustomPriceResponse is the response type for the
+              Query/CustomPrice RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -1121,6 +1244,9 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/sell_return/{bond_amount}':
     get:
+      summary: >-
+        SellReturn queries return/s on selling an amount of tokens of a specific
+        bond.
       operationId: SellReturn
       responses:
         '200':
@@ -1228,6 +1354,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QuerySellReturnResponse is the response type for the
+              Query/SellReturn RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -1263,6 +1392,9 @@ paths:
         - Query
   '/ixo/bonds/{bond_did}/swap_return/{from_token_with_amount}/{to_token}':
     get:
+      summary: >-
+        SwapReturn queries return/s on swapping an amount of tokens to another
+        token of a specific bond.
       operationId: SwapReturn
       responses:
         '200':
@@ -1304,6 +1436,9 @@ paths:
                     method
 
                     signatures required by gogoproto.
+            description: >-
+              QuerySwapReturnResponse is the response type for the
+              Query/SwapReturn RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -1343,6 +1478,9 @@ paths:
         - Query
   /ixo/bonds_detailed:
     get:
+      summary: >-
+        BondsDetailed returns a list of all existing bonds with some details
+        about their current state.
       operationId: BondsDetailed
       responses:
         '200':
@@ -1408,6 +1546,12 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
+                  description: >-
+                    BondDetails contains details about the current state of a
+                    given bond.
+            description: >-
+              QueryBondsDetailedResponse is the response type for the
+              Query/BondsDetailed RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -1434,6 +1578,9 @@ paths:
         - Query
   /ixo/allDidDocs:
     get:
+      summary: >-
+        AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along
+        with their DidDoc info).
       operationId: AllDidDocs
       responses:
         '200':
@@ -1618,6 +1765,9 @@ paths:
                           "@type": "type.googleapis.com/google.protobuf.Duration",
                           "value": "1.212s"
                         }
+            description: >-
+              QueryAllDidDocsResponse is the response type for the
+              Query/AllDidDocs RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -1811,6 +1961,7 @@ paths:
         - Query
   /ixo/did:
     get:
+      summary: AllDids returns a list of all existing DIDs.
       operationId: AllDids
       responses:
         '200':
@@ -1822,6 +1973,9 @@ paths:
                 type: array
                 items:
                   type: string
+            description: >-
+              QueryAllDidsResponse is the response type for the Query/AllDids
+              RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -2015,6 +2169,7 @@ paths:
         - Query
   '/ixo/did/{did}':
     get:
+      summary: DidDoc queries info of a specific DID's DidDoc.
       operationId: DidDoc
       responses:
         '200':
@@ -2193,6 +2348,9 @@ paths:
                         "@type": "type.googleapis.com/google.protobuf.Duration",
                         "value": "1.212s"
                       }
+            description: >-
+              QueryDidDocResponse is the response type for the Query/DidDoc RPC
+              method.
         default:
           description: An unexpected error response
           schema:
@@ -2391,6 +2549,7 @@ paths:
         - Query
   '/ixo/didToAddr/{did}':
     get:
+      summary: AddressFromDid retrieves the cosmos address associated to an ixo DID.
       operationId: AddressFromDid
       responses:
         '200':
@@ -2400,6 +2559,9 @@ paths:
             properties:
               address:
                 type: string
+            description: >-
+              QueryAddressFromDidResponse is the response type for the
+              Query/AddressFromDid RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -2598,6 +2760,9 @@ paths:
         - Query
   '/ixo/pubKeyToAddr/{pubKey}':
     get:
+      summary: >-
+        AddressFromBase58EncodedPubkey retrieves the cosmos address associated
+        to an ixo DID's pubkey.
       operationId: AddressFromBase58EncodedPubkey
       responses:
         '200':
@@ -2607,6 +2772,9 @@ paths:
             properties:
               address:
                 type: string
+            description: >-
+              QueryAddressFromBase58EncodedPubkeyResponse is the response type
+              for the Query/AddressFromBase58EncodedPubkey RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -2805,6 +2973,7 @@ paths:
         - Query
   '/ixo/payments/contracts/{payment_contract_id}':
     get:
+      summary: PaymentContract queries info of a specific payment contract.
       operationId: PaymentContract
       responses:
         '200':
@@ -2832,6 +3001,9 @@ paths:
                           type: string
                         percentage:
                           type: string
+                      description: >-
+                        DistributionShare specifies the share of a specific
+                        payment an address will receive.
                   cumulative_pay:
                     type: array
                     items:
@@ -2874,6 +3046,14 @@ paths:
                     format: boolean
                   discount_id:
                     type: string
+                description: >-
+                  PaymentContract specifies an agreement between a payer and
+                  payee/s which can be invoked
+
+                  once or multiple times to effect payment/s.
+            description: >-
+              QueryPaymentContractResponse is the response type for the
+              Query/PaymentContract RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -3072,6 +3252,9 @@ paths:
         - Query
   '/ixo/payments/contracts_by_id_prefix/{payment_contracts_id_prefix}':
     get:
+      summary: >-
+        PaymentContractsByIdPrefix lists all payment contracts having an id with
+        a specific prefix.
       operationId: PaymentContractsByIdPrefix
       responses:
         '200':
@@ -3101,6 +3284,9 @@ paths:
                             type: string
                           percentage:
                             type: string
+                        description: >-
+                          DistributionShare specifies the share of a specific
+                          payment an address will receive.
                     cumulative_pay:
                       type: array
                       items:
@@ -3145,6 +3331,14 @@ paths:
                       format: boolean
                     discount_id:
                       type: string
+                  description: >-
+                    PaymentContract specifies an agreement between a payer and
+                    payee/s which can be invoked
+
+                    once or multiple times to effect payment/s.
+            description: >-
+              QueryPaymentContractsByIdPrefixResponse is the response type for
+              the Query/PaymentContractsByIdPrefix RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -3343,6 +3537,7 @@ paths:
         - Query
   '/ixo/payments/subscriptions/{subscription_id}':
     get:
+      summary: Subscription queries info of a specific Subscription.
       operationId: Subscription
       responses:
         '200':
@@ -3538,6 +3733,12 @@ paths:
                             "@type": "type.googleapis.com/google.protobuf.Duration",
                             "value": "1.212s"
                           }
+                description: >-
+                  Subscription specifies details of a payment to be effected
+                  periodically.
+            description: >-
+              QuerySubscriptionResponse is the response type for the
+              Query/Subscription RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -3736,6 +3937,7 @@ paths:
         - Query
   '/ixo/payments/templates/{payment_template_id}':
     get:
+      summary: PaymentTemplate queries info of a specific payment template.
       operationId: PaymentTemplate
       responses:
         '200':
@@ -3808,6 +4010,15 @@ paths:
                           type: string
                         percent:
                           type: string
+                      description: >-
+                        Discount contains details about a discount which can be
+                        granted to payers.
+                description: >-
+                  PaymentTemplate contains details about a payment, with no info
+                  about the payer or payee.
+            description: >-
+              QueryPaymentTemplateResponse is the response type for the
+              Query/PaymentTemplate RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -4006,6 +4217,7 @@ paths:
         - Query
   '/ixo/project/{project_did}':
     get:
+      summary: ProjectDoc queries info of a specific project.
       operationId: ProjectDoc
       responses:
         '200':
@@ -4029,6 +4241,12 @@ paths:
                   data:
                     type: string
                     format: byte
+                description: >-
+                  ProjectDoc defines a project (or entity) type with all of its
+                  parameters.
+            description: >-
+              QueryProjectDocResponse is the response type for the
+              Query/ProjectDoc RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -4060,6 +4278,7 @@ paths:
         - Query
   '/ixo/projectAccounts/{project_did}':
     get:
+      summary: ProjectAccounts lists a specific project's accounts.
       operationId: ProjectAccounts
       responses:
         '200':
@@ -4074,6 +4293,12 @@ paths:
                     type: object
                     additionalProperties:
                       type: string
+                description: >-
+                  AccountMap maps a specific project's account names to the
+                  accounts' addresses.
+            description: >-
+              QueryProjectAccountsResponse is the response type for the
+              Query/ProjectAccounts RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -4105,6 +4330,7 @@ paths:
         - Query
   /ixo/projectParams:
     get:
+      summary: Params queries the paramaters of x/project module.
       operationId: ProjectParams
       responses:
         '200':
@@ -4138,6 +4364,10 @@ paths:
                     type: string
                   node_fee_percentage:
                     type: string
+                description: Params defines the parameters for the project module.
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
         default:
           description: An unexpected error response
           schema:
@@ -4164,6 +4394,7 @@ paths:
         - Query
   '/ixo/projectTxs/{project_did}':
     get:
+      summary: ProjectTx lists a specific project's transactions.
       operationId: ProjectTx
       responses:
         '200':
@@ -4199,6 +4430,13 @@ paths:
                             the custom method
 
                             signatures required by gogoproto.
+                      description: >-
+                        WithdrawalInfoDoc contains details required to withdraw
+                        from a specific project.
+                description: WithdrawalInfoDocs contains a list of type WithdrawalInfoDoc.
+            description: >-
+              QueryProjectTxResponse is the response type for the
+              Query/ProjectTx RPC method.
         default:
           description: An unexpected error response
           schema:
@@ -4251,6 +4489,11 @@ definitions:
         format: boolean
       cancel_reason:
         type: string
+    description: >-
+      BaseOrder defines a base order type. It contains all the necessary fields
+      for specifying
+
+      the general details about a buy, sell, or swap order.
   bonds.Batch:
     type: object
     properties:
@@ -4342,6 +4585,11 @@ definitions:
                   format: boolean
                 cancel_reason:
                   type: string
+              description: >-
+                BaseOrder defines a base order type. It contains all the
+                necessary fields for specifying
+
+                the general details about a buy, sell, or swap order.
             max_prices:
               type: array
               items:
@@ -4359,6 +4607,11 @@ definitions:
                   method
 
                   signatures required by gogoproto.
+          description: >-
+            BuyOrder defines a type for submitting a buy order on a bond,
+            together with the maximum
+
+            amount of reserve tokens the buyer is willing to pay.
       sells:
         type: array
         items:
@@ -4389,6 +4642,12 @@ definitions:
                   format: boolean
                 cancel_reason:
                   type: string
+              description: >-
+                BaseOrder defines a base order type. It contains all the
+                necessary fields for specifying
+
+                the general details about a buy, sell, or swap order.
+          description: SellOrder defines a type for submitting a sell order on a bond.
       swaps:
         type: array
         items:
@@ -4419,8 +4678,19 @@ definitions:
                   format: boolean
                 cancel_reason:
                   type: string
+              description: >-
+                BaseOrder defines a base order type. It contains all the
+                necessary fields for specifying
+
+                the general details about a buy, sell, or swap order.
             to_token:
               type: string
+          description: >-
+            SwapOrder defines a type for submitting a swap order between two
+            tokens on a bond.
+    description: >-
+      Batch holds a collection of outstanding buy, sell, and swap orders on a
+      particular bond.
   bonds.Bond:
     type: object
     properties:
@@ -4445,6 +4715,9 @@ definitions:
               type: string
             value:
               type: string
+          description: >-
+            FunctionParam is a key-value pair used for specifying a specific
+            bond parameter.
       reserve_tokens:
         type: array
         items:
@@ -4558,6 +4831,7 @@ definitions:
         type: string
       bond_did:
         type: string
+    description: Bond defines a token bonding curve type with all of its parameters.
   bonds.BondDetails:
     type: object
     properties:
@@ -4603,6 +4877,7 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: BondDetails contains details about the current state of a given bond.
   bonds.BuyOrder:
     type: object
     properties:
@@ -4631,6 +4906,11 @@ definitions:
             format: boolean
           cancel_reason:
             type: string
+        description: >-
+          BaseOrder defines a base order type. It contains all the necessary
+          fields for specifying
+
+          the general details about a buy, sell, or swap order.
       max_prices:
         type: array
         items:
@@ -4645,6 +4925,11 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      BuyOrder defines a type for submitting a buy order on a bond, together
+      with the maximum
+
+      amount of reserve tokens the buyer is willing to pay.
   bonds.FunctionParam:
     type: object
     properties:
@@ -4652,6 +4937,9 @@ definitions:
         type: string
       value:
         type: string
+    description: >-
+      FunctionParam is a key-value pair used for specifying a specific bond
+      parameter.
   bonds.Params:
     type: object
     properties:
@@ -4659,6 +4947,7 @@ definitions:
         type: array
         items:
           type: string
+    description: Params defines the parameters for the bonds module.
   bonds.QueryAlphaMaximumsResponse:
     type: object
     properties:
@@ -4666,6 +4955,9 @@ definitions:
         type: string
       max_system_alpha:
         type: string
+    description: >-
+      QueryAlphaMaximumsResponse is the response type for the
+      Query/AlphaMaximums RPC method.
   bonds.QueryAvailableReserveResponse:
     type: object
     properties:
@@ -4683,6 +4975,9 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QueryAvailableReserveResponse is the response type for the
+      Query/AvailableReserve RPC method.
   bonds.QueryBatchResponse:
     type: object
     properties:
@@ -4791,6 +5086,11 @@ definitions:
                       format: boolean
                     cancel_reason:
                       type: string
+                  description: >-
+                    BaseOrder defines a base order type. It contains all the
+                    necessary fields for specifying
+
+                    the general details about a buy, sell, or swap order.
                 max_prices:
                   type: array
                   items:
@@ -4808,6 +5108,11 @@ definitions:
                       custom method
 
                       signatures required by gogoproto.
+              description: >-
+                BuyOrder defines a type for submitting a buy order on a bond,
+                together with the maximum
+
+                amount of reserve tokens the buyer is willing to pay.
           sells:
             type: array
             items:
@@ -4838,6 +5143,12 @@ definitions:
                       format: boolean
                     cancel_reason:
                       type: string
+                  description: >-
+                    BaseOrder defines a base order type. It contains all the
+                    necessary fields for specifying
+
+                    the general details about a buy, sell, or swap order.
+              description: SellOrder defines a type for submitting a sell order on a bond.
           swaps:
             type: array
             items:
@@ -4868,8 +5179,20 @@ definitions:
                       format: boolean
                     cancel_reason:
                       type: string
+                  description: >-
+                    BaseOrder defines a base order type. It contains all the
+                    necessary fields for specifying
+
+                    the general details about a buy, sell, or swap order.
                 to_token:
                   type: string
+              description: >-
+                SwapOrder defines a type for submitting a swap order between two
+                tokens on a bond.
+        description: >-
+          Batch holds a collection of outstanding buy, sell, and swap orders on
+          a particular bond.
+    description: QueryBatchResponse is the response type for the Query/Batch RPC method.
   bonds.QueryBondResponse:
     type: object
     properties:
@@ -4897,6 +5220,9 @@ definitions:
                   type: string
                 value:
                   type: string
+              description: >-
+                FunctionParam is a key-value pair used for specifying a specific
+                bond parameter.
           reserve_tokens:
             type: array
             items:
@@ -5028,6 +5354,8 @@ definitions:
             type: string
           bond_did:
             type: string
+        description: Bond defines a token bonding curve type with all of its parameters.
+    description: QueryBondResponse is the response type for the Query/Bond RPC method.
   bonds.QueryBondsDetailedResponse:
     type: object
     properties:
@@ -5088,6 +5416,12 @@ definitions:
                   method
 
                   signatures required by gogoproto.
+          description: >-
+            BondDetails contains details about the current state of a given
+            bond.
+    description: >-
+      QueryBondsDetailedResponse is the response type for the
+      Query/BondsDetailed RPC method.
   bonds.QueryBondsResponse:
     type: object
     properties:
@@ -5095,6 +5429,7 @@ definitions:
         type: array
         items:
           type: string
+    description: QueryBondsResponse is the response type for the Query/Bonds RPC method.
   bonds.QueryBuyPriceResponse:
     type: object
     properties:
@@ -5166,6 +5501,9 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QueryCustomPriceResponse is the response type for the Query/BuyPrice RPC
+      method.
   bonds.QueryCurrentPriceResponse:
     type: object
     properties:
@@ -5183,6 +5521,9 @@ definitions:
 
             NOTE: The amount field is an Dec which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QueryCurrentPriceResponse is the response type for the Query/CurrentPrice
+      RPC method.
   bonds.QueryCurrentReserveResponse:
     type: object
     properties:
@@ -5200,6 +5541,9 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QueryCurrentReserveResponse is the response type for the
+      Query/CurrentReserve RPC method.
   bonds.QueryCustomPriceResponse:
     type: object
     properties:
@@ -5217,6 +5561,9 @@ definitions:
 
             NOTE: The amount field is an Dec which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QueryCustomPriceResponse is the response type for the Query/CustomPrice
+      RPC method.
   bonds.QueryLastBatchResponse:
     type: object
     properties:
@@ -5325,6 +5672,11 @@ definitions:
                       format: boolean
                     cancel_reason:
                       type: string
+                  description: >-
+                    BaseOrder defines a base order type. It contains all the
+                    necessary fields for specifying
+
+                    the general details about a buy, sell, or swap order.
                 max_prices:
                   type: array
                   items:
@@ -5342,6 +5694,11 @@ definitions:
                       custom method
 
                       signatures required by gogoproto.
+              description: >-
+                BuyOrder defines a type for submitting a buy order on a bond,
+                together with the maximum
+
+                amount of reserve tokens the buyer is willing to pay.
           sells:
             type: array
             items:
@@ -5372,6 +5729,12 @@ definitions:
                       format: boolean
                     cancel_reason:
                       type: string
+                  description: >-
+                    BaseOrder defines a base order type. It contains all the
+                    necessary fields for specifying
+
+                    the general details about a buy, sell, or swap order.
+              description: SellOrder defines a type for submitting a sell order on a bond.
           swaps:
             type: array
             items:
@@ -5402,8 +5765,22 @@ definitions:
                       format: boolean
                     cancel_reason:
                       type: string
+                  description: >-
+                    BaseOrder defines a base order type. It contains all the
+                    necessary fields for specifying
+
+                    the general details about a buy, sell, or swap order.
                 to_token:
                   type: string
+              description: >-
+                SwapOrder defines a type for submitting a swap order between two
+                tokens on a bond.
+        description: >-
+          Batch holds a collection of outstanding buy, sell, and swap orders on
+          a particular bond.
+    description: >-
+      QueryLastBatchResponse is the response type for the Query/LastBatch RPC
+      method.
   bonds.QueryParamsResponse:
     type: object
     properties:
@@ -5414,6 +5791,8 @@ definitions:
             type: array
             items:
               type: string
+        description: Params defines the parameters for the bonds module.
+    description: QueryParamsResponse is the response type for the Query/Params RPC method.
   bonds.QuerySellReturnResponse:
     type: object
     properties:
@@ -5499,6 +5878,9 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QuerySellReturnResponse is the response type for the Query/SellReturn RPC
+      method.
   bonds.QuerySwapReturnResponse:
     type: object
     properties:
@@ -5530,6 +5912,9 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
+    description: >-
+      QuerySwapReturnResponse is the response type for the Query/SwapReturn RPC
+      method.
   bonds.SellOrder:
     type: object
     properties:
@@ -5558,6 +5943,12 @@ definitions:
             format: boolean
           cancel_reason:
             type: string
+        description: >-
+          BaseOrder defines a base order type. It contains all the necessary
+          fields for specifying
+
+          the general details about a buy, sell, or swap order.
+    description: SellOrder defines a type for submitting a sell order on a bond.
   bonds.SwapOrder:
     type: object
     properties:
@@ -5586,8 +5977,16 @@ definitions:
             format: boolean
           cancel_reason:
             type: string
+        description: >-
+          BaseOrder defines a base order type. It contains all the necessary
+          fields for specifying
+
+          the general details about a buy, sell, or swap order.
       to_token:
         type: string
+    description: >-
+      SwapOrder defines a type for submitting a swap order between two tokens on
+      a bond.
   cosmos.base.v1beta1.Coin:
     type: object
     properties:
@@ -5946,11 +6345,17 @@ definitions:
     properties:
       address:
         type: string
+    description: >-
+      QueryAddressFromBase58EncodedPubkeyResponse is the response type for the
+      Query/AddressFromBase58EncodedPubkey RPC method.
   did.QueryAddressFromDidResponse:
     type: object
     properties:
       address:
         type: string
+    description: >-
+      QueryAddressFromDidResponse is the response type for the
+      Query/AddressFromDid RPC method.
   did.QueryAllDidDocsResponse:
     type: object
     properties:
@@ -6118,6 +6523,9 @@ definitions:
                   "@type": "type.googleapis.com/google.protobuf.Duration",
                   "value": "1.212s"
                 }
+    description: >-
+      QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC
+      method.
   did.QueryAllDidsResponse:
     type: object
     properties:
@@ -6125,6 +6533,9 @@ definitions:
         type: array
         items:
           type: string
+    description: >-
+      QueryAllDidsResponse is the response type for the Query/AllDids RPC
+      method.
   did.QueryDidDocResponse:
     type: object
     properties:
@@ -6287,6 +6698,7 @@ definitions:
                 "@type": "type.googleapis.com/google.protobuf.Duration",
                 "value": "1.212s"
               }
+    description: QueryDidDocResponse is the response type for the Query/DidDoc RPC method.
   payments.Discount:
     type: object
     properties:
@@ -6294,6 +6706,7 @@ definitions:
         type: string
       percent:
         type: string
+    description: Discount contains details about a discount which can be granted to payers.
   payments.DistributionShare:
     type: object
     properties:
@@ -6301,6 +6714,9 @@ definitions:
         type: string
       percentage:
         type: string
+    description: >-
+      DistributionShare specifies the share of a specific payment an address
+      will receive.
   payments.PaymentContract:
     type: object
     properties:
@@ -6321,6 +6737,9 @@ definitions:
               type: string
             percentage:
               type: string
+          description: >-
+            DistributionShare specifies the share of a specific payment an
+            address will receive.
       cumulative_pay:
         type: array
         items:
@@ -6357,6 +6776,11 @@ definitions:
         format: boolean
       discount_id:
         type: string
+    description: >-
+      PaymentContract specifies an agreement between a payer and payee/s which
+      can be invoked
+
+      once or multiple times to effect payment/s.
   payments.PaymentTemplate:
     type: object
     properties:
@@ -6413,6 +6837,12 @@ definitions:
               type: string
             percent:
               type: string
+          description: >-
+            Discount contains details about a discount which can be granted to
+            payers.
+    description: >-
+      PaymentTemplate contains details about a payment, with no info about the
+      payer or payee.
   payments.QueryPaymentContractResponse:
     type: object
     properties:
@@ -6436,6 +6866,9 @@ definitions:
                   type: string
                 percentage:
                   type: string
+              description: >-
+                DistributionShare specifies the share of a specific payment an
+                address will receive.
           cumulative_pay:
             type: array
             items:
@@ -6478,6 +6911,14 @@ definitions:
             format: boolean
           discount_id:
             type: string
+        description: >-
+          PaymentContract specifies an agreement between a payer and payee/s
+          which can be invoked
+
+          once or multiple times to effect payment/s.
+    description: >-
+      QueryPaymentContractResponse is the response type for the
+      Query/PaymentContract RPC method.
   payments.QueryPaymentContractsByIdPrefixResponse:
     type: object
     properties:
@@ -6503,6 +6944,9 @@ definitions:
                     type: string
                   percentage:
                     type: string
+                description: >-
+                  DistributionShare specifies the share of a specific payment an
+                  address will receive.
             cumulative_pay:
               type: array
               items:
@@ -6545,6 +6989,14 @@ definitions:
               format: boolean
             discount_id:
               type: string
+          description: >-
+            PaymentContract specifies an agreement between a payer and payee/s
+            which can be invoked
+
+            once or multiple times to effect payment/s.
+    description: >-
+      QueryPaymentContractsByIdPrefixResponse is the response type for the
+      Query/PaymentContractsByIdPrefix RPC method.
   payments.QueryPaymentTemplateResponse:
     type: object
     properties:
@@ -6613,6 +7065,15 @@ definitions:
                   type: string
                 percent:
                   type: string
+              description: >-
+                Discount contains details about a discount which can be granted
+                to payers.
+        description: >-
+          PaymentTemplate contains details about a payment, with no info about
+          the payer or payee.
+    description: >-
+      QueryPaymentTemplateResponse is the response type for the
+      Query/PaymentTemplate RPC method.
   payments.QuerySubscriptionResponse:
     type: object
     properties:
@@ -6794,6 +7255,12 @@ definitions:
                     "@type": "type.googleapis.com/google.protobuf.Duration",
                     "value": "1.212s"
                   }
+        description: >-
+          Subscription specifies details of a payment to be effected
+          periodically.
+    description: >-
+      QuerySubscriptionResponse is the response type for the Query/Subscription
+      RPC method.
   payments.Subscription:
     type: object
     properties:
@@ -6966,6 +7433,7 @@ definitions:
                 "@type": "type.googleapis.com/google.protobuf.Duration",
                 "value": "1.212s"
               }
+    description: Subscription specifies details of a payment to be effected periodically.
   project.AccountMap:
     type: object
     properties:
@@ -6973,6 +7441,9 @@ definitions:
         type: object
         additionalProperties:
           type: string
+    description: >-
+      AccountMap maps a specific project's account names to the accounts'
+      addresses.
   project.Params:
     type: object
     properties:
@@ -6996,6 +7467,7 @@ definitions:
         type: string
       node_fee_percentage:
         type: string
+    description: Params defines the parameters for the project module.
   project.ProjectDoc:
     type: object
     properties:
@@ -7012,6 +7484,7 @@ definitions:
       data:
         type: string
         format: byte
+    description: ProjectDoc defines a project (or entity) type with all of its parameters.
   project.QueryParamsResponse:
     type: object
     properties:
@@ -7041,6 +7514,8 @@ definitions:
             type: string
           node_fee_percentage:
             type: string
+        description: Params defines the parameters for the project module.
+    description: QueryParamsResponse is the response type for the Query/Params RPC method.
   project.QueryProjectAccountsResponse:
     type: object
     properties:
@@ -7051,6 +7526,12 @@ definitions:
             type: object
             additionalProperties:
               type: string
+        description: >-
+          AccountMap maps a specific project's account names to the accounts'
+          addresses.
+    description: >-
+      QueryProjectAccountsResponse is the response type for the
+      Query/ProjectAccounts RPC method.
   project.QueryProjectDocResponse:
     type: object
     properties:
@@ -7070,6 +7551,12 @@ definitions:
           data:
             type: string
             format: byte
+        description: >-
+          ProjectDoc defines a project (or entity) type with all of its
+          parameters.
+    description: >-
+      QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+      method.
   project.QueryProjectTxResponse:
     type: object
     properties:
@@ -7100,6 +7587,13 @@ definitions:
                     method
 
                     signatures required by gogoproto.
+              description: >-
+                WithdrawalInfoDoc contains details required to withdraw from a
+                specific project.
+        description: WithdrawalInfoDocs contains a list of type WithdrawalInfoDoc.
+    description: >-
+      QueryProjectTxResponse is the response type for the Query/ProjectTx RPC
+      method.
   project.WithdrawalInfoDoc:
     type: object
     properties:
@@ -7119,6 +7613,9 @@ definitions:
 
           NOTE: The amount field is an Int which implements the custom method
           signatures required by gogoproto.
+    description: >-
+      WithdrawalInfoDoc contains details required to withdraw from a specific
+      project.
   project.WithdrawalInfoDocs:
     type: object
     properties:
@@ -7146,3 +7643,7 @@ definitions:
                 method
 
                 signatures required by gogoproto.
+          description: >-
+            WithdrawalInfoDoc contains details required to withdraw from a
+            specific project.
+    description: WithdrawalInfoDocs contains a list of type WithdrawalInfoDoc.

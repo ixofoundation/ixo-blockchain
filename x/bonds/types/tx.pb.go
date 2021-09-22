@@ -30,6 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgCreateBond defines a message for creating a new bond.
 type MsgCreateBond struct {
 	BondDid                  string                                   `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	Token                    string                                   `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty" yaml:"token"`
@@ -200,6 +201,7 @@ func (m *MsgCreateBond) GetAlphaBond() bool {
 	return false
 }
 
+// MsgCreateBondResponse defines the Msg/CreateBond response type.
 type MsgCreateBondResponse struct {
 }
 
@@ -236,6 +238,7 @@ func (m *MsgCreateBondResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateBondResponse proto.InternalMessageInfo
 
+// MsgEditBond defines a message for editing an existing bond.
 type MsgEditBond struct {
 	BondDid                string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	Name                   string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" yaml:"name"`
@@ -328,6 +331,7 @@ func (m *MsgEditBond) GetEditorDid() string {
 	return ""
 }
 
+// MsgEditBondResponse defines the Msg/EditBond response type.
 type MsgEditBondResponse struct {
 }
 
@@ -364,6 +368,7 @@ func (m *MsgEditBondResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgEditBondResponse proto.InternalMessageInfo
 
+// MsgSetNextAlpha defines a message for editing a bond's alpha parameter.
 type MsgSetNextAlpha struct {
 	BondDid   string                                 `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	Alpha     github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=alpha,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"alpha" yaml:"alpha"`
@@ -453,6 +458,7 @@ func (m *MsgSetNextAlphaResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSetNextAlphaResponse proto.InternalMessageInfo
 
+// MsgUpdateBondState defines a message for updating a bond's current state.
 type MsgUpdateBondState struct {
 	BondDid   string `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
 	State     string `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty" yaml:"state"`
@@ -513,6 +519,7 @@ func (m *MsgUpdateBondState) GetEditorDid() string {
 	return ""
 }
 
+// MsgUpdateBondStateResponse defines the Msg/UpdateBondState response type.
 type MsgUpdateBondStateResponse struct {
 }
 
@@ -549,6 +556,7 @@ func (m *MsgUpdateBondStateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateBondStateResponse proto.InternalMessageInfo
 
+// MsgBuy defines a message for buying from a bond.
 type MsgBuy struct {
 	BuyerDid  string                                   `protobuf:"bytes,1,opt,name=buyer_did,json=buyerDid,proto3" json:"buyer_did,omitempty" yaml:"buyer_did"`
 	Amount    types.Coin                               `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount" yaml:"amount"`
@@ -617,6 +625,7 @@ func (m *MsgBuy) GetBondDid() string {
 	return ""
 }
 
+// MsgBuyResponse defines the Msg/Buy response type.
 type MsgBuyResponse struct {
 }
 
@@ -653,6 +662,7 @@ func (m *MsgBuyResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgBuyResponse proto.InternalMessageInfo
 
+// MsgSell defines a message for selling from a bond.
 type MsgSell struct {
 	SellerDid string     `protobuf:"bytes,1,opt,name=seller_did,json=sellerDid,proto3" json:"seller_did,omitempty" yaml:"seller_did"`
 	Amount    types.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount" yaml:"amount"`
@@ -713,6 +723,7 @@ func (m *MsgSell) GetBondDid() string {
 	return ""
 }
 
+// MsgSellResponse defines the Msg/Sell response type.
 type MsgSellResponse struct {
 }
 
@@ -749,6 +760,7 @@ func (m *MsgSellResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSellResponse proto.InternalMessageInfo
 
+// MsgSwap defines a message for swapping from one reserve bond token to another.
 type MsgSwap struct {
 	SwapperDid string     `protobuf:"bytes,1,opt,name=swapper_did,json=swapperDid,proto3" json:"swapper_did,omitempty" yaml:"swapper_did"`
 	BondDid    string     `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
@@ -817,6 +829,7 @@ func (m *MsgSwap) GetToToken() string {
 	return ""
 }
 
+// MsgSwapResponse defines the Msg/Swap response type.
 type MsgSwapResponse struct {
 }
 
@@ -853,6 +866,7 @@ func (m *MsgSwapResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 
+// MsgMakeOutcomePayment defines a message for making an outcome payment to a bond.
 type MsgMakeOutcomePayment struct {
 	SenderDid string                                 `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3" json:"sender_did,omitempty" yaml:"sender_did"`
 	Amount    github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"amount" yaml:"amount"`
@@ -906,6 +920,7 @@ func (m *MsgMakeOutcomePayment) GetBondDid() string {
 	return ""
 }
 
+// MsgMakeOutcomePaymentResponse defines the Msg/MakeOutcomePayment response type.
 type MsgMakeOutcomePaymentResponse struct {
 }
 
@@ -942,6 +957,7 @@ func (m *MsgMakeOutcomePaymentResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgMakeOutcomePaymentResponse proto.InternalMessageInfo
 
+// MsgWithdrawShare defines a message for withdrawing a share from a bond that is in the SETTLE stage.
 type MsgWithdrawShare struct {
 	RecipientDid string `protobuf:"bytes,1,opt,name=recipient_did,json=recipientDid,proto3" json:"recipient_did,omitempty" yaml:"recipient_did"`
 	BondDid      string `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
@@ -994,6 +1010,7 @@ func (m *MsgWithdrawShare) GetBondDid() string {
 	return ""
 }
 
+// MsgWithdrawShareResponse defines the Msg/WithdrawShare response type.
 type MsgWithdrawShareResponse struct {
 }
 
@@ -1030,6 +1047,7 @@ func (m *MsgWithdrawShareResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawShareResponse proto.InternalMessageInfo
 
+// MsgWithdrawReserve defines a message for withdrawing reserve from a bond.
 type MsgWithdrawReserve struct {
 	WithdrawerDid string                                   `protobuf:"bytes,1,opt,name=withdrawer_did,json=withdrawerDid,proto3" json:"withdrawer_did,omitempty" yaml:"withdrawer_did"`
 	Amount        github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount" yaml:"amount"`
@@ -1090,6 +1108,7 @@ func (m *MsgWithdrawReserve) GetBondDid() string {
 	return ""
 }
 
+// MsgWithdrawReserveResponse defines the Msg/WithdrawReserve response type.
 type MsgWithdrawReserveResponse struct {
 }
 
@@ -1269,15 +1288,25 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// CreateBond defines a method for creating a bond.
 	CreateBond(ctx context.Context, in *MsgCreateBond, opts ...grpc.CallOption) (*MsgCreateBondResponse, error)
+	// EditBond defines a method for editing a bond.
 	EditBond(ctx context.Context, in *MsgEditBond, opts ...grpc.CallOption) (*MsgEditBondResponse, error)
+	// SetNextAlpha defines a method for editing a bond's alpha parameter.
 	SetNextAlpha(ctx context.Context, in *MsgSetNextAlpha, opts ...grpc.CallOption) (*MsgSetNextAlphaResponse, error)
+	// UpdateBondState defines a method for updating a bond's current state.
 	UpdateBondState(ctx context.Context, in *MsgUpdateBondState, opts ...grpc.CallOption) (*MsgUpdateBondStateResponse, error)
+	// Buy defines a method for buying from a bond.
 	Buy(ctx context.Context, in *MsgBuy, opts ...grpc.CallOption) (*MsgBuyResponse, error)
+	// Sell defines a method for selling from a bond.
 	Sell(ctx context.Context, in *MsgSell, opts ...grpc.CallOption) (*MsgSellResponse, error)
+	// Swap defines a method for swapping from one reserve bond token to another.
 	Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOption) (*MsgSwapResponse, error)
+	// MakeOutcomePayment defines a method for making an outcome payment to a bond.
 	MakeOutcomePayment(ctx context.Context, in *MsgMakeOutcomePayment, opts ...grpc.CallOption) (*MsgMakeOutcomePaymentResponse, error)
+	// WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage.
 	WithdrawShare(ctx context.Context, in *MsgWithdrawShare, opts ...grpc.CallOption) (*MsgWithdrawShareResponse, error)
+	// WithdrawReserve defines a method for withdrawing reserve from a bond.
 	WithdrawReserve(ctx context.Context, in *MsgWithdrawReserve, opts ...grpc.CallOption) (*MsgWithdrawReserveResponse, error)
 }
 
@@ -1381,15 +1410,25 @@ func (c *msgClient) WithdrawReserve(ctx context.Context, in *MsgWithdrawReserve,
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// CreateBond defines a method for creating a bond.
 	CreateBond(context.Context, *MsgCreateBond) (*MsgCreateBondResponse, error)
+	// EditBond defines a method for editing a bond.
 	EditBond(context.Context, *MsgEditBond) (*MsgEditBondResponse, error)
+	// SetNextAlpha defines a method for editing a bond's alpha parameter.
 	SetNextAlpha(context.Context, *MsgSetNextAlpha) (*MsgSetNextAlphaResponse, error)
+	// UpdateBondState defines a method for updating a bond's current state.
 	UpdateBondState(context.Context, *MsgUpdateBondState) (*MsgUpdateBondStateResponse, error)
+	// Buy defines a method for buying from a bond.
 	Buy(context.Context, *MsgBuy) (*MsgBuyResponse, error)
+	// Sell defines a method for selling from a bond.
 	Sell(context.Context, *MsgSell) (*MsgSellResponse, error)
+	// Swap defines a method for swapping from one reserve bond token to another.
 	Swap(context.Context, *MsgSwap) (*MsgSwapResponse, error)
+	// MakeOutcomePayment defines a method for making an outcome payment to a bond.
 	MakeOutcomePayment(context.Context, *MsgMakeOutcomePayment) (*MsgMakeOutcomePaymentResponse, error)
+	// WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage.
 	WithdrawShare(context.Context, *MsgWithdrawShare) (*MsgWithdrawShareResponse, error)
+	// WithdrawReserve defines a method for withdrawing reserve from a bond.
 	WithdrawReserve(context.Context, *MsgWithdrawReserve) (*MsgWithdrawReserveResponse, error)
 }
 

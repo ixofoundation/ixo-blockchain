@@ -24,6 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// GenesisState defines the did module's genesis state.
 type GenesisState struct {
 	DidDocs []*types.Any `protobuf:"bytes,1,rep,name=did_docs,json=didDocs,proto3" json:"did_docs,omitempty" yaml:"did_docs"`
 }

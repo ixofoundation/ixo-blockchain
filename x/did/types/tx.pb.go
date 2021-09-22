@@ -28,6 +28,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgAddDid defines a message for adding a DID.
 type MsgAddDid struct {
 	Did    string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" json:"did" yaml:"did"`
 	PubKey string `protobuf:"bytes,2,opt,name=pubKey,proto3" json:"pubKey,omitempty" json:"pubKey" yaml:"pubKey"`
@@ -80,6 +81,7 @@ func (m *MsgAddDid) GetPubKey() string {
 	return ""
 }
 
+// MsgAddDidResponse defines the Msg/AddDid response type.
 type MsgAddDidResponse struct {
 }
 
@@ -116,6 +118,7 @@ func (m *MsgAddDidResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgAddDidResponse proto.InternalMessageInfo
 
+// MsgAddCredential defines a message for adding a credential to the signer's DID.
 type MsgAddCredential struct {
 	DidCredential DidCredential `protobuf:"bytes,1,opt,name=did_credential,json=didCredential,proto3" json:"credential" yaml:"credential"`
 }
@@ -160,6 +163,7 @@ func (m *MsgAddCredential) GetDidCredential() DidCredential {
 	return DidCredential{}
 }
 
+// MsgAddCredentialResponse defines the Msg/AddCredential response type.
 type MsgAddCredentialResponse struct {
 }
 
@@ -243,7 +247,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// AddDid defines a method for adding a DID.
 	AddDid(ctx context.Context, in *MsgAddDid, opts ...grpc.CallOption) (*MsgAddDidResponse, error)
+	// AddCredential defines a method for adding a credential to the signer's DID.
 	AddCredential(ctx context.Context, in *MsgAddCredential, opts ...grpc.CallOption) (*MsgAddCredentialResponse, error)
 }
 
@@ -275,7 +281,9 @@ func (c *msgClient) AddCredential(ctx context.Context, in *MsgAddCredential, opt
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// AddDid defines a method for adding a DID.
 	AddDid(context.Context, *MsgAddDid) (*MsgAddDidResponse, error)
+	// AddCredential defines a method for adding a credential to the signer's DID.
 	AddCredential(context.Context, *MsgAddCredential) (*MsgAddCredentialResponse, error)
 }
 
