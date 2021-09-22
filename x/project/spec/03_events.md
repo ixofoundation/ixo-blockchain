@@ -4,7 +4,7 @@ The project module emits the following events:
 
 ## Handlers
 
-## MsgCreateProject
+### MsgCreateProject
 
 | Type           | Attribute Key | Attribute Value |
 |----------------|---------------|-----------------|
@@ -13,7 +13,7 @@ The project module emits the following events:
 | create_project | project_did   | {project_did}   |
 | create_project | pub_key       | {pub_key}       |
 
-## MsgUpdateProjectStatus
+### MsgUpdateProjectStatus
 
 | Type                  | Attribute Key      | Attribute Value      |
 |-----------------------|--------------------|----------------------|
@@ -23,7 +23,7 @@ The project module emits the following events:
 | update_project_status | eth_funding_txn_id | {eth_funding_txn_id} |
 | update_project_status | updated_status     | {status}             |
 
-## MsgUpdateProjectDoc
+### MsgUpdateProjectDoc
 
 | Type               | Attribute Key      | Attribute Value      |
 |--------------------|--------------------|----------------------|
@@ -31,7 +31,7 @@ The project module emits the following events:
 | update_project_doc | sender_did         | {sender_did}         |
 | update_project_doc | project_did        | {project_did}        |
 
-## MsgCreateAgent
+### MsgCreateAgent
 
 | Type         | Attribute Key | Attribute Value |
 |--------------|---------------|-----------------|
@@ -41,7 +41,7 @@ The project module emits the following events:
 | create_agent | agent_did     | {agent_did}     |
 | create_agent | role          | {role}          |
 
-## MsgUpdateAgent
+### MsgUpdateAgent
 
 | Type         | Attribute Key  | Attribute Value |
 |--------------|----------------|-----------------|
@@ -52,7 +52,7 @@ The project module emits the following events:
 | update_agent | role           | {role}          |
 | update_agent | updated_status | {status}        |
 
-## MsgCreateClaim
+### MsgCreateClaim
 
 | Type         | Attribute Key     | Attribute Value     |
 |--------------|-------------------|---------------------|
@@ -62,7 +62,7 @@ The project module emits the following events:
 | create_claim | claim_id          | {claim_id}          |
 | create_claim | claim_template_id | {claim_template_id} |
 
-## MsgCreateEvaluation
+### MsgCreateEvaluation
 
 | Type              | Attribute Key | Attribute Value |
 |-------------------|---------------|-----------------|
@@ -72,7 +72,7 @@ The project module emits the following events:
 | create_evaluation | claim_id      | {claim_id}      |
 | create_evaluation | claim_status  | {status}        |
 
-## MsgWithdrawFund
+### MsgWithdrawFund
 
 | Type           | Attribute Key | Attribute Value |
 |----------------|---------------|-----------------|
