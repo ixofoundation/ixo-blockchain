@@ -7,8 +7,8 @@ by each message are defined within the [state](01_state.md) section.
 ## MsgCreateProject
 
 This message creates and stores a new project doc with arbitrary `Data` at
-appropriate indexes. Refer to [01_state.md](./01_state.md) for information
-about project docs.
+appropriate indexes. Refer to [01_state.md](./01_state.md) for information about
+project docs.
 
 | **Field**  | **Type**          | **Description** |
 |:-----------|:------------------|:----------------|
@@ -29,6 +29,7 @@ type MsgCreateProject struct {
 ```
 
 This message is expected to fail if:
+
 - A project doc with DID ProjectDid already exists
 - SenderDid is empty or invalid
 - PubKey is empty or does not match ProjectDid
@@ -55,7 +56,9 @@ type MsgUpdateProjectStatus struct {
 }
 ```
 
-An `UpdateProjectStatusDoc` contains the new project status as well as TODO.
+An `UpdateProjectStatusDoc` contains the new project status. The
+`EthFundingTxnId` is a deprecated field which in the past was used to point to
+an Ethereum transaction corresponding to the project's funding.
 
 ```go
 type UpdateProjectStatusDoc struct {
@@ -65,6 +68,7 @@ type UpdateProjectStatusDoc struct {
 ```
 
 This message is expected to fail if:
+
 - Project doc having DID ProjectDid does not exist
 - SenderDid is empty or invalid
 - ProjectDid is empty or invalid
@@ -93,6 +97,7 @@ type MsgUpdateProjectDoc struct {
 ```
 
 This message is expected to fail if:
+
 - SenderDid is empty or invalid
 - SenderDid does not match project creator DID
 - ProjectDid is empty or invalid
@@ -129,8 +134,9 @@ type CreateAgentDoc struct {
 }
 ```
 
-The role of an agent must be one of `SA` (can list claims), `EA` (can evaluate
-claims), or `IA`. TODO
+The role of an agent must be one of `SA` (service provider, can create and list
+claims), `EA` (evaluator, can evaluate claims), or `IA` (investor). The cod will
+eventually be updated to also support `PO` (owner).
 
 ## MsgUpdateAgent
 
@@ -161,7 +167,8 @@ type UpdateAgentDoc struct {
 ```
 
 Similarly to `MsgCreateAgent`, the role of an agent must be one of `SA`, `EA`,
-or `IA`. The status must be one of `0` (Pending), `1` (Approved), or `2` (Revoked).
+or `IA`. The status must be one of `0` (Pending), `1` (Approved), or `2` (
+Revoked). The code will eventually be updated to also support `3` (Invited).
 
 ## MsgCreateClaim
 
@@ -184,8 +191,11 @@ type MsgCreateClaim struct {
 }
 ```
 
-A `CreateClaimDoc` contains an ID uniquely identifying the claim, and TODO. Upon
-creating a claim, its default status is `0` i.e. Pending.
+A `CreateClaimDoc` contains an ID uniquely identifying the claim, and a template
+ID of the claim template that the claim is based on. More information about
+schema templates (and specifically claim templates) in [this repository](
+https://github.com/ixofoundation/schema). Upon creating a claim, its default
+status is `0` i.e. Pending.
 
 ```go
 type CreateClaimDoc struct {
@@ -195,6 +205,7 @@ type CreateClaimDoc struct {
 ```
 
 This message is expected to fail if:
+
 - Project doc having DID ProjectDid does not exist
 - Project is not in status STARTED
 - SenderDid is empty or invalid
@@ -222,8 +233,8 @@ type MsgCreateEvaluation struct {
 }
 ```
 
-A `CreateEvaluationDoc` contains the claim ID of the claim being evaluated, and a
-new status indicating whether the claim is accepted (status `1`) or rejected
+A `CreateEvaluationDoc` contains the claim ID of the claim being evaluated, and
+a new status indicating whether the claim is accepted (status `1`) or rejected
 (status `2`).
 
 ```go
@@ -234,6 +245,7 @@ type CreateEvaluationDoc struct {
 ```
 
 This message is expected to fail if:
+
 - Project doc having DID ProjectDid does not exist
 - Project is not in status STARTED
 - Claim with ClaimId (in Data) does not exist
@@ -260,9 +272,9 @@ type MsgWithdrawFunds struct {
 }
 ```
 
-The `WithdrawFundsDoc` specifies the project DID from which funds are to be withdrawn,
-the recipient of the funds, the amount of funds to be withdrawn, and whether the
-withdrawal is a refund to be sent to the project creator.
+The `WithdrawFundsDoc` specifies the project DID from which funds are to be
+withdrawn, the recipient of the funds, the amount of funds to be withdrawn, and
+whether the withdrawal is a refund to be sent to the project creator.
 
 ```go
 type WithdrawFundsDoc struct {
@@ -274,6 +286,7 @@ type WithdrawFundsDoc struct {
 ```
 
 This message is expected to fail if:
+
 - Project doc having DID ProjectDid does not exist
 - Project is not in status PAIDOUT
 - IsRefund is set to true and RecipientDid is not the project creator

@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
-// TODO
+// Digital identity credential issued to an ixo DID
 message DidCredential {
   repeated string cred_type = 1 [(gogoproto.jsontag) = "type", (gogoproto.moretags) = "yaml:\"type\""];
   string issuer             = 2 [(gogoproto.moretags) = "yaml:\"issuer\""];
@@ -13,13 +13,13 @@ message DidCredential {
   Claim claim               = 4 [(gogoproto.moretags) = "yaml:\"claim\""];
 }
 
-// TODO
+// The claim section of a credential, indicating if the DID is KYC validated
 message Claim {
   string id         = 1 [(gogoproto.moretags) = "yaml:\"id\""];
   bool KYC_validated = 2 [(gogoproto.jsontag) = "KYCValidated", (gogoproto.moretags) = "yaml:\"KYCValidated\""];
 }
 
-// TODO
+// An ixo DID with public and private keys, based on the Sovrin DID spec
 message IxoDid {
   string did                   = 1 [(gogoproto.moretags) = "yaml:\"did\""];
   string verify_key            = 2 [(gogoproto.jsontag) = "verifyKey", (gogoproto.moretags) = "yaml:\"verifyKey\""];
@@ -27,7 +27,7 @@ message IxoDid {
   Secret secret                = 4 [(gogoproto.moretags) = "yaml:\"secret\""];
 }
 
-// TODO
+// The private section of an ixo DID, based on the Sovrin DID spec
 message Secret {
   string seed                   = 1 [(gogoproto.moretags) = "yaml:\"seed\""];
   string sign_key               = 2 [(gogoproto.jsontag) = "signKey", (gogoproto.moretags) = "yaml:\"signKey\""];
