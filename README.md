@@ -47,7 +47,7 @@ bash ./scripts/demo_project.sh   # Option 3
 # Look in the scripts folder for more options!
 ```
 
-- To re-generate `.pb.go` and `.pb.gw.go` files from `.proto` files:
+- To re-generate `.pb.go` and `.pb.gw.go` files from `.proto` files, as well as docs/core/proto-docs.md:
 ```bash
 make proto-gen
 ```
