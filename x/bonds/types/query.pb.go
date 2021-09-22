@@ -1535,7 +1535,7 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Bonds returns all existing bonds.
 	Bonds(ctx context.Context, in *QueryBondsRequest, opts ...grpc.CallOption) (*QueryBondsResponse, error)
-	// BondsDetailed returns a list of all existing bonds with details about their current state.
+	// BondsDetailed returns a list of all existing bonds with some details about their current state.
 	BondsDetailed(ctx context.Context, in *QueryBondsDetailedRequest, opts ...grpc.CallOption) (*QueryBondsDetailedResponse, error)
 	// Params queries the paramaters of x/bonds module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
@@ -1701,7 +1701,7 @@ func (c *queryClient) AlphaMaximums(ctx context.Context, in *QueryAlphaMaximumsR
 type QueryServer interface {
 	// Bonds returns all existing bonds.
 	Bonds(context.Context, *QueryBondsRequest) (*QueryBondsResponse, error)
-	// BondsDetailed returns a list of all existing bonds with details about their current state.
+	// BondsDetailed returns a list of all existing bonds with some details about their current state.
 	BondsDetailed(context.Context, *QueryBondsDetailedRequest) (*QueryBondsDetailedResponse, error)
 	// Params queries the paramaters of x/bonds module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)

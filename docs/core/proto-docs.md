@@ -218,7 +218,7 @@
 
 ### BaseOrder
 BaseOrder defines a base order type. It contains all the necessary fields for specifying
-a buy, sell, or swap order.
+the general details about a buy, sell, or swap order.
 
 
 | Field | Type | Label | Description |
@@ -879,7 +879,7 @@ Query defines the gRPC querier service.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Bonds | [QueryBondsRequest](#bonds.QueryBondsRequest) | [QueryBondsResponse](#bonds.QueryBondsResponse) | Bonds returns all existing bonds. |
-| BondsDetailed | [QueryBondsDetailedRequest](#bonds.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#bonds.QueryBondsDetailedResponse) | BondsDetailed returns a list of all existing bonds with details about their current state. |
+| BondsDetailed | [QueryBondsDetailedRequest](#bonds.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#bonds.QueryBondsDetailedResponse) | BondsDetailed returns a list of all existing bonds with some details about their current state. |
 | Params | [QueryParamsRequest](#bonds.QueryParamsRequest) | [QueryParamsResponse](#bonds.QueryParamsResponse) | Params queries the paramaters of x/bonds module. |
 | Bond | [QueryBondRequest](#bonds.QueryBondRequest) | [QueryBondResponse](#bonds.QueryBondResponse) | Bond queries info of a specific bond. |
 | Batch | [QueryBatchRequest](#bonds.QueryBatchRequest) | [QueryBatchResponse](#bonds.QueryBatchResponse) | Batch queries info of a specific bond&#39;s current batch. |
@@ -1236,7 +1236,7 @@ Msg defines the bonds Msg service.
 <a name="did.Claim"></a>
 
 ### Claim
-TODO
+The claim section of a credential, indicating if the DID is KYC validated
 
 
 | Field | Type | Label | Description |
@@ -1252,7 +1252,7 @@ TODO
 <a name="did.DidCredential"></a>
 
 ### DidCredential
-TODO
+Digital identity credential issued to an ixo DID
 
 
 | Field | Type | Label | Description |
@@ -1270,7 +1270,7 @@ TODO
 <a name="did.IxoDid"></a>
 
 ### IxoDid
-TODO
+An ixo DID with public and private keys, based on the Sovrin DID spec
 
 
 | Field | Type | Label | Description |
@@ -1288,7 +1288,7 @@ TODO
 <a name="did.Secret"></a>
 
 ### Secret
-TODO
+The private section of an ixo DID, based on the Sovrin DID spec
 
 
 | Field | Type | Label | Description |

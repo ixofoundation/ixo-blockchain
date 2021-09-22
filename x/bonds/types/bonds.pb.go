@@ -352,7 +352,7 @@ func (m *Bond) GetBondDid() string {
 }
 
 // BaseOrder defines a base order type. It contains all the necessary fields for specifying
-// a buy, sell, or swap order.
+// the general details about a buy, sell, or swap order.
 type BaseOrder struct {
 	AccountDid   string     `protobuf:"bytes,1,opt,name=account_did,json=accountDid,proto3" json:"account_did,omitempty" yaml:"account_did"`
 	Amount       types.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount" yaml:"amount"`
