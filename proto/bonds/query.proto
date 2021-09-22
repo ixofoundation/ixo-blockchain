@@ -15,7 +15,7 @@ service Query {
     option (google.api.http).get = "/ixo/bonds"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
   }
 
-  // BondsDetailed returns a list of all existing bonds with details about their current state.
+  // BondsDetailed returns a list of all existing bonds with some details about their current state.
   rpc BondsDetailed(QueryBondsDetailedRequest) returns (QueryBondsDetailedResponse) {
     option (google.api.http).get = "/ixo/bonds_detailed";
   }
