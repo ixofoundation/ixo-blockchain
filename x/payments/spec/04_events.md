@@ -16,12 +16,13 @@ The payments module emits the following events:
 | Type                    | Attribute Key       | Attribute Value       |
 |-------------------------|---------------------|-----------------------|
 | create_payment_template | creator_did         | {creator_did}         |
-| create_payment_template | id                  | {id}                  |
+| create_payment_template | payment_id          | {payment_id}          |
 | create_payment_template | payment_amount      | {payment_amount}      |
 | create_payment_template | payment_minimum     | {payment_minimum}     |
-| create_payment_template | payment_maximum,    | {payment_maximum}     |
+| create_payment_template | payment_maximum     | {payment_maximum}     |
 | create_payment_template | discounts           | {discounts}           |
 | create_payment_template | wallet_distribution | {wallet_distribution} |
+| message                 | module              | payments              |
 
 ## MsgCreatePaymentContract
 
@@ -31,8 +32,10 @@ The payments module emits the following events:
 | create_payment_contract | payment_template_id | {payment_template_id} |
 | create_payment_contract | payment_contract_id | {payment_contract_id} |
 | create_payment_contract | payer               | {payer}               |
+| create_payment_contract | recipients          | {recipients}          |
 | create_payment_contract | discount_id         | {wallet_distribution} |
 | create_payment_contract | can_deauthorise     | {can_deauthorise}     |
+| message                 | module              | payments              |
 
 ## MsgGrantDiscount
 
@@ -41,7 +44,8 @@ The payments module emits the following events:
 | grant_discount | sender_did          | {sender_did}          |
 | grant_discount | payment_contract_id | {payment_contract_id} |
 | grant_discount | discount_id         | {discount_id}         |
-| grant_discount | Recipient           | {Recipient}           |
+| grant_discount | recipient           | {Recipient}           |
+| message        | module              | payments              |
 
 ## MsgSetPaymentContractAuthorisation
 
@@ -60,6 +64,7 @@ The payments module emits the following events:
 | create_subscription | max_periods         | {max_periods}         |
 | create_subscription | key_period          | {key_period}          |
 | create_subscription | creator_did         | {creator_did}         |
+| message             | module              | payments              |
 
 ## MsgRevokeDiscount
 
@@ -68,6 +73,7 @@ The payments module emits the following events:
 | revoke_discount | sender_did          | {sender_did}          |
 | revoke_discount | payment_contract_id | {payment_contract_id} |
 | revoke_discount | holder              | {holder}              |
+| message         | module              | payments              |
 
 ## MsgEffectPayment
 
@@ -75,3 +81,4 @@ The payments module emits the following events:
 |----------------|---------------------|-----------------------|
 | effect_payment | sender_did          | {sender_did}          |
 | effect_payment | payment_contract_id | {payment_contract_id} |
+| message        | module              | payments              |
