@@ -12,6 +12,7 @@ The project module emits the following events:
 | create_project | sender_did    | {sender_did}    |
 | create_project | project_did   | {project_did}   |
 | create_project | pub_key       | {pub_key}       |
+| message        | module        | project         |
 
 ### MsgUpdateProjectStatus
 
@@ -22,6 +23,7 @@ The project module emits the following events:
 | update_project_status | project_did        | {project_did}        |
 | update_project_status | eth_funding_txn_id | {eth_funding_txn_id} |
 | update_project_status | updated_status     | {status}             |
+| message               | module             | project              |
 
 ### MsgUpdateProjectDoc
 
@@ -30,6 +32,7 @@ The project module emits the following events:
 | update_project_doc | tx_hash            | {tx_hash}            |
 | update_project_doc | sender_did         | {sender_did}         |
 | update_project_doc | project_did        | {project_did}        |
+| message            | module             | project         |
 
 ### MsgCreateAgent
 
@@ -40,6 +43,7 @@ The project module emits the following events:
 | create_agent | project_did   | {project_did}   |
 | create_agent | agent_did     | {agent_did}     |
 | create_agent | role          | {role}          |
+| message      | module        | project         |
 
 ### MsgUpdateAgent
 
@@ -51,6 +55,7 @@ The project module emits the following events:
 | update_agent | agent_did      | {agent_did}     |
 | update_agent | role           | {role}          |
 | update_agent | updated_status | {status}        |
+| message      | module         | project         |
 
 ### MsgCreateClaim
 
@@ -61,6 +66,7 @@ The project module emits the following events:
 | create_claim | project_did       | {project_did}       |
 | create_claim | claim_id          | {claim_id}          |
 | create_claim | claim_template_id | {claim_template_id} |
+| message      | module            | project             |
 
 ### MsgCreateEvaluation
 
@@ -71,8 +77,9 @@ The project module emits the following events:
 | create_evaluation | project_did   | {project_did}   |
 | create_evaluation | claim_id      | {claim_id}      |
 | create_evaluation | claim_status  | {status}        |
+| message           | module        | project         |
 
-### MsgWithdrawFund
+### MsgWithdrawFunds
 
 | Type           | Attribute Key | Attribute Value |
 |----------------|---------------|-----------------|
@@ -81,3 +88,4 @@ The project module emits the following events:
 | withdraw_funds | recipient_did | {recipient_did} |
 | withdraw_funds | amount        | {amount}        |
 | withdraw_funds | is_refund     | {is_refund}     |
+| message        | module        | project         |
