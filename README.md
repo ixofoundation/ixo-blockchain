@@ -4,9 +4,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/ixofoundation/ixo-blockchain)](https://goreportcard.com/report/github.com/ixofoundation/ixo-blockchain)
 [![LoC](https://tokei.rs/b1/github/ixofoundation/ixo-blockchain)](https://github.com/ixofoundation/ixo-blockchain)
 
-This is the official repository for the Sustainability Hub (ixo-Hub)
+This is the official repository for the Impact Hub (ImpactHub)
 
-> This document will have all details necessary to help getting started with ixo-Hub
+> This document will have all details necessary to help getting started with ImpactHub
 
 ## Documentation
 - Guide for setting up a Relayer on the Pandora test network and Internet of Impact Hub main network: [here](https://github.com/ixofoundation/genesis)
