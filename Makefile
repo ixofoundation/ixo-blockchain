@@ -55,6 +55,11 @@ else
 	go build -mod=readonly $(BUILD_FLAGS) -o build/ixod ./cmd/ixod
 endif
 
+build-for-platform: go.sum
+        @read -p "Enter Platform OS:" GOOS;
+        @read -p "Enter Platform Arch:" GOARCH;
+        env GOARCH=$(GOARCH) GOOS=$(GOOS) go build -mod=readonly $(BUILD_FLAGS) -o build/ixod-$(VERSION)-$(GOOS)-$(GOARCH) ./cmd/ixod
+
 install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/ixod
 
