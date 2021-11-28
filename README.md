@@ -9,7 +9,7 @@ This is the official repository for the Impact Hub (ImpactHub)
 > This document will have all details necessary to help getting started with ImpactHub
 
 ## Documentation
-- Guide for setting up a Relayer on the Pandora test network and Internet of Impact Hub main network: [here](https://github.com/ixofoundation/genesis)
+- Guide for setting up a Validator on the Pandora test network and Internet of Impact Hub main network: [here](https://github.com/ixofoundation/genesis)
 - Swagger API documentation for ixo modules gRPC endpoints can be found at [client/docs/swagger-ui/swagger.yaml](client/docs/swagger-ui/swagger.yaml)
 - Swagger API documentation for ixo modules legacy endpoints can be found at [client/docs/swagger-ui-legacy/swagger.yaml](client/docs/swagger-ui-legacy/swagger.yaml)
 - Blockchain Module Specifications can be found under `x/<module>/spec`
