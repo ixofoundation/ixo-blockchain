@@ -1,0 +1,45 @@
+name: Publish Release
+
+on: 
+  release:
+    types: [released]
+
+env:
+  VERSION: 1
+  BUILD_NUMBER: ${{ github.run_number }}
+  # ENABLE_LIBRARY: false
+  # ENABLE_DOCKER: true
+ # VERSION: "0.0.1"
+jobs:
+  debug-build:
+    name: Debug Build
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_debug_build.yaml@release/v0
+    with:
+      enabled: true
+
+  send-workflow-started-notifications:
+    name: Send Workflow Started Notifications
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+
+  publish-release-artifacts:
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_publish_packages.yaml@release/v0
+    with:
+      release-track: public
+      version-tag: ${{ github.ref_name }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      pa-token: ${{ secrets.GH_ACCESS_TOKEN }}
+
+  send-workflow-completed-notifications:
+    name: Send Build Completed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - publish-release-artifacts
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack

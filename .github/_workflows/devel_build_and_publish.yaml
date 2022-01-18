@@ -1,0 +1,77 @@
+
+name: Build Development Release
+
+on:
+  push:
+    branches:
+      - issue/*
+      - devel/*
+    #  paths-ignore:
+    #   - 'docs/**'
+
+jobs:
+  debug-build:
+    name: Debug Build
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_debug_build.yaml@release/v0
+    with:
+      enabled: true
+       
+  send-workflow-started-notifications:
+    name: Send Workflow Started Notifications
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+  
+  gather-build-info:
+    name: Gather Build Information
+    runs-on: ubuntu-latest
+    outputs:
+      build-context: ws-test
+    steps:
+      - run: echo "todo"
+
+  build-package: 
+    name: Build Package
+    needs:
+      - gather-build-info
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_build_and_package.yaml@release/v0
+    with:
+      version: 
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+  
+  send-build-failed-notifications:
+    name: Send Build Failed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - build-package
+    if: ${{ failure() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+        
+  publish-package: 
+    name: Publish Package
+    needs: 
+      - gather-build-info
+      - build-package
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_publish_packages.yaml@release/v0
+    with:
+      release-track: devel
+      version-tag: ${{ format('{0}-devel.{1}', needs.gather-build-info.outputs.build-context, env.GITHUB_RUN_NUMBER) }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      pa-token: ${{ secrets.GH_ACCESS_TOKEN }}
+  
+  send-workflow-completed-notifications:
+    name: Send Build Completed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - publish-package
+      - build-package
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack

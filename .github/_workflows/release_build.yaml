@@ -1,0 +1,175 @@
+name: Draft Release
+
+# test 5
+
+on:
+  push:
+    branches:
+      - release/*
+    #  paths-ignore:
+    #   - 'docs/**'
+
+  # schedule:
+  #   # * is a special character in YAML so you have to quote this string
+  #   - cron:  '30 5,17 * * *'
+
+env:
+  release-config: public-release-drafter.yaml
+  release-target: release/v0
+  # type: hotfix
+
+jobs:
+  debug-build:
+    name: Debug Build
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_debug_build.yaml@release/v0
+    with:
+      enabled: true
+
+  send-workflow-started-notifications:
+    name: Send Workflow Started Notifications
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+  
+  draft-github-release:
+    name: Draft Github Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.tag_name }}
+      upload-url: ${{ steps.release.outputs.upload_url }}
+    steps:
+      - name: Draft Release
+        id: release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+        with:
+          config-name: ${{ env.release-config }}
+          publish: false
+          commitish: ${{ github.sha }}
+
+  build-package: 
+    name: Build Package
+    needs:
+      - draft-github-release
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_build_and_package.yaml@release/v0
+    with:
+      test-package: true
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
+  send-build-failed-notifications:
+    name: Send Build Failed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - build-package
+    if: ${{ failure() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+
+  upload-release-artifacts:
+    name: Upload release artifacts
+    runs-on: ubuntu-latest
+    needs:
+      - build-package
+      - draft-github-release
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: ./artifacts
+
+      - run: ls -R ./artifacts
+
+      - name: Upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./artifacts/**
+          draft: true
+          tag_name: ${{ needs.draft-github-release.outputs.version }}
+
+  publish-github-release:
+    name: Publish Github Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-package
+      - upload-release-artifacts
+    outputs:
+      version: ${{ steps.release.outputs.tag_name }}
+      changelog: ${{ steps.release.outputs.body }}
+      changelog-url: ${{ steps.release.outputs.html_url }}
+    steps:
+      - name: Publish Release
+        id: release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+        with:
+          config-name: ${{ env.release-config }}
+          publish: true
+          commitish: ${{ github.sha }}
+
+  publish-jira-release:
+    name: Publish Jira Release
+    runs-on: ubuntu-latest
+    needs:
+      - publish-github-release
+    outputs:
+      jira-version: cms-v0.1.1
+    steps:
+      - id: build-info
+        run: |
+          echo "::set-output name=current-version::0.0.0"
+          echo "::set-output name=next-version::0.0.0"
+          echo "::set-output name=build-number::0.0.0"
+          echo "::set-output name=release-track::0.0.0"
+          echo "::set-output name=temp-issue::ws-test"
+
+  update-issues:
+    name: Update Issues
+    runs-on: ubuntu-latest
+    needs:
+      - publish-github-release
+      - publish-jira-release
+    strategy:
+      matrix:
+        commit-message: ${{ github.event.commits.*.message }}
+      fail-fast: false
+    continue-on-error: true
+    steps:
+      - name: Jira Login
+        uses: atlassian/gajira-login@master
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Find in commit message
+        id: jira-issue
+        uses: atlassian/gajira-find-issue-key@master
+        with:
+          string: ${{ matrix.commit-message }}
+
+      - name: Comment on issue
+        uses: atlassian/gajira-comment@master
+        with:
+          issue: ${{ steps.jira-issue.outputs.issue }}
+          comment: |
+            This issue as been assigned version ${{ needs.publish-github-release.outputs.version }}
+            and will get deployed once this version is deployed onto a public environment.
+            See [Full Changelog](${{ needs.publish-github-release.outputs.changelog-url }}) for more information about this release.
+  
+  send-workflow-completed-notifications:
+    name: Send Build Completed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - build-package
+      - publish-github-release
+      - publish-jira-release
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack

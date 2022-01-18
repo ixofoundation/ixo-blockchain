@@ -1,0 +1,59 @@
+name: Synchronize pre-release branches with release 
+
+# test4
+
+on:
+  push:
+    branches:
+      - release/*
+
+jobs:
+  debug-build:
+    name: Debug Build
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_debug_build.yaml@release/v0
+    with:
+      enabled: true
+
+  rebase-branches:
+    name: Rebase ${{ matrix.base }} onto ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          base: [master]
+          target: [devel]
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Git
+        run: |
+          git config user.email "{{ github.actor }}@users.noreply.github.com"
+          git config user.name "Github"
+          
+      - name: Checkout target branch
+        run: git checkout ${{ matrix.target }}
+
+      - name: Creating target branch
+        if: ${{ failure() }}
+        run: | 
+          git checkout -b ${{ matrix.target }}
+          git push --set-upstream origin ${{ matrix.target }}
+
+      - name: Rebase branch
+        run: git rebase ${{ matrix.base }}
+
+      - name: Push rebased branch
+        run: git push --force-with-lease
+
+      - name: Rebase failed, create pull request
+        if: ${{ failure() }}
+        id: create-pull-request
+        uses: repo-sync/pull-request@v2
+        with:                        
+          source_branch: ${{ matrix.base }}
+          destination_branch: ${{ matrix.target }}
+          pr_draft: false
+          pr_allow_empty: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}

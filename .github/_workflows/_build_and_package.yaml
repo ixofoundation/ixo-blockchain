@@ -1,0 +1,180 @@
+name: Build and Package Release
+
+# test 5
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: false
+      test-package: 
+        type: boolean
+        required: false
+        default: false
+            
+    secrets:
+      token:
+        required: true
+
+jobs:
+  # cancel:
+  #   name: 'Cancel Previous Builds'
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 3
+  #   steps:
+  #     - uses: styfle/cancel-workflow-action@0.9.1
+  #       with:
+  #         all_but_latest: true
+  #         access_token: ${{ github.token }}
+
+  test-build:
+    name: Run ${{ matrix.test }} tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - test: unit
+            command: npm test
+
+          - test: integration
+            command: npm test
+    steps:
+      - run: echo "All Good"
+        
+  check-build:
+    name: Check Build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "hi"
+  
+  upload-report:
+    name: Generate Build Reports
+    runs-on: ubuntu-latest
+    needs:
+      - test-build
+      - check-build
+    # strategy:
+    #   matrix:
+    #     report: 
+    #       - name: codecov
+            
+    #         file: codecov.yml
+    #     exclude:
+    #       - report:
+    #           if: false
+    steps:
+      - run: echo "All Good"
+      # - name: Upload Coverage Report
+      #   if: ${{ needs.test-build.outputs.coverage_file }} != null
+      #   uses: codecov/codecov-action@v2
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+      #     files: ./coverage1.xml,./coverage2.xml # optional
+      #     flags: unittests # optional
+      #     name: codecov-umbrella # optional
+      #     fail_ci_if_error: true # optional (default = false)
+      #     verbose: true # optional (default = false)
+        
+
+#         name: Snyk example
+# on: push
+# jobs:
+#   security:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@master
+#       - uses: snyk/actions/setup@master
+#       - uses: actions/setup-go@v1
+#         with:
+#           go-version: '1.13'
+#       - name: Snyk monitor
+#         run: snyk test
+#         env:
+#           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        
+  package-build:
+    name: Package Build
+    runs-on: ${{ matrix.os }}
+    needs:
+      - test-build
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # - name: Application (IOS)
+            # platform: ios
+            # os: macos-latest
+
+          - name: website
+            os: ubuntu-latest
+            platform: web
+            artifact-path: ./app.tar.gz
+            build-args: {}
+            package-args:
+              dockerfile: dockerfile
+              save: true
+
+          # - name: Application (Android)
+            # platform: android
+            # os: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Build ${{ matrix.name }}
+        id: build-website
+        uses: ./.github/actions/build-project
+        with:
+          platform: ${{ matrix.platform }}
+          version-tag: ${{ inputs.version }}
+
+      - name: Package Docker
+        id: package-docker
+        uses: ./.github/actions/package-docker
+        with: ${{ matrix.package-args }}
+
+      - name: Upload saved image as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          retention-days: 1
+          path: ${{ matrix.artifact-path }}
+        
+  test-package:
+    name: Test Package
+    runs-on: ubuntu-latest
+    needs:
+      - package-build
+    strategy:
+      matrix:
+        include:
+          - test: unit
+            command: npm test
+    if: ${{ inputs.test-package }}
+    steps:
+      - run: echo "hi"
+        
+  
+    
+        # Run the Firebase Test Lab Action
+      # - name: Run tests on Firebase Test Lab
+      #   uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+      #   with:
+      #     arg-spec: 'tests.yml:android-pixel-4'
+      #   env:
+      #     SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+
+      # - name: Test
+      #   run: |
+      #     xcodebuild -scheme MyFramework -resultBundlePath TestResults test
+
+      # - uses: kishikawakatsumi/xcresulttool@v1.0.3
+      #   with:
+      #     path: TestResults.xcresult
+      #   if: success() || failure()
+
+
+  #     - uses: azure/container-scan@v0
+  # with:
+  #   image-name: my-image:my-tag

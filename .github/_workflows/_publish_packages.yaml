@@ -1,0 +1,270 @@
+name: Publish Packages
+
+# test 5
+
+on:
+  workflow_call:
+    inputs:
+      release-track:
+        type: string
+        required: true
+        description: "Release track to publish packages to"
+      version-tag:
+        type: string
+        required: true
+        description: "Version tag used to tag the packages"
+    secrets:
+      token:
+        required: true
+      pa-token:
+        required: true
+
+jobs:
+  
+  # - name: Cache multiple paths
+  # uses: actions/cache@v2
+  # with:
+  #   path: |
+  #     ~/cache
+  #     !~/cache/exclude
+  #   key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+
+
+  publish-github-container-registry:
+    name: Publish to GitHub Container Registry
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        name: [app]
+        registry:
+          - ghcr.io
+        release:
+          - if: true
+            tag: ${{ inputs.version-tag }}
+            
+          - if: ${{ contains(inputs.release-track, 'public') }}
+            tag: latest
+        
+        include:
+          - name: app
+            artifact: app.tar.gz
+            repository: ${{ github.repository }}  
+            
+        exclude:
+          - release:
+              if: false
+    env:
+      IMAGE: ${{ format('{0}/{1}:{2}', matrix.registry, matrix.repository, matrix.release.tag) }}
+    steps:
+      - name: Docker Login
+        uses: docker/login-action@master
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.token }}
+
+      - uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          token: ${{ secrets.pa-token }}
+          repo: ${{ github.repository }}
+          version: ${{ github.event.release.id }}
+          file: ${{ matrix.artifact }}
+          target: ${{ matrix.artifact }}
+
+      - name: Load Image
+        run: docker load -i ${{ matrix.artifact }}
+
+      - name: Tag Image
+        run: docker tag ${{ matrix.name }}:temp ${{ env.IMAGE }}
+
+      - name: Publish Docker Image
+        run: docker push ${{ env.IMAGE }}
+
+  # publish-helm-chart:
+  #   name: Publish to helm Chart
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       track: 
+  #         - ${{ inputs.release-track }}
+  #       name: [app]
+  #       version:
+  #         - ${{ github.ref_name }}
+  #       # build-number: 
+  #       include:
+  #         - track: ${{ inputs.release-track }}
+  #           name: app
+  #           artifact: app.tar.gz
+  #           package: 'tv.xxx'
+  #   if: "false"
+  #   steps:
+  #     - uses: dsaltares/fetch-gh-release-asset@master
+  #       with:
+  #         token: ${{ secrets.pa-token }}
+  #         repo: ${{ github.repository }}
+  #         version: ${{ github.event.release.id }}
+  #         file: ${{ matrix.artifact }}
+  #         target: ${{ matrix.artifact }}
+
+  #     - name: Upload app bundle to playstore
+  #       uses: r0adkll/upload-google-play@v1
+  #       with:
+  #         serviceAccountJson: service_account.json
+  #         packageName: ${{ matrix.package }}
+  #         releaseFile: ${{ matrix.artifact }}
+  #         track: ${{ matrix.track }}
+  #         whatsNewDirectory: whatsnew/
+
+  # publish-play-store:
+  #   name: Publish to Play Store
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       track: 
+  #         - ${{ inputs.release-track }}
+  #       name: [app]
+  #       version:
+  #         - ${{ github.ref_name }}
+  #       # build-number: 
+  #       include:
+  #         - track: ${{ inputs.release-track }}
+  #           name: app
+  #           artifact: app.tar.gz
+  #           package: 'tv.xxx'
+  #   if: "false"
+  #   steps:
+  #     - uses: dsaltares/fetch-gh-release-asset@master
+  #       with:
+  #         token: ${{ secrets.pa-token }}
+  #         repo: ${{ github.repository }}
+  #         version: ${{ github.event.release.id }}
+  #         file: ${{ matrix.artifact }}
+  #         target: ${{ matrix.artifact }}
+
+  #     - name: Upload app bundle to playstore
+  #       uses: r0adkll/upload-google-play@v1
+  #       with:
+  #         serviceAccountJson: service_account.json
+  #         packageName: ${{ matrix.package }}
+  #         releaseFile: ${{ matrix.artifact }}
+  #         track: ${{ matrix.track }}
+  #         whatsNewDirectory: whatsnew/
+
+  # publish-app-gallery:
+  #   name: Publish to Play Store
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       track: 
+  #         - ${{ inputs.release-track }}
+  #       name: [app]
+  #       version:
+  #         - ${{ github.ref_name }}
+  #       # build-number: 
+  #       include:
+  #         - track: ${{ inputs.release-track }}
+  #           name: app
+  #           artifact: app.tar.gz
+  #           package: 'tv.xxx'
+  #   if: "false"
+  #   steps:
+  #     - uses: dsaltares/fetch-gh-release-asset@master
+  #       with:
+  #         token: ${{ secrets.pa-token }}
+  #         repo: ${{ github.repository }}
+  #         version: ${{ github.event.release.id }}
+  #         file: ${{ matrix.artifact }}
+  #         target: ${{ matrix.artifact }}
+
+  #     - name: Upload app bundle to playstore
+  #       uses: r0adkll/upload-google-play@v1
+  #       with:
+  #         serviceAccountJson: service_account.json
+  #         packageName: ${{ matrix.package }}
+  #         releaseFile: ${{ matrix.artifact }}
+  #         track: ${{ matrix.track }}
+  #         whatsNewDirectory: whatsnew/
+
+  # publish-app-store:
+  #   name: Publish to Apple App Store
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       track: 
+  #         - ${{ inputs.release-track }}
+  #       name: [app]
+  #       version:
+  #         - ${{ github.ref_name }}
+  #       # build-number: 
+  #       include:
+  #         - track: ${{ inputs.release-track }}
+  #           name: app
+  #           artifact: app.tar.gz
+  #           package: 'tv.xxx'
+  #   if: "false"
+  #   steps:
+  #     - uses: dsaltares/fetch-gh-release-asset@master
+  #       with:
+  #         token: ${{ secrets.pa-token }}
+  #         repo: ${{ github.repository }}
+  #         version: ${{ github.event.release.id }}
+  #         file: ${{ matrix.artifact }}
+  #         target: ${{ matrix.artifact }}
+
+  #     - name: Upload app bundle to playstore
+  #       uses: r0adkll/upload-google-play@v1
+  #       with:
+  #         serviceAccountJson: service_account.json
+  #         packageName: ${{ matrix.package }}
+  #         releaseFile: ${{ matrix.artifact }}
+  #         track: ${{ matrix.track }}
+  #         whatsNewDirectory: whatsnew/
+
+# publish-package:
+  #   name: Package Build
+  #   runs-on: ${{ matrix.os }}
+  #   needs:
+  #     - test-build
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         # - name: Application (IOS)
+  #           # platform: ios
+  #           # os: macos-latest
+
+  #         - name: website
+  #           os: ubuntu-latest
+  #           platform: docker
+  #           artifact: app.tar.gz
+  #           publish-args:
+  #             tag: ${{ github.ref }}
+
+  #         # - name: Application (Android)
+  #           # platform: android
+  #           # os: ubuntu-latest
+
+  #     fail-fast: true
+  #   steps:
+  #     - uses: dsaltares/fetch-gh-release-asset@master
+  #       with:
+  #         token: ${{ secrets.GH_ACCESS_TOKEN }}
+  #         repo: ${{ github.repository }}
+  #         version: ${{ github.event.release.id }}
+  #         file: "cms.tar.gz"
+  #         target: "cms.tar.gz"
+
+  #     - name: Build ${{ matrix.name }}
+  #       id: build-website
+  #       uses: ./.github/actions/build-project
+  #       with:
+  #         platform: ${{ matrix.platform }}
+
+  #     - name: Package Android App Bundle
+  #       id: package-android
+  #       uses: ./.github/actions/package-docker
+  #       with: ${{ matrix.package-args }}

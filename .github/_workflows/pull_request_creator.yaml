@@ -1,0 +1,91 @@
+name: Create Pull Request
+
+on:
+  create
+
+env:
+  type: hotfix
+
+jobs:
+  create-pull-request:
+    name: Create Pull Request
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        type: [hotfix, feature, chore, sync]
+        include:
+          - type: hotfix
+            draft: false
+            template: '.github/pull_request_templates/hotfix.md'
+
+          - type: feature
+            draft: true
+            template: '.github/pull_request_templates/feature.md'
+
+          - type: chore
+            draft: false
+            template: '.github/pull_request_templates/chore.md'
+          
+          - type: sync
+            draft: false
+            template: '.github/pull_request_templates/sync.md'
+            
+    if: ${{ github.event.ref_type == "branch" }}
+    steps:
+      - name: Checkout branch
+        if: ${{ matrix.type == env.type }}
+        uses: actions/checkout@v2
+
+      - name: Create Pull Request
+        id: create-pull-request
+        if: ${{ matrix.type == env.type }}
+        uses: repo-sync/pull-request@v2
+        with:                        
+          destination_branch: ${{ github.event.master_branch }}
+          pr_draft: ${{ matrix.draft }}
+          pr_allow_empty: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Enable Pull Request Automerge
+      #   if: steps.create-pull-request.outputs.pull-request-operation == 'created'
+      #   uses: peter-evans/enable-pull-request-automerge@v1
+      #   with:
+      #     token: ${{ secrets.GH_ACCESS_TOKEN }}
+      #     pull-request-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+      #     merge-method: squash
+
+  # assign-to-pull-request-project-board:
+  #   name: Assign to One Project
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - create-pull-request
+  #   env:
+  #     MY_GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+  #   steps:
+  #   - name: Assign NEW issues and NEW pull requests to project 2
+  #     uses: srggrs/assign-one-project-github-action@1.2.1
+  #     # if: github.event.action == 'opened'
+  #     with:
+  #       project: ${{ secrets.PULL_REQUEST_PROJECT }}
+  #       column_name: 'pending'
+
+  # create-check-suite:
+  #   name: "Create Check Suite"
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - create-pull-request
+  #   steps:
+  #     - name: Prepare Check Runs
+  #       uses: wgmouton/check-runs-action@master
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         sha: ${{ env.head_sha }}
+  #         checks: |
+  #           [
+  #             { "id": "labels", "name": "Jira Issue Passed" },
+  #             { "id": "description", "name": "Required Description" }
+  #           ]
+  #         fail-on-error: true
+  #         status: "queued"
+

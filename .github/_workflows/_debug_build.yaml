@@ -1,0 +1,21 @@
+name: Debug Build
+
+on:
+  workflow_call:
+    inputs:
+      enabled: 
+        type: boolean
+        required: true
+        default: false
+        description: "Enable this workflow"
+
+jobs:
+  debug-build:
+    name: Debug Information about the build
+    runs-on: ubuntu-latest
+    if: ${{ inputs.enabled }}
+    steps:
+      - name: Print Environment Variables and Event Json
+        uses: hmarr/debug-action@v2
+
+    

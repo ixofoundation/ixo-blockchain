@@ -1,0 +1,65 @@
+
+name: Build Development Release
+
+on:
+  push:
+    branches:
+      - release-candidate/*
+      - beta/*
+      - alpha/*
+    #  paths-ignore:
+    #   - 'docs/**'
+
+jobs:
+  debug-build:
+    name: Debug Build
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_debug_build.yaml@release/v0
+    with:
+      enabled: true
+
+  send-workflow-started-notifications:
+    name: Send Workflow Started Notifications
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+       
+  build-package:
+    name: Build Package
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_build_and_package.yaml@release/v0
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+  
+  send-build-failed-notifications:
+    name: Send Build Failed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - build-package
+    if: ${{ failure() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
+        
+  publish-package: 
+    name: Publish Package
+    needs:
+      - build-package
+    uses: workflow-tv/wfl-clt-contacts-directory/.github/workflows/_publish_packages.yaml@release/v0
+    with:
+      release-track: rc
+      version-tag: ${{ format('rc.{0}', env.GITHUB_RUN_NUMBER) }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      pa-token: ${{ secrets.GH_ACCESS_TOKEN }}
+  
+  send-workflow-completed-notifications:
+    name: Send Build Completed Notifications
+    runs-on: ubuntu-latest
+    needs:
+      - publish-package
+      - build-package
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/notify-slack
