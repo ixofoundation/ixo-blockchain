@@ -25,7 +25,7 @@ func (k Keeper) MustGetPaymentTemplateByKey(ctx sdk.Context, key []byte) types.P
 
 	bz := store.Get(key)
 	var template types.PaymentTemplate
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &template)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &template)
 
 	return template
 }
@@ -53,7 +53,7 @@ func (k Keeper) GetPaymentTemplate(ctx sdk.Context, templateId string) (types.Pa
 	}
 
 	var template types.PaymentTemplate
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &template)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &template)
 
 	return template, nil
 }
@@ -61,7 +61,7 @@ func (k Keeper) GetPaymentTemplate(ctx sdk.Context, templateId string) (types.Pa
 func (k Keeper) SetPaymentTemplate(ctx sdk.Context, template types.PaymentTemplate) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentTemplateKey(template.Id)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&template))
+	store.Set(key, k.cdc.MustMarshalLengthPrefixed(&template))
 }
 
 func (k Keeper) DiscountIdExists(ctx sdk.Context, templateId string, discountId sdk.Uint) (bool, error) {
@@ -95,7 +95,7 @@ func (k Keeper) MustGetPaymentContractByKey(ctx sdk.Context, key []byte) types.P
 
 	bz := store.Get(key)
 	var contract types.PaymentContract
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &contract)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &contract)
 
 	return contract
 }
@@ -123,7 +123,7 @@ func (k Keeper) GetPaymentContract(ctx sdk.Context, contractId string) (types.Pa
 	}
 
 	var contract types.PaymentContract
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &contract)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &contract)
 
 	return contract, nil
 }
@@ -145,7 +145,7 @@ func (k Keeper) GetPaymentContractsByPrefix(ctx sdk.Context, contractIdPrefix st
 func (k Keeper) SetPaymentContract(ctx sdk.Context, contract types.PaymentContract) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetPaymentContractKey(contract.Id)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&contract))
+	store.Set(key, k.cdc.MustMarshalLengthPrefixed(&contract))
 }
 
 func (k Keeper) SetPaymentContractAuthorised(ctx sdk.Context, contractId string,

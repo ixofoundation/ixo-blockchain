@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "prepare": "npx lefthook install",
+    "test": "echo testing",
+    "lint": "echo linting",
+    "start": "skaffold dev",
+    "start:local": "npx parcel watch & air src/main.go & wait",
+    "build": "skaffold build"
+  },
+  "devDependencies": {
+    "@arkweid/lefthook": "^0.7.7",
+    "@commitlint/cli": "^14.1.0",
+    "@commitlint/config-conventional": "^14.1.0"
+  }
+}

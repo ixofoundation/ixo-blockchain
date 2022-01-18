@@ -1,11 +1,12 @@
 package keeper_test
 
 import (
+	"testing"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 func TestKeeperIdReserver(t *testing.T) {

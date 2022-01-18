@@ -20,7 +20,7 @@ func (k Keeper) GetBond(ctx sdk.Context, bondDid didexported.Did) (bond types.Bo
 		return
 	}
 	bz := store.Get(types.GetBondKey(bondDid))
-	k.cdc.MustUnmarshalBinaryBare(bz, &bond)
+	k.cdc.MustUnmarshal(bz, &bond)
 
 	return bond, true
 }
@@ -52,7 +52,7 @@ func (k Keeper) MustGetBondByKey(ctx sdk.Context, key []byte) types.Bond {
 
 	bz := store.Get(key)
 	var bond types.Bond
-	k.cdc.MustUnmarshalBinaryBare(bz, &bond)
+	k.cdc.MustUnmarshal(bz, &bond)
 
 	return bond
 }
@@ -69,7 +69,7 @@ func (k Keeper) BondDidExists(ctx sdk.Context, bondToken string) bool {
 
 func (k Keeper) SetBond(ctx sdk.Context, bondDid didexported.Did, bond types.Bond) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetBondKey(bondDid), k.cdc.MustMarshalBinaryBare(&bond))
+	store.Set(types.GetBondKey(bondDid), k.cdc.MustMarshal(&bond))
 }
 
 func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid didexported.Did) {

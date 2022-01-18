@@ -3,3 +3,6 @@ build/*
 data
 */utils/node_modules/
 */utils/package-lock.json
+
+vendor
+node_modules

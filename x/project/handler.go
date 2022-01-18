@@ -41,8 +41,9 @@ func NewHandler(k keeper.Keeper, pk paymentskeeper.Keeper, bk bankkeeper.Keeper)
 			res, err := msgServer.UpdateProjectDoc(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized,
-				"unrecognized project Msg type: %v", msg.Type())
+			// err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg type: %v", msg.Type())
+			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg")
+			return nil, err
 		}
 	}
 }

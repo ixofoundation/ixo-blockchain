@@ -17,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -48,14 +49,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
-	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
-	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
-	ibcclient "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client"
-	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
-	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
-	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/keeper"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
@@ -74,6 +67,14 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/cosmos/ibc-go/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
+	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/ixofoundation/ixo-blockchain/client/tx"
@@ -181,9 +182,10 @@ var _ servertypes.Application = (*IxoApp)(nil)
 
 // Extended ABCI application
 type IxoApp struct {
-	*baseapp.BaseApp  `json:"_bam_base_app,omitempty"`
-	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
-	appCodec          codec.Marshaler         `json:"app_codec,omitempty"`
+	*baseapp.BaseApp `json:"_bam_base_app,omitempty"`
+	legacyAmino      *codec.LegacyAmino `json:"legacy_amino,omitempty"`
+	// TODO: Confirm is this is correct
+	appCodec          codec.Codec             `json:"app_codec,omitempty"`
 	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
 
 	invCheckPeriod uint `json:"inv_check_period,omitempty"`
@@ -240,7 +242,7 @@ func NewIxoApp(
 
 	bApp := baseapp.NewBaseApp(appName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
-	bApp.SetAppVersion(version.Version)
+	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
@@ -303,7 +305,13 @@ func NewIxoApp(
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
-	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)
+	// NewKeeper constructs an upgrade Keeper which requires the following arguments:
+	// skipUpgradeHeights - map of heights to skip an upgrade
+	// storeKey - a store key with which to access upgrade's store
+	// cdc - the app-wide binary codec
+	// homePath - root directory of the application's config
+	// TODO: vs - the interface implemented by baseapp which allows setting baseapp's protocol version field
+	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, nil)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -313,7 +321,7 @@ func NewIxoApp(
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, scopedIBCKeeper,
+		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
 	)
 
 	// register the proposal types
@@ -322,7 +330,7 @@ func NewIxoApp(
 		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -429,7 +437,7 @@ func NewIxoApp(
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(module.NewConfigurator(app.MsgServiceRouter(), app.GRPCQueryRouter()))
+	app.mm.RegisterServices(module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
 
 	// add test gRPC service for testing gRPC queries in isolation
 	testdata.RegisterQueryServer(app.GRPCQueryRouter(), testdata.QueryImpl{})
@@ -479,7 +487,9 @@ func NewIxoApp(
 		// Note that since this reads from the store, we can only perform it when
 		// `loadLatest` is set to true.
 		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-		app.CapabilityKeeper.InitializeAndSeal(ctx)
+		// TODO: Check if this will work
+		app.CapabilityKeeper.InitMemStore(ctx)
+		app.CapabilityKeeper.Seal()
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
@@ -491,7 +501,8 @@ func NewIxoApp(
 // MakeCodecs constructs the *std.Codec and *codec.LegacyAmino instances used by
 // ixoapp. It is useful for tests and clients who do not want to construct the
 // full ixoapp.
-func MakeCodecs() (codec.Marshaler, *codec.LegacyAmino) {
+// TODO: Dont know if this Codec is correct
+func MakeCodecs() (codec.Codec, *codec.LegacyAmino) {
 	config := MakeTestEncodingConfig()
 	return config.Marshaler, config.Amino
 }
@@ -555,7 +566,7 @@ func (app *IxoApp) LegacyAmino() *codec.LegacyAmino {
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *IxoApp) AppCodec() codec.Marshaler {
+func (app *IxoApp) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
@@ -684,23 +695,23 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// of a project DID). The project module PubKeyGetter deals with this
 	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
 
-	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
-	didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
-	projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
+	// defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
+	// didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
+	// projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
 
 	// Since we have parameterised pubkey getters, we can use the same default
 	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
 	// instead of having to implement three unique AnteHandlers.
 
-	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	didAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	// defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
+	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+	// 	defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	// didAnteHandler := ixotypes.NewDefaultAnteHandler(
+	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+	// 	didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	// projectAnteHandler := ixotypes.NewDefaultAnteHandler(
+	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+	// 	projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 
 	// The default Cosmos AnteHandler is still used for standard Cosmos messages
 	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
@@ -708,9 +719,24 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// one, since the default does not allow ED25519 signatures. Thus, like this
 	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
 
-	cosmosAnteHandler := authante.NewAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		encodingConfig.TxConfig.SignModeHandler())
+	// TODO: Fix this and figure out what happens here
+	// cosmosAnteHandler := authante.NewAnteHandler(
+	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+	// 	encodingConfig.TxConfig.SignModeHandler())
+
+	options := authante.HandlerOptions{
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		FeegrantKeeper:  nil,
+		SignModeHandler: nil,
+		SigGasConsumer:  ixotypes.IxoSigVerificationGasConsumer,
+	}
+
+	cosmosAnteHandler, err := authante.NewAnteHandler(options)
+
+	if err != nil {
+		panic(sdkerrors.Wrap(err, "could not create Cosmos AnteHandler"))
+	}
 
 	// In the case of project creation, besides having a custom pubkey getter,
 	// we also have to use a custom project creation AnteHandler. Recall that
@@ -727,36 +753,37 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// to the original creator, which is pointed out in the project doc. For
 	// this purpose, a custom project creation AnteHandler had to be created.
 
-	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.DidKeeper,
-		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
+	// projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+	// 	app.AccountKeeper, app.BankKeeper, app.DidKeeper,
+	// 	encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
 
+	// TODO: Routing https://docs.cosmos.network/v0.44/building-modules/msg-services.html#amino-legacymsgs
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
 		// Otherwise, route to Cosmos ante handler
-		msg := tx.GetMsgs()[0]
-		switch msg.Route() {
-		case didtypes.RouterKey:
-			return didAnteHandler(ctx, tx, simulate)
-		case projecttypes.RouterKey:
-			switch msg.Type() {
-			case projecttypes.TypeMsgCreateProject:
-				return projectCreationAnteHandler(ctx, tx, simulate)
-			default:
-				return projectAnteHandler(ctx, tx, simulate)
-			}
-		case bondstypes.RouterKey:
-			fallthrough
-		case paymentstypes.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
-		default:
-			return cosmosAnteHandler(ctx, tx, simulate)
-		}
+		// msg := tx.GetMsgs()[0]
+		// switch msg.Route() {
+		// case didtypes.RouterKey:
+		// 	return didAnteHandler(ctx, tx, simulate)
+		// case projecttypes.RouterKey:
+		// 	switch msg.Type() {
+		// 	case projecttypes.TypeMsgCreateProject:
+		// 		return projectCreationAnteHandler(ctx, tx, simulate)
+		// 	default:
+		// 		return projectAnteHandler(ctx, tx, simulate)
+		// 	}
+		// case bondstypes.RouterKey:
+		// 	fallthrough
+		// case paymentstypes.RouterKey:
+		// 	return defaultIxoAnteHandler(ctx, tx, simulate)
+		// default:
+		return cosmosAnteHandler(ctx, tx, simulate)
+		// }
 	}
 }
 
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
 	// init params keeper and subspaces (for standard Cosmos modules)
