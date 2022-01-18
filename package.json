@@ -2,7 +2,7 @@
   "scripts": {
     "prepare": "npx lefthook install",
     "test": "echo testing",
-    "lint": "echo linting",
+    "lint": "go vet ./...",
     "start": "skaffold dev",
     "start:local": "npx parcel watch & air src/main.go & wait",
     "build": "skaffold build"
