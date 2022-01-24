@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  # nginx:
+  #   image: nginx
+  #   container_name: ixo_nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #   links:
+  #     - php
+  ixo-blockchain:
+    container_name: ixo_blockchain
+    build:
+      context: .
+      dockerfile: /.infra/dockerfiles/Dockerfile
+    ports:
+      - "9000:9000"

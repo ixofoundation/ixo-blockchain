@@ -1,3 +1,9 @@
 .git
 vendor
 docs
+# dist
+
+node_modules
+docs
+# .infra
+.github
