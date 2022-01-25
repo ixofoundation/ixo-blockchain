@@ -47,9 +47,9 @@ COPY ./ ./
 
 RUN curl https://get.starport.network/starport! | bash
 
-COPY ./dist/app/ /dist/app/
-# RUN starport chain build --release -o /dist/app -v -t linux:amd64 -t darwin:amd64
-# RUN starport chain init --home /dist/app/.ixod
+# COPY ./dist/app/ /dist/app/
+RUN starport chain build --release -o /dist/app -v -t linux:amd64 -t darwin:amd64
+RUN starport chain init --home /dist/app/.ixod
 
 RUN tar -xzf /dist/app/ixo-blockchain_linux_amd64.tar.gz -C /dist/app/
 
