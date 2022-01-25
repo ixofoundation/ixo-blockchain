@@ -74,8 +74,10 @@ COPY --from=build-blockchain /dist/app/ixo-blockchaind /app/ixod
 COPY --from=build-blockchain /dist/app/.ixod/ /app/.ixod/
 # RUN chown -R nonroot:nonroot /app/.ixod
 
-EXPOSE 8080
-
+#HTTP
+EXPOSE 1317
+#RPC
+EXPOSE 26657
 # USER nonroot:nonroot
 
 
