@@ -3,6 +3,7 @@ services:
   nginx:
     image: nginx
     container_name: ixo_nginx
+    restart: unless-stopped
     ports:
       - "80:8081"
     volumes:
@@ -14,20 +15,22 @@ services:
   ixo-swagger:
     container_name: ixo_swagger
     image: swaggerapi/swagger-ui
+    restart: unless-stopped
     environment:
       - BASE_URL=/swagger 
       - SWAGGER_JSON=/api-docs/swagger.yaml
     ports: 
      - "8090:8080" 
     volumes:
-      - ./client/docs/swagger-ui:/api-docs
+      - "./docs/static/openapi.yml:/api-docs/swagger.yaml"
 
   ixo-blockchain:
     container_name: ixo_blockchain
     build:
       context: .
       dockerfile: .infra/dockerfiles/Dockerfile
-    # image: ixo-chain:devel
+    image: ixo-chain:devel
+    restart: unless-stopped
     ports:
       - "1317:1317" # API
       - "26657:26657" # RPC
