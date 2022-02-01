@@ -1,0 +1,7 @@
+{
+  "type": "payments/TimePeriod",
+  "value": {
+    "period_duration_ns": "6000000000",
+    "period_start_time": "2020-06-03T13:00:00.00Z"
+  }
+}
