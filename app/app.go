@@ -24,10 +24,12 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	legacytx "github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -44,6 +46,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
+	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
@@ -139,6 +144,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		feegrantmodule.AppModuleBasic{},
 
 		// Custom ixo modules
 		did.AppModuleBasic{},
@@ -210,6 +216,7 @@ type IxoApp struct {
 	IBCKeeper        *ibckeeper.Keeper        `json:"ibc_keeper,omitempty"` // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
 	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
+	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
@@ -305,6 +312,9 @@ func NewIxoApp(
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
+
+	// TODO: know what this is.
+	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	// NewKeeper constructs an upgrade Keeper which requires the following arguments:
 	// skipUpgradeHeights - map of heights to skip an upgrade
 	// storeKey - a store key with which to access upgrade's store
@@ -393,6 +403,7 @@ func NewIxoApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		transferModule,
 
 		// Custom ixo AppModules
@@ -409,13 +420,26 @@ func NewIxoApp(
 	app.mm.SetOrderBeginBlockers(
 		// Standard Cosmos modules
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
+		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, banktypes.ModuleName,
+		paymentstypes.ModuleName, genutiltypes.ModuleName, crisistypes.ModuleName,
+		paramstypes.ModuleName, authtypes.ModuleName, capabilitytypes.ModuleName,
+		govtypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName,
+		feegrant.ModuleName,
+
 		// Custom ixo modules
+		didtypes.ModuleName,
+		projecttypes.ModuleName,
 		bondstypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
+		distrtypes.ModuleName, evidencetypes.ModuleName, didtypes.ModuleName, banktypes.ModuleName,
+		upgradetypes.ModuleName, ibchost.ModuleName, paramstypes.ModuleName, authtypes.ModuleName,
+		minttypes.ModuleName, projecttypes.ModuleName, genutiltypes.ModuleName, vestingtypes.ModuleName,
+		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
+		feegrant.ModuleName,
+
 		// Custom ixo modules
 		bondstypes.ModuleName, paymentstypes.ModuleName,
 	)
@@ -430,11 +454,13 @@ func NewIxoApp(
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
+		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName,
 		// Custom ixo modules
 		didtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName,
 	)
 
+	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.mm.RegisterServices(module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
@@ -458,6 +484,7 @@ func NewIxoApp(
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		transferModule,
 	)
 
@@ -695,23 +722,23 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// of a project DID). The project module PubKeyGetter deals with this
 	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
 
-	// defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
-	// didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
-	// projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
+	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
+	didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
+	projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
 
 	// Since we have parameterised pubkey getters, we can use the same default
 	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
 	// instead of having to implement three unique AnteHandlers.
 
-	// defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
-	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-	// 	defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	// didAnteHandler := ixotypes.NewDefaultAnteHandler(
-	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-	// 	didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	// projectAnteHandler := ixotypes.NewDefaultAnteHandler(
-	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-	// 	projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
+		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	didAnteHandler := ixotypes.NewDefaultAnteHandler(
+		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
+		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
 
 	// The default Cosmos AnteHandler is still used for standard Cosmos messages
 	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
@@ -720,15 +747,15 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
 
 	// TODO: Fix this and figure out what happens here
-	// cosmosAnteHandler := authante.NewAnteHandler(
+	// cosmosAnteHandler, err := authante.NewAnteHandler(
 	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
 	// 	encodingConfig.TxConfig.SignModeHandler())
 
 	options := authante.HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  nil,
-		SignModeHandler: nil,
+		FeegrantKeeper:  app.FeeGrantKeeper,
+		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  ixotypes.IxoSigVerificationGasConsumer,
 	}
 
@@ -753,32 +780,34 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// to the original creator, which is pointed out in the project doc. For
 	// this purpose, a custom project creation AnteHandler had to be created.
 
-	// projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-	// 	app.AccountKeeper, app.BankKeeper, app.DidKeeper,
-	// 	encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
+	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+		app.AccountKeeper, app.BankKeeper, app.DidKeeper,
+		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
 
 	// TODO: Routing https://docs.cosmos.network/v0.44/building-modules/msg-services.html#amino-legacymsgs
 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
 		// Route message based on ixo module router key
 		// Otherwise, route to Cosmos ante handler
-		// msg := tx.GetMsgs()[0]
-		// switch msg.Route() {
-		// case didtypes.RouterKey:
-		// 	return didAnteHandler(ctx, tx, simulate)
-		// case projecttypes.RouterKey:
-		// 	switch msg.Type() {
-		// 	case projecttypes.TypeMsgCreateProject:
-		// 		return projectCreationAnteHandler(ctx, tx, simulate)
-		// 	default:
-		// 		return projectAnteHandler(ctx, tx, simulate)
-		// 	}
-		// case bondstypes.RouterKey:
-		// 	fallthrough
-		// case paymentstypes.RouterKey:
-		// 	return defaultIxoAnteHandler(ctx, tx, simulate)
-		// default:
-		return cosmosAnteHandler(ctx, tx, simulate)
-		// }
+		msg := tx.GetMsgs()[0].(legacytx.LegacyMsg)
+
+		switch msg.Route() {
+		case didtypes.RouterKey:
+			return didAnteHandler(ctx, tx, simulate)
+		case projecttypes.RouterKey:
+			switch msg.Type() {
+			case projecttypes.TypeMsgCreateProject:
+				return projectCreationAnteHandler(ctx, tx, simulate)
+			default:
+				return projectAnteHandler(ctx, tx, simulate)
+			}
+
+		case bondstypes.RouterKey:
+			fallthrough
+		case paymentstypes.RouterKey:
+			return defaultIxoAnteHandler(ctx, tx, simulate)
+		default:
+			return cosmosAnteHandler(ctx, tx, simulate)
+		}
 	}
 }
 

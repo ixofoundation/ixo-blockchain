@@ -19,3 +19,6 @@ genesis:
     staking:
       params:
         bond_denom: "uixo"
+build:
+  main: cmd/ixod
+  bindary: ixod
