@@ -6,6 +6,7 @@ data
 
 vendor
 node_modules
+
 lefthook-local.yaml
 coverage.out
 dist

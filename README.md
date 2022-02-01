@@ -1,3 +1,8 @@
+# DO NOT USE THIS FORK / BRANCH. 
+## This is a is for devops development preposes only and will form the future structure of the project.
+
+---
+
 # ixo Blockchain SDK
 
 [![version](https://img.shields.io/github/tag/ixofoundation/ixo-blockchain.svg)](https://github.com/ixofoundation/ixo-blockchain/releases/latest)
