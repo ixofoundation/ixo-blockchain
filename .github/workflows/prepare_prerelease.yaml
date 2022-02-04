@@ -21,7 +21,7 @@ jobs:
     #   changelog: ${{ steps.release.outputs.body }}
     #   changelog-url: ${{ steps.release.outputs.html_url }}
     steps:
-      - name: Publish Release
+      - name: Publish Pre Release
         id: release
         uses: release-drafter/release-drafter@v5
         env:
@@ -29,6 +29,16 @@ jobs:
         with:
           config-name: prerelease-config.yaml
           publish: true
+          commitish: ${{ github.sha }}
+
+      - name: Publish Stable Release
+        id: release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-config.yaml
+          publish: false
           commitish: ${{ github.sha }}
 
 #udhui
