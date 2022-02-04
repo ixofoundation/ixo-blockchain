@@ -10,7 +10,7 @@ jobs:
   gather-build-info:
     runs-on: ubuntu-latest
     outputs:
-      is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, "rc") }}
+      is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, 'rc') }}
       version: ${{ star steps.get_version.outputs.version }}
     steps:
       - id: get_version
