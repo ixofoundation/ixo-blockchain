@@ -30,6 +30,6 @@ version-resolver:
 commitish: release/v0
 filter-by-commitish: true
 template: |
-  ## Changes
+  ## Changes h
 
   $CHANGES
