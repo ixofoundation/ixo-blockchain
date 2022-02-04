@@ -1,6 +1,6 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
-version-template: '$COMPLETE'
+version-template: '$MAJOR.$MINOR.$PATCH'
 categories:
   - title: '🚀 Features'
     labels:
@@ -30,6 +30,6 @@ version-resolver:
 commitish: release/v0
 filter-by-commitish: true
 template: |
-  ## Changes h
+  ## Changes
 
   $CHANGES
