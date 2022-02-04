@@ -1,5 +1,6 @@
-name-template: 'v$NEXT_MAJOR_VERSION 🌈'
-tag-template: 'v$NEXT_MAJOR_VERSION'
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+version-template: '$COMPLETE'
 categories:
   - title: '🚀 Features'
     labels:
