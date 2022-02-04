@@ -8,6 +8,7 @@ on:
 jobs:
   
   gather-build-info:
+    name: Gather Build Info
     runs-on: ubuntu-latest
     outputs:
       is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, 'rc') }}
@@ -15,14 +16,63 @@ jobs:
     steps:
       - id: get_version
         uses: battila7/get-version-action@master
-      - run: echo ${{ startsWith(steps.get_version.outputs.prerelease, 'rc') }}
+
   test:
+    name: ${{ matrix.test.name }}
     runs-on: ubuntu-latest
+    needs:
+      - gather-build-info
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - name: unit
+            command: npm test
+            artifact: ""
+            enabled: false
+
+          - name: integration
+            command: npm test
+            enabled: false
+            
+        exclude:
+          - test:
+              enable: false
+
     steps:
       - run: echo "All Good"
         
   build:
+    name: ${{ matrix.build.name }}
     runs-on: ubuntu-latest
+    needs:
+      - gather-build-info
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - name: Build docker image
+            command: docker build -t $IMAGE_NAME:$VERSION .
+            os: ubuntu-latest
+            artifact: ""
+            enabled: true
+
+          - name: Build debian package
+            command: docker build -t $IMAGE_NAME:$VERSION .
+            os: ubuntu-latest
+            artifact: ""
+            enabled: false
+
+          - name: Build macos binary
+            command: docker build -t $IMAGE_NAME:$VERSION .
+            os: ubuntu-latest
+            artifact: ""
+            enabled: false
+
+        exclude:
+          - build:
+              enabled: false
+            
     steps:
       - run: echo "All Good"
         
@@ -31,6 +81,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - gather-build-info
+      - test
+      - build
     strategy:
       fail-fast: false
       matrix:
