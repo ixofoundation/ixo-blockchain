@@ -27,6 +27,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config-name: prepublic-config.yaml
+          config-name: prerelease-config.yaml
           publish: false
           commitish: ${{ github.sha }}
