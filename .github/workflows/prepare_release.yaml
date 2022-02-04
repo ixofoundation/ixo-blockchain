@@ -35,7 +35,7 @@ jobs:
             config: prerelease-config.yaml
 
         exclude:
-          - build:
+          - release:
               enabled: false
     steps:
       - name: Publish Release
