@@ -1,8 +1,8 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
 version-template: '$COMPLETE-rc.$PATCH'
-# version-resolver:
-#   default: patch
+version-resolver:
+  default: patch
 prerelease: true
 filter-by-commitish: true
 template: |
