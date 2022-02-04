@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, 'rc') }}
-      version: ${{ star steps.get_version.outputs.version }}
+      version: ${{ steps.get_version.outputs.version }}
     steps:
       - id: get_version
         uses: battila7/get-version-action@master
