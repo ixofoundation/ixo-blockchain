@@ -190,7 +190,6 @@ var _ servertypes.Application = (*IxoApp)(nil)
 type IxoApp struct {
 	*baseapp.BaseApp `json:"_bam_base_app,omitempty"`
 	legacyAmino      *codec.LegacyAmino `json:"legacy_amino,omitempty"`
-	// TODO: Confirm is this is correct
 	appCodec          codec.Codec             `json:"app_codec,omitempty"`
 	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
 

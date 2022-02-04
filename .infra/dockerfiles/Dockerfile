@@ -1,7 +1,12 @@
+## Starport
+
+FROM golang:latest AS starport
+RUN curl https://get.starport.network/starport! | bash
+
 ##
 ## Fetch Golang Dependencies
 ##
-FROM golang:latest AS fetch-dependencies
+FROM starport AS build-dependencies
 WORKDIR /app
 
 COPY go.mod ./
@@ -9,48 +14,25 @@ COPY go.sum ./
 
 RUN go mod vendor
 
-# ## ----------------------------------- ##
+ONBUILD WORKDIR /app
 
-# ##
-# ## Run Devel Build
-# ##
-# ARG GO_ENABLED=true
-# ARG GO_VERSION=latest
-# ARG NODE_ENABLED=true
-# ARG NODE_VERSION=latest
+##
+## Fetch Golang Dependencies
+##
 
-# FROM golang:latest AS build
+FROM build-dependencies AS build-tests
+RUN go test -v ./...
 
-
-# # Setup Environment
-# WORKDIR /app
-# ENV DEBIAN_FRONTEND=noninteractive
-# # RUN chsh --shell /bin/bash
-# # Copy Source Files
-# COPY ./ ./
-
-# # Copy Dependencies
-# COPY --from=fetch-dependencies-golang /app/vendor ./vendor
-# RUN
-
-# # Copy Entrypint script
-# COPY ./.deploy/dockerfiles/devel.entrypoint.sh ./
-# ENTRYPOINT [ "/bin/bash", "./devel.entrypoint.sh" ]
-
-# Build Golang files
-FROM golang:latest AS build-blockchain
-WORKDIR /app
-
-# COPY --from=fetch-dependencies /app ./
-# RUN mkdir -p /dist/app/
+FROM build-dependencies AS build-devel
 COPY ./ ./
 
-RUN curl https://get.starport.network/starport! | bash
+ENTRYPOINT [ "starport", "chain", "serve" ]
 
-# COPY ./dist/app/ /dist/app/
+# Build Golang files
+FROM build-dependencies AS build-binary
+COPY ./ ./
+
 RUN starport chain build --release -o /dist/app -v -t linux:amd64 -t darwin:amd64
-RUN starport chain init --home /dist/app/.ixod
-
 RUN tar -xzf /dist/app/ixo-blockchain_linux_amd64.tar.gz -C /dist/app/
 
 # FROM ubuntu:latest AS setup-genisis
@@ -59,26 +41,32 @@ RUN tar -xzf /dist/app/ixo-blockchain_linux_amd64.tar.gz -C /dist/app/
 
 # RUN curl https://raw.githubusercontent.com/ixofoundation/genesis/master/pandora-4/genesis.json
 
+##
+## Build Distrubutiable Blockchain
+##
 
-FROM gcr.io/distroless/base-debian10 AS run-app
+FROM gcr.io/distroless/base-debian10 AS distributable
 
-WORKDIR /app
+COPY --from=build-binary /dist/app/ixo-blockchaind /app/ixod
+# COPY --from=build-binary /dist/app/.ixod/ /app/.ixod/
 
-# COPY --from=setup-genisis /dist/app/ixo-blockchaind /app/ixod
-# RUN 
+ONBUILD LABEL world.ixo.blockchain.image.authors="willem.mouton@ixo.world"
 
-# chown -R ixo:ixo /home/ixo/.$DAEMONNAME/config/
-# chown -R ixo:ixo /home/ixo/.$DAEMONNAME/config/genesis.json
+ONBUILD WORKDIR /app
 
-COPY --from=build-blockchain /dist/app/ixo-blockchaind /app/ixod
-COPY --from=build-blockchain /dist/app/.ixod/ /app/.ixod/
-# RUN chown -R nonroot:nonroot /app/.ixod
+ONBUILD EXPOSE 1317
+ONBUILD EXPOSE 26657
 
-#HTTP
-EXPOSE 1317
-#RPC
-EXPOSE 26657
-# USER nonroot:nonroot
+ONBUILD ENTRYPOINT ["/app/ixod", "--home", "/app/.ixod"]
 
+FROM distributable AS dist-devel
+RUN echo "Fetch genisis file"
 
-ENTRYPOINT ["/app/ixod", "start", "--home", "/app/.ixod"]
+FROM distributable AS dist-beta
+RUN echo "Fetch genisis file"
+
+FROM distributable AS dist-rc
+RUN echo "Fetch genisis file"
+
+FROM distributable AS dist-stable
+RUN echo "Fetch genisis file"

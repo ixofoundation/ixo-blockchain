@@ -1,0 +1,8 @@
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+version-template: '$MAJOR.$MINOR.0-rc.$PATCH'
+version-resolver:
+  default: patch
+filter-by-commitish: true
+template: |
+  Release Candidate see changelog

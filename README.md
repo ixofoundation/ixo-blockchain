@@ -1,6 +1,13 @@
 # DO NOT USE THIS FORK / BRANCH. 
 ## This is a is for devops development preposes only and will form the future structure of the project.
 
+
+
+## Docker Commands
+
+### Build Blockchain and output binary
+docker build 
+
 ---
 
 # ixo Blockchain SDK
