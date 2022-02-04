@@ -22,6 +22,8 @@ jobs:
         
   create-release:
     runs-on: ubuntu-latest
+    needs:
+      - gather-build-info
     strategy:
       fail-fast: false
       matrix:
