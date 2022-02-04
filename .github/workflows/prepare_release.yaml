@@ -15,7 +15,7 @@ jobs:
     steps:
       - id: get_version
         uses: battila7/get-version-action@v2
-      - run: echo ${{ steps.get_version.outputs.is-prerelease }}
+      - run: echo "${{ steps.get_version.outputs.is-prerelease }}"
   test:
     runs-on: ubuntu-latest
     steps:
