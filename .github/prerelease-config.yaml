@@ -1,6 +1,6 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
-version-template: '$MAJOR.$MINOR.0-rc.$NEXT_PATCH_VERSION'
+version-template: '$COMPLETE'
 # version-resolver:
 #   default: patch
 prerelease: true
