@@ -1,0 +1,50 @@
+name: Prepare Release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  
+  gather-build-info:
+    runs-on: ubuntu-latest
+    outputs:
+      is-prerelease: ${{ steps.get_version.outputs.is-prerelease }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - id: get_version
+        uses: battila7/get-version-action@v2
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All Good"
+        
+  create-release:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - release: 
+              enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
+              config: release-config.yaml
+
+          - release: 
+              enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
+              config: prerelease-config.yaml
+
+        exclude:
+          - build:
+              enabled: false
+    steps:
+      - name: Publish Release
+        id: release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: ${{ matrix.release.config }}
+          tag: ${{ needs.gather-build-info.outputs.version }}
+          publish: true
+          commitish: ${{ github.sha }}
