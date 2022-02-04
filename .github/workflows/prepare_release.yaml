@@ -21,6 +21,11 @@ jobs:
     steps:
       - run: echo "All Good"
         
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All Good"
+        
   create-release:
     name: ${{ matrix.release.name }}
     runs-on: ubuntu-latest
