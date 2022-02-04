@@ -27,14 +27,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build:
-          - release: 
-              enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
-              config: release-config.yaml
+        release:
+          - enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
+            config: release-config.yaml
 
-          - release: 
-              enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
-              config: prerelease-config.yaml
+          - enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
+            config: prerelease-config.yaml
 
         exclude:
           - build:
