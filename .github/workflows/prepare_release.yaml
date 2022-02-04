@@ -21,6 +21,7 @@ jobs:
       - run: echo "All Good"
         
   create-release:
+    
     runs-on: ubuntu-latest
     needs:
       - gather-build-info
@@ -28,10 +29,12 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          - enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
+          - name: Create Release
+            enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
             config: release-config.yaml
 
-          - enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
+          - name: Create Pre-Release
+            enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
             config: prerelease-config.yaml
 
         exclude:
