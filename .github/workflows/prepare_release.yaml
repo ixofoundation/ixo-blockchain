@@ -10,12 +10,12 @@ jobs:
   gather-build-info:
     runs-on: ubuntu-latest
     outputs:
-      is-prerelease: ${{ steps.get_version.outputs.is-prerelease }}
-      version: ${{ steps.get_version.outputs.version }}
+      is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, "rc") }}
+      version: ${{ star steps.get_version.outputs.version }}
     steps:
       - id: get_version
         uses: battila7/get-version-action@master
-      - run: echo "${{ steps.get_version.outputs.is-prerelease }}"
+      - run: echo ${{ startsWith(steps.get_version.outputs.prerelease, "rc") }}
   test:
     runs-on: ubuntu-latest
     steps:
