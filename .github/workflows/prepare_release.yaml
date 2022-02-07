@@ -117,7 +117,7 @@ jobs:
           path: /tmp/${{ matrix.build.artifact }}.tar
 
   test-artifact:
-    name: ${{ matrix.artifact.name }}
+    name: ${{ matrix.test.name }}
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.test.experimental }}
     needs:
