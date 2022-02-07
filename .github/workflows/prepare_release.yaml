@@ -19,7 +19,7 @@ jobs:
   test-code:
     name: ${{ matrix.test.name }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.test.experimental }}
     needs:
       - gather-build-info
     strategy:
@@ -119,12 +119,12 @@ jobs:
   test-artifact:
     name: ${{ matrix.artifact.name }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.test.experimental }}
     needs:
       - build
     strategy:
       matrix:
-        artifact:
+        test:
           - name: Upload Release Artifacts
             os: ubuntu-latest
             artifact: ixo-chain
