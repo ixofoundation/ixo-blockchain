@@ -69,10 +69,16 @@ jobs:
                 docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
 
           - name: Build debian package
-            command: docker build -t $IMAGE_NAME:$VERSION .
             os: ubuntu-latest
-            artifact: ""
+            artifact: "ixod"
             enabled: false
+            docker:
+              file: .infra/dockerfiles/Dockerfile
+              target: dist-stable
+            post-build:
+              enabled: false
+              command: | 
+                docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
 
           - name: Build macos binary
             command: docker build -t $IMAGE_NAME:$VERSION .
@@ -95,11 +101,16 @@ jobs:
           tags: ${{ matrix.build.artifact }}:tmp
           target: ${{ matrix.build.docker.target }}
           file: ${{ matrix.build.docker.file }}
-          outputs: "type=local,dest=./docker.tar"
+          outputs: type=docker,dest=/tmp/${{ matrix.build.artifact }}.tar
       - run: ls -l
       - if: matrix.build.post-command.enabled
         run: echo "hi"
-        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.build.artifact }}
+          path: /tmp/${{ matrix.build.artifact }}.tar
+
   test-artifact:
     name: ${{ matrix.artifact.name }}
     runs-on: ubuntu-latest
@@ -110,14 +121,23 @@ jobs:
         artifact:
           - name: Upload Release Artifacts
             os: ubuntu-latest
-            artifact: ""
+            artifact: ixo-chain
             enabled: true
         exclude:
           - artifact:
               enabled: false
 
-    steps:
-      - run: echo "All Good"
+    steps:        
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.artifact.artifact }}
+          path: /artifacts
+      -
+        name: Load image
+        run: |
+          docker load --input /artifacts/${{ matrix.artifact.artifact }}.tar
+          docker image ls -a
 
   publish-release:
     name: ${{ matrix.release.name }}
@@ -161,13 +181,18 @@ jobs:
       - gather-build-info
       - build
       - publish-release
+    env: 
+      registry: ${{ needs.gather-build-info.outputs.version }}
+      owner: wgmouton
+      image: ixo-blockchain
+      tag: ${{ needs.gather-build-info.outputs.version }}
     strategy:
       matrix:
         artifact:
           - name: Upload Release Artifacts
             command: docker build -t $IMAGE_NAME:$VERSION .
             os: ubuntu-latest
-            artifact: ""
+            artifact: ixo-chain
             enabled: true
 
         exclude:
@@ -175,4 +200,21 @@ jobs:
               enabled: false
 
     steps:
-      - run: echo "All Good"
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.artifact.artifact }}
+          path: /artifacts
+      -
+        name: Load image
+        run: |
+          docker load --input /artifacts/${{ matrix.artifact.artifact }}.tar
+          docker ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.version }}
+          docker push ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
