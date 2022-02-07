@@ -125,15 +125,21 @@ jobs:
     strategy:
       matrix:
         test:
-          - name: Upload Release Artifacts
+          - name: Scan Docker image (Security)
             os: ubuntu-latest
             artifact: ixo-chain
             enabled: true
             experimental: true
+
+          - name: Integration Tests (Quality)
+            os: ubuntu-latest
+            artifact: ixo-chain
+            enabled: false
+            experimental: true
+
         exclude:
           - test:
               enabled: false
-
     steps: 
       - run: mkdir -p /artifacts
         
@@ -141,11 +147,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.test.artifact }}
-          path: /artifacts
 
       - name: Load image
         run: |
-          docker load --input /artifacts/${{ matrix.test.artifact }}.tar
+          docker load --input ${{ matrix.test.artifact }}.tar
           docker image ls -a
 
   publish-release:
@@ -209,6 +214,8 @@ jobs:
               enabled: false
 
     steps:
+      - run: mkdir -p /artifacts
+        
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
@@ -220,10 +227,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.artifact.artifact }}
-          path: /artifacts
       -
         name: Load image
         run: |
-          docker load --input /artifacts/${{ matrix.artifact.artifact }}.tar
+          docker load --input ${{ matrix.artifact.artifact }}.tar
           docker ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.version }}
           docker push ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
