@@ -131,7 +131,7 @@ jobs:
             enabled: true
             experimental: true
         exclude:
-          - artifact:
+          - test:
               enabled: false
 
     steps: 
