@@ -25,19 +25,18 @@ jobs:
       fail-fast: false
       matrix:
         test:
-          - name: unit
+          - name: Unit Tests (Code)
             command: npm run test:code
             artifact: ""
             enabled: true
 
-          - name: Security (Snyk)
+          - name: Snyk (Security)
             command: npm run test:security
             enabled: true
 
         exclude:
           - test:
-              enable: false
-
+              enabled: false
     steps:
       - uses: actions/checkout@v2
       - name: Install Npm Dependencies
