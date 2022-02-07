@@ -25,7 +25,6 @@ const (
 	MsgCreateProjectTotalFee       = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
 
-	// TODO: This was removed from the CosmosSDK without clear reason. However, this does not seem important, consider removing this entirely.
 	flagMemo = "memo"
 	// Project funding will be totalFee - transactionFee = 990000
 )
