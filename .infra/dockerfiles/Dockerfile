@@ -60,13 +60,13 @@ ONBUILD EXPOSE 26657
 ONBUILD ENTRYPOINT ["/app/ixod", "--home", "/app/.ixod"]
 
 FROM distributable AS dist-devel
-RUN echo "Fetch genisis file"
+# RUN echo "Fetch genisis file"
 
 FROM distributable AS dist-beta
-RUN echo "Fetch genisis file"
+# RUN echo "Fetch genisis file"
 
 FROM distributable AS dist-rc
-RUN echo "Fetch genisis file"
+# RUN echo "Fetch genisis file"
 
 FROM distributable AS dist-stable
-RUN echo "Fetch genisis file"
+# RUN echo "Fetch genisis file"
