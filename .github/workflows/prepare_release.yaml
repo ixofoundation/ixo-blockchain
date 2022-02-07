@@ -130,7 +130,7 @@ jobs:
             artifact: ixo-chain
             enabled: true
             experimental: true
-            command: docker scan --file .infra/dockerfiles/Dockerfile ${{ matrix.test.artifact }}:tmp
+            command: docker scan --file .infra/dockerfiles/Dockerfile ixo-chain:tmp
 
           - name: Integration Tests (Quality)
             os: ubuntu-latest
