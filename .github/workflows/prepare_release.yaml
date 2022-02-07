@@ -57,13 +57,16 @@ jobs:
       matrix:
         build:
           - name: Build docker image
-            enabled: true
-            target: dist-stable
-            file: .infra/docker/Dockerfile
-            artifact: ""
             os: ubuntu-latest
-            command: | 
-              docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
+            enabled: true
+            artifact: ixo-chain
+            docker:
+              file: .infra/docker/Dockerfile
+              target: dist-stable
+            post-build:
+              enabled: false
+              command: | 
+                docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
 
           - name: Build debian package
             command: docker build -t $IMAGE_NAME:$VERSION .
@@ -90,10 +93,12 @@ jobs:
           push: false
           context: .
           tags: ${{ matrix.build.artifact }}:tmp
-          target: ${{ matrix.build.target }}
-          file: ${{ matrix.build.file }}
+          target: ${{ matrix.build.docker.target }}
+          file: ${{ matrix.build.docker.file }}
           outputs: "type=local,dest=./docker.tar"
       - run: ls -l
+      - if: matrix.build.post-command.enabled
+        run: echo "hi"
         
   test-artifact:
     name: ${{ matrix.artifact.name }}
@@ -104,11 +109,9 @@ jobs:
       matrix:
         artifact:
           - name: Upload Release Artifacts
-            command: docker build -t $IMAGE_NAME:$VERSION .
             os: ubuntu-latest
             artifact: ""
             enabled: true
-
         exclude:
           - artifact:
               enabled: false
