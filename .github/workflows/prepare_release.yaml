@@ -127,8 +127,9 @@ jobs:
             os: ubuntu-latest
             artifact: ""
             enabled: true
+
         exclude:
-          - publish-release-artifacts:
+          - artifact:
               enabled: false
 
     steps:
