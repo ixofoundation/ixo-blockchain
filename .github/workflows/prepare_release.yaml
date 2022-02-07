@@ -26,13 +26,13 @@ jobs:
       matrix:
         test:
           - name: unit
-            command: npm run test
+            command: npm run test:code
             artifact: ""
-            enabled: false
+            enabled: true
 
-          - name: integration
-            command: npm test
-            enabled: false
+          - name: Security (Snyk)
+            command: npm run test:security
+            enabled: true
 
         exclude:
           - test:
