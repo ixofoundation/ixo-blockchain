@@ -92,7 +92,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -102,9 +105,11 @@ jobs:
           target: ${{ matrix.build.docker.target }}
           file: ${{ matrix.build.docker.file }}
           outputs: type=docker,dest=/tmp/${{ matrix.build.artifact }}.tar
+
       - run: ls -l
       - if: matrix.build.post-command.enabled
         run: echo "hi"
+        
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
