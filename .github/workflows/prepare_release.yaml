@@ -37,6 +37,16 @@ jobs:
             experimental: true
             enabled: true
 
+          - name: Lint (Quality)
+            command: npm run lint
+            experimental: true
+            enabled: true
+
+          - name: Coverage (Quality)
+            command: npm run test:coverage
+            experimental: true
+            enabled: false
+
         exclude:
           - test:
               enabled: false
@@ -230,5 +240,5 @@ jobs:
       - name: Publish Artifact
         run: |  
           docker load --input ${{ matrix.artifact.artifact }}.tar
-          docker ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.version }}
+          docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.version }}
           docker push ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
