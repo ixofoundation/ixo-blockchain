@@ -240,5 +240,5 @@ jobs:
       - name: Publish Artifact
         run: |  
           docker load --input ${{ matrix.artifact.artifact }}.tar
-          docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.version }}
+          docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
           docker push ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
