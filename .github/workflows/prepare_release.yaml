@@ -157,7 +157,7 @@ jobs:
     needs:
       - gather-build-info
       - build
-      - create-release
+      - publish-release
     strategy:
       matrix:
         artifact:
