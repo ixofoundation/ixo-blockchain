@@ -141,8 +141,6 @@ jobs:
           - test:
               enabled: false
     steps: 
-      - run: mkdir -p /artifacts
-        
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
@@ -214,8 +212,6 @@ jobs:
               enabled: false
 
     steps:
-      - run: mkdir -p /artifacts
-        
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
