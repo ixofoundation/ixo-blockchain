@@ -16,9 +16,10 @@ jobs:
       - id: get_version
         uses: battila7/get-version-action@master
 
-  test:
+  test-code:
     name: ${{ matrix.test.name }}
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     needs:
       - gather-build-info
     strategy:
@@ -27,11 +28,13 @@ jobs:
         test:
           - name: Unit Tests (Code)
             command: npm run test:code
+            experimental: true
             artifact: ""
             enabled: true
 
           - name: Snyk (Security)
             command: npm run test:security
+            experimental: true
             enabled: true
 
         exclude:
@@ -54,10 +57,13 @@ jobs:
       matrix:
         build:
           - name: Build docker image
-            command: docker build -t $IMAGE_NAME:$VERSION .
-            os: ubuntu-latest
-            artifact: ""
             enabled: true
+            target: dist-stable
+            file: .infra/docker/Dockerfile
+            artifact: ""
+            os: ubuntu-latest
+            command: | 
+              docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
 
           - name: Build debian package
             command: docker build -t $IMAGE_NAME:$VERSION .
@@ -76,24 +82,57 @@ jobs:
               enabled: false
 
     steps:
+      - uses: actions/checkout@v2
+        
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          context: .
+          tags: ${{ matrix.build.artifact }}:tmp
+          target: ${{ matrix.build.target }}
+          file: ${{ matrix.build.file }}
+          outputs: "type=local,dest=./docker.tar"
+      - run: ls -l
+        
+  test-artifact:
+    name: ${{ matrix.artifact.name }}
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    strategy:
+      matrix:
+        artifact:
+          - name: Upload Release Artifacts
+            command: docker build -t $IMAGE_NAME:$VERSION .
+            os: ubuntu-latest
+            artifact: ""
+            enabled: true
+
+        exclude:
+          - artifact:
+              enabled: false
+
+    steps:
       - run: echo "All Good"
 
-  create-release:
+  publish-release:
     name: ${{ matrix.release.name }}
     runs-on: ubuntu-latest
     needs:
       - gather-build-info
-      - test
+      - test-code
       - build
+      - test-artifact
     strategy:
       fail-fast: false
       matrix:
         release:
-          - name: Create Release
+          - name: Publish Release
             enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
             config: release-config.yaml
 
-          - name: Create Pre-Release
+          - name: Publish Pre-Release
             enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
             config: prerelease-config.yaml
 
@@ -101,7 +140,7 @@ jobs:
           - release:
               enabled: false
     steps:
-      - name: Publish Release
+      - name: Create Release
         id: release
         uses: release-drafter/release-drafter@v5
         env:
@@ -117,6 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - gather-build-info
+      - build
       - create-release
     strategy:
       matrix:
