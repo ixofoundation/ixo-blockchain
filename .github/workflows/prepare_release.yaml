@@ -61,7 +61,7 @@ jobs:
             enabled: true
             artifact: ixo-chain
             docker:
-              file: .infra/docker/Dockerfile
+              file: .infra/dockerfiles/Dockerfile
               target: dist-stable
             post-build:
               enabled: false
