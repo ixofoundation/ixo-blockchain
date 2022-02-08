@@ -57,7 +57,10 @@ ONBUILD WORKDIR /app
 ONBUILD EXPOSE 1317
 ONBUILD EXPOSE 26657
 
-ONBUILD ENTRYPOINT ["/app/ixod", "--home", "/app/.ixod"]
+ONBUILD ENV IXOD_ENV=prod
+ONBUILD ENV IXOD_HOME=/app/.ixod-$IXOD_ENV
+
+ONBUILD ENTRYPOINT ["/app/ixod", "--home", "${IXOD_HOME}"]
 
 FROM distributable AS dist-devel
 # RUN echo "Fetch genisis file"

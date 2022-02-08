@@ -214,12 +214,16 @@ jobs:
     strategy:
       matrix:
         artifact:
-          - name: Upload Release Artifacts
-            command: docker build -t $IMAGE_NAME:$VERSION .
+          - name: Publish Docker Image
             os: ubuntu-latest
             artifact: ixo-chain
             enabled: true
-
+            type: docker
+            args: 
+              registry: ghcr.io
+              owner: wgmouton
+              image: ixo-blockchain
+              tag: ${{ needs.gather-build-info.outputs.version }}
         exclude:
           - artifact:
               enabled: false
@@ -237,7 +241,8 @@ jobs:
         with:
           name: ${{ matrix.artifact.artifact }}
 
-      - name: Publish Artifact
+      - name: Publish Docker Image
+        if: ${{ matrix.artifact.type }} == "docker"
         run: |  
           docker load --input ${{ matrix.artifact.artifact }}.tar
           docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
