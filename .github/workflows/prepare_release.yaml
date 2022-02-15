@@ -81,10 +81,13 @@ jobs:
           - name: Build debian package
             os: ubuntu-latest
             artifact: "ixod"
-            enabled: false
+            enabled: true
             docker:
               file: .infra/dockerfiles/Dockerfile
               target: dist-stable
+            outputs:
+              type: file
+              path: .infra/build/ixod
             post-build:
               enabled: false
               command: | 
@@ -116,15 +119,31 @@ jobs:
           file: ${{ matrix.build.docker.file }}
           outputs: type=docker,dest=/tmp/${{ matrix.build.artifact }}.tar
 
+      - name: Extract files
+        id: extracted-files
+        if: matrix.build.output.enabled
+        uses: shrink/actions-docker-extract@v1
+        with:
+          image: ${{ matrix.build.artifact }}:tmp
+          path: ${{ matrix.build.output.path }}
+          
       - run: ls -l
       - if: matrix.build.post-command.enabled
         run: echo "hi"
 
-      - name: Upload artifact
+      - name: Upload Docker Image 
+        if: matrix.build.outputs.type == "image"
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.build.artifact }}
           path: /tmp/${{ matrix.build.artifact }}.tar
+
+      - name: Upload File 
+        if: matrix.build.outputs.type == "file"
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.build.artifact }}
+          path: ${{ steps.extracted-files.outputs.destination }}
 
   test-artifact:
     name: ${{ matrix.test.name }}
