@@ -80,7 +80,7 @@ jobs:
 
           - name: Build debian package
             os: ubuntu-latest
-            artifact: "ixod"
+            artifact: "ixod_linux_amd64"
             enabled: true
             docker:
               file: .infra/dockerfiles/Dockerfile
@@ -91,12 +91,16 @@ jobs:
             # post-build:
             #   enabled: false
 
-
-          - name: Build macos binary
-            command: docker build -t $IMAGE_NAME:$VERSION .
+          - name: Build darwin binary
             os: ubuntu-latest
-            artifact: ""
-            enabled: false
+            artifact: "ixod_darwin_amd64"
+            enabled: true
+            docker:
+              file: .infra/dockerfiles/Dockerfile
+              target: build-binary
+            outputs:
+              type: file
+              path: /dist/app/ixo-blockchain_darwin_amd64.tar.gz
 
         exclude:
           - build:
