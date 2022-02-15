@@ -112,7 +112,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Build Docker Image
+      - name: Build Docker Image and Save
+        if: matrix.build.outputs.type == 'image'
         uses: docker/build-push-action@v2
         with:
           push: false
@@ -121,6 +122,16 @@ jobs:
           target: ${{ matrix.build.docker.target }}
           file: ${{ matrix.build.docker.file }}
           outputs: type=docker,dest=/tmp/${{ matrix.build.artifact }}.tar
+
+      - name: Build Docker Image
+        if: matrix.build.outputs.type == 'file'
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          context: .
+          tags: ${{ matrix.build.artifact }}:tmp
+          target: ${{ matrix.build.docker.target }}
+          file: ${{ matrix.build.docker.file }}
 
       - name: Extract files from Docker Image
         id: extracted-files
