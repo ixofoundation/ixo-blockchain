@@ -75,8 +75,8 @@ jobs:
               target: dist-stable
             outputs:
               type: "image"
-            post-build:
-              enabled: false
+            # post-build:
+            #   enabled: false
 
           - name: Build debian package
             os: ubuntu-latest
@@ -84,12 +84,12 @@ jobs:
             enabled: true
             docker:
               file: .infra/dockerfiles/Dockerfile
-              target: dist-stable
+              target: build-binary
             outputs:
               type: file
-              path: .infra/build/ixod
-            post-build:
-              enabled: false
+              path: /dist/app/ixo-blockchain_linux_amd64.tar.gz
+            # post-build:
+            #   enabled: false
 
 
           - name: Build macos binary
@@ -120,15 +120,15 @@ jobs:
 
       - name: Extract files
         id: extracted-files
-        if: matrix.build.output.enabled
+        if: matrix.build.outputs.type == 'file'
         uses: shrink/actions-docker-extract@v1
         with:
           image: ${{ matrix.build.artifact }}:tmp
           path: ${{ matrix.build.output.path }}
           
-      - run: ls -l
-      - if: matrix.build.post-command.enabled
-        run: echo "hi"
+      # - run: ls -l
+      # - if: matrix.build.post-command.enabled
+      #   run: echo "hi"
 
       - name: Upload Docker Image 
         if: matrix.build.outputs.type == 'image'
