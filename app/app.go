@@ -7,7 +7,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -21,15 +20,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	legacytx "github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	legacytx "github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -54,9 +54,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	"github.com/cosmos/cosmos-sdk/x/nft"
+	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
+	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
 	sdkparams "github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -188,8 +194,8 @@ var _ servertypes.Application = (*IxoApp)(nil)
 
 // Extended ABCI application
 type IxoApp struct {
-	*baseapp.BaseApp `json:"_bam_base_app,omitempty"`
-	legacyAmino      *codec.LegacyAmino `json:"legacy_amino,omitempty"`
+	*baseapp.BaseApp  `json:"_bam_base_app,omitempty"`
+	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
 	appCodec          codec.Codec             `json:"app_codec,omitempty"`
 	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
 
@@ -215,7 +221,9 @@ type IxoApp struct {
 	IBCKeeper        *ibckeeper.Keeper        `json:"ibc_keeper,omitempty"` // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
 	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
-	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
+	GroupKeeper      groupkeeper.Keeper       `json:"group_keeper"`
+	NftKeeper        nftkeeper.Keeper         `json:"nft_keeper"`
+	AuthzKeeper      authzkeeper.Keeper       `json:"authz_keeper"`
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
@@ -312,6 +320,9 @@ func NewIxoApp(
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
+	app.GroupKeeper = groupkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
+	app.AuthzKeeper = authzkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
+	app.NftKeeper = nftkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	// NewKeeper constructs an upgrade Keeper which requires the following arguments:
 	// skipUpgradeHeights - map of heights to skip an upgrade
 	// storeKey - a store key with which to access upgrade's store
@@ -400,6 +411,9 @@ func NewIxoApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		groupmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.GroupKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.AuthzKeeper, app.interfaceRegistry),
+		nftmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.NftKeeper, app.interfaceRegistry),
 		transferModule,
 
 		// Custom ixo AppModules
@@ -420,7 +434,7 @@ func NewIxoApp(
 		paymentstypes.ModuleName, genutiltypes.ModuleName, crisistypes.ModuleName,
 		paramstypes.ModuleName, authtypes.ModuleName, capabilitytypes.ModuleName,
 		govtypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName,
-		feegrant.ModuleName,
+		feegrant.ModuleName, groupkeeper.ModuleName, authz.ModuleName, nft.ModuleName,
 
 		// Custom ixo modules
 		didtypes.ModuleName,
@@ -434,7 +448,7 @@ func NewIxoApp(
 		upgradetypes.ModuleName, ibchost.ModuleName, paramstypes.ModuleName, authtypes.ModuleName,
 		minttypes.ModuleName, projecttypes.ModuleName, genutiltypes.ModuleName, vestingtypes.ModuleName,
 		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
-		feegrant.ModuleName,
+		feegrant.ModuleName, groupkeeper.ModuleName, authz.ModuleName, nft.ModuleName,
 
 		// Custom ixo modules
 		bondstypes.ModuleName, paymentstypes.ModuleName,
@@ -451,6 +465,8 @@ func NewIxoApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName,
+		groupkeeper.ModuleName, authz.ModuleName, nft.ModuleName,
+
 		// Custom ixo modules
 		didtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName,
@@ -481,6 +497,9 @@ func NewIxoApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		groupmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.GroupKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.AuthzKeeper, app.interfaceRegistry),
+		nftmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.NftKeeper, app.interfaceRegistry),
 		transferModule,
 	)
 
