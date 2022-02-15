@@ -77,8 +77,6 @@ jobs:
               type: "image"
             post-build:
               enabled: false
-              command: | 
-                docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
 
           - name: Build debian package
             os: ubuntu-latest
@@ -92,8 +90,7 @@ jobs:
               path: .infra/build/ixod
             post-build:
               enabled: false
-              command: | 
-                docker build -t $IMAGE_NAME:$VERSION -f .infra/docker .
+
 
           - name: Build macos binary
             command: docker build -t $IMAGE_NAME:$VERSION .
@@ -134,7 +131,7 @@ jobs:
         run: echo "hi"
 
       - name: Upload Docker Image 
-        if: ${{ matrix.build.outputs.type == "image" }}
+        if: matrix.build.outputs.type == 'image'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.build.artifact }}
