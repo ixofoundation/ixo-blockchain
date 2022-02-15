@@ -138,7 +138,7 @@ jobs:
           path: /tmp/${{ matrix.build.artifact }}.tar
 
       - name: Upload File 
-        if: ${{ matrix.build.outputs.type == "file" }}
+        if: matrix.build.outputs.type == 'file'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.build.artifact }}
