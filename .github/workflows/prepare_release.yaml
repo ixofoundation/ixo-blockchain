@@ -73,6 +73,8 @@ jobs:
             docker:
               file: .infra/dockerfiles/Dockerfile
               target: dist-stable
+            outputs:
+              type: "image"
             post-build:
               enabled: false
               command: | 
