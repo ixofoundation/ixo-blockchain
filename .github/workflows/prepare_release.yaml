@@ -133,6 +133,8 @@ jobs:
           target: ${{ matrix.build.docker.target }}
           file: ${{ matrix.build.docker.file }}
 
+      - run: docker images
+
       - name: Extract files from Docker Image
         id: extracted-files
         if: matrix.build.outputs.type == 'file'
