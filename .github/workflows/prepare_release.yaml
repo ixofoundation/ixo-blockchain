@@ -110,6 +110,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
+        if: matrix.build.outputs.type == 'image'
         uses: docker/setup-buildx-action@v1
 
       - name: Build Docker Image and Save
