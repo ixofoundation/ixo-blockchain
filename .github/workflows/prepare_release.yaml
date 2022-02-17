@@ -134,8 +134,6 @@ jobs:
           target: ${{ matrix.build.docker.target }}
           file: ${{ matrix.build.docker.file }}
 
-      - run: docker images
-
       - name: Extract files from Docker Image
         id: extracted-files
         if: matrix.build.outputs.type == 'file'
@@ -143,10 +141,6 @@ jobs:
         with:
           image: ${{ matrix.build.artifact }}:tmp
           path: ${{ matrix.build.outputs.path }}
-          
-      # - run: ls -l
-      # - if: matrix.build.post-command.enabled
-      #   run: echo "hi"
 
       - name: Upload Docker Image 
         if: matrix.build.outputs.type == 'image'
@@ -203,6 +197,8 @@ jobs:
   publish-release:
     name: ${{ matrix.release.name }}
     runs-on: ubuntu-latest
+    outputs:
+      upload-url: ${{ steps.release.outputs.upload_url}} 
     needs:
       - gather-build-info
       - test-code
@@ -260,6 +256,29 @@ jobs:
               owner: wgmouton
               image: ixo-blockchain
               tag: ${{ needs.gather-build-info.outputs.version }}
+
+          - name: Publish Linux Binary
+            os: ubuntu-latest
+            artifact: "ixod_linux_amd64"
+            enabled: true
+            type: file
+            args: 
+              registry: ghcr.io
+              owner: wgmouton
+              image: ixo-blockchain
+              tag: ${{ needs.gather-build-info.outputs.version }}
+
+          - name: Publish Darwin Binary
+            os: ubuntu-latest
+            artifact: "ixod_darwin_amd64"
+            enabled: true
+            type: file
+            args: 
+              registry: ghcr.io
+              owner: wgmouton
+              image: ixo-blockchain
+              tag: ${{ needs.gather-build-info.outputs.version }}
+
         exclude:
           - artifact:
               enabled: false
@@ -276,6 +295,18 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.artifact.artifact }}
+
+      - name: Upload Release Asset
+        if: ${{ matrix.artifact.type }} == "file"
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          # asset_path: ./
+          asset_name: ${{ matrix.artifact.artifact }}
+          # asset_content_type: application/zip
 
       - name: Publish Docker Image
         if: ${{ matrix.artifact.type }} == "docker"
