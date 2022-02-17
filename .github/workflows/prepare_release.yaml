@@ -297,7 +297,7 @@ jobs:
           name: ${{ matrix.artifact.artifact }}
 
       - name: Upload Release Asset
-        if: ${{ matrix.artifact.type }} == "file"
+        if: matrix.artifact.type == 'file'
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
@@ -309,7 +309,7 @@ jobs:
           # asset_content_type: application/zip
 
       - name: Publish Docker Image
-        if: ${{ matrix.artifact.type }} == "docker"
+        if: matrix.artifact.type == 'docker'
         run: |  
           docker load --input ${{ matrix.artifact.artifact }}.tar
           docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
