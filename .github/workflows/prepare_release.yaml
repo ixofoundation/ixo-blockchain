@@ -275,7 +275,7 @@ jobs:
             artifact: "ixod_darwin_amd64"
             enabled: true
             type: file
-            file: ixo-blockchain_darwin_amd64.tar.gz
+            path: ixo-blockchain_darwin_amd64.tar.gz
             args: 
               registry: ghcr.io
               owner: wgmouton
