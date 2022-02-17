@@ -295,6 +295,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.artifact.artifact }}
+          
+      - run: ls
 
       - name: Upload Release Asset
         if: matrix.artifact.type == 'file'
