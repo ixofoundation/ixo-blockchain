@@ -1,15 +1,3 @@
-# DO NOT USE THIS FORK / BRANCH. 
-## This is a is for devops development preposes only and will form the future structure of the project.
-
-
-
-## Docker Commands
-
-### Build Blockchain and output binary
-docker build 
-
----
-
 # ixo Blockchain SDK
 
 [![version](https://img.shields.io/github/tag/ixofoundation/ixo-blockchain.svg)](https://github.com/ixofoundation/ixo-blockchain/releases/latest)
@@ -17,6 +5,17 @@ docker build
 [![LoC](https://tokei.rs/b1/github/ixofoundation/ixo-blockchain)](https://github.com/ixofoundation/ixo-blockchain)
 
 This is the official repository for the Impact Hub (ImpactHub)
+
+## Notice
+The IXO team is in the process of upgrading this repository better align with our new standards and goals. Exciting things will soon come, but not without making some fundamental and overdue changes that might cause confusion for some.
+
+### Mini Changelog
+- Upgraded to cosmos-sdk 0.45
+- Introducing of github actions to help automate some tasks. (Note this will be improved as we get more functionality in place)
+- The `master` was renamed to `main` wil no longer represent the latest stable version but should represent the next feature release. 
+- As the project is still in active developmet, we thought it best to rename all are releases from version `v1.x.x` to `v0.x.x`. This would make [`v0.17.0`](https://github.com/ixofoundation/ixo-blockchain/releases/v0.17.0) our last stable version.
+
+---
 
 > This document will have all details necessary to help getting started with ImpactHub
 
