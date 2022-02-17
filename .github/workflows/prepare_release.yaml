@@ -262,11 +262,13 @@ jobs:
             artifact: "ixod_linux_amd64"
             enabled: true
             type: file
+            path: ixo-blockchain_linux_amd64.tar.gz
             args: 
               registry: ghcr.io
               owner: wgmouton
               image: ixo-blockchain
               tag: ${{ needs.gather-build-info.outputs.version }}
+            
 
           - name: Publish Darwin Binary
             os: ubuntu-latest
@@ -295,7 +297,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.artifact.artifact }}
-          
+
       - run: ls
 
       - name: Upload Release Asset
@@ -306,7 +308,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ matrix.artifact.artifact }}
+          asset_path: ./${{ matrix.artifact.path }}
           asset_name: ${{ matrix.artifact.artifact }}
           asset_content_type: application/ixo
 
