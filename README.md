@@ -14,7 +14,7 @@ The IXO team is in the process of upgrading this repository better align with ou
 - Introduction of github actions to help automate some tasks. (Note this will be improved as we get more functionality in place)
 - The `master` branch was renamed to `main` and will no longer represent the latest stable version but rather the next feature release. 
 - As the project is still in active developmet, we thought it best to rename all are releases from version `v1.x.x` to `v0.x.x`. This would make [`v0.17.0`](https://github.com/ixofoundation/ixo-blockchain/releases/v0.17.0) our last stable version.
-- Going forward all releases will follow clear samantic versioning guidelines and all stable releases will have a release branch dedicated to it. For example the release `v0.17.0` will associated the branch `release/v0.17.x` and all bugfixes for this release should be made against this branch as well as all upstream branches if deemed relevant.
+- Going forward all releases will follow clear samantic versioning guidelines and all stable releases will have a release branch dedicated to it. For example the release `v0.17.0` will associated with the branch `release/v0.17.x` and all bugfixes related to this release should be made against this branch as well as all upstream branches if deemed relevant.
 
 ---
 
