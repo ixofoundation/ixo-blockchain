@@ -7,7 +7,7 @@
 This is the official repository for the Impact Hub (ImpactHub)
 
 ## Notice
-The IXO team is in the process of upgrading this repository better align with our new standards and goals. Exciting things will soon come, but not without first making some fundamental and overdue changes that might cause confusion for some.
+The IXO team is in the process of upgrading this repository better align with our new standards and goals. Exciting things will soon come, but not without first making some fundamental and overdue changes.
 
 ### Mini Changelog
 - Upgraded to cosmos-sdk 0.45
