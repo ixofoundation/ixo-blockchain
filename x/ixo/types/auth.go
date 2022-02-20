@@ -113,65 +113,10 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 	return BroadcastTx(clientCtx, txf, ixoDid, msg)
 }
 
+// TODO: This function was a copy and paste of the the internal function which Cosmos made private.
+// TODO: Function looked 99% the same so just wrapped the official implementation.
 func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDid, msg sdk.Msg) error {
-	txf, err := tx.PrepareFactory(clientCtx, txf)
-	if err != nil {
-		return err
-	}
-
-	if txf.SimulateAndExecute() || clientCtx.Simulate {
-		_, adjusted, err := tx.CalculateGas(clientCtx.QueryWithData, txf, msg)
-		if err != nil {
-			return err
-		}
-
-		txf = txf.WithGas(adjusted)
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n", tx.GasEstimateResponse{GasEstimate: txf.Gas()})
-	}
-
-	if clientCtx.Simulate {
-		return nil
-	}
-
-	tx, err := tx.BuildUnsignedTx(txf, msg) //like old BuildSignMsg
-	if err != nil {
-		return err
-	}
-
-	if !clientCtx.SkipConfirm {
-		out, err := clientCtx.TxConfig.TxJSONEncoder()(tx.GetTx())
-		if err != nil {
-			return err
-		}
-
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
-
-		buf := bufio.NewReader(os.Stdin)
-		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
-
-		if err != nil || !ok {
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
-			return err
-		}
-	}
-
-	err = Sign(txf, clientCtx, tx, true, ixoDid)
-	if err != nil {
-		return err
-	}
-
-	txBytes, err := clientCtx.TxConfig.TxEncoder()(tx.GetTx())
-	if err != nil {
-		return err
-	}
-
-	// broadcast to a Tendermint node
-	res, err := clientCtx.BroadcastTx(txBytes)
-	if err != nil {
-		return err
-	}
-
-	return clientCtx.PrintProto(res)
+	return tx.BroadcastTx(clientCtx, txf)
 }
 
 func checkMultipleSigners(mode signing.SignMode, tx authsigning.Tx) error {

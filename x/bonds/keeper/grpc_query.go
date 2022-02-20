@@ -20,7 +20,7 @@ func (k Keeper) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.Que
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		k.cdc.MustUnmarshal(iterator.Value(), &bond)
 		bondsList = append(bondsList, bond.BondDid)
 	}
 
@@ -34,7 +34,7 @@ func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequ
 	iterator := k.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		k.cdc.MustUnmarshal(iterator.Value(), &bond)
 
 		reserveBalances := k.GetReserveBalances(ctx, bond.BondDid)
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)

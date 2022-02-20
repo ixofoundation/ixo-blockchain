@@ -1,0 +1,9 @@
+strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - test: unit
+            command: npm test
+
+          - test: integration
+            command: npm test

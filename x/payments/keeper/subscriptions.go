@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 )
@@ -21,7 +22,7 @@ func (k Keeper) MustGetSubscriptionByKey(ctx sdk.Context, key []byte) types.Subs
 
 	bz := store.Get(key)
 	var subscription types.Subscription
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &subscription)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &subscription)
 
 	return subscription
 }
@@ -41,7 +42,7 @@ func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.S
 	}
 
 	var subscription types.Subscription
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &subscription)
+	k.cdc.MustUnmarshalLengthPrefixed(bz, &subscription)
 
 	return subscription, nil
 }
@@ -49,7 +50,7 @@ func (k Keeper) GetSubscription(ctx sdk.Context, subscriptionId string) (types.S
 func (k Keeper) SetSubscription(ctx sdk.Context, subscription types.Subscription) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetSubscriptionKey(subscription.Id)
-	store.Set(key, k.cdc.MustMarshalBinaryLengthPrefixed(&subscription))
+	store.Set(key, k.cdc.MustMarshalLengthPrefixed(&subscription))
 }
 
 // -------------------------------------------------------- Subscriptions Payment

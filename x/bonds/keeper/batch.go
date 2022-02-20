@@ -17,7 +17,7 @@ func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid didexported.Did) types.Bat
 
 	bz := store.Get(types.GetBatchKey(bondDid))
 	var batch types.Batch
-	k.cdc.MustUnmarshalBinaryBare(bz, &batch)
+	k.cdc.MustUnmarshal(bz, &batch)
 
 	return batch
 }
@@ -30,7 +30,7 @@ func (k Keeper) MustGetLastBatch(ctx sdk.Context, bondDid didexported.Did) types
 
 	bz := store.Get(types.GetLastBatchKey(bondDid))
 	var batch types.Batch
-	k.cdc.MustUnmarshalBinaryBare(bz, &batch)
+	k.cdc.MustUnmarshal(bz, &batch)
 
 	return batch
 }
@@ -47,12 +47,12 @@ func (k Keeper) LastBatchExists(ctx sdk.Context, bondDid didexported.Did) bool {
 
 func (k Keeper) SetBatch(ctx sdk.Context, bondDid didexported.Did, batch types.Batch) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(&batch))
+	store.Set(types.GetBatchKey(bondDid), k.cdc.MustMarshal(&batch))
 }
 
 func (k Keeper) SetLastBatch(ctx sdk.Context, bondDid didexported.Did, batch types.Batch) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.GetLastBatchKey(bondDid), k.cdc.MustMarshalBinaryBare(&batch))
+	store.Set(types.GetLastBatchKey(bondDid), k.cdc.MustMarshal(&batch))
 }
 
 func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid didexported.Did, bo types.BuyOrder, buyPrices, sellPrices sdk.DecCoins) {

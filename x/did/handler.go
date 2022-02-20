@@ -20,8 +20,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := msgServer.AddCredential(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest,
-				"unrecognized %s Msg type: %v", types.ModuleName, msg.Type())
+			// err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg type: %v", msg.Type())
+			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg")
+			return nil, err
 		}
 	}
 }

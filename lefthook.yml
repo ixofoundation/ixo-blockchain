@@ -1,0 +1,20 @@
+# https://github.com/Arkweid/lefthook/blob/master/docs/full_guide.md
+
+commit-msg:
+  parallel: true
+  commands:
+    validate-commit-message:
+      run: npx --no-install commitlint -e
+    
+pre-push:
+  parallel: true
+  commands:
+    test security:
+      tags: test security
+      run: npm run test:security
+    lint: 
+      tags: lint code
+      run: npm run lint
+    test code:
+      tags: test code
+      run: npm run test:code

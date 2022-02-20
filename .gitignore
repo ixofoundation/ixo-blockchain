@@ -3,3 +3,10 @@ build/*
 data
 */utils/node_modules/
 */utils/package-lock.json
+
+vendor
+node_modules
+
+lefthook-local.yaml
+coverage.out
+dist

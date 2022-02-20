@@ -22,11 +22,11 @@ type Keeper struct {
 	storeKey   sdk.StoreKey
 	paramSpace paramstypes.Subspace
 
-	cdc codec.BinaryMarshaler
+	cdc codec.BinaryCodec
 }
 
 func NewKeeper(bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper, stakingKeeper stakingkeeper.Keeper,
-	didKeeper types.DidKeeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryMarshaler) Keeper {
+	didKeeper types.DidKeeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryCodec) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {

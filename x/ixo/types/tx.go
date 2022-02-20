@@ -8,4 +8,6 @@ import (
 type IxoMsg interface {
 	sdk.Msg
 	GetSignerDid() exported.Did
+	Type() string
+	Route() string
 }

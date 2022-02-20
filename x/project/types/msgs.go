@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
@@ -25,6 +24,9 @@ const (
 
 	MsgCreateProjectTotalFee       = int64(1000000)
 	MsgCreateProjectTransactionFee = int64(10000)
+
+	// TODO: This was removed from the CosmosSDK without clear reason. However, this does not seem important, consider removing this entirely.
+	flagMemo = "memo"
 	// Project funding will be totalFee - transactionFee = 990000
 )
 
@@ -52,9 +54,8 @@ func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
 	accNum, accSeq := uint64(0), uint64(0)
-	stdFee := legacytx.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(
-		ixotypes.IxoNativeToken, sdk.NewInt(fee))))
-	memo := viper.GetString(flags.FlagMemo)
+	stdFee := legacytx.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(ixotypes.IxoNativeToken, sdk.NewInt(fee))))
+	memo := viper.GetString(flagMemo)
 
 	return legacytx.StdSignMsg{
 		AccountNumber: accNum,

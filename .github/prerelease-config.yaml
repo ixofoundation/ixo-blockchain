@@ -1,0 +1,12 @@
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+version-template: '$COMPLETE'
+version-resolver:
+  default: patch
+prerelease: true
+filter-by-commitish: true
+template: |
+  Release Candidate see changelog
+#dua
+
+##dd

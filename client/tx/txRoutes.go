@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	"github.com/gorilla/mux"
+	"github.com/ixofoundation/ixo-blockchain/compatibility"
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
@@ -98,7 +99,7 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 				WithMemo("").
 				WithGasPrices(expectedMinGasPrices)
 
-			txf, err := clienttx.PrepareFactory(clientCtx, txf)
+			txf, err := compatibility.PrepareFactory(clientCtx, txf)
 			if rest.CheckInternalServerError(w, err) {
 				return
 			}
@@ -113,12 +114,12 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 				WithGasAdjustment(gasAdjustment).
 				WithFees(fees.String())
 
-			txfForGasCalc, err = clienttx.PrepareFactory(clientCtx, txfForGasCalc)
+			txfForGasCalc, err = compatibility.PrepareFactory(clientCtx, txfForGasCalc)
 			if rest.CheckInternalServerError(w, err) {
 				return
 			}
 
-			_, gasAmt, err := clienttx.CalculateGas(clientCtx.QueryWithData, txfForGasCalc, msg)
+			_, gasAmt, err := clienttx.CalculateGas(clientCtx, txfForGasCalc, msg)
 			if rest.CheckBadRequestError(w, err) {
 				return
 			}

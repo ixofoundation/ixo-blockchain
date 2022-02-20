@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

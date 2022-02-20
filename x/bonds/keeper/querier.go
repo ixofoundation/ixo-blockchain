@@ -91,7 +91,7 @@ func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAm
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
 		bondsList = append(bondsList, bond.BondDid)
 	}
 
@@ -108,7 +108,7 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 	iterator := keeper.GetBondIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
 
 		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
