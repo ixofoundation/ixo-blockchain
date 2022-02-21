@@ -261,6 +261,7 @@ jobs:
             type: file
             file: 
               path: ixo-blockchain_linux_amd64.tar.gz
+              extention: .tar.gz
             
           - name: Publish Darwin Binary
             os: ubuntu-latest
@@ -269,6 +270,7 @@ jobs:
             type: file
             file: 
               path: ixo-blockchain_darwin_amd64.tar.gz
+              extention: .tar.gz
 
         exclude:
           - artifact:
@@ -297,8 +299,8 @@ jobs:
         with:
           upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./${{ matrix.artifact.file.path }}
-          asset_name: ${{ matrix.artifact.artifact }}
-          asset_content_type: application/ixo
+          asset_name: ${{ matrix.artifact.artifact }}.${{ matrix.artifact.file.extention }}
+          asset_content_type: application/tar+gzip
 
       - name: Publish Docker Image
         if: matrix.artifact.type == 'docker'
