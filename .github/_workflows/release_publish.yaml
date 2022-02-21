@@ -1,0 +1,12 @@
+on: 
+  tag:
+  branches:
+    - release/v*
+   
+jobs:
+  test:
+   
+  build:
+    
+    
+  publish:
