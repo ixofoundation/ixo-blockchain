@@ -253,8 +253,8 @@ jobs:
             type: docker
             args: 
               registry: ghcr.io
-              owner: wgmouton
-              image: ixo-blockchain
+              owner: ${{ github.repository_owner }}
+              image: ${{ github.event.repository.name }}
               tag: ${{ needs.gather-build-info.outputs.version }}
 
           - name: Publish Linux Binary
@@ -265,8 +265,8 @@ jobs:
             path: ixo-blockchain_linux_amd64.tar.gz
             args: 
               registry: ghcr.io
-              owner: wgmouton
-              image: ixo-blockchain
+              owner: ${{ github.repository_owner }}
+              image: ${{ github.event.repository.name }}
               tag: ${{ needs.gather-build-info.outputs.version }}
             
 
@@ -278,8 +278,8 @@ jobs:
             path: ixo-blockchain_darwin_amd64.tar.gz
             args: 
               registry: ghcr.io
-              owner: wgmouton
-              image: ixo-blockchain
+              owner: ${{ github.repository_owner }}
+              image: ${{ github.event.repository.name }}
               tag: ${{ needs.gather-build-info.outputs.version }}
 
         exclude:
