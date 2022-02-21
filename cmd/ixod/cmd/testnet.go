@@ -190,9 +190,7 @@ func InitTestnet(
 			return err
 		}
 
-		// TODO: Is default Power reduction correct?
 		accTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)
-		// TODO: Is default Power reduction correct?
 		accStakingTokens := sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction)
 		coins := sdk.Coins{
 			sdk.NewCoin(fmt.Sprintf("%stoken", nodeDirName), accTokens),

@@ -241,7 +241,6 @@ func NewIxoApp(
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IxoApp {
 
-	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
 	appCodec := encodingConfig.Marshaler
 	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -312,14 +311,12 @@ func NewIxoApp(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
 
-	// TODO: know what this is.
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	// NewKeeper constructs an upgrade Keeper which requires the following arguments:
 	// skipUpgradeHeights - map of heights to skip an upgrade
 	// storeKey - a store key with which to access upgrade's store
 	// cdc - the app-wide binary codec
 	// homePath - root directory of the application's config
-	// TODO: vs - the interface implemented by baseapp which allows setting baseapp's protocol version field
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, nil)
 
 	// register the staking hooks
@@ -527,7 +524,6 @@ func NewIxoApp(
 // MakeCodecs constructs the *std.Codec and *codec.LegacyAmino instances used by
 // ixoapp. It is useful for tests and clients who do not want to construct the
 // full ixoapp.
-// TODO: Dont know if this Codec is correct
 func MakeCodecs() (codec.Codec, *codec.LegacyAmino) {
 	config := MakeTestEncodingConfig()
 	return config.Marshaler, config.Amino
@@ -744,11 +740,6 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 	// is that we use an IxoSigVerificationGasConsumer instead of the default
 	// one, since the default does not allow ED25519 signatures. Thus, like this
 	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
-
-	// TODO: Fix this and figure out what happens here
-	// cosmosAnteHandler, err := authante.NewAnteHandler(
-	// 	app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-	// 	encodingConfig.TxConfig.SignModeHandler())
 
 	options := authante.HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,

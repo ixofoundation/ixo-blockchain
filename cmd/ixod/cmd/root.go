@@ -71,7 +71,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	// TODO: What does this do?
+	// This was removed from COSMOS-SDK, I assume this gets injected somewhere else. For now leaving it in.
 	// authclient.Codec = encodingConfig.Marshaler
 
 	rootCmd.AddCommand(
