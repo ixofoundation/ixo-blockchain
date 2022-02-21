@@ -238,8 +238,6 @@ jobs:
       - gather-build-info
       - build
       - publish-release
-    env: 
-      tag: ${{ needs.gather-build-info.outputs.version }}
     strategy:
       matrix:
         artifact:
@@ -248,10 +246,12 @@ jobs:
             artifact: ixo-chain
             enabled: true
             type: docker
-            args: 
+            docker: 
               registry: ghcr.io
               owner: ${{ github.repository_owner }}
               image: ${{ github.event.repository.name }}
+              username: ${{ github.actor }}
+              password: ${{ secrets.GITHUB_TOKEN }}
               tag: ${{ needs.gather-build-info.outputs.version }}
 
           - name: Publish Linux Binary
@@ -259,25 +259,16 @@ jobs:
             artifact: "ixod_linux_amd64"
             enabled: true
             type: file
-            path: ixo-blockchain_linux_amd64.tar.gz
-            args: 
-              registry: ghcr.io
-              owner: ${{ github.repository_owner }}
-              image: ${{ github.event.repository.name }}
-              tag: ${{ needs.gather-build-info.outputs.version }}
+            file: 
+              path: ixo-blockchain_linux_amd64.tar.gz
             
-
           - name: Publish Darwin Binary
             os: ubuntu-latest
             artifact: "ixod_darwin_amd64"
             enabled: true
             type: file
-            path: ixo-blockchain_darwin_amd64.tar.gz
-            args: 
-              registry: ghcr.io
-              owner: ${{ github.repository_owner }}
-              image: ${{ github.event.repository.name }}
-              tag: ${{ needs.gather-build-info.outputs.version }}
+            file: 
+              path: ixo-blockchain_darwin_amd64.tar.gz
 
         exclude:
           - artifact:
@@ -285,11 +276,12 @@ jobs:
 
     steps:
       - name: Login to DockerHub
+        if: matrix.artifact.type == 'docker'
         uses: docker/login-action@v1 
         with:
-          registry: ${{ env.registry }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ matrix.artifact.docker.registry }}
+          username: ${{ matrix.artifact.docker.username }}
+          password: ${{ matrix.artifact.docker.password }}
 
       - name: Download artifact
         uses: actions/download-artifact@v2
@@ -311,7 +303,7 @@ jobs:
       - name: Publish Docker Image
         if: matrix.artifact.type == 'docker'
         env:
-          image: ${{ matrix.artifact.args.registry}}/${{ matrix.artifact.args.owner }}/${{ matrix.artifact.args.image }}:${{ env.tag }}
+          image: ${{ matrix.artifact.docker.registry }}/${{ matrix.artifact.docker.owner }}/${{ matrix.artifact.docker.image }}:${{ matrix.artifact.docker.tag }}
         run: |  
           docker load --input ${{ matrix.artifact.artifact }}.tar
           docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.image }}
