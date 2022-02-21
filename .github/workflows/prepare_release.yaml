@@ -239,9 +239,6 @@ jobs:
       - build
       - publish-release
     env: 
-      registry: ghcr.io
-      owner: wgmouton
-      image: ixo-blockchain
       tag: ${{ needs.gather-build-info.outputs.version }}
     strategy:
       matrix:
@@ -313,7 +310,9 @@ jobs:
 
       - name: Publish Docker Image
         if: matrix.artifact.type == 'docker'
+        env:
+          image: ${{ matrix.artifact.args.registry}}/${{ matrix.artifact.args.owner }}/${{ matrix.artifact.args.image }}:${{ env.tag }}
         run: |  
           docker load --input ${{ matrix.artifact.artifact }}.tar
-          docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
-          docker push ${{ env.registry}}/${{ env.owner }}/${{ env.image }}:${{ env.tag }}
+          docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.image }}
+          docker push ${{ env.image }}
