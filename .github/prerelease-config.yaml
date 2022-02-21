@@ -5,7 +5,7 @@ version-resolver:
   default: patch
 prerelease: true
 filter-by-commitish: true
-# template: |
+template: ""
 #   Release Candidate see changelog
 # #dua
 
