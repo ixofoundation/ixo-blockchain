@@ -6,19 +6,27 @@ version-resolver:
 prerelease: true
 filter-by-commitish: true
 template: |
+  ## Changes
+
+  $CHANGES
+
+  ---
+
   ## Quick Start
   ### Homebrew
   ```
-  brew tap ixofoundation/ixo-blockchain
-  brew install ixo-blockchain
+  brew tap ixofoundation/ixo
+  brew install ixo-blockchain@$MAJOR.$MINOR
   ```
 
   ### Docker
   ```
-  docker run ghcr.io/ixofoundation/ixo-blockchain:$RESOLVED_VERSION \
+  docker run \
     --name ixo-blockchain \
     -p 1317:1317 \
-    -p 26657:26657
+    -p 26657:26657 \
+    ghcr.io/ixofoundation/ixo-blockchain:v$RESOLVED_VERSION \
+    start
   ```
 #   Release Candidate see changelog
 # #dua
