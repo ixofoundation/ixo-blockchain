@@ -9,6 +9,12 @@ This is the official repository for the Impact Hub (ImpactHub)
 ## Notice
 The IXO team is in the process of upgrading this repository better align with our new standards and goals. Exciting things will soon come, but not without first making some fundamental and overdue changes.
 
+## Hosted Blockchain endpoints
+- Testnet RPC:https://testnet.ixo.world/rpc/
+- Testnet Rest:https://testnet.ixo.world/rest/
+- Testnet Rest:https://impacthub.ixo.world/rpc/
+- Testnet RPC:https://impacthub.ixo.world/rest/
+
 ### Mini Changelog
 - Upgraded to cosmos-sdk 0.45
 - Introduction of github actions to help automate some tasks. (Note this will be improved as we get more functionality in place)
