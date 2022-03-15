@@ -135,8 +135,8 @@ type CreateAgentDoc struct {
 ```
 
 The role of an agent must be one of `SA` (service provider, can create and list
-claims), `EA` (evaluator, can evaluate claims), or `IA` (investor). The cod will
-eventually be updated to also support `PO` (owner).
+claims), `EA` (evaluator, can evaluate claims), or `IA` (investor, can transact with a bond – although this is not an absolute requirement). The code will
+eventually be updated to also support `PO` (prediction oracle) and `EC` (entity controller).
 
 ## MsgUpdateAgent
 
