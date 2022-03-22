@@ -11,3 +11,8 @@ coverage.out
 dist
 
 .DS_STORE
+
+./ixo-blockchain
+
+.vscode/*
+!.vscode/devcontainer.json

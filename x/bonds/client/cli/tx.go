@@ -2,17 +2,18 @@ package cli
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"strings"
+
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/types"
 	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 )
 
 func NewTxCmd() *cobra.Command {

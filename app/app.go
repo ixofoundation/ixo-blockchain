@@ -1,35 +1,45 @@
 package app
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
+
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
+	"github.com/spf13/cast"
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
-	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
+	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/testutil/testdata"
+	"github.com/cosmos/cosmos-sdk/store/streaming"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	legacytx "github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	authmiddleware "github.com/cosmos/cosmos-sdk/x/auth/middleware"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -52,12 +62,21 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
+	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	govv1beta2 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta2"
+	"github.com/cosmos/cosmos-sdk/x/group"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	sdkparams "github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/x/nft"
+	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
+	nftmodule "github.com/cosmos/cosmos-sdk/x/nft/module"
+	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -72,60 +91,37 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
-	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
-	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-blockchain/app/params"
-	"github.com/ixofoundation/ixo-blockchain/client/tx"
+	ixoappparams "github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/ixofoundation/ixo-blockchain/x/did"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	entities "github.com/ixofoundation/ixo-blockchain/x/entities"
+	entitieskeeper "github.com/ixofoundation/ixo-blockchain/x/entities/keeper"
+	entitiestypes "github.com/ixofoundation/ixo-blockchain/x/entities/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"github.com/ixofoundation/ixo-blockchain/x/project"
-	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
-	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
-	"github.com/rakyll/statik/fs"
-	"github.com/spf13/cast"
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
+
+	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
+
+	// unnamed import of statik for swagger UI support
+	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
 
-const (
-	appName              = "IxoApp"
-	Bech32MainPrefix     = "ixo"
-	Bech32PrefixAccAddr  = Bech32MainPrefix
-	Bech32PrefixAccPub   = Bech32MainPrefix + sdk.PrefixPublic
-	Bech32PrefixValAddr  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator
-	Bech32PrefixValPub   = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
-	Bech32PrefixConsAddr = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus
-	Bech32PrefixConsPub  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
-)
+const appName = "IxoApp"
 
 var (
 	// DefaultNodeHome default home directories for the application daemon
-	DefaultNodeHome = os.ExpandEnv("$HOME/.ixod")
+	DefaultNodeHome string = os.ExpandEnv("$HOME/.ixod")
 
-	// ModuleBasics defines the module BasicManager which is in charge of setting up basic,
+	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
 	ModuleBasics = module.NewBasicManager(
-		// Standard Cosmos modules
 		auth.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		bank.AppModuleBasic{},
@@ -134,164 +130,199 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
+			[]govclient.ProposalHandler{paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.LegacyProposalHandler, upgradeclient.LegacyCancelProposalHandler},
 		),
-		sdkparams.AppModuleBasic{},
+		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
-		ibc.AppModuleBasic{},
+		feegrantmodule.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
-		transfer.AppModuleBasic{},
+		authzmodule.AppModuleBasic{},
+		groupmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		feegrantmodule.AppModuleBasic{},
+		nftmodule.AppModuleBasic{},
 
-		// Custom ixo modules
-		did.AppModuleBasic{},
+		//## IBC
+
+		//## Cosmos Cash
+
+		//## Osmosis
+
+		//## Ixo
 		bonds.AppModuleBasic{},
+		did.AppModuleBasic{},
+		entities.AppModuleBasic{},
 		payments.AppModuleBasic{},
-		project.AppModuleBasic{},
 	)
 
-	// Module account permissions
+	// module account permissions
 	maccPerms = map[string][]string{
-		// Standard Cosmos module accounts
 		authtypes.FeeCollectorName:     nil,
 		distrtypes.ModuleName:          nil,
 		minttypes.ModuleName:           {authtypes.Minter},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-
-		// Custom ixo module accounts
-		bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
-		bondstypes.BatchesIntermediaryAccount: nil,
-		bondstypes.BondsReserveAccount:        nil,
-		paymentstypes.PayRemainderPool:        nil,
-	}
-
-	// Module accounts that are allowed to receive tokens
-	allowedReceivingModAcc = map[string]bool{
-		distrtypes.ModuleName: true,
-	}
-
-	// Reserved payments module ID prefixes
-	paymentsReservedIdPrefixes = []string{
-		projecttypes.ModuleName,
+		nft.ModuleName:                 nil,
 	}
 )
 
-// Verify app interface at compile time
-var _ simapp.App = (*IxoApp)(nil)
-var _ servertypes.Application = (*IxoApp)(nil)
+var (
+	_ App                     = (*IxoApp)(nil)
+	_ servertypes.Application = (*IxoApp)(nil)
+)
 
-// Extended ABCI application
+// IxoApp extends an ABCI application, but with most of its parameters exported.
+// They are exported for convenience in creating helper functions, as object
+// capabilities aren't needed for testing.
 type IxoApp struct {
-	*baseapp.BaseApp `json:"_bam_base_app,omitempty"`
-	legacyAmino      *codec.LegacyAmino `json:"legacy_amino,omitempty"`
-	appCodec          codec.Codec             `json:"app_codec,omitempty"`
-	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
+	*baseapp.BaseApp
 
-	invCheckPeriod uint `json:"inv_check_period,omitempty"`
+	legacyAmino       *codec.LegacyAmino
+	appCodec          codec.Codec
+	interfaceRegistry types.InterfaceRegistry
+	msgSvcRouter      *authmiddleware.MsgServiceRouter
+	legacyRouter      sdk.Router
+
+	invCheckPeriod uint
+
+
+	// # keepers
+	// ## Cosmos SDK Keepers
+	AccountKeeper  authkeeper.AccountKeeper
+	BankKeeper     bankkeeper.Keeper
+	StakingKeeper  stakingkeeper.Keeper
+	SlashingKeeper slashingkeeper.Keeper
+	MintKeeper     mintkeeper.Keeper
+	DistrKeeper    distrkeeper.Keeper
+	GovKeeper      govkeeper.Keeper
+	AuthzKeeper    authzkeeper.Keeper
+	EvidenceKeeper evidencekeeper.Keeper
+	FeeGrantKeeper feegrantkeeper.Keeper
+	GroupKeeper    groupkeeper.Keeper
+	NFTKeeper      nftkeeper.Keeper
+
+	// ## IBC Keepers
+	IBCKeeper            ibckeeper.Keeper
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+
+	// ## Osmosis Keepers
+	// SuperfluidKeeper     *superfluidkeeper.Keeper
+	// PoolIncentivesKeeper *poolincentiveskeeper.Keeper
+	// IncentivesKeeper     *incentiveskeeper.Keeper
+	// ClaimKeeper          *claimkeeper.Keeper
+	// GAMMKeeper           *gammkeeper.Keeper
+	// LockupKeeper         *lockupkeeper.Keeper
+	// EpochsKeeper         *epochskeeper.Keeper
+	// TxFeesKeeper         *txfeeskeeper.Keeper
+
+	// ## Cosmos Cash Keepers
+
+	// ## Ixo Keepers
+	DidKeeper      didkeeper.Keeper
+	BondsKeeper    bondskeeper.Keeper
+	PaymentsKeeper paymentskeeper.Keeper
+	EntitiesKeeper entitieskeeper.Keeper
 
 	// keys to access the substores
-	keys    map[string]*sdk.KVStoreKey        `json:"keys,omitempty"`
-	tkeys   map[string]*sdk.TransientStoreKey `json:"tkeys,omitempty"`
-	memKeys map[string]*sdk.MemoryStoreKey    `json:"mem_keys,omitempty"`
-
-	// keepers
-	AccountKeeper    authkeeper.AccountKeeper `json:"account_keeper"`
-	BankKeeper       bankkeeper.Keeper        `json:"bank_keeper,omitempty"`
-	CapabilityKeeper *capabilitykeeper.Keeper `json:"capability_keeper,omitempty"`
-	StakingKeeper    stakingkeeper.Keeper     `json:"staking_keeper"`
-	SlashingKeeper   slashingkeeper.Keeper    `json:"slashing_keeper"`
-	MintKeeper       mintkeeper.Keeper        `json:"mint_keeper"`
-	DistrKeeper      distrkeeper.Keeper       `json:"distr_keeper"`
-	GovKeeper        govkeeper.Keeper         `json:"gov_keeper"`
-	CrisisKeeper     crisiskeeper.Keeper      `json:"crisis_keeper"`
-	UpgradeKeeper    upgradekeeper.Keeper     `json:"upgrade_keeper"`
-	ParamsKeeper     paramskeeper.Keeper      `json:"params_keeper"`
-	IBCKeeper        *ibckeeper.Keeper        `json:"ibc_keeper,omitempty"` // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
-	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
-	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
-
-	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
-
-	// Custom ixo keepers
-	DidKeeper      didkeeper.Keeper      `json:"did_keeper"`
-	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
-	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
-	ProjectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
+	keys    map[string]*storetypes.KVStoreKey
+	tkeys   map[string]*storetypes.TransientStoreKey
+	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// the module manager
-	mm *module.Manager `json:"mm,omitempty"`
+	mm *module.Manager
 
 	// simulation manager
-	sm *module.SimulationManager `json:"sm,omitempty"`
+	sm *module.SimulationManager
+
+	// module configurator
+	configurator module.Configurator
+}
+
+func init() {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	DefaultNodeHome = filepath.Join(userHomeDir, ".ixod")
 }
 
 // NewIxoApp returns a reference to an initialized IxoApp.
 func NewIxoApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig params.EncodingConfig,
+	homePath string, invCheckPeriod uint, encodingConfig ixoappparams.EncodingConfig,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IxoApp {
 
-	appCodec := encodingConfig.Marshaler
+	appCodec := encodingConfig.Codec
 	legacyAmino := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := baseapp.NewBaseApp(appName, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(appName, logger, db, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
-		// Standard Cosmos store keys
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
+		evidencetypes.StoreKey, capabilitytypes.StoreKey,
+		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
 
-		// Custom ixo store keys
-		didtypes.StoreKey, bondstypes.StoreKey,
-		paymentstypes.StoreKey, projecttypes.StoreKey,
+		//## IBC
+		ibchost.StoreKey,
+
+		//## Osmosis
+
+		//## Cosmos Cash
+
+		//## Ixo
+		didtypes.StoreKey, bondstypes.StoreKey, paymentstypes.StoreKey, entitiestypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
-	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	// NOTE: The testingkey is just mounted for testing purposes. Actual applications should
+	// not include this key.
+	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey, "testingkey")
+
+	// configure state listening capabilities using AppOptions
+	// we are doing nothing with the returned streamingServices and waitGroup in this case
+	if _, _, err := streaming.LoadStreamingServices(bApp, appOpts, appCodec, keys); err != nil {
+		tmos.Exit(err.Error())
+	}
 
 	app := &IxoApp{
 		BaseApp:           bApp,
 		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
 		interfaceRegistry: interfaceRegistry,
+		legacyRouter:      authmiddleware.NewLegacyRouter(),
+		msgSvcRouter:      authmiddleware.NewMsgServiceRouter(interfaceRegistry),
 		invCheckPeriod:    invCheckPeriod,
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
 	}
 
-	// init params keeper and subspaces
 	app.ParamsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
-	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
+	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable()))
 
-	// add capability keeper and ScopeToModule for ibc module
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
-	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
-	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	// Applications that wish to enforce statically created ScopedKeepers should call `Seal` after creating
+	// their scoped modules in `NewApp` with `ScopeToModule`
+	app.CapabilityKeeper.Seal()
 
-	// add keepers (for standard Cosmos modules)
+	//## Cosmos SDK Keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms, sdk.Bech32MainPrefix,
 	)
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.BlockedAddrs(),
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName),
@@ -302,7 +333,7 @@ func NewIxoApp(
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec, keys[distrtypes.StoreKey], app.GetSubspace(distrtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, authtypes.FeeCollectorName, app.ModuleAccountAddrs(),
+		&stakingKeeper, authtypes.FeeCollectorName,
 	)
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.GetSubspace(slashingtypes.ModuleName),
@@ -312,12 +343,6 @@ func NewIxoApp(
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
-	// NewKeeper constructs an upgrade Keeper which requires the following arguments:
-	// skipUpgradeHeights - map of heights to skip an upgrade
-	// storeKey - a store key with which to access upgrade's store
-	// cdc - the app-wide binary codec
-	// homePath - root directory of the application's config
-	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, nil)
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -325,35 +350,39 @@ func NewIxoApp(
 		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
 
-	// Create IBC Keeper
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
-	)
+	app.AuthzKeeper = authzkeeper.NewKeeper(keys[authzkeeper.StoreKey], appCodec, app.msgSvcRouter, app.AccountKeeper)
+
+	groupConfig := group.DefaultConfig()
+	/*
+		Example of setting group params:
+		groupConfig.MaxMetadataLen = 1000
+	*/
+	app.GroupKeeper = groupkeeper.NewKeeper(keys[group.StoreKey], appCodec, app.msgSvcRouter, app.AccountKeeper, groupConfig)
 
 	// register the proposal types
-	govRouter := govtypes.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
+	govRouter := govv1beta1.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
-	app.GovKeeper = govkeeper.NewKeeper(
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper))
+	govConfig := govtypes.DefaultConfig()
+	/*
+		Example of setting gov params:
+		govConfig.MaxMetadataLen = 10000
+	*/
+	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, govRouter,
+		&stakingKeeper, govRouter, app.msgSvcRouter, govConfig,
 	)
 
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+	app.GovKeeper = *govKeeper.SetHooks(
+		govtypes.NewMultiGovHooks(
+		// register the governance hooks
+		),
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
-	// Create static IBC router, add transfer route, then set and seal it
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-	app.IBCKeeper.SetRouter(ibcRouter)
+	// set the governance module account as the authority for conducting upgrades
+	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	app.NFTKeeper = nftkeeper.NewKeeper(keys[nftkeeper.StoreKey], appCodec, app.AccountKeeper, app.BankKeeper)
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -362,127 +391,149 @@ func NewIxoApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	//## IBC Keepers
+	app.IBCKeeper = ibckeeper.NewKeeper(
+		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
+	)
+
+	//## Osmosis Keepers
+
+	//## Cosmos Cash Keepers
+
+	//## IXO Keepers
+	app.DidKeeper = didkeeper.NewKeeper(app.appCodec, keys[didtypes.StoreKey])
+
+	app.BondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.DidKeeper,
+		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
+	app.PaymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
+		app.BankKeeper, app.DidKeeper, paymentsReservedIdPrefixes)
+	app.EntitiesKeeper = entitieskeeper.NewKeeper(app.appCodec, keys[entitiestypes.StoreKey],
+		app.GetSubspace(entitiestypes.ModuleName), app.AccountKeeper, app.DidKeeper, app.PaymentsKeeper)
+
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
 	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
-	// add keepers (for custom ixo modules)
-	app.DidKeeper = didkeeper.NewKeeper(app.appCodec, keys[didtypes.StoreKey])
-	app.BondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.DidKeeper,
-		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
-	app.PaymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
-		app.BankKeeper, app.DidKeeper, paymentsReservedIdPrefixes)
-	app.ProjectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
-		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.DidKeeper, app.PaymentsKeeper)
-
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
-		// Standard Cosmos AppModules
 		genutil.NewAppModule(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
 			encodingConfig.TxConfig,
 		),
+
+		//## Cosmos SDK App Modules
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		crisis.NewAppModule(&app.CrisisKeeper, skipGenesisInvariants),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
-		ibc.NewAppModule(app.IBCKeeper),
-		sdkparams.NewAppModule(app.ParamsKeeper),
-		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		transferModule,
+		params.NewAppModule(app.ParamsKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 
-		// Custom ixo AppModules
+		//## IBC App Modules
+		ibc.NewAppModule(app.IBCKeeper),
+
+		//## Osmosis App Modules
+
+		//## Cosmos Cash App Modules
+
+		//## IXO App Modules
 		did.NewAppModule(app.DidKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
-		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
+		entities.NewAppModule(app.EntitiesKeeper, app.PaymentsKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
+	// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
 	app.mm.SetOrderBeginBlockers(
-		// Standard Cosmos modules
-		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, banktypes.ModuleName,
-		paymentstypes.ModuleName, genutiltypes.ModuleName, crisistypes.ModuleName,
-		paramstypes.ModuleName, authtypes.ModuleName, capabilitytypes.ModuleName,
-		govtypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName,
-		feegrant.ModuleName,
+		//## Cosmos SDK Blockers
+		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
+		evidencetypes.ModuleName, stakingtypes.ModuleName,
+		authtypes.ModuleName, banktypes.ModuleName, govtypes.ModuleName, crisistypes.ModuleName, genutiltypes.ModuleName,
+		authz.ModuleName, feegrant.ModuleName, nft.ModuleName, group.ModuleName,
+		paramstypes.ModuleName, vestingtypes.ModuleName,
 
-		// Custom ixo modules
-		didtypes.ModuleName,
-		projecttypes.ModuleName,
-		bondstypes.ModuleName,
+		//## IXO Blockers
+		paymentstypes.ModuleName, didtypes.ModuleName, entitiestypes.ModuleName, bondstypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		// Standard Cosmos modules
+		//## Cosmos SDK Blockers
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		distrtypes.ModuleName, evidencetypes.ModuleName, didtypes.ModuleName, banktypes.ModuleName,
-		upgradetypes.ModuleName, ibchost.ModuleName, paramstypes.ModuleName, authtypes.ModuleName,
-		minttypes.ModuleName, projecttypes.ModuleName, genutiltypes.ModuleName, vestingtypes.ModuleName,
-		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
-		feegrant.ModuleName,
+		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName,
+		slashingtypes.ModuleName, minttypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
+		feegrant.ModuleName, nft.ModuleName, group.ModuleName,
+		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName,
 
-		// Custom ixo modules
-		bondstypes.ModuleName, paymentstypes.ModuleName,
+		//## IXO Blockers
+		paymentstypes.ModuleName, didtypes.ModuleName, entitiestypes.ModuleName, bondstypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
+	// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
 	// NOTE: Capability module must occur first so that it can initialize any capabilities
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		// Standard Cosmos modules
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
-		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName,
-		// Custom ixo modules
-		didtypes.ModuleName, bondstypes.ModuleName,
-		paymentstypes.ModuleName, projecttypes.ModuleName,
+		genutiltypes.ModuleName, evidencetypes.ModuleName, authz.ModuleName,
+		feegrant.ModuleName, nft.ModuleName, group.ModuleName,
+		paramstypes.ModuleName, upgradetypes.ModuleName, vestingtypes.ModuleName,
+
+		//## IXO
+		paymentstypes.ModuleName, didtypes.ModuleName, entitiestypes.ModuleName, bondstypes.ModuleName,
 	)
 
-	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
-	app.mm.RegisterInvariants(&app.CrisisKeeper)
-	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
-	app.mm.RegisterServices(module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
+	// Uncomment if you want to set a custom migration order here.
+	// app.mm.SetOrderMigrations(custom order)
 
-	// add test gRPC service for testing gRPC queries in isolation
-	testdata.RegisterQueryServer(app.GRPCQueryRouter(), testdata.QueryImpl{})
+	app.mm.RegisterInvariants(&app.CrisisKeeper)
+	app.mm.RegisterRoutes(app.legacyRouter, app.QueryRouter(), encodingConfig.Amino)
+	app.configurator = module.NewConfigurator(app.appCodec, app.msgSvcRouter, app.GRPCQueryRouter())
+	app.mm.RegisterServices(app.configurator)
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	//
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
-	app.sm = module.NewSimulationManager(
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
-		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
-		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		sdkparams.NewAppModule(app.ParamsKeeper),
-		evidence.NewAppModule(app.EvidenceKeeper),
-		ibc.NewAppModule(app.IBCKeeper),
-		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		transferModule,
-	)
+	/*
+		? This is not required it seems. Consider removing.
+		app.sm = module.NewSimulationManager(
+			auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+			bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
+			capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+			feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+			gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
+			mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil),
+			staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+			distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+			slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+			params.NewAppModule(app.ParamsKeeper),
+			evidence.NewAppModule(app.EvidenceKeeper),
+			authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+			groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+			nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		)
+	*/
 
 	app.sm.RegisterStoreDecoders()
 
@@ -494,39 +545,40 @@ func NewIxoApp(
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(NewIxoAnteHandler(app, encodingConfig))
 	app.SetEndBlocker(app.EndBlocker)
+	app.setTxHandler(encodingConfig.TxConfig, cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents)))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
 		}
-
-		// Initialize and seal the capability keeper so all persistent capabilities
-		// are loaded in-memory and prevent any further modules from creating scoped
-		// sub-keepers.
-		// This must be done during creation of baseapp rather than in InitChain so
-		// that in-memory capabilities get regenerated on app restart.
-		// Note that since this reads from the store, we can only perform it when
-		// `loadLatest` is set to true.
-		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-		// TODO: Check if this will work
-		app.CapabilityKeeper.InitMemStore(ctx)
-		app.CapabilityKeeper.Seal()
 	}
-
-	app.ScopedIBCKeeper = scopedIBCKeeper
-	app.ScopedTransferKeeper = scopedTransferKeeper
 
 	return app
 }
 
-// MakeCodecs constructs the *std.Codec and *codec.LegacyAmino instances used by
-// ixoapp. It is useful for tests and clients who do not want to construct the
-// full ixoapp.
-func MakeCodecs() (codec.Codec, *codec.LegacyAmino) {
-	config := MakeTestEncodingConfig()
-	return config.Marshaler, config.Amino
+func (app *IxoApp) setTxHandler(txConfig client.TxConfig, indexEventsStr []string) {
+	indexEvents := map[string]struct{}{}
+	for _, e := range indexEventsStr {
+		indexEvents[e] = struct{}{}
+	}
+	txHandler, err := authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions{
+		Debug:            app.Trace(),
+		IndexEvents:      indexEvents,
+		LegacyRouter:     app.legacyRouter,
+		MsgServiceRouter: app.msgSvcRouter,
+		AccountKeeper:    app.AccountKeeper,
+		BankKeeper:       app.BankKeeper,
+		FeegrantKeeper:   app.FeeGrantKeeper,
+		SignModeHandler:  txConfig.SignModeHandler(),
+		SigGasConsumer:   authmiddleware.DefaultSigVerificationGasConsumer,
+		TxDecoder:        txConfig.TxDecoder(),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	app.SetTxHandler(txHandler)
 }
 
 // Name returns the name of the App
@@ -545,9 +597,10 @@ func (app *IxoApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Re
 // InitChainer application update at chain initialization
 func (app *IxoApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
-	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
+	if err := json.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -564,16 +617,6 @@ func (app *IxoApp) ModuleAccountAddrs() map[string]bool {
 	}
 
 	return modAccAddrs
-}
-
-// BlockedAddrs returns all the app's module account addresses black listed for receiving tokens.
-func (app *IxoApp) BlockedAddrs() map[string]bool {
-	blockedAddrs := make(map[string]bool)
-	for acc := range maccPerms {
-		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
-	}
-
-	return blockedAddrs
 }
 
 // LegacyAmino returns IxoApp's amino codec.
@@ -600,21 +643,21 @@ func (app *IxoApp) InterfaceRegistry() types.InterfaceRegistry {
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *IxoApp) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *IxoApp) GetKey(storeKey string) *storetypes.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *IxoApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *IxoApp) GetTKey(storeKey string) *storetypes.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
 // GetMemKey returns the MemStoreKey for the provided mem key.
 //
 // NOTE: This is solely used for testing purposes.
-func (app *IxoApp) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
+func (app *IxoApp) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
 	return app.memKeys[storeKey]
 }
 
@@ -633,19 +676,12 @@ func (app *IxoApp) SimulationManager() *module.SimulationManager {
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
-func (app *IxoApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig srvconfig.APIConfig) {
-	//panic("implement me")
-
+func (app *IxoApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
-	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
-	// Register legacy tx routes.
-	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
-	// Register client tx routes.
-	tx.RegisterTxRoutes(clientCtx, apiSvr.Router)
 
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
@@ -687,139 +723,18 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler {
-
-	// The AnteHandler needs to get the signer's pubkey to verify signatures,
-	// charge gas fees (to the corresponding address), and for other purposes.
-	//
-	// The default Cosmos AnteHandler fetches a signer address' pubkey from the
-	// GetPubKey() function after querying the account from the account keeper.
-	//
-	// In the case of ixo, since signers are DIDs rather than addresses, we get
-	// the DID Doc containing the pubkey from the did/project module (depending
-	// if signer is a user or a project, respectively).
-	//
-	// This is what PubKeyGetters achieve.
-	//
-	// To get a pubkey from the did/project, the did/project must have been
-	// created. But during the did/project creation, we also need the pubkeys,
-	// which we cannot get because the did/project does not even exist yet.
-	// For this purpose, a special didPubKeyGetter and projectPubkeyGetter were
-	// created, which get the pubkey from the did/project creation msg itself,
-	// given that the pubkey is one of the parameters in such messages.
-	//
-	// - did module msgs are signed by did module DIDs
-	// - project module msgs are signed by project module DIDs (a.k.a projects)
-	// - [[default]] remaining ixo module msgs are signed by did module DIDs
-	//
-	// A special case in the project module is the MsgWithdrawFunds message,
-	// which is a project module message signed by a did module DID (instead
-	// of a project DID). The project module PubKeyGetter deals with this
-	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
-
-	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
-	didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
-	projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
-
-	// Since we have parameterised pubkey getters, we can use the same default
-	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
-	// instead of having to implement three unique AnteHandlers.
-
-	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	didAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
-
-	// The default Cosmos AnteHandler is still used for standard Cosmos messages
-	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
-	// is that we use an IxoSigVerificationGasConsumer instead of the default
-	// one, since the default does not allow ED25519 signatures. Thus, like this
-	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
-
-	options := authante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  ixotypes.IxoSigVerificationGasConsumer,
-	}
-
-	cosmosAnteHandler, err := authante.NewAnteHandler(options)
-
-	if err != nil {
-		panic(sdkerrors.Wrap(err, "could not create Cosmos AnteHandler"))
-	}
-
-	// In the case of project creation, besides having a custom pubkey getter,
-	// we also have to use a custom project creation AnteHandler. Recall that
-	// one of the purposes of getting the pubkey is to charge gas fees. So we
-	// expect the signer to have enough tokens to pay for gas fees. Typically,
-	// these are sent to the signer before the signer signs their first message.
-	//
-	// However, in the case of a project, we cannot send tokens to it before its
-	// creation since we do not know the project DID (and thus where to send the
-	// tokens) until exactly before its creation (when project creation is done
-	// through ixo-cellnode). The project however does have an original creator!
-	//
-	// Thus, the gas fees in the case of project creation are instead charged
-	// to the original creator, which is pointed out in the project doc. For
-	// this purpose, a custom project creation AnteHandler had to be created.
-
-	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.DidKeeper,
-		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
-
-	// TODO: Routing https://docs.cosmos.network/v0.44/building-modules/msg-services.html#amino-legacymsgs
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
-		// Route message based on ixo module router key
-		// Otherwise, route to Cosmos ante handler
-		msg := tx.GetMsgs()[0].(legacytx.LegacyMsg)
-
-		switch msg.Route() {
-		case didtypes.RouterKey:
-			return didAnteHandler(ctx, tx, simulate)
-		case projecttypes.RouterKey:
-			switch msg.Type() {
-			case projecttypes.TypeMsgCreateProject:
-				return projectCreationAnteHandler(ctx, tx, simulate)
-			default:
-				return projectAnteHandler(ctx, tx, simulate)
-			}
-
-		case bondstypes.RouterKey:
-			fallthrough
-		case paymentstypes.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
-		default:
-			return cosmosAnteHandler(ctx, tx, simulate)
-		}
-	}
-}
-
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
-	// init params keeper and subspaces (for standard Cosmos modules)
 	paramsKeeper.Subspace(authtypes.ModuleName)
 	paramsKeeper.Subspace(banktypes.ModuleName)
 	paramsKeeper.Subspace(stakingtypes.ModuleName)
 	paramsKeeper.Subspace(minttypes.ModuleName)
 	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
+	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1beta2.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
-
-	// init params keeper and subspaces (for custom ixo modules)
-	paramsKeeper.Subspace(bondstypes.ModuleName)
-	paramsKeeper.Subspace(projecttypes.ModuleName)
 
 	return paramsKeeper
 }

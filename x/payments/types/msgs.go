@@ -3,16 +3,17 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/types"
 )
 
 const (

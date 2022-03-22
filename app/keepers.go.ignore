@@ -1,0 +1,151 @@
+package app
+
+import (
+	// Utilities from the Cosmos-SDK other than Cosmos modules
+
+	// Cosmos-SDK Modules
+	// https://github.com/cosmos/cosmos-sdk/tree/master/x
+	// NB: Osmosis uses a fork of the cosmos-sdk which can be found at: https://github.com/osmosis-labs/cosmos-sdk
+
+	// Auth: Authentication of accounts and transactions for Cosmos SDK applications.
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+
+	// Authz: Authorization for accounts to perform actions on behalf of other accounts.
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+
+	// Bank: allows users to transfer tokens
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+
+	// Capability: allows developers to atomically define what a module can and cannot do
+	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
+
+	// Crisis: Halting the blockchain under certain circumstances (e.g. if an invariant is broken).
+	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
+
+	// Distribution: Fee distribution, and staking token provision distribution.
+
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+
+	// Evidence handling for double signing, misbehaviour, etc.
+	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
+
+	// Governance: Allows stakeholders to make decisions concering a Cosmos-SDK blockchain's economy and development
+	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
+
+	// Params: Parameters that are always available
+
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+
+	// Slashing:
+	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
+
+	// Staking: Allows the Tendermint validator set to be chosen based on bonded stake.
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+
+	// Upgrade:  Software upgrades handling and coordination.
+
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+
+	// IBC Transfer: Defines the "transfer" IBC port
+
+	// IBC: Inter-blockchain communication
+
+	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
+
+	// Upgrades from earlier versions of Osmosis
+	_ "github.com/osmosis-labs/osmosis/v7/client/docs/statik"
+
+	// Modules that live in the Osmosis repository and are specific to Osmosis
+	claimkeeper "github.com/osmosis-labs/osmosis/v7/x/claim/keeper"
+
+	// Epochs: gives Osmosis a sense of "clock time" so that events can be based on days instead of "number of blocks"
+	epochskeeper "github.com/osmosis-labs/osmosis/v7/x/epochs/keeper"
+
+	// Generalized Automated Market Maker
+	gammkeeper "github.com/osmosis-labs/osmosis/v7/x/gamm/keeper"
+
+	// Incentives: Allows Osmosis and foriegn chain communities to incentivize users to provide liquidity
+	incentiveskeeper "github.com/osmosis-labs/osmosis/v7/x/incentives/keeper"
+
+	// Lockup: allows tokens to be locked (made non-transferrable)
+	lockupkeeper "github.com/osmosis-labs/osmosis/v7/x/lockup/keeper"
+
+	// Mint: Our modified version of github.com/cosmos/cosmos-sdk/x/mint
+	mintkeeper "github.com/osmosis-labs/osmosis/v7/x/mint/keeper"
+
+	// Pool incentives:
+
+	poolincentiveskeeper "github.com/osmosis-labs/osmosis/v7/x/pool-incentives/keeper"
+
+	// Superfluid: Allows users to stake gamm (bonded liquidity)
+	superfluidkeeper "github.com/osmosis-labs/osmosis/v7/x/superfluid/keeper"
+
+	// Txfees: Allows Osmosis to charge transaction fees without harming IBC user experience
+	txfeeskeeper "github.com/osmosis-labs/osmosis/v7/x/txfees/keeper"
+
+	// Wasm: Allows Osmosis to interact with web assembly smart contracts
+	"github.com/CosmWasm/wasmd/x/wasm"
+	// Modules related to bech32-ibc, which allows new ibc funcationality based on the bech32 prefix of addresses
+
+	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	entitieskeeper "github.com/ixofoundation/ixo-blockchain/x/entities/keeper"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+
+	nftkeeper "github.com/cosmos/cosmos-sdk/x/nft/keeper"
+
+	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
+
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+)
+
+type appKeepers struct {
+	// keepers, by order of initialization
+	// "Special" keepers
+	ParamsKeeper     *paramskeeper.Keeper
+	CapabilityKeeper *capabilitykeeper.Keeper
+	CrisisKeeper     *crisiskeeper.Keeper
+	UpgradeKeeper    *upgradekeeper.Keeper
+
+	// make scoped keepers public for test purposes
+	ScopedWasmKeeper capabilitykeeper.ScopedKeeper
+	WasmKeeper       *wasm.Keeper
+
+	// # keepers
+	// ## Cosmos SDK Keepers
+	AccountKeeper  authkeeper.AccountKeeper
+	BankKeeper     bankkeeper.Keeper
+	StakingKeeper  stakingkeeper.Keeper
+	SlashingKeeper slashingkeeper.Keeper
+	MintKeeper     mintkeeper.Keeper
+	DistrKeeper    distrkeeper.Keeper
+	GovKeeper      govkeeper.Keeper
+	AuthzKeeper    authzkeeper.Keeper
+	EvidenceKeeper evidencekeeper.Keeper
+	FeeGrantKeeper feegrantkeeper.Keeper
+	GroupKeeper    groupkeeper.Keeper
+	NFTKeeper      nftkeeper.Keeper
+
+	// ## IBC Keepers
+	IBCKeeper            ibckeeper.Keeper
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+
+	// ## Osmosis Keepers
+	SuperfluidKeeper     *superfluidkeeper.Keeper
+	PoolIncentivesKeeper *poolincentiveskeeper.Keeper
+	IncentivesKeeper     *incentiveskeeper.Keeper
+	ClaimKeeper          *claimkeeper.Keeper
+	GAMMKeeper           *gammkeeper.Keeper
+	LockupKeeper         *lockupkeeper.Keeper
+	EpochsKeeper         *epochskeeper.Keeper
+	TxFeesKeeper         *txfeeskeeper.Keeper
+
+	// ## Cosmos Cash Keepers
+
+	// ## Ixo Keepers
+	DidKeeper      didkeeper.Keeper
+	BondsKeeper    bondskeeper.Keeper
+	PaymentsKeeper paymentskeeper.Keeper
+	EntitiesKeeper entitieskeeper.Keeper
+}

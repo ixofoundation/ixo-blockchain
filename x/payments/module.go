@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/spf13/cobra"

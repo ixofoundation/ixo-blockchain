@@ -11,10 +11,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	"github.com/spf13/cobra"
@@ -57,9 +55,9 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 }
 
 // RegisterRESTRoutes registers the REST routes for the bonds module.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterHandlers(clientCtx, rtr)
-}
+// func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
+// 	rest.RegisterHandlers(clientCtx, rtr)
+// }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the bonds module.
 func (a AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {

@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"log"
 
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
-// ExportAppStateAndValidators exports the state of ixo for a genesis file.
+// ExportAppStateAndValidators exports the state of the application for a genesis
+// file.
 func (app *IxoApp) ExportAppStateAndValidators(
 	forZeroHeight bool, jailAllowedAddrs []string,
 ) (servertypes.ExportedApp, error) {
@@ -23,6 +25,7 @@ func (app *IxoApp) ExportAppStateAndValidators(
 	// Tendermint will start InitChain.
 	height := app.LastBlockHeight() + 1
 	if forZeroHeight {
+		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
 	}
 
@@ -31,6 +34,7 @@ func (app *IxoApp) ExportAppStateAndValidators(
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}
+
 	validators, err := staking.WriteValidators(ctx, app.StakingKeeper)
 	return servertypes.ExportedApp{
 		AppState:        appState,
@@ -46,7 +50,7 @@ func (app *IxoApp) ExportAppStateAndValidators(
 func (app *IxoApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
 	applyAllowedAddrs := false
 
-	//Check if there is an allowed address list
+	// check if there is a allowed address list
 	if len(jailAllowedAddrs) > 0 {
 		applyAllowedAddrs = true
 	}
@@ -105,7 +109,9 @@ func (app *IxoApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 		feePool.CommunityPool = feePool.CommunityPool.Add(scraps...)
 		app.DistrKeeper.SetFeePool(ctx, feePool)
 
-		app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator())
+		if err := app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, val.GetOperator()); err != nil {
+			panic(err)
+		}
 		return false
 	})
 
@@ -153,7 +159,7 @@ func (app *IxoApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 	counter := int16(0)
 
 	for ; iter.Valid(); iter.Next() {
-		addr := sdk.ValAddress(iter.Key()[1:])
+		addr := sdk.ValAddress(stakingtypes.AddressFromValidatorsKey(iter.Key()))
 		validator, found := app.StakingKeeper.GetValidator(ctx, addr)
 		if !found {
 			panic("expected validator, not found")
@@ -186,6 +192,4 @@ func (app *IxoApp) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []
 			return false
 		},
 	)
-
-	// TODO: perform zero-height prep for payments module (and any other ixo module)
 }

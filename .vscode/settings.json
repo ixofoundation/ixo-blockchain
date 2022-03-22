@@ -1,0 +1,9 @@
+{
+  "go.lintOnSave": "off",
+  "cSpell.words": [
+    "abci",
+    "Configurator",
+    "ixofoundation",
+    "ixotypes"
+  ]
+}

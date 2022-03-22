@@ -12,11 +12,10 @@ import (
 	authsign "github.com/cosmos/cosmos-sdk/x/auth/signing"
 )
 
-// Copied from Cosmos SDK
-
 // SimAppChainID hardcoded chainID for simulation
 const (
 	DefaultGenTxGas = 1000000
+	SimAppChainID   = "simulation-app"
 )
 
 // GenTx generates a signed mock transaction.
@@ -58,9 +57,11 @@ func GenTx(gen client.TxConfig, msgs []sdk.Msg, feeAmt sdk.Coins, gas uint64, ch
 	// 2nd round: once all signer infos are set, every signer can sign.
 	for i, p := range priv {
 		signerData := authsign.SignerData{
+			Address:       sdk.AccAddress(p.PubKey().Address()).String(),
 			ChainID:       chainID,
 			AccountNumber: accNums[i],
 			Sequence:      accSeqs[i],
+			PubKey:        p.PubKey(),
 		}
 		signBytes, err := gen.SignModeHandler().GetSignBytes(signMode, signerData, tx.GetTx())
 		if err != nil {

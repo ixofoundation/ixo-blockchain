@@ -276,7 +276,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 
 	// Calculate scaled delta public alpha, to calculate new system alpha
 	prevPublicAlpha := paramsMap["publicAlpha"]
-	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
+	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha) //0.1
 	temp, err := types.ApproxPower(
 		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
 		sdk.MustNewDecFromStr("2"))
