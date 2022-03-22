@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/ixofoundation/ixo-blockchain/app"
-	"github.com/ixofoundation/ixo-blockchain/cmd/cmd"
+	"github.com/ixofoundation/ixo-blockchain/cli/ixod/cmd"
 )
 
 func main() {

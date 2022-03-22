@@ -8,12 +8,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	// "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+/*
+!! DO we need this
 type SetPubKeyDecorator struct {
 	ak  ante.AccountKeeper
 	pkg PubKeyGetter
@@ -25,6 +27,7 @@ func NewSetPubKeyDecorator(ak ante.AccountKeeper, pkg PubKeyGetter) SetPubKeyDec
 		pkg: pkg,
 	}
 }
+*/
 
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	_, ok := tx.(authsigning.SigVerifiableTx)
