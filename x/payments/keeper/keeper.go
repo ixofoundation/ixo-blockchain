@@ -4,7 +4,8 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
@@ -13,14 +14,14 @@ import (
 
 type Keeper struct {
 	cdc                codec.BinaryCodec
-	storeKey           sdk.StoreKey
+	storeKey           storetypes.StoreKey
 	paramSpace         paramtypes.Subspace
 	bankKeeper         bankkeeper.Keeper
 	DidKeeper          didkeeper.Keeper
 	ReservedIdPrefixes []string
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeKey sdk.StoreKey, bankKeeper bankkeeper.Keeper,
+func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, bankKeeper bankkeeper.Keeper,
 	didKeeper didkeeper.Keeper, reservedIdPrefixes []string) Keeper {
 	return Keeper{
 		cdc:                cdc,

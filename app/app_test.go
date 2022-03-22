@@ -36,11 +36,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 )
 
-func TestSimAppExportAndBlockedAddrs(t *testing.T) {
+func TestIxoAppExportAndBlockedAddrs(t *testing.T) {
 	encCfg := MakeTestEncodingConfig()
 	db := dbm.NewMemDB()
 	logger, _ := log.NewDefaultLogger("plain", "info", false)
-	app := NewSimappWithCustomOptions(t, false, SetupOptions{
+	app := NewIxoAppWithCustomOptions(t, false, SetupOptions{
 		Logger:             logger,
 		DB:                 db,
 		InvCheckPeriod:     0,
@@ -62,7 +62,7 @@ func TestSimAppExportAndBlockedAddrs(t *testing.T) {
 
 	logger2, _ := log.NewDefaultLogger("plain", "info", false)
 	// Making a new app object with the db, so that initchain hasn't been called
-	app2 := NewSimApp(logger2, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
+	app2 := NewIxoApp(logger2, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
 	_, err := app2.ExportAppStateAndValidators(false, []string{})
 	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
 }
@@ -76,7 +76,7 @@ func TestRunMigrations(t *testing.T) {
 	db := dbm.NewMemDB()
 	encCfg := MakeTestEncodingConfig()
 	logger, _ := log.NewDefaultLogger("plain", "info", false)
-	app := NewSimApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
+	app := NewIxoApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
 
 	// Create a new baseapp and configurator for the purpose of this test.
 	bApp := baseapp.NewBaseApp(appName, logger, db)
@@ -206,7 +206,7 @@ func TestInitGenesisOnMigration(t *testing.T) {
 	db := dbm.NewMemDB()
 	encCfg := MakeTestEncodingConfig()
 	logger, _ := log.NewDefaultLogger("plain", "info", false)
-	app := NewSimApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
+	app := NewIxoApp(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encCfg, EmptyAppOptions{})
 	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
 
 	// Create a mock module. This module will serve as the new module we're
@@ -250,7 +250,7 @@ func TestUpgradeStateOnGenesis(t *testing.T) {
 	encCfg := MakeTestEncodingConfig()
 	db := dbm.NewMemDB()
 	logger, _ := log.NewDefaultLogger("plain", "info", false)
-	app := NewSimappWithCustomOptions(t, false, SetupOptions{
+	app := NewIxoAppWithCustomOptions(t, false, SetupOptions{
 		Logger:             logger,
 		DB:                 db,
 		InvCheckPeriod:     0,

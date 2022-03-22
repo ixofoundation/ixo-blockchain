@@ -92,17 +92,18 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ixoappparams "github.com/ixofoundation/ixo-blockchain/app/params"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
+	bondsmodule "github.com/ixofoundation/ixo-blockchain/x/bonds/module"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
+
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	didmodule "github.com/ixofoundation/ixo-blockchain/x/did/module"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	entities "github.com/ixofoundation/ixo-blockchain/x/entities"
 	entitieskeeper "github.com/ixofoundation/ixo-blockchain/x/entities/keeper"
+	entitiesmodule "github.com/ixofoundation/ixo-blockchain/x/entities/module"
 	entitiestypes "github.com/ixofoundation/ixo-blockchain/x/entities/types"
-	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
+	paymentsmodule "github.com/ixofoundation/ixo-blockchain/x/payments/module"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 
 	// ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
@@ -150,10 +151,10 @@ var (
 		//## Osmosis
 
 		//## Ixo
-		bonds.AppModuleBasic{},
-		did.AppModuleBasic{},
-		entities.AppModuleBasic{},
-		payments.AppModuleBasic{},
+		paymentsmodule.AppModuleBasic{},
+		didmodule.AppModuleBasic{},
+		entitiesmodule.AppModuleBasic{},
+		paymentsmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -171,6 +172,10 @@ var (
 var (
 	_ App                     = (*IxoApp)(nil)
 	_ servertypes.Application = (*IxoApp)(nil)
+
+	paymentsReservedIdPrefixes = []string{
+		entitiestypes.ModuleName,
+	}
 )
 
 // IxoApp extends an ABCI application, but with most of its parameters exported.
@@ -187,9 +192,13 @@ type IxoApp struct {
 
 	invCheckPeriod uint
 
-
 	// # keepers
 	// ## Cosmos SDK Keepers
+	ParamsKeeper     paramskeeper.Keeper
+	CapabilityKeeper *capabilitykeeper.Keeper
+	CrisisKeeper     crisiskeeper.Keeper
+	UpgradeKeeper    upgradekeeper.Keeper
+
 	AccountKeeper  authkeeper.AccountKeeper
 	BankKeeper     bankkeeper.Keeper
 	StakingKeeper  stakingkeeper.Keeper
@@ -204,9 +213,9 @@ type IxoApp struct {
 	NFTKeeper      nftkeeper.Keeper
 
 	// ## IBC Keepers
-	IBCKeeper            ibckeeper.Keeper
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	// IBCKeeper            ibckeeper.Keeper
+	// ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	// ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// ## Osmosis Keepers
 	// SuperfluidKeeper     *superfluidkeeper.Keeper
@@ -274,7 +283,7 @@ func NewIxoApp(
 		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
 
 		//## IBC
-		ibchost.StoreKey,
+		// ibchost.StoreKey,
 
 		//## Osmosis
 
@@ -392,9 +401,9 @@ func NewIxoApp(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	//## IBC Keepers
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
-	)
+	// app.IBCKeeper = ibckeeper.NewKeeper(
+	// 	appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
+	// )
 
 	//## Osmosis Keepers
 
@@ -444,17 +453,17 @@ func NewIxoApp(
 		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 
 		//## IBC App Modules
-		ibc.NewAppModule(app.IBCKeeper),
+		// ibc.NewAppModule(app.IBCKeeper),
 
 		//## Osmosis App Modules
 
 		//## Cosmos Cash App Modules
 
 		//## IXO App Modules
-		did.NewAppModule(app.DidKeeper),
-		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
-		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
-		entities.NewAppModule(app.EntitiesKeeper, app.PaymentsKeeper, app.BankKeeper),
+		didmodule.NewAppModule(app.DidKeeper),
+		bondsmodule.NewAppModule(app.BondsKeeper, app.AccountKeeper),
+		paymentsmodule.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
+		entitiesmodule.NewAppModule(app.EntitiesKeeper, app.PaymentsKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that

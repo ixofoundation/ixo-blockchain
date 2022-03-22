@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -19,14 +20,14 @@ type Keeper struct {
 	StakingKeeper stakingkeeper.Keeper
 	didKeeper     types.DidKeeper
 
-	storeKey   sdk.StoreKey
+	storeKey   storetypes.StoreKey
 	paramSpace paramstypes.Subspace
 
 	cdc codec.BinaryCodec
 }
 
 func NewKeeper(bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper, stakingKeeper stakingkeeper.Keeper,
-	didKeeper types.DidKeeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryCodec) Keeper {
+	didKeeper types.DidKeeper, storeKey storetypes.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryCodec) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {

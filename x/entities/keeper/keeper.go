@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -13,20 +15,20 @@ import (
 	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entities/types"
+	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 )
 
 type Keeper struct {
 	cdc            codec.BinaryCodec
-	storeKey       sdk.StoreKey
+	storeKey       storetypes.StoreKey
 	paramSpace     paramstypes.Subspace
 	AccountKeeper  authkeeper.AccountKeeper
 	DidKeeper      didkeeper.Keeper
 	paymentsKeeper paymentskeeper.Keeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramstypes.Subspace,
+func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey, paramSpace paramstypes.Subspace,
 	accountKeeper authkeeper.AccountKeeper, didKeeper didkeeper.Keeper,
 	paymentsKeeper paymentskeeper.Keeper) Keeper {
 	return Keeper{

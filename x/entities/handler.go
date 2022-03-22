@@ -1,4 +1,4 @@
-package project
+package entities
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"

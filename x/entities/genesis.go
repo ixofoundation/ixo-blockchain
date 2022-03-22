@@ -1,4 +1,4 @@
-package project
+package entities
 
 import (
 	"encoding/json"
