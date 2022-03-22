@@ -1,4 +1,4 @@
-package entities
+package module
 
 import (
 	"encoding/json"

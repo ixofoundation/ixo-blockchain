@@ -25,3 +25,50 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 
 	return tx.BroadcastTx(clientCtx, txf)
 }
+
+func SignAndBroadcastTxFromStdSignMsg(clientCtx client.Context,
+	msg sdk.Msg, ixoDid exported.IxoDid, flagSet *pflag.FlagSet) (*sdk.TxResponse, error) {
+
+	// txf := tx.NewFactoryCLI(clientCtx, flagSet)
+	// txf = txf.WithFees(fees).WithGasPrices("").WithGas(0)
+
+	// tx, err := tx.BuildUnsignedTx(txf, msg)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// if !clientCtx.SkipConfirm {
+	// 	out, err := clientCtx.TxConfig.TxJSONEncoder()(tx.GetTx())
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
+
+	// 	buf := bufio.NewReader(os.Stdin)
+	// 	ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
+
+	// 	if err != nil || !ok {
+	// 		_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+	// 		return nil, err
+	// 	}
+	// }
+
+	// // err = Sign(txf, clientCtx, tx, true, ixoDid)
+	// // if err != nil {
+	// // 	return nil, err
+	// // }
+
+	// txBytes, err := clientCtx.TxConfig.TxEncoder()(tx.GetTx())
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// // broadcast to a Tendermint node
+	// res, err := clientCtx.BroadcastTx(txBytes)
+	// if err != nil {
+	// 	return &sdk.TxResponse{}, err
+	// }
+
+	return nil, nil
+}

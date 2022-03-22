@@ -305,7 +305,7 @@ func (a appCreator) appExport(
 	if height != -1 {
 		ixoApp = app.NewIxoApp(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
 
-		if err := app.LoadHeight(height); err != nil {
+		if err := ixoApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {

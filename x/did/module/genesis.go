@@ -1,4 +1,4 @@
-package did
+package module
 
 import (
 	"fmt"

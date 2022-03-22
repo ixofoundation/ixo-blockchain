@@ -26,8 +26,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/ixofoundation/ixo-blockchain/app/helpers"
-	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
@@ -35,6 +33,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/ixofoundation/ixo-blockchain/app/helpers"
+	"github.com/ixofoundation/ixo-blockchain/app/params"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in

@@ -1,4 +1,4 @@
-package payments
+package module
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
