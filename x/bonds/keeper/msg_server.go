@@ -337,6 +337,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 			types.EventTypeSetNextAlpha,
 			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
 			sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
+			sdk.NewAttribute(types.AttributeKeySystemAlpha, newSystemAlpha.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

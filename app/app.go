@@ -146,12 +146,8 @@ var (
 
 		//## IBC
 
-		//## Cosmos Cash
-
-		//## Osmosis
-
 		//## Ixo
-		paymentsmodule.AppModuleBasic{},
+		bondsmodule.AppModule{},
 		didmodule.AppModuleBasic{},
 		entitiesmodule.AppModuleBasic{},
 		paymentsmodule.AppModuleBasic{},
@@ -216,16 +212,6 @@ type IxoApp struct {
 	// IBCKeeper            ibckeeper.Keeper
 	// ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	// ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-
-	// ## Osmosis Keepers
-	// SuperfluidKeeper     *superfluidkeeper.Keeper
-	// PoolIncentivesKeeper *poolincentiveskeeper.Keeper
-	// IncentivesKeeper     *incentiveskeeper.Keeper
-	// ClaimKeeper          *claimkeeper.Keeper
-	// GAMMKeeper           *gammkeeper.Keeper
-	// LockupKeeper         *lockupkeeper.Keeper
-	// EpochsKeeper         *epochskeeper.Keeper
-	// TxFeesKeeper         *txfeeskeeper.Keeper
 
 	// ## Cosmos Cash Keepers
 
@@ -414,8 +400,10 @@ func NewIxoApp(
 
 	app.BondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.DidKeeper,
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
+
 	app.PaymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
 		app.BankKeeper, app.DidKeeper, paymentsReservedIdPrefixes)
+
 	app.EntitiesKeeper = entitieskeeper.NewKeeper(app.appCodec, keys[entitiestypes.StoreKey],
 		app.GetSubspace(entitiestypes.ModuleName), app.AccountKeeper, app.DidKeeper, app.PaymentsKeeper)
 
