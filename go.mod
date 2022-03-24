@@ -20,10 +20,10 @@ require (
 	github.com/tendermint/go-amino v0.16.0
 	github.com/tendermint/tendermint v0.35.2
 	github.com/tendermint/tm-db v0.6.7
-	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
-	google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5
-	google.golang.org/grpc v1.44.0
-	google.golang.org/protobuf v1.27.1
+	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
+	google.golang.org/genproto v0.0.0-20220323144105-ec3c684e5b14
+	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.28.0
 )
 
 require github.com/golang/mock v1.6.0
@@ -127,8 +127,8 @@ require (
 	github.com/zondax/hid v0.9.1-0.20220302062450-5552068d2266 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/net v0.0.0-20211208012354-db4efeb81f4b // indirect
-	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
@@ -155,4 +155,4 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 replace github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
 
-replace github.com/cosmos/cosmos-sdk => ../../community/cosmos-sdk
+// replace github.com/cosmos/cosmos-sdk => ../../community/cosmos-sdk

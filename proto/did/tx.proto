@@ -17,16 +17,22 @@ service Msg {
 
 // MsgAddDid defines a message for adding a DID.
 message MsgAddDid {
-  string did    = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
-  string pubKey = 2 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
+  string did = 1 [ (gogoproto.moretags) = "json:\"did\" yaml:\"did\"" ];
+  string pubKey = 2
+      [ (gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\"" ];
 }
 
 // MsgAddDidResponse defines the Msg/AddDid response type.
 message MsgAddDidResponse {}
 
-// MsgAddCredential defines a message for adding a credential to the signer's DID.
+// MsgAddCredential defines a message for adding a credential to the signer's
+// DID.
 message MsgAddCredential {
-  DidCredential did_credential = 1 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "credential", (gogoproto.moretags) = "yaml:\"credential\""];
+  DidCredential did_credential = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.jsontag) = "credential",
+    (gogoproto.moretags) = "yaml:\"credential\""
+  ];
 }
 
 // MsgAddCredentialResponse defines the Msg/AddCredential response type.

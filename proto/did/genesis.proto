@@ -8,5 +8,6 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 
 // GenesisState defines the did module's genesis state.
 message GenesisState {
-  repeated google.protobuf.Any did_docs = 1 [(gogoproto.moretags) = "yaml:\"did_docs\""];
+  repeated google.protobuf.Any did_docs = 1
+      [ (gogoproto.moretags) = "yaml:\"did_docs\"" ];
 }

@@ -12,7 +12,9 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 service Query {
   // DidDoc queries info of a specific DID's DidDoc.
   rpc DidDoc(QueryDidDocRequest) returns (QueryDidDocResponse) {
-    option (google.api.http).get = "/ixo/did/{did}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+    option (google.api.http).get =
+        "/ixo/did/{did}"; // this is a REST endpoint - see Query service here
+                          // https://docs.cosmos.network/master/migrations/app_and_modules.html
   }
 
   // AllDids returns a list of all existing DIDs.
@@ -20,30 +22,35 @@ service Query {
     option (google.api.http).get = "/ixo/did";
   }
 
-  // AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with their DidDoc info).
+  // AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with
+  // their DidDoc info).
   rpc AllDidDocs(QueryAllDidDocsRequest) returns (QueryAllDidDocsResponse) {
     option (google.api.http).get = "/ixo/allDidDocs";
   }
 
   // AddressFromDid retrieves the cosmos address associated to an ixo DID.
-  rpc AddressFromDid(QueryAddressFromDidRequest) returns (QueryAddressFromDidResponse) {
+  rpc AddressFromDid(QueryAddressFromDidRequest)
+      returns (QueryAddressFromDidResponse) {
     option (google.api.http).get = "/ixo/didToAddr/{did=**}";
   }
 
-  // AddressFromBase58EncodedPubkey retrieves the cosmos address associated to an ixo DID's pubkey.
-  rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest) returns (QueryAddressFromBase58EncodedPubkeyResponse) {
+  // AddressFromBase58EncodedPubkey retrieves the cosmos address associated to
+  // an ixo DID's pubkey.
+  rpc AddressFromBase58EncodedPubkey(QueryAddressFromBase58EncodedPubkeyRequest)
+      returns (QueryAddressFromBase58EncodedPubkeyResponse) {
     option (google.api.http).get = "/ixo/pubKeyToAddr/{pubKey}";
   }
 }
 
 // QueryDidDocRequest is the request type for the Query/DidDoc RPC method.
 message QueryDidDocRequest {
-  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+  string did = 1 [ (gogoproto.moretags) = "json:\"did\" yaml:\"did\"" ];
 }
 
 // QueryDidDocResponse is the response type for the Query/DidDoc RPC method.
 message QueryDidDocResponse {
-  google.protobuf.Any diddoc = 1 [(gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\""];
+  google.protobuf.Any diddoc = 1
+      [ (gogoproto.moretags) = "json:\"did_doc\" yaml:\"did_doc\"" ];
 }
 
 // QueryAllDidsRequest is the request type for the Query/AllDids RPC method.
@@ -51,33 +58,44 @@ message QueryAllDidsRequest {}
 
 // QueryAllDidsResponse is the response type for the Query/AllDids RPC method.
 message QueryAllDidsResponse {
-  repeated string dids = 1 [(gogoproto.moretags) = "json:\"dids\" yaml:\"dids\""];
+  repeated string dids = 1
+      [ (gogoproto.moretags) = "json:\"dids\" yaml:\"dids\"" ];
 }
 
-// QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC method.
+// QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC
+// method.
 message QueryAllDidDocsRequest {}
 
-// QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC method.
+// QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC
+// method.
 message QueryAllDidDocsResponse {
-  repeated google.protobuf.Any diddocs = 1 [(gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\""];
+  repeated google.protobuf.Any diddocs = 1
+      [ (gogoproto.moretags) = "json:\"did_docs\" yaml:\"did_docs\"" ];
 }
 
-// QueryAddressFromDidRequest is the request type for the Query/AddressFromDid RPC method.
+// QueryAddressFromDidRequest is the request type for the Query/AddressFromDid
+// RPC method.
 message QueryAddressFromDidRequest {
-  string did = 1 [(gogoproto.moretags) = "json:\"did\" yaml:\"did\""];
+  string did = 1 [ (gogoproto.moretags) = "json:\"did\" yaml:\"did\"" ];
 }
 
-// QueryAddressFromDidResponse is the response type for the Query/AddressFromDid RPC method.
+// QueryAddressFromDidResponse is the response type for the Query/AddressFromDid
+// RPC method.
 message QueryAddressFromDidResponse {
-  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+  string address = 1
+      [ (gogoproto.moretags) = "json:\"address\" yaml:\"address\"" ];
 }
 
-// QueryAddressFromBase58EncodedPubkeyRequest is the request type for the Query/AddressFromBase58EncodedPubkey RPC method.
+// QueryAddressFromBase58EncodedPubkeyRequest is the request type for the
+// Query/AddressFromBase58EncodedPubkey RPC method.
 message QueryAddressFromBase58EncodedPubkeyRequest {
-  string pubKey = 1 [(gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\""];
+  string pubKey = 1
+      [ (gogoproto.moretags) = "json:\"pubKey\" yaml:\"pubKey\"" ];
 }
 
-// QueryAddressFromBase58EncodedPubkeyResponse is the response type for the Query/AddressFromBase58EncodedPubkey RPC method.
+// QueryAddressFromBase58EncodedPubkeyResponse is the response type for the
+// Query/AddressFromBase58EncodedPubkey RPC method.
 message QueryAddressFromBase58EncodedPubkeyResponse {
-  string address = 1 [(gogoproto.moretags) = "json:\"address\" yaml:\"address\""];
+  string address = 1
+      [ (gogoproto.moretags) = "json:\"address\" yaml:\"address\"" ];
 }
