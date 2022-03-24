@@ -13,6 +13,6 @@ dist
 .DS_STORE
 
 ./ixo-blockchain
-
+lefthook-local
 .vscode/*
 !.vscode/devcontainer.json
