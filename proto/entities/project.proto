@@ -1,5 +1,5 @@
 syntax = "proto3";
-package project;
+package entities;
 
 import "gogoproto/gogo.proto";
 import "cosmos/coin.proto";

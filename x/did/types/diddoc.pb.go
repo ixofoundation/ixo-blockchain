@@ -23,7 +23,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// BaseDidDoc defines a base DID document type. It implements the DidDoc interface.
+// BaseDidDoc defines a base DID document type. It implements the DidDoc
+// interface.
 type BaseDidDoc struct {
 	Did         string           `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" yaml:"did"`
 	PubKey      string           `protobuf:"bytes,2,opt,name=pub_key,json=pubKey,proto3" json:"pubKey" yaml:"pubKey"`
@@ -315,10 +316,7 @@ func (m *BaseDidDoc) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthDiddoc
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthDiddoc
 			}
 			if (iNdEx + skippy) > l {

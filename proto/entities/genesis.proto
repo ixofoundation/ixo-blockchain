@@ -1,8 +1,8 @@
 syntax = "proto3";
-package project;
+package entities;
 
 import "gogoproto/gogo.proto";
-import "project/project.proto";
+import "entities/project.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entities/types";
 

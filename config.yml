@@ -20,5 +20,5 @@ genesis:
       params:
         bond_denom: "uixo"
 build:
-  main: cmd/ixod
+  main: cli/ixod
   bindary: ixod

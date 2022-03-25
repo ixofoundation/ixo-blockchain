@@ -118,7 +118,8 @@ func (m *MsgAddDidResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgAddDidResponse proto.InternalMessageInfo
 
-// MsgAddCredential defines a message for adding a credential to the signer's DID.
+// MsgAddCredential defines a message for adding a credential to the signer's
+// DID.
 type MsgAddCredential struct {
 	DidCredential DidCredential `protobuf:"bytes,1,opt,name=did_credential,json=didCredential,proto3" json:"credential" yaml:"credential"`
 }
@@ -633,10 +634,7 @@ func (m *MsgAddDid) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -686,10 +684,7 @@ func (m *MsgAddDidResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -772,10 +767,7 @@ func (m *MsgAddCredential) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {
@@ -825,10 +817,7 @@ func (m *MsgAddCredentialResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthTx
 			}
 			if (iNdEx + skippy) > l {

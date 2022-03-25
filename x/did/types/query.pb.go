@@ -202,7 +202,8 @@ func (m *QueryAllDidsResponse) GetDids() []string {
 	return nil
 }
 
-// QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC method.
+// QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC
+// method.
 type QueryAllDidDocsRequest struct {
 }
 
@@ -239,7 +240,8 @@ func (m *QueryAllDidDocsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAllDidDocsRequest proto.InternalMessageInfo
 
-// QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC method.
+// QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC
+// method.
 type QueryAllDidDocsResponse struct {
 	Diddocs []*types.Any `protobuf:"bytes,1,rep,name=diddocs,proto3" json:"diddocs,omitempty" json:"did_docs" yaml:"did_docs"`
 }
@@ -284,7 +286,8 @@ func (m *QueryAllDidDocsResponse) GetDiddocs() []*types.Any {
 	return nil
 }
 
-// QueryAddressFromDidRequest is the request type for the Query/AddressFromDid RPC method.
+// QueryAddressFromDidRequest is the request type for the Query/AddressFromDid
+// RPC method.
 type QueryAddressFromDidRequest struct {
 	Did string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty" json:"did" yaml:"did"`
 }
@@ -329,7 +332,8 @@ func (m *QueryAddressFromDidRequest) GetDid() string {
 	return ""
 }
 
-// QueryAddressFromDidResponse is the response type for the Query/AddressFromDid RPC method.
+// QueryAddressFromDidResponse is the response type for the Query/AddressFromDid
+// RPC method.
 type QueryAddressFromDidResponse struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty" json:"address" yaml:"address"`
 }
@@ -374,7 +378,8 @@ func (m *QueryAddressFromDidResponse) GetAddress() string {
 	return ""
 }
 
-// QueryAddressFromBase58EncodedPubkeyRequest is the request type for the Query/AddressFromBase58EncodedPubkey RPC method.
+// QueryAddressFromBase58EncodedPubkeyRequest is the request type for the
+// Query/AddressFromBase58EncodedPubkey RPC method.
 type QueryAddressFromBase58EncodedPubkeyRequest struct {
 	PubKey string `protobuf:"bytes,1,opt,name=pubKey,proto3" json:"pubKey,omitempty" json:"pubKey" yaml:"pubKey"`
 }
@@ -423,7 +428,8 @@ func (m *QueryAddressFromBase58EncodedPubkeyRequest) GetPubKey() string {
 	return ""
 }
 
-// QueryAddressFromBase58EncodedPubkeyResponse is the response type for the Query/AddressFromBase58EncodedPubkey RPC method.
+// QueryAddressFromBase58EncodedPubkeyResponse is the response type for the
+// Query/AddressFromBase58EncodedPubkey RPC method.
 type QueryAddressFromBase58EncodedPubkeyResponse struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty" json:"address" yaml:"address"`
 }
@@ -548,11 +554,13 @@ type QueryClient interface {
 	DidDoc(ctx context.Context, in *QueryDidDocRequest, opts ...grpc.CallOption) (*QueryDidDocResponse, error)
 	// AllDids returns a list of all existing DIDs.
 	AllDids(ctx context.Context, in *QueryAllDidsRequest, opts ...grpc.CallOption) (*QueryAllDidsResponse, error)
-	// AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with their DidDoc info).
+	// AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with
+	// their DidDoc info).
 	AllDidDocs(ctx context.Context, in *QueryAllDidDocsRequest, opts ...grpc.CallOption) (*QueryAllDidDocsResponse, error)
 	// AddressFromDid retrieves the cosmos address associated to an ixo DID.
 	AddressFromDid(ctx context.Context, in *QueryAddressFromDidRequest, opts ...grpc.CallOption) (*QueryAddressFromDidResponse, error)
-	// AddressFromBase58EncodedPubkey retrieves the cosmos address associated to an ixo DID's pubkey.
+	// AddressFromBase58EncodedPubkey retrieves the cosmos address associated to
+	// an ixo DID's pubkey.
 	AddressFromBase58EncodedPubkey(ctx context.Context, in *QueryAddressFromBase58EncodedPubkeyRequest, opts ...grpc.CallOption) (*QueryAddressFromBase58EncodedPubkeyResponse, error)
 }
 
@@ -615,11 +623,13 @@ type QueryServer interface {
 	DidDoc(context.Context, *QueryDidDocRequest) (*QueryDidDocResponse, error)
 	// AllDids returns a list of all existing DIDs.
 	AllDids(context.Context, *QueryAllDidsRequest) (*QueryAllDidsResponse, error)
-	// AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with their DidDoc info).
+	// AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with
+	// their DidDoc info).
 	AllDidDocs(context.Context, *QueryAllDidDocsRequest) (*QueryAllDidDocsResponse, error)
 	// AddressFromDid retrieves the cosmos address associated to an ixo DID.
 	AddressFromDid(context.Context, *QueryAddressFromDidRequest) (*QueryAddressFromDidResponse, error)
-	// AddressFromBase58EncodedPubkey retrieves the cosmos address associated to an ixo DID's pubkey.
+	// AddressFromBase58EncodedPubkey retrieves the cosmos address associated to
+	// an ixo DID's pubkey.
 	AddressFromBase58EncodedPubkey(context.Context, *QueryAddressFromBase58EncodedPubkeyRequest) (*QueryAddressFromBase58EncodedPubkeyResponse, error)
 }
 
@@ -1276,10 +1286,7 @@ func (m *QueryDidDocRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1365,10 +1372,7 @@ func (m *QueryDidDocResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1418,10 +1422,7 @@ func (m *QueryAllDidsRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1503,10 +1504,7 @@ func (m *QueryAllDidsResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1556,10 +1554,7 @@ func (m *QueryAllDidDocsRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1643,10 +1638,7 @@ func (m *QueryAllDidDocsResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1728,10 +1720,7 @@ func (m *QueryAddressFromDidRequest) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1813,10 +1802,7 @@ func (m *QueryAddressFromDidResponse) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1898,10 +1884,7 @@ func (m *QueryAddressFromBase58EncodedPubkeyRequest) Unmarshal(dAtA []byte) erro
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {
@@ -1983,10 +1966,7 @@ func (m *QueryAddressFromBase58EncodedPubkeyResponse) Unmarshal(dAtA []byte) err
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if (iNdEx + skippy) > l {

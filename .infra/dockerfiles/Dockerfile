@@ -12,7 +12,7 @@ WORKDIR /app
 COPY go.mod ./
 COPY go.sum ./
 
-RUN go mod vendor
+RUN go mod tidy && go mod vendor
 
 ONBUILD WORKDIR /app
 
@@ -20,13 +20,14 @@ ONBUILD WORKDIR /app
 ## Fetch Golang Dependencies
 ##
 
-FROM build-dependencies AS build-tests
-RUN go test -v ./...
+# FROM build-dependencies AS build-tests
+# RUN go test -v ./...
 
 FROM build-dependencies AS build-devel
 COPY ./ ./
 
-ENTRYPOINT [ "starport", "chain", "serve" ]
+RUN go install -mod=readonly ./cli/ixod
+ENTRYPOINT [ "tail", "-F", "anything" ]
 
 # Build Golang files
 FROM build-dependencies AS build-binary
