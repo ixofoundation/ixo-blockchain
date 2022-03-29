@@ -32,8 +32,8 @@ services:
       target: build-devel
     image: ixo-chain:devel
     restart: unless-stopped
-    # volumes:
-    #   - /Users/wg/Projects/ixo.world/ixo-blockchain:/app
-    ports:
-      - "1317:1317" # API
-      - "26657:26657" # RPC
+    volumes:
+      - /Users/wg/Projects/ixo.world/ixo-blockchain:/app
+    # ports:
+      # - "1317:1317" # API
+      # - "26657:26657" # RPC

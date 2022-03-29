@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -88,6 +90,8 @@ func (k Keeper) SetDidDoc(ctx sdk.Context, did exported.DidDoc) (err error) {
 func (k Keeper) AddDidDoc(ctx sdk.Context, did exported.DidDoc) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.GetDidPrefixKey(did.GetDid())
+
+	fmt.Println("hiiiiii")
 
 	dd, err := k.MarshalDidDoc(did)
 	if err != nil {

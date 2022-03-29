@@ -60,7 +60,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 
 // RegisterRESTRoutes registers the REST routes for the did module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-// 	rest.RegisterHandlers(clientCtx, rtr)
+	// 	rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the did module.
@@ -97,6 +97,7 @@ func NewAppModule(keeper keeper.Keeper) AppModule {
 
 // Name returns the did module's name.
 func (AppModule) Name() string {
+	fmt.Println("hiiiii")
 	return types.ModuleName
 }
 

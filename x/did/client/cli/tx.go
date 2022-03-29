@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -42,13 +43,20 @@ func NewCmdAddDidDoc() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
+			// cliCtx = cliCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgAddDid(ixoDid.Did, ixoDid.VerifyKey)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
+
+			fmt.Println("yay!!")
+			// sdk.AccAddress()
+
+			// cliCtx = cliCtx.WithFromAddress(exported.VerifyKeyToAddr("ixo17f9gnalu73gps97dt23kptlkv0nt07hyns4nxv"))
+			// fmt.Println(exported.VerifyKeyToAddr("ixo17f9gnalu73gps97dt23kptlkv0nt07hyns4nxv"))
+			// fmt.Println(cliCtx.GetFromAddress())
 
 			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), ixoDid, msg)
 		},

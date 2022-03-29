@@ -113,7 +113,16 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
 
-const appName = "IxoApp"
+const (
+	appName              = "IxoApp"
+	Bech32MainPrefix     = "ixo"
+	Bech32PrefixAccAddr  = Bech32MainPrefix
+	Bech32PrefixAccPub   = Bech32MainPrefix + sdk.PrefixPublic
+	Bech32PrefixValAddr  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator
+	Bech32PrefixValPub   = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
+	Bech32PrefixConsAddr = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus
+	Bech32PrefixConsPub  = Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
+)
 
 var (
 	// DefaultNodeHome default home directories for the application daemon
@@ -162,6 +171,12 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		nft.ModuleName:                 nil,
+
+		//## IXO
+		bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
+		bondstypes.BatchesIntermediaryAccount: nil,
+		bondstypes.BondsReserveAccount:        nil,
+		paymentstypes.PayRemainderPool:        nil,
 	}
 )
 
@@ -532,7 +547,7 @@ func NewIxoApp(
 		)
 	*/
 
-	app.sm.RegisterStoreDecoders()
+	// app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -732,6 +747,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1beta2.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
+
+	//## IXO
+	paramsKeeper.Subspace(bondstypes.ModuleName)
+	paramsKeeper.Subspace(entitiestypes.ModuleName)
 
 	return paramsKeeper
 }

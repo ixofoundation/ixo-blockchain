@@ -14,10 +14,10 @@ wait() {
   done
 }
 
-RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
-  wait
-fi
+# RET=$(ixod status 2>&1)
+# if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
+#   wait
+# fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"

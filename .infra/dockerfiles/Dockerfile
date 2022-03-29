@@ -27,6 +27,7 @@ FROM build-dependencies AS build-devel
 COPY ./ ./
 
 RUN go install -mod=readonly ./cli/ixod
+RUN chmod +x -R .
 ENTRYPOINT [ "tail", "-F", "anything" ]
 
 # Build Golang files
