@@ -25,9 +25,9 @@ yes $PASSWORD | ixod keys add fee5
 yes $PASSWORD | ixod keys add reserveOut
 
 # Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "miguel" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
+yes $PASSWORD | ixod add-genesis-account "francesco" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "shaun" 1000000000000uixo,1000000000000res,1000000000000rez
 
 # Add pubkey-based genesis accounts
 MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey

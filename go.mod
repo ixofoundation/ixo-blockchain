@@ -155,4 +155,4 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 replace github.com/99designs/keyring => github.com/99designs/keyring v1.2.1
 
-// replace github.com/cosmos/cosmos-sdk => ../../community/cosmos-sdk
+replace github.com/cosmos/cosmos-sdk => ../../community/cosmos-sdk
