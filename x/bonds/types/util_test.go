@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
+	"testing"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/ed25519"
-	"testing"
 )
 
 func TestRoundReservePrice(t *testing.T) {
