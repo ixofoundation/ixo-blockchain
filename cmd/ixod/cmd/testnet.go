@@ -4,6 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+
+	"net"
+	"os"
+	"path/filepath"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -25,9 +30,6 @@ import (
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
-	"net"
-	"os"
-	"path/filepath"
 )
 
 var (

@@ -4,5 +4,5 @@ data
 */utils/node_modules/
 */utils/package-lock.json
 
-node_modules
 vendor
+node_modules

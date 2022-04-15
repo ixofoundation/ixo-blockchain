@@ -249,24 +249,32 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	// stdSigs contains the sequence number, account number, and signatures.
 	// When simulating, this would just be a 0-length slice.
 	sigs, err := sigTx.GetSignaturesV2()
+	//fmt.Println("sigs")
+	//fmt.Println(sigs)
+
 	if err != nil {
 		return ctx, err
 	}
 
 	// all messages must be of type IxoMsg
 	msg, ok := tx.GetMsgs()[0].(IxoMsg)
+	//fmt.Println("msgg ---------")
+	//fmt.Println(msg)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be ixo.IxoMsg")
 	}
 
 	// Get pubKey
 	pubKey, err := svd.pkg(ctx, msg)
+	//fmt.Println("message PubKey: ", pubKey)
 	if err != nil {
 		return ctx, err
 	}
 
 	// fetch first (and only) signer
 	signerAddrs := []sdk.AccAddress{sdk.AccAddress(pubKey.Address())}
+	//fmt.Println("signerAddrs: ")
+	//fmt.Println(signerAddrs)
 
 	// check that signer length and signature length are the same
 	if len(sigs) != len(signerAddrs) {
@@ -274,7 +282,13 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	}
 
 	for i, sig := range sigs {
+
+		//fmt.Println("Sign Virify ----------------------")
 		acc, err := ante.GetSignerAcc(ctx, svd.ak, signerAddrs[i])
+
+		//fmt.Println("acc")
+		//fmt.Println(base58.Decode(acc.GetAddress().String()))
+		//fmt.Println("acc err", err)
 		if err != nil {
 			return ctx, err
 		}
@@ -283,6 +297,8 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 
 		// retrieve pubkey
 		pubKey := acc.GetPubKey()
+		//fmt.Println("pubKey: ", pubKey)
+
 		if !simulate && pubKey == nil {
 			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidPubKey, "pubkey on account is not set")
 		}
@@ -305,18 +321,23 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		// retrieve signer data
 		genesis := ctx.BlockHeight() == 0
 		chainID := ctx.ChainID()
+		//fmt.Println("chainID: ", chainID)
+
 		var accNum uint64
 		if !genesis {
 			accNum = acc.GetAccountNumber()
+			//fmt.Println("accNum: ", accNum)
 		}
 		signerData := authsigning.SignerData{
 			ChainID:       chainID,
 			AccountNumber: accNum,
 			Sequence:      acc.GetSequence(),
 		}
-
+		//fmt.Println("signerData")
+		//fmt.Println(signerData)
 		if !simulate {
 			err := authsigning.VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, tx)
+			//fmt.Println("Sig Failure: ", err)
 			if err != nil {
 				var errMsg string
 				if onlyAminoSigners {
