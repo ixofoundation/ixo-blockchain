@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"errors"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"github.com/prometheus/client_golang/prometheus"
 	"io"
 	"os"
 	"path/filepath"
@@ -185,12 +188,18 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	if err != nil {
 		panic(err)
 	}
+	var wasmOpts []wasm.Option
+	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
+		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
+	}
 
 	return app.NewIxoApp(logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		app.MakeTestEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.)
+		app.GetEnabledProposals(),
 		appOpts,
+		wasmOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
@@ -217,9 +226,9 @@ func (a appCreator) appExport(
 	}
 
 	//var ixoApp *app.ixoApp
-
+	var emptyWasmOpts []wasm.Option
 	if height != -1 {
-		ixoApp := app.NewIxoApp(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
+		ixoApp := app.NewIxoApp(logger, db, traceStore, false, map[int64]bool{}, homePath, uint(1), a.encCfg, app.GetEnabledProposals(), appOpts, emptyWasmOpts)
 
 		if err := ixoApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
@@ -227,7 +236,7 @@ func (a appCreator) appExport(
 
 		return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 	} else {
-		ixoApp := app.NewIxoApp(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, appOpts)
+		ixoApp := app.NewIxoApp(logger, db, traceStore, true, map[int64]bool{}, homePath, uint(1), a.encCfg, app.GetEnabledProposals(), appOpts, emptyWasmOpts)
 
 		return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 	}
