@@ -47,7 +47,7 @@ ixod_q() {
   ixod q "$@" --output=json | jq .
 }
 
-BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+BOND_DID="did:ixo:R5Qv6pJm53NLNaMktwuB47"
 #BOND_DID_FULL='{
 #  "did":"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c",
 #  "verifyKey":"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW",
@@ -94,6 +94,18 @@ SHAUN_DID_FULL='{
   }
 }'
 
+
+GREG_DID_FULL='{
+  "did": "did:ixo:CYCc2xaJKrp8Yt947Nc6jd",
+  "verifyKey": "7HjjYKd4SoBv26MqXp1SzmvDiouQxarBZ2ryscZLK22x",
+  "encryptionPublicKey": "FaE44kz98vbKdKh3YWzhe7PTPZ8YsbpDFpdwveGjDgv6",
+  "secret": {
+    "seed": "29a58bc799e8ce6a0ee87cc1e42107fc93e9d904f345501fcd92c20172b2603a",
+    "signKey": "3oa8GeqqCYpmdXa1TW8Q8CtU1M1PELhkTnNYbhcTamBX",
+    "encryptionPrivateKey": "3oa8GeqqCYpmdXa1TW8Q8CtU1M1PELhkTnNYbhcTamBX"
+  }
+}'
+
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
 ixod_tx did add-did-doc "$MIGUEL_DID_FULL" 
@@ -112,47 +124,75 @@ ixod_tx did add-did-doc "$SHAUN_DID_FULL"
 # V0 = 416666666666.667 // invariant
 
 echo "Creating bond..."
+# ixod_tx bonds create-bond \
+#   --token=abcde \
+#   --name="A B C" \
+#   --description="Description about A B C" \
+#   --function-type=augmented_function \
+#   --function-parameters="d0:60000000000.0,p0:1000000.0,theta:0.0,kappa:3.0" \
+#   --reserve-tokens=res \
+#   --tx-fee-percentage=0 \
+#   --exit-fee-percentage=0 \
+#   --fee-address="$FEE" \
+#   --reserve-withdrawal-address="$RESERVE_OUT" \
+#   --max-supply=1000000abcde \
+#   --order-quantity-limits="" \
+#   --sanity-rate="0" \
+#   --sanity-margin-percentage="0" \
+#   --allow-sells \
+#   --alpha-bond \
+#   --batch-blocks=1 \
+#   --outcome-payment="68100000000" \
+#   --bond-did="$BOND_DID" \
+#   --creator-did="$MIGUEL_DID_FULL" \
+#   --controller-did="$FRANCESCO_DID"
+
 ixod_tx bonds create-bond \
-  --token=abc \
+  --token=abcdefgh \
   --name="A B C" \
   --description="Description about A B C" \
   --function-type=augmented_function \
-  --function-parameters="d0:500.0,p0:0.01,theta:0.4,kappa:3.0" \
+  --function-parameters="d0:1000000.0,p0:1000.0,theta:0.0,kappa:3.0" \
   --reserve-tokens=res \
   --tx-fee-percentage=0 \
   --exit-fee-percentage=0 \
   --fee-address="$FEE" \
   --reserve-withdrawal-address="$RESERVE_OUT" \
-  --max-supply=1000000abc \
+  --max-supply=1000000000000abcdefgh \
   --order-quantity-limits="" \
   --sanity-rate="0" \
   --sanity-margin-percentage="0" \
-  --allow-sells \
   --alpha-bond \
   --batch-blocks=1 \
-  --outcome-payment="100000" \
-  --bond-did="$BOND_DID" \
-  --creator-did="$MIGUEL_DID_FULL" \
-  --controller-did="$FRANCESCO_DID"
+  --outcome-payment="68100000000" \
+  --bond-did="did:ixo:ChAvQu3n7X7vTzDtb97ZiU" \
+  --creator-did="$GREG_DID_FULL" \
+  --controller-did="$FRANCESCO_DID" \
+  --generate-only | ixod tx sign-with-did "$GREG_DID_FULL" - \
+    --chain-id="$CHAIN_ID" --amino | ixod tx broadcast - \
+    --chain-id="$CHAIN_ID" | jq -rc '.'
+
 echo "Created bond..."
 ixod_q bonds bond "$BOND_DID"
 
-echo "Miguel buys 20000abc..."
-ixod_tx bonds buy 20000abc 100000res "$BOND_DID" "$MIGUEL_DID_FULL" 
+echo "Miguel buys 20000abcde..."
+ixod_tx bonds buy 10000abcde 10000000000res "$BOND_DID" "$MIGUEL_DID_FULL" --generate-only | ixod tx sign-with-did "$MIGUEL_DID_FULL" - \
+    --chain-id="$CHAIN_ID" | ixod tx broadcast - \
+    --chain-id="$CHAIN_ID" | jq -rc '.'
 echo "Miguel's account..."
 ixod_q bank balances "$MIGUEL_ADDR"
 
-echo "Francesco buys 20000abc..."
-ixod_tx bonds buy 20000abc 100000res "$BOND_DID" "$FRANCESCO_DID_FULL" 
+echo "Francesco buys 20000abcde..."
+ixod_tx bonds buy 20000abcde 100000res "$BOND_DID" "$FRANCESCO_DID_FULL" 
 echo "Francesco's account..."
 ixod_q bank balances "$FRANCESCO_ADDR"
 
-echo "Shaun cannot buy 10001abc..."
-ixod_tx bonds buy 10001abc 100000res "$BOND_DID" "$SHAUN_DID_FULL" 
+echo "Shaun cannot buy 10001abcde..."
+ixod_tx bonds buy 10001abcde 100000res "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun cannot sell anything..."
-ixod_tx bonds sell 10000abc "$BOND_DID" "$SHAUN_DID_FULL" 
-echo "Shaun can buy 10000abc..."
-ixod_tx bonds buy 10000abc 100000res "$BOND_DID" "$SHAUN_DID_FULL" 
+ixod_tx bonds sell 10000abcde "$BOND_DID" "$SHAUN_DID_FULL" 
+echo "Shaun can buy 10000abcde..."
+ixod_tx bonds buy 10000abcde 100000res "$BOND_DID" "$SHAUN_DID_FULL" 
 echo "Shaun's account..."
 ixod_q bank balances "$SHAUN_ADDR"
 
@@ -162,52 +202,52 @@ ixod_q bonds bond "$BOND_DID"
 echo "Current price is 0.018..."
 ixod_q bonds current-price "$BOND_DID"
 
-echo "Changing public alpha 0.5->0.51..."
-NEW_ALPHA="0.51"
-ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
-echo "Current price is now approx 0.011..."
-ixod_q bonds current-price "$BOND_DID"
+# echo "Changing public alpha 0.5->0.51..."
+# NEW_ALPHA="0.51"
+# ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
+# echo "Current price is now approx 0.011..."
+# ixod_q bonds current-price "$BOND_DID"
 
-echo "Changing public alpha 0.51->0.4..."
-NEW_ALPHA="0.4"
-ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
-echo "Current price is still approx 0.011..."
-ixod_q bonds current-price "$BOND_DID"
+# echo "Changing public alpha 0.51->0.4..."
+# NEW_ALPHA="0.4"
+# ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
+# echo "Current price is still approx 0.011..."
+# ixod_q bonds current-price "$BOND_DID"
 
-echo "Cannot change public alpha 0.5->0.6..."
-NEW_ALPHA="0.6"
-ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
+# echo "Cannot change public alpha 0.5->0.6..."
+# NEW_ALPHA="0.6"
+# ixod_tx bonds set-next-alpha "$NEW_ALPHA" "$BOND_DID" "$FRANCESCO_DID_FULL" 
 
-echo "Miguel sells 20000abc..."
-ixod_tx bonds sell 20000abc "$BOND_DID" "$MIGUEL_DID_FULL" 
-echo "Miguel's account..."
-ixod_q bank balances "$MIGUEL_ADDR"
+# echo "Miguel sells 20000abcde..."
+# ixod_tx bonds sell 20000abcde "$BOND_DID" "$MIGUEL_DID_FULL" 
+# echo "Miguel's account..."
+# ixod_q bank balances "$MIGUEL_ADDR"
 
-echo "Francesco makes outcome payment of 50000000 [1]..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" 
-echo "Francesco makes outcome payment of 100000000 [2]..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL" 
-echo "Francesco makes outcome payment of 150000000 [3]..."
-ixod_tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" 
-echo "Francesco's account..."
-ixod_q bank balances "$FRANCESCO_ADDR"
-echo "Bond outcome payment reserve is now 300000000..."
-ixod_q bonds bond "$BOND_DID"
+# echo "Francesco makes outcome payment of 50000000 [1]..."
+# ixod_tx bonds make-outcome-payment "$BOND_DID" "50000000" "$FRANCESCO_DID_FULL" 
+# echo "Francesco makes outcome payment of 100000000 [2]..."
+# ixod_tx bonds make-outcome-payment "$BOND_DID" "100000000" "$FRANCESCO_DID_FULL" 
+# echo "Francesco makes outcome payment of 150000000 [3]..."
+# ixod_tx bonds make-outcome-payment "$BOND_DID" "150000000" "$FRANCESCO_DID_FULL" 
+# echo "Francesco's account..."
+# ixod_q bank balances "$FRANCESCO_ADDR"
+# echo "Bond outcome payment reserve is now 300000000..."
+# ixod_q bonds bond "$BOND_DID"
 
-echo "Francesco updates the bond state to SETTLE"
-ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
-echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
-ixod_q bonds bond "$BOND_DID"
+# echo "Francesco updates the bond state to SETTLE"
+# ixod_tx bonds update-bond-state "SETTLE" "$BOND_DID" "$FRANCESCO_DID_FULL"
+# echo "Bond outcome payment reserve is now empty (moved to main reserve)..."
+# ixod_q bonds bond "$BOND_DID"
 
-echo "Francesco withdraws share..."
-ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" 
-echo "Francesco's account..."
-ixod_q bank balances "$FRANCESCO_ADDR"
+# echo "Francesco withdraws share..."
+# ixod_tx bonds withdraw-share "$BOND_DID" "$FRANCESCO_DID_FULL" 
+# echo "Francesco's account..."
+# ixod_q bank balances "$FRANCESCO_ADDR"
 
-echo "Shaun withdraws share..."
-ixod_tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" 
-echo "Shaun's account..."
-ixod_q bank balances "$SHAUN_ADDR"
+# echo "Shaun withdraws share..."
+# ixod_tx bonds withdraw-share "$BOND_DID" "$SHAUN_DID_FULL" 
+# echo "Shaun's account..."
+# ixod_q bank balances "$SHAUN_ADDR"
 
-echo "Bond reserve is now empty and supply is 0..."
-ixod_q bonds bond "$BOND_DID"
+# echo "Bond reserve is now empty and supply is 0..."
+# ixod_q bonds bond "$BOND_DID"

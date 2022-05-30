@@ -2,7 +2,8 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
+	fmt "fmt"
+
 	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

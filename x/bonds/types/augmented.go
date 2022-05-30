@@ -19,13 +19,13 @@ func Invariant(R, S sdk.Dec, kappa sdk.Dec) (sdk.Dec, error) {
 // given a value function (parameterized by kappa)
 // and an invariant coeficient V0
 // return Supply S as a function of reserve R
-func Supply(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) (sdk.Dec, error) {
-	result, err := ApproxRoot(V0.Mul(R), kappa)
-	if err != nil {
-		return sdk.Dec{}, nil
-	}
-	return result, nil
-}
+// func Supply(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) (sdk.Dec, error) {
+// 	result, err := ApproxRoot(V0.Mul(R), kappa)
+// 	if err != nil {
+// 		return sdk.Dec{}, nil
+// 	}
+// 	return result, nil
+// }
 
 // This is the reverse of Supply(...) function
 func Reserve(S sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) (sdk.Dec, error) {

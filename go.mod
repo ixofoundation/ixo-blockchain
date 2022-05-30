@@ -5,12 +5,16 @@ go 1.17
 require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.45.1 // latest
+	github.com/CosmWasm/wasmd v0.21.0
+	github.com/btcsuite/btcutil v1.0.2
+	github.com/cosmos/cosmos-sdk v0.42.10 // latest
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.2.1

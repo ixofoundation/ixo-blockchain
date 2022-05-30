@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"encoding/hex"
 	"fmt"
-	"os"
-
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
@@ -22,8 +22,11 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	channelkeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/keeper"
+	ibcante "github.com/cosmos/cosmos-sdk/x/ibc/core/ante"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/pflag"
+	"os"
 )
 
 var (
@@ -45,9 +48,16 @@ func init() {
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (cryptotypes.PubKey, error)
 
-func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
-	sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter,
-	signModeHandler authsigning.SignModeHandler) sdk.AnteHandler {
+func NewDefaultAnteHandler(
+	ak authkeeper.AccountKeeper,
+	bk bankkeeper.Keeper,
+	sigGasConsumer ante.SignatureVerificationGasConsumer,
+	pubKeyGetter PubKeyGetter,
+	signModeHandler authsigning.SignModeHandler,
+	txCounterStoreKey sdk.StoreKey,
+	channelKeeper channelkeeper.Keeper,
+	wasmConfig wasmTypes.WasmConfig,
+) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler. Below, we will discuss the differences
@@ -86,7 +96,9 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 	//   instead of from the messages' GetSigners() function.
 
 	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		ante.NewSetUpContextDecorator(),                                          // outermost AnteDecorator. SetUpContext must be called
+		wasmkeeper.NewLimitSimulationGasDecorator(wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(txCounterStoreKey),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewValidateMemoDecorator(ak),
@@ -97,6 +109,7 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 		NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
 		NewSigVerificationDecorator(ak, signModeHandler, pubKeyGetter),
 		NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator
+		ibcante.NewAnteDecorator(channelKeeper),
 	)
 }
 

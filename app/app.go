@@ -1,10 +1,10 @@
 package app
 
 import (
-	"io"
-	"net/http"
-	"os"
-
+	"fmt"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	WasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -104,6 +104,11 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 const (
@@ -146,6 +151,10 @@ var (
 		vesting.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 
+		gov.NewAppModuleBasic(
+			append(wasmclient.ProposalHandlers, paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler)...,
+		),
+		wasm.AppModuleBasic{},
 		// Custom ixo modules
 		did.AppModuleBasic{},
 		bonds.AppModuleBasic{},
@@ -163,6 +172,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		wasm.ModuleName:                {authtypes.Burner},
 
 		// Custom ixo module accounts
 		bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
@@ -182,9 +192,37 @@ var (
 	}
 )
 
+var (
+	//NodeDir      = ".ixod"
+	//Bech32Prefix = "ixo"
+
+	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
+	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
+	ProposalsEnabled = "false"
+	// If set to non-empty string it must be comma-separated list of values that are all a subset
+	// of "EnableAllProposals" (takes precedence over ProposalsEnabled)
+	// https://github.com/CosmWasm/wasmd/blob/02a54d33ff2c064f3539ae12d75d027d9c665f05/x/wasm/internal/types/proposal.go#L28-L34
+	EnableSpecificProposals = ""
+)
+
 // Verify app interface at compile time
 var _ simapp.App = (*IxoApp)(nil)
 var _ servertypes.Application = (*IxoApp)(nil)
+
+func GetEnabledProposals() []wasm.ProposalType {
+	if EnableSpecificProposals == "" {
+		if ProposalsEnabled == "true" {
+			return wasm.EnableAllProposals
+		}
+		return wasm.DisableAllProposals
+	}
+	chunks := strings.Split(EnableSpecificProposals, ",")
+	proposals, err := wasm.ConvertToProposals(chunks)
+	if err != nil {
+		panic(err)
+	}
+	return proposals
+}
 
 // Extended ABCI application
 type IxoApp struct {
@@ -216,10 +254,12 @@ type IxoApp struct {
 	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
 	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
 	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
+	wasmKeeper       wasm.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper `json:"scoped_transfer_keeper"`
+	scopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
 	// Custom ixo keepers
 	DidKeeper      didkeeper.Keeper      `json:"did_keeper"`
@@ -237,8 +277,8 @@ type IxoApp struct {
 // NewIxoApp returns a reference to an initialized IxoApp.
 func NewIxoApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig params.EncodingConfig,
-	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
+	homePath string, invCheckPeriod uint, encodingConfig params.EncodingConfig, enabledProposals []wasm.ProposalType,
+	appOpts servertypes.AppOptions, wasmOpts []wasm.Option, baseAppOptions ...func(*baseapp.BaseApp),
 ) *IxoApp {
 
 	appCodec := encodingConfig.Marshaler
@@ -260,6 +300,7 @@ func NewIxoApp(
 		// Custom ixo store keys
 		didtypes.StoreKey, bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
+		wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -285,6 +326,7 @@ func NewIxoApp(
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 
 	// add keepers (for standard Cosmos modules)
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -353,6 +395,10 @@ func NewIxoApp(
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	if len(enabledProposals) != 0 {
+		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
+	}
+	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -361,6 +407,37 @@ func NewIxoApp(
 	)
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
+
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
+	// The last arguments can contain custom message handlers, and custom query handlers,
+	// if we want to allow any custom callbacks
+	supportedFeatures := "iterator,staking,stargate"
+	app.wasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.GetSubspace(wasm.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.StakingKeeper,
+		app.DistrKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.TransferKeeper,
+		app.Router(),
+		app.GRPCQueryRouter(),
+		wasmDir,
+		wasmConfig,
+		supportedFeatures,
+		wasmOpts...,
+	)
+
+	//app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
 
@@ -396,6 +473,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
+		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
@@ -453,7 +531,7 @@ func NewIxoApp(
 		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName,
 		// Custom ixo modules
 		didtypes.ModuleName, bondstypes.ModuleName,
-		paymentstypes.ModuleName, projecttypes.ModuleName,
+		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
 	)
 
 	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
@@ -478,6 +556,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
+		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
@@ -494,7 +573,7 @@ func NewIxoApp(
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(NewIxoAnteHandler(app, encodingConfig))
+	app.SetAnteHandler(NewIxoAnteHandler(app, encodingConfig, wasmConfig, keys[wasm.StoreKey]))
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
@@ -517,6 +596,7 @@ func NewIxoApp(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.scopedWasmKeeper = scopedWasmKeeper
 
 	return app
 }
@@ -687,7 +767,11 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.AnteHandler {
+type KVStoreKey struct {
+	name string
+}
+
+func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig, wasmConfig WasmTypes.WasmConfig, key sdk.StoreKey) sdk.AnteHandler {
 
 	// The AnteHandler needs to get the signer's pubkey to verify signatures,
 	// charge gas fees (to the corresponding address), and for other purposes.
@@ -727,13 +811,16 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig) sdk.An
 
 	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper.ChannelKeeper,
+		wasmConfig)
 	didAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper.ChannelKeeper,
+		wasmConfig)
 	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler())
+		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper.ChannelKeeper,
+		wasmConfig)
 
 	// The default Cosmos AnteHandler is still used for standard Cosmos messages
 	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
@@ -820,6 +907,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	// init params keeper and subspaces (for custom ixo modules)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
+	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
 }
