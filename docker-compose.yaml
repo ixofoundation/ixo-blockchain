@@ -17,7 +17,7 @@ services:
     image: swaggerapi/swagger-ui
     restart: unless-stopped
     environment:
-      - BASE_URL=/swagger 
+      - BASE_URL=/swagger
       - SWAGGER_JSON=/api-docs/swagger.yaml
     ports: 
      - "8090:8080" 
@@ -29,6 +29,7 @@ services:
     build:
       context: .
       dockerfile: .infra/dockerfiles/Dockerfile
+      target: starport
     image: ixo-chain:devel
     restart: unless-stopped
     ports:
