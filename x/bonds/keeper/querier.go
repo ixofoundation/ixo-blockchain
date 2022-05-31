@@ -109,17 +109,18 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshalBinaryBare(iterator.Value(), &bond)
+		if bond.State == types.HatchState.String() || bond.State == types.OpenState.String() {
+			reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
+			reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
+			reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
-		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
-		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
-
-		bondsList = append(bondsList, &types.BondDetails{
-			BondDid:   bond.BondDid,
-			SpotPrice: reservePrices,
-			Supply:    bond.CurrentSupply,
-			Reserve:   reserveBalances,
-		})
+			bondsList = append(bondsList, &types.BondDetails{
+				BondDid:   bond.BondDid,
+				SpotPrice: reservePrices,
+				Supply:    bond.CurrentSupply,
+				Reserve:   reserveBalances,
+			})
+		}
 	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
