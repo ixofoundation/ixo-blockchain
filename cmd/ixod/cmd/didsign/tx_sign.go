@@ -208,7 +208,7 @@ func makeSignCmd() func(cmd *cobra.Command, args []string) error {
 		clientCtx, txF, newTx, err := readTxAndInitContexts(clientCtx, cmd, args[1])
 		clientCtx = clientCtx.WithFromAddress(singerDid.Address())
 
-		txF, err = tx.PrepareFactory(clientCtx, txF)
+		// txF, err = tx.PrepareFactory(clientCtx, txF)
 
 		if err != nil {
 			return err

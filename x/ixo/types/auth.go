@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"encoding/hex"
 	"fmt"
+	"os"
+
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/btcsuite/btcutil/base58"
@@ -22,11 +24,10 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	channelkeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/keeper"
-	ibcante "github.com/cosmos/cosmos-sdk/x/ibc/core/ante"
+	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
+	channelkeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/pflag"
-	"os"
 )
 
 var (
@@ -55,7 +56,7 @@ func NewDefaultAnteHandler(
 	pubKeyGetter PubKeyGetter,
 	signModeHandler authsigning.SignModeHandler,
 	txCounterStoreKey sdk.StoreKey,
-	channelKeeper channelkeeper.Keeper,
+	channelKeeper *channelkeeper.Keeper,
 	wasmConfig wasmTypes.WasmConfig,
 ) sdk.AnteHandler {
 
@@ -129,7 +130,64 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 // TODO: This function was a copy and paste of the the internal function which Cosmos made private.
 // TODO: Function looked 99% the same so just wrapped the official implementation.
 func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDid, msg sdk.Msg) error {
-	return tx.BroadcastTx(clientCtx, txf)
+	txf, err := prepareFactory(clientCtx, txf)
+	if err != nil {
+		return err
+	}
+
+	if txf.SimulateAndExecute() || clientCtx.Simulate {
+		_, adjusted, err := tx.CalculateGas(clientCtx, txf, msg)
+		if err != nil {
+			return err
+		}
+
+		txf = txf.WithGas(adjusted)
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", tx.GasEstimateResponse{GasEstimate: txf.Gas()})
+	}
+
+	if clientCtx.Simulate {
+		return nil
+	}
+
+	tx, err := tx.BuildUnsignedTx(txf, msg) //like old BuildSignMsg
+	if err != nil {
+		return err
+	}
+
+	if !clientCtx.SkipConfirm {
+		out, err := clientCtx.TxConfig.TxJSONEncoder()(tx.GetTx())
+		if err != nil {
+			return err
+		}
+
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
+
+		buf := bufio.NewReader(os.Stdin)
+		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
+
+		if err != nil || !ok {
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+			return err
+		}
+	}
+
+	err = Sign(txf, clientCtx, tx, true, ixoDid)
+	if err != nil {
+		return err
+	}
+
+	txBytes, err := clientCtx.TxConfig.TxEncoder()(tx.GetTx())
+	if err != nil {
+		return err
+	}
+
+	// broadcast to a Tendermint node
+	res, err := clientCtx.BroadcastTx(txBytes)
+	if err != nil {
+		return err
+	}
+
+	return clientCtx.PrintProto(res)
 }
 
 func checkMultipleSigners(mode signing.SignMode, tx authsigning.Tx) error {

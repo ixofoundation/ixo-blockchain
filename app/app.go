@@ -2,6 +2,12 @@ package app
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 	WasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -72,14 +78,15 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
-	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
+	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v3/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/ixofoundation/ixo-blockchain/client/tx"
@@ -104,11 +111,6 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 const (
@@ -226,8 +228,8 @@ func GetEnabledProposals() []wasm.ProposalType {
 
 // Extended ABCI application
 type IxoApp struct {
-	*baseapp.BaseApp `json:"_bam_base_app,omitempty"`
-	legacyAmino      *codec.LegacyAmino `json:"legacy_amino,omitempty"`
+	*baseapp.BaseApp  `json:"_bam_base_app,omitempty"`
+	legacyAmino       *codec.LegacyAmino      `json:"legacy_amino,omitempty"`
 	appCodec          codec.Codec             `json:"app_codec,omitempty"`
 	interfaceRegistry types.InterfaceRegistry `json:"interface_registry,omitempty"`
 
@@ -378,7 +380,7 @@ func NewIxoApp(
 		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -386,15 +388,22 @@ func NewIxoApp(
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+		appCodec,
+		keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
+	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	if len(enabledProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
 	}
@@ -429,7 +438,7 @@ func NewIxoApp(
 		&app.IBCKeeper.PortKeeper,
 		scopedWasmKeeper,
 		app.TransferKeeper,
-		app.Router(),
+		app.MsgServiceRouter(),
 		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
@@ -473,7 +482,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
+		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
@@ -498,7 +507,7 @@ func NewIxoApp(
 		paymentstypes.ModuleName, genutiltypes.ModuleName, crisistypes.ModuleName,
 		paramstypes.ModuleName, authtypes.ModuleName, capabilitytypes.ModuleName,
 		govtypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName,
-		feegrant.ModuleName,
+		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
 		didtypes.ModuleName,
@@ -512,7 +521,7 @@ func NewIxoApp(
 		upgradetypes.ModuleName, ibchost.ModuleName, paramstypes.ModuleName, authtypes.ModuleName,
 		minttypes.ModuleName, projecttypes.ModuleName, genutiltypes.ModuleName, vestingtypes.ModuleName,
 		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
-		feegrant.ModuleName,
+		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
 		bondstypes.ModuleName, paymentstypes.ModuleName,
@@ -529,6 +538,8 @@ func NewIxoApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName,
+		wasm.ModuleName,
+
 		// Custom ixo modules
 		didtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
@@ -556,7 +567,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
+		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
@@ -811,15 +822,15 @@ func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig, wasmCo
 
 	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper.ChannelKeeper,
+		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
 		wasmConfig)
 	didAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper.ChannelKeeper,
+		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
 		wasmConfig)
 	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper.ChannelKeeper,
+		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
 		wasmConfig)
 
 	// The default Cosmos AnteHandler is still used for standard Cosmos messages

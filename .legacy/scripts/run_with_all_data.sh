@@ -4,15 +4,15 @@ PASSWORD="12345678"
 
 ixod init local --chain-id pandora-4
 
-yes 'y' | ixod keys delete miguel --force
-yes 'y' | ixod keys delete francesco --force
-yes 'y' | ixod keys delete shaun --force
-yes 'y' | ixod keys delete fee --force
-yes 'y' | ixod keys delete fee2 --force
-yes 'y' | ixod keys delete fee3 --force
-yes 'y' | ixod keys delete fee4 --force
-yes 'y' | ixod keys delete fee5 --force
-yes 'y' | ixod keys delete reserveOut --force
+# yes 'y' | ixod keys delete miguel --force
+# yes 'y' | ixod keys delete francesco --force
+# yes 'y' | ixod keys delete shaun --force
+# yes 'y' | ixod keys delete fee --force
+# yes 'y' | ixod keys delete fee2 --force
+# yes 'y' | ixod keys delete fee3 --force
+# yes 'y' | ixod keys delete fee4 --force
+# yes 'y' | ixod keys delete fee5 --force
+# yes 'y' | ixod keys delete reserveOut --force
 
 yes $PASSWORD | ixod keys add miguel
 yes $PASSWORD | ixod keys add francesco
