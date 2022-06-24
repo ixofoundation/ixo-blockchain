@@ -123,6 +123,9 @@ func (id IxoDid) String() string {
 func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
 	var pubKey ed25519.PubKey
 	pubKey.Key = base58.Decode(verifyKey)
+	// var pkSECP secp256k1.PubKey
+	// pkSECP.Key = base58.Decode(verifyKey)
+
 	return sdk.AccAddress(pubKey.Address())
 }
 

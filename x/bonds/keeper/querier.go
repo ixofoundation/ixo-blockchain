@@ -10,20 +10,21 @@ import (
 )
 
 const (
-	QueryBonds            = "bonds"
-	QueryBondsDetailed    = "bonds_detailed"
-	QueryBond             = "bond"
-	QueryBatch            = "batch"
-	QueryLastBatch        = "last_batch"
-	QueryCurrentPrice     = "current_price"
-	QueryCurrentReserve   = "current_reserve"
-	QueryAvailableReserve = "available_reserve"
-	QueryCustomPrice      = "custom_price"
-	QueryBuyPrice         = "buy_price"
-	QuerySellReturn       = "sell_return"
-	QuerySwapReturn       = "swap_return"
-	QueryAlphaMaximums    = "alpha_maximums"
-	QueryParams           = "params"
+	QueryBonds              = "bonds"
+	QueryBondsDetailed      = "bonds_detailed"
+	QueryBond               = "bond"
+	QueryBatch              = "batch"
+	QueryLastBatch          = "last_batch"
+	QueryCurrentPrice       = "current_price"
+	QueryCurrentReserve     = "current_reserve"
+	QueryAvailableReserve   = "available_reserve"
+	QueryCustomPrice        = "custom_price"
+	QueryBuyPrice           = "buy_price"
+	QuerySellReturn         = "sell_return"
+	QuerySwapReturn         = "swap_return"
+	QueryAlphaMaximums      = "alpha_maximums"
+	QueryParams             = "params"
+	QueryBondAccountDetails = "bond_account_details"
 )
 
 // NewQuerier is the module level router for state queries
@@ -58,6 +59,8 @@ func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier 
 			return queryAlphaMaximums(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryParams:
 			return queryParams(ctx, keeper, legacyQuerierCdc)
+		// case QueryBondAccountDetails:
+		// 	return queryBondAccountDetails(ctx, path[1:], keeper, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown bonds query endpoint")
 		}
@@ -441,6 +444,19 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper, legacyQue
 
 	return bz, nil
 }
+
+// func queryBondAccountDetails(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
+// 	bondDid := path[0]
+
+// 	bond, found := keeper.GetBond(ctx, bondDid)
+// 	if !found {
+// 		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+// 	}
+
+//  keeper.Get
+
+// 	return bz, nil
+// }
 
 func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	params := k.GetParams(ctx)

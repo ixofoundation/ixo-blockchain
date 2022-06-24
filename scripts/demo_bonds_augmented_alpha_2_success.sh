@@ -64,7 +64,7 @@ FRANCESCO_ADDR="ixo1cpa6w2wnqyxpxm4rryfjwjnx75kn4xt372dp3y"
 SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"
 MIGUEL_DID_FULL='{
   "did":"did:ixo:4XJLBfGtWSGKSz4BeRxdun",
-  "verifyKey":"2vMHhssdhrBCRFiq9vj7TxGYDybW4yYdrYh9JG56RaAt",
+  "verifyKey":"A84TX+JIkb1s1WUj/Uxt4P7N9K/yWg4eUQIzjMmdgOO0",
   "encryptionPublicKey":"6GBp8qYgjE3ducksUa9Ar26ganhDFcmYfbZE9ezFx5xS",
   "secret":{
     "seed":"38734eeb53b5d69177da1fa9a093f10d218b3e0f81087226be6ce0cdce478180",

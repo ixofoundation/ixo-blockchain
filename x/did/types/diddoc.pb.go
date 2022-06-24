@@ -315,10 +315,7 @@ func (m *BaseDidDoc) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthDiddoc
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthDiddoc
 			}
 			if (iNdEx + skippy) > l {

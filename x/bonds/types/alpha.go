@@ -30,9 +30,6 @@ func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {
 	x := I
 	z := alpha.MulInt(C)
 	y := I.Sub(z)
-	//fmt.Println(x)
-	//fmt.Println(z)
-	//fmt.Println(y)
 	return x.Quo(y)
 }
 

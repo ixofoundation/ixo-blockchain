@@ -1,13 +1,12 @@
 module github.com/ixofoundation/ixo-blockchain
 
-go 1.17
+go 1.18
 
 require (
 	github.com/CosmWasm/wasmd v0.27.0
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.45.4
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/cosmos/ibc-go v1.4.0
 	github.com/cosmos/ibc-go/v3 v3.0.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
@@ -24,9 +23,9 @@ require (
 	github.com/tendermint/go-amino v0.16.0
 	github.com/tendermint/tendermint v0.34.19
 	github.com/tendermint/tm-db v0.6.7
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
-	google.golang.org/genproto v0.0.0-20220407144326-9054f6ed7bac
-	google.golang.org/grpc v1.45.0
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	google.golang.org/genproto v0.0.0-20220608133413-ed9918b62aac
+	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
 )
 
@@ -119,7 +118,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 )
 

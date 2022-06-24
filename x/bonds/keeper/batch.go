@@ -657,7 +657,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
 	newPublicAlpha := batch.NextPublicAlpha
 
 	// Get supply, reserve, outcome payment
-	// S := bond.CurrentSupply.Amount.ToDec()
+	S := bond.CurrentSupply.Amount.ToDec()
 	//fmt.Println("S: ", S)
 	R := bond.CurrentReserve[0].Amount.ToDec()
 	//fmt.Println("R: ", R)
@@ -687,7 +687,8 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
 	//fmt.Println("temp: ", temp)
 	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
 	//fmt.Println("scaledDeltaPublicAlpha: ", scaledDeltaPublicAlpha)
-
+	// temp = (prevPublicAlpha * (1 - 0.5)) pow 2
+	// (new_public_alpha - previous_public_alpha) * temp)
 	// Calculate new system alpha
 	prevSystemAlpha := paramsMap["systemAlpha"]
 	//fmt.Println("prevSystemAlpha: ", prevSystemAlpha)
@@ -746,21 +747,21 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
 	}
 
 	// Recalculate kappa and V0 using new alpha
-	// I0 := paramsMap["I0"]
-	// //fmt.Println("I0: ", I0)
-	// newKappa := types.Kappa(I0, C, newSystemAlpha)
-	// //fmt.Println("newKappa: ", newKappa)
-	// newV0, err := types.Invariant(R, S, newKappa)
-	// //fmt.Println("newV0: ", newV0)
-	// if err != nil {
-	// 	ctx.EventManager().EmitEvent(sdk.NewEvent(
-	// 		types.EventTypeEditAlphaFailed,
-	// 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-	// 		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-	// 		sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
-	// 	))
-	// 	return
-	// }
+	I0 := paramsMap["I0"]
+	//fmt.Println("I0: ", I0)
+	newKappa := types.Kappa(I0, C, newSystemAlpha)
+	//fmt.Println("newKappa: ", newKappa)
+	newV0, err := types.Invariant(R, S, newKappa)
+	//fmt.Println("newV0: ", newV0)
+	if err != nil {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+		))
+		return
+	}
 
 	// Get batch to reset alpha
 	batch = k.MustGetBatch(ctx, bond.BondDid)
@@ -768,8 +769,8 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
 	k.SetBatch(ctx, bond.BondDid, batch)
 
 	// Set new function parameters
-	// bond.FunctionParameters.ReplaceParam("kappa", newKappa)
-	// bond.FunctionParameters.ReplaceParam("V0", newV0)
+	bond.FunctionParameters.ReplaceParam("kappa", newKappa)
+	bond.FunctionParameters.ReplaceParam("V0", newV0)
 	bond.FunctionParameters.ReplaceParam("publicAlpha", newPublicAlpha)
 	bond.FunctionParameters.ReplaceParam("systemAlpha", newSystemAlpha)
 	k.SetBond(ctx, bond.BondDid, bond)
