@@ -42,7 +42,7 @@ FROM build-dependencies AS build-binary
 COPY ./ ./
 
 ENV IXOD_HOME="/home/ixo/"
-RUN mkdir -p ${IXOD_HOME}
+RUN mkdir -p ${IXOD_HOME}/data
 
 RUN go mod tidy && go mod vendor
 RUN make install

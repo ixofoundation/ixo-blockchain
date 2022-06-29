@@ -5,7 +5,6 @@ type DID struct {
 }
 
 type IIDImpl interface {
-	
 }
 
 type IID struct {
@@ -35,5 +34,6 @@ func X(did DID) {
 
 func Y() {
 
-	X(IID{Id: "hi", Other: "hi"})
+	Project{}.
+		X(IID{Id: "hi", Other: "hi"})
 }
