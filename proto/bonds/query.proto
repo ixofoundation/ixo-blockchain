@@ -79,6 +79,10 @@ service Query {
   rpc AlphaMaximums(QueryAlphaMaximumsRequest) returns (QueryAlphaMaximumsResponse) {
     option (google.api.http).get = "/ixo/bonds/{bond_did}/alpha_maximums";
   }
+
+  // rpc BondAccountDetails(QueryAlphaMaximumsRequest) returns (QueryBondAccountDetailsResponse) {
+  //   option (google.api.http).get = "/ixo/bonds/{bond_did}/bond_account_details";
+  // }
 }
 
 // QueryBondsRequest is the request type for the Query/Bonds RPC method.
@@ -222,6 +226,19 @@ message QueryAlphaMaximumsResponse {
   string max_system_alpha_increase = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_system_alpha_increase\""];
   string max_system_alpha          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_system_alpha\""];
 }
+
+
+// message QueryBondAccountDetailsRequest {
+//   string bond_did = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
+// }
+
+// QueryAlphaMaximumsResponse is the response type for the Query/AlphaMaximums RPC method.
+// message QueryBondAccountDetailsResponse {
+//   string fee_account = 1 [(gogoproto.moretags) = "yaml:\"fee_address\""];
+//   string withdraw_reserve_account = 2 [(gogoproto.moretags) = "yaml:\"withdraw_reserve_account\""];
+//   string outcome_payment_account = 3 [(gogoproto.moretags) = "yaml:\"outcome_payment_account\""];
+//   string reserve_account          = 4 [(gogoproto.moretags) = "yaml:\"reserve_account\""];
+// }
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
 message QueryParamsRequest {}

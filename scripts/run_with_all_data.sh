@@ -4,15 +4,15 @@ PASSWORD="12345678"
 
 ixod init local --chain-id pandora-4
 
-yes 'y' | ixod keys delete miguel --force
-yes 'y' | ixod keys delete francesco --force
-yes 'y' | ixod keys delete shaun --force
-yes 'y' | ixod keys delete fee --force
-yes 'y' | ixod keys delete fee2 --force
-yes 'y' | ixod keys delete fee3 --force
-yes 'y' | ixod keys delete fee4 --force
-yes 'y' | ixod keys delete fee5 --force
-yes 'y' | ixod keys delete reserveOut --force
+# yes 'y' | ixod keys delete miguel --force
+# yes 'y' | ixod keys delete francesco --force
+# yes 'y' | ixod keys delete shaun --force
+# yes 'y' | ixod keys delete fee --force
+# yes 'y' | ixod keys delete fee2 --force
+# yes 'y' | ixod keys delete fee3 --force
+# yes 'y' | ixod keys delete fee4 --force
+# yes 'y' | ixod keys delete fee5 --force
+# yes 'y' | ixod keys delete reserveOut --force
 
 yes $PASSWORD | ixod keys add miguel
 yes $PASSWORD | ixod keys add francesco
@@ -36,6 +36,7 @@ SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"     # address from did:i
 yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "ixo19h3lqj50uhzdrv8mkafnp55nqmz4ghc2sd3m48" 1000000000000uixo,1000000000000res,1000000000000rez
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"

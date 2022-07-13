@@ -1,6 +1,8 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 var (
 	StartingPublicAlpha = sdk.MustNewDecFromStr("0.5")
@@ -25,7 +27,8 @@ func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {
 	// C: outcome payment
 
 	x := I
-	y := I.Sub(alpha.MulInt(C))
+	z := alpha.MulInt(C)
+	y := I.Sub(z)
 	return x.Quo(y)
 }
 

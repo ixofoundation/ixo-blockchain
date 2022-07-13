@@ -331,6 +331,8 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 				}
 				result = bond.GetNewReserveDecCoins(spotPriceDec)
 			}
+		case FailedState.String():
+			fallthrough
 		case SettleState.String():
 			return nil, ErrInvalidStateForAction
 		default:

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/cmd/ixod/cmd"
 	"os"
+
+	"github.com/ixofoundation/ixo-blockchain/cmd/ixod/cmd"
 
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"

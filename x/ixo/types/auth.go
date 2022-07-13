@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
@@ -22,6 +24,8 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
+	channelkeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
 	"github.com/spf13/pflag"
 )
@@ -45,9 +49,16 @@ func init() {
 
 type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (cryptotypes.PubKey, error)
 
-func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
-	sigGasConsumer ante.SignatureVerificationGasConsumer, pubKeyGetter PubKeyGetter,
-	signModeHandler authsigning.SignModeHandler) sdk.AnteHandler {
+func NewDefaultAnteHandler(
+	ak authkeeper.AccountKeeper,
+	bk bankkeeper.Keeper,
+	sigGasConsumer ante.SignatureVerificationGasConsumer,
+	pubKeyGetter PubKeyGetter,
+	signModeHandler authsigning.SignModeHandler,
+	txCounterStoreKey sdk.StoreKey,
+	channelKeeper *channelkeeper.Keeper,
+	wasmConfig wasmTypes.WasmConfig,
+) sdk.AnteHandler {
 
 	// Refer to inline documentation in app/app.go for introduction to why we
 	// need a custom ixo AnteHandler. Below, we will discuss the differences
@@ -86,7 +97,9 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 	//   instead of from the messages' GetSigners() function.
 
 	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		ante.NewSetUpContextDecorator(),                                          // outermost AnteDecorator. SetUpContext must be called
+		wasmkeeper.NewLimitSimulationGasDecorator(wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(txCounterStoreKey),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewValidateMemoDecorator(ak),
@@ -97,6 +110,7 @@ func NewDefaultAnteHandler(ak authkeeper.AccountKeeper, bk bankkeeper.Keeper,
 		NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
 		NewSigVerificationDecorator(ak, signModeHandler, pubKeyGetter),
 		NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator
+		ibcante.NewAnteDecorator(channelKeeper),
 	)
 }
 
@@ -113,10 +127,65 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 	return BroadcastTx(clientCtx, txf, ixoDid, msg)
 }
 
-// TODO: This function was a copy and paste of the the internal function which Cosmos made private.
-// TODO: Function looked 99% the same so just wrapped the official implementation.
 func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDid, msg sdk.Msg) error {
-	return tx.BroadcastTx(clientCtx, txf)
+	txf, err := prepareFactory(clientCtx, txf)
+	if err != nil {
+		return err
+	}
+
+	if txf.SimulateAndExecute() || clientCtx.Simulate {
+		_, adjusted, err := tx.CalculateGas(clientCtx, txf, msg)
+		if err != nil {
+			return err
+		}
+
+		txf = txf.WithGas(adjusted)
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", tx.GasEstimateResponse{GasEstimate: txf.Gas()})
+	}
+
+	if clientCtx.Simulate {
+		return nil
+	}
+
+	tx, err := tx.BuildUnsignedTx(txf, msg) //like old BuildSignMsg
+	if err != nil {
+		return err
+	}
+
+	if !clientCtx.SkipConfirm {
+		out, err := clientCtx.TxConfig.TxJSONEncoder()(tx.GetTx())
+		if err != nil {
+			return err
+		}
+
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
+
+		buf := bufio.NewReader(os.Stdin)
+		ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
+
+		if err != nil || !ok {
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+			return err
+		}
+	}
+
+	err = Sign(txf, clientCtx, tx, true, ixoDid)
+	if err != nil {
+		return err
+	}
+
+	txBytes, err := clientCtx.TxConfig.TxEncoder()(tx.GetTx())
+	if err != nil {
+		return err
+	}
+
+	// broadcast to a Tendermint node
+	res, err := clientCtx.BroadcastTx(txBytes)
+	if err != nil {
+		return err
+	}
+
+	return clientCtx.PrintProto(res)
 }
 
 func checkMultipleSigners(mode signing.SignMode, tx authsigning.Tx) error {

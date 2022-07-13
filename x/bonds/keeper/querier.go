@@ -58,6 +58,8 @@ func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier 
 			return queryAlphaMaximums(ctx, path[1:], keeper, legacyQuerierCdc)
 		case QueryParams:
 			return queryParams(ctx, keeper, legacyQuerierCdc)
+		// case QueryBondAccountDetails:
+		// 	return queryBondAccountDetails(ctx, path[1:], keeper, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown bonds query endpoint")
 		}
@@ -109,17 +111,18 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
+		if bond.State == types.HatchState.String() || bond.State == types.OpenState.String() {
+			reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
+			reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
+			reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
-		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
-		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
-
-		bondsList = append(bondsList, &types.BondDetails{
-			BondDid:   bond.BondDid,
-			SpotPrice: reservePrices,
-			Supply:    bond.CurrentSupply,
-			Reserve:   reserveBalances,
-		})
+			bondsList = append(bondsList, &types.BondDetails{
+				BondDid:   bond.BondDid,
+				SpotPrice: reservePrices,
+				Supply:    bond.CurrentSupply,
+				Reserve:   reserveBalances,
+			})
+		}
 	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
