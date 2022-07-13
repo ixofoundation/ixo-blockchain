@@ -50,7 +50,7 @@ func SpotPrice(R sdk.Dec, kappa sdk.Dec, V0 sdk.Dec) (sdk.Dec, error) {
 	}
 	temp3, err := ApproxRoot(temp2, kappa)
 	if err != nil {
-		panic(err)
+		return sdk.Dec{}, err
 	}
 	return (kappa.Mul(temp3)).Quo(temp1), nil
 }

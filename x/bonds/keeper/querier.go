@@ -101,6 +101,7 @@ func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAm
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
 	if err != nil {
 		panic("could not marshal result to JSON")
+		return nil, err
 	}
 
 	return bz, nil

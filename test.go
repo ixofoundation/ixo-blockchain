@@ -4,36 +4,36 @@ type DID struct {
 	Id string
 }
 
-type IIDImpl interface {
-}
+// type IIDImpl interface {
+// }
 
-type IID struct {
-	DID
-	Other string
-}
+// type IID struct {
+// 	DID
+// 	Other string
+// }
 
-type Entity interface {
-	DID
-	// IsEntity() bool
-}
+// type Entity interface {
+// 	DID
+// 	// IsEntity() bool
+// }
 
-type Project struct {
-}
+// type Project struct {
+// }
 
-// func (p *Project) IsEntity() bool { return true }
+// // func (p *Project) IsEntity() bool { return true }
 
-type Investment struct {
-	Entity
-}
+// type Investment struct {
+// 	Entity
+// }
 
-// func (p *Investment) IsEntity() bool { return true }
+// // func (p *Investment) IsEntity() bool { return true }
 
-func X(did DID) {
+// func X(did DID) {
 
-}
+// }
 
-func Y() {
+// func Y() {
 
-	Project{}.
-		X(IID{Id: "hi", Other: "hi"})
-}
+// 	Project{}.
+// 		X(IID{Id: "hi", Other: "hi"})
+// }
