@@ -2,8 +2,7 @@ package types
 
 import (
 	"encoding/json"
-	fmt "fmt"
-
+	"fmt"
 	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -332,6 +331,8 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 				}
 				result = bond.GetNewReserveDecCoins(spotPriceDec)
 			}
+		case FailedState.String():
+			fallthrough
 		case SettleState.String():
 			return nil, ErrInvalidStateForAction
 		default:

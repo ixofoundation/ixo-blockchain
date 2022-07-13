@@ -10,21 +10,20 @@ import (
 )
 
 const (
-	QueryBonds              = "bonds"
-	QueryBondsDetailed      = "bonds_detailed"
-	QueryBond               = "bond"
-	QueryBatch              = "batch"
-	QueryLastBatch          = "last_batch"
-	QueryCurrentPrice       = "current_price"
-	QueryCurrentReserve     = "current_reserve"
-	QueryAvailableReserve   = "available_reserve"
-	QueryCustomPrice        = "custom_price"
-	QueryBuyPrice           = "buy_price"
-	QuerySellReturn         = "sell_return"
-	QuerySwapReturn         = "swap_return"
-	QueryAlphaMaximums      = "alpha_maximums"
-	QueryParams             = "params"
-	QueryBondAccountDetails = "bond_account_details"
+	QueryBonds            = "bonds"
+	QueryBondsDetailed    = "bonds_detailed"
+	QueryBond             = "bond"
+	QueryBatch            = "batch"
+	QueryLastBatch        = "last_batch"
+	QueryCurrentPrice     = "current_price"
+	QueryCurrentReserve   = "current_reserve"
+	QueryAvailableReserve = "available_reserve"
+	QueryCustomPrice      = "custom_price"
+	QueryBuyPrice         = "buy_price"
+	QuerySellReturn       = "sell_return"
+	QuerySwapReturn       = "swap_return"
+	QueryAlphaMaximums    = "alpha_maximums"
+	QueryParams           = "params"
 )
 
 // NewQuerier is the module level router for state queries
@@ -112,17 +111,18 @@ func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
+		if bond.State == types.HatchState.String() || bond.State == types.OpenState.String() {
+			reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
+			reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
+			reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
-		reserveBalances := keeper.GetReserveBalances(ctx, bond.BondDid)
-		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
-		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
-
-		bondsList = append(bondsList, &types.BondDetails{
-			BondDid:   bond.BondDid,
-			SpotPrice: reservePrices,
-			Supply:    bond.CurrentSupply,
-			Reserve:   reserveBalances,
-		})
+			bondsList = append(bondsList, &types.BondDetails{
+				BondDid:   bond.BondDid,
+				SpotPrice: reservePrices,
+				Supply:    bond.CurrentSupply,
+				Reserve:   reserveBalances,
+			})
+		}
 	}
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
@@ -444,19 +444,6 @@ func queryAlphaMaximums(ctx sdk.Context, path []string, keeper Keeper, legacyQue
 
 	return bz, nil
 }
-
-// func queryBondAccountDetails(ctx sdk.Context, path []string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
-// 	bondDid := path[0]
-
-// 	bond, found := keeper.GetBond(ctx, bondDid)
-// 	if !found {
-// 		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
-// 	}
-
-//  keeper.Get
-
-// 	return bz, nil
-// }
 
 func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	params := k.GetParams(ctx)
