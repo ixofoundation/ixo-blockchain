@@ -127,8 +127,6 @@ func GenerateOrBroadcastTxWithFactory(clientCtx client.Context, txf tx.Factory, 
 	return BroadcastTx(clientCtx, txf, ixoDid, msg)
 }
 
-// TODO: This function was a copy and paste of the the internal function which Cosmos made private.
-// TODO: Function looked 99% the same so just wrapped the official implementation.
 func BroadcastTx(clientCtx client.Context, txf tx.Factory, ixoDid exported.IxoDid, msg sdk.Msg) error {
 	txf, err := prepareFactory(clientCtx, txf)
 	if err != nil {

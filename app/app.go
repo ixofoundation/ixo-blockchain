@@ -600,7 +600,6 @@ func NewIxoApp(
 		// Note that since this reads from the store, we can only perform it when
 		// `loadLatest` is set to true.
 		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
-		// TODO: Check if this will work
 		app.CapabilityKeeper.InitMemStore(ctx)
 		app.CapabilityKeeper.Seal()
 	}
