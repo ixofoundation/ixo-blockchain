@@ -97,6 +97,10 @@ import (
 	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	// this line is used by starport scaffolding # stargate/app/moduleImport
+	datamodule "github.com/ixofoundation/ixo-blockchain/x/data"
+	datamodulekeeper "github.com/ixofoundation/ixo-blockchain/x/data/keeper"
+	datamoduletypes "github.com/ixofoundation/ixo-blockchain/x/data/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -151,6 +155,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		datamodule.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 
 		gov.NewAppModuleBasic(
@@ -264,6 +270,9 @@ type IxoApp struct {
 	scopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
 	// Custom ixo keepers
+	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+
+	DataKeeper     datamodulekeeper.Keeper
 	DidKeeper      didkeeper.Keeper      `json:"did_keeper"`
 	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
@@ -298,7 +307,8 @@ func NewIxoApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-
+		// this line is used by starport scaffolding # stargate/app/storeKey
+		datamoduletypes.StoreKey,
 		// Custom ixo store keys
 		didtypes.StoreKey, bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
@@ -401,6 +411,15 @@ func NewIxoApp(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
+	app.DataKeeper = *datamodulekeeper.NewKeeper(
+		appCodec,
+		keys[datamoduletypes.StoreKey],
+		keys[datamoduletypes.MemStoreKey],
+	)
+	dataModule := datamodule.NewAppModule(app.appCodec, app.DataKeeper)
+
+	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
@@ -490,6 +509,8 @@ func NewIxoApp(
 		transferModule,
 
 		// Custom ixo AppModules
+		// this line is used by starport scaffolding # stargate/app/appModule
+		dataModule,
 		did.NewAppModule(app.DidKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
@@ -513,6 +534,7 @@ func NewIxoApp(
 		didtypes.ModuleName,
 		projecttypes.ModuleName,
 		bondstypes.ModuleName,
+		datamoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
@@ -524,7 +546,7 @@ func NewIxoApp(
 		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
-		bondstypes.ModuleName, paymentstypes.ModuleName,
+		bondstypes.ModuleName, paymentstypes.ModuleName, datamoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -541,6 +563,8 @@ func NewIxoApp(
 		wasm.ModuleName,
 
 		// Custom ixo modules
+		// this line is used by starport scaffolding # stargate/app/initGenesis
+		datamoduletypes.ModuleName,
 		didtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
 	)
@@ -913,8 +937,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-
 	// init params keeper and subspaces (for custom ixo modules)
+	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(datamoduletypes.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)

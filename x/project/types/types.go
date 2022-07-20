@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	InternalAccountID string
+	InternalAccountID          string
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
 	ProjectDataMap             map[string]json.RawMessage
