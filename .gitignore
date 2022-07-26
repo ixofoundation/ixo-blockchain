@@ -1,6 +1,5 @@
 .idea/
 build/*
-data
 */utils/node_modules/
 */utils/package-lock.json
 
