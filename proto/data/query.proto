@@ -51,6 +51,6 @@ message QueryDidDocumentRequest {
 message QueryDidDocumentResponse {
   // validators contains all the queried validators.
   DidDocument didDocument = 1  [(gogoproto.nullable) = false];
-  DidMetadata didMetadata = 2  [(gogoproto.nullable) = false];
+//  DidMetadata didMetadata = 2  [(gogoproto.nullable) = false];
 }
 // this line is used by starport scaffolding # 3

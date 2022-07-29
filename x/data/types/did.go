@@ -173,7 +173,7 @@ func IsValidDIDDocument(didDoc *DidDocument) bool {
 	}
 
 	for _, c := range didDoc.Context {
-		if c == contextDIDBase {
+		if c.Key != "" && c.Value != "" {
 			return true
 		}
 	}
@@ -358,8 +358,7 @@ func NewDidDocument(id string, options ...DidDocumentOption) (did DidDocument, e
 	}
 
 	did = DidDocument{
-		Context: []string{contextDIDBase},
-		Id:      id,
+		Id: id,
 	}
 	// apply all the options
 	for _, fn := range options {
@@ -442,7 +441,7 @@ func (didDoc *DidDocument) AddVerifications(verifications ...*Verification) (err
 		didDoc.setRelationships(v.Method.Id, vrs...)
 
 		// update context
-		didDoc.Context = union(didDoc.Context, v.Context)
+		//didDoc.Context = union(didDoc.Context, v.Context)
 
 	}
 	return

@@ -10,14 +10,18 @@ import "google/protobuf/timestamp.proto";
 This represents a minimal self-managed did document
 definition: https://w3c.github.io/did-core/
 */
-
+message context{
+  option (gogoproto.equal) = true;
+  string key = 1;
+  string value =2;
+}
 // DidDocument represents a dencentralised identifer.
 message DidDocument {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
   // @context is spec for did document.
-  repeated string context = 1 [(gogoproto.jsontag) = "@context,omitempty"];
+  repeated context context = 1 [(gogoproto.jsontag) = "@context,omitempty"];
 
   // id represents the id for the did document.
   string id = 2;

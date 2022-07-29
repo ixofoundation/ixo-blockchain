@@ -30,12 +30,15 @@ service Msg {
   rpc AddController(MsgAddController) returns (MsgAddControllerResponse);
   // DeleteService delete an existing service
   rpc DeleteController(MsgDeleteController) returns (MsgDeleteControllerResponse);
-
+  //Add / Delete Linked Resource
   rpc AddLinkedResource(MsgAddLinkedResource) returns(MsgAddLinkedResourceResponse);
   rpc DeleteLinkedResource(MsgDeleteLinkedResource) returns(MsgDeleteLinkedResourceResponse);
-
+  //Add / Delete Accorded Right
   rpc AddAccordedRight(MsgAddAccordedRight) returns(MsgAddAccordedRightResponse);
   rpc DeleteAccordedRight(MsgDeleteAccordedRight) returns(MsgDeleteAccordedRightResponse);
+  //Add / Delete Context
+  rpc AddDidContext(MsgAddDidContext) returns(MsgAddDidContextResponse);
+  rpc DeleteDidContext(MsgDeleteDidContext) returns(MsgDeleteDidContextResponse);
 }
 
 // Verification is a message that allows to assign a verification method
@@ -183,6 +186,15 @@ message MsgAddLinkedResource {
   string       signer       = 3; // address of the account signing the message
 }
 
+message MsgDeleteLinkedResource {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string id         = 1; // the did
+  string resource_id = 2; // the service id
+  string signer     = 3; // address of the account signing the message
+}
+
 message MsgAddAccordedRight {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
@@ -200,12 +212,20 @@ message MsgDeleteAccordedRight {
   string signer     = 3; // address of the account signing the message
 }
 
-message MsgDeleteLinkedResource {
+message MsgAddDidContext {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+  string      id           = 1; // the did
+  Context     context = 2; // the Accorded right to add
+  string      signer       = 3; // address of the account signing the message
+}
+
+message MsgDeleteDidContext {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
   string id         = 1; // the did
-  string resource_id = 2; // the service id
+  string context_id = 2; // the service id
   string signer     = 3; // address of the account signing the message
 }
 
