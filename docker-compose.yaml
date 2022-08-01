@@ -33,9 +33,6 @@ services:
       target: build-devel
     image: ixo-chain:devel
     restart: unless-stopped
-    volumes:
-      - ./:/app
-      # - ./tmp/.ixod:/root/.ixod
     ports:
       - "1317:1317" # API
       - "26657:26657" # 
