@@ -25,6 +25,8 @@ var (
 
 func RegisterTxRoutes(clientCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/txs/sign_data", SignDataRequest(clientCtx)).Methods("POST")
+	r.HandleFunc("/txs", compatibility.BroadcastTxRequest(clientCtx)).Methods("POST")
+
 }
 
 type SignDataReq struct {
