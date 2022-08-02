@@ -592,3 +592,85 @@ func NewDeleteAccordedRightCmd() *cobra.Command {
 
 	return cmd
 }
+
+func NewAddDidContextCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "add-did-context [id] [resource_id] [type] [description] [media_type] [service_endpoint] [proof] [encrypted] [privacy]",
+		Short:   "add a linked resource to a decentralized did (did/IID) document",
+		Example: "adds a linked resource to a did document",
+		Args:    cobra.ExactArgs(9),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// tx signer
+			signer := clientCtx.GetFromAddress()
+			// service parameters
+			resourceId, resourceType, desc, mediaType, endpoint, proof, encrypted, privacy := args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
+			// document did
+			did := types.NewChainDID(clientCtx.ChainID, args[0])
+
+			resource := types.NewLinkedResource(
+				resourceId,
+				resourceType,
+				desc,
+				mediaType,
+				endpoint,
+				proof,
+				encrypted,
+				privacy,
+			)
+
+			msg := types.NewMsgAddLinkedResource(
+				did.String(),
+				resource,
+				signer.String(),
+			)
+			// broadcast
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewDeleteDidContextCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "delete-resource [id] [resource-id]",
+		Short:   "deletes a resource from a decentralized did (did) document",
+		Example: "delete a resource for a did document",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			// document did
+			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			// signer
+			signer := clientCtx.GetFromAddress()
+			// resource id
+			rID := args[1]
+
+			msg := types.NewMsgDeleteLinkedResource(
+				did.String(),
+				rID,
+				signer.String(),
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}

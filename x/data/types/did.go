@@ -717,7 +717,7 @@ func (didDoc *DidDocument) DeleteLinkedResource(resourceID string) {
 		}
 	}
 
-	for i, s := range didDoc.Service {
+	for i, s := range didDoc.LinkedResource {
 		if s.Id == resourceID {
 			del(i)
 			break
@@ -772,8 +772,63 @@ func (didDoc *DidDocument) DeleteAccordedRight(rightID string) {
 		}
 	}
 
-	for i, s := range didDoc.Service {
+	for i, s := range didDoc.AccordedRight {
 		if s.Id == rightID {
+			del(i)
+			break
+		}
+	}
+}
+
+////Contexts
+
+func (didDoc *DidDocument) AddDidContext(contexts ...*Context) (err error) {
+	if didDoc.Context == nil {
+		didDoc.Context = []*Context{}
+	}
+
+	// used to check duplicates
+	index := make(map[string]struct{}, len(didDoc.Context))
+
+	// load existing resources
+	for _, s := range didDoc.Context {
+		index[s.Key] = struct{}{}
+	}
+
+	// resources must be unique
+	for _, s := range contexts {
+		//if err = ValidateService(s); err != nil {
+		//	return
+		//}
+
+		// verify that there are no duplicates in method ids
+		if _, found := index[s.Key]; found {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", s.Key)
+			return
+		}
+		index[s.Key] = struct{}{}
+
+		didDoc.Context = append(didDoc.Context, s)
+	}
+	return
+}
+
+func (didDoc *DidDocument) DeleteDidContext(contextKey string) {
+	del := func(x int) {
+		lastIdx := len(didDoc.Context) - 1
+		switch lastIdx {
+		case 0: // remove the relationships since there is no elements left
+			didDoc.Context = nil
+		case x: // if it's at the last position, just drop the last position
+			didDoc.Context = didDoc.Context[:lastIdx]
+		default: // swap and drop last position
+			didDoc.Context[x] = didDoc.Context[lastIdx]
+			didDoc.Context = didDoc.Context[:lastIdx]
+		}
+	}
+
+	for i, s := range didDoc.Context {
+		if s.Key == contextKey {
 			del(i)
 			break
 		}
@@ -865,6 +920,7 @@ func (did Verification) GetBytes() []byte {
 type Services []*Service
 type AccordedRights []*AccordedRight
 type LinkedResources []*LinkedResource
+type Contexts []*Context
 
 // NewService creates a new service
 func NewService(id string, serviceType string, serviceEndpoint string) *Service {

@@ -146,6 +146,30 @@ func (k msgServer) AddLinkedResource(
 	return &types.MsgAddLinkedResourceResponse{}, nil
 }
 
+func (k msgServer) DeleteLinkedResource(
+	goCtx context.Context,
+	msg *types.MsgDeleteLinkedResource,
+) (*types.MsgDeleteLinkedResourceResponse, error) {
+
+	if err := executeOnDidWithRelationships(
+		goCtx, &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.DidDocument) error {
+			// Only try to remove service if there are services
+			if len(didDoc.LinkedResource) == 0 {
+				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have resources associated")
+			}
+			// delete service
+			didDoc.DeleteLinkedResource(msg.ResourceId)
+			return nil
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeleteLinkedResourceResponse{}, nil
+}
+
 func (k msgServer) AddAccordedRight(
 	goCtx context.Context,
 	msg *types.MsgAddAccordedRight,
@@ -188,28 +212,47 @@ func (k msgServer) DeleteAccordedRight(
 	return &types.MsgDeleteAccordedRightResponse{}, nil
 }
 
-func (k msgServer) DeleteLinkedResource(
+//Contexts
+func (k msgServer) AddDidContext(
 	goCtx context.Context,
-	msg *types.MsgDeleteLinkedResource,
-) (*types.MsgDeleteLinkedResourceResponse, error) {
+	msg *types.MsgAddDidContext,
+) (*types.MsgAddDidContextResponse, error) {
 
 	if err := executeOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.DidDocument) error {
-			// Only try to remove service if there are services
-			if len(didDoc.LinkedResource) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have resources associated")
+			return didDoc.AddDidContext(msg.Context)
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAddDidContextResponse{}, nil
+}
+
+func (k msgServer) DeleteDidContext(
+	goCtx context.Context,
+	msg *types.MsgDeleteDidContext,
+) (*types.MsgDeleteDidContextResponse, error) {
+
+	if err := executeOnDidWithRelationships(
+		goCtx, &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.DidDocument) error {
+			// Only try to remove right if there are rights
+			if len(didDoc.Context) == 0 {
+				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have contexts associated")
 			}
 			// delete service
-			didDoc.DeleteLinkedResource(msg.ResourceId)
+			didDoc.DeleteDidContext(msg.ContextId)
 			return nil
 		}); err != nil {
 		return nil, err
 	}
 
-	return &types.MsgDeleteLinkedResourceResponse{}, nil
+	return &types.MsgDeleteDidContextResponse{}, nil
 }
 
 // RevokeVerification removes a public key and controller from an existing DID document

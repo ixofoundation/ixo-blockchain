@@ -24,6 +24,12 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgDeleteService{},
 		&MsgAddController{},
 		&MsgDeleteController{},
+		//&MsgAddDidContext{},
+		//&MsgDeleteDidContext{},
+		//&MsgAddLinkedResource{},
+		//&MsgDeleteLinkedResource{},
+		//&MsgAddAccordedRight{},
+		//&MsgDeleteAccordedRight{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

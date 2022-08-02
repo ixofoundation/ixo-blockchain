@@ -97,11 +97,12 @@ func (m *Verification) GetContext() []string {
 type MsgCreateDidDocument struct {
 	Id             string            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Controllers    []string          `protobuf:"bytes,2,rep,name=controllers,proto3" json:"controllers,omitempty"`
-	Verifications  []*Verification   `protobuf:"bytes,3,rep,name=verifications,proto3" json:"verifications,omitempty"`
-	Services       []*Service        `protobuf:"bytes,4,rep,name=services,proto3" json:"services,omitempty"`
-	AccordedRight  []*AccordedRight  `protobuf:"bytes,5,rep,name=accordedRight,proto3" json:"accordedRight,omitempty"`
-	LinkedResource []*LinkedResource `protobuf:"bytes,6,rep,name=linkedResource,proto3" json:"linkedResource,omitempty"`
-	Signer         string            `protobuf:"bytes,7,opt,name=signer,proto3" json:"signer,omitempty"`
+	Context        []*Context        `protobuf:"bytes,3,rep,name=context,proto3" json:"context,omitempty"`
+	Verifications  []*Verification   `protobuf:"bytes,4,rep,name=verifications,proto3" json:"verifications,omitempty"`
+	Services       []*Service        `protobuf:"bytes,5,rep,name=services,proto3" json:"services,omitempty"`
+	AccordedRight  []*AccordedRight  `protobuf:"bytes,6,rep,name=accordedRight,proto3" json:"accordedRight,omitempty"`
+	LinkedResource []*LinkedResource `protobuf:"bytes,7,rep,name=linkedResource,proto3" json:"linkedResource,omitempty"`
+	Signer         string            `protobuf:"bytes,8,opt,name=signer,proto3" json:"signer,omitempty"`
 }
 
 func (m *MsgCreateDidDocument) Reset()         { *m = MsgCreateDidDocument{} }
@@ -815,6 +816,45 @@ func (m *MsgAddLinkedResource) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgAddLinkedResource proto.InternalMessageInfo
 
+type MsgDeleteLinkedResource struct {
+	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ResourceId string `protobuf:"bytes,2,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	Signer     string `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+func (m *MsgDeleteLinkedResource) Reset()         { *m = MsgDeleteLinkedResource{} }
+func (m *MsgDeleteLinkedResource) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLinkedResource) ProtoMessage()    {}
+func (*MsgDeleteLinkedResource) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c04efb879b1d2f8a, []int{20}
+}
+func (m *MsgDeleteLinkedResource) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLinkedResource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLinkedResource.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLinkedResource) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLinkedResource.Merge(m, src)
+}
+func (m *MsgDeleteLinkedResource) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLinkedResource) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLinkedResource.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLinkedResource proto.InternalMessageInfo
+
 type MsgAddAccordedRight struct {
 	Id            string         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	AccordedRight *AccordedRight `protobuf:"bytes,2,opt,name=accordedRight,proto3" json:"accordedRight,omitempty"`
@@ -825,7 +865,7 @@ func (m *MsgAddAccordedRight) Reset()         { *m = MsgAddAccordedRight{} }
 func (m *MsgAddAccordedRight) String() string { return proto.CompactTextString(m) }
 func (*MsgAddAccordedRight) ProtoMessage()    {}
 func (*MsgAddAccordedRight) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{20}
+	return fileDescriptor_c04efb879b1d2f8a, []int{21}
 }
 func (m *MsgAddAccordedRight) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -864,7 +904,7 @@ func (m *MsgDeleteAccordedRight) Reset()         { *m = MsgDeleteAccordedRight{}
 func (m *MsgDeleteAccordedRight) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteAccordedRight) ProtoMessage()    {}
 func (*MsgDeleteAccordedRight) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{21}
+	return fileDescriptor_c04efb879b1d2f8a, []int{22}
 }
 func (m *MsgDeleteAccordedRight) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -893,24 +933,24 @@ func (m *MsgDeleteAccordedRight) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteAccordedRight proto.InternalMessageInfo
 
-type MsgDeleteLinkedResource struct {
-	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ResourceId string `protobuf:"bytes,2,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
-	Signer     string `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+type MsgAddDidContext struct {
+	Id      string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Context *Context `protobuf:"bytes,2,opt,name=context,proto3" json:"context,omitempty"`
+	Signer  string   `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
 }
 
-func (m *MsgDeleteLinkedResource) Reset()         { *m = MsgDeleteLinkedResource{} }
-func (m *MsgDeleteLinkedResource) String() string { return proto.CompactTextString(m) }
-func (*MsgDeleteLinkedResource) ProtoMessage()    {}
-func (*MsgDeleteLinkedResource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{22}
+func (m *MsgAddDidContext) Reset()         { *m = MsgAddDidContext{} }
+func (m *MsgAddDidContext) String() string { return proto.CompactTextString(m) }
+func (*MsgAddDidContext) ProtoMessage()    {}
+func (*MsgAddDidContext) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c04efb879b1d2f8a, []int{23}
 }
-func (m *MsgDeleteLinkedResource) XXX_Unmarshal(b []byte) error {
+func (m *MsgAddDidContext) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgDeleteLinkedResource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgAddDidContext) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgDeleteLinkedResource.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgAddDidContext.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -920,17 +960,56 @@ func (m *MsgDeleteLinkedResource) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *MsgDeleteLinkedResource) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgDeleteLinkedResource.Merge(m, src)
+func (m *MsgAddDidContext) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddDidContext.Merge(m, src)
 }
-func (m *MsgDeleteLinkedResource) XXX_Size() int {
+func (m *MsgAddDidContext) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgDeleteLinkedResource) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgDeleteLinkedResource.DiscardUnknown(m)
+func (m *MsgAddDidContext) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddDidContext.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgDeleteLinkedResource proto.InternalMessageInfo
+var xxx_messageInfo_MsgAddDidContext proto.InternalMessageInfo
+
+type MsgDeleteDidContext struct {
+	Id        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ContextId string `protobuf:"bytes,2,opt,name=context_id,json=contextId,proto3" json:"context_id,omitempty"`
+	Signer    string `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+func (m *MsgDeleteDidContext) Reset()         { *m = MsgDeleteDidContext{} }
+func (m *MsgDeleteDidContext) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteDidContext) ProtoMessage()    {}
+func (*MsgDeleteDidContext) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c04efb879b1d2f8a, []int{24}
+}
+func (m *MsgDeleteDidContext) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteDidContext) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteDidContext.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteDidContext) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteDidContext.Merge(m, src)
+}
+func (m *MsgDeleteDidContext) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteDidContext) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteDidContext.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteDidContext proto.InternalMessageInfo
 
 type MsgAddLinkedResourceResponse struct {
 }
@@ -939,7 +1018,7 @@ func (m *MsgAddLinkedResourceResponse) Reset()         { *m = MsgAddLinkedResour
 func (m *MsgAddLinkedResourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddLinkedResourceResponse) ProtoMessage()    {}
 func (*MsgAddLinkedResourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{23}
+	return fileDescriptor_c04efb879b1d2f8a, []int{25}
 }
 func (m *MsgAddLinkedResourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -975,7 +1054,7 @@ func (m *MsgDeleteLinkedResourceResponse) Reset()         { *m = MsgDeleteLinked
 func (m *MsgDeleteLinkedResourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteLinkedResourceResponse) ProtoMessage()    {}
 func (*MsgDeleteLinkedResourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{24}
+	return fileDescriptor_c04efb879b1d2f8a, []int{26}
 }
 func (m *MsgDeleteLinkedResourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1011,7 +1090,7 @@ func (m *MsgAddAccordedRightResponse) Reset()         { *m = MsgAddAccordedRight
 func (m *MsgAddAccordedRightResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddAccordedRightResponse) ProtoMessage()    {}
 func (*MsgAddAccordedRightResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{25}
+	return fileDescriptor_c04efb879b1d2f8a, []int{27}
 }
 func (m *MsgAddAccordedRightResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1047,7 +1126,7 @@ func (m *MsgDeleteAccordedRightResponse) Reset()         { *m = MsgDeleteAccorde
 func (m *MsgDeleteAccordedRightResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteAccordedRightResponse) ProtoMessage()    {}
 func (*MsgDeleteAccordedRightResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c04efb879b1d2f8a, []int{26}
+	return fileDescriptor_c04efb879b1d2f8a, []int{28}
 }
 func (m *MsgDeleteAccordedRightResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1076,6 +1155,78 @@ func (m *MsgDeleteAccordedRightResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteAccordedRightResponse proto.InternalMessageInfo
 
+type MsgAddDidContextResponse struct {
+}
+
+func (m *MsgAddDidContextResponse) Reset()         { *m = MsgAddDidContextResponse{} }
+func (m *MsgAddDidContextResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddDidContextResponse) ProtoMessage()    {}
+func (*MsgAddDidContextResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c04efb879b1d2f8a, []int{29}
+}
+func (m *MsgAddDidContextResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddDidContextResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddDidContextResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddDidContextResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddDidContextResponse.Merge(m, src)
+}
+func (m *MsgAddDidContextResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddDidContextResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddDidContextResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddDidContextResponse proto.InternalMessageInfo
+
+type MsgDeleteDidContextResponse struct {
+}
+
+func (m *MsgDeleteDidContextResponse) Reset()         { *m = MsgDeleteDidContextResponse{} }
+func (m *MsgDeleteDidContextResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteDidContextResponse) ProtoMessage()    {}
+func (*MsgDeleteDidContextResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c04efb879b1d2f8a, []int{30}
+}
+func (m *MsgDeleteDidContextResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteDidContextResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteDidContextResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteDidContextResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteDidContextResponse.Merge(m, src)
+}
+func (m *MsgDeleteDidContextResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteDidContextResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteDidContextResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteDidContextResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*Verification)(nil), "ixofoundation.ixo.data.Verification")
 	proto.RegisterType((*MsgCreateDidDocument)(nil), "ixofoundation.ixo.data.MsgCreateDidDocument")
@@ -1097,84 +1248,94 @@ func init() {
 	proto.RegisterType((*MsgDeleteController)(nil), "ixofoundation.ixo.data.MsgDeleteController")
 	proto.RegisterType((*MsgDeleteControllerResponse)(nil), "ixofoundation.ixo.data.MsgDeleteControllerResponse")
 	proto.RegisterType((*MsgAddLinkedResource)(nil), "ixofoundation.ixo.data.MsgAddLinkedResource")
+	proto.RegisterType((*MsgDeleteLinkedResource)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedResource")
 	proto.RegisterType((*MsgAddAccordedRight)(nil), "ixofoundation.ixo.data.MsgAddAccordedRight")
 	proto.RegisterType((*MsgDeleteAccordedRight)(nil), "ixofoundation.ixo.data.MsgDeleteAccordedRight")
-	proto.RegisterType((*MsgDeleteLinkedResource)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedResource")
+	proto.RegisterType((*MsgAddDidContext)(nil), "ixofoundation.ixo.data.MsgAddDidContext")
+	proto.RegisterType((*MsgDeleteDidContext)(nil), "ixofoundation.ixo.data.MsgDeleteDidContext")
 	proto.RegisterType((*MsgAddLinkedResourceResponse)(nil), "ixofoundation.ixo.data.MsgAddLinkedResourceResponse")
 	proto.RegisterType((*MsgDeleteLinkedResourceResponse)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse")
 	proto.RegisterType((*MsgAddAccordedRightResponse)(nil), "ixofoundation.ixo.data.MsgAddAccordedRightResponse")
 	proto.RegisterType((*MsgDeleteAccordedRightResponse)(nil), "ixofoundation.ixo.data.MsgDeleteAccordedRightResponse")
+	proto.RegisterType((*MsgAddDidContextResponse)(nil), "ixofoundation.ixo.data.MsgAddDidContextResponse")
+	proto.RegisterType((*MsgDeleteDidContextResponse)(nil), "ixofoundation.ixo.data.MsgDeleteDidContextResponse")
 }
 
 func init() { proto.RegisterFile("data/tx.proto", fileDescriptor_c04efb879b1d2f8a) }
 
 var fileDescriptor_c04efb879b1d2f8a = []byte{
-	// 1035 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x98, 0xcf, 0x6f, 0x1b, 0x45,
-	0x14, 0xc7, 0xbd, 0x71, 0x9b, 0xc4, 0xcf, 0x71, 0x28, 0xd3, 0x90, 0x2e, 0xdb, 0xc4, 0x36, 0xa1,
-	0x01, 0xd3, 0x36, 0x36, 0x72, 0x5b, 0x2a, 0xc1, 0x01, 0x39, 0xf5, 0x81, 0x5f, 0xee, 0x61, 0x2b,
-	0x38, 0x70, 0x89, 0x36, 0x3b, 0x93, 0xf5, 0xc8, 0xce, 0x8e, 0xd9, 0xdd, 0x04, 0x83, 0x84, 0xc4,
-	0x05, 0x89, 0x63, 0x84, 0x10, 0xea, 0xb1, 0x27, 0xfe, 0x16, 0x8e, 0x3d, 0x72, 0x44, 0xc9, 0x85,
-	0x3f, 0x03, 0x79, 0x76, 0x3d, 0xde, 0xf5, 0xec, 0x8e, 0xd7, 0x45, 0xea, 0x2d, 0x3b, 0xfb, 0x7d,
-	0xef, 0xfb, 0xd9, 0x37, 0x33, 0xef, 0x45, 0x86, 0x0a, 0xb6, 0x02, 0xab, 0x15, 0x8c, 0x9b, 0x23,
-	0x8f, 0x05, 0x0c, 0x6d, 0xd3, 0x31, 0x3b, 0x61, 0x67, 0x2e, 0xb6, 0x02, 0xca, 0xdc, 0x26, 0x1d,
-	0xb3, 0xe6, 0x44, 0x60, 0x6c, 0x39, 0xcc, 0x61, 0x5c, 0xd2, 0x9a, 0xfc, 0x15, 0xaa, 0x8d, 0x4d,
-	0x1e, 0x8c, 0x29, 0x8e, 0x9e, 0x77, 0x1c, 0xc6, 0x9c, 0x21, 0x69, 0x59, 0x23, 0xda, 0xb2, 0x5c,
-	0x97, 0x05, 0x3c, 0x8b, 0x1f, 0xbe, 0xdd, 0xfb, 0x4d, 0x83, 0x8d, 0x6f, 0x88, 0x47, 0x4f, 0xa8,
-	0xcd, 0xd7, 0xd1, 0x1d, 0xa8, 0x78, 0x64, 0x18, 0x6a, 0xfa, 0x74, 0xe4, 0xeb, 0x5a, 0xbd, 0xd8,
-	0x28, 0x99, 0xc9, 0x45, 0x74, 0x08, 0xab, 0xa7, 0x24, 0xe8, 0x33, 0xac, 0xaf, 0xd4, 0xb5, 0x46,
-	0xb9, 0x7d, 0xb7, 0x99, 0xce, 0xd8, 0x8c, 0xe7, 0xee, 0xf1, 0x08, 0x33, 0x8a, 0x44, 0x3a, 0xac,
-	0xd9, 0xcc, 0x0d, 0xc8, 0x38, 0xd0, 0x8b, 0xdc, 0x63, 0xfa, 0xb8, 0x77, 0x51, 0x84, 0xad, 0x9e,
-	0xef, 0x3c, 0xf1, 0x88, 0x15, 0x90, 0x2e, 0xc5, 0x5d, 0x66, 0x9f, 0x9d, 0x12, 0x37, 0x40, 0x9b,
-	0xb0, 0x42, 0xb1, 0xae, 0xd5, 0xb5, 0x46, 0xc9, 0x5c, 0xa1, 0x18, 0xd5, 0xa1, 0x3c, 0x89, 0xf1,
-	0xd8, 0x70, 0x48, 0x3c, 0x5f, 0x5f, 0xe1, 0x69, 0xe2, 0x4b, 0xe8, 0x0b, 0xa8, 0x9c, 0xc7, 0x10,
-	0x7c, 0x6e, 0x55, 0x6e, 0xdf, 0xc9, 0xc3, 0x6b, 0x26, 0x43, 0xd1, 0x27, 0xb0, 0xee, 0x13, 0xef,
-	0x9c, 0xda, 0xc4, 0xd7, 0xaf, 0xf1, 0x34, 0xb5, 0xac, 0x34, 0xcf, 0x42, 0x9d, 0x29, 0x02, 0xd0,
-	0x97, 0x50, 0xb1, 0x6c, 0x9b, 0x79, 0x98, 0x60, 0x93, 0x3a, 0xfd, 0x40, 0xbf, 0xce, 0x33, 0xec,
-	0x67, 0x65, 0xe8, 0xc4, 0xc5, 0x66, 0x32, 0x16, 0x3d, 0x85, 0xcd, 0x21, 0x75, 0x07, 0x04, 0x9b,
-	0xc4, 0x67, 0x67, 0x9e, 0x4d, 0xf4, 0x55, 0x9e, 0xed, 0xbd, 0xac, 0x6c, 0x5f, 0x25, 0xd4, 0xe6,
-	0x5c, 0x34, 0xda, 0x86, 0x55, 0x9f, 0x3a, 0x2e, 0xf1, 0xf4, 0x35, 0x5e, 0xdb, 0xe8, 0xe9, 0xe3,
-	0xf5, 0x5f, 0x5f, 0xd4, 0x0a, 0xff, 0xbe, 0xa8, 0x15, 0xf6, 0xaa, 0xb0, 0x93, 0xb6, 0x23, 0x26,
-	0xf1, 0x47, 0xcc, 0xf5, 0xc9, 0x1e, 0xe3, 0x3b, 0xf6, 0xf5, 0x08, 0xcf, 0xed, 0xd8, 0x23, 0x28,
-	0x62, 0x66, 0xf3, 0x2d, 0x2b, 0xb7, 0xdf, 0xcd, 0xc2, 0x8b, 0x67, 0x9c, 0xe8, 0x63, 0x40, 0xd7,
-	0x95, 0x40, 0x92, 0xa1, 0x00, 0xba, 0xd0, 0x00, 0xf5, 0x7c, 0xa7, 0x83, 0x71, 0xe2, 0x78, 0xcf,
-	0x9f, 0xa0, 0xcf, 0x60, 0x23, 0xbe, 0xc9, 0xd1, 0x71, 0xce, 0x77, 0x3c, 0x12, 0x91, 0x31, 0xe4,
-	0x62, 0x06, 0xf2, 0x0e, 0x18, 0x32, 0x91, 0x00, 0xfe, 0x43, 0x83, 0x5a, 0xcf, 0x77, 0x9e, 0x91,
-	0x20, 0xf9, 0x3a, 0x7e, 0xed, 0xe6, 0xe9, 0x6f, 0x43, 0x29, 0xbc, 0x4c, 0x47, 0x34, 0xbc, 0x89,
-	0x25, 0x73, 0x3d, 0x5c, 0xf8, 0x1c, 0xcb, 0x37, 0xb9, 0x98, 0x76, 0x93, 0x67, 0xd8, 0xd7, 0x32,
-	0xb0, 0x3f, 0x80, 0xf7, 0x17, 0x70, 0x89, 0x6f, 0x38, 0x81, 0xb7, 0x7a, 0xbe, 0x63, 0x92, 0x73,
-	0x36, 0x20, 0xca, 0xb2, 0x2b, 0xc1, 0x17, 0x57, 0xb2, 0x06, 0xbb, 0xa9, 0x3e, 0x02, 0xe4, 0x17,
-	0x0d, 0x2a, 0x61, 0xad, 0xa3, 0x9b, 0x28, 0x11, 0x1c, 0xc2, 0x46, 0x74, 0x37, 0x8f, 0x26, 0x3b,
-	0x1b, 0x6d, 0xfc, 0xc2, 0x0b, 0x5d, 0x8e, 0x82, 0xba, 0x56, 0x60, 0xe5, 0x00, 0xbd, 0xc5, 0x0b,
-	0x32, 0xc3, 0x10, 0x80, 0x36, 0xdc, 0xe8, 0xf9, 0x4e, 0x97, 0x0c, 0x49, 0x40, 0xb2, 0x10, 0x77,
-	0x01, 0xa6, 0x88, 0xa2, 0x4a, 0xa5, 0x68, 0x25, 0x57, 0x99, 0x0c, 0xd0, 0xe7, 0x4d, 0x04, 0xc0,
-	0x80, 0x03, 0x74, 0x30, 0x7e, 0x22, 0xba, 0xa5, 0x04, 0xb0, 0x0f, 0x9b, 0xb3, 0x5e, 0x7a, 0x84,
-	0x05, 0x44, 0x65, 0xb6, 0xda, 0xa5, 0xf9, 0x41, 0x12, 0x66, 0x02, 0xc4, 0x85, 0x9b, 0x02, 0xf2,
-	0x75, 0xb0, 0xec, 0xc2, 0xed, 0x14, 0x3f, 0x81, 0xf3, 0x5c, 0xe3, 0x9d, 0xac, 0x83, 0x71, 0xb2,
-	0x67, 0x4a, 0x40, 0x72, 0x0f, 0x0e, 0x8f, 0xd0, 0xff, 0xef, 0xc1, 0x59, 0xe4, 0xbf, 0x6b, 0xbc,
-	0x54, 0x1d, 0x8c, 0x13, 0xc3, 0x41, 0x22, 0x93, 0x46, 0x4d, 0x08, 0xf6, 0x6a, 0xa3, 0x66, 0x31,
-	0x16, 0x81, 0x6d, 0x51, 0x50, 0x35, 0xd8, 0xdb, 0xb0, 0xee, 0x4d, 0x5e, 0xcc, 0x8e, 0xf3, 0x1a,
-	0x7f, 0xce, 0x75, 0x98, 0x87, 0x70, 0x4b, 0xd8, 0x2c, 0xd8, 0x9a, 0x1a, 0x94, 0xbd, 0xe8, 0xdd,
-	0xcc, 0x0a, 0xa6, 0x4b, 0xb9, 0xdc, 0xc2, 0xf1, 0x22, 0x9d, 0x02, 0x71, 0x4c, 0xde, 0xe1, 0xcd,
-	0x3a, 0x8d, 0x46, 0x48, 0xc2, 0x83, 0x36, 0xbf, 0x5b, 0xe2, 0x75, 0x1d, 0xaa, 0xe9, 0x65, 0x9b,
-	0x2a, 0xda, 0x7f, 0x6e, 0x40, 0xb1, 0xe7, 0x3b, 0xe8, 0x7b, 0x78, 0x53, 0xfe, 0x57, 0xe8, 0x7e,
-	0xd6, 0x6e, 0xa6, 0x8d, 0x69, 0xe3, 0xe1, 0x32, 0xea, 0x29, 0xc0, 0xc4, 0x58, 0x9e, 0xe8, 0x2a,
-	0x63, 0x49, 0xad, 0x34, 0xce, 0x1c, 0xde, 0xe8, 0x3b, 0x78, 0x63, 0x7e, 0x70, 0xdf, 0x55, 0x24,
-	0x9a, 0xd3, 0x1a, 0xed, 0xfc, 0x5a, 0x61, 0xf9, 0x23, 0xa0, 0x94, 0xb9, 0x75, 0xa0, 0xc8, 0x24,
-	0xcb, 0x8d, 0x47, 0x4b, 0xc9, 0x85, 0xf7, 0x73, 0x0d, 0x76, 0x94, 0x73, 0xff, 0xb1, 0x22, 0xaf,
-	0x2a, 0xd0, 0xf8, 0xf4, 0x15, 0x03, 0x05, 0xda, 0x31, 0x40, 0x6c, 0x88, 0xee, 0xab, 0x0b, 0x1b,
-	0xc9, 0x8c, 0x83, 0x5c, 0x32, 0xe1, 0x31, 0x80, 0x4a, 0x72, 0x10, 0x36, 0x14, 0xf1, 0x09, 0xa5,
-	0xf1, 0x61, 0x5e, 0x65, 0xdc, 0x2c, 0x39, 0xf4, 0x1a, 0x6a, 0xd8, 0x99, 0x52, 0x69, 0x96, 0x3a,
-	0xdb, 0x50, 0x00, 0x37, 0xa4, 0xc1, 0x76, 0x6f, 0x21, 0x72, 0xcc, 0xf2, 0xc1, 0x12, 0xe2, 0xf8,
-	0xb5, 0x95, 0xc7, 0xd7, 0x7d, 0x35, 0x7c, 0x52, 0xad, 0xbc, 0xb6, 0x99, 0x4d, 0x11, 0xfd, 0xac,
-	0xc1, 0x56, 0x6a, 0x83, 0x6e, 0x2d, 0xfc, 0x8c, 0x39, 0xff, 0xc7, 0x4b, 0x06, 0xc4, 0x2b, 0x2e,
-	0xcd, 0xc7, 0x7b, 0xea, 0x8f, 0x49, 0x88, 0x95, 0x15, 0xcf, 0xea, 0xe5, 0xe8, 0x27, 0xb8, 0x99,
-	0x36, 0xff, 0x9a, 0x0b, 0xbf, 0x22, 0xe9, 0xfd, 0xd1, 0x72, 0xfa, 0xa9, 0xfd, 0xe1, 0xd3, 0xbf,
-	0x2e, 0xab, 0xda, 0xcb, 0xcb, 0xaa, 0xf6, 0xcf, 0x65, 0x55, 0xbb, 0xb8, 0xaa, 0x16, 0x5e, 0x5e,
-	0x55, 0x0b, 0x7f, 0x5f, 0x55, 0x0b, 0xdf, 0x3e, 0x74, 0x68, 0xd0, 0x3f, 0x3b, 0x6e, 0xda, 0xec,
-	0xb4, 0x95, 0xc8, 0x3d, 0x79, 0x3a, 0x38, 0x1e, 0x32, 0x7b, 0x60, 0xf7, 0x2d, 0xea, 0xb6, 0xc6,
-	0xad, 0xf0, 0x37, 0x87, 0x1f, 0x46, 0xc4, 0x3f, 0x5e, 0xe5, 0xbf, 0x0d, 0x3c, 0xf8, 0x2f, 0x00,
-	0x00, 0xff, 0xff, 0x07, 0x93, 0x1d, 0x62, 0x88, 0x10, 0x00, 0x00,
+	// 1123 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcf, 0x6f, 0xdc, 0x44,
+	0x14, 0x8e, 0xb3, 0x6d, 0x7e, 0xbc, 0xcd, 0x86, 0xe2, 0x86, 0xd4, 0xb8, 0xc9, 0x6e, 0x08, 0x0d,
+	0x84, 0xb6, 0xd9, 0x45, 0x49, 0x4b, 0x05, 0x1c, 0x50, 0x92, 0x3d, 0xf0, 0x6b, 0x7b, 0x70, 0x05,
+	0x07, 0x2e, 0x91, 0xe3, 0x99, 0x38, 0xa3, 0xdd, 0x78, 0x16, 0xdb, 0x09, 0x0b, 0x12, 0x82, 0x0b,
+	0x12, 0xdc, 0x2a, 0x84, 0x50, 0x8f, 0xfd, 0x73, 0x90, 0xb8, 0xf4, 0xc8, 0x11, 0x25, 0x17, 0xfe,
+	0x0c, 0xb4, 0x63, 0xef, 0x78, 0xec, 0xb1, 0xc7, 0xde, 0x22, 0x71, 0x5b, 0xcf, 0x7c, 0xef, 0x7d,
+	0xdf, 0xbc, 0x79, 0x6f, 0xde, 0xd3, 0x42, 0x03, 0xd9, 0xa1, 0xdd, 0x09, 0x47, 0xed, 0xa1, 0x4f,
+	0x43, 0xaa, 0xaf, 0x92, 0x11, 0x3d, 0xa1, 0xe7, 0x1e, 0xb2, 0x43, 0x42, 0xbd, 0x36, 0x19, 0xd1,
+	0xf6, 0x18, 0x60, 0xae, 0xb8, 0xd4, 0xa5, 0x0c, 0xd2, 0x19, 0xff, 0x8a, 0xd0, 0xe6, 0x32, 0x33,
+	0x46, 0x04, 0xc5, 0xdf, 0x6b, 0x2e, 0xa5, 0xee, 0x00, 0x77, 0xec, 0x21, 0xe9, 0xd8, 0x9e, 0x47,
+	0x43, 0xe6, 0x25, 0x88, 0x76, 0x37, 0x7f, 0xd5, 0x60, 0xe9, 0x4b, 0xec, 0x93, 0x13, 0xe2, 0xb0,
+	0x75, 0xfd, 0x0e, 0x34, 0x7c, 0x3c, 0x88, 0x30, 0xa7, 0x64, 0x18, 0x18, 0xda, 0x46, 0x6d, 0x7b,
+	0xd1, 0x4a, 0x2f, 0xea, 0x07, 0x30, 0x77, 0x86, 0xc3, 0x53, 0x8a, 0x8c, 0xd9, 0x0d, 0x6d, 0xbb,
+	0xbe, 0x7b, 0xb7, 0x9d, 0xaf, 0xb1, 0x2d, 0xfa, 0xee, 0x31, 0x0b, 0x2b, 0xb6, 0xd4, 0x0d, 0x98,
+	0x77, 0xa8, 0x17, 0xe2, 0x51, 0x68, 0xd4, 0x18, 0xc7, 0xe4, 0x73, 0xf3, 0xcf, 0x1a, 0xac, 0xf4,
+	0x02, 0xf7, 0xd0, 0xc7, 0x76, 0x88, 0xbb, 0x04, 0x75, 0xa9, 0x73, 0x7e, 0x86, 0xbd, 0x50, 0x5f,
+	0x86, 0x59, 0x82, 0x0c, 0x6d, 0x43, 0xdb, 0x5e, 0xb4, 0x66, 0x09, 0xd2, 0x37, 0xa0, 0x3e, 0xb6,
+	0xf1, 0xe9, 0x60, 0x80, 0xfd, 0xc0, 0x98, 0x65, 0x6e, 0xc4, 0x25, 0xfd, 0xfd, 0x34, 0x49, 0x7d,
+	0xb7, 0x55, 0xa4, 0xf4, 0x30, 0x82, 0x71, 0x15, 0xfa, 0xa7, 0xd0, 0xb8, 0x10, 0xd4, 0x07, 0xc6,
+	0x35, 0xe6, 0xe0, 0x4e, 0x95, 0xa3, 0x5a, 0x69, 0x53, 0xfd, 0x43, 0x58, 0x08, 0xb0, 0x7f, 0x41,
+	0x1c, 0x1c, 0x18, 0xd7, 0xd5, 0x3a, 0x9e, 0x44, 0x38, 0x8b, 0x1b, 0xe8, 0x9f, 0x41, 0xc3, 0x76,
+	0x1c, 0xea, 0x23, 0x8c, 0x2c, 0xe2, 0x9e, 0x86, 0xc6, 0x1c, 0xf3, 0xb0, 0x55, 0xe4, 0x61, 0x5f,
+	0x04, 0x5b, 0x69, 0x5b, 0xfd, 0x31, 0x2c, 0x0f, 0x88, 0xd7, 0xc7, 0xc8, 0xc2, 0x01, 0x3d, 0xf7,
+	0x1d, 0x6c, 0xcc, 0x33, 0x6f, 0x6f, 0x15, 0x79, 0xfb, 0x3c, 0x85, 0xb6, 0x32, 0xd6, 0xfa, 0x2a,
+	0xcc, 0x05, 0xc4, 0xf5, 0xb0, 0x6f, 0x2c, 0xb0, 0x6b, 0x89, 0xbf, 0x3e, 0x58, 0xf8, 0xf9, 0x79,
+	0x6b, 0xe6, 0x9f, 0xe7, 0xad, 0x99, 0xcd, 0x26, 0xac, 0xe5, 0x5d, 0xa6, 0x85, 0x83, 0x21, 0xf5,
+	0x02, 0xbc, 0x49, 0xd9, 0x65, 0x7f, 0x31, 0x44, 0x99, 0xcb, 0x7e, 0x08, 0x35, 0x44, 0x1d, 0x76,
+	0xdb, 0xf5, 0xdd, 0x37, 0x8b, 0xe4, 0x89, 0x1e, 0xc7, 0x78, 0x41, 0xd0, 0x75, 0xa5, 0x20, 0x89,
+	0x90, 0x0b, 0x7a, 0xaa, 0x81, 0xde, 0x0b, 0xdc, 0x7d, 0x84, 0x52, 0x95, 0x91, 0x4d, 0xbe, 0x8f,
+	0x61, 0x49, 0xbc, 0xe4, 0xb8, 0x12, 0xaa, 0xa5, 0x47, 0xca, 0x52, 0x90, 0x5c, 0x2b, 0x90, 0xbc,
+	0x06, 0xa6, 0xac, 0x88, 0x0b, 0xfe, 0x5d, 0x83, 0x56, 0x2f, 0x70, 0x9f, 0xe0, 0x30, 0xbd, 0x2d,
+	0x56, 0x6c, 0x56, 0xfd, 0x6d, 0x58, 0x8c, 0xea, 0xf0, 0x88, 0x44, 0x45, 0xbc, 0x68, 0x2d, 0x44,
+	0x0b, 0x9f, 0x20, 0xf9, 0x11, 0xa8, 0xe5, 0x3d, 0x02, 0x89, 0xec, 0x6b, 0x05, 0xb2, 0xdf, 0x81,
+	0xb7, 0x4b, 0x74, 0xf1, 0x33, 0x9c, 0xc0, 0x6b, 0xbd, 0xc0, 0xb5, 0xf0, 0x05, 0xed, 0x63, 0x65,
+	0xd8, 0x95, 0xc2, 0xcb, 0x23, 0xd9, 0x82, 0xf5, 0x5c, 0x1e, 0x2e, 0xe4, 0x27, 0x0d, 0x1a, 0x51,
+	0xac, 0xe3, 0x4a, 0x94, 0x14, 0x1c, 0xc0, 0x52, 0x5c, 0x9b, 0x47, 0xe3, 0x9b, 0x8d, 0x2f, 0xbe,
+	0xb4, 0xa0, 0xeb, 0xb1, 0x51, 0xd7, 0x0e, 0xed, 0x0a, 0x42, 0x6f, 0xb1, 0x80, 0x24, 0x32, 0xb8,
+	0x40, 0x07, 0x6e, 0xf4, 0x02, 0xb7, 0x8b, 0x07, 0x38, 0xc4, 0x45, 0x12, 0xd7, 0x01, 0x26, 0x12,
+	0x79, 0x94, 0x16, 0xe3, 0x95, 0x4a, 0x61, 0x32, 0xc1, 0xc8, 0x92, 0x70, 0x01, 0x7d, 0x26, 0x60,
+	0x1f, 0xa1, 0x43, 0xfe, 0xd0, 0x4a, 0x02, 0xb6, 0x60, 0x39, 0x79, 0x86, 0x8f, 0x10, 0x17, 0xd1,
+	0x48, 0x56, 0xbb, 0xa4, 0xba, 0x90, 0x14, 0x19, 0x17, 0xe2, 0xc1, 0x4d, 0x2e, 0xf2, 0xff, 0xd0,
+	0xb2, 0x0e, 0xb7, 0x73, 0xf8, 0xb8, 0x9c, 0x67, 0x1a, 0x7b, 0xc9, 0xf6, 0x11, 0x4a, 0xbf, 0x99,
+	0x92, 0x20, 0xf9, 0x0d, 0x8e, 0x52, 0xe8, 0xbf, 0xbf, 0xc1, 0x45, 0xca, 0x07, 0x70, 0x8b, 0x2b,
+	0x2f, 0x11, 0xd7, 0x82, 0xba, 0x1f, 0xef, 0x25, 0xb9, 0x03, 0x93, 0xa5, 0x4a, 0xc9, 0xf3, 0x9b,
+	0xc6, 0x2e, 0x66, 0x1f, 0xa1, 0x54, 0x2b, 0x92, 0xa8, 0xa4, 0xc6, 0x16, 0x85, 0xe1, 0xe5, 0x1a,
+	0x5b, 0xb9, 0x2c, 0x0c, 0xab, 0x3c, 0x08, 0x6a, 0x61, 0xaf, 0xc3, 0x82, 0x3f, 0xde, 0x48, 0x02,
+	0x30, 0xcf, 0xbe, 0x2b, 0x9d, 0xfe, 0x87, 0x49, 0x79, 0x74, 0x09, 0x8a, 0x87, 0x0a, 0x89, 0x40,
+	0x18, 0x4b, 0x4a, 0x5e, 0x0f, 0x69, 0x2c, 0x29, 0x17, 0x70, 0x22, 0x94, 0x85, 0x42, 0xc3, 0x3a,
+	0x40, 0xec, 0x53, 0x78, 0x23, 0xe2, 0x95, 0x4a, 0x07, 0x8d, 0xfa, 0xa8, 0x94, 0xee, 0xbc, 0x1e,
+	0xde, 0x60, 0x5d, 0x29, 0x2f, 0xe9, 0x38, 0x24, 0xaa, 0xa8, 0x6c, 0xa2, 0xf0, 0xed, 0x0d, 0x68,
+	0xe6, 0xdf, 0x18, 0x47, 0xf0, 0xe7, 0x21, 0x39, 0x68, 0xc6, 0x79, 0x36, 0x0e, 0x93, 0xed, 0xdd,
+	0x5f, 0x96, 0xa1, 0xd6, 0x0b, 0x5c, 0xfd, 0x1b, 0x78, 0x55, 0x9e, 0x34, 0xef, 0x17, 0xdd, 0x47,
+	0xde, 0x28, 0x63, 0x3e, 0x98, 0x06, 0x3d, 0x11, 0x30, 0x26, 0x96, 0xa7, 0x1e, 0x15, 0xb1, 0x84,
+	0x56, 0x12, 0x17, 0x0e, 0x38, 0xfa, 0xd7, 0xf0, 0x4a, 0x76, 0xb8, 0xb9, 0xab, 0x70, 0x94, 0xc1,
+	0x9a, 0xbb, 0xd5, 0xb1, 0x9c, 0xf2, 0x3b, 0xd0, 0x73, 0x7a, 0xfb, 0x8e, 0xc2, 0x93, 0x0c, 0x37,
+	0x1f, 0x4e, 0x05, 0xe7, 0xdc, 0xcf, 0x34, 0x58, 0x53, 0xce, 0x46, 0x8f, 0x14, 0x7e, 0x55, 0x86,
+	0xe6, 0x47, 0x2f, 0x69, 0xc8, 0xa5, 0x1d, 0x03, 0x08, 0x83, 0xc6, 0x96, 0x3a, 0xb0, 0x31, 0xcc,
+	0xdc, 0xa9, 0x04, 0xe3, 0x1c, 0x7d, 0x68, 0xa4, 0x87, 0x85, 0x6d, 0x85, 0x7d, 0x0a, 0x69, 0xbe,
+	0x5b, 0x15, 0x29, 0x92, 0xa5, 0x07, 0x83, 0x6d, 0xb5, 0xd8, 0x04, 0xa9, 0x24, 0xcb, 0xed, 0xff,
+	0x7a, 0x08, 0x37, 0xa4, 0xe6, 0x7f, 0xaf, 0x54, 0xb2, 0x40, 0xb9, 0x37, 0x05, 0x58, 0x2c, 0x5b,
+	0xb9, 0xc5, 0xdf, 0x57, 0x8b, 0x4f, 0xa3, 0x95, 0x65, 0x5b, 0xf8, 0x9e, 0xea, 0x3f, 0x6a, 0xb0,
+	0x92, 0xdb, 0xc2, 0x3b, 0xa5, 0xc7, 0xc8, 0xf0, 0x3f, 0x9a, 0xd2, 0x40, 0x8c, 0xb8, 0xd4, 0xd5,
+	0xef, 0xa9, 0x0f, 0x93, 0x02, 0x2b, 0x23, 0x5e, 0xd4, 0x06, 0xf4, 0xef, 0xe1, 0x66, 0x5e, 0xd7,
+	0x6e, 0x97, 0x9e, 0x22, 0xcd, 0xfd, 0xde, 0x74, 0xf8, 0x4c, 0x4e, 0x0b, 0x9d, 0xb4, 0x24, 0xa7,
+	0x13, 0x64, 0x59, 0x4e, 0xcb, 0x5d, 0x29, 0xc9, 0x69, 0x81, 0xaf, 0x3c, 0xa7, 0x05, 0xca, 0xbd,
+	0x29, 0xc0, 0x13, 0xd6, 0x83, 0xc7, 0x7f, 0x5c, 0x36, 0xb5, 0x17, 0x97, 0x4d, 0xed, 0xef, 0xcb,
+	0xa6, 0xf6, 0xf4, 0xaa, 0x39, 0xf3, 0xe2, 0xaa, 0x39, 0xf3, 0xd7, 0x55, 0x73, 0xe6, 0xab, 0x07,
+	0x2e, 0x09, 0x4f, 0xcf, 0x8f, 0xdb, 0x0e, 0x3d, 0xeb, 0xa4, 0x1c, 0x8f, 0xbf, 0x76, 0x8e, 0x07,
+	0xd4, 0xe9, 0x3b, 0xa7, 0x36, 0xf1, 0x3a, 0xa3, 0x4e, 0xf4, 0xaf, 0xd5, 0xb7, 0x43, 0x1c, 0x1c,
+	0xcf, 0xb1, 0x7f, 0x97, 0xf6, 0xfe, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x9e, 0x31, 0xf3, 0xa0, 0xca,
+	0x12, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1207,10 +1368,15 @@ type MsgClient interface {
 	AddController(ctx context.Context, in *MsgAddController, opts ...grpc.CallOption) (*MsgAddControllerResponse, error)
 	// DeleteService delete an existing service
 	DeleteController(ctx context.Context, in *MsgDeleteController, opts ...grpc.CallOption) (*MsgDeleteControllerResponse, error)
+	//Add / Delete Linked Resource
 	AddLinkedResource(ctx context.Context, in *MsgAddLinkedResource, opts ...grpc.CallOption) (*MsgAddLinkedResourceResponse, error)
 	DeleteLinkedResource(ctx context.Context, in *MsgDeleteLinkedResource, opts ...grpc.CallOption) (*MsgDeleteLinkedResourceResponse, error)
+	//Add / Delete Accorded Right
 	AddAccordedRight(ctx context.Context, in *MsgAddAccordedRight, opts ...grpc.CallOption) (*MsgAddAccordedRightResponse, error)
 	DeleteAccordedRight(ctx context.Context, in *MsgDeleteAccordedRight, opts ...grpc.CallOption) (*MsgDeleteAccordedRightResponse, error)
+	//Add / Delete Context
+	AddDidContext(ctx context.Context, in *MsgAddDidContext, opts ...grpc.CallOption) (*MsgAddDidContextResponse, error)
+	DeleteDidContext(ctx context.Context, in *MsgDeleteDidContext, opts ...grpc.CallOption) (*MsgDeleteDidContextResponse, error)
 }
 
 type msgClient struct {
@@ -1338,6 +1504,24 @@ func (c *msgClient) DeleteAccordedRight(ctx context.Context, in *MsgDeleteAccord
 	return out, nil
 }
 
+func (c *msgClient) AddDidContext(ctx context.Context, in *MsgAddDidContext, opts ...grpc.CallOption) (*MsgAddDidContextResponse, error) {
+	out := new(MsgAddDidContextResponse)
+	err := c.cc.Invoke(ctx, "/ixofoundation.ixo.data.Msg/AddDidContext", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteDidContext(ctx context.Context, in *MsgDeleteDidContext, opts ...grpc.CallOption) (*MsgDeleteDidContextResponse, error) {
+	out := new(MsgDeleteDidContextResponse)
+	err := c.cc.Invoke(ctx, "/ixofoundation.ixo.data.Msg/DeleteDidContext", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// CreateDidDocument defines a method for creating a new identity.
@@ -1358,10 +1542,15 @@ type MsgServer interface {
 	AddController(context.Context, *MsgAddController) (*MsgAddControllerResponse, error)
 	// DeleteService delete an existing service
 	DeleteController(context.Context, *MsgDeleteController) (*MsgDeleteControllerResponse, error)
+	//Add / Delete Linked Resource
 	AddLinkedResource(context.Context, *MsgAddLinkedResource) (*MsgAddLinkedResourceResponse, error)
 	DeleteLinkedResource(context.Context, *MsgDeleteLinkedResource) (*MsgDeleteLinkedResourceResponse, error)
+	//Add / Delete Accorded Right
 	AddAccordedRight(context.Context, *MsgAddAccordedRight) (*MsgAddAccordedRightResponse, error)
 	DeleteAccordedRight(context.Context, *MsgDeleteAccordedRight) (*MsgDeleteAccordedRightResponse, error)
+	//Add / Delete Context
+	AddDidContext(context.Context, *MsgAddDidContext) (*MsgAddDidContextResponse, error)
+	DeleteDidContext(context.Context, *MsgDeleteDidContext) (*MsgDeleteDidContextResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1406,6 +1595,12 @@ func (*UnimplementedMsgServer) AddAccordedRight(ctx context.Context, req *MsgAdd
 }
 func (*UnimplementedMsgServer) DeleteAccordedRight(ctx context.Context, req *MsgDeleteAccordedRight) (*MsgDeleteAccordedRightResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccordedRight not implemented")
+}
+func (*UnimplementedMsgServer) AddDidContext(ctx context.Context, req *MsgAddDidContext) (*MsgAddDidContextResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddDidContext not implemented")
+}
+func (*UnimplementedMsgServer) DeleteDidContext(ctx context.Context, req *MsgDeleteDidContext) (*MsgDeleteDidContextResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDidContext not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1646,6 +1841,42 @@ func _Msg_DeleteAccordedRight_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_AddDidContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddDidContext)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddDidContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixofoundation.ixo.data.Msg/AddDidContext",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddDidContext(ctx, req.(*MsgAddDidContext))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteDidContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteDidContext)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteDidContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixofoundation.ixo.data.Msg/DeleteDidContext",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteDidContext(ctx, req.(*MsgDeleteDidContext))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ixofoundation.ixo.data.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -1701,6 +1932,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAccordedRight",
 			Handler:    _Msg_DeleteAccordedRight_Handler,
+		},
+		{
+			MethodName: "AddDidContext",
+			Handler:    _Msg_AddDidContext_Handler,
+		},
+		{
+			MethodName: "DeleteDidContext",
+			Handler:    _Msg_DeleteDidContext_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1785,7 +2024,7 @@ func (m *MsgCreateDidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Signer)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x42
 	}
 	if len(m.LinkedResource) > 0 {
 		for iNdEx := len(m.LinkedResource) - 1; iNdEx >= 0; iNdEx-- {
@@ -1798,7 +2037,7 @@ func (m *MsgCreateDidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x3a
 		}
 	}
 	if len(m.AccordedRight) > 0 {
@@ -1812,7 +2051,7 @@ func (m *MsgCreateDidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x32
 		}
 	}
 	if len(m.Services) > 0 {
@@ -1826,13 +2065,27 @@ func (m *MsgCreateDidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x2a
 		}
 	}
 	if len(m.Verifications) > 0 {
 		for iNdEx := len(m.Verifications) - 1; iNdEx >= 0; iNdEx-- {
 			{
 				size, err := m.Verifications[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.Context) > 0 {
+		for iNdEx := len(m.Context) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Context[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2487,6 +2740,50 @@ func (m *MsgAddLinkedResource) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgDeleteLinkedResource) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLinkedResource) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLinkedResource) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ResourceId) > 0 {
+		i -= len(m.ResourceId)
+		copy(dAtA[i:], m.ResourceId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ResourceId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgAddAccordedRight) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2580,7 +2877,7 @@ func (m *MsgDeleteAccordedRight) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgDeleteLinkedResource) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddDidContext) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2590,12 +2887,12 @@ func (m *MsgDeleteLinkedResource) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgDeleteLinkedResource) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddDidContext) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgDeleteLinkedResource) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddDidContext) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2607,10 +2904,59 @@ func (m *MsgDeleteLinkedResource) MarshalToSizedBuffer(dAtA []byte) (int, error)
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.ResourceId) > 0 {
-		i -= len(m.ResourceId)
-		copy(dAtA[i:], m.ResourceId)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.ResourceId)))
+	if m.Context != nil {
+		{
+			size, err := m.Context.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteDidContext) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteDidContext) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteDidContext) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ContextId) > 0 {
+		i -= len(m.ContextId)
+		copy(dAtA[i:], m.ContextId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ContextId)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -2716,6 +3062,52 @@ func (m *MsgDeleteAccordedRightResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgAddDidContextResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddDidContextResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddDidContextResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteDidContextResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteDidContextResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteDidContextResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -2765,6 +3157,12 @@ func (m *MsgCreateDidDocument) Size() (n int) {
 	if len(m.Controllers) > 0 {
 		for _, s := range m.Controllers {
 			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Context) > 0 {
+		for _, e := range m.Context {
+			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
@@ -3071,6 +3469,27 @@ func (m *MsgAddLinkedResource) Size() (n int) {
 	return n
 }
 
+func (m *MsgDeleteLinkedResource) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ResourceId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
 func (m *MsgAddAccordedRight) Size() (n int) {
 	if m == nil {
 		return 0
@@ -3113,7 +3532,7 @@ func (m *MsgDeleteAccordedRight) Size() (n int) {
 	return n
 }
 
-func (m *MsgDeleteLinkedResource) Size() (n int) {
+func (m *MsgAddDidContext) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3123,7 +3542,28 @@ func (m *MsgDeleteLinkedResource) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.ResourceId)
+	if m.Context != nil {
+		l = m.Context.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgDeleteDidContext) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ContextId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -3162,6 +3602,24 @@ func (m *MsgAddAccordedRightResponse) Size() (n int) {
 }
 
 func (m *MsgDeleteAccordedRightResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgAddDidContextResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgDeleteDidContextResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3421,6 +3879,40 @@ func (m *MsgCreateDidDocument) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Context", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Context = append(m.Context, &Context{})
+			if err := m.Context[len(m.Context)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Verifications", wireType)
 			}
 			var msglen int
@@ -3453,7 +3945,7 @@ func (m *MsgCreateDidDocument) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Services", wireType)
 			}
@@ -3487,7 +3979,7 @@ func (m *MsgCreateDidDocument) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AccordedRight", wireType)
 			}
@@ -3521,7 +4013,7 @@ func (m *MsgCreateDidDocument) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 6:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LinkedResource", wireType)
 			}
@@ -3555,7 +4047,7 @@ func (m *MsgCreateDidDocument) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
 			}
@@ -5388,6 +5880,152 @@ func (m *MsgAddLinkedResource) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLinkedResource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLinkedResource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *MsgAddAccordedRight) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -5684,7 +6322,7 @@ func (m *MsgDeleteAccordedRight) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
+func (m *MsgAddDidContext) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5707,10 +6345,10 @@ func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgDeleteLinkedResource: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgAddDidContext: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgDeleteLinkedResource: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgAddDidContext: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -5747,7 +6385,43 @@ func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ResourceId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Context", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Context == nil {
+				m.Context = &Context{}
+			}
+			if err := m.Context.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5775,7 +6449,121 @@ func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ResourceId = string(dAtA[iNdEx:postIndex])
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteDidContext) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteDidContext: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteDidContext: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContextId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ContextId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -6007,6 +6795,106 @@ func (m *MsgDeleteAccordedRightResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgDeleteAccordedRightResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddDidContextResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddDidContextResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddDidContextResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteDidContextResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteDidContextResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteDidContextResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

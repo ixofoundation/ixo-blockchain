@@ -569,3 +569,94 @@ func (msg MsgDeleteController) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{accAddr}
 }
+
+// --------------------------
+// ADD CONTEXT
+// --------------------------
+
+// msg types
+const (
+	TypeMsgAddContext = "add-context"
+)
+
+var _ sdk.Msg = &MsgAddDidContext{}
+
+// NewMsgAddService creates a new MsgAddService instance
+func NewMsgAddDidContext(
+	id string,
+	context *Context,
+	signerAccount string,
+) *MsgAddDidContext {
+	return &MsgAddDidContext{
+		Id:      id,
+		Context: context,
+		Signer:  signerAccount,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgAddDidContext) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgAddDidContext) Type() string {
+	return TypeMsgAddService
+}
+
+func (msg MsgAddDidContext) GetSignBytes() []byte {
+	panic("IBC messages do not support amino")
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgAddDidContext) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+
+// --------------------------
+// DELETE CONTEXT
+// --------------------------
+
+// msg types
+const (
+	TypeMsgDeleteDidContext = "delete-context"
+)
+
+func NewMsgDeleteDidContext(
+	id string,
+	key string,
+	signerAccount string,
+) *MsgDeleteDidContext {
+	return &MsgDeleteDidContext{
+		Id:        id,
+		ContextId: key,
+		Signer:    signerAccount,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgDeleteDidContext) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgDeleteDidContext) Type() string {
+	return TypeMsgDeleteService
+}
+
+func (msg MsgDeleteDidContext) GetSignBytes() []byte {
+	panic("IBC messages do not support amino")
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgDeleteDidContext) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
