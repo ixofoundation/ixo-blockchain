@@ -172,13 +172,13 @@ func IsValidDIDDocument(didDoc *DidDocument) bool {
 		}
 	}
 
-	for _, c := range didDoc.Context {
-		if c.Key != "" && c.Value != "" {
-			return true
-		}
-	}
+	//for _, c := range didDoc.Context {
+	//	if c.Key != "" && c.Value != "" {
+	//		return true
+	//	}
+	//}
 
-	return false
+	return true
 }
 
 // IsValidDIDKeyFormat verify that a did is compliant with the did:cosmos:key format
@@ -782,18 +782,18 @@ func (didDoc *DidDocument) DeleteAccordedRight(rightID string) {
 
 ////Contexts
 
-func (didDoc *DidDocument) AddDidContext(contexts ...*Context) (err error) {
+func (didDoc *DidDocument) AddDidContext(contexts ...string) (err error) {
 	if didDoc.Context == nil {
-		didDoc.Context = []*Context{}
+		didDoc.Context = []string{}
 	}
 
 	// used to check duplicates
-	index := make(map[string]struct{}, len(didDoc.Context))
+	//index := make(map[string]struct{}, len(didDoc.Context))
 
 	// load existing resources
-	for _, s := range didDoc.Context {
-		index[s.Key] = struct{}{}
-	}
+	//for _, s := range didDoc.Context {
+	//	index[s.Key] = struct{}{}
+	//}
 
 	// resources must be unique
 	for _, s := range contexts {
@@ -802,11 +802,11 @@ func (didDoc *DidDocument) AddDidContext(contexts ...*Context) (err error) {
 		//}
 
 		// verify that there are no duplicates in method ids
-		if _, found := index[s.Key]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", s.Key)
-			return
-		}
-		index[s.Key] = struct{}{}
+		//if _, found := index[s.Key]; found {
+		//	err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", s.Key)
+		//	return
+		//}
+		//index[s.Key] = struct{}{}
 
 		didDoc.Context = append(didDoc.Context, s)
 	}
@@ -828,7 +828,7 @@ func (didDoc *DidDocument) DeleteDidContext(contextKey string) {
 	}
 
 	for i, s := range didDoc.Context {
-		if s.Key == contextKey {
+		if s == contextKey {
 			del(i)
 			break
 		}
@@ -920,7 +920,7 @@ func (did Verification) GetBytes() []byte {
 type Services []*Service
 type AccordedRights []*AccordedRight
 type LinkedResources []*LinkedResource
-type Contexts []*Context
+type Contexts []string
 
 // NewService creates a new service
 func NewService(id string, serviceType string, serviceEndpoint string) *Service {
@@ -952,6 +952,10 @@ func NewAccordedRight(id string, rightType string, mechanism string, message str
 		Message:         message,
 		ServiceEndpoint: endpoint,
 	}
+}
+
+func NewDidContext(value string) string {
+	return value
 }
 
 // NewDidMetadata returns a DidMetadata struct that has equals created and updated date,

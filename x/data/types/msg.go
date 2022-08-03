@@ -402,7 +402,7 @@ const (
 
 var _ sdk.Msg = &MsgAddAccordedRight{}
 
-// NewMsgAddService creates a new MsgAddService instance
+// NewMsgAddAccordedRight creates a new MsgAddAccordedright instance
 func NewMsgAddAccordedRight(
 	id string,
 	right *AccordedRight,
@@ -576,7 +576,7 @@ func (msg MsgDeleteController) GetSigners() []sdk.AccAddress {
 
 // msg types
 const (
-	TypeMsgAddContext = "add-context"
+	TypeMsgAddContext = "add-did-context"
 )
 
 var _ sdk.Msg = &MsgAddDidContext{}
@@ -584,7 +584,7 @@ var _ sdk.Msg = &MsgAddDidContext{}
 // NewMsgAddService creates a new MsgAddService instance
 func NewMsgAddDidContext(
 	id string,
-	context *Context,
+	context string,
 	signerAccount string,
 ) *MsgAddDidContext {
 	return &MsgAddDidContext{

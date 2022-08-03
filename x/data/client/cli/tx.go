@@ -38,6 +38,8 @@ func GetTxCmd() *cobra.Command {
 		NewDeleteLinkedresourceCmd(),
 		NewAddAccordedRightCmd(),
 		NewDeleteAccordedRightCmd(),
+		NewAddDidContextCmd(),
+		NewDeleteDidContextCmd(),
 	)
 
 	return cmd
@@ -595,10 +597,10 @@ func NewDeleteAccordedRightCmd() *cobra.Command {
 
 func NewAddDidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-did-context [id] [resource_id] [type] [description] [media_type] [service_endpoint] [proof] [encrypted] [privacy]",
-		Short:   "add a linked resource to a decentralized did (did/IID) document",
-		Example: "adds a linked resource to a did document",
-		Args:    cobra.ExactArgs(9),
+		Use:     "add-did-context [did-id] [context]",
+		Short:   "add a context item to a decentralized did (did/IID) document",
+		Example: "adds a context item to a did document",
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -608,26 +610,20 @@ func NewAddDidContextCmd() *cobra.Command {
 			// tx signer
 			signer := clientCtx.GetFromAddress()
 			// service parameters
-			resourceId, resourceType, desc, mediaType, endpoint, proof, encrypted, privacy := args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
+			contString := args[1]
 			// document did
 			did := types.NewChainDID(clientCtx.ChainID, args[0])
 
-			resource := types.NewLinkedResource(
-				resourceId,
-				resourceType,
-				desc,
-				mediaType,
-				endpoint,
-				proof,
-				encrypted,
-				privacy,
+			didContext := types.NewDidContext(
+				contString,
 			)
 
-			msg := types.NewMsgAddLinkedResource(
+			msg := types.NewMsgAddDidContext(
 				did.String(),
-				resource,
+				didContext,
 				signer.String(),
 			)
+			fmt.Println(msg)
 			// broadcast
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -640,9 +636,9 @@ func NewAddDidContextCmd() *cobra.Command {
 
 func NewDeleteDidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-resource [id] [resource-id]",
-		Short:   "deletes a resource from a decentralized did (did) document",
-		Example: "delete a resource for a did document",
+		Use:     "delete-context [did-id] [key]",
+		Short:   "deletes a did context from a decentralized did (did) document",
+		Example: "delete a context for a did document",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -654,11 +650,11 @@ func NewDeleteDidContextCmd() *cobra.Command {
 			// signer
 			signer := clientCtx.GetFromAddress()
 			// resource id
-			rID := args[1]
+			cID := args[1]
 
-			msg := types.NewMsgDeleteLinkedResource(
+			msg := types.NewMsgDeleteDidContext(
 				did.String(),
-				rID,
+				cID,
 				signer.String(),
 			)
 

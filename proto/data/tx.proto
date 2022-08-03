@@ -62,7 +62,7 @@ message MsgCreateDidDocument {
 
   string                id            = 1; // the did
   repeated string       controllers   = 2; // the list of controller DIDs
-  repeated Context      context        = 3;
+  repeated string      context        = 3;
   repeated Verification verifications = 4; // the list of verification methods and relationships
   repeated Service      services      = 5;
   repeated AccordedRight accordedRight = 6;
@@ -217,7 +217,7 @@ message MsgAddDidContext {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
   string      id           = 1; // the did
-  Context     context = 2; // the Accorded right to add
+  string     context = 2; // the context string to add
   string      signer       = 3; // address of the account signing the message
 }
 
@@ -226,7 +226,7 @@ message MsgDeleteDidContext {
   option (gogoproto.goproto_getters) = false;
 
   string id         = 1; // the did
-  string context_id = 2; // the service id
+  string context = 2; // the context string
   string signer     = 3; // address of the account signing the message
 }
 
