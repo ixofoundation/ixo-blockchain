@@ -1081,6 +1081,13 @@
                 </tr>
               
                 <tr>
+                  <td>next_public_alpha_delta</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>total_buy_amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td></td>
@@ -3021,6 +3028,13 @@
               
                 <tr>
                   <td>alpha</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>delta</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>

@@ -94,6 +94,11 @@ func (msg MsgCreateBond) ValidateBasic() error {
 	}
 	// Note: FunctionParameters can be empty
 
+	// Checks that the bond token starts with 'x'
+	if !strings.HasPrefix(msg.Token, "x") {
+		return ErrInvalidBondTokenPrefix
+	}
+
 	// Check that bond token is a valid token name
 	err := CheckCoinDenom(msg.Token)
 	if err != nil {

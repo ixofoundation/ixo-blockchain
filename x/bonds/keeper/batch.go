@@ -653,7 +653,7 @@ func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid didexp
 	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
 	newPublicAlpha := batch.NextPublicAlpha
-	nextPublicAlphaDelta := sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
+	nextPublicAlphaDelta := batch.NextPublicAlphaDelta
 
 	var algo types.AugmentedBondRevision1
 	if err := algo.Init(bond); err != nil {

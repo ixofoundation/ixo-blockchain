@@ -393,6 +393,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 		}
 		batch := k.MustGetBatch(ctx, bond.BondDid)
 		batch.NextPublicAlpha = ap
+		batch.NextPublicAlphaDelta = *msg.Delta
 		// batch.NextPublicAlphaDelta = sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
 		k.SetBatch(ctx, bond.BondDid, batch)
 

@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -49,11 +47,6 @@ func CheckNoOfReserveTokens(resTokens []string, fnType string) error {
 }
 
 func CheckCoinDenom(denom string) (err error) {
-
-	if !strings.HasPrefix(denom, "x") {
-		return ErrInvalidBondTokenPrefix
-	}
-
 	coin, err := sdk.ParseCoinNormalized("0" + denom)
 	if err != nil {
 		return err

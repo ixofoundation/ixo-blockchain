@@ -83,13 +83,14 @@ message Batch {
   string bond_did                                  = 1 [(gogoproto.moretags) = "yaml:\"bond_did\""];
   string blocks_remaining                          = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"blocks_remaining\""];
   string next_public_alpha                         = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"next_public_alpha\""];
-  cosmos.base.v1beta1.Coin total_buy_amount        = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"total_buy_amount\""];
-  cosmos.base.v1beta1.Coin total_sell_amount       = 5 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"total_sell_amount\""];
-  repeated cosmos.base.v1beta1.DecCoin buy_prices  = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"buy_prices\""];
-  repeated cosmos.base.v1beta1.DecCoin sell_prices = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"sell_prices\""];
-  repeated BuyOrder buys                           = 8 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"buys\""];
-  repeated SellOrder sells                         = 9 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sells\""];
-  repeated SwapOrder swaps                         = 10 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"swaps\""];
+  string next_public_alpha_delta                   = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"next_public_alpha_delta\""];
+  cosmos.base.v1beta1.Coin total_buy_amount        = 5 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"total_buy_amount\""];
+  cosmos.base.v1beta1.Coin total_sell_amount       = 6 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"total_sell_amount\""];
+  repeated cosmos.base.v1beta1.DecCoin buy_prices  = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"buy_prices\""];
+  repeated cosmos.base.v1beta1.DecCoin sell_prices = 8 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins", (gogoproto.moretags) = "yaml:\"sell_prices\""];
+  repeated BuyOrder buys                           = 9 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"buys\""];
+  repeated SellOrder sells                         = 10 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"sells\""];
+  repeated SwapOrder swaps                         = 11 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"swaps\""];
 }
 
 // Params defines the parameters for the bonds module.
