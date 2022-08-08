@@ -475,6 +475,12 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 		return nil, types.ErrBondTokenDoesNotMatchBond
 	}
 
+	if bond.FunctionType == types.BondingFunction {
+		targetFundcing := bond.FunctionParameters.AsMap()["Funding_Target"]
+		if targetFundcing.GT(msg.Amount.Amount.ToDec()) {
+			return nil, types.ErrBondFundingTargetExceeded
+		}
+	}
 	// Check current state is HATCH/OPEN, max prices, order quantity limits
 	if bond.State != types.OpenState.String() && bond.State != types.HatchState.String() {
 		return nil, types.ErrInvalidStateForAction

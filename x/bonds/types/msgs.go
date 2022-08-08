@@ -148,7 +148,7 @@ func (msg MsgCreateBond) ValidateBasic() error {
 	}
 
 	// Alpha bonds have to be augmented bonding curves
-	if msg.AlphaBond && msg.FunctionType != AugmentedFunction {
+	if msg.AlphaBond && (msg.FunctionType != AugmentedFunction || msg.FunctionType != BondingFunction) {
 		return sdkerrors.Wrap(ErrFunctionNotAvailableForFunctionType,
 			"only augmented bonding curves can be alpha bonds")
 	}

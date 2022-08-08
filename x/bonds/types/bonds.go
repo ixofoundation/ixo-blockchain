@@ -70,6 +70,16 @@ var (
 		SigmoidFunction:   {"a", "b", "c"},
 		SwapperFunction:   nil,
 		AugmentedFunction: {"d0", "p0", "theta", "kappa"},
+		BondingFunction: {
+			"Funding_Target",
+			"Hatch_Supply",
+			"Hatch_Price",
+			"APY_MAX",
+			"APY_MIN",
+			"DISCOUNT_RATE",
+			"MATURITY",
+			"GAMMA",
+		},
 	}
 
 	NoOfReserveTokensForFunctionType = map[string]int{
@@ -77,6 +87,7 @@ var (
 		SigmoidFunction:   AnyNumberOfReserveTokens,
 		SwapperFunction:   2,
 		AugmentedFunction: AnyNumberOfReserveTokens,
+		BondingFunction:   AnyNumberOfReserveTokens,
 	}
 
 	ExtraParameterRestrictions = map[string]FunctionParamRestrictions{
@@ -84,6 +95,7 @@ var (
 		SigmoidFunction:   sigmoidParameterRestrictions,
 		SwapperFunction:   nil,
 		AugmentedFunction: augmentedParameterRestrictions,
+		BondingFunction:   augmentedParameterRestrictions,
 	}
 )
 

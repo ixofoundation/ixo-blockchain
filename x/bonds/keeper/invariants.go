@@ -94,9 +94,13 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 			denom := bond.Token
 			did := bond.BondDid
 
-			if bond.FunctionType == types.AugmentedFunction ||
-				bond.FunctionType == types.SwapperFunction {
-				continue // Check does not apply to augmented/swapper functions
+			switch bond.FunctionType {
+			case types.AugmentedFunction:
+				fallthrough
+			case types.SwapperFunction:
+				fallthrough
+			case types.BondingFunction:
+				continue
 			}
 
 			expectedReserve, err := bond.ReserveAtSupply(bond.CurrentSupply.Amount)
