@@ -54,5 +54,6 @@ var (
 	ErrInvalidStateProgression              = sdkerrors.Register(DefaultCodespace, 44, "invalid state progression requested")
 	ErrCannotAllowSellsAndWithdrawals       = sdkerrors.Register(DefaultCodespace, 45, "cannot allow both sells and reserve withdrawals")
 	ErrInsufficientReserveForWithdraw       = sdkerrors.Register(DefaultCodespace, 46, "requested withdraw amount is greater than available reserve")
-	ErrBondFundingTargetExceeded            = sdkerrors.Register(DefaultCodespace, 47, "bond funding target has been reached.")
+	ErrBondFundingTargetExceeded            = sdkerrors.Register(DefaultCodespace, 47, "bond funding target has been reached")
+	ErrInvalidBondTokenPrefix               = sdkerrors.Register(DefaultCodespace, 48, "a bond's token but have the prefix 'x'")
 )

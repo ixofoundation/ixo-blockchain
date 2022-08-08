@@ -122,6 +122,10 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 		state = types.HatchState
 	}
 
+	if !strings.HasPrefix(msg.Token, "x") {
+		return nil, types.ErrInvalidBondTokenPrefix
+	}
+
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
 		msg.ControllerDid, msg.FunctionType, msg.FunctionParameters,
 		msg.ReserveTokens, msg.TxFeePercentage, msg.ExitFeePercentage,
