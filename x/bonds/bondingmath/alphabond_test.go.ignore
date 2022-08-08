@@ -8,10 +8,10 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 )
 
-type simFunc func(*AlphabondV2, AlphabondV2) (AlphabondV2, error)
+type simFunc func(*AugmentedBondRevision1, AugmentedBondRevision1) (AugmentedBondRevision1, error)
 
-func buyToken(amount int64, stateF func(state AlphabondV2) AlphabondV2) func(*AlphabondV2, AlphabondV2) (AlphabondV2, error) {
-	return func(algo *AlphabondV2, state AlphabondV2) (AlphabondV2, error) {
+func buyToken(amount int64, stateF func(state AugmentedBondRevision1) AugmentedBondRevision1) func(*AugmentedBondRevision1, AugmentedBondRevision1) (AugmentedBondRevision1, error) {
+	return func(algo *AugmentedBondRevision1, state AugmentedBondRevision1) (AugmentedBondRevision1, error) {
 		priceCoin, _ := algo.CalculateTokensForPrice(sdk.NewInt64Coin("bond", amount))
 		price, _ := priceCoin.Amount.Float64()
 		// fmt.Println("Buy price:", price)
@@ -21,8 +21,8 @@ func buyToken(amount int64, stateF func(state AlphabondV2) AlphabondV2) func(*Al
 	}
 }
 
-func updateAlpha(publicAloha float64, stateF func(state AlphabondV2) AlphabondV2) func(*AlphabondV2, AlphabondV2) (AlphabondV2, error) {
-	return func(algo *AlphabondV2, state AlphabondV2) (AlphabondV2, error) {
+func updateAlpha(publicAloha float64, stateF func(state AugmentedBondRevision1) AugmentedBondRevision1) func(*AugmentedBondRevision1, AugmentedBondRevision1) (AugmentedBondRevision1, error) {
+	return func(algo *AugmentedBondRevision1, state AugmentedBondRevision1) (AugmentedBondRevision1, error) {
 		algo.UpdateAlpha(publicAloha)
 		return stateF(state), nil
 	}
@@ -88,8 +88,8 @@ func TestBondWithoutMaturityOrAlphaUpdates(t *testing.T) {
 	// algo.UpdateRivsion()
 	// algo.Export(alphaBond)
 
-	algo := &AlphabondV2{}
-	algo.Init(alphaBond)
+	algo := &AugmentedBondRevision1{}
+	err := algo.init(alphaBond)
 
 	// // pbond, _ := algo.CalculatePriceForTokens(sdk.NewInt64Coin(reserveToken, 20000))
 	// // fmt.Println("price for 20000 bond tokens:", pbond.Amount.String())
@@ -98,135 +98,135 @@ func TestBondWithoutMaturityOrAlphaUpdates(t *testing.T) {
 	// // fmt.Println("price for 4500 xusd:", pxusd.Amount.String())
 
 	sim := []simFunc{
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = 10000
 			// state._R = state._R + 4199
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		updateAlpha(0.6, func(state AlphabondV2) AlphabondV2 {
+		updateAlpha(0.6, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			// state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(10000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(10000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		updateAlpha(0.7, func(state AlphabondV2) AlphabondV2 {
+		updateAlpha(0.7, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			// state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		updateAlpha(0.8, func(state AlphabondV2) AlphabondV2 {
+		updateAlpha(0.8, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			// state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(400, func(state AlphabondV2) AlphabondV2 {
+		buyToken(400, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		buyToken(1000, func(state AlphabondV2) AlphabondV2 {
+		buyToken(1000, func(state AugmentedBondRevision1) AugmentedBondRevision1 {
 			state._m = state._m + 10000
 			// state.price = 100000
 			return state
 		}),
-		// updateAlpha(0.6, func(state AlphabondV2) {
+		// updateAlpha(0.6, func(state AugmentedBondRevision1) {
 		// 	state.alpha = 0.6
 		// 	return state
 		// }),
 	}
 
-	handleSim := func(t *testing.T, algo *AlphabondV2, sim []simFunc) {
-		var nextState AlphabondV2 = *algo
+	handleSim := func(t *testing.T, algo *AugmentedBondRevision1, sim []simFunc) {
+		var nextState AugmentedBondRevision1 = *algo
 		var err error
 
 		for _, f := range sim {

@@ -187,7 +187,7 @@ func (bond *AlphabondV2) UpdateAlpha(_ap float64) error {
 	}()
 	fmt.Println("alpha_new", alpha_new)
 	bond._a = (bond._theta * alpha_new) + (1-bond._theta)*bond._a
-	
+
 	bond._kappa = (bond._a / bond._a0) * math.Exp(bond._r*bond._t)
 	bond._Pavg = bond._kappa * bond._Fi / bond._Mi
 	bond._APYavg = -1 * (math.Log(bond._Pavg * bond._M / bond._C)) / bond._T

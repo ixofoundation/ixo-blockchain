@@ -21,6 +21,7 @@ const (
 	SigmoidFunction   = "sigmoid_function"
 	SwapperFunction   = "swapper_function"
 	AugmentedFunction = "augmented_function"
+	BondingFunction   = "bonding_function"
 
 	HatchState  BondState = "HATCH"
 	OpenState   BondState = "OPEN"
@@ -339,6 +340,23 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		}
 	case SwapperFunction:
 		return nil, ErrFunctionNotAvailableForFunctionType
+	case BondingFunction:
+		var algo BondingAlgorithm
+
+		switch args["rev"].TruncateInt64() {
+		case 1:
+			fallthrough
+		default:
+			algo = new(AugmentedBondRevision1)
+		}
+
+		algo.Init(bond)
+
+		price, err := algo.CalculateTokensForPrice(sdk.NewInt64Coin(bond.Token, 1))
+		if err != nil {
+			return nil, err
+		}
+		result = sdk.NewDecCoins(price)
 	default:
 		panic("unrecognized function type")
 	}
@@ -361,6 +379,24 @@ func (bond Bond) GetCurrentPricesPT(reserveBalances sdk.Coins) (sdk.DecCoins, er
 		return bond.GetPricesAtSupply(bond.CurrentSupply.Amount)
 	case SwapperFunction:
 		return bond.GetPricesToMint(sdk.OneInt(), reserveBalances)
+	case BondingFunction:
+		args := bond.FunctionParameters.AsMap()
+		var algo BondingAlgorithm
+
+		switch args["rev"].TruncateInt64() {
+		case 1:
+			fallthrough
+		default:
+			algo = new(AugmentedBondRevision1)
+		}
+
+		algo.Init(bond)
+
+		price, err := algo.CalculateTokensForPrice(sdk.NewInt64Coin(bond.Token, 1))
+		if err != nil {
+			return nil, err
+		}
+		return sdk.NewDecCoins(price), nil
 	default:
 		panic("unrecognized function type")
 	}

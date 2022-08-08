@@ -116,6 +116,7 @@ require (
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/zondax/hid v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
+	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
 	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect

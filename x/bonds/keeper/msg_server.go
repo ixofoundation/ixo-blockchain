@@ -3,9 +3,10 @@ package keeper
 import (
 	"context"
 	"fmt"
-
 	"strconv"
 	"strings"
+
+	"golang.org/x/exp/slices"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -23,6 +24,55 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
+
+func augmentedFunctionBuilder(msg *types.MsgCreateBond) error {
+	paramsMap := msg.FunctionParameters.AsMap()
+	d0, _ := paramsMap["d0"]
+	p0, _ := paramsMap["p0"]
+	theta, _ := paramsMap["theta"]
+	kappa, _ := paramsMap["kappa"]
+
+	R0 := d0.Mul(sdk.OneDec().Sub(theta))
+	S0 := d0.Quo(p0)
+	V0, err := types.Invariant(R0, S0, kappa)
+	if err != nil {
+		return nil
+	}
+
+	msg.FunctionParameters = msg.FunctionParameters.AddParams(
+		types.FunctionParams{
+			types.NewFunctionParam("R0", R0),
+			types.NewFunctionParam("S0", S0),
+			types.NewFunctionParam("V0", V0),
+		})
+
+	if msg.AlphaBond {
+		publicAlpha := types.StartingPublicAlpha
+		systemAlpha := types.SystemAlpha(publicAlpha, sdk.OneInt(),
+			sdk.OneInt(), R0.TruncateInt(), msg.OutcomePayment)
+
+		I0 := types.InvariantI(msg.OutcomePayment, systemAlpha, sdk.ZeroInt())
+
+		msg.FunctionParameters = msg.FunctionParameters.AddParams(
+			types.FunctionParams{
+				types.NewFunctionParam("I0", I0),
+				types.NewFunctionParam("publicAlpha", publicAlpha),
+				types.NewFunctionParam("systemAlpha", systemAlpha),
+			})
+	}
+	return nil
+}
+
+// This is where you would add the default initial function paramaters
+func augmentedFunction2Builder(msg *types.MsgCreateBond) error {
+	// if msg.AlphaBond {
+	publicAlpha := types.StartingPublicAlpha
+	msg.FunctionParameters = msg.FunctionParameters.AddParams(
+		types.FunctionParams{
+			types.NewFunctionParam("INITIAL_PUBLIC_ALPHA", publicAlpha),
+		})
+	return nil
+}
 
 func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (*types.MsgCreateBondResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -60,44 +110,15 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 
 	// If augmented, add R0, S0, V0 as parameters for quick access
 	// Also, override AllowSells and set to False if S0 > 0
-	if msg.FunctionType == types.AugmentedFunction {
-		paramsMap := msg.FunctionParameters.AsMap()
-		d0, _ := paramsMap["d0"]
-		p0, _ := paramsMap["p0"]
-		theta, _ := paramsMap["theta"]
-		kappa, _ := paramsMap["kappa"]
 
-		R0 := d0.Mul(sdk.OneDec().Sub(theta))
-		S0 := d0.Quo(p0)
-		V0, err := types.Invariant(R0, S0, kappa)
-		if err != nil {
-			return nil, err
-		}
-
-		msg.FunctionParameters = msg.FunctionParameters.AddParams(
-			types.FunctionParams{
-				types.NewFunctionParam("R0", R0),
-				types.NewFunctionParam("S0", S0),
-				types.NewFunctionParam("V0", V0),
-			})
-
-		if msg.AlphaBond {
-			publicAlpha := types.StartingPublicAlpha
-			systemAlpha := types.SystemAlpha(publicAlpha, sdk.OneInt(),
-				sdk.OneInt(), R0.TruncateInt(), msg.OutcomePayment)
-
-			I0 := types.InvariantI(msg.OutcomePayment, systemAlpha, sdk.ZeroInt())
-
-			msg.FunctionParameters = msg.FunctionParameters.AddParams(
-				types.FunctionParams{
-					types.NewFunctionParam("I0", I0),
-					types.NewFunctionParam("publicAlpha", publicAlpha),
-					types.NewFunctionParam("systemAlpha", systemAlpha),
-				})
-		}
-
+	switch msg.FunctionType {
+	case types.AugmentedFunction:
+		augmentedFunctionBuilder(msg)
 		// The starting state for augmented bonding curves is the Hatch state.
 		// Note that we can never start with OpenState since S0>0 (S0=d0/p0 and d0>0).
+		state = types.HatchState
+	case types.BondingFunction:
+		augmentedFunction2Builder(msg)
 		state = types.HatchState
 	}
 
@@ -241,110 +262,153 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 
 	newPublicAlpha := msg.Alpha
 
-	if bond.FunctionType != types.AugmentedFunction {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
-			"bond is not an augmented bonding curve")
-	} else if !bond.AlphaBond {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
-			"bond is not an alpha bond")
-	} else if bond.State != types.OpenState.String() {
+	supportedFunctionTypes := []string{types.AugmentedFunction, types.BondingFunction}
+	switch {
+	case !slices.Contains(supportedFunctionTypes, bond.FunctionType):
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an augmented bonding curve")
+	case !bond.AlphaBond:
+		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
+	case bond.State != types.OpenState.String():
 		return nil, types.ErrInvalidStateForAction
+	case bond.ControllerDid != msg.EditorDid:
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "editor must be the controller of the bond")
 	}
 
-	if bond.ControllerDid != msg.EditorDid {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
-			"editor must be the controller of the bond")
+	if bond.FunctionType == types.AugmentedFunction {
+		// Get supply, reserve, outcome payment. Note that we get the adjusted
+		// supply in order to take into consideration the influence of the buys and
+		// sells in the current batch. We then get the reserve based on this supply.
+		S := k.GetSupplyAdjustedForAlphaEdit(ctx, bond.BondDid).Amount
+		R, err := bond.ReserveAtSupply(S)
+		if err != nil {
+			return nil, err
+		}
+		C := bond.OutcomePayment
+
+		// Get current parameters
+		paramsMap := bond.FunctionParameters.AsMap()
+
+		// Check (newPublicAlpha != publicAlpha)
+		if newPublicAlpha.Equal(paramsMap["publicAlpha"]) {
+			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+				"cannot change public alpha to the current value of public alpha")
+		}
+
+		// Calculate scaled delta public alpha, to calculate new system alpha
+		prevPublicAlpha := paramsMap["publicAlpha"]
+		deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
+		temp, err := types.ApproxPower(
+			prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
+			sdk.MustNewDecFromStr("2"))
+		if err != nil {
+			return nil, err
+		}
+		scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
+
+		// Calculate new system alpha
+		prevSystemAlpha := paramsMap["systemAlpha"]
+		var newSystemAlpha sdk.Dec
+		if deltaPublicAlpha.IsPositive() {
+			// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
+			temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+			temp2 := sdk.OneDec().Sub(prevSystemAlpha)
+			newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
+		} else {
+			// (1 - scaled_delta_public_alpha) * (previous_alpha)
+			temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+			temp2 := prevSystemAlpha
+			newSystemAlpha = temp1.Mul(temp2)
+		}
+
+		// Check 1 (newSystemAlpha != prevSystemAlpha)
+		if newSystemAlpha.Equal(prevSystemAlpha) {
+			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+				"resultant system alpha based on public alpha is unchanged")
+		}
+		// Check 2 (I > C * newSystemAlpha)
+		if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
+			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+				"cannot change alpha to that value due to violated restriction [1]")
+		}
+		// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
+		if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
+			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+				"cannot change alpha to that value due to violated restriction [2]")
+		}
+
+		// Recalculate kappa and V0 using new alpha
+		newKappa := types.Kappa(paramsMap["I0"], C, newSystemAlpha)
+		_, err = types.Invariant(R, S.ToDec(), newKappa)
+		if err != nil {
+			return nil, err
+		}
+
+		// Get batch to set new alpha
+		batch := k.MustGetBatch(ctx, bond.BondDid)
+		batch.NextPublicAlpha = newPublicAlpha
+		k.SetBatch(ctx, bond.BondDid, batch)
+
+		logger := k.Logger(ctx)
+		logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
+			msg.BondDid, msg.EditorDid))
+
+		ctx.EventManager().EmitEvents(sdk.Events{
+			sdk.NewEvent(
+				types.EventTypeSetNextAlpha,
+				sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+				sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
+			),
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+			),
+		})
+	} else if bond.FunctionType == types.BondingFunction {
+		// Get supply, reserve, outcome payment. Note that we get the adjusted
+		// supply in order to take into consideration the influence of the buys and
+		// sells in the current batch. We then get the reserve based on this supply.
+		// S := k.GetSupplyAdjustedForAlphaEdit(ctx, bond.BondDid).Amount
+		// R, err := bond.ReserveAtSupply(S)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// C := bond.OutcomePayment
+
+		var algo types.AugmentedBondRevision1
+		if err := algo.Init(bond); err != nil {
+			return nil, err
+		}
+
+		algoParams := algo.ExportToMap()
+
+		// Get batch to set new alpha
+		ap, err := types.ConvertFloat64ToDec(algoParams["ap"])
+		if err != nil {
+			return nil, err
+		}
+		batch := k.MustGetBatch(ctx, bond.BondDid)
+		batch.NextPublicAlpha = ap
+		// batch.NextPublicAlphaDelta = sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
+		k.SetBatch(ctx, bond.BondDid, batch)
+
+		logger := k.Logger(ctx)
+		logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
+			msg.BondDid, msg.EditorDid))
+
+		ctx.EventManager().EmitEvents(sdk.Events{
+			sdk.NewEvent(
+				types.EventTypeSetNextAlpha,
+				sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
+				sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
+			),
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+			),
+		})
 	}
-
-	// Get supply, reserve, outcome payment. Note that we get the adjusted
-	// supply in order to take into consideration the influence of the buys and
-	// sells in the current batch. We then get the reserve based on this supply.
-	S := k.GetSupplyAdjustedForAlphaEdit(ctx, bond.BondDid).Amount
-	R, err := bond.ReserveAtSupply(S)
-	if err != nil {
-		return nil, err
-	}
-	C := bond.OutcomePayment
-
-	// Get current parameters
-	paramsMap := bond.FunctionParameters.AsMap()
-
-	// Check (newPublicAlpha != publicAlpha)
-	if newPublicAlpha.Equal(paramsMap["publicAlpha"]) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
-			"cannot change public alpha to the current value of public alpha")
-	}
-
-	// Calculate scaled delta public alpha, to calculate new system alpha
-	prevPublicAlpha := paramsMap["publicAlpha"]
-	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
-	temp, err := types.ApproxPower(
-		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
-		sdk.MustNewDecFromStr("2"))
-	if err != nil {
-		return nil, err
-	}
-	scaledDeltaPublicAlpha := deltaPublicAlpha.Mul(temp)
-
-	// Calculate new system alpha
-	prevSystemAlpha := paramsMap["systemAlpha"]
-	var newSystemAlpha sdk.Dec
-	if deltaPublicAlpha.IsPositive() {
-		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
-		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-		temp2 := sdk.OneDec().Sub(prevSystemAlpha)
-		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
-	} else {
-		// (1 - scaled_delta_public_alpha) * (previous_alpha)
-		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-		temp2 := prevSystemAlpha
-		newSystemAlpha = temp1.Mul(temp2)
-	}
-
-	// Check 1 (newSystemAlpha != prevSystemAlpha)
-	if newSystemAlpha.Equal(prevSystemAlpha) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
-			"resultant system alpha based on public alpha is unchanged")
-	}
-	// Check 2 (I > C * newSystemAlpha)
-	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
-			"cannot change alpha to that value due to violated restriction [1]")
-	}
-	// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
-	if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
-			"cannot change alpha to that value due to violated restriction [2]")
-	}
-
-	// Recalculate kappa and V0 using new alpha
-	newKappa := types.Kappa(paramsMap["I0"], C, newSystemAlpha)
-	_, err = types.Invariant(R, S.ToDec(), newKappa)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get batch to set new alpha
-	batch := k.MustGetBatch(ctx, bond.BondDid)
-	batch.NextPublicAlpha = newPublicAlpha
-	k.SetBatch(ctx, bond.BondDid, batch)
-
-	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
-		msg.BondDid, msg.EditorDid))
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeSetNextAlpha,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
-		),
-	})
 
 	return &types.MsgSetNextAlphaResponse{}, nil
 }

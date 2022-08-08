@@ -649,20 +649,68 @@ func (k Keeper) CancelUnfulfillableOrders(ctx sdk.Context, bondDid didexported.D
 	return cancelledOrders
 }
 
-func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
-	//fmt.Println("Updating alpha-------------------------")
+func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid didexported.Did) {
 	bond := k.MustGetBond(ctx, bondDid)
-	//fmt.Println("bond did: ", bondDid)
+	batch := k.MustGetBatch(ctx, bondDid)
+	newPublicAlpha := batch.NextPublicAlpha
+	nextPublicAlphaDelta := sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
+
+	var algo types.AugmentedBondRevision1
+	if err := algo.Init(bond); err != nil {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+		))
+		return
+	}
+
+	valueOrError := types.RightFlatMap(types.FromError(newPublicAlpha.Float64()), func(ap float64) types.Either[error, bool] {
+		return types.RightFlatMap(types.FromError(nextPublicAlphaDelta.Float64()), func(delta float64) types.Either[error, bool] {
+			algo.UpdateAlpha(ap, delta)
+			return types.Right[error](true)
+		})
+	})
+
+	if !valueOrError.IsRight() {
+		ctx.EventManager().EmitEvent(sdk.NewEvent(
+			types.EventTypeEditAlphaFailed,
+			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+			sdk.NewAttribute(types.AttributeKeyCancelReason, valueOrError.Left().Error()),
+		))
+		return
+	}
+
+	// Get batch to reset alpha
+	batch = k.MustGetBatch(ctx, bond.BondDid)
+	batch.NextPublicAlpha = sdk.OneDec().Neg()
+	k.SetBatch(ctx, bond.BondDid, batch)
+
+	// Set new function parameters
+	algo.ExportToBond(&bond)
+	k.SetBond(ctx, bond.BondDid, bond)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypeEditAlphaSuccess,
+		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+		sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
+		// sdk.NewAttribute(types.AttributeKeySystemAlpha, newSystemAlpha.String()),
+	))
+
+}
+
+func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid didexported.Did) {
+	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
 	newPublicAlpha := batch.NextPublicAlpha
 
 	// Get supply, reserve, outcome payment
 	S := bond.CurrentSupply.Amount.ToDec()
-	//fmt.Println("S: ", S)
 	R := bond.CurrentReserve[0].Amount.ToDec()
-	//fmt.Println("R: ", R)
 	C := bond.OutcomePayment
-	//fmt.Println("C: ", C)
 
 	// Get current parameters
 	paramsMap := bond.FunctionParameters.AsMap()

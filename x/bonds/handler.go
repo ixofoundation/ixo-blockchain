@@ -89,9 +89,23 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			}
 		}
 
+		// For augmented, if hatch phase and newSupply >= S0, go to open phase
+		if bond.FunctionType == types.BondingFunction &&
+			bond.State == types.HatchState.String() {
+			args := bond.FunctionParameters.AsMap()
+			if bond.CurrentSupply.Amount.ToDec().GTE(args["Hatch_Supply"]) {
+				keeper.SetBondState(ctx, bond.BondDid, types.OpenState.String())
+				bond = keeper.MustGetBond(ctx, bond.BondDid) // get updated bond
+			}
+		}
+
 		// Update alpha value if in open state and next alpha is not null
 		if bond.State == types.OpenState.String() && batch.HasNextAlpha() {
-			keeper.UpdateAlpha(ctx, bond.BondDid)
+			if bond.FunctionType == types.BondingFunction {
+				keeper.HandleBondingFunctionAlphaUpdate(ctx, bond.BondDid)
+			} else {
+				keeper.UpdateAlpha(ctx, bond.BondDid)
+			}
 		}
 
 		// Save current batch as last batch and reset current batch
@@ -104,7 +118,7 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		}
 
 		// Recalculate and re-set I0 if alpha bond
-		if bond.AlphaBond {
+		if bond.AlphaBond && bond.FunctionType == types.AugmentedFunction {
 			bond = keeper.MustGetBond(ctx, bond.BondDid)
 			bondFunctions := bond.FunctionParameters.AsMap()
 
