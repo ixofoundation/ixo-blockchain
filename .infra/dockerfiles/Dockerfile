@@ -35,7 +35,7 @@ FROM build-dependencies AS build-devel
 # RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
 COPY ./ ./
 
-ENTRYPOINT [ "starport", "chain", "serve" ]
+# ENTRYPOINT [ "starport", "chain", "serve" ]
 
 # Build Golang files
 FROM build-dependencies AS build-binary
