@@ -237,12 +237,19 @@ func (msg MsgDeleteDidContext) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
 
-	if IsEmpty(msg.ContextId) {
+	if IsEmpty(msg.ContextKey) {
 		return sdkerrors.Wrap(ErrInvalidInput, "context id cannot be empty - try using the key of the context")
 	}
 
 	//if !IsValidRFC3986Uri(msg.ServiceId) {
 	//	return sdkerrors.Wrap(ErrInvalidRFC3986UriFormat, "service id validation error")
 	//}
+	return nil
+}
+
+func (msg MsgUpdateDidMeta) ValidateBasic() error {
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
 	return nil
 }

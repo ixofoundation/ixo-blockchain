@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -40,6 +41,7 @@ func GetTxCmd() *cobra.Command {
 		NewDeleteAccordedRightCmd(),
 		NewAddDidContextCmd(),
 		NewDeleteDidContextCmd(),
+		NewUpdateDidMetaCmd(),
 	)
 
 	return cmd
@@ -597,10 +599,10 @@ func NewDeleteAccordedRightCmd() *cobra.Command {
 
 func NewAddDidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-did-context [did-id] [context]",
+		Use:     "add-did-context [did-id] [key] [value]",
 		Short:   "add a context item to a decentralized did (did/IID) document",
 		Example: "adds a context item to a did document",
-		Args:    cobra.ExactArgs(2),
+		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -610,12 +612,14 @@ func NewAddDidContextCmd() *cobra.Command {
 			// tx signer
 			signer := clientCtx.GetFromAddress()
 			// service parameters
-			contString := args[1]
+			key := args[1]
+			val := args[2]
 			// document did
 			did := types.NewChainDID(clientCtx.ChainID, args[0])
 
 			didContext := types.NewDidContext(
-				contString,
+				key,
+				val,
 			)
 
 			msg := types.NewMsgAddDidContext(
@@ -662,6 +666,47 @@ func NewDeleteDidContextCmd() *cobra.Command {
 				return err
 			}
 
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewUpdateDidMetaCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "update-did-meta [did-id] [meta]",
+		Short:   "add a context item to a decentralized did (did/IID) document",
+		Example: "adds a context item to a did document",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// tx signer
+			signer := clientCtx.GetFromAddress()
+			// service parameters
+			var metaData *types.DidMetadata
+
+			if err := json.Unmarshal([]byte(args[1]), &metaData); err != nil {
+				panic(err)
+				err = fmt.Errorf(err.Error())
+			}
+			// document did
+			did := types.NewChainDID(clientCtx.ChainID, args[0])
+
+			msg := types.NewMsgUpdateDidMetaData(
+				did.String(),
+				metaData,
+				signer.String(),
+			)
+			fmt.Println(msg)
+
+			// broadcast
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

@@ -584,7 +584,7 @@ var _ sdk.Msg = &MsgAddDidContext{}
 // NewMsgAddService creates a new MsgAddService instance
 func NewMsgAddDidContext(
 	id string,
-	context string,
+	context *Context,
 	signerAccount string,
 ) *MsgAddDidContext {
 	return &MsgAddDidContext{
@@ -632,9 +632,9 @@ func NewMsgDeleteDidContext(
 	signerAccount string,
 ) *MsgDeleteDidContext {
 	return &MsgDeleteDidContext{
-		Id:        id,
-		ContextId: key,
-		Signer:    signerAccount,
+		Id:         id,
+		ContextKey: key,
+		Signer:     signerAccount,
 	}
 }
 
@@ -654,6 +654,53 @@ func (msg MsgDeleteDidContext) GetSignBytes() []byte {
 
 // GetSigners implements sdk.Msg
 func (msg MsgDeleteDidContext) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+
+// --------------------------
+// ADD META
+// --------------------------
+
+// msg types
+const (
+	TypeMsgAddDidMeta = "add-did-meta"
+)
+
+var _ sdk.Msg = &MsgUpdateDidMeta{}
+
+// NewMsgAddService creates a new MsgAddService instance
+func NewMsgUpdateDidMetaData(
+	id string,
+	meta *DidMetadata,
+	signerAccount string,
+) *MsgUpdateDidMeta {
+	return &MsgUpdateDidMeta{
+		Id:     id,
+		Meta:   meta,
+		Signer: signerAccount,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgUpdateDidMeta) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgUpdateDidMeta) Type() string {
+	return TypeMsgAddDidMeta
+}
+
+func (msg MsgUpdateDidMeta) GetSignBytes() []byte {
+	panic("IBC messages do not support amino")
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgUpdateDidMeta) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
 		panic(err)

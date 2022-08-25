@@ -3,6 +3,7 @@ package types
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -120,6 +121,12 @@ type DID string
 // cfr.https://www.w3.org/TR/did-core/#did
 func NewChainDID(chainName, didID string) DID {
 	return DID(fmt.Sprint(DidChainPrefix, chainName, ":", didID))
+}
+
+func UnmarshalMetadata(meta []byte) DidMetadata {
+	var metadata DidMetadata
+	json.Unmarshal(meta, &metadata)
+	return metadata
 }
 
 // NewKeyDID format a DID of type key
@@ -388,6 +395,11 @@ func (didDoc *DidDocument) AddControllers(controllers ...string) error {
 
 	// remove duplicates
 	didDoc.Controller = dc
+	return nil
+}
+
+func (didDoc *DidDocument) UpdateMeta(meta *DidMetadata) error {
+	didDoc.DidMetaData = meta
 	return nil
 }
 
@@ -782,31 +794,29 @@ func (didDoc *DidDocument) DeleteAccordedRight(rightID string) {
 
 ////Contexts
 
-func (didDoc *DidDocument) AddDidContext(contexts ...string) (err error) {
+func (didDoc *DidDocument) AddDidContext(contexts ...*Context) (err error) {
 	if didDoc.Context == nil {
-		didDoc.Context = []string{}
+		didDoc.Context = []*Context{}
 	}
 
 	// used to check duplicates
-	//index := make(map[string]struct{}, len(didDoc.Context))
+	index := make(map[string]struct{}, len(didDoc.Context))
 
-	// load existing resources
-	//for _, s := range didDoc.Context {
-	//	index[s.Key] = struct{}{}
-	//}
+	//load existing resources
+	for _, s := range didDoc.Context {
+		index[s.Key] = struct{}{}
+	}
 
 	// resources must be unique
 	for _, s := range contexts {
 		//if err = ValidateService(s); err != nil {
 		//	return
 		//}
-
-		// verify that there are no duplicates in method ids
-		//if _, found := index[s.Key]; found {
-		//	err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", s.Key)
-		//	return
-		//}
-		//index[s.Key] = struct{}{}
+		if _, found := index[s.Key]; found {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", s.Key)
+			return
+		}
+		index[s.Key] = struct{}{}
 
 		didDoc.Context = append(didDoc.Context, s)
 	}
@@ -828,7 +838,7 @@ func (didDoc *DidDocument) DeleteDidContext(contextKey string) {
 	}
 
 	for i, s := range didDoc.Context {
-		if s == contextKey {
+		if s.Key == contextKey {
 			del(i)
 			break
 		}
@@ -920,7 +930,7 @@ func (did Verification) GetBytes() []byte {
 type Services []*Service
 type AccordedRights []*AccordedRight
 type LinkedResources []*LinkedResource
-type Contexts []string
+type Contexts []*Context
 
 // NewService creates a new service
 func NewService(id string, serviceType string, serviceEndpoint string) *Service {
@@ -954,19 +964,11 @@ func NewAccordedRight(id string, rightType string, mechanism string, message str
 	}
 }
 
-func NewDidContext(value string) string {
-	return value
-}
-
-// NewDidMetadata returns a DidMetadata struct that has equals created and updated date,
-// and with deactivated field set to false
-func NewDidMetadata(versionData []byte, created time.Time) DidMetadata {
-	m := DidMetadata{
-		Created:     &created,
-		Deactivated: false,
+func NewDidContext(key string, val string) *Context {
+	return &Context{
+		Key: key,
+		Val: val,
 	}
-	UpdateDidMetadata(&m, versionData, created)
-	return m
 }
 
 // UpdateDidMetadata updates a DID metadata time and version id
@@ -1005,6 +1007,15 @@ func ResolveAccountDID(did, chainID string) (didDoc DidDocument, didMeta DidMeta
 		),
 	))
 	return
+}
+
+func NewDidMetadata(versionData []byte, created time.Time) DidMetadata {
+	m := DidMetadata{
+		Created:     &created,
+		Deactivated: false,
+	}
+	UpdateDidMetadata(&m, versionData, created)
+	return m
 }
 
 // toAddress encode a kexKey string to cosmos based address

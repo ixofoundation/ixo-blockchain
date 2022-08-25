@@ -39,6 +39,8 @@ service Msg {
   //Add / Delete Context
   rpc AddDidContext(MsgAddDidContext) returns(MsgAddDidContextResponse);
   rpc DeleteDidContext(MsgDeleteDidContext) returns(MsgDeleteDidContextResponse);
+  //Update META
+  rpc UpdateMetaData(MsgUpdateDidMeta) returns(MsgUpdateDidMetaResponse);
 }
 
 // Verification is a message that allows to assign a verification method
@@ -217,7 +219,7 @@ message MsgAddDidContext {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
   string      id           = 1; // the did
-  string     context = 2; // the context string to add
+  Context     context = 2; // the context to add
   string      signer       = 3; // address of the account signing the message
 }
 
@@ -226,8 +228,16 @@ message MsgDeleteDidContext {
   option (gogoproto.goproto_getters) = false;
 
   string id         = 1; // the did
-  string context = 2; // the context string
+  string contextKey = 2; // the context key
   string signer     = 3; // address of the account signing the message
+}
+
+message MsgUpdateDidMeta {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+  string      id           = 1; // the did
+  DidMetadata     meta = 2; // the context to add
+  string      signer       = 3; // address of the account signing the message
 }
 
 message MsgAddLinkedResourceResponse {}
@@ -236,3 +246,4 @@ message MsgAddAccordedRightResponse {}
 message MsgDeleteAccordedRightResponse {}
 message MsgAddDidContextResponse {}
 message MsgDeleteDidContextResponse {}
+message MsgUpdateDidMetaResponse {}

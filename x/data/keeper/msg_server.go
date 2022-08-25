@@ -246,7 +246,7 @@ func (k msgServer) DeleteDidContext(
 				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have contexts associated")
 			}
 			// delete service
-			didDoc.DeleteDidContext(msg.ContextId)
+			didDoc.DeleteDidContext(msg.ContextKey)
 			return nil
 		}); err != nil {
 		return nil, err
@@ -363,6 +363,23 @@ func updateDidMetadata(keeper *Keeper, ctx sdk.Context, did string) (err error) 
 		err = fmt.Errorf("(warning) did metadata not found")
 	}
 	return
+}
+
+func (k msgServer) UpdateMetaData(
+	goCtx context.Context,
+	msg *types.MsgUpdateDidMeta,
+) (*types.MsgUpdateDidMetaResponse, error) {
+	if err := executeOnDidWithRelationships(
+		goCtx, &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.DidDocument) error {
+			return didDoc.UpdateMeta(msg.Meta)
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateDidMetaResponse{}, nil
 }
 
 // VerificationRelationships for did document manipulation

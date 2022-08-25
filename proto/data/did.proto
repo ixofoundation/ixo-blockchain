@@ -11,12 +11,20 @@ This represents a minimal self-managed did document
 definition: https://w3c.github.io/did-core/
 */
 // DidDocument represents a dencentralised identifer.
+
+message Context{
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  string key = 1;
+  string val = 2;
+}
+
 message DidDocument {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
   // @context is spec for did document.
-  repeated string context = 1 [(gogoproto.jsontag) = "@context,omitempty"];
+  repeated Context context = 1 [(gogoproto.jsontag) = "@context,omitempty"];
 
   // id represents the id for the did document.
   string id = 2;
@@ -66,6 +74,8 @@ message DidDocument {
   repeated LinkedResource linkedResource = 11;
 
   repeated AccordedRight accordedRight = 12;
+
+  DidMetadata didMetaData = 13;
 }
 
 // A DID document can express verification methods, 
@@ -133,8 +143,9 @@ message DidMetadata {
   string entityType = 5;
   google.protobuf.Timestamp startDate = 6 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp endDate = 7 [(gogoproto.stdtime) = true];
-  string status = 8;
+  int32 status = 8;
   string stage = 9;
   string relayerNode = 10;
   string verifiableCredential = 11;
+  repeated string credentials =12;
 }
