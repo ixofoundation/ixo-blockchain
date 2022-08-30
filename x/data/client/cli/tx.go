@@ -63,17 +63,17 @@ func deriveVMType(pubKey cryptotypes.PubKey) (vmType types.VerificationMaterialT
 // NewCreateDidDocumentCmd defines the command to create a new IBC light client.
 func NewCreateDidDocumentCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "create-did [id]",
+		Use:     "create-did [id] [chain name]",
 		Short:   "create decentralized did (did) document",
 		Example: "creates a did document for users",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 			// did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			did := types.NewChainDID(args[1], args[0])
 			// verification
 			signer := clientCtx.GetFromAddress()
 			// pubkey
@@ -105,6 +105,7 @@ func NewCreateDidDocumentCmd() *cobra.Command {
 				types.Services{},
 				types.AccordedRights{},
 				types.LinkedResources{},
+				types.Contexts{},
 				signer.String(),
 			)
 			// validate

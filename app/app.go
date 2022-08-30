@@ -416,7 +416,7 @@ func NewIxoApp(
 		keys[datamoduletypes.StoreKey],
 		keys[datamoduletypes.MemStoreKey],
 	)
-	dataModule := datamodule.NewAppModule(app.appCodec, app.DataKeeper)
+	dataModule := datamodule.NewAppModule(app.appCodec, app.DataKeeper, app.wasmKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 

@@ -399,6 +399,7 @@ func (didDoc *DidDocument) AddControllers(controllers ...string) error {
 }
 
 func (didDoc *DidDocument) UpdateMeta(meta *DidMetadata) error {
+
 	didDoc.DidMetaData = meta
 	return nil
 }

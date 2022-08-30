@@ -19,6 +19,7 @@ func NewMsgCreateDidDocument(
 	rights []*AccordedRight,
 	resources []*LinkedResource,
 	signerAccount string,
+	didContexts []Context,
 ) *MsgCreateDidDocument {
 	return &MsgCreateDidDocument{
 		Id:             id,
@@ -26,6 +27,7 @@ func NewMsgCreateDidDocument(
 		Services:       services,
 		AccordedRight:  rights,
 		LinkedResource: resources,
+		Context:        didContexts,
 		Signer:         signerAccount,
 	}
 }

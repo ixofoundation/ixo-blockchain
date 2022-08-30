@@ -3,6 +3,7 @@ package did
 import ( // this line is used by starport scaffolding # 1
 	"context"
 	"encoding/json"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -95,14 +96,15 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule implements the AppModule interface for the capability module.
 type AppModule struct {
 	AppModuleBasic
-
-	keeper keeper.Keeper
+	wasmKeeper wasmkeeper.Keeper
+	keeper     keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, wasmKeeper wasmkeeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
+		wasmKeeper:     wasmKeeper,
 	}
 }
 

@@ -1,3 +1,4 @@
+
 # Messages
 
 In this section we describe the processing of the DID messages and the corresponding updates to the state. All created/modified state objects specified by each message are defined within the [state](01_state.md) section.

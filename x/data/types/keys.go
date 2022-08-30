@@ -21,7 +21,7 @@ const (
 	QuerierRoute = ModuleName
 
 	// DidChainPrefix defines the did prefix for this chain
-	DidChainPrefix = "did:cosmos:net:"
+	DidChainPrefix = "did:earth:"
 
 	// DidKeyPrefix defines the did key prefix
 	DidKeyPrefix = "did:cosmos:key:"
