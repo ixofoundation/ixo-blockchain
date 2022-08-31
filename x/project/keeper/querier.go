@@ -41,7 +41,7 @@ func queryProjectDoc(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc 
 
 	res, errRes := codec.MarshalJSONIndent(legacyQuerierCdc, storedDoc)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data: %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid: %s", err)
 	}
 
 	return res, nil
@@ -51,7 +51,7 @@ func queryProjectAccounts(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 	resp := k.GetAccountMap(ctx, path[0])
 	res, err := json.Marshal(resp)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", err)
 	}
 
 	return res, nil
@@ -65,7 +65,7 @@ func queryProjectTx(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc *
 
 	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, info)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", err)
 	}
 
 	return res, nil
@@ -76,7 +76,7 @@ func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino)
 
 	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", err)
 	}
 
 	return res, nil

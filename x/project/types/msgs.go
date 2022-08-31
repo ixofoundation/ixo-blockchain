@@ -77,11 +77,11 @@ func (msg MsgCreateProject) ValidateBasic() error {
 		return err
 	}
 
-	// Check that data marshallable to map[string]json.RawMessage
+	// Check that iid marshallable to map[string]json.RawMessage
 	var dataMap ProjectDataMap
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project data map")
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project iid map")
 	}
 
 	// Check that project DID matches the PubKey
@@ -443,11 +443,11 @@ func (msg MsgUpdateProjectDoc) ValidateBasic() error {
 		return err
 	}
 
-	// Check that data marshallable to map[string]json.RawMessage
+	// Check that iid marshallable to map[string]json.RawMessage
 	var dataMap ProjectDataMap
 	err := json.Unmarshal(msg.Data, &dataMap)
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project data map")
+		return sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, "failed to unmarshal project iid map")
 	}
 
 	// Check that DIDs valid

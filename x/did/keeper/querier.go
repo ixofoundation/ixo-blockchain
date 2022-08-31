@@ -38,7 +38,7 @@ func queryDidDoc(ctx sdk.Context, path []string, k Keeper, legacyQuerierCdc *cod
 
 	res, errRes := codec.MarshalJSONIndent(legacyQuerierCdc, didDoc)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", errRes.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", errRes.Error())
 	}
 
 	return res, nil
@@ -49,7 +49,7 @@ func queryAllDids(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, errRes := json.Marshal(allDids)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", errRes.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", errRes.Error())
 	}
 
 	return res, nil
@@ -61,7 +61,7 @@ func queryAllDidDocs(ctx sdk.Context, k Keeper) ([]byte, error) {
 
 	res, errRes := json.Marshal(didDocs)
 	if errRes != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", errRes.Error())
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", errRes.Error())
 	}
 
 	return res, nil

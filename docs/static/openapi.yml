@@ -10090,7 +10090,7 @@ paths:
                       lastCommitHash:
                         type: string
                         format: byte
-                        title: hashes of block data
+                        title: hashes of block iid
                       dataHash:
                         type: string
                         format: byte
@@ -22403,7 +22403,7 @@ definitions:
           lastCommitHash:
             type: string
             format: byte
-            title: hashes of block data
+            title: hashes of block iid
           dataHash:
             type: string
             format: byte
@@ -23650,7 +23650,7 @@ definitions:
               lastCommitHash:
                 type: string
                 format: byte
-                title: hashes of block data
+                title: hashes of block iid
               dataHash:
                 type: string
                 format: byte
@@ -25567,7 +25567,7 @@ definitions:
       lastCommitHash:
         type: string
         format: byte
-        title: hashes of block data
+        title: hashes of block iid
       dataHash:
         type: string
         format: byte

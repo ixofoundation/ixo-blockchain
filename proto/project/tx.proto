@@ -42,7 +42,7 @@ message MsgCreateProject {
   string sender_did  = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   string pub_key     = 4 [(gogoproto.jsontag) = "pubKey", (gogoproto.moretags) = "yaml:\"pubKey\""];
-  bytes data         = 5 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
+  bytes data         = 5 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.
@@ -53,7 +53,7 @@ message MsgUpdateProjectStatus {
   string tx_hash              = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
   string sender_did           = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did          = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+  UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.
@@ -66,7 +66,7 @@ message MsgCreateAgent {
   string tx_hash      = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
   string sender_did   = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did  = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  CreateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+  CreateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgCreateAgentResponse defines the Msg/CreateAgent response type.
@@ -79,7 +79,7 @@ message MsgUpdateAgent {
   string tx_hash      = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
   string sender_did   = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did  = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  UpdateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+  UpdateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgUpdateAgentResponse defines the Msg/UpdateAgent response type.
@@ -92,7 +92,7 @@ message MsgCreateClaim {
   string tx_hash      = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
   string sender_did   = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did  = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  CreateClaimDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+  CreateClaimDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgCreateClaimResponse defines the Msg/CreateClaim response type.
@@ -105,7 +105,7 @@ message MsgCreateEvaluation {
   string tx_hash           = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
   string sender_did        = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did       = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+  CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgCreateEvaluationResponse defines the Msg/CreateEvaluation response type.
@@ -116,7 +116,7 @@ message MsgWithdrawFunds {
   option (gogoproto.goproto_stringer) = false;
 
   string sender_did     = 1 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
-  WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
+  WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgWithdrawFundsResponse defines the Msg/WithdrawFunds response type.
@@ -127,7 +127,7 @@ message MsgUpdateProjectDoc {
   string tx_hash     = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
   string sender_did  = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  bytes data         = 4 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
+  bytes data         = 4 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // MsgUpdateProjectDocResponse defines the Msg/UpdateProjectDoc response type.

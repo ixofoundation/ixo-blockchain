@@ -14,7 +14,7 @@ type ProjectFeesMap struct {
 
 The following is an example of a `fees` section inside a project's `data`:
 ```json
-"data": {
+"iid": {
     ...
     "fees": {
         "@context": "...",

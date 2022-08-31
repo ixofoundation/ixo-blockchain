@@ -98,9 +98,9 @@ import (
 	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
-	datamodule "github.com/ixofoundation/ixo-blockchain/x/data"
-	datamodulekeeper "github.com/ixofoundation/ixo-blockchain/x/data/keeper"
-	datamoduletypes "github.com/ixofoundation/ixo-blockchain/x/data/types"
+	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
+	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -156,7 +156,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
-		datamodule.AppModuleBasic{},
+		iidmodule.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 
 		gov.NewAppModuleBasic(
@@ -272,7 +272,7 @@ type IxoApp struct {
 	// Custom ixo keepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	DataKeeper     datamodulekeeper.Keeper
+	IidKeeper      iidmodulekeeper.Keeper
 	DidKeeper      didkeeper.Keeper      `json:"did_keeper"`
 	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
@@ -308,7 +308,7 @@ func NewIxoApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		datamoduletypes.StoreKey,
+		iidkeeper.StoreKey,
 		// Custom ixo store keys
 		didtypes.StoreKey, bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
@@ -411,12 +411,12 @@ func NewIxoApp(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
-	app.DataKeeper = *datamodulekeeper.NewKeeper(
+	app.IidKeeper = *iidmodulekeeper.NewKeeper(
 		appCodec,
-		keys[datamoduletypes.StoreKey],
-		keys[datamoduletypes.MemStoreKey],
+		keys[iidkeeper.StoreKey],
+		keys[iidkeeper.MemStoreKey],
 	)
-	dataModule := datamodule.NewAppModule(app.appCodec, app.DataKeeper, app.wasmKeeper)
+	iidModule := iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.wasmKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -510,7 +510,7 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule
-		dataModule,
+		iidModule,
 		did.NewAppModule(app.DidKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
@@ -534,7 +534,7 @@ func NewIxoApp(
 		didtypes.ModuleName,
 		projecttypes.ModuleName,
 		bondstypes.ModuleName,
-		datamoduletypes.ModuleName,
+		iidkeeper.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
@@ -546,7 +546,7 @@ func NewIxoApp(
 		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
-		bondstypes.ModuleName, paymentstypes.ModuleName, datamoduletypes.ModuleName,
+		bondstypes.ModuleName, paymentstypes.ModuleName, iidkeeper.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -564,7 +564,7 @@ func NewIxoApp(
 
 		// Custom ixo modules
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		datamoduletypes.ModuleName,
+		iidkeeper.ModuleName,
 		didtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
 	)
@@ -939,7 +939,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// init params keeper and subspaces (for custom ixo modules)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(datamoduletypes.ModuleName)
+	paramsKeeper.Subspace(iidkeeper.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)

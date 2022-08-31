@@ -53,10 +53,10 @@ DID=$(yes $PASSWORD | ixod tx data create-did "$NEW_DID" --from miguel --from mi
 echo $DID
 
 #echo "Adding 2 contexts.."
-#CONTEXT1=$(yes $PASSWORD | ixod tx data add-did-context "$NEW_DID" "ixo" "https://w3id.org/ixo/NS/" --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json | jq .)
+#CONTEXT1=$(yes $PASSWORD | ixod tx iid add-did-context "$NEW_DID" "ixo" "https://w3id.org/ixo/NS/" --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json | jq .)
 #echo $CONTEXT1
 
-#CONTEXT2=$(yes $PASSWORD | ixod tx data add-did-context "$NEW_DID" "iid" "https://w3id.org/ixo/NS/"  --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json | jq .)
+#CONTEXT2=$(yes $PASSWORD | ixod tx iid add-did-context "$NEW_DID" "iid" "https://w3id.org/ixo/NS/"  --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json | jq .)
 #echo $CONTEXT2
 
 echo "Adding metadata..."

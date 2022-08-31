@@ -34,14 +34,14 @@ func queryPaymentTemplateHandler(clientCtx client.Context) http.HandlerFunc {
 			types.QuerierRoute, keeper.QueryPaymentTemplate, templateId), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query iid %s", err.Error())))
 			return
 		}
 
 		var template types.PaymentTemplate
 		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &template); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal iid %s", err.Error())))
 			return
 		}
 
@@ -58,14 +58,14 @@ func queryPaymentContractHandler(clientCtx client.Context) http.HandlerFunc {
 			types.QuerierRoute, keeper.QueryPaymentContract, contractId), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query iid %s", err.Error())))
 			return
 		}
 
 		var contract types.PaymentContract
 		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &contract); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal iid %s", err.Error())))
 			return
 		}
 
@@ -82,14 +82,14 @@ func queryPaymentContractsByIdPrefixHandler(clientCtx client.Context) http.Handl
 			types.QuerierRoute, keeper.QueryPaymentContractsByIdPrefix, contractIdPrefix), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query iid %s", err.Error())))
 			return
 		}
 
 		var contracts []types.PaymentContract
 		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &contracts); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal iid %s", err.Error())))
 			return
 		}
 
@@ -106,14 +106,14 @@ func querySubscriptionHandler(clientCtx client.Context) http.HandlerFunc {
 			types.QuerierRoute, keeper.QuerySubscription, subscriptionId), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query iid %s", err.Error())))
 			return
 		}
 
 		var subscription types.Subscription
 		if err := clientCtx.LegacyAmino.UnmarshalJSON(bz, &subscription); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't Unmarshal iid %s", err.Error())))
 			return
 		}
 

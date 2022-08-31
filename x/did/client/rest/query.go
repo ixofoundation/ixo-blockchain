@@ -55,7 +55,7 @@ func queryAddressFromDidRequestHandlerFn(clientCtx client.Context) http.HandlerF
 		}
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
-			_, _ = w.Write([]byte("No data for respected did address."))
+			_, _ = w.Write([]byte("No iid for respected did address."))
 			return
 		}
 
@@ -83,7 +83,7 @@ func queryDidDocRequestHandlerFn(clientCtx client.Context) http.HandlerFunc {
 		}
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
-			_, _ = w.Write([]byte("No data for respected did address."))
+			_, _ = w.Write([]byte("No iid for respected did address."))
 			return
 		}
 
@@ -132,7 +132,7 @@ func queryAllDidDocsRequestHandlerFn(clientCtx client.Context) http.HandlerFunc 
 
 		if len(res) == 0 {
 			w.WriteHeader(http.StatusNoContent)
-			_, _ = w.Write([]byte("No data present."))
+			_, _ = w.Write([]byte("No iid present."))
 			return
 		}
 

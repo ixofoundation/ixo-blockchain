@@ -52,7 +52,7 @@ message ProjectDoc {
   string sender_did  = 3 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string pub_key     = 4 [(gogoproto.jsontag) = "pubKey", (gogoproto.moretags) = "yaml:\"pubKey\""];
   string status      = 5 [(gogoproto.moretags) = "yaml:\"status\""];
-  bytes data         = 6 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
+  bytes data         = 6 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"iid\""];
 }
 
 // WithdrawalInfoDoc contains details required to withdraw from a specific project.

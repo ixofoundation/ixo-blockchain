@@ -69,7 +69,7 @@ The following is an example where both an `OracleFee` and `FeeForService` are
 specified:
 
 ```json
-"data": {
+"iid": {
     ...
     "fees": {
         "@context": "...",
@@ -91,7 +91,7 @@ specified:
 If we do not specify fees, a blank `items` array is required:
 
 ```json
-"data": {
+"iid": {
     ...
     "fees": {
         "@context": "...",
