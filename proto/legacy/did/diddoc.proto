@@ -2,7 +2,7 @@ syntax = "proto3";
 package did;
 
 import "gogoproto/gogo.proto";
-import "did/did.proto";
+import "legacy/did/did.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
 

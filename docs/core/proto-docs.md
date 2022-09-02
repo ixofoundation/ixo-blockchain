@@ -459,7 +459,91 @@
         
           
           <li>
-            <a href="#did%2fdid.proto">did/did.proto</a>
+            <a href="#entity%2fentity.proto">entity/entity.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#entity.EntityDoc"><span class="badge">M</span>EntityDoc</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#entity%2fgenesis.proto">entity/genesis.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#entity.GenesisState"><span class="badge">M</span>GenesisState</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#entity%2fquery.proto">entity/query.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#entity.QueryEntityDocRequest"><span class="badge">M</span>QueryEntityDocRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityDocResponse"><span class="badge">M</span>QueryEntityDocResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityListRequest"><span class="badge">M</span>QueryEntityListRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityListResponse"><span class="badge">M</span>QueryEntityListResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#entity.Query"><span class="badge">S</span>Query</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#entity%2ftx.proto">entity/tx.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#entity.MsgCreateEntity"><span class="badge">M</span>MsgCreateEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#entity.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#legacy%2fdid%2fdid.proto">legacy/did/did.proto</a>
             <ul>
               
                 <li>
@@ -486,7 +570,7 @@
         
           
           <li>
-            <a href="#did%2fdiddoc.proto">did/diddoc.proto</a>
+            <a href="#legacy%2fdid%2fdiddoc.proto">legacy/did/diddoc.proto</a>
             <ul>
               
                 <li>
@@ -495,107 +579,6 @@
               
               
               
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#did%2fgenesis.proto">did/genesis.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#did.GenesisState"><span class="badge">M</span>GenesisState</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#did%2fquery.proto">did/query.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#did.QueryAddressFromBase58EncodedPubkeyRequest"><span class="badge">M</span>QueryAddressFromBase58EncodedPubkeyRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAddressFromBase58EncodedPubkeyResponse"><span class="badge">M</span>QueryAddressFromBase58EncodedPubkeyResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAddressFromDidRequest"><span class="badge">M</span>QueryAddressFromDidRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAddressFromDidResponse"><span class="badge">M</span>QueryAddressFromDidResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAllDidDocsRequest"><span class="badge">M</span>QueryAllDidDocsRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAllDidDocsResponse"><span class="badge">M</span>QueryAllDidDocsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAllDidsRequest"><span class="badge">M</span>QueryAllDidsRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryAllDidsResponse"><span class="badge">M</span>QueryAllDidsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryDidDocRequest"><span class="badge">M</span>QueryDidDocRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#did.QueryDidDocResponse"><span class="badge">M</span>QueryDidDocResponse</a>
-                </li>
-              
-              
-              
-              
-                <li>
-                  <a href="#did.Query"><span class="badge">S</span>Query</a>
-                </li>
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#did%2ftx.proto">did/tx.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#did.MsgAddCredential"><span class="badge">M</span>MsgAddCredential</a>
-                </li>
-              
-                <li>
-                  <a href="#did.MsgAddCredentialResponse"><span class="badge">M</span>MsgAddCredentialResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#did.MsgAddDid"><span class="badge">M</span>MsgAddDid</a>
-                </li>
-              
-                <li>
-                  <a href="#did.MsgAddDidResponse"><span class="badge">M</span>MsgAddDidResponse</a>
-                </li>
-              
-              
-              
-              
-                <li>
-                  <a href="#did.Msg"><span class="badge">S</span>Msg</a>
-                </li>
               
             </ul>
           </li>
@@ -3318,7 +3301,261 @@
     
       
       <div class="file-heading">
-        <h2 id="did/did.proto">did/did.proto</h2><a href="#title">Top</a>
+        <h2 id="entity/entity.proto">entity/entity.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.EntityDoc">EntityDoc</h3>
+        <p>ProjectDoc defines a project (or entity) type with all of its parameters.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="entity/genesis.proto">entity/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the project module's genesis state.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entity_docs</td>
+                  <td><a href="#entity.EntityDoc">EntityDoc</a></td>
+                  <td>repeated</td>
+                  <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;];
+Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;params\&#34;&#34;]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="entity/query.proto">entity/query.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.QueryEntityDocRequest">QueryEntityDocRequest</h3>
+        <p>QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entity_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.QueryEntityDocResponse">QueryEntityDocResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+
+        
+      
+        <h3 id="entity.QueryEntityListRequest">QueryEntityListRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entity_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entity_status</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.QueryEntityListResponse">QueryEntityListResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="entity.Query">Query</h3>
+        <p>Query defines the gRPC querier service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>EntityList</td>
+                <td><a href="#entity.QueryEntityListRequest">QueryEntityListRequest</a></td>
+                <td><a href="#entity.QueryEntityListResponse">QueryEntityListResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>EntityDoc</td>
+                <td><a href="#entity.QueryEntityDocRequest">QueryEntityDocRequest</a></td>
+                <td><a href="#entity.QueryEntityDocResponse">QueryEntityDocResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>EntityList</td>
+                <td>GET</td>
+                <td>/ixo/entity</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>EntityDoc</td>
+                <td>GET</td>
+                <td>/ixo/entity/{entity_did}</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="entity/tx.proto">entity/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.MsgCreateEntity">MsgCreateEntity</h3>
+        <p>MsgCreateProject defines a message for creating a project.</p>
+
+        
+
+        
+      
+        <h3 id="entity.MsgCreateEntityResponse">MsgCreateEntityResponse</h3>
+        <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="entity.Msg">Msg</h3>
+        <p>Msg defines the project Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateEntity</td>
+                <td><a href="#entity.MsgCreateEntity">MsgCreateEntity</a></td>
+                <td><a href="#entity.MsgCreateEntityResponse">MsgCreateEntityResponse</a></td>
+                <td><p>CreateProject defines a method for creating a project.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="legacy/did/did.proto">legacy/did/did.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -3491,7 +3728,7 @@
     
       
       <div class="file-heading">
-        <h2 id="did/diddoc.proto">did/diddoc.proto</h2><a href="#title">Top</a>
+        <h2 id="legacy/did/diddoc.proto">legacy/did/diddoc.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -3540,488 +3777,6 @@
       
 
       
-    
-      
-      <div class="file-heading">
-        <h2 id="did/genesis.proto">did/genesis.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="did.GenesisState">GenesisState</h3>
-        <p>GenesisState defines the did module's genesis state.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did_docs</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="did/query.proto">did/query.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="did.QueryAddressFromBase58EncodedPubkeyRequest">QueryAddressFromBase58EncodedPubkeyRequest</h3>
-        <p>QueryAddressFromBase58EncodedPubkeyRequest is the request type for the Query/AddressFromBase58EncodedPubkey RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>pubKey</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAddressFromBase58EncodedPubkeyResponse">QueryAddressFromBase58EncodedPubkeyResponse</h3>
-        <p>QueryAddressFromBase58EncodedPubkeyResponse is the response type for the Query/AddressFromBase58EncodedPubkey RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAddressFromDidRequest">QueryAddressFromDidRequest</h3>
-        <p>QueryAddressFromDidRequest is the request type for the Query/AddressFromDid RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAddressFromDidResponse">QueryAddressFromDidResponse</h3>
-        <p>QueryAddressFromDidResponse is the response type for the Query/AddressFromDid RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAllDidDocsRequest">QueryAllDidDocsRequest</h3>
-        <p>QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC method.</p>
-
-        
-
-        
-      
-        <h3 id="did.QueryAllDidDocsResponse">QueryAllDidDocsResponse</h3>
-        <p>QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>diddocs</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAllDidsRequest">QueryAllDidsRequest</h3>
-        <p>QueryAllDidsRequest is the request type for the Query/AllDids RPC method.</p>
-
-        
-
-        
-      
-        <h3 id="did.QueryAllDidsResponse">QueryAllDidsResponse</h3>
-        <p>QueryAllDidsResponse is the response type for the Query/AllDids RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>dids</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryDidDocRequest">QueryDidDocRequest</h3>
-        <p>QueryDidDocRequest is the request type for the Query/DidDoc RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryDidDocResponse">QueryDidDocResponse</h3>
-        <p>QueryDidDocResponse is the response type for the Query/DidDoc RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>diddoc</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-        <h3 id="did.Query">Query</h3>
-        <p>Query defines the gRPC querier service.</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>DidDoc</td>
-                <td><a href="#did.QueryDidDocRequest">QueryDidDocRequest</a></td>
-                <td><a href="#did.QueryDidDocResponse">QueryDidDocResponse</a></td>
-                <td><p>DidDoc queries info of a specific DID&#39;s DidDoc.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AllDids</td>
-                <td><a href="#did.QueryAllDidsRequest">QueryAllDidsRequest</a></td>
-                <td><a href="#did.QueryAllDidsResponse">QueryAllDidsResponse</a></td>
-                <td><p>AllDids returns a list of all existing DIDs.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AllDidDocs</td>
-                <td><a href="#did.QueryAllDidDocsRequest">QueryAllDidDocsRequest</a></td>
-                <td><a href="#did.QueryAllDidDocsResponse">QueryAllDidDocsResponse</a></td>
-                <td><p>AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with their DidDoc info).</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddressFromDid</td>
-                <td><a href="#did.QueryAddressFromDidRequest">QueryAddressFromDidRequest</a></td>
-                <td><a href="#did.QueryAddressFromDidResponse">QueryAddressFromDidResponse</a></td>
-                <td><p>AddressFromDid retrieves the cosmos address associated to an ixo DID.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddressFromBase58EncodedPubkey</td>
-                <td><a href="#did.QueryAddressFromBase58EncodedPubkeyRequest">QueryAddressFromBase58EncodedPubkeyRequest</a></td>
-                <td><a href="#did.QueryAddressFromBase58EncodedPubkeyResponse">QueryAddressFromBase58EncodedPubkeyResponse</a></td>
-                <td><p>AddressFromBase58EncodedPubkey retrieves the cosmos address associated to an ixo DID&#39;s pubkey.</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-
-        
-          
-          
-          <h4>Methods with HTTP bindings</h4>
-          <table>
-            <thead>
-              <tr>
-                <td>Method Name</td>
-                <td>Method</td>
-                <td>Pattern</td>
-                <td>Body</td>
-              </tr>
-            </thead>
-            <tbody>
-            
-              
-              
-              <tr>
-                <td>DidDoc</td>
-                <td>GET</td>
-                <td>/ixo/did/{did}</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>AllDids</td>
-                <td>GET</td>
-                <td>/ixo/did</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>AllDidDocs</td>
-                <td>GET</td>
-                <td>/ixo/allDidDocs</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>AddressFromDid</td>
-                <td>GET</td>
-                <td>/ixo/didToAddr/{did=**}</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>AddressFromBase58EncodedPubkey</td>
-                <td>GET</td>
-                <td>/ixo/pubKeyToAddr/{pubKey}</td>
-                <td></td>
-              </tr>
-              
-            
-            </tbody>
-          </table>
-          
-        
-    
-      
-      <div class="file-heading">
-        <h2 id="did/tx.proto">did/tx.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="did.MsgAddCredential">MsgAddCredential</h3>
-        <p>MsgAddCredential defines a message for adding a credential to the signer's DID.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did_credential</td>
-                  <td><a href="#did.DidCredential">DidCredential</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.MsgAddCredentialResponse">MsgAddCredentialResponse</h3>
-        <p>MsgAddCredentialResponse defines the Msg/AddCredential response type.</p>
-
-        
-
-        
-      
-        <h3 id="did.MsgAddDid">MsgAddDid</h3>
-        <p>MsgAddDid defines a message for adding a DID.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>pubKey</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.MsgAddDidResponse">MsgAddDidResponse</h3>
-        <p>MsgAddDidResponse defines the Msg/AddDid response type.</p>
-
-        
-
-        
-      
-
-      
-
-      
-
-      
-        <h3 id="did.Msg">Msg</h3>
-        <p>Msg defines the did Msg service.</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>AddDid</td>
-                <td><a href="#did.MsgAddDid">MsgAddDid</a></td>
-                <td><a href="#did.MsgAddDidResponse">MsgAddDidResponse</a></td>
-                <td><p>AddDid defines a method for adding a DID.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddCredential</td>
-                <td><a href="#did.MsgAddCredential">MsgAddCredential</a></td>
-                <td><a href="#did.MsgAddCredentialResponse">MsgAddCredentialResponse</a></td>
-                <td><p>AddCredential defines a method for adding a credential to the signer&#39;s DID.</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-
-        
     
       
       <div class="file-heading">
