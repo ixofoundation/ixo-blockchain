@@ -318,7 +318,7 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 			}
 		}
 
-		// retrieve signer data
+		// retrieve signer iid
 		genesis := ctx.BlockHeight() == 0
 		chainID := ctx.ChainID()
 		//fmt.Println("chainID: ", chainID)

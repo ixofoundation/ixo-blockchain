@@ -1,0 +1,32 @@
+syntax = "proto3";
+package ixofoundation.ixo.data;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
+
+import "gogoproto/gogo.proto";
+
+// DidDocumentCreatedEvent is an event triggered on a DID document creation
+message IidDocumentCreatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters)  = false;
+
+  // the did being created
+  string did  = 1;
+
+  // the signer account creating the did
+  string signer = 2;
+
+}
+
+// DidDocumentUpdatedEvent is an event triggered on a DID document update
+message IidDocumentUpdatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters)  = false;
+
+  // the did being updated
+  string did    = 1;
+
+  // the signer account of the change
+  string signer = 2;
+
+}

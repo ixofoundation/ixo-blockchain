@@ -3845,7 +3845,7 @@ paths:
             $ref: "#/definitions/txs.SignDataQuery"
       responses:
         "200":
-          description: Signature data result
+          description: Signature iid result
           schema:
             $ref: "#/definitions/txs.SignDataResult"
         default:

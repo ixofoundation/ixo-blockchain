@@ -37,7 +37,7 @@ func NewTxCmd() *cobra.Command {
 
 func NewCmdCreateProject() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-project [sender-did] [project-data-json] [ixo-did]",
+		Use:   "create-project [sender-did] [project-iid-json] [ixo-did]",
 		Short: "Create a new ProjectDoc signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -291,7 +291,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 
 func NewCmdWithdrawFunds() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-funds [sender-did] [data]",
+		Use:   "withdraw-funds [sender-did] [iid]",
 		Short: "Withdraw funds.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -328,8 +328,8 @@ func NewCmdWithdrawFunds() *cobra.Command {
 
 func NewCmdUpdateProjectDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-project-doc [sender-did] [project-data-json] [ixo-did]",
-		Short: "Update a project's data signed by the ixoDid of the project",
+		Use:   "update-project-doc [sender-did] [project-iid-json] [ixo-did]",
+		Short: "Update a project's iid signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
