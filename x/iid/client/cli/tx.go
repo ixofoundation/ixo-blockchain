@@ -26,7 +26,7 @@ func GetTxCmd() *cobra.Command {
 
 	// this line is used by starport scaffolding # 1
 	cmd.AddCommand(
-		NewCreateDidDocumentCmd(),
+		NewCreateIidDocumentCmd(),
 		NewAddVerificationCmd(),
 		NewAddServiceCmd(),
 		NewRevokeVerificationCmd(),
@@ -39,9 +39,9 @@ func GetTxCmd() *cobra.Command {
 		NewDeleteLinkedresourceCmd(),
 		NewAddAccordedRightCmd(),
 		NewDeleteAccordedRightCmd(),
-		NewAddDidContextCmd(),
-		NewDeleteDidContextCmd(),
-		NewUpdateDidMetaCmd(),
+		NewAddIidContextCmd(),
+		NewDeleteIidContextCmd(),
+		NewUpdateIidMetaCmd(),
 	)
 
 	return cmd
@@ -61,9 +61,9 @@ func deriveVMType(pubKey cryptotypes.PubKey) (vmType types.VerificationMaterialT
 }
 
 // NewCreateDidDocumentCmd defines the command to create a new IBC light client.
-func NewCreateDidDocumentCmd() *cobra.Command {
+func NewCreateIidDocumentCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "create-did [id] [chain name]",
+		Use:     "create-iid [id] [chain name]",
 		Short:   "create decentralized did (did) document",
 		Example: "creates a did document for users",
 		Args:    cobra.ExactArgs(2),
@@ -127,8 +127,8 @@ func NewAddVerificationCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "add-verification-method [id] [pubkey]",
-		Short:   "add an verification method to a decentralized did (did) document",
-		Example: "adds an verification method for a did document",
+		Short:   "add an verification method to an (iid) document",
+		Example: "adds an verification method for an iid document",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -598,11 +598,11 @@ func NewDeleteAccordedRightCmd() *cobra.Command {
 	return cmd
 }
 
-func NewAddDidContextCmd() *cobra.Command {
+func NewAddIidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-did-context [did-id] [key] [value]",
-		Short:   "add a context item to a decentralized did (did/IID) document",
-		Example: "adds a context item to a did document",
+		Use:     "add-iid-context [iid-id] [key] [value]",
+		Short:   "add a context item to a decentralized (did/IID) document",
+		Example: "adds a context item to a iid document",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -639,11 +639,11 @@ func NewAddDidContextCmd() *cobra.Command {
 	return cmd
 }
 
-func NewDeleteDidContextCmd() *cobra.Command {
+func NewDeleteIidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-context [did-id] [key]",
-		Short:   "deletes a did context from a decentralized did (did) document",
-		Example: "delete a context for a did document",
+		Use:     "delete-context [iid-id] [key]",
+		Short:   "deletes a iid context from a decentralized iid document",
+		Example: "delete a context for a iid document",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -676,11 +676,11 @@ func NewDeleteDidContextCmd() *cobra.Command {
 	return cmd
 }
 
-func NewUpdateDidMetaCmd() *cobra.Command {
+func NewUpdateIidMetaCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "update-did-meta [did-id] [meta]",
-		Short:   "add a context item to a decentralized did (did/IID) document",
-		Example: "adds a context item to a did document",
+		Use:     "update-iid-meta [iid-id] [meta]",
+		Short:   "add a context item to a decentralized (did/IID) document",
+		Example: "adds a context item to a iid document",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

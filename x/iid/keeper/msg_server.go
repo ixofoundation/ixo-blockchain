@@ -2,12 +2,13 @@ package keeper
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	"github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	"time"
 )
 
 type msgServer struct {
@@ -369,14 +370,32 @@ func (k msgServer) UpdateMetaData(
 	goCtx context.Context,
 	msg *types.MsgUpdateIidMeta,
 ) (*types.MsgUpdateIidMetaResponse, error) {
-	if err := executeOnDidWithRelationships(
-		goCtx, &k.Keeper,
-		newConstraints(types.Authentication),
-		msg.Id, msg.Signer,
-		func(didDoc *types.IidDocument) error {
-			return didDoc.UpdateMeta(msg.Meta)
-		}); err != nil {
-		return nil, err
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	didMeta, found := k.GetDidMetadata(ctx, []byte(msg.Id))
+	nm := msg.Meta
+	if found {
+		newMeta := types.IidMetadata{
+			VersionId:            "",
+			Created:              didMeta.Created,
+			Updated:              nil,
+			Deactivated:          nm.Deactivated,
+			EntityType:           nm.EntityType,
+			StartDate:            nm.StartDate,
+			EndDate:              nm.EndDate,
+			Status:               nm.Status,
+			Stage:                nm.Stage,
+			RelayerNode:          nm.RelayerNode,
+			VerifiableCredential: nm.VerifiableCredential,
+			Credentials:          nm.Credentials,
+		}
+		txH := sha256.Sum256(ctx.TxBytes())
+		newMeta.VersionId = hex.EncodeToString(txH[:])
+		var upd time.Time
+		upd = ctx.BlockTime()
+		newMeta.Updated = &upd
+		k.SetDidMetadata(ctx, []byte(msg.Id), newMeta)
+	} else {
+		//proper error response
 	}
 
 	return &types.MsgUpdateIidMetaResponse{}, nil
