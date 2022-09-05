@@ -26,6 +26,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(
 		GetCmdQueryIdentifers(),
 		GetCmdQueryIdentifer(),
+		GetCmdQueryMetadata(),
 	)
 
 	return cmd
@@ -82,6 +83,37 @@ func GetCmdQueryIdentifer() *cobra.Command {
 			result, err := queryClient.IidDocument(
 				context.Background(),
 				&types.QueryIidDocumentRequest{
+					Id: args[0],
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(result)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdQueryMetadata() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "metadata [id]",
+		Short: "Query for an iid's metadata",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			result, err := queryClient.MetaData(
+				context.Background(),
+				&types.QueryIidMetaDataRequest{
 					Id: args[0],
 				},
 			)

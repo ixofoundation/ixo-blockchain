@@ -13,13 +13,18 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  // DidDocuments queries all did documents that match the given status.
+  // IidDocuments queries all iid documents that match the given status.
   rpc IidDocuments(QueryIidDocumentsRequest) returns (QueryIidDocumentsResponse) {
-    option (google.api.http).get = "/allinbits/did/dids";
+    option (google.api.http).get = "/ixo/did/dids";
   }
-  // DidDocument queries a did documents with an id.
+  // IidDocument queries a iid documents with an id.
   rpc IidDocument(QueryIidDocumentRequest) returns (QueryIidDocumentResponse) {
-    option (google.api.http).get = "/allinbits/did/dids/{id}";
+    option (google.api.http).get = "/ixo/did/dids/{id}";
+  }
+
+  // MetaData queries a iid documents with an id.
+  rpc MetaData(QueryIidMetaDataRequest) returns (QueryIidMetaDataResponse) {
+    option (google.api.http).get = "/ixo/did/dids/{id}";
   }
 }
 
@@ -52,5 +57,16 @@ message QueryIidDocumentResponse {
   // validators contains all the queried validators.
   IidDocument iidDocument = 1  [(gogoproto.nullable) = false];
 //  DidMetadata didMetadata = 2  [(gogoproto.nullable) = false];
+}
+
+message QueryIidMetaDataRequest {
+  // status enables to query for validators matching a given status.
+  string id = 1;
+}
+
+message QueryIidMetaDataResponse {
+  // validators contains all the queried validators.
+  //IidDocument iidDocument = 1  [(gogoproto.nullable) = false];
+    IidMetadata didMetadata = 2  [(gogoproto.nullable) = false];
 }
 // this line is used by starport scaffolding # 3

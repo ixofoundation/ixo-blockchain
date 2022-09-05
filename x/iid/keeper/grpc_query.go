@@ -43,3 +43,22 @@ func (k Keeper) IidDocument(
 		IidDocument: doc,
 	}, nil
 }
+
+func (k Keeper) MetaData(
+	c context.Context,
+	req *types.QueryIidMetaDataRequest,
+) (*types.QueryIidMetaDataResponse, error) {
+	if req.Id == "" {
+		return nil, status.Error(codes.InvalidArgument, "verifiable credential id cannot be empty")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+	_, meta, err := k.ResolveDid(ctx, types.DID(req.Id))
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+
+	return &types.QueryIidMetaDataResponse{
+		DidMetadata: meta,
+	}, nil
+}
