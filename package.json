@@ -1,18 +1,14 @@
 {
   "scripts": {
     "prepare": "npx lefthook install",
-    
     "start": "skaffold dev",
     "start:local": "starport chain serve",
-    
     "test": "concurrently -m 1 -n test: npm:test:*",
     "test:code": "go test -v ./...",
     "test:security": "snyk test --all-projects --dev",
     "test:coverage": "(go test -coverprofile=coverage.out ./... &> /dev/null) | true && go tool cover -func=coverage.out | grep total",
-
     "lint": "concurrently -m 1 -n lint: npm:lint:*",
     "lint:go": "go vet ./...",
-    
     "build": "skaffold build"
   },
   "devDependencies": {
@@ -21,5 +17,8 @@
     "@commitlint/config-conventional": "^14.1.0",
     "concurrently": "^7.0.0",
     "snyk": "^1.833.0"
+  },
+  "dependencies": {
+    "sovrin-did": "^1.4.0"
   }
 }
