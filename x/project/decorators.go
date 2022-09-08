@@ -11,8 +11,8 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 

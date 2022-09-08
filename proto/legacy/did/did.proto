@@ -1,9 +1,9 @@
 syntax = "proto3";
-package did;
+package legacydid;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/did/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/lib/legacydid";
 
 // Digital identity credential issued to an ixo DID
 message DidCredential {

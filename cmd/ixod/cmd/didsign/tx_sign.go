@@ -20,8 +20,7 @@ import (
 	// authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	// bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
 const (
@@ -111,7 +110,7 @@ func preSignCmd(cmd *cobra.Command, _ []string) {
 	}
 }
 
-func sign(txf tx.Factory, clientCtx client.Context, txBuilder client.TxBuilder, overwriteSig bool, ixoDid exported.IxoDid) error {
+func sign(txf tx.Factory, clientCtx client.Context, txBuilder client.TxBuilder, overwriteSig bool, ixoDid didtypes.IxoDid) error {
 	var privateKey ed25519.PrivKey
 	privateKey.Key = append(base58.Decode(ixoDid.Secret.SignKey), base58.Decode(ixoDid.VerifyKey)...)
 

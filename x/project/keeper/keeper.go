@@ -10,9 +10,9 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )

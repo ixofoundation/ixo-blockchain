@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
 func NewProjectDoc(txHash string, projectDid, senderDid didexported.Did,

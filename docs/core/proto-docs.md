@@ -547,19 +547,19 @@
             <ul>
               
                 <li>
-                  <a href="#did.Claim"><span class="badge">M</span>Claim</a>
+                  <a href="#legacydid.Claim"><span class="badge">M</span>Claim</a>
                 </li>
               
                 <li>
-                  <a href="#did.DidCredential"><span class="badge">M</span>DidCredential</a>
+                  <a href="#legacydid.DidCredential"><span class="badge">M</span>DidCredential</a>
                 </li>
               
                 <li>
-                  <a href="#did.IxoDid"><span class="badge">M</span>IxoDid</a>
+                  <a href="#legacydid.IxoDid"><span class="badge">M</span>IxoDid</a>
                 </li>
               
                 <li>
-                  <a href="#did.Secret"><span class="badge">M</span>Secret</a>
+                  <a href="#legacydid.Secret"><span class="badge">M</span>Secret</a>
                 </li>
               
               
@@ -574,7 +574,7 @@
             <ul>
               
                 <li>
-                  <a href="#did.BaseDidDoc"><span class="badge">M</span>BaseDidDoc</a>
+                  <a href="#legacydid.BaseDidDoc"><span class="badge">M</span>BaseDidDoc</a>
                 </li>
               
               
@@ -3560,7 +3560,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
       <p></p>
 
       
-        <h3 id="did.Claim">Claim</h3>
+        <h3 id="legacydid.Claim">Claim</h3>
         <p>The claim section of a credential, indicating if the DID is KYC validated</p>
 
         
@@ -3591,7 +3591,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
 
         
       
-        <h3 id="did.DidCredential">DidCredential</h3>
+        <h3 id="legacydid.DidCredential">DidCredential</h3>
         <p>Digital identity credential issued to an ixo DID</p>
 
         
@@ -3624,7 +3624,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
               
                 <tr>
                   <td>claim</td>
-                  <td><a href="#did.Claim">Claim</a></td>
+                  <td><a href="#legacydid.Claim">Claim</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -3636,7 +3636,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
 
         
       
-        <h3 id="did.IxoDid">IxoDid</h3>
+        <h3 id="legacydid.IxoDid">IxoDid</h3>
         <p>An ixo DID with public and private keys, based on the Sovrin DID spec</p>
 
         
@@ -3669,7 +3669,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
               
                 <tr>
                   <td>secret</td>
-                  <td><a href="#did.Secret">Secret</a></td>
+                  <td><a href="#legacydid.Secret">Secret</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -3681,7 +3681,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
 
         
       
-        <h3 id="did.Secret">Secret</h3>
+        <h3 id="legacydid.Secret">Secret</h3>
         <p>The private section of an ixo DID, based on the Sovrin DID spec</p>
 
         
@@ -3733,7 +3733,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
       <p></p>
 
       
-        <h3 id="did.BaseDidDoc">BaseDidDoc</h3>
+        <h3 id="legacydid.BaseDidDoc">BaseDidDoc</h3>
         <p>BaseDidDoc defines a base DID document type. It implements the DidDoc interface.</p>
 
         
@@ -3759,7 +3759,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
               
                 <tr>
                   <td>credentials</td>
-                  <td><a href="#did.DidCredential">DidCredential</a></td>
+                  <td><a href="#legacydid.DidCredential">DidCredential</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>

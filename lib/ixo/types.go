@@ -1,3 +1,3 @@
-package types
+package ixo
 
 const IxoNativeToken = "uixo"

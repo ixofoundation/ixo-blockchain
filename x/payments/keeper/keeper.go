@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
+	didkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 )
 

@@ -26,62 +26,18 @@ const (
 func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper, iidkeeper iidkeeper.Keeper) types.MsgServer {
 	return &msgServer{
 		Keeper:         k,
-		BankKeeper:     bk,
-		PaymentsKeeper: pk,
 		IIDKeeper: iidkeeper,
 	}
 }
 
 func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntity) (*types.MsgCreateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	k := s.Keeper
+	keeper := s.keeper
 
-	if k.ProjectDocExists(ctx, msg.ProjectDid) {
-		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "project already exists")
-	}
 
-	// Create project doc
-	projectDoc := types.NewProjectDoc(
-		msg.TxHash, msg.ProjectDid, msg.SenderDid,
-		msg.PubKey, types.NullStatus, msg.Data)
+	keeper.
 
-	// Get and validate project fees map
-	err := k.ValidateProjectFeesMap(ctx, projectDoc.GetProjectFeesMap())
-	if err != nil {
-		return nil, err
-	}
 
-	// Create all necessary initial project accounts
-	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId); err != nil {
-		return nil, err
-	}
-	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountPayFeesId); err != nil {
-		return nil, err
-	}
-	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InitiatingNodeAccountPayFeesId); err != nil {
-		return nil, err
-	}
-	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.ProjectDid)); err != nil {
-		return nil, err
-	}
-
-	// Set project doc and initialise list of withdrawal transactions
-	k.SetProjectDoc(ctx, projectDoc)
-	k.SetProjectWithdrawalTransactions(ctx, msg.ProjectDid, types.WithdrawalInfoDocs{})
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeCreateProject,
-			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
-			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyPubKey, msg.PubKey),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
 
 	return &types.MsgCreateProjectResponse{}, nil
 }

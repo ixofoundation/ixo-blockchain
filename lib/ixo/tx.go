@@ -1,10 +1,10 @@
-package types
+package ixo
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	exported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
 type IxoMsg interface {

@@ -1,4 +1,4 @@
-package types
+package ixo
 
 import (
 	"bufio"
@@ -26,7 +26,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
 	channelkeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	exported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	"github.com/spf13/pflag"
 )
 

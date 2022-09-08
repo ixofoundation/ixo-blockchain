@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
