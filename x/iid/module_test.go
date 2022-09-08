@@ -1,4 +1,4 @@
-package did_test
+package iid_test
 
 import (
 	"testing"

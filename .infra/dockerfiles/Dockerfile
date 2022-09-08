@@ -33,7 +33,7 @@ FROM build-dependencies AS build-devel
 # RUN cp /lib/libwasmvm_muslc.$(uname -m).a /lib/libwasmvm_muslc.a
 
 # RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
-COPY ./ ./
+COPY ./ .
 
 ENTRYPOINT [ "starport", "chain", "serve" ]
 

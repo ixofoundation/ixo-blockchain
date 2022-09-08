@@ -307,6 +307,7 @@ func NewIxoApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		feegrant.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		iidkeeper.StoreKey,
 		// Custom ixo store keys

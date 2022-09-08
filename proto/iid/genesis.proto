@@ -1,12 +1,13 @@
 syntax = "proto3";
-package iid;
+package ixofoundation.ixo.data;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
-
+import "iid/iid.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
 
 // GenesisState defines the did module's genesis state.
 message GenesisState {
-repeated google.protobuf.Any did_docs = 1 [(gogoproto.moretags) = "yaml:\"did_docs\""];
+repeated IidDocument iid_docs = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid_docs\""];
+repeated IidMetadata iid_meta = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid_meta\""];
 }
