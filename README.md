@@ -12,8 +12,8 @@ The IXO team is in the process of upgrading this repository better align with ou
 ## Hosted Blockchain endpoints
 - Testnet RPC:https://testnet.ixo.world/rpc/
 - Testnet Rest:https://testnet.ixo.world/rest/
-- Testnet Rest:https://impacthub.ixo.world/rpc/
-- Testnet RPC:https://impacthub.ixo.world/rest/
+- Mainnet Rest:https://impacthub.ixo.world/rpc/
+- Mainnet RPC:https://impacthub.ixo.world/rest/
 
 ### Mini Changelog
 - Upgraded to cosmos-sdk 0.45
