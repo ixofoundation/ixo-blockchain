@@ -12,7 +12,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
@@ -22,19 +22,19 @@ type Keeper struct {
 	storeKey       sdk.StoreKey
 	paramSpace     paramstypes.Subspace
 	AccountKeeper  authkeeper.AccountKeeper
-	DidKeeper      didkeeper.Keeper
+	IidKeeper      iidkeeper.Keeper
 	paymentsKeeper paymentskeeper.Keeper
 }
 
 func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramstypes.Subspace,
-	accountKeeper authkeeper.AccountKeeper, didKeeper didkeeper.Keeper,
+	accountKeeper authkeeper.AccountKeeper, iidKeeper iidkeeper.Keeper,
 	paymentsKeeper paymentskeeper.Keeper) Keeper {
 	return Keeper{
 		cdc:            cdc,
 		storeKey:       key,
 		paramSpace:     paramSpace.WithKeyTable(types.ParamKeyTable()),
 		AccountKeeper:  accountKeeper,
-		DidKeeper:      didKeeper,
+		IidKeeper:      iidKeeper,
 		paymentsKeeper: paymentsKeeper,
 	}
 }

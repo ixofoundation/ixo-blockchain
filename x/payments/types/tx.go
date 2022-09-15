@@ -43,6 +43,7 @@ func NewMsgCreatePaymentTemplate(template PaymentTemplate,
 		PaymentTemplate: template,
 	}
 }
+func (msg MsgCreatePaymentTemplate) GetIidController() string { return msg.CreatorDid }
 
 func (msg MsgCreatePaymentTemplate) Type() string  { return TypeMsgCreatePaymentTemplate }
 func (msg MsgCreatePaymentTemplate) Route() string { return RouterKey }
@@ -95,6 +96,7 @@ func NewMsgCreatePaymentContract(templateId, contractId string,
 		DiscountId:        discountId,
 	}
 }
+func (msg MsgCreatePaymentContract) GetIidController() string { return msg.CreatorDid }
 
 func (msg MsgCreatePaymentContract) Type() string  { return TypeMsgCreatePaymentContract }
 func (msg MsgCreatePaymentContract) Route() string { return RouterKey }
@@ -160,6 +162,8 @@ func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.
 
 	return msg
 }
+
+func (msg MsgCreateSubscription) GetIidController() string { return msg.CreatorDid }
 
 func (msg *MsgCreateSubscription) SetPeriod(period Period) error {
 	m, ok := period.(proto.Message)
@@ -249,6 +253,7 @@ func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
 		Authorised:        authorised,
 	}
 }
+func (msg MsgSetPaymentContractAuthorisation) GetIidController() string { return msg.PayerDid }
 
 func (msg MsgSetPaymentContractAuthorisation) Type() string {
 	return TypeMsgSetPaymentContractAuthorisation
@@ -301,6 +306,8 @@ func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
 	}
 }
 
+func (msg MsgGrantDiscount) GetIidController() string { return msg.SenderDid }
+
 func (msg MsgGrantDiscount) Type() string  { return TypeMsgGrantDiscount }
 func (msg MsgGrantDiscount) Route() string { return RouterKey }
 func (msg MsgGrantDiscount) ValidateBasic() error {
@@ -350,6 +357,8 @@ func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
 	}
 }
 
+func (msg MsgRevokeDiscount) GetIidController() string { return msg.SenderDid }
+
 func (msg MsgRevokeDiscount) Type() string  { return TypeMsgRevokeDiscount }
 func (msg MsgRevokeDiscount) Route() string { return RouterKey }
 func (msg MsgRevokeDiscount) ValidateBasic() error {
@@ -396,6 +405,8 @@ func NewMsgEffectPayment(contractId string, creatorDid didexported.Did) *MsgEffe
 		PaymentContractId: contractId,
 	}
 }
+
+func (msg MsgEffectPayment) GetIidController() string { return msg.SenderDid }
 
 func (msg MsgEffectPayment) Type() string  { return TypeMsgEffectPayment }
 func (msg MsgEffectPayment) Route() string { return RouterKey }

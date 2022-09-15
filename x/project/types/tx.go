@@ -51,6 +51,8 @@ func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
 	}
 }
 
+func (msg MsgCreateProject) GetIidController() string { return msg.ProjectDid }
+
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
 	accNum, accSeq := uint64(0), uint64(0)
 	stdFee := legacytx.NewStdFee(0, sdk.NewCoins(sdk.NewCoin(ixotypes.IxoNativeToken, sdk.NewInt(fee))))
@@ -121,6 +123,7 @@ func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc
 		Data:       updateProjectStatusDoc,
 	}
 }
+func (msg MsgUpdateProjectStatus) GetIidController() string { return msg.ProjectDid }
 
 func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
 func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
@@ -164,6 +167,8 @@ func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc 
 		Data:       createAgentDoc,
 	}
 }
+
+func (msg MsgCreateAgent) GetIidController() string { return msg.ProjectDid }
 
 func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
 func (msg MsgCreateAgent) Route() string { return RouterKey }
@@ -214,6 +219,7 @@ func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc 
 		Data:       updateAgentDoc,
 	}
 }
+func (msg MsgUpdateAgent) GetIidController() string { return msg.ProjectDid }
 
 func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
 func (msg MsgUpdateAgent) Route() string { return RouterKey }
@@ -265,6 +271,8 @@ func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc 
 		Data:       createClaimDoc,
 	}
 }
+
+func (msg MsgCreateClaim) GetIidController() string { return msg.ProjectDid }
 
 func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
 func (msg MsgCreateClaim) Route() string { return RouterKey }
@@ -320,6 +328,8 @@ func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEval
 	}
 }
 
+func (msg MsgCreateEvaluation) GetIidController() string { return msg.ProjectDid }
+
 func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
 func (msg MsgCreateEvaluation) Route() string { return RouterKey }
 
@@ -367,6 +377,7 @@ func NewMsgWithdrawFunds(senderDid didexported.Did, data WithdrawFundsDoc) *MsgW
 		Data:      data,
 	}
 }
+func (msg MsgWithdrawFunds) GetIidController() string { return msg.SenderDid }
 
 func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
 func (msg MsgWithdrawFunds) Route() string { return RouterKey }
@@ -431,6 +442,8 @@ func NewMsgUpdateProjectDoc(senderDid didexported.Did, projectData json.RawMessa
 		Data:       projectData,
 	}
 }
+
+func (msg MsgUpdateProjectDoc) GetIidController() string { return msg.ProjectDid }
 
 func (msg MsgUpdateProjectDoc) Type() string  { return TypeMsgUpdateProjectDoc }
 func (msg MsgUpdateProjectDoc) Route() string { return RouterKey }

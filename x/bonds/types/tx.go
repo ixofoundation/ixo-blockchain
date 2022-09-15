@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 )
 
 const (
@@ -68,6 +68,8 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		OutcomePayment:           outcomePayment,
 	}
 }
+
+func (msg MsgCreateBond) GetIidController() string { return msg.CreatorDid }
 
 func (msg MsgCreateBond) ValidateBasic() error {
 	// Check if empty
@@ -201,6 +203,8 @@ func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 	}
 }
 
+func (msg MsgEditBond) GetIidController() string { return msg.EditorDid }
+
 func (msg MsgEditBond) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
@@ -266,6 +270,8 @@ func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid didexported.Did) *MsgS
 	}
 }
 
+func (msg MsgSetNextAlpha) GetIidController() string { return msg.EditorDid }
+
 func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
@@ -314,6 +320,8 @@ func NewMsgUpdateBondState(state BondState, editorDid, bondDid didexported.Did) 
 	}
 }
 
+func (msg MsgUpdateBondState) GetIidController() string { return msg.EditorDid }
+
 func (msg MsgUpdateBondState) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
@@ -359,6 +367,8 @@ func NewMsgBuy(buyerDid didexported.Did, amount sdk.Coin, maxPrices sdk.Coins,
 		BondDid:   bondDid,
 	}
 }
+
+func (msg MsgBuy) GetIidController() string { return msg.BuyerDid }
 
 func (msg MsgBuy) ValidateBasic() error {
 	// Check if empty
@@ -411,6 +421,8 @@ func NewMsgSell(sellerDid didexported.Did, amount sdk.Coin, bondDid didexported.
 	}
 }
 
+func (msg MsgSell) GetIidController() string { return msg.SellerDid }
+
 func (msg MsgSell) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.SellerDid) == "" {
@@ -458,6 +470,8 @@ func NewMsgSwap(swapperDid didexported.Did, from sdk.Coin, toToken string,
 		BondDid:    bondDid,
 	}
 }
+
+func (msg MsgSwap) GetIidController() string { return msg.SwapperDid }
 
 func (msg MsgSwap) ValidateBasic() error {
 	// Check if empty
@@ -523,6 +537,8 @@ func NewMsgMakeOutcomePayment(senderDid didexported.Did, amount sdk.Int, bondDid
 	}
 }
 
+func (msg MsgMakeOutcomePayment) GetIidController() string { return msg.SenderDid }
+
 func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.SenderDid) == "" {
@@ -566,6 +582,8 @@ func NewMsgWithdrawShare(recipientDid, bondDid didexported.Did) *MsgWithdrawShar
 	}
 }
 
+func (msg MsgWithdrawShare) GetIidController() string { return msg.RecipientDid }
+
 func (msg MsgWithdrawShare) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.RecipientDid) == "" {
@@ -605,6 +623,8 @@ func NewMsgWithdrawReserve(withdrawerDid didexported.Did, amount sdk.Coins,
 		BondDid:       bondDid,
 	}
 }
+
+func (msg MsgWithdrawReserve) GetIidController() string { return msg.WithdrawerDid }
 
 func (msg MsgWithdrawReserve) ValidateBasic() error {
 	// Check if empty

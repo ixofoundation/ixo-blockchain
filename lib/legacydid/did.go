@@ -7,8 +7,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	fmt "fmt"
 	"io"
+	"regexp"
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -18,9 +19,36 @@ import (
 	naclBox "golang.org/x/crypto/nacl/box"
 )
 
+var (
+	ValidDid      = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
+	ValidPubKey   = regexp.MustCompile(`^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]{43,44}$`)
+	IsValidDid    = ValidDid.MatchString
+	IsValidPubKey = ValidPubKey.MatchString
+	// https://sovrin-foundation.github.io/sovrin/spec/did-method-spec-template.html
+	// IsValidDid adapted from the above link but assumes no sub-namespaces
+	// TODO: ValidDid needs to be updated once we no longer want to be able
+	//   to consider project accounts as DIDs (especially in treasury module),
+	//   possibly should just be `^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}$`.
+)
+
 var DidPrefix = "did:ixo:"
 
 type Did = string
+
+func fromJsonString(jsonIxoDid string) (IxoDid, error) {
+	var did IxoDid
+	err := json.Unmarshal([]byte(jsonIxoDid), &did)
+	if err != nil {
+		err := fmt.Errorf("could not unmarshal did into struct due to error: %s", err.Error())
+		return IxoDid{}, err
+	}
+
+	return did, nil
+}
+
+func UnmarshalIxoDid(jsonIxoDid string) (IxoDid, error) {
+	return fromJsonString(jsonIxoDid)
+}
 
 func UnprefixedDid(did Did) string {
 	// Assumes that DID is valid (check IsValidDid regex)
@@ -45,12 +73,6 @@ type DidDoc interface {
 	Address() sdk.AccAddress
 }
 
-type Secret struct {
-	Seed                 string `json:"seed" yaml:"seed"`
-	SignKey              string `json:"signKey" yaml:"signKey"`
-	EncryptionPrivateKey string `json:"encryptionPrivateKey" yaml:"encryptionPrivateKey"`
-}
-
 func NewSecret(seed, signKey, encryptionPrivateKey string) Secret {
 	return Secret{
 		Seed:                 seed,
@@ -63,22 +85,6 @@ func (s Secret) Equals(other Secret) bool {
 	return s.Seed == other.Seed &&
 		s.SignKey == other.SignKey &&
 		s.EncryptionPrivateKey == other.EncryptionPrivateKey
-}
-
-func (s Secret) String() string {
-	output, err := json.MarshalIndent(s, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-
-	return fmt.Sprintf("%v", string(output))
-}
-
-type IxoDid struct {
-	Did                 string `json:"did" yaml:"did"`
-	VerifyKey           string `json:"verifyKey" yaml:"verifyKey"`
-	EncryptionPublicKey string `json:"encryptionPublicKey" yaml:"encryptionPublicKey"`
-	Secret              Secret `json:"secret" yaml:"secret"`
 }
 
 // Above IxoDid modelled after Sovrin documents
@@ -100,7 +106,7 @@ func NewIxoDid(did, verifyKey, encryptionPublicKey string, secret Secret) IxoDid
 		Did:                 did,
 		VerifyKey:           verifyKey,
 		EncryptionPublicKey: encryptionPublicKey,
-		Secret:              secret,
+		Secret:              &secret,
 	}
 }
 
@@ -108,16 +114,7 @@ func (id IxoDid) Equals(other IxoDid) bool {
 	return id.Did == other.Did &&
 		id.VerifyKey == other.VerifyKey &&
 		id.EncryptionPublicKey == other.EncryptionPublicKey &&
-		id.Secret.Equals(other.Secret)
-}
-
-func (id IxoDid) String() string {
-	output, err := json.MarshalIndent(id, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-
-	return fmt.Sprintf("%v", string(output))
+		id.Secret.Equals(*other.Secret)
 }
 
 func VerifyKeyToAddr(verifyKey string) sdk.AccAddress {
@@ -178,7 +175,7 @@ func FromSeed(seed [32]byte) (IxoDid, error) {
 		Did:                 DidPrefix + base58.Encode(publicKey[:16]),
 		VerifyKey:           base58.Encode(publicKey),
 		EncryptionPublicKey: base58.Encode(keyPairPublicKey[:]),
-		Secret: Secret{
+		Secret: &Secret{
 			Seed:                 hex.EncodeToString(seed[0:32]),
 			SignKey:              signKey,
 			EncryptionPrivateKey: base58.Encode(keyPairPrivateKey[:]),

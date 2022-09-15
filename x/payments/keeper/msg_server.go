@@ -32,18 +32,24 @@ func (k msgServer) SetPaymentContractAuthorisation(goCtx context.Context, msg *t
 	}
 
 	// Get payer address
-	payerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.PayerDid)
-	if err != nil {
-		return nil, err
+	payerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.PayerDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	payerAddr := payerDidDoc.Address()
 
+	//TODO: Find this value
+	payerAddr, err := payerDidDoc.GetVerificationMethodBlockchainAddress("")
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "signer must be payment contract payer")
+
+	}
 	// Confirm that signer is actually the payer in the payment contract
 	contractPayerAddr, err := sdk.AccAddressFromBech32(contract.Payer)
 	if err != nil {
 		return nil, err
 	}
-	if !payerAddr.Equals(contractPayerAddr) {
+
+	if !contractPayerAddr.Equals(sdk.AccAddress([]byte(payerAddr))) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 
 	}
@@ -144,11 +150,16 @@ func (k msgServer) CreatePaymentContract(goCtx context.Context, msg *types.MsgCr
 	}
 
 	// Get creator address
-	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.CreatorDid)
-	if err != nil {
-		return nil, err
+	cretorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.CreatorDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr := cretorDidDoc.Address()
+
+	//TODO: Find this value
+	creatorAddr, err := cretorDidDoc.GetVerificationMethodBlockchainAddress("")
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "signer must be payment contract payer")
+	}
 
 	// Create payment contract and validate
 	authorised := false
@@ -216,9 +227,9 @@ func (k msgServer) CreateSubscription(goCtx context.Context, msg *types.MsgCreat
 	}
 
 	// Get creator address
-	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.CreatorDid)
-	if err != nil {
-		return nil, err
+	cretorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.CreatorDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	creatorAddr := cretorDidDoc.Address()
 
@@ -269,9 +280,9 @@ func (k msgServer) GrantDiscount(goCtx context.Context, msg *types.MsgGrantDisco
 	}
 
 	// Get creator address
-	creatorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-	if err != nil {
-		return nil, err
+	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	creatorAddr := creatorDidDoc.Address()
 
@@ -328,9 +339,9 @@ func (k msgServer) RevokeDiscount(goCtx context.Context, msg *types.MsgRevokeDis
 	}
 
 	// Get creator address
-	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-	if err != nil {
-		return nil, err
+	cretorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	creatorAddr := cretorDidDoc.Address()
 
@@ -377,9 +388,9 @@ func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPaym
 	}
 
 	// Get creator address
-	cretorDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-	if err != nil {
-		return nil, err
+	cretorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	creatorAddr := cretorDidDoc.Address()
 

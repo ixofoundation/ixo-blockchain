@@ -95,9 +95,10 @@ import (
 	entitymodule "github.com/ixofoundation/ixo-blockchain/x/entity"
 	entitymodulekeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -483,6 +484,7 @@ func NewIxoApp(
 		appCodec,
 		keys[entitykeeper.StoreKey],
 		keys[entitykeeper.MemStoreKey],
+		app.AccountKeeper,
 		app.IidKeeper,
 		app.WasmKeeper,
 	)
@@ -515,11 +517,11 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule
-		iidmodule.NewAppModule(app.appCodec, app.IidKeeper),
+		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.wasmKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
-		entitymodule.NewAppModule(app.appCodec, app.EntityKeeper),
+		entitymodule.NewAppModule(app.appCodec, app.EntityKeeper, app.wasmKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that

@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 )
@@ -25,7 +23,7 @@ const (
 // for the provided Keeper.
 func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper, iidkeeper iidkeeper.Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper:         k,
+		Keeper:    k,
 		IIDKeeper: iidkeeper,
 	}
 }
@@ -33,11 +31,6 @@ func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper, 
 func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntity) (*types.MsgCreateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	keeper := s.keeper
-
-
-	keeper.
-
-
 
 	return &types.MsgCreateProjectResponse{}, nil
 }

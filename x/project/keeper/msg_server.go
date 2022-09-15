@@ -71,6 +71,20 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 		return nil, err
 	}
 
+	//Create project backed IID
+	did, err := types.NewDidDocument(msg.ProjectDid,
+		// types.WithServices(msg.Services...),
+		// types.WithRights(msg.AccordedRight...),
+		// types.WithResources(msg.LinkedResource...),
+		// types.WithVerifications(msg.Verifications...),
+		types.WithControllers(msg.Controllers...),
+	)
+	if err != nil {
+		// k.Logger(ctx).Error(err.Error())
+		return nil, err
+	}
+	k.IidKeeper.SetDidDocument(ctx, []byte(msg.ProjectDid), did)
+
 	// Set project doc and initialise list of withdrawal transactions
 	k.SetProjectDoc(ctx, projectDoc)
 	k.SetProjectWithdrawalTransactions(ctx, msg.ProjectDid, types.WithdrawalInfoDocs{})
@@ -371,9 +385,9 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		}
 
 		// Get sender (oracle) address
-		senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-		if err != nil {
-			return nil, err
+		senderDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+		if !exists {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
 		senderAddr := senderDidDoc.Address()
 
@@ -400,9 +414,9 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 	templateId, err = feesMap.GetPayTemplateId(types.FeeForService)
 	if err == nil && msg.Data.Status == string(types.ApprovedClaim) {
 		// Get claimer address
-		claimerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, claim.ClaimerDid)
-		if err != nil {
-			return nil, err
+		claimerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(claim.ClaimerDid))
+		if !exists {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
 		claimerAddr := claimerDidDoc.Address()
 
@@ -563,9 +577,9 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	}
 
 	// Get recipient address
-	recipientDidDoc, err := k.DidKeeper.GetDidDoc(ctx, recipientDid)
-	if err != nil {
-		return err
+	recipientDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(recipientDid))
+	if !exists {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	recipientAddr := recipientDidDoc.Address()
 
