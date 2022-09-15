@@ -33,6 +33,9 @@ service Msg {
   //Add / Delete Linked Resource
   rpc AddLinkedResource(MsgAddLinkedResource) returns(MsgAddLinkedResourceResponse);
   rpc DeleteLinkedResource(MsgDeleteLinkedResource) returns(MsgDeleteLinkedResourceResponse);
+  //Add / Delete Linked Entity
+  rpc AddLinkedEntity(MsgAddLinkedEntity) returns(MsgAddLinkedEntityResponse);
+  rpc DeleteLinkedEntity(MsgDeleteLinkedEntity) returns(MsgDeleteLinkedEntityResponse);
   //Add / Delete Accorded Right
   rpc AddAccordedRight(MsgAddAccordedRight) returns(MsgAddAccordedRightResponse);
   rpc DeleteAccordedRight(MsgDeleteAccordedRight) returns(MsgDeleteAccordedRightResponse);
@@ -198,6 +201,24 @@ message MsgDeleteLinkedResource {
   string signer     = 3; // address of the account signing the message
 }
 
+message MsgAddLinkedEntity {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string       id           = 1; // the iid
+  LinkedEntity linkedEntity = 2; // the entity to add
+  string       signer       = 3; // address of the account signing the message
+}
+
+message MsgDeleteLinkedEntity {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string id         = 1; // the iid
+  string entity_id = 2; // the entity id
+  string signer     = 3; // address of the account signing the message
+}
+
 message MsgAddAccordedRight {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
@@ -242,6 +263,8 @@ message MsgUpdateIidMeta {
 
 message MsgAddLinkedResourceResponse {}
 message MsgDeleteLinkedResourceResponse {}
+message MsgAddLinkedEntityResponse {}
+message MsgDeleteLinkedEntityResponse {}
 message MsgAddAccordedRightResponse {}
 message MsgDeleteAccordedRightResponse {}
 message MsgAddIidContextResponse {}

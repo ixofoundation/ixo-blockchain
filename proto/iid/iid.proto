@@ -22,58 +22,46 @@ message Context{
 message IidDocument {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
-
   // @context is spec for did document.
   repeated Context context = 1 [(gogoproto.jsontag) = "@context,omitempty"];
-
   // id represents the id for the did document.
   string id = 2;
-
   // A DID controller is an entity that is authorized to make changes to a DID document.
   // cfr. https://www.w3.org/TR/did-core/#did-controller
   repeated string controller = 3;
-
   // A DID document can express verification methods, 
   // such as cryptographic public keys, which can be used 
   // to authenticate or authorize interactions with the DID subject or associated parties.
   // https://www.w3.org/TR/did-core/#verification-methods
   repeated VerificationMethod verificationMethod = 4;
-
   // Services are used in DID documents to express ways of communicating 
   // with the DID subject or associated entities.
   // https://www.w3.org/TR/did-core/#services
   repeated Service service = 5;
-
   // NOTE: below this line there are the relationships
-
   // Authentication represents public key associated with the did document.
   // cfr. https://www.w3.org/TR/did-core/#authentication
   repeated string authentication = 6;
-
   // Used to specify how the DID subject is expected to express claims, 
   // such as for the purposes of issuing a Verifiable Credential.
   // cfr. https://www.w3.org/TR/did-core/#assertion
   repeated string assertionMethod = 7;
-
   // used to specify how an entity can generate encryption material 
   // in order to transmit confidential information intended for the DID subject.
   // https://www.w3.org/TR/did-core/#key-agreement
   repeated string keyAgreement = 8;
-
   // Used to specify a verification method that might be used by the DID subject
   // to invoke a cryptographic capability, such as the authorization 
   // to update the DID Document.
   // https://www.w3.org/TR/did-core/#capability-invocation
   repeated string capabilityInvocation = 9;
-
   // Used to specify a mechanism that might be used by the DID subject 
   // to delegate a cryptographic capability to another party.
   // https://www.w3.org/TR/did-core/#capability-delegation
   repeated string capabilityDelegation = 10;
-
   repeated LinkedResource linkedResource = 11;
-
   repeated AccordedRight accordedRight = 12;
+  repeated LinkedEntity linkedEntity = 13;
 }
 
 // A DID document can express verification methods, 
@@ -103,6 +91,12 @@ message LinkedResource{
   string proof = 6;
   string encrypted = 7;
   string privacy = 8;
+}
+message LinkedEntity{
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  string id = 2;
+  string relationship =3;
 }
 
 message VerificationMethod {

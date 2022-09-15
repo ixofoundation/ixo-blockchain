@@ -269,6 +269,17 @@ func NewMsgAddLinkedResource(
 		Signer:         signerAccount,
 	}
 }
+func NewMsgAddLinkedEntity(
+	id string,
+	linkedResource *LinkedEntity,
+	signerAccount string,
+) *MsgAddLinkedEntity {
+	return &MsgAddLinkedEntity{
+		Id:           id,
+		LinkedEntity: linkedResource,
+		Signer:       signerAccount,
+	}
+}
 
 // Route implements sdk.Msg
 func (MsgAddService) Route() string {
@@ -315,6 +326,13 @@ func (msg MsgAddLinkedResource) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{accAddr}
 }
+func (msg MsgAddLinkedEntity) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
 
 // --------------------------
 // DELETE SERVICE
@@ -345,6 +363,17 @@ func NewMsgDeleteLinkedResource(
 		Id:         id,
 		ResourceId: resourceID,
 		Signer:     signerAccount,
+	}
+}
+func NewMsgDeleteLinkedEntity(
+	id string,
+	entityID string,
+	signerAccount string,
+) *MsgDeleteLinkedEntity {
+	return &MsgDeleteLinkedEntity{
+		Id:       id,
+		EntityId: entityID,
+		Signer:   signerAccount,
 	}
 }
 
@@ -386,6 +415,13 @@ func (msg MsgDeleteLinkedResource) GetSignBytes() []byte {
 
 // GetSigners implements sdk.Msg
 func (msg MsgDeleteLinkedResource) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+func (msg MsgDeleteLinkedEntity) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
 		panic(err)

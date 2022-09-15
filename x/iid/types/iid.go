@@ -732,6 +732,59 @@ func (didDoc *IidDocument) DeleteLinkedResource(resourceID string) {
 	}
 }
 
+func (didDoc *IidDocument) AddLinkedEntity(linkedEntities ...*LinkedEntity) (err error) {
+	if didDoc.LinkedEntity == nil {
+		didDoc.LinkedEntity = []*LinkedEntity{}
+	}
+
+	// used to check duplicates
+	index := make(map[string]struct{}, len(didDoc.LinkedEntity))
+
+	// load existing resources
+	for _, s := range didDoc.LinkedEntity {
+		index[s.Id] = struct{}{}
+	}
+
+	// resources must be unique
+	for _, s := range linkedEntities {
+		//if err = ValidateService(s); err != nil {
+		//	return
+		//}
+
+		// verify that there are no duplicates in method ids
+		if _, found := index[s.Id]; found {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated verification method id %s", s.Id)
+			return
+		}
+		index[s.Id] = struct{}{}
+
+		didDoc.LinkedEntity = append(didDoc.LinkedEntity, s)
+	}
+	return
+}
+
+func (didDoc *IidDocument) DeleteLinkedEntity(entityID string) {
+	del := func(x int) {
+		lastIdx := len(didDoc.LinkedEntity) - 1
+		switch lastIdx {
+		case 0: // remove the relationships since there is no elements left
+			didDoc.LinkedEntity = nil
+		case x: // if it's at the last position, just drop the last position
+			didDoc.LinkedEntity = didDoc.LinkedEntity[:lastIdx]
+		default: // swap and drop last position
+			didDoc.LinkedEntity[x] = didDoc.LinkedEntity[lastIdx]
+			didDoc.LinkedEntity = didDoc.LinkedEntity[:lastIdx]
+		}
+	}
+
+	for i, s := range didDoc.LinkedEntity {
+		if s.Id == entityID {
+			del(i)
+			break
+		}
+	}
+}
+
 ////Accorded Right
 
 func (didDoc *IidDocument) AddAccordedRight(accordedRights ...*AccordedRight) (err error) {
@@ -946,6 +999,12 @@ func NewLinkedResource(id string, resourceType string, description string, media
 		Proof:           proof,
 		Encrypted:       encrypted,
 		Privacy:         privacy,
+	}
+}
+func NewLinkedEntity(id string, relationship string) *LinkedEntity {
+	return &LinkedEntity{
+		Id:           id,
+		Relationship: relationship,
 	}
 }
 
