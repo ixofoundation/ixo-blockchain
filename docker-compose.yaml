@@ -35,4 +35,4 @@ services:
     restart: unless-stopped
     ports:
       - "1317:1317" # API
-      - "26657:26657" # 
+      - "26659:26657" # 

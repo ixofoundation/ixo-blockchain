@@ -55,7 +55,7 @@ COPY --from=build-dependencies /app/ /app/
 ENV O_PATH="${PATH}"
 ENV PATH="/usr/local/go/bin:${PATH}"
 
-RUN make install &&\
+RUN go install -mod=readonly $(BUILD_FLAGS) ./cmd/ixod &&\
   rm -rf /usr/local/go/ &&\
   rm -rf /app/
 
