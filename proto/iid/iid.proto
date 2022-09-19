@@ -62,6 +62,7 @@ message IidDocument {
   repeated LinkedResource linkedResource = 11;
   repeated AccordedRight accordedRight = 12;
   repeated LinkedEntity linkedEntity = 13;
+  string alsoKnownAs = 14;
 }
 
 // A DID document can express verification methods, 
@@ -77,7 +78,7 @@ message AccordedRight{
   string id = 2;
   string mechanism = 3;
   string message = 4;
-  string serviceEndpoint = 5;
+  string service = 5;
 }
 
 message LinkedResource{
@@ -90,7 +91,7 @@ message LinkedResource{
   string serviceEndpoint = 5;
   string proof = 6;
   string encrypted = 7;
-  string privacy = 8;
+  string right = 8;
 }
 message LinkedEntity{
   option (gogoproto.equal) = true;

@@ -998,7 +998,7 @@ func NewLinkedResource(id string, resourceType string, description string, media
 		ServiceEndpoint: serviceEndpoint,
 		Proof:           proof,
 		Encrypted:       encrypted,
-		Privacy:         privacy,
+		Right:           privacy,
 	}
 }
 func NewLinkedEntity(id string, relationship string) *LinkedEntity {
@@ -1010,11 +1010,11 @@ func NewLinkedEntity(id string, relationship string) *LinkedEntity {
 
 func NewAccordedRight(id string, rightType string, mechanism string, message string, endpoint string) *AccordedRight {
 	return &AccordedRight{
-		Type:            rightType,
-		Id:              id,
-		Mechanism:       mechanism,
-		Message:         message,
-		ServiceEndpoint: endpoint,
+		Type:      rightType,
+		Id:        id,
+		Mechanism: mechanism,
+		Message:   message,
+		Service:   endpoint,
 	}
 }
 
