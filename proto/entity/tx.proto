@@ -36,13 +36,17 @@ service Msg {
 
 // MsgCreateProject defines a message for creating a project.
 message MsgCreateEntity {
-  // option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_getters)  = false;
 
-  // string tx_hash     = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
-  // string sender_did  = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
-  // string project_did = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-  // string pub_key     = 4 [(gogoproto.jsontag) = "pubKey", (gogoproto.moretags) = "yaml:\"pubKey\""];
-  // bytes data         = 5 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
+  string                id            = 1; // the did
+  repeated string       controllers   = 2; // the list of controller DIDs
+  repeated Context      context        = 3;
+  repeated Verification verifications = 4; // the list of verification methods and relationships
+  repeated Service      services      = 5;
+  repeated AccordedRight accordedRight = 6;
+  repeated LinkedResource linkedResource = 7;
+  string   signer        = 8; // address of the account signing the message
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.

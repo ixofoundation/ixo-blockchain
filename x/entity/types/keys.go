@@ -1,7 +1,5 @@
 package types
 
-import didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
-
 const (
 	ModuleName        = "entity"
 	DefaultParamspace = ModuleName

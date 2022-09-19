@@ -11,6 +11,7 @@ import (
 	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
@@ -71,13 +72,20 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 		return nil, err
 	}
 
+	iidProjectVerificationMethod, err := iidtypes.NewPublicKeyHexFromString(msg.PubKey, iidtypes.DIDVMethodTypeEd25519VerificationKey2018)
+	if err != nil {
+		return nil, err
+	}
+
 	//Create project backed IID
-	did, err := types.NewDidDocument(msg.ProjectDid,
-		// types.WithServices(msg.Services...),
-		// types.WithRights(msg.AccordedRight...),
-		// types.WithResources(msg.LinkedResource...),
-		// types.WithVerifications(msg.Verifications...),
-		types.WithControllers(msg.Controllers...),
+	did, err := iidtypes.NewDidDocument(
+		msg.ProjectDid,
+		iidtypes.WithControllers(msg.ProjectDid),
+		iidtypes.WithVerifications(iidtypes.NewVerification(
+			iidtypes.NewVerificationMethod(msg.ProjectDid, iidtypes.DID(msg.ProjectDid), iidProjectVerificationMethod),
+			[]string{},
+			[]string{},
+		)),
 	)
 	if err != nil {
 		// k.Logger(ctx).Error(err.Error())
@@ -389,8 +397,10 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		if !exists {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		senderAddr := senderDidDoc.Address()
-
+		senderAddr, err := senderDidDoc.GetVerificationMethodBlockchainAddress(senderDidDoc.Id)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		}
 		// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
 		feePercentage := k.GetParams(ctx).OracleFeePercentage
 		nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
@@ -418,7 +428,10 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		if !exists {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		claimerAddr := claimerDidDoc.Address()
+		claimerAddr, err := claimerDidDoc.GetVerificationMethodBlockchainAddress(claimerDidDoc.Id)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		}
 
 		// Get recipients (just the claimer)
 		claimApprovedPayRecipients := paymentstypes.NewDistribution(
@@ -581,7 +594,10 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	if !exists {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	recipientAddr := recipientDidDoc.Address()
+	recipientAddr, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{amount})
 	if err != nil {

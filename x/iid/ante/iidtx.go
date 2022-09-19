@@ -34,12 +34,6 @@ func (tx *IidTx) VerifyIidControllersAgainstSigniture(ctx sdk.Context, iidKeeper
 		return sdkerrors.Wrap(err, "Tx must be a IIDTx")
 	}
 
-	// for _, pk := range pubKeys {
-
-	// 	if
-
-	// }
-
 	iidHasPubKey := false
 
 	for _, iidMsg := range tx.GetIidControllers() {
@@ -50,8 +44,8 @@ func (tx *IidTx) VerifyIidControllersAgainstSigniture(ctx sdk.Context, iidKeeper
 		}
 
 		for _, pk := range pubKeys {
-			if iidDoc.HasPublicKey(pk) {
-				iidHasPubKey = true
+			if iidHasPubKey = iidDoc.HasPublicKey(pk); iidHasPubKey {
+				break
 			}
 		}
 	}

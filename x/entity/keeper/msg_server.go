@@ -4,24 +4,18 @@ import (
 	"context"
 
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 type msgServer struct {
-	Keeper         Keeper
-	BankKeeper     bankkeeper.Keeper
-	PaymentsKeeper paymentskeeper.Keeper
-	IIDKeeper      iidKeeper.Keeper
+	Keeper    Keeper
+	IIDKeeper iidkeeper.Keeper
 }
-
-const (
-	IxoAccountFeesId               types.InternalAccountID = "IxoFees"
-	IxoAccountPayFeesId            types.InternalAccountID = "IxoPayFees"
-	InitiatingNodeAccountPayFeesId types.InternalAccountID = "InitiatingNodePayFees"
-)
 
 // NewMsgServerImpl returns an implementation of the project MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper, iidkeeper iidkeeper.Keeper) types.MsgServer {
+func NewMsgServerImpl(k Keeper, iidkeeper iidkeeper.Keeper) types.MsgServer {
 	return &msgServer{
 		Keeper:    k,
 		IIDKeeper: iidkeeper,
@@ -30,9 +24,43 @@ func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper, 
 
 func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntity) (*types.MsgCreateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	keeper := s.keeper
+	// keeper := s.keeper
 
-	return &types.MsgCreateProjectResponse{}, nil
+	did, err := iidtypes.NewDidDocument(msg.Id,
+		iidtypes.WithServices(msg.Services...),
+		iidtypes.WithRights(msg.AccordedRight...),
+		iidtypes.WithResources(msg.LinkedResource...),
+		iidtypes.WithVerifications(msg.Verifications...),
+		iidtypes.WithControllers(msg.Controllers...),
+	)
+	if err != nil {
+		// k.Logger(ctx).Error(err.Error())
+		return nil, err
+	}
+
+	// check that the did is not already taken
+	_, found := k.Keeper.GetDidDocument(ctx, []byte(msg.Id))
+	if found {
+		err := sdkerrors.Wrapf(types.ErrDidDocumentFound, "a document with did %s already exists", msg.Id)
+		k.Logger(ctx).Error(err.Error())
+		return nil, err
+	}
+
+	// persist the did document
+	k.Keeper.SetDidDocument(ctx, []byte(msg.Id), did)
+
+	// now create and persist the metadata
+	didM := types.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	k.Keeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
+
+	k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
+
+	// emit the event
+	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
+		k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
+	}
+
+	return &types.MsgCreateEntityResponse{}, nil
 }
 
 // func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpdateProjectStatus) (*types.MsgUpdateProjectStatusResponse, error) {
