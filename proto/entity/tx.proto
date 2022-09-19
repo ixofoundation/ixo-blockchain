@@ -2,7 +2,10 @@ syntax = "proto3";
 package entity;
 
 import "gogoproto/gogo.proto";
+import "iid/iid.proto";
+import "iid/tx.proto";
 import "entity/entity.proto";
+
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
@@ -12,23 +15,8 @@ service Msg {
    // CreateProject defines a method for creating a project.
   rpc CreateEntity(MsgCreateEntity) returns (MsgCreateEntityResponse);
 
-  // // UpdateProjectStatus defines a method for updating a project's current status.
-  // rpc UpdateProjectStatus(MsgUpdateProjectStatus) returns (MsgUpdateProjectStatusResponse);
-
-  // // CreateAgent defines a method for creating an agent on a project.
-  // rpc CreateAgent(MsgCreateAgent) returns (MsgCreateAgentResponse);
-
-  // // UpdateAgent defines a method for updating an agent on a project.
-  // rpc UpdateAgent(MsgUpdateAgent) returns (MsgUpdateAgentResponse);
-
-  // // CreateClaim defines a method for creating a claim on a project.
-  // rpc CreateClaim(MsgCreateClaim) returns (MsgCreateClaimResponse);
-
-  // // CreateEvaluation defines a method for creating an evaluation for a specific claim on a project.
-  // rpc CreateEvaluation(MsgCreateEvaluation) returns (MsgCreateEvaluationResponse);
-
-  // // WithdrawFunds defines a method for project agents to withdraw their funds from a project.
-  // rpc WithdrawFunds(MsgWithdrawFunds) returns (MsgWithdrawFundsResponse);
+  // // UpdateEntityStatus defines a method for updating a entity's current status.
+  rpc UpdateEntityStatus(MsgUpdateEntityStatus) returns (MsgUpdateEntityStatusResponse);
 
   // // UpdateProjectDoc defines a method for updating a project's data.
   // rpc UpdateProjectDoc(MsgUpdateProjectDoc) returns (MsgUpdateProjectDocResponse);
@@ -41,27 +29,24 @@ message MsgCreateEntity {
 
   string                id            = 1; // the did
   repeated string       controllers   = 2; // the list of controller DIDs
-  repeated Context      context        = 3;
-  repeated Verification verifications = 4; // the list of verification methods and relationships
-  repeated Service      services      = 5;
-  repeated AccordedRight accordedRight = 6;
-  repeated LinkedResource linkedResource = 7;
+  repeated iid.Context      context        = 3;
+  repeated iid.Verification verifications = 4; // the list of verification methods and relationships
+  repeated iid.Service      services      = 5;
+  repeated iid.AccordedRight accordedRight = 6;
+  repeated iid.LinkedResource linkedResource = 7;
   string   signer        = 8; // address of the account signing the message
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.
 message MsgCreateEntityResponse {}
 
-// // MsgUpdateProjectStatus defines a message for updating a project's current status.
-// message MsgUpdateProjectStatus {
-//   string tx_hash              = 1 [(gogoproto.jsontag) = "txHash", (gogoproto.moretags) = "yaml:\"txHash\""];
-//   string sender_did           = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
-//   string project_did          = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
-//   UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"data\""];
-// }
+// MsgUpdateEntityStatus defines a message for updating a entity's current status.
+message MsgUpdateEntityStatus {
+  number status = 1;
+}
 
-// // MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.
-// message MsgUpdateProjectStatusResponse{}
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
+message MsgUpdateEntityStatusResponse{}
 
 // // MsgCreateAgent defines a message for creating an agent on a project.
 // message MsgCreateAgent {

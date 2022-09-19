@@ -47,17 +47,17 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	}
 
 	// persist the did document
-	k.Keeper.SetDidDocument(ctx, []byte(msg.Id), did)
+	k.IIDKeeper.SetDidDocument(ctx, []byte(msg.Id), did)
 
 	// now create and persist the metadata
-	didM := types.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
-	k.Keeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
+	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	s.IIDKeeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
 
-	k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
+	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
 
 	// emit the event
 	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
-		k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
+		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
 	}
 
 	return &types.MsgCreateEntityResponse{}, nil
