@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 type msgServer struct {
@@ -24,43 +24,13 @@ func NewMsgServerImpl(k Keeper, iidkeeper iidkeeper.Keeper) types.MsgServer {
 
 func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntity) (*types.MsgCreateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	// keeper := s.keeper
-
-	did, err := iidtypes.NewDidDocument(msg.Id,
-		iidtypes.WithServices(msg.Services...),
-		iidtypes.WithRights(msg.AccordedRight...),
-		iidtypes.WithResources(msg.LinkedResource...),
-		iidtypes.WithVerifications(msg.Verifications...),
-		iidtypes.WithControllers(msg.Controllers...),
-	)
-	if err != nil {
-		// k.Logger(ctx).Error(err.Error())
-		return nil, err
-	}
-
-	// check that the did is not already taken
-	_, found := k.Keeper.GetDidDocument(ctx, []byte(msg.Id))
-	if found {
-		err := sdkerrors.Wrapf(types.ErrDidDocumentFound, "a document with did %s already exists", msg.Id)
-		k.Logger(ctx).Error(err.Error())
-		return nil, err
-	}
-
-	// persist the did document
-	k.IIDKeeper.SetDidDocument(ctx, []byte(msg.Id), did)
-
-	// now create and persist the metadata
-	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
-	s.IIDKeeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
-
-	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
-
-	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
-		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
-	}
+	s.Keeper.CreateEntity(ctx, msg)
 
 	return &types.MsgCreateEntityResponse{}, nil
+}
+
+func (s msgServer) UpdateEntityStatus(goCtx context.Context, msg *types.MsgUpdateEntityStatus) (*types.MsgUpdateEntityStatusResponse, error) {
+	return &types.MsgUpdateEntityStatusResponse{}, nil
 }
 
 // func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpdateProjectStatus) (*types.MsgUpdateProjectStatusResponse, error) {

@@ -1,29 +1,67 @@
 package keeper
 
 import (
+	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 type Keeper struct {
-	cdc            codec.BinaryCodec
-	storeKey       sdk.StoreKey
-	paramSpace     paramstypes.Subspace
-	AccountKeeper  authkeeper.AccountKeeper
-	DidKeeper      didkeeper.Keeper
-	paymentsKeeper paymentskeeper.Keeper
+	cdc        codec.BinaryCodec
+	storeKey   sdk.StoreKey
+	IidKeeper  iidkeeper.Keeper
+	WasmKeeper wasm.Keeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramstypes.Subspace,
-	accountKeeper authkeeper.AccountKeeper, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasm.Keeper) Keeper {
 	return Keeper{
-		cdc:           cdc,
-		storeKey:      key,
-		paramSpace:    paramSpace.WithKeyTable(types.ParamKeyTable()),
-		AccountKeeper: accountKeeper,
-		IIDKeeper:     iidKeeper,
-		wasmKeeper:    wasmKeeper,
+		cdc:        cdc,
+		storeKey:   key,
+		IidKeeper:  iidKeeper,
+		WasmKeeper: wasmKeeper,
 	}
+}
+
+func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error {
+	did, err := iidtypes.NewDidDocument(msg.Id,
+		iidtypes.WithServices(msg.Services...),
+		iidtypes.WithRights(msg.AccordedRight...),
+		iidtypes.WithResources(msg.LinkedResource...),
+		iidtypes.WithVerifications(msg.Verifications...),
+		iidtypes.WithControllers(msg.Controllers...),
+	)
+	if err != nil {
+		// k.Logger(ctx).Error(err.Error())
+		return err
+	}
+
+	// check that the did is not already taken
+	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(msg.Id))
+	if found {
+		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", msg.Id)
+		// k.Logger(ctx).Error(err.Error())
+		return err
+	}
+
+	// persist the did document
+	k.IidKeeper.SetDidDocument(ctx, []byte(msg.Id), did)
+
+	// now create and persist the metadata
+	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	k.IidKeeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
+
+	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
+
+	// emit the event
+	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
+		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
+	}
+
+	return nil
 }
 
 // // GetParams returns the total set of project parameters.
@@ -56,8 +94,9 @@ func (k Keeper) GetEntityDocIterator(ctx sdk.Context) sdk.Iterator {
 // }
 
 func (k Keeper) EntityExists(ctx sdk.Context, entityDid string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.GetEntityKey(projectDid))
+	// store := ctx.KVStore(k.storeKey)
+	_, exists := k.IidKeeper.GetDidDocument(ctx, []byte(entityDid))
+	return exists
 }
 
 // func (k Keeper) GetEntityDoc(ctx sdk.Context, projectDid didexported.Did) (types.ProjectDoc, error) {

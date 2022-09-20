@@ -3,13 +3,11 @@ package entity
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 )
 
-func NewHandler(k keeper.Keeper, pk paymentskeeper.Keeper, bk bankkeeper.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper) sdk.Handler {
 	msgServer := keeper.NewMsgServerImpl(k, bk, pk)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {

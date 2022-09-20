@@ -42,7 +42,7 @@ message MsgCreateEntityResponse {}
 
 // MsgUpdateEntityStatus defines a message for updating a entity's current status.
 message MsgUpdateEntityStatus {
-  number status = 1;
+  int64 status = 1;
 }
 
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.

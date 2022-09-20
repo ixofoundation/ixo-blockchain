@@ -8,7 +8,7 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/lib/legacydid";
 
 // BaseDidDoc defines a base DID document type. It implements the DidDoc interface.
 message BaseDidDoc {
-  option (gogoproto.goproto_stringer) = false;
+  // option (gogoproto.goproto_stringer) = false;
   option (gogoproto.goproto_getters)  = false;
   option (gogoproto.equal)            = false;
 

@@ -12,7 +12,10 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/client/cli"
+
+	// "github.com/ixofoundation/ixo-blockchain/x/entity/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
@@ -51,7 +54,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	if err != nil {
 		return err
 	}
-	return types.ValidateGenesis(data)
+	return nil //types.ValidateGenesis(data)
 }
 
 // RegisterRESTRoutes registers the REST routes for the project module.
@@ -76,7 +79,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 // RegisterInterfaces registers interfaces and implementations of the project module.
 func (a AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
-	types.RegisterInterfaces(registry)
+	// types.RegisterInterfaces(registry)
 }
 
 //____________________________________________________________________________
@@ -107,7 +110,7 @@ func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the project module.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper, am.paymentsKeeper, am.bankKeeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
 }
 
 // QuerierRoute returns the project module's querier route name.

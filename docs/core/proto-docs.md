@@ -520,6 +520,192 @@
         
           
           <li>
+            <a href="#iid%2fiid.proto">iid/iid.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#iid.AccordedRight"><span class="badge">M</span>AccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.Context"><span class="badge">M</span>Context</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.IidDocument"><span class="badge">M</span>IidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.IidMetadata"><span class="badge">M</span>IidMetadata</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.LinkedResource"><span class="badge">M</span>LinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.Service"><span class="badge">M</span>Service</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2ftx.proto">iid/tx.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#iid.MsgAddAccordedRight"><span class="badge">M</span>MsgAddAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddAccordedRightResponse"><span class="badge">M</span>MsgAddAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddController"><span class="badge">M</span>MsgAddController</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddControllerResponse"><span class="badge">M</span>MsgAddControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddIidContext"><span class="badge">M</span>MsgAddIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddLinkedResource"><span class="badge">M</span>MsgAddLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddLinkedResourceResponse"><span class="badge">M</span>MsgAddLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddService"><span class="badge">M</span>MsgAddService</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddServiceResponse"><span class="badge">M</span>MsgAddServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddVerification"><span class="badge">M</span>MsgAddVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddVerificationResponse"><span class="badge">M</span>MsgAddVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgCreateIidDocument"><span class="badge">M</span>MsgCreateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgCreateIidDocumentResponse"><span class="badge">M</span>MsgCreateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteAccordedRightResponse"><span class="badge">M</span>MsgDeleteAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteController"><span class="badge">M</span>MsgDeleteController</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteControllerResponse"><span class="badge">M</span>MsgDeleteControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteIidContext"><span class="badge">M</span>MsgDeleteIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedResource"><span class="badge">M</span>MsgDeleteLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedResourceResponse"><span class="badge">M</span>MsgDeleteLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteService"><span class="badge">M</span>MsgDeleteService</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteServiceResponse"><span class="badge">M</span>MsgDeleteServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgRevokeVerification"><span class="badge">M</span>MsgRevokeVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgRevokeVerificationResponse"><span class="badge">M</span>MsgRevokeVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgSetVerificationRelationships"><span class="badge">M</span>MsgSetVerificationRelationships</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgSetVerificationRelationshipsResponse"><span class="badge">M</span>MsgSetVerificationRelationshipsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidDocument"><span class="badge">M</span>MsgUpdateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidDocumentResponse"><span class="badge">M</span>MsgUpdateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidMeta"><span class="badge">M</span>MsgUpdateIidMeta</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidMetaResponse"><span class="badge">M</span>MsgUpdateIidMetaResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.Verification"><span class="badge">M</span>Verification</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#iid.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#entity%2ftx.proto">entity/tx.proto</a>
             <ul>
               
@@ -531,11 +717,92 @@
                   <a href="#entity.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
                 </li>
               
+                <li>
+                  <a href="#entity.MsgUpdateEntityStatus"><span class="badge">M</span>MsgUpdateEntityStatus</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntityStatusResponse"><span class="badge">M</span>MsgUpdateEntityStatusResponse</a>
+                </li>
+              
               
               
               
                 <li>
                   <a href="#entity.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fevent.proto">iid/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#iid.IidDocumentCreatedEvent"><span class="badge">M</span>IidDocumentCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.IidDocumentUpdatedEvent"><span class="badge">M</span>IidDocumentUpdatedEvent</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fgenesis.proto">iid/genesis.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#iid.GenesisState"><span class="badge">M</span>GenesisState</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fquery.proto">iid/query.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#iid.QueryIidDocumentRequest"><span class="badge">M</span>QueryIidDocumentRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.QueryIidDocumentResponse"><span class="badge">M</span>QueryIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.QueryIidDocumentsRequest"><span class="badge">M</span>QueryIidDocumentsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.QueryIidDocumentsResponse"><span class="badge">M</span>QueryIidDocumentsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.QueryIidMetaDataRequest"><span class="badge">M</span>QueryIidMetaDataRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.QueryIidMetaDataResponse"><span class="badge">M</span>QueryIidMetaDataResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#iid.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -3508,6 +3775,1425 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
     
       
       <div class="file-heading">
+        <h2 id="iid/iid.proto">iid/iid.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.AccordedRight">AccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mechanism</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>message</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.Context">Context</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>val</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.IidDocument">IidDocument</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">Context</a></td>
+                  <td>repeated</td>
+                  <td><p>@context is spec for did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>id represents the id for the did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>A DID controller is an entity that is authorized to make changes to a DID document.
+cfr. https://www.w3.org/TR/did-core/#did-controller </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verificationMethod</td>
+                  <td><a href="#iid.VerificationMethod">VerificationMethod</a></td>
+                  <td>repeated</td>
+                  <td><p>A DID document can express verification methods, 
+such as cryptographic public keys, which can be used 
+to authenticate or authorize interactions with the DID subject or associated parties.
+https://www.w3.org/TR/did-core/#verification-methods </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service</td>
+                  <td><a href="#iid.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p>Services are used in DID documents to express ways of communicating 
+with the DID subject or associated entities.
+https://www.w3.org/TR/did-core/#services </p></td>
+                </tr>
+              
+                <tr>
+                  <td>authentication</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Authentication represents public key associated with the did document.
+cfr. https://www.w3.org/TR/did-core/#authentication </p></td>
+                </tr>
+              
+                <tr>
+                  <td>assertionMethod</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify how the DID subject is expected to express claims, 
+such as for the purposes of issuing a Verifiable Credential.
+cfr. https://www.w3.org/TR/did-core/#assertion </p></td>
+                </tr>
+              
+                <tr>
+                  <td>keyAgreement</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>used to specify how an entity can generate encryption material 
+in order to transmit confidential information intended for the DID subject.
+https://www.w3.org/TR/did-core/#key-agreement </p></td>
+                </tr>
+              
+                <tr>
+                  <td>capabilityInvocation</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify a verification method that might be used by the DID subject
+to invoke a cryptographic capability, such as the authorization 
+to update the DID Document.
+https://www.w3.org/TR/did-core/#capability-invocation </p></td>
+                </tr>
+              
+                <tr>
+                  <td>capabilityDelegation</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify a mechanism that might be used by the DID subject 
+to delegate a cryptographic capability to another party.
+https://www.w3.org/TR/did-core/#capability-delegation </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.IidMetadata">IidMetadata</h3>
+        <p>DidMetadata defines metadata associated to a did document such as </p><p>the status of the DID document</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>versionId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>created</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>updated</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>startDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>endDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>stage</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relayerNode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifiableCredential</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>credentials</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.LinkedResource">LinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mediaType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>proof</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>encrypted</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>privacy</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.Service">Service</h3>
+        <p>Service defines how to find data associated with a identifer</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.VerificationMethod">VerificationMethod</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>blockchainAccountID</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyHex</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyMultibase</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/tx.proto">iid/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.MsgAddAccordedRight">MsgAddAccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td></td>
+                  <td><p>the Accorded right to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddController">MsgAddController</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did of the document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did to add as a controller of the did document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddControllerResponse">MsgAddControllerResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddIidContext">MsgAddIidContext</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">Context</a></td>
+                  <td></td>
+                  <td><p>the context to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddIidContextResponse">MsgAddIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddLinkedResource">MsgAddLinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td></td>
+                  <td><p>the verification to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddService">MsgAddService</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_data</td>
+                  <td><a href="#iid.Service">Service</a></td>
+                  <td></td>
+                  <td><p>the service data to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddServiceResponse">MsgAddServiceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddVerification">MsgAddVerification</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verification</td>
+                  <td><a href="#iid.Verification">Verification</a></td>
+                  <td></td>
+                  <td><p>the verification to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddVerificationResponse">MsgAddVerificationResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgCreateIidDocument">MsgCreateIidDocument</h3>
+        <p>MsgCreateDidDocument defines a SDK message for creating a new did.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllers</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of controller DIDs </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">Context</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifications</td>
+                  <td><a href="#iid.Verification">Verification</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of verification methods and relationships </p></td>
+                </tr>
+              
+                <tr>
+                  <td>services</td>
+                  <td><a href="#iid.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>right_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteController">MsgDeleteController</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did of the document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did to remove from the list of controllers of the did document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteControllerResponse">MsgDeleteControllerResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteIidContext">MsgDeleteIidContext</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contextKey</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the context key </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedResource">MsgDeleteLinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>resource_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteService">MsgDeleteService</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteServiceResponse">MsgDeleteServiceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgRevokeVerification">MsgRevokeVerification</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the verification method id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgSetVerificationRelationships">MsgSetVerificationRelationships</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the verification method id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relationships</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of relationships to set </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgUpdateIidDocument">MsgUpdateIidDocument</h3>
+        <p>MsgUpdateDidDocument replace an existing did document with a new version</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>doc</td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td></td>
+                  <td><p>the did document to replace </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgUpdateIidMeta">MsgUpdateIidMeta</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>meta</td>
+                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td></td>
+                  <td><p>the context to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.Verification">Verification</h3>
+        <p>Verification is a message that allows to assign a verification method</p><p>to one or more verification relationships</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>relationships</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>verificationRelationships defines which relationships
+are allowed to use the verification method
+
+relationships that the method is allowed into. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method</td>
+                  <td><a href="#iid.VerificationMethod">VerificationMethod</a></td>
+                  <td></td>
+                  <td><p>public key associated with the did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>additional contexts (json ld schemas) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="iid.Msg">Msg</h3>
+        <p>Msg defines the identity Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateIidDocument</td>
+                <td><a href="#iid.MsgCreateIidDocument">MsgCreateIidDocument</a></td>
+                <td><a href="#iid.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</a></td>
+                <td><p>CreateDidDocument defines a method for creating a new identity.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateIidDocument</td>
+                <td><a href="#iid.MsgUpdateIidDocument">MsgUpdateIidDocument</a></td>
+                <td><a href="#iid.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</a></td>
+                <td><p>UpdateDidDocument defines a method for updating an identity.</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddVerification</td>
+                <td><a href="#iid.MsgAddVerification">MsgAddVerification</a></td>
+                <td><a href="#iid.MsgAddVerificationResponse">MsgAddVerificationResponse</a></td>
+                <td><p>AddVerificationMethod adds a new verification method</p></td>
+              </tr>
+            
+              <tr>
+                <td>RevokeVerification</td>
+                <td><a href="#iid.MsgRevokeVerification">MsgRevokeVerification</a></td>
+                <td><a href="#iid.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</a></td>
+                <td><p>RevokeVerification remove the verification method and all associated verification Relations</p></td>
+              </tr>
+            
+              <tr>
+                <td>SetVerificationRelationships</td>
+                <td><a href="#iid.MsgSetVerificationRelationships">MsgSetVerificationRelationships</a></td>
+                <td><a href="#iid.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</a></td>
+                <td><p>SetVerificationRelationships overwrite current verification relationships</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddService</td>
+                <td><a href="#iid.MsgAddService">MsgAddService</a></td>
+                <td><a href="#iid.MsgAddServiceResponse">MsgAddServiceResponse</a></td>
+                <td><p>AddService add a new service</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteService</td>
+                <td><a href="#iid.MsgDeleteService">MsgDeleteService</a></td>
+                <td><a href="#iid.MsgDeleteServiceResponse">MsgDeleteServiceResponse</a></td>
+                <td><p>DeleteService delete an existing service</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddController</td>
+                <td><a href="#iid.MsgAddController">MsgAddController</a></td>
+                <td><a href="#iid.MsgAddControllerResponse">MsgAddControllerResponse</a></td>
+                <td><p>AddService add a new service</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteController</td>
+                <td><a href="#iid.MsgDeleteController">MsgDeleteController</a></td>
+                <td><a href="#iid.MsgDeleteControllerResponse">MsgDeleteControllerResponse</a></td>
+                <td><p>DeleteService delete an existing service</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddLinkedResource</td>
+                <td><a href="#iid.MsgAddLinkedResource">MsgAddLinkedResource</a></td>
+                <td><a href="#iid.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</a></td>
+                <td><p>Add / Delete Linked Resource</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteLinkedResource</td>
+                <td><a href="#iid.MsgDeleteLinkedResource">MsgDeleteLinkedResource</a></td>
+                <td><a href="#iid.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddAccordedRight</td>
+                <td><a href="#iid.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
+                <td><a href="#iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
+                <td><p>Add / Delete Accorded Right</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteAccordedRight</td>
+                <td><a href="#iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</a></td>
+                <td><a href="#iid.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddIidContext</td>
+                <td><a href="#iid.MsgAddIidContext">MsgAddIidContext</a></td>
+                <td><a href="#iid.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
+                <td><p>Add / Delete Context</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteIidContext</td>
+                <td><a href="#iid.MsgDeleteIidContext">MsgDeleteIidContext</a></td>
+                <td><a href="#iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateMetaData</td>
+                <td><a href="#iid.MsgUpdateIidMeta">MsgUpdateIidMeta</a></td>
+                <td><a href="#iid.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</a></td>
+                <td><p>Update META</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
         <h2 id="entity/tx.proto">entity/tx.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
@@ -3517,11 +5203,108 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
         <p>MsgCreateProject defines a message for creating a project.</p>
 
         
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllers</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of controller DIDs </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">iid.Context</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifications</td>
+                  <td><a href="#iid.Verification">iid.Verification</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of verification methods and relationships </p></td>
+                </tr>
+              
+                <tr>
+                  <td>services</td>
+                  <td><a href="#iid.Service">iid.Service</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">iid.AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">iid.LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
 
         
       
         <h3 id="entity.MsgCreateEntityResponse">MsgCreateEntityResponse</h3>
         <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
+
+        
+
+        
+      
+        <h3 id="entity.MsgUpdateEntityStatus">MsgUpdateEntityStatus</h3>
+        <p>MsgUpdateEntityStatus defines a message for updating a entity's current status.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgUpdateEntityStatusResponse">MsgUpdateEntityStatusResponse</h3>
+        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
 
         
 
@@ -3548,9 +5331,393 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
                 <td><p>CreateProject defines a method for creating a project.</p></td>
               </tr>
             
+              <tr>
+                <td>UpdateEntityStatus</td>
+                <td><a href="#entity.MsgUpdateEntityStatus">MsgUpdateEntityStatus</a></td>
+                <td><a href="#entity.MsgUpdateEntityStatusResponse">MsgUpdateEntityStatusResponse</a></td>
+                <td><p>UpdateEntityStatus defines a method for updating a entity&#39;s current status.</p></td>
+              </tr>
+            
           </tbody>
         </table>
 
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/event.proto">iid/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
+        <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did being created </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account creating the did </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.IidDocumentUpdatedEvent">IidDocumentUpdatedEvent</h3>
+        <p>DidDocumentUpdatedEvent is an event triggered on a DID document update</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did being updated </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account of the change </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/genesis.proto">iid/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the did module's genesis state.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>iid_docs</td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>iid_meta</td>
+                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/query.proto">iid/query.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.QueryIidDocumentRequest">QueryIidDocumentRequest</h3>
+        <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>status enables to query for validators matching a given status. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.QueryIidDocumentResponse">QueryIidDocumentResponse</h3>
+        <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>iidDocument</td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td></td>
+                  <td><p>validators contains all the queried validators.
+
+DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.QueryIidDocumentsRequest">QueryIidDocumentsRequest</h3>
+        <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>status enables to query for validators matching a given status. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pagination</td>
+                  <td><a href="#cosmos.base.query.v1beta1.PageRequest">cosmos.base.query.v1beta1.PageRequest</a></td>
+                  <td></td>
+                  <td><p>pagination defines an optional pagination for the request. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.QueryIidDocumentsResponse">QueryIidDocumentsResponse</h3>
+        <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>iidDocuments</td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td>repeated</td>
+                  <td><p>validators contains all the queried validators. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pagination</td>
+                  <td><a href="#cosmos.base.query.v1beta1.PageResponse">cosmos.base.query.v1beta1.PageResponse</a></td>
+                  <td></td>
+                  <td><p>pagination defines the pagination in the response. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.QueryIidMetaDataRequest">QueryIidMetaDataRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>status enables to query for validators matching a given status. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.QueryIidMetaDataResponse">QueryIidMetaDataResponse</h3>
+        <p>this line is used by starport scaffolding # 3</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>didMetadata</td>
+                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td></td>
+                  <td><p>validators contains all the queried validators.
+IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="iid.Query">Query</h3>
+        <p>Query defines the gRPC querier service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>IidDocuments</td>
+                <td><a href="#iid.QueryIidDocumentsRequest">QueryIidDocumentsRequest</a></td>
+                <td><a href="#iid.QueryIidDocumentsResponse">QueryIidDocumentsResponse</a></td>
+                <td><p>IidDocuments queries all iid documents that match the given status.</p></td>
+              </tr>
+            
+              <tr>
+                <td>IidDocument</td>
+                <td><a href="#iid.QueryIidDocumentRequest">QueryIidDocumentRequest</a></td>
+                <td><a href="#iid.QueryIidDocumentResponse">QueryIidDocumentResponse</a></td>
+                <td><p>IidDocument queries a iid documents with an id.</p></td>
+              </tr>
+            
+              <tr>
+                <td>MetaData</td>
+                <td><a href="#iid.QueryIidMetaDataRequest">QueryIidMetaDataRequest</a></td>
+                <td><a href="#iid.QueryIidMetaDataResponse">QueryIidMetaDataResponse</a></td>
+                <td><p>MetaData queries a iid documents with an id.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>IidDocuments</td>
+                <td>GET</td>
+                <td>/ixo/did/dids</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>IidDocument</td>
+                <td>GET</td>
+                <td>/ixo/did/dids/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>MetaData</td>
+                <td>GET</td>
+                <td>/ixo/did/dids/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
         
     
       
