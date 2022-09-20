@@ -18,6 +18,7 @@ func NewMsgCreateIidDocument(
 	services []*Service,
 	rights []*AccordedRight,
 	resources []*LinkedResource,
+	entity []*LinkedEntity,
 	signerAccount string,
 	didContexts []*Context,
 ) *MsgCreateIidDocument {
@@ -27,6 +28,7 @@ func NewMsgCreateIidDocument(
 		Services:       services,
 		AccordedRight:  rights,
 		LinkedResource: resources,
+		LinkedEntity:   entity,
 		Context:        didContexts,
 		Signer:         signerAccount,
 	}

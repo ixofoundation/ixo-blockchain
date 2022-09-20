@@ -43,7 +43,6 @@ func GetCmdQueryIdentifers() *cobra.Command {
 				return err
 			}
 			queryClient := types.NewQueryClient(clientCtx)
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -52,7 +51,6 @@ func GetCmdQueryIdentifers() *cobra.Command {
 				context.Background(),
 				&types.QueryIidDocumentsRequest{
 					// Leaving status empty on purpose to query all validators.
-					Pagination: pageReq,
 				},
 			)
 			if err != nil {

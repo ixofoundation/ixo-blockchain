@@ -2,7 +2,6 @@ syntax = "proto3";
 package ixofoundation.ixo.data;
 
 import "google/api/annotations.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
 import "iid/iid.proto";
 import "gogoproto/gogo.proto";
 // this line is used by starport scaffolding # 1
@@ -34,7 +33,7 @@ message QueryIidDocumentsRequest {
   string status = 1;
 
   // pagination defines an optional pagination for the request.
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+//  cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 // QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method
@@ -43,7 +42,7 @@ message QueryIidDocumentsResponse {
   repeated IidDocument iidDocuments = 1  [(gogoproto.nullable) = false];
 
   // pagination defines the pagination in the response.
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+//  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.

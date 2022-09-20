@@ -72,7 +72,8 @@ message MsgCreateIidDocument {
   repeated Service      services      = 5;
   repeated AccordedRight accordedRight = 6;
   repeated LinkedResource linkedResource = 7;
-  string   signer        = 8; // address of the account signing the message
+  repeated LinkedEntity linkedEntity = 8;
+  string   signer        = 9; // address of the account signing the message
 }
 
 message MsgCreateIidDocumentResponse {}

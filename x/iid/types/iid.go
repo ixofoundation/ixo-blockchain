@@ -349,6 +349,12 @@ func WithResources(resources ...*LinkedResource) DidDocumentOption {
 	}
 }
 
+func WithEntities(entities ...*LinkedEntity) DidDocumentOption {
+	return func(did *IidDocument) error {
+		return did.AddLinkedEntity(entities...)
+	}
+}
+
 // WithControllers add optional did controller
 func WithControllers(controllers ...string) DidDocumentOption {
 	return func(did *IidDocument) (err error) {
@@ -978,6 +984,7 @@ func (did Verification) GetBytes() []byte {
 type Services []*Service
 type AccordedRights []*AccordedRight
 type LinkedResources []*LinkedResource
+type LinkedEntities []*LinkedEntity
 type Contexts []*Context
 
 // NewService creates a new service

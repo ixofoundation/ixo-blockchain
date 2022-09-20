@@ -35,6 +35,7 @@ func (k msgServer) CreateIidDocument(
 		types.WithServices(msg.Services...),
 		types.WithRights(msg.AccordedRight...),
 		types.WithResources(msg.LinkedResource...),
+		types.WithEntities(msg.LinkedEntity...),
 		types.WithVerifications(msg.Verifications...),
 		types.WithControllers(msg.Controllers...),
 	)

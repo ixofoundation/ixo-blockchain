@@ -107,6 +107,7 @@ func NewCreateIidDocumentCmd() *cobra.Command {
 				types.Services{},
 				types.AccordedRights{},
 				types.LinkedResources{},
+				types.LinkedEntities{},
 				signer.String(),
 				types.Contexts{},
 			)

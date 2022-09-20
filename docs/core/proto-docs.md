@@ -602,6 +602,285 @@
         
           
           <li>
+            <a href="#iid%2fevent.proto">iid/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.IidDocumentCreatedEvent"><span class="badge">M</span>IidDocumentCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.IidDocumentUpdatedEvent"><span class="badge">M</span>IidDocumentUpdatedEvent</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fiid.proto">iid/iid.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.AccordedRight"><span class="badge">M</span>AccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.Context"><span class="badge">M</span>Context</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.IidDocument"><span class="badge">M</span>IidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.IidMetadata"><span class="badge">M</span>IidMetadata</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.LinkedEntity"><span class="badge">M</span>LinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.LinkedResource"><span class="badge">M</span>LinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.Service"><span class="badge">M</span>Service</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fgenesis.proto">iid/genesis.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.GenesisState"><span class="badge">M</span>GenesisState</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fquery.proto">iid/query.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.QueryIidDocumentRequest"><span class="badge">M</span>QueryIidDocumentRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.QueryIidDocumentResponse"><span class="badge">M</span>QueryIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.QueryIidDocumentsRequest"><span class="badge">M</span>QueryIidDocumentsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.QueryIidDocumentsResponse"><span class="badge">M</span>QueryIidDocumentsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.QueryIidMetaDataRequest"><span class="badge">M</span>QueryIidMetaDataRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.QueryIidMetaDataResponse"><span class="badge">M</span>QueryIidMetaDataResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.Query"><span class="badge">S</span>Query</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2ftx.proto">iid/tx.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddAccordedRight"><span class="badge">M</span>MsgAddAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddAccordedRightResponse"><span class="badge">M</span>MsgAddAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddController"><span class="badge">M</span>MsgAddController</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddControllerResponse"><span class="badge">M</span>MsgAddControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddIidContext"><span class="badge">M</span>MsgAddIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddLinkedEntity"><span class="badge">M</span>MsgAddLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddLinkedEntityResponse"><span class="badge">M</span>MsgAddLinkedEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddLinkedResource"><span class="badge">M</span>MsgAddLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddLinkedResourceResponse"><span class="badge">M</span>MsgAddLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddService"><span class="badge">M</span>MsgAddService</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddServiceResponse"><span class="badge">M</span>MsgAddServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddVerification"><span class="badge">M</span>MsgAddVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgAddVerificationResponse"><span class="badge">M</span>MsgAddVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgCreateIidDocument"><span class="badge">M</span>MsgCreateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgCreateIidDocumentResponse"><span class="badge">M</span>MsgCreateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteAccordedRightResponse"><span class="badge">M</span>MsgDeleteAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteController"><span class="badge">M</span>MsgDeleteController</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteControllerResponse"><span class="badge">M</span>MsgDeleteControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteIidContext"><span class="badge">M</span>MsgDeleteIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntity"><span class="badge">M</span>MsgDeleteLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse"><span class="badge">M</span>MsgDeleteLinkedEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedResource"><span class="badge">M</span>MsgDeleteLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse"><span class="badge">M</span>MsgDeleteLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteService"><span class="badge">M</span>MsgDeleteService</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgDeleteServiceResponse"><span class="badge">M</span>MsgDeleteServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgRevokeVerification"><span class="badge">M</span>MsgRevokeVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgRevokeVerificationResponse"><span class="badge">M</span>MsgRevokeVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgSetVerificationRelationships"><span class="badge">M</span>MsgSetVerificationRelationships</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse"><span class="badge">M</span>MsgSetVerificationRelationshipsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgUpdateIidDocument"><span class="badge">M</span>MsgUpdateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgUpdateIidDocumentResponse"><span class="badge">M</span>MsgUpdateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgUpdateIidMeta"><span class="badge">M</span>MsgUpdateIidMeta</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.MsgUpdateIidMetaResponse"><span class="badge">M</span>MsgUpdateIidMetaResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.Verification"><span class="badge">M</span>Verification</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixofoundation.ixo.data.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#payments%2fpayments.proto">payments/payments.proto</a>
             <ul>
               
@@ -4016,6 +4295,1945 @@
                 <td><a href="#did.MsgAddCredential">MsgAddCredential</a></td>
                 <td><a href="#did.MsgAddCredentialResponse">MsgAddCredentialResponse</a></td>
                 <td><p>AddCredential defines a method for adding a credential to the signer&#39;s DID.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/event.proto">iid/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixofoundation.ixo.data.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
+        <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did being created </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account creating the did </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.IidDocumentUpdatedEvent">IidDocumentUpdatedEvent</h3>
+        <p>DidDocumentUpdatedEvent is an event triggered on a DID document update</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did being updated </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account of the change </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/iid.proto">iid/iid.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixofoundation.ixo.data.AccordedRight">AccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mechanism</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>message</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.Context">Context</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>val</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.IidDocument">IidDocument</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#ixofoundation.ixo.data.Context">Context</a></td>
+                  <td>repeated</td>
+                  <td><p>@context is spec for did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>id represents the id for the did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>A DID controller is an entity that is authorized to make changes to a DID document.
+cfr. https://www.w3.org/TR/did-core/#did-controller </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verificationMethod</td>
+                  <td><a href="#ixofoundation.ixo.data.VerificationMethod">VerificationMethod</a></td>
+                  <td>repeated</td>
+                  <td><p>A DID document can express verification methods, 
+such as cryptographic public keys, which can be used 
+to authenticate or authorize interactions with the DID subject or associated parties.
+https://www.w3.org/TR/did-core/#verification-methods </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service</td>
+                  <td><a href="#ixofoundation.ixo.data.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p>Services are used in DID documents to express ways of communicating 
+with the DID subject or associated entities.
+https://www.w3.org/TR/did-core/#services </p></td>
+                </tr>
+              
+                <tr>
+                  <td>authentication</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: below this line there are the relationships
+Authentication represents public key associated with the did document.
+cfr. https://www.w3.org/TR/did-core/#authentication </p></td>
+                </tr>
+              
+                <tr>
+                  <td>assertionMethod</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify how the DID subject is expected to express claims, 
+such as for the purposes of issuing a Verifiable Credential.
+cfr. https://www.w3.org/TR/did-core/#assertion </p></td>
+                </tr>
+              
+                <tr>
+                  <td>keyAgreement</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>used to specify how an entity can generate encryption material 
+in order to transmit confidential information intended for the DID subject.
+https://www.w3.org/TR/did-core/#key-agreement </p></td>
+                </tr>
+              
+                <tr>
+                  <td>capabilityInvocation</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify a verification method that might be used by the DID subject
+to invoke a cryptographic capability, such as the authorization 
+to update the DID Document.
+https://www.w3.org/TR/did-core/#capability-invocation </p></td>
+                </tr>
+              
+                <tr>
+                  <td>capabilityDelegation</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify a mechanism that might be used by the DID subject 
+to delegate a cryptographic capability to another party.
+https://www.w3.org/TR/did-core/#capability-delegation </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#ixofoundation.ixo.data.LinkedResource">LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#ixofoundation.ixo.data.AccordedRight">AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#ixofoundation.ixo.data.LinkedEntity">LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>alsoKnownAs</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.IidMetadata">IidMetadata</h3>
+        <p>DidMetadata defines metadata associated to a did document such as </p><p>the status of the DID document</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>versionId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>created</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>updated</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>startDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>endDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>stage</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relayerNode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifiableCredential</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>credentials</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.LinkedEntity">LinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relationship</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.LinkedResource">LinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mediaType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>proof</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>encrypted</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>right</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.Service">Service</h3>
+        <p>Service defines how to find data associated with a identifer</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.VerificationMethod">VerificationMethod</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>blockchainAccountID</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyHex</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyMultibase</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/genesis.proto">iid/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixofoundation.ixo.data.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the did module's genesis state.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>iid_docs</td>
+                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>iid_meta</td>
+                  <td><a href="#ixofoundation.ixo.data.IidMetadata">IidMetadata</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/query.proto">iid/query.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixofoundation.ixo.data.QueryIidDocumentRequest">QueryIidDocumentRequest</h3>
+        <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>status enables to query for validators matching a given status. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.QueryIidDocumentResponse">QueryIidDocumentResponse</h3>
+        <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>iidDocument</td>
+                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td></td>
+                  <td><p>validators contains all the queried validators.
+
+DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.QueryIidDocumentsRequest">QueryIidDocumentsRequest</h3>
+        <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>status enables to query for validators matching a given status. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.QueryIidDocumentsResponse">QueryIidDocumentsResponse</h3>
+        <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>iidDocuments</td>
+                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td>repeated</td>
+                  <td><p>validators contains all the queried validators. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.QueryIidMetaDataRequest">QueryIidMetaDataRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>status enables to query for validators matching a given status. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.QueryIidMetaDataResponse">QueryIidMetaDataResponse</h3>
+        <p>this line is used by starport scaffolding # 3</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>didMetadata</td>
+                  <td><a href="#ixofoundation.ixo.data.IidMetadata">IidMetadata</a></td>
+                  <td></td>
+                  <td><p>validators contains all the queried validators.
+IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixofoundation.ixo.data.Query">Query</h3>
+        <p>Query defines the gRPC querier service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>IidDocuments</td>
+                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentsRequest">QueryIidDocumentsRequest</a></td>
+                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentsResponse">QueryIidDocumentsResponse</a></td>
+                <td><p>IidDocuments queries all iid documents that match the given status.</p></td>
+              </tr>
+            
+              <tr>
+                <td>IidDocument</td>
+                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentRequest">QueryIidDocumentRequest</a></td>
+                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentResponse">QueryIidDocumentResponse</a></td>
+                <td><p>IidDocument queries a iid documents with an id.</p></td>
+              </tr>
+            
+              <tr>
+                <td>MetaData</td>
+                <td><a href="#ixofoundation.ixo.data.QueryIidMetaDataRequest">QueryIidMetaDataRequest</a></td>
+                <td><a href="#ixofoundation.ixo.data.QueryIidMetaDataResponse">QueryIidMetaDataResponse</a></td>
+                <td><p>MetaData queries a iid documents with an id.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>IidDocuments</td>
+                <td>GET</td>
+                <td>/ixo/did/dids</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>IidDocument</td>
+                <td>GET</td>
+                <td>/ixo/did/dids/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>MetaData</td>
+                <td>GET</td>
+                <td>/ixo/did/dids/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/tx.proto">iid/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddAccordedRight">MsgAddAccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#ixofoundation.ixo.data.AccordedRight">AccordedRight</a></td>
+                  <td></td>
+                  <td><p>the Accorded right to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddController">MsgAddController</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did of the document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did to add as a controller of the did document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddControllerResponse">MsgAddControllerResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddIidContext">MsgAddIidContext</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#ixofoundation.ixo.data.Context">Context</a></td>
+                  <td></td>
+                  <td><p>the context to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddIidContextResponse">MsgAddIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddLinkedEntity">MsgAddLinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the iid </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#ixofoundation.ixo.data.LinkedEntity">LinkedEntity</a></td>
+                  <td></td>
+                  <td><p>the entity to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddLinkedResource">MsgAddLinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#ixofoundation.ixo.data.LinkedResource">LinkedResource</a></td>
+                  <td></td>
+                  <td><p>the verification to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddService">MsgAddService</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_data</td>
+                  <td><a href="#ixofoundation.ixo.data.Service">Service</a></td>
+                  <td></td>
+                  <td><p>the service data to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddServiceResponse">MsgAddServiceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddVerification">MsgAddVerification</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verification</td>
+                  <td><a href="#ixofoundation.ixo.data.Verification">Verification</a></td>
+                  <td></td>
+                  <td><p>the verification to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgAddVerificationResponse">MsgAddVerificationResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgCreateIidDocument">MsgCreateIidDocument</h3>
+        <p>MsgCreateDidDocument defines a SDK message for creating a new did.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllers</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of controller DIDs </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#ixofoundation.ixo.data.Context">Context</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifications</td>
+                  <td><a href="#ixofoundation.ixo.data.Verification">Verification</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of verification methods and relationships </p></td>
+                </tr>
+              
+                <tr>
+                  <td>services</td>
+                  <td><a href="#ixofoundation.ixo.data.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#ixofoundation.ixo.data.AccordedRight">AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#ixofoundation.ixo.data.LinkedResource">LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#ixofoundation.ixo.data.LinkedEntity">LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>right_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteController">MsgDeleteController</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did of the document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did to remove from the list of controllers of the did document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteControllerResponse">MsgDeleteControllerResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteIidContext">MsgDeleteIidContext</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contextKey</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the context key </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the iid </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entity_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the entity id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedResource">MsgDeleteLinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>resource_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteService">MsgDeleteService</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgDeleteServiceResponse">MsgDeleteServiceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgRevokeVerification">MsgRevokeVerification</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the verification method id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgSetVerificationRelationships">MsgSetVerificationRelationships</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the verification method id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relationships</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of relationships to set </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgUpdateIidDocument">MsgUpdateIidDocument</h3>
+        <p>MsgUpdateDidDocument replace an existing did document with a new version</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>doc</td>
+                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td></td>
+                  <td><p>the did document to replace </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgUpdateIidMeta">MsgUpdateIidMeta</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>meta</td>
+                  <td><a href="#ixofoundation.ixo.data.IidMetadata">IidMetadata</a></td>
+                  <td></td>
+                  <td><p>the context to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixofoundation.ixo.data.Verification">Verification</h3>
+        <p>Verification is a message that allows to assign a verification method</p><p>to one or more verification relationships</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>relationships</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>verificationRelationships defines which relationships
+are allowed to use the verification method
+
+relationships that the method is allowed into. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method</td>
+                  <td><a href="#ixofoundation.ixo.data.VerificationMethod">VerificationMethod</a></td>
+                  <td></td>
+                  <td><p>public key associated with the did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>additional contexts (json ld schemas) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixofoundation.ixo.data.Msg">Msg</h3>
+        <p>Msg defines the identity Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateIidDocument</td>
+                <td><a href="#ixofoundation.ixo.data.MsgCreateIidDocument">MsgCreateIidDocument</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</a></td>
+                <td><p>CreateDidDocument defines a method for creating a new identity.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateIidDocument</td>
+                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidDocument">MsgUpdateIidDocument</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</a></td>
+                <td><p>UpdateDidDocument defines a method for updating an identity.</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddVerification</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddVerification">MsgAddVerification</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddVerificationResponse">MsgAddVerificationResponse</a></td>
+                <td><p>AddVerificationMethod adds a new verification method</p></td>
+              </tr>
+            
+              <tr>
+                <td>RevokeVerification</td>
+                <td><a href="#ixofoundation.ixo.data.MsgRevokeVerification">MsgRevokeVerification</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</a></td>
+                <td><p>RevokeVerification remove the verification method and all associated verification Relations</p></td>
+              </tr>
+            
+              <tr>
+                <td>SetVerificationRelationships</td>
+                <td><a href="#ixofoundation.ixo.data.MsgSetVerificationRelationships">MsgSetVerificationRelationships</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</a></td>
+                <td><p>SetVerificationRelationships overwrite current verification relationships</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddService</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddService">MsgAddService</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddServiceResponse">MsgAddServiceResponse</a></td>
+                <td><p>AddService add a new service</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteService</td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteService">MsgDeleteService</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteServiceResponse">MsgDeleteServiceResponse</a></td>
+                <td><p>DeleteService delete an existing service</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddController</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddController">MsgAddController</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddControllerResponse">MsgAddControllerResponse</a></td>
+                <td><p>AddService add a new service</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteController</td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteController">MsgDeleteController</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteControllerResponse">MsgDeleteControllerResponse</a></td>
+                <td><p>DeleteService delete an existing service</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddLinkedResource</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedResource">MsgAddLinkedResource</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</a></td>
+                <td><p>Add / Delete Linked Resource</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteLinkedResource</td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedResource">MsgDeleteLinkedResource</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddLinkedEntity</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedEntity">MsgAddLinkedEntity</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</a></td>
+                <td><p>Add / Delete Linked Entity</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteLinkedEntity</td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddAccordedRight</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
+                <td><p>Add / Delete Accorded Right</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteAccordedRight</td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteAccordedRight">MsgDeleteAccordedRight</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddIidContext</td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddIidContext">MsgAddIidContext</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
+                <td><p>Add / Delete Context</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteIidContext</td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteIidContext">MsgDeleteIidContext</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateMetaData</td>
+                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidMeta">MsgUpdateIidMeta</a></td>
+                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</a></td>
+                <td><p>Update META</p></td>
               </tr>
             
           </tbody>
