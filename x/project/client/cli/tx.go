@@ -90,15 +90,15 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			}
 
 			projectStatus := types.ProjectStatus(status)
-			if projectStatus != types.CreatedProject &&
-				projectStatus != types.PendingStatus &&
-				projectStatus != types.FundedStatus &&
-				projectStatus != types.StartedStatus &&
-				projectStatus != types.StoppedStatus &&
-				projectStatus != types.PaidoutStatus {
-				return errors.New("The status must be one of 'CREATED', " +
-					"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
-			}
+			//if projectStatus != types.CreatedProject &&
+			//	projectStatus != types.PendingStatus &&
+			//	projectStatus != types.FundedStatus &&
+			//	projectStatus != types.StartedStatus &&
+			//	projectStatus != types.StoppedStatus &&
+			//	projectStatus != types.PaidoutStatus {
+			//	return errors.New("The status must be one of 'CREATED', " +
+			//		"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
+			//}
 
 			updateProjectStatusDoc := types.NewUpdateProjectStatusDoc(
 				projectStatus, "")

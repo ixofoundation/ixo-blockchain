@@ -102,7 +102,8 @@ type MsgCreateIidDocument struct {
 	Services       []*Service        `protobuf:"bytes,5,rep,name=services,proto3" json:"services,omitempty"`
 	AccordedRight  []*AccordedRight  `protobuf:"bytes,6,rep,name=accordedRight,proto3" json:"accordedRight,omitempty"`
 	LinkedResource []*LinkedResource `protobuf:"bytes,7,rep,name=linkedResource,proto3" json:"linkedResource,omitempty"`
-	Signer         string            `protobuf:"bytes,8,opt,name=signer,proto3" json:"signer,omitempty"`
+	LinkedEntity   []*LinkedEntity   `protobuf:"bytes,8,rep,name=linkedEntity,proto3" json:"linkedEntity,omitempty"`
+	Signer         string            `protobuf:"bytes,9,opt,name=signer,proto3" json:"signer,omitempty"`
 }
 
 func (m *MsgCreateIidDocument) Reset()         { *m = MsgCreateIidDocument{} }
@@ -855,6 +856,84 @@ func (m *MsgDeleteLinkedResource) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteLinkedResource proto.InternalMessageInfo
 
+type MsgAddLinkedEntity struct {
+	Id           string        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	LinkedEntity *LinkedEntity `protobuf:"bytes,2,opt,name=linkedEntity,proto3" json:"linkedEntity,omitempty"`
+	Signer       string        `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+func (m *MsgAddLinkedEntity) Reset()         { *m = MsgAddLinkedEntity{} }
+func (m *MsgAddLinkedEntity) String() string { return proto.CompactTextString(m) }
+func (*MsgAddLinkedEntity) ProtoMessage()    {}
+func (*MsgAddLinkedEntity) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7037c784a6742b78, []int{21}
+}
+func (m *MsgAddLinkedEntity) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddLinkedEntity) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddLinkedEntity.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddLinkedEntity) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddLinkedEntity.Merge(m, src)
+}
+func (m *MsgAddLinkedEntity) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddLinkedEntity) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddLinkedEntity.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddLinkedEntity proto.InternalMessageInfo
+
+type MsgDeleteLinkedEntity struct {
+	Id       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	EntityId string `protobuf:"bytes,2,opt,name=entity_id,json=entityId,proto3" json:"entity_id,omitempty"`
+	Signer   string `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+func (m *MsgDeleteLinkedEntity) Reset()         { *m = MsgDeleteLinkedEntity{} }
+func (m *MsgDeleteLinkedEntity) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLinkedEntity) ProtoMessage()    {}
+func (*MsgDeleteLinkedEntity) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7037c784a6742b78, []int{22}
+}
+func (m *MsgDeleteLinkedEntity) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLinkedEntity) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLinkedEntity.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLinkedEntity) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLinkedEntity.Merge(m, src)
+}
+func (m *MsgDeleteLinkedEntity) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLinkedEntity) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLinkedEntity.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLinkedEntity proto.InternalMessageInfo
+
 type MsgAddAccordedRight struct {
 	Id            string         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	AccordedRight *AccordedRight `protobuf:"bytes,2,opt,name=accordedRight,proto3" json:"accordedRight,omitempty"`
@@ -865,7 +944,7 @@ func (m *MsgAddAccordedRight) Reset()         { *m = MsgAddAccordedRight{} }
 func (m *MsgAddAccordedRight) String() string { return proto.CompactTextString(m) }
 func (*MsgAddAccordedRight) ProtoMessage()    {}
 func (*MsgAddAccordedRight) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{21}
+	return fileDescriptor_7037c784a6742b78, []int{23}
 }
 func (m *MsgAddAccordedRight) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -904,7 +983,7 @@ func (m *MsgDeleteAccordedRight) Reset()         { *m = MsgDeleteAccordedRight{}
 func (m *MsgDeleteAccordedRight) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteAccordedRight) ProtoMessage()    {}
 func (*MsgDeleteAccordedRight) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{22}
+	return fileDescriptor_7037c784a6742b78, []int{24}
 }
 func (m *MsgDeleteAccordedRight) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -943,7 +1022,7 @@ func (m *MsgAddIidContext) Reset()         { *m = MsgAddIidContext{} }
 func (m *MsgAddIidContext) String() string { return proto.CompactTextString(m) }
 func (*MsgAddIidContext) ProtoMessage()    {}
 func (*MsgAddIidContext) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{23}
+	return fileDescriptor_7037c784a6742b78, []int{25}
 }
 func (m *MsgAddIidContext) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -982,7 +1061,7 @@ func (m *MsgDeleteIidContext) Reset()         { *m = MsgDeleteIidContext{} }
 func (m *MsgDeleteIidContext) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteIidContext) ProtoMessage()    {}
 func (*MsgDeleteIidContext) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{24}
+	return fileDescriptor_7037c784a6742b78, []int{26}
 }
 func (m *MsgDeleteIidContext) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1021,7 +1100,7 @@ func (m *MsgUpdateIidMeta) Reset()         { *m = MsgUpdateIidMeta{} }
 func (m *MsgUpdateIidMeta) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateIidMeta) ProtoMessage()    {}
 func (*MsgUpdateIidMeta) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{25}
+	return fileDescriptor_7037c784a6742b78, []int{27}
 }
 func (m *MsgUpdateIidMeta) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1057,7 +1136,7 @@ func (m *MsgAddLinkedResourceResponse) Reset()         { *m = MsgAddLinkedResour
 func (m *MsgAddLinkedResourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddLinkedResourceResponse) ProtoMessage()    {}
 func (*MsgAddLinkedResourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{26}
+	return fileDescriptor_7037c784a6742b78, []int{28}
 }
 func (m *MsgAddLinkedResourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1093,7 +1172,7 @@ func (m *MsgDeleteLinkedResourceResponse) Reset()         { *m = MsgDeleteLinked
 func (m *MsgDeleteLinkedResourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteLinkedResourceResponse) ProtoMessage()    {}
 func (*MsgDeleteLinkedResourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{27}
+	return fileDescriptor_7037c784a6742b78, []int{29}
 }
 func (m *MsgDeleteLinkedResourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1122,6 +1201,78 @@ func (m *MsgDeleteLinkedResourceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteLinkedResourceResponse proto.InternalMessageInfo
 
+type MsgAddLinkedEntityResponse struct {
+}
+
+func (m *MsgAddLinkedEntityResponse) Reset()         { *m = MsgAddLinkedEntityResponse{} }
+func (m *MsgAddLinkedEntityResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddLinkedEntityResponse) ProtoMessage()    {}
+func (*MsgAddLinkedEntityResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7037c784a6742b78, []int{30}
+}
+func (m *MsgAddLinkedEntityResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddLinkedEntityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddLinkedEntityResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddLinkedEntityResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddLinkedEntityResponse.Merge(m, src)
+}
+func (m *MsgAddLinkedEntityResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddLinkedEntityResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddLinkedEntityResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddLinkedEntityResponse proto.InternalMessageInfo
+
+type MsgDeleteLinkedEntityResponse struct {
+}
+
+func (m *MsgDeleteLinkedEntityResponse) Reset()         { *m = MsgDeleteLinkedEntityResponse{} }
+func (m *MsgDeleteLinkedEntityResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLinkedEntityResponse) ProtoMessage()    {}
+func (*MsgDeleteLinkedEntityResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7037c784a6742b78, []int{31}
+}
+func (m *MsgDeleteLinkedEntityResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLinkedEntityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLinkedEntityResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLinkedEntityResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLinkedEntityResponse.Merge(m, src)
+}
+func (m *MsgDeleteLinkedEntityResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLinkedEntityResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLinkedEntityResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLinkedEntityResponse proto.InternalMessageInfo
+
 type MsgAddAccordedRightResponse struct {
 }
 
@@ -1129,7 +1280,7 @@ func (m *MsgAddAccordedRightResponse) Reset()         { *m = MsgAddAccordedRight
 func (m *MsgAddAccordedRightResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddAccordedRightResponse) ProtoMessage()    {}
 func (*MsgAddAccordedRightResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{28}
+	return fileDescriptor_7037c784a6742b78, []int{32}
 }
 func (m *MsgAddAccordedRightResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1165,7 +1316,7 @@ func (m *MsgDeleteAccordedRightResponse) Reset()         { *m = MsgDeleteAccorde
 func (m *MsgDeleteAccordedRightResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteAccordedRightResponse) ProtoMessage()    {}
 func (*MsgDeleteAccordedRightResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{29}
+	return fileDescriptor_7037c784a6742b78, []int{33}
 }
 func (m *MsgDeleteAccordedRightResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1201,7 +1352,7 @@ func (m *MsgAddIidContextResponse) Reset()         { *m = MsgAddIidContextRespon
 func (m *MsgAddIidContextResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddIidContextResponse) ProtoMessage()    {}
 func (*MsgAddIidContextResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{30}
+	return fileDescriptor_7037c784a6742b78, []int{34}
 }
 func (m *MsgAddIidContextResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1237,7 +1388,7 @@ func (m *MsgDeleteIidContextResponse) Reset()         { *m = MsgDeleteIidContext
 func (m *MsgDeleteIidContextResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteIidContextResponse) ProtoMessage()    {}
 func (*MsgDeleteIidContextResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{31}
+	return fileDescriptor_7037c784a6742b78, []int{35}
 }
 func (m *MsgDeleteIidContextResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1273,7 +1424,7 @@ func (m *MsgUpdateIidMetaResponse) Reset()         { *m = MsgUpdateIidMetaRespon
 func (m *MsgUpdateIidMetaResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateIidMetaResponse) ProtoMessage()    {}
 func (*MsgUpdateIidMetaResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7037c784a6742b78, []int{32}
+	return fileDescriptor_7037c784a6742b78, []int{36}
 }
 func (m *MsgUpdateIidMetaResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1303,117 +1454,129 @@ func (m *MsgUpdateIidMetaResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgUpdateIidMetaResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*Verification)(nil), "iid.Verification")
-	proto.RegisterType((*MsgCreateIidDocument)(nil), "iid.MsgCreateIidDocument")
-	proto.RegisterType((*MsgCreateIidDocumentResponse)(nil), "iid.MsgCreateIidDocumentResponse")
-	proto.RegisterType((*MsgUpdateIidDocument)(nil), "iid.MsgUpdateIidDocument")
-	proto.RegisterType((*MsgUpdateIidDocumentResponse)(nil), "iid.MsgUpdateIidDocumentResponse")
-	proto.RegisterType((*MsgAddVerification)(nil), "iid.MsgAddVerification")
-	proto.RegisterType((*MsgAddVerificationResponse)(nil), "iid.MsgAddVerificationResponse")
-	proto.RegisterType((*MsgSetVerificationRelationships)(nil), "iid.MsgSetVerificationRelationships")
-	proto.RegisterType((*MsgSetVerificationRelationshipsResponse)(nil), "iid.MsgSetVerificationRelationshipsResponse")
-	proto.RegisterType((*MsgRevokeVerification)(nil), "iid.MsgRevokeVerification")
-	proto.RegisterType((*MsgRevokeVerificationResponse)(nil), "iid.MsgRevokeVerificationResponse")
-	proto.RegisterType((*MsgAddService)(nil), "iid.MsgAddService")
-	proto.RegisterType((*MsgAddServiceResponse)(nil), "iid.MsgAddServiceResponse")
-	proto.RegisterType((*MsgDeleteService)(nil), "iid.MsgDeleteService")
-	proto.RegisterType((*MsgDeleteServiceResponse)(nil), "iid.MsgDeleteServiceResponse")
-	proto.RegisterType((*MsgAddController)(nil), "iid.MsgAddController")
-	proto.RegisterType((*MsgAddControllerResponse)(nil), "iid.MsgAddControllerResponse")
-	proto.RegisterType((*MsgDeleteController)(nil), "iid.MsgDeleteController")
-	proto.RegisterType((*MsgDeleteControllerResponse)(nil), "iid.MsgDeleteControllerResponse")
-	proto.RegisterType((*MsgAddLinkedResource)(nil), "iid.MsgAddLinkedResource")
-	proto.RegisterType((*MsgDeleteLinkedResource)(nil), "iid.MsgDeleteLinkedResource")
-	proto.RegisterType((*MsgAddAccordedRight)(nil), "iid.MsgAddAccordedRight")
-	proto.RegisterType((*MsgDeleteAccordedRight)(nil), "iid.MsgDeleteAccordedRight")
-	proto.RegisterType((*MsgAddIidContext)(nil), "iid.MsgAddIidContext")
-	proto.RegisterType((*MsgDeleteIidContext)(nil), "iid.MsgDeleteIidContext")
-	proto.RegisterType((*MsgUpdateIidMeta)(nil), "iid.MsgUpdateIidMeta")
-	proto.RegisterType((*MsgAddLinkedResourceResponse)(nil), "iid.MsgAddLinkedResourceResponse")
-	proto.RegisterType((*MsgDeleteLinkedResourceResponse)(nil), "iid.MsgDeleteLinkedResourceResponse")
-	proto.RegisterType((*MsgAddAccordedRightResponse)(nil), "iid.MsgAddAccordedRightResponse")
-	proto.RegisterType((*MsgDeleteAccordedRightResponse)(nil), "iid.MsgDeleteAccordedRightResponse")
-	proto.RegisterType((*MsgAddIidContextResponse)(nil), "iid.MsgAddIidContextResponse")
-	proto.RegisterType((*MsgDeleteIidContextResponse)(nil), "iid.MsgDeleteIidContextResponse")
-	proto.RegisterType((*MsgUpdateIidMetaResponse)(nil), "iid.MsgUpdateIidMetaResponse")
+	proto.RegisterType((*Verification)(nil), "ixofoundation.ixo.data.Verification")
+	proto.RegisterType((*MsgCreateIidDocument)(nil), "ixofoundation.ixo.data.MsgCreateIidDocument")
+	proto.RegisterType((*MsgCreateIidDocumentResponse)(nil), "ixofoundation.ixo.data.MsgCreateIidDocumentResponse")
+	proto.RegisterType((*MsgUpdateIidDocument)(nil), "ixofoundation.ixo.data.MsgUpdateIidDocument")
+	proto.RegisterType((*MsgUpdateIidDocumentResponse)(nil), "ixofoundation.ixo.data.MsgUpdateIidDocumentResponse")
+	proto.RegisterType((*MsgAddVerification)(nil), "ixofoundation.ixo.data.MsgAddVerification")
+	proto.RegisterType((*MsgAddVerificationResponse)(nil), "ixofoundation.ixo.data.MsgAddVerificationResponse")
+	proto.RegisterType((*MsgSetVerificationRelationships)(nil), "ixofoundation.ixo.data.MsgSetVerificationRelationships")
+	proto.RegisterType((*MsgSetVerificationRelationshipsResponse)(nil), "ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse")
+	proto.RegisterType((*MsgRevokeVerification)(nil), "ixofoundation.ixo.data.MsgRevokeVerification")
+	proto.RegisterType((*MsgRevokeVerificationResponse)(nil), "ixofoundation.ixo.data.MsgRevokeVerificationResponse")
+	proto.RegisterType((*MsgAddService)(nil), "ixofoundation.ixo.data.MsgAddService")
+	proto.RegisterType((*MsgAddServiceResponse)(nil), "ixofoundation.ixo.data.MsgAddServiceResponse")
+	proto.RegisterType((*MsgDeleteService)(nil), "ixofoundation.ixo.data.MsgDeleteService")
+	proto.RegisterType((*MsgDeleteServiceResponse)(nil), "ixofoundation.ixo.data.MsgDeleteServiceResponse")
+	proto.RegisterType((*MsgAddController)(nil), "ixofoundation.ixo.data.MsgAddController")
+	proto.RegisterType((*MsgAddControllerResponse)(nil), "ixofoundation.ixo.data.MsgAddControllerResponse")
+	proto.RegisterType((*MsgDeleteController)(nil), "ixofoundation.ixo.data.MsgDeleteController")
+	proto.RegisterType((*MsgDeleteControllerResponse)(nil), "ixofoundation.ixo.data.MsgDeleteControllerResponse")
+	proto.RegisterType((*MsgAddLinkedResource)(nil), "ixofoundation.ixo.data.MsgAddLinkedResource")
+	proto.RegisterType((*MsgDeleteLinkedResource)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedResource")
+	proto.RegisterType((*MsgAddLinkedEntity)(nil), "ixofoundation.ixo.data.MsgAddLinkedEntity")
+	proto.RegisterType((*MsgDeleteLinkedEntity)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedEntity")
+	proto.RegisterType((*MsgAddAccordedRight)(nil), "ixofoundation.ixo.data.MsgAddAccordedRight")
+	proto.RegisterType((*MsgDeleteAccordedRight)(nil), "ixofoundation.ixo.data.MsgDeleteAccordedRight")
+	proto.RegisterType((*MsgAddIidContext)(nil), "ixofoundation.ixo.data.MsgAddIidContext")
+	proto.RegisterType((*MsgDeleteIidContext)(nil), "ixofoundation.ixo.data.MsgDeleteIidContext")
+	proto.RegisterType((*MsgUpdateIidMeta)(nil), "ixofoundation.ixo.data.MsgUpdateIidMeta")
+	proto.RegisterType((*MsgAddLinkedResourceResponse)(nil), "ixofoundation.ixo.data.MsgAddLinkedResourceResponse")
+	proto.RegisterType((*MsgDeleteLinkedResourceResponse)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse")
+	proto.RegisterType((*MsgAddLinkedEntityResponse)(nil), "ixofoundation.ixo.data.MsgAddLinkedEntityResponse")
+	proto.RegisterType((*MsgDeleteLinkedEntityResponse)(nil), "ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse")
+	proto.RegisterType((*MsgAddAccordedRightResponse)(nil), "ixofoundation.ixo.data.MsgAddAccordedRightResponse")
+	proto.RegisterType((*MsgDeleteAccordedRightResponse)(nil), "ixofoundation.ixo.data.MsgDeleteAccordedRightResponse")
+	proto.RegisterType((*MsgAddIidContextResponse)(nil), "ixofoundation.ixo.data.MsgAddIidContextResponse")
+	proto.RegisterType((*MsgDeleteIidContextResponse)(nil), "ixofoundation.ixo.data.MsgDeleteIidContextResponse")
+	proto.RegisterType((*MsgUpdateIidMetaResponse)(nil), "ixofoundation.ixo.data.MsgUpdateIidMetaResponse")
 }
 
 func init() { proto.RegisterFile("iid/tx.proto", fileDescriptor_7037c784a6742b78) }
 
 var fileDescriptor_7037c784a6742b78 = []byte{
-	// 1137 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcd, 0x6f, 0xe3, 0x44,
-	0x14, 0xaf, 0x9b, 0x6e, 0x3f, 0x5e, 0x9a, 0xd2, 0x9d, 0xb6, 0x5b, 0xd7, 0x4d, 0x93, 0x6c, 0x28,
-	0x50, 0x24, 0x68, 0xa4, 0xae, 0x10, 0x08, 0xb8, 0x84, 0x16, 0xa4, 0x6a, 0x09, 0x12, 0x5e, 0x3e,
-	0xa4, 0x15, 0x52, 0xe5, 0x7a, 0xa6, 0xce, 0xd0, 0xd4, 0x13, 0xd9, 0x6e, 0xd5, 0x3d, 0x20, 0xc4,
-	0x01, 0x89, 0x23, 0x17, 0x38, 0xef, 0x9f, 0xc3, 0x71, 0x8f, 0x1c, 0x51, 0x7b, 0xe1, 0xc0, 0x1f,
-	0x81, 0x3c, 0xb6, 0xc7, 0x33, 0x1e, 0x3b, 0x09, 0x17, 0x6e, 0xf1, 0xfb, 0xbd, 0x79, 0xef, 0x37,
-	0xef, 0x73, 0x14, 0x58, 0xa5, 0x14, 0xf7, 0xa2, 0xdb, 0xc3, 0x71, 0xc0, 0x22, 0x86, 0x6a, 0x94,
-	0x62, 0x6b, 0xd3, 0x63, 0x1e, 0xe3, 0xdf, 0xbd, 0xf8, 0x57, 0x02, 0x59, 0x8d, 0x58, 0x91, 0x52,
-	0x9c, 0x7e, 0x36, 0x3d, 0xc6, 0xbc, 0x11, 0xe9, 0x39, 0x63, 0xda, 0x73, 0x7c, 0x9f, 0x45, 0x4e,
-	0x44, 0x99, 0x1f, 0x26, 0x68, 0xf7, 0x47, 0x58, 0xfd, 0x86, 0x04, 0xf4, 0x82, 0xba, 0x5c, 0x8c,
-	0xf6, 0xa1, 0x11, 0x90, 0x51, 0xa2, 0x32, 0xa4, 0xe3, 0xd0, 0x34, 0x3a, 0xb5, 0x83, 0x15, 0x5b,
-	0x15, 0xa2, 0x1e, 0x2c, 0x5e, 0x91, 0x68, 0xc8, 0xb0, 0x39, 0xdf, 0x31, 0x0e, 0xea, 0x47, 0xdb,
-	0x87, 0xb1, 0x3f, 0xd9, 0xd0, 0x80, 0xc3, 0x76, 0xaa, 0x86, 0x4c, 0x58, 0x72, 0x99, 0x1f, 0x91,
-	0xdb, 0xc8, 0xac, 0x71, 0x83, 0xd9, 0x67, 0xf7, 0x9f, 0x79, 0xd8, 0x1c, 0x84, 0xde, 0x71, 0x40,
-	0x9c, 0x88, 0x9c, 0x52, 0x7c, 0xc2, 0xdc, 0xeb, 0x2b, 0xe2, 0x47, 0x68, 0x0d, 0xe6, 0x29, 0x36,
-	0x8d, 0x8e, 0x71, 0xb0, 0x62, 0xcf, 0x53, 0x8c, 0x3a, 0x50, 0x8f, 0xcf, 0x04, 0x6c, 0x34, 0x22,
-	0x41, 0x68, 0xce, 0x73, 0x33, 0xb2, 0x08, 0xbd, 0xa9, 0x3a, 0xa9, 0x1f, 0xad, 0x72, 0x5a, 0xc7,
-	0x89, 0x4c, 0xb8, 0x44, 0xef, 0x43, 0xe3, 0x46, 0xa2, 0x1a, 0x9a, 0x0b, 0x5c, 0xfb, 0xa1, 0x76,
-	0x09, 0x5b, 0xd5, 0x43, 0x07, 0xb0, 0x1c, 0x92, 0xe0, 0x86, 0xba, 0x24, 0x34, 0x1f, 0x48, 0x1e,
-	0x9e, 0x25, 0x42, 0x5b, 0xa0, 0xe8, 0x03, 0x68, 0x38, 0xae, 0xcb, 0x02, 0x4c, 0xb0, 0x4d, 0xbd,
-	0x61, 0x64, 0x2e, 0x72, 0x75, 0xc4, 0xd5, 0xfb, 0x32, 0x62, 0xab, 0x8a, 0xe8, 0x23, 0x58, 0x1b,
-	0x51, 0xff, 0x92, 0x60, 0x9b, 0x84, 0xec, 0x3a, 0x70, 0x89, 0xb9, 0xc4, 0x8f, 0x6e, 0xf0, 0xa3,
-	0x9f, 0x2b, 0x90, 0x5d, 0x50, 0x45, 0x8f, 0x60, 0x31, 0xa4, 0x9e, 0x4f, 0x02, 0x73, 0x99, 0xc7,
-	0x2d, 0xfd, 0xfa, 0x70, 0xf9, 0x97, 0x97, 0xed, 0xb9, 0xbf, 0x5f, 0xb6, 0xe7, 0xba, 0x2d, 0x68,
-	0x96, 0x45, 0xdb, 0x26, 0xe1, 0x98, 0xf9, 0x21, 0xe9, 0x7e, 0xc7, 0xb3, 0xf1, 0xf5, 0x18, 0x17,
-	0xb2, 0xd1, 0x85, 0x1a, 0x66, 0x2e, 0x4f, 0x47, 0xfd, 0x68, 0x9d, 0x73, 0x91, 0x8f, 0xc7, 0xa0,
-	0xe4, 0xfd, 0xc1, 0x44, 0xef, 0x9a, 0x75, 0xe1, 0xfd, 0x07, 0x40, 0x83, 0xd0, 0xeb, 0x63, 0xac,
-	0xd4, 0x64, 0xb1, 0x12, 0xde, 0x83, 0x55, 0x39, 0x2f, 0x69, 0x0d, 0x96, 0xa4, 0x4f, 0x51, 0x93,
-	0xe8, 0xd5, 0x2a, 0xe8, 0x35, 0xc1, 0xd2, 0xdd, 0x0b, 0x72, 0xbf, 0x1b, 0xd0, 0x1e, 0x84, 0xde,
-	0x33, 0x12, 0xa9, 0xb0, 0xdc, 0x18, 0x45, 0xaa, 0xbb, 0xb0, 0x92, 0x74, 0xc0, 0x19, 0x4d, 0x7a,
-	0x65, 0xc5, 0x5e, 0x4e, 0x04, 0xa7, 0x58, 0xef, 0xb5, 0x5a, 0x59, 0xaf, 0xe5, 0xb4, 0x17, 0x2a,
-	0x68, 0xbf, 0x0d, 0x6f, 0x4d, 0xe1, 0x25, 0xee, 0x70, 0x01, 0x5b, 0x83, 0xd0, 0xb3, 0xc9, 0x0d,
-	0xbb, 0x24, 0x13, 0x63, 0x3c, 0x91, 0xf8, 0xf4, 0x48, 0xb6, 0x61, 0xaf, 0xd4, 0x8f, 0x20, 0x12,
-	0x40, 0x23, 0x09, 0x75, 0xda, 0x3b, 0x1a, 0x81, 0x1e, 0xac, 0xa6, 0xdd, 0x74, 0x86, 0x9d, 0xc8,
-	0x49, 0x93, 0xac, 0xf6, 0x5b, 0x3d, 0xd5, 0x38, 0x71, 0x22, 0x67, 0x06, 0x52, 0xdb, 0xfc, 0xf2,
-	0xb9, 0x4f, 0x41, 0xc6, 0x85, 0xf5, 0x41, 0xe8, 0x9d, 0x90, 0x11, 0x89, 0x48, 0x15, 0x9f, 0x3d,
-	0x80, 0x8c, 0x8f, 0x88, 0xc8, 0x4a, 0x2a, 0x99, 0x29, 0x24, 0x16, 0x98, 0x45, 0x27, 0x82, 0xc0,
-	0x25, 0x27, 0xd0, 0xc7, 0xf8, 0x58, 0x8c, 0x33, 0x8d, 0xc0, 0x1b, 0xb0, 0x96, 0x0f, 0xbb, 0x33,
-	0x2c, 0x48, 0x34, 0x72, 0xe9, 0x09, 0x9d, 0x9d, 0x88, 0xe2, 0x4c, 0x10, 0xf1, 0x61, 0x43, 0x90,
-	0xfc, 0x3f, 0xb8, 0xec, 0xc1, 0x6e, 0x89, 0x3f, 0x41, 0xe7, 0x67, 0x83, 0x8f, 0xa3, 0x3e, 0xc6,
-	0xea, 0xe0, 0xd3, 0x08, 0xe9, 0x53, 0x33, 0xa9, 0x97, 0xff, 0x38, 0x35, 0xab, 0x68, 0x8e, 0x60,
-	0x5b, 0xd0, 0x9c, 0xc2, 0xa4, 0x0d, 0xf5, 0x20, 0xc5, 0xf2, 0x42, 0x81, 0x4c, 0x34, 0x53, 0xa5,
-	0xfc, 0x64, 0xf0, 0x2c, 0xf4, 0x31, 0x56, 0x36, 0x85, 0xe6, 0x4a, 0x5b, 0x32, 0xc9, 0x9d, 0x67,
-	0x58, 0x32, 0xd3, 0x39, 0x10, 0x78, 0x24, 0x6e, 0x3c, 0x99, 0xc5, 0x0e, 0x2c, 0x07, 0x31, 0x90,
-	0xdf, 0x76, 0x89, 0x7f, 0xcf, 0x74, 0xd5, 0x51, 0x56, 0xf8, 0xa7, 0x14, 0xa7, 0x7b, 0x5a, 0x73,
-	0x20, 0xad, 0x75, 0x79, 0x08, 0x68, 0x6b, 0x7d, 0xba, 0x37, 0x4f, 0xaa, 0xee, 0x09, 0x0e, 0x5b,
-	0x00, 0xa9, 0xcd, 0xa7, 0xe4, 0x45, 0x96, 0xc1, 0x5c, 0x32, 0x83, 0xa3, 0xef, 0xf9, 0xb5, 0xc4,
-	0x9e, 0x1b, 0x90, 0xc8, 0xd1, 0xbc, 0xec, 0xc3, 0xc2, 0x15, 0x11, 0x83, 0x4d, 0xac, 0xd4, 0x58,
-	0x37, 0x1e, 0x78, 0x36, 0x47, 0x67, 0xf0, 0x95, 0xec, 0x54, 0xad, 0x45, 0x44, 0x0f, 0x3d, 0xe6,
-	0x5b, 0xab, 0xac, 0x76, 0x85, 0x4a, 0xd2, 0x85, 0xc5, 0x7a, 0x13, 0x70, 0x07, 0x5a, 0xe5, 0xb5,
-	0x20, 0x34, 0xc4, 0x48, 0xc9, 0xa3, 0x5a, 0x30, 0x5e, 0x0c, 0x7a, 0xe1, 0xa8, 0x12, 0xaa, 0x0c,
-	0x3b, 0xfa, 0x0d, 0xa0, 0x36, 0x08, 0x3d, 0xf4, 0x25, 0x3c, 0xd4, 0xdf, 0x87, 0x3b, 0x3c, 0x62,
-	0x65, 0x8f, 0x19, 0xeb, 0x71, 0x25, 0x94, 0x99, 0x8e, 0x4d, 0xea, 0x8f, 0x1c, 0x61, 0x52, 0x83,
-	0x72, 0x93, 0x95, 0x8f, 0x17, 0xf4, 0x14, 0x5e, 0x2b, 0xbe, 0x5c, 0xb6, 0xb3, 0x53, 0x05, 0xc0,
-	0x6a, 0x57, 0x00, 0xc2, 0xd8, 0x57, 0x80, 0x4a, 0xb6, 0xb4, 0x95, 0x1d, 0xd3, 0x31, 0xab, 0x5b,
-	0x8d, 0x09, 0xab, 0x01, 0x34, 0x27, 0x3e, 0x5f, 0xf6, 0x33, 0x1b, 0x93, 0xb4, 0xac, 0x77, 0x66,
-	0xd1, 0x12, 0x3e, 0x3f, 0x06, 0x90, 0xd6, 0x3c, 0x92, 0x2e, 0x9e, 0xca, 0x2c, 0x4b, 0x97, 0x89,
-	0xd3, 0x9f, 0x42, 0x43, 0xdd, 0xcb, 0x5b, 0x99, 0xb2, 0x22, 0xb6, 0xf6, 0x4a, 0xc5, 0xb2, 0x19,
-	0x75, 0xbb, 0x6e, 0x49, 0x3e, 0x73, 0x71, 0x6e, 0xa6, 0x74, 0x3d, 0xa2, 0x2f, 0x60, 0x5d, 0xdb,
-	0x8d, 0xa6, 0xea, 0x59, 0x32, 0xd6, 0xa9, 0x42, 0xe4, 0x2a, 0xd4, 0x77, 0xdb, 0x8e, 0xc4, 0x41,
-	0x85, 0xf2, 0x2a, 0xac, 0x6c, 0x77, 0xf4, 0x1c, 0x36, 0x4b, 0xf7, 0x54, 0x53, 0x25, 0x53, 0x30,
-	0xbc, 0x3f, 0x09, 0x95, 0xaf, 0xaf, 0x2d, 0x25, 0x53, 0xa2, 0xa4, 0x20, 0xf9, 0xf5, 0xab, 0x06,
-	0x0b, 0xfa, 0x16, 0x36, 0xca, 0x36, 0xcc, 0xae, 0x4a, 0x46, 0xb5, 0xfa, 0xfa, 0x04, 0xb0, 0x90,
-	0x6e, 0x69, 0xc4, 0xcb, 0xe9, 0xce, 0xc5, 0x4a, 0xba, 0xf5, 0xd9, 0x94, 0xa7, 0x5b, 0xb2, 0x54,
-	0x48, 0xb7, 0x64, 0xac, 0x53, 0x85, 0x08, 0x7b, 0x9f, 0xc1, 0x5a, 0x32, 0x3e, 0xe2, 0x29, 0xc7,
-	0x1f, 0xad, 0x5b, 0xda, 0x58, 0x89, 0xa1, 0x9c, 0x57, 0xe9, 0x5c, 0xfc, 0x64, 0xf0, 0xc7, 0x5d,
-	0xcb, 0x78, 0x75, 0xd7, 0x32, 0xfe, 0xba, 0x6b, 0x19, 0xbf, 0xde, 0xb7, 0xe6, 0x5e, 0xdd, 0xb7,
-	0xe6, 0xfe, 0xbc, 0x6f, 0xcd, 0x3d, 0x7f, 0xe2, 0xd1, 0x68, 0x78, 0x7d, 0x7e, 0xe8, 0xb2, 0xab,
-	0x1e, 0xbd, 0x65, 0x17, 0xec, 0xda, 0xc7, 0xbc, 0x27, 0xe3, 0xaf, 0x77, 0xcf, 0x47, 0xcc, 0xbd,
-	0x74, 0x87, 0x0e, 0xf5, 0x7b, 0xb7, 0x3d, 0xfe, 0x77, 0xc2, 0x8b, 0x31, 0x09, 0xcf, 0x17, 0xf9,
-	0x5f, 0x01, 0x4f, 0xfe, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x19, 0x99, 0x84, 0x39, 0x62, 0x10, 0x00,
-	0x00,
+	// 1277 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcf, 0x6f, 0xdc, 0x44,
+	0x14, 0x8e, 0xb3, 0x69, 0x9a, 0x7d, 0x9b, 0x0d, 0xc5, 0x2d, 0xad, 0xd9, 0x26, 0xbb, 0x21, 0x34,
+	0xb0, 0xa4, 0xcd, 0x2e, 0x4a, 0x08, 0x11, 0x70, 0x40, 0xf9, 0x81, 0xd4, 0xd0, 0x2e, 0x07, 0x57,
+	0x70, 0xe0, 0x12, 0x6d, 0x3c, 0x13, 0x67, 0x94, 0x8d, 0x67, 0xb1, 0x9d, 0x90, 0x20, 0x55, 0x70,
+	0x41, 0xe2, 0x58, 0x21, 0x40, 0x3d, 0xf6, 0xcf, 0xe1, 0xd8, 0x23, 0x47, 0x94, 0x48, 0x88, 0x3f,
+	0x03, 0x79, 0xec, 0x1d, 0xcf, 0xf8, 0xc7, 0xd8, 0x9b, 0x03, 0xb7, 0x78, 0xe6, 0x7b, 0xef, 0x7d,
+	0x6f, 0xe6, 0xbd, 0x37, 0x5f, 0x16, 0x66, 0x09, 0x41, 0x5d, 0xff, 0xbc, 0x33, 0x74, 0xa9, 0x4f,
+	0xf5, 0xbb, 0xe4, 0x9c, 0x1e, 0xd2, 0x53, 0x07, 0xf5, 0x7d, 0x42, 0x9d, 0x0e, 0x39, 0xa7, 0x1d,
+	0xd4, 0xf7, 0xfb, 0x8d, 0x3b, 0x36, 0xb5, 0x29, 0x83, 0x74, 0x83, 0xbf, 0x42, 0x74, 0xa3, 0x1e,
+	0xd8, 0x12, 0x82, 0xa2, 0xcf, 0x79, 0x9b, 0x52, 0x7b, 0x80, 0xbb, 0xfd, 0x21, 0xe9, 0xf6, 0x1d,
+	0x87, 0xfa, 0xcc, 0x89, 0x17, 0xee, 0x2e, 0xfd, 0xaa, 0xc1, 0xec, 0x37, 0xd8, 0x25, 0x87, 0xc4,
+	0x62, 0xeb, 0xfa, 0x03, 0xa8, 0xbb, 0x78, 0x10, 0x62, 0x8e, 0xc8, 0xd0, 0x33, 0xb4, 0xc5, 0x4a,
+	0xbb, 0x6a, 0xca, 0x8b, 0xfa, 0x36, 0x4c, 0x9f, 0x60, 0xff, 0x88, 0x22, 0x63, 0x72, 0x51, 0x6b,
+	0xd7, 0xd6, 0x56, 0x3a, 0xd9, 0x14, 0x3b, 0xa2, 0xef, 0x1e, 0xb3, 0x30, 0x23, 0x4b, 0xdd, 0x80,
+	0x9b, 0x16, 0x75, 0x7c, 0x7c, 0xee, 0x1b, 0x15, 0x16, 0x63, 0xf4, 0xb9, 0xf4, 0xfb, 0x14, 0xdc,
+	0xe9, 0x79, 0xf6, 0x8e, 0x8b, 0xfb, 0x3e, 0xde, 0x23, 0x68, 0x97, 0x5a, 0xa7, 0x27, 0xd8, 0xf1,
+	0xf5, 0x39, 0x98, 0x24, 0xc8, 0xd0, 0x16, 0xb5, 0x76, 0xd5, 0x9c, 0x24, 0x48, 0x5f, 0x84, 0x5a,
+	0x60, 0xe3, 0xd2, 0xc1, 0x00, 0xbb, 0x9e, 0x31, 0xc9, 0xdc, 0x88, 0x4b, 0xfa, 0x27, 0x72, 0x90,
+	0xda, 0x5a, 0x2b, 0x8f, 0xe9, 0x4e, 0x08, 0xe3, 0x2c, 0xf4, 0x2f, 0xa1, 0x7e, 0x26, 0xb0, 0xf7,
+	0x8c, 0x29, 0xe6, 0xe0, 0x41, 0x99, 0x54, 0x4d, 0xd9, 0x54, 0xff, 0x0c, 0x66, 0x3c, 0xec, 0x9e,
+	0x11, 0x0b, 0x7b, 0xc6, 0x0d, 0x35, 0x8f, 0x67, 0x21, 0xce, 0xe4, 0x06, 0xfa, 0x13, 0xa8, 0xf7,
+	0x2d, 0x8b, 0xba, 0x08, 0x23, 0x93, 0xd8, 0x47, 0xbe, 0x31, 0xcd, 0x3c, 0x2c, 0xe7, 0x79, 0xd8,
+	0x12, 0xc1, 0xa6, 0x6c, 0xab, 0x7f, 0x05, 0x73, 0x03, 0xe2, 0x1c, 0x63, 0x64, 0x62, 0x8f, 0x9e,
+	0xba, 0x16, 0x36, 0x6e, 0x32, 0x6f, 0xef, 0xe5, 0x79, 0x7b, 0x2a, 0xa1, 0xcd, 0x84, 0xb5, 0xfe,
+	0x18, 0x66, 0xc3, 0x95, 0x2f, 0x1c, 0x9f, 0xf8, 0x17, 0xc6, 0x8c, 0xfa, 0x90, 0x9e, 0x0a, 0x58,
+	0x53, 0xb2, 0xd4, 0xef, 0xc2, 0xb4, 0x47, 0x6c, 0x07, 0xbb, 0x46, 0x95, 0x5d, 0x70, 0xf4, 0xf5,
+	0xe9, 0xcc, 0x2f, 0xaf, 0x5a, 0x13, 0xff, 0xbe, 0x6a, 0x4d, 0x2c, 0x35, 0x61, 0x3e, 0xab, 0x2c,
+	0x4c, 0xec, 0x0d, 0xa9, 0xe3, 0xe1, 0x25, 0xca, 0xca, 0xe6, 0xeb, 0x21, 0x4a, 0x94, 0xcd, 0x06,
+	0x54, 0x10, 0xb5, 0x58, 0xdd, 0xd4, 0xd6, 0xde, 0xcd, 0xa3, 0x26, 0x7a, 0x0c, 0xf0, 0x02, 0xa1,
+	0x1b, 0x4a, 0x42, 0xa9, 0x80, 0x9c, 0xd0, 0x0b, 0x0d, 0xf4, 0x9e, 0x67, 0x6f, 0x21, 0x24, 0xf5,
+	0x58, 0xb2, 0x8c, 0x1f, 0xc3, 0xac, 0x58, 0x2e, 0x51, 0x4f, 0x95, 0x2b, 0x34, 0xc9, 0x52, 0xa0,
+	0x5c, 0xc9, 0xa1, 0x3c, 0x0f, 0x8d, 0x34, 0x23, 0x4e, 0xf8, 0x0f, 0x0d, 0x5a, 0x3d, 0xcf, 0x7e,
+	0x86, 0x7d, 0x79, 0x5b, 0xec, 0xfd, 0x24, 0xfb, 0xfb, 0x50, 0x0d, 0x3b, 0x7a, 0x9f, 0x84, 0xe3,
+	0xa0, 0x6a, 0xce, 0x84, 0x0b, 0x7b, 0x28, 0x3d, 0x4e, 0x2a, 0x59, 0xe3, 0x24, 0xa6, 0x3d, 0x95,
+	0x43, 0xfb, 0x03, 0x78, 0xbf, 0x80, 0x17, 0xcf, 0xe1, 0x10, 0xde, 0xea, 0x79, 0xb6, 0x89, 0xcf,
+	0xe8, 0x31, 0x56, 0x1e, 0xbb, 0x92, 0x78, 0xf1, 0x49, 0xb6, 0x60, 0x21, 0x33, 0x0e, 0x27, 0xf2,
+	0xb3, 0x06, 0xf5, 0xf0, 0xac, 0xa3, 0x9e, 0x4e, 0x31, 0xd8, 0x86, 0xd9, 0xa8, 0xcb, 0xf7, 0x83,
+	0x9b, 0x8d, 0x2e, 0xbe, 0x70, 0x34, 0xd4, 0x22, 0xa3, 0xdd, 0xbe, 0xdf, 0x2f, 0x41, 0xf4, 0x1e,
+	0x3b, 0x90, 0x98, 0x06, 0x27, 0x68, 0xc1, 0xad, 0x9e, 0x67, 0xef, 0xe2, 0x01, 0xf6, 0x71, 0x1e,
+	0xc5, 0x05, 0x80, 0x11, 0x45, 0x7e, 0x4a, 0xd5, 0x68, 0xa5, 0xd4, 0x31, 0x35, 0xc0, 0x48, 0x06,
+	0xe1, 0x04, 0x8e, 0x19, 0x81, 0x2d, 0x84, 0x76, 0xf8, 0xc8, 0x4e, 0x11, 0x58, 0x86, 0xb9, 0x78,
+	0xa0, 0xef, 0x23, 0x4e, 0xa2, 0x1e, 0xaf, 0xee, 0x92, 0xf2, 0x44, 0xa4, 0x60, 0x9c, 0x88, 0x03,
+	0xb7, 0x39, 0xc9, 0xff, 0x83, 0xcb, 0x02, 0xdc, 0xcf, 0x88, 0xc7, 0xe9, 0xbc, 0xd4, 0xd8, 0x24,
+	0xdb, 0x42, 0x48, 0x9e, 0xbe, 0x29, 0x42, 0xe9, 0x69, 0x1e, 0x96, 0xd0, 0x75, 0xa7, 0x79, 0x31,
+	0xf3, 0x01, 0xdc, 0xe3, 0xcc, 0x0b, 0xc8, 0xb5, 0xa0, 0xe6, 0x46, 0x7b, 0x71, 0xed, 0xc0, 0x68,
+	0xa9, 0x54, 0xf1, 0xc4, 0x03, 0x54, 0x7c, 0x38, 0xb2, 0x06, 0xa8, 0xf4, 0x08, 0x15, 0x0c, 0xd0,
+	0x52, 0x8f, 0x50, 0x1e, 0xa5, 0x70, 0xbc, 0x88, 0x07, 0x90, 0x43, 0xea, 0x3e, 0x54, 0x31, 0xdb,
+	0x11, 0xc6, 0x4b, 0xb8, 0x50, 0x2a, 0xf5, 0xdf, 0x34, 0x56, 0x93, 0x5b, 0x08, 0x49, 0xef, 0x79,
+	0x2a, 0x4c, 0x4a, 0x1d, 0x84, 0xc9, 0x5f, 0x4f, 0x1d, 0x14, 0xd3, 0xc2, 0x70, 0x97, 0xa7, 0xaf,
+	0x26, 0xf6, 0x36, 0xcc, 0xb8, 0xc1, 0x46, 0x9c, 0xfe, 0x4d, 0xf6, 0x5d, 0x2a, 0xfb, 0x1f, 0x47,
+	0x93, 0x61, 0x8f, 0xa0, 0x48, 0x99, 0xa5, 0x02, 0x08, 0xda, 0xae, 0x60, 0x70, 0xa6, 0xb4, 0x5d,
+	0x31, 0x01, 0x5b, 0x98, 0x08, 0x0a, 0x0e, 0x4d, 0x80, 0xc8, 0xe7, 0x13, 0x7c, 0x31, 0x2a, 0xf1,
+	0x78, 0xa5, 0x44, 0xa0, 0xe7, 0x2c, 0x53, 0xae, 0x21, 0x7a, 0xd8, 0xef, 0xa7, 0xa2, 0x6c, 0xc2,
+	0xd4, 0x09, 0xe6, 0xef, 0x83, 0x4a, 0xc1, 0x04, 0xe6, 0xc1, 0xdf, 0x26, 0x33, 0x28, 0x11, 0x3e,
+	0x94, 0x30, 0xa9, 0x49, 0xc3, 0x47, 0xd1, 0x3b, 0x4c, 0x10, 0x64, 0xf5, 0x3b, 0x87, 0x70, 0x49,
+	0x21, 0xf5, 0xd5, 0x68, 0x37, 0x7c, 0x26, 0xd3, 0xfd, 0xc2, 0x01, 0xe1, 0x2c, 0x4c, 0xd6, 0x39,
+	0xdf, 0x5e, 0x84, 0x66, 0x76, 0xc1, 0x71, 0x04, 0x1f, 0xec, 0xf1, 0x3d, 0x25, 0x9c, 0x27, 0xaf,
+	0x31, 0x61, 0x2a, 0x1d, 0xfe, 0x68, 0x6f, 0xed, 0x9f, 0x5b, 0x50, 0xe9, 0x79, 0xb6, 0xfe, 0x3d,
+	0xbc, 0x99, 0xfe, 0x4f, 0xe4, 0x51, 0xde, 0x1d, 0x64, 0x09, 0xd4, 0xc6, 0x47, 0xe3, 0xa0, 0x47,
+	0x04, 0x82, 0xc0, 0x69, 0x2d, 0xab, 0x0a, 0x9c, 0x42, 0x2b, 0x03, 0xe7, 0xca, 0x56, 0xfd, 0x3b,
+	0x78, 0x23, 0x29, 0x59, 0x57, 0x14, 0x8e, 0x12, 0xd8, 0xc6, 0x5a, 0x79, 0x2c, 0x0f, 0xf9, 0x03,
+	0xe8, 0x19, 0x8a, 0x6d, 0x55, 0xe1, 0x29, 0x0d, 0x6f, 0x6c, 0x8c, 0x05, 0xe7, 0xb1, 0x5f, 0x6a,
+	0x30, 0xaf, 0x54, 0xbc, 0x9b, 0x0a, 0xbf, 0x2a, 0xc3, 0xc6, 0xe7, 0xd7, 0x34, 0xe4, 0xd4, 0x0e,
+	0x00, 0x04, 0xf9, 0xb8, 0xac, 0x3e, 0xd8, 0x08, 0xd6, 0x58, 0x2d, 0x05, 0xe3, 0x31, 0x8e, 0xa1,
+	0x2e, 0x4b, 0xc0, 0xb6, 0xc2, 0x5e, 0x42, 0x36, 0x3e, 0x2c, 0x8b, 0x14, 0x83, 0xc9, 0x72, 0xaf,
+	0xad, 0x26, 0x1b, 0x23, 0x95, 0xc1, 0x32, 0x55, 0x9d, 0xee, 0xc3, 0xad, 0x94, 0xa4, 0x7b, 0x58,
+	0x48, 0x59, 0x08, 0xb9, 0x3e, 0x06, 0x58, 0x6c, 0xdb, 0xb4, 0x70, 0x7b, 0xa4, 0x26, 0x2f, 0xa3,
+	0x95, 0x6d, 0x9b, 0x3b, 0xaa, 0xf5, 0x9f, 0x34, 0xb8, 0x93, 0x29, 0xcc, 0xba, 0x85, 0x69, 0x24,
+	0xe2, 0x6f, 0x8e, 0x69, 0x90, 0x98, 0x1c, 0x92, 0x2c, 0x5a, 0x29, 0x93, 0x4b, 0x88, 0x2d, 0x9a,
+	0x1c, 0x59, 0xcf, 0x47, 0x30, 0x39, 0x32, 0xc4, 0xd8, 0x6a, 0xc9, 0x0c, 0xa2, 0xc0, 0x1b, 0x63,
+	0xc1, 0xc5, 0x02, 0x4b, 0xe9, 0xb3, 0x87, 0xea, 0x1c, 0x24, 0xb0, 0xb2, 0xc0, 0xf2, 0x5e, 0x44,
+	0xfd, 0x39, 0xdc, 0xce, 0xd2, 0x5f, 0x9d, 0xc2, 0x1c, 0xe4, 0xd8, 0x1f, 0x8f, 0x87, 0x4f, 0xb4,
+	0xb0, 0xa0, 0x89, 0x0a, 0x5a, 0x38, 0x46, 0x16, 0xb5, 0x70, 0xfa, 0x81, 0x8e, 0x5b, 0x58, 0x88,
+	0x57, 0xdc, 0xc2, 0x42, 0xc8, 0xf5, 0x31, 0xc0, 0x3c, 0xea, 0x00, 0xe6, 0xc2, 0xd7, 0x31, 0x10,
+	0x04, 0xec, 0xbf, 0xec, 0x76, 0x99, 0x87, 0x34, 0x40, 0x2b, 0x73, 0xcc, 0x14, 0x1a, 0xdb, 0xbd,
+	0x3f, 0x2f, 0x9b, 0xda, 0xeb, 0xcb, 0xa6, 0xf6, 0xf7, 0x65, 0x53, 0x7b, 0x71, 0xd5, 0x9c, 0x78,
+	0x7d, 0xd5, 0x9c, 0xf8, 0xeb, 0xaa, 0x39, 0xf1, 0xed, 0xba, 0x4d, 0xfc, 0xa3, 0xd3, 0x83, 0x8e,
+	0x45, 0x4f, 0xba, 0x92, 0xd7, 0xe0, 0x6b, 0xf5, 0x60, 0x40, 0xad, 0x63, 0xeb, 0xa8, 0x4f, 0x9c,
+	0xee, 0x79, 0x97, 0xfd, 0x60, 0x7c, 0x31, 0xc4, 0xde, 0xc1, 0x34, 0xfb, 0x65, 0x77, 0xfd, 0xbf,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0xa2, 0xce, 0xb2, 0x25, 0x44, 0x16, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1449,6 +1612,9 @@ type MsgClient interface {
 	//Add / Delete Linked Resource
 	AddLinkedResource(ctx context.Context, in *MsgAddLinkedResource, opts ...grpc.CallOption) (*MsgAddLinkedResourceResponse, error)
 	DeleteLinkedResource(ctx context.Context, in *MsgDeleteLinkedResource, opts ...grpc.CallOption) (*MsgDeleteLinkedResourceResponse, error)
+	//Add / Delete Linked Entity
+	AddLinkedEntity(ctx context.Context, in *MsgAddLinkedEntity, opts ...grpc.CallOption) (*MsgAddLinkedEntityResponse, error)
+	DeleteLinkedEntity(ctx context.Context, in *MsgDeleteLinkedEntity, opts ...grpc.CallOption) (*MsgDeleteLinkedEntityResponse, error)
 	//Add / Delete Accorded Right
 	AddAccordedRight(ctx context.Context, in *MsgAddAccordedRight, opts ...grpc.CallOption) (*MsgAddAccordedRightResponse, error)
 	DeleteAccordedRight(ctx context.Context, in *MsgDeleteAccordedRight, opts ...grpc.CallOption) (*MsgDeleteAccordedRightResponse, error)
@@ -1566,6 +1732,24 @@ func (c *msgClient) DeleteLinkedResource(ctx context.Context, in *MsgDeleteLinke
 	return out, nil
 }
 
+func (c *msgClient) AddLinkedEntity(ctx context.Context, in *MsgAddLinkedEntity, opts ...grpc.CallOption) (*MsgAddLinkedEntityResponse, error) {
+	out := new(MsgAddLinkedEntityResponse)
+	err := c.cc.Invoke(ctx, "/ixofoundation.ixo.data.Msg/AddLinkedEntity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteLinkedEntity(ctx context.Context, in *MsgDeleteLinkedEntity, opts ...grpc.CallOption) (*MsgDeleteLinkedEntityResponse, error) {
+	out := new(MsgDeleteLinkedEntityResponse)
+	err := c.cc.Invoke(ctx, "/ixofoundation.ixo.data.Msg/DeleteLinkedEntity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *msgClient) AddAccordedRight(ctx context.Context, in *MsgAddAccordedRight, opts ...grpc.CallOption) (*MsgAddAccordedRightResponse, error) {
 	out := new(MsgAddAccordedRightResponse)
 	err := c.cc.Invoke(ctx, "/iid.Msg/AddAccordedRight", in, out, opts...)
@@ -1634,6 +1818,9 @@ type MsgServer interface {
 	//Add / Delete Linked Resource
 	AddLinkedResource(context.Context, *MsgAddLinkedResource) (*MsgAddLinkedResourceResponse, error)
 	DeleteLinkedResource(context.Context, *MsgDeleteLinkedResource) (*MsgDeleteLinkedResourceResponse, error)
+	//Add / Delete Linked Entity
+	AddLinkedEntity(context.Context, *MsgAddLinkedEntity) (*MsgAddLinkedEntityResponse, error)
+	DeleteLinkedEntity(context.Context, *MsgDeleteLinkedEntity) (*MsgDeleteLinkedEntityResponse, error)
 	//Add / Delete Accorded Right
 	AddAccordedRight(context.Context, *MsgAddAccordedRight) (*MsgAddAccordedRightResponse, error)
 	DeleteAccordedRight(context.Context, *MsgDeleteAccordedRight) (*MsgDeleteAccordedRightResponse, error)
@@ -1680,6 +1867,12 @@ func (*UnimplementedMsgServer) AddLinkedResource(ctx context.Context, req *MsgAd
 }
 func (*UnimplementedMsgServer) DeleteLinkedResource(ctx context.Context, req *MsgDeleteLinkedResource) (*MsgDeleteLinkedResourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteLinkedResource not implemented")
+}
+func (*UnimplementedMsgServer) AddLinkedEntity(ctx context.Context, req *MsgAddLinkedEntity) (*MsgAddLinkedEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddLinkedEntity not implemented")
+}
+func (*UnimplementedMsgServer) DeleteLinkedEntity(ctx context.Context, req *MsgDeleteLinkedEntity) (*MsgDeleteLinkedEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLinkedEntity not implemented")
 }
 func (*UnimplementedMsgServer) AddAccordedRight(ctx context.Context, req *MsgAddAccordedRight) (*MsgAddAccordedRightResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddAccordedRight not implemented")
@@ -1899,6 +2092,42 @@ func _Msg_DeleteLinkedResource_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_AddLinkedEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddLinkedEntity)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddLinkedEntity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixofoundation.ixo.data.Msg/AddLinkedEntity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddLinkedEntity(ctx, req.(*MsgAddLinkedEntity))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteLinkedEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteLinkedEntity)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteLinkedEntity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixofoundation.ixo.data.Msg/DeleteLinkedEntity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteLinkedEntity(ctx, req.(*MsgDeleteLinkedEntity))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Msg_AddAccordedRight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgAddAccordedRight)
 	if err := dec(in); err != nil {
@@ -2038,6 +2267,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_DeleteLinkedResource_Handler,
 		},
 		{
+			MethodName: "AddLinkedEntity",
+			Handler:    _Msg_AddLinkedEntity_Handler,
+		},
+		{
+			MethodName: "DeleteLinkedEntity",
+			Handler:    _Msg_DeleteLinkedEntity_Handler,
+		},
+		{
 			MethodName: "AddAccordedRight",
 			Handler:    _Msg_AddAccordedRight_Handler,
 		},
@@ -2140,7 +2377,21 @@ func (m *MsgCreateIidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Signer)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x4a
+	}
+	if len(m.LinkedEntity) > 0 {
+		for iNdEx := len(m.LinkedEntity) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.LinkedEntity[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x42
+		}
 	}
 	if len(m.LinkedResource) > 0 {
 		for iNdEx := len(m.LinkedResource) - 1; iNdEx >= 0; iNdEx-- {
@@ -2900,6 +3151,99 @@ func (m *MsgDeleteLinkedResource) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgAddLinkedEntity) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddLinkedEntity) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddLinkedEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.LinkedEntity != nil {
+		{
+			size, err := m.LinkedEntity.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLinkedEntity) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLinkedEntity) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLinkedEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.EntityId) > 0 {
+		i -= len(m.EntityId)
+		copy(dAtA[i:], m.EntityId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EntityId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgAddAccordedRight) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3181,6 +3525,52 @@ func (m *MsgDeleteLinkedResourceResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgAddLinkedEntityResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddLinkedEntityResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddLinkedEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLinkedEntityResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLinkedEntityResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLinkedEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgAddAccordedRightResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3374,6 +3764,12 @@ func (m *MsgCreateIidDocument) Size() (n int) {
 	}
 	if len(m.LinkedResource) > 0 {
 		for _, e := range m.LinkedResource {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.LinkedEntity) > 0 {
+		for _, e := range m.LinkedEntity {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -3678,6 +4074,48 @@ func (m *MsgDeleteLinkedResource) Size() (n int) {
 	return n
 }
 
+func (m *MsgAddLinkedEntity) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.LinkedEntity != nil {
+		l = m.LinkedEntity.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgDeleteLinkedEntity) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.EntityId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
 func (m *MsgAddAccordedRight) Size() (n int) {
 	if m == nil {
 		return 0
@@ -3793,6 +4231,24 @@ func (m *MsgAddLinkedResourceResponse) Size() (n int) {
 }
 
 func (m *MsgDeleteLinkedResourceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgAddLinkedEntityResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgDeleteLinkedEntityResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4266,6 +4722,40 @@ func (m *MsgCreateIidDocument) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LinkedEntity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LinkedEntity = append(m.LinkedEntity, &LinkedEntity{})
+			if err := m.LinkedEntity[len(m.LinkedEntity)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
 			}
@@ -6244,6 +6734,302 @@ func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *MsgAddLinkedEntity) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddLinkedEntity: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddLinkedEntity: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LinkedEntity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LinkedEntity == nil {
+				m.LinkedEntity = &LinkedEntity{}
+			}
+			if err := m.LinkedEntity.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLinkedEntity) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLinkedEntity: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLinkedEntity: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EntityId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *MsgAddAccordedRight) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -7063,6 +7849,106 @@ func (m *MsgDeleteLinkedResourceResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgDeleteLinkedResourceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddLinkedEntityResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddLinkedEntityResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddLinkedEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLinkedEntityResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLinkedEntityResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLinkedEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

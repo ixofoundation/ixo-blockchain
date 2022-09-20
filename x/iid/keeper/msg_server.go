@@ -35,6 +35,7 @@ func (k msgServer) CreateIidDocument(
 		types.WithServices(msg.Services...),
 		types.WithRights(msg.AccordedRight...),
 		types.WithResources(msg.LinkedResource...),
+		types.WithEntities(msg.LinkedEntity...),
 		types.WithVerifications(msg.Verifications...),
 		types.WithControllers(msg.Controllers...),
 	)
@@ -169,6 +170,48 @@ func (k msgServer) DeleteLinkedResource(
 	}
 
 	return &types.MsgDeleteLinkedResourceResponse{}, nil
+}
+
+func (k msgServer) AddLinkedEntity(
+	goCtx context.Context,
+	msg *types.MsgAddLinkedEntity,
+) (*types.MsgAddLinkedEntityResponse, error) {
+
+	if err := executeOnDidWithRelationships(
+		goCtx, &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.IidDocument) error {
+			return didDoc.AddLinkedEntity(msg.LinkedEntity)
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAddLinkedEntityResponse{}, nil
+}
+
+func (k msgServer) DeleteLinkedEntity(
+	goCtx context.Context,
+	msg *types.MsgDeleteLinkedEntity,
+) (*types.MsgDeleteLinkedEntityResponse, error) {
+
+	if err := executeOnDidWithRelationships(
+		goCtx, &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.IidDocument) error {
+			// Only try to remove service if there are services
+			if len(didDoc.LinkedEntity) == 0 {
+				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have entities associated")
+			}
+			// delete service
+			didDoc.DeleteLinkedResource(msg.EntityId)
+			return nil
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeleteLinkedEntityResponse{}, nil
 }
 
 func (k msgServer) AddAccordedRight(

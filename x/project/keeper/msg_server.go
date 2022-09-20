@@ -478,10 +478,10 @@ func (s msgServer) WithdrawFunds(goCtx context.Context, msg *types.MsgWithdrawFu
 		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
 	}
 
-	if projectDoc.Status != string(types.PaidoutStatus) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
-			"project not in PAIDOUT status")
-	}
+	//if projectDoc.Status != string(types.PaidoutStatus) {
+	//	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+	//		"project not in PAIDOUT status")
+	//}
 
 	projectDid := withdrawFundsDoc.ProjectDid
 	recipientDid := withdrawFundsDoc.RecipientDid

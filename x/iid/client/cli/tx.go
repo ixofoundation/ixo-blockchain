@@ -37,6 +37,8 @@ func GetTxCmd() *cobra.Command {
 		NewDeleteControllerCmd(),
 		NewAddLinkedResourceCmd(),
 		NewDeleteLinkedresourceCmd(),
+		NewAddLinkedEntityCmd(),
+		NewDeleteLinkedEntityCmd(),
 		NewAddAccordedRightCmd(),
 		NewDeleteAccordedRightCmd(),
 		NewAddIidContextCmd(),
@@ -105,6 +107,7 @@ func NewCreateIidDocumentCmd() *cobra.Command {
 				types.Services{},
 				types.AccordedRights{},
 				types.LinkedResources{},
+				types.LinkedEntities{},
 				signer.String(),
 				types.Contexts{},
 			)
@@ -708,6 +711,83 @@ func NewUpdateIidMetaCmd() *cobra.Command {
 			fmt.Println(msg)
 
 			// broadcast
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+//Linked Entity
+func NewAddLinkedEntityCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "add-linked-resource [id] [relationship id] [relationship]",
+		Short:   "add a linked entity to a decentralized did (did/IID) document",
+		Example: "adds a linked entity to a did document",
+		Args:    cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// tx signer
+			signer := clientCtx.GetFromAddress()
+			// service parameters
+			relationshipId, relationship := args[1], args[2]
+			// document did
+			did := types.NewChainDID(clientCtx.ChainID, args[0])
+
+			entity := types.NewLinkedEntity(
+				relationshipId,
+				relationship,
+			)
+
+			msg := types.NewMsgAddLinkedEntity(
+				did.String(),
+				entity,
+				signer.String(),
+			)
+			// broadcast
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewDeleteLinkedEntityCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "delete-linked-entity [id] [entity-id]",
+		Short:   "deletes a entity from a decentralized did (did) document",
+		Example: "delete a entity for a did document",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			// document did
+			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			// signer
+			signer := clientCtx.GetFromAddress()
+			// resource id
+			eID := args[1]
+
+			msg := types.NewMsgDeleteLinkedEntity(
+				did.String(),
+				eID,
+				signer.String(),
+			)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

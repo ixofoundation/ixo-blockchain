@@ -212,6 +212,33 @@ func (msg MsgDeleteLinkedResource) ValidateBasic() error {
 	return nil
 }
 
+func (msg MsgAddLinkedEntity) ValidateBasic() error {
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
+	return nil
+}
+
+// --------------------------
+// DELETE Resource
+// --------------------------
+
+// ValidateBasic performs a basic check of the MsgDeleteService fields.
+func (msg MsgDeleteLinkedEntity) ValidateBasic() error {
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
+
+	if IsEmpty(msg.EntityId) {
+		return sdkerrors.Wrap(ErrInvalidInput, "entity id cannot be empty;")
+	}
+
+	if !IsValidRFC3986Uri(msg.EntityId) {
+		return sdkerrors.Wrap(ErrInvalidRFC3986UriFormat, "service id validation error")
+	}
+	return nil
+}
+
 func (msg MsgDeleteAccordedRight) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
