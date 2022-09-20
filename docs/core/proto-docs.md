@@ -540,6 +540,10 @@
                 </li>
               
                 <li>
+                  <a href="#iid.LinkedEntity"><span class="badge">M</span>LinkedEntity</a>
+                </li>
+              
+                <li>
                   <a href="#iid.LinkedResource"><span class="badge">M</span>LinkedResource</a>
                 </li>
               
@@ -584,6 +588,14 @@
               
                 <li>
                   <a href="#iid.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddLinkedEntity"><span class="badge">M</span>MsgAddLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddLinkedEntityResponse"><span class="badge">M</span>MsgAddLinkedEntityResponse</a>
                 </li>
               
                 <li>
@@ -640,6 +652,14 @@
               
                 <li>
                   <a href="#iid.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedEntity"><span class="badge">M</span>MsgDeleteLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedEntityResponse"><span class="badge">M</span>MsgDeleteLinkedEntityResponse</a>
                 </li>
               
                 <li>
@@ -3819,7 +3839,7 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
                 </tr>
               
                 <tr>
-                  <td>serviceEndpoint</td>
+                  <td>service</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3918,7 +3938,8 @@ https://www.w3.org/TR/did-core/#services </p></td>
                   <td>authentication</td>
                   <td><a href="#string">string</a></td>
                   <td>repeated</td>
-                  <td><p>Authentication represents public key associated with the did document.
+                  <td><p>NOTE: below this line there are the relationships
+Authentication represents public key associated with the did document.
 cfr. https://www.w3.org/TR/did-core/#authentication </p></td>
                 </tr>
               
@@ -3970,6 +3991,20 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
                   <td>accordedRight</td>
                   <td><a href="#iid.AccordedRight">AccordedRight</a></td>
                   <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>alsoKnownAs</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
@@ -4081,6 +4116,37 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
+        <h3 id="iid.LinkedEntity">LinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relationship</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="iid.LinkedResource">LinkedResource</h3>
         <p></p>
 
@@ -4141,7 +4207,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
                 </tr>
               
                 <tr>
-                  <td>privacy</td>
+                  <td>right</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -4400,6 +4466,51 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
+        <h3 id="iid.MsgAddLinkedEntity">MsgAddLinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the iid </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td></td>
+                  <td><p>the entity to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="iid.MsgAddLinkedResource">MsgAddLinkedResource</h3>
         <p></p>
 
@@ -4595,6 +4706,13 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
                 </tr>
               
                 <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>signer</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
@@ -4744,6 +4862,51 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
         
       
         <h3 id="iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the iid </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entity_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the entity id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</h3>
         <p></p>
 
         
@@ -5153,6 +5316,20 @@ relationships that the method is allowed into. </p></td>
               </tr>
             
               <tr>
+                <td>AddLinkedEntity</td>
+                <td><a href="#iid.MsgAddLinkedEntity">MsgAddLinkedEntity</a></td>
+                <td><a href="#iid.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</a></td>
+                <td><p>Add / Delete Linked Entity</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteLinkedEntity</td>
+                <td><a href="#iid.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</a></td>
+                <td><a href="#iid.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
                 <td>AddAccordedRight</td>
                 <td><a href="#iid.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
                 <td><a href="#iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
@@ -5538,13 +5715,6 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
                   <td><p>status enables to query for validators matching a given status. </p></td>
                 </tr>
               
-                <tr>
-                  <td>pagination</td>
-                  <td><a href="#cosmos.base.query.v1beta1.PageRequest">cosmos.base.query.v1beta1.PageRequest</a></td>
-                  <td></td>
-                  <td><p>pagination defines an optional pagination for the request. </p></td>
-                </tr>
-              
             </tbody>
           </table>
 
@@ -5567,13 +5737,6 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
                   <td><a href="#iid.IidDocument">IidDocument</a></td>
                   <td>repeated</td>
                   <td><p>validators contains all the queried validators. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>pagination</td>
-                  <td><a href="#cosmos.base.query.v1beta1.PageResponse">cosmos.base.query.v1beta1.PageResponse</a></td>
-                  <td></td>
-                  <td><p>pagination defines the pagination in the response. </p></td>
                 </tr>
               
             </tbody>

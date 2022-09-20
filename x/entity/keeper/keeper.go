@@ -11,18 +11,20 @@ import (
 )
 
 type Keeper struct {
-	cdc        codec.BinaryCodec
-	storeKey   sdk.StoreKey
-	IidKeeper  iidkeeper.Keeper
-	WasmKeeper wasm.Keeper
+	cdc         codec.BinaryCodec
+	storeKey    sdk.StoreKey
+	memStoreKey sdk.StoreKey
+	IidKeeper   iidkeeper.Keeper
+	WasmKeeper  wasm.Keeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasm.Keeper) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasm.Keeper) Keeper {
 	return Keeper{
-		cdc:        cdc,
-		storeKey:   key,
-		IidKeeper:  iidKeeper,
-		WasmKeeper: wasmKeeper,
+		cdc:         cdc,
+		storeKey:    key,
+		memStoreKey: memStoreKey,
+		IidKeeper:   iidKeeper,
+		WasmKeeper:  wasmKeeper,
 	}
 }
 
@@ -59,6 +61,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	// emit the event
 	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
 		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
+		return err
 	}
 
 	return nil

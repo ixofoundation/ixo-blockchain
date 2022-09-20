@@ -15,10 +15,9 @@ type msgServer struct {
 
 // NewMsgServerImpl returns an implementation of the project MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(k Keeper, iidkeeper iidkeeper.Keeper) types.MsgServer {
+func NewMsgServerImpl(k Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper:    k,
-		IIDKeeper: iidkeeper,
+		Keeper: k,
 	}
 }
 

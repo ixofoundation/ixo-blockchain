@@ -6,6 +6,7 @@ const (
 	StoreKey          = ModuleName
 	RouterKey         = ModuleName
 	QuerierRoute      = ModuleName
+	MemStoreKey       = "mem_entity"
 )
 
 var (

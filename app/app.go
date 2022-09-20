@@ -25,6 +25,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -93,8 +94,7 @@ import (
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	entitymodule "github.com/ixofoundation/ixo-blockchain/x/entity"
-	entitymodulekeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
@@ -260,7 +260,7 @@ type IxoApp struct {
 	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
 	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
 	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
-	wasmKeeper       wasm.Keeper
+	WasmKeeper       wasm.Keeper              `json:"wasm_keeper"`
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
@@ -271,7 +271,7 @@ type IxoApp struct {
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	IidKeeper      iidmodulekeeper.Keeper
-	EntityKeeper   entitymodule.Keeper
+	EntityKeeper   entitykeeper.Keeper
 	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
 	ProjectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
@@ -307,7 +307,7 @@ func NewIxoApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		iidkeeper.StoreKey,
+		iidtypes.StoreKey,
 		// Custom ixo store keys
 		bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
@@ -413,8 +413,8 @@ func NewIxoApp(
 
 	app.IidKeeper = *iidmodulekeeper.NewKeeper(
 		appCodec,
-		keys[iidkeeper.StoreKey],
-		keys[iidkeeper.MemStoreKey],
+		keys[iidtypes.StoreKey],
+		keys[iidtypes.MemStoreKey],
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
@@ -423,9 +423,9 @@ func NewIxoApp(
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	if len(enabledProposals) != 0 {
-		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
+		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, enabledProposals))
 	}
-	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper))
+	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -444,7 +444,7 @@ func NewIxoApp(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	supportedFeatures := "iterator,staking,stargate"
-	app.wasmKeeper = wasm.NewKeeper(
+	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
 		app.GetSubspace(wasm.ModuleName),
@@ -480,11 +480,10 @@ func NewIxoApp(
 	app.ProjectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
 		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.IidKeeper, app.PaymentsKeeper)
 
-	app.entityKeeper = *entitymodulekeeper.NewKeeper(
+	app.EntityKeeper = entitykeeper.NewKeeper(
 		appCodec,
-		keys[entitykeeper.StoreKey],
-		keys[entitykeeper.MemStoreKey],
-		app.AccountKeeper,
+		keys[entitytypes.StoreKey],
+		keys[entitytypes.MemStoreKey],
 		app.IidKeeper,
 		app.WasmKeeper,
 	)
@@ -508,7 +507,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
@@ -517,11 +516,11 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule
-		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.wasmKeeper),
+		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.WasmKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
-		entitymodule.NewAppModule(app.appCodec, app.EntityKeeper, app.wasmKeeper),
+		entitymodule.NewAppModule(app.EntityKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -540,7 +539,7 @@ func NewIxoApp(
 		// Custom ixo modules
 		projecttypes.ModuleName,
 		bondstypes.ModuleName,
-		iidkeeper.ModuleName,
+		iidtypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Standard Cosmos modules
@@ -570,7 +569,7 @@ func NewIxoApp(
 
 		// Custom ixo modules
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		iidkeeper.ModuleName, bondstypes.ModuleName,
+		iidtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
 	)
 
@@ -596,7 +595,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
@@ -611,9 +610,21 @@ func NewIxoApp(
 	app.MountMemoryStores(memKeys)
 
 	// initialize BaseApp
+	ixoAnteHandler, err := IxoAnteHandler(HandlerOptions{
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		FeegrantKeeper:  app.FeeGrantKeeper,
+		IidKeeper:       app.IidKeeper,
+		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(IxoAnteHandler(app, encodingConfig, wasmConfig, keys[wasm.StoreKey]))
+	app.SetAnteHandler(ixoAnteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
@@ -944,7 +955,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// init params keeper and subspaces (for custom ixo modules)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(iidkeeper.ModuleName)
+	paramsKeeper.Subspace(iidtypes.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)

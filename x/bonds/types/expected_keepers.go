@@ -5,7 +5,7 @@ import (
 	did "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
-type DidKeeper interface {
+type IidKeeper interface {
 	MustGetDidDoc(ctx sdk.Context, did did.Did) did.DidDoc
 	GetDidDoc(ctx sdk.Context, did did.Did) (did.DidDoc, error)
 }

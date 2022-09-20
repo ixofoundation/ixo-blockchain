@@ -9,7 +9,6 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/client/rest"
@@ -18,7 +17,6 @@ import (
 	// "github.com/ixofoundation/ixo-blockchain/x/entity/client/rest"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -91,8 +89,7 @@ type AppModule struct {
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(keeper keeper.Keeper, paymentsKeeper paymentskeeper.Keeper,
-	bankKeeper bankkeeper.Keeper) AppModule {
+func NewAppModule(keeper keeper.Keeper) AppModule {
 
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
@@ -134,7 +131,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, genesisState)
+	InitGenesis(ctx, am.keeper, &genesisState)
 	return []abci.ValidatorUpdate{}
 }
 

@@ -5,8 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid didexported.Did) types.Batch {
@@ -208,11 +209,14 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	var extraEventAttributes []sdk.Attribute
 
 	// Get buyer address
-	buyerDidDoc, err := k.didKeeper.GetDidDoc(ctx, bo.BaseOrder.AccountDid)
+	buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid))
+	if !exists {
+		return err
+	}
+	buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(buyerDidDoc.Id)
 	if err != nil {
 		return err
 	}
-	buyerAddr := buyerDidDoc.Address()
 
 	feeAddr, err := sdk.AccAddressFromBech32(bond.FeeAddress)
 	if err != nil {
@@ -357,11 +361,14 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// Get seller address
-	sellerDidDoc, err := k.didKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
-	if err != nil {
-		return err
+	sellerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid))
+	if !exists {
+		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found")
 	}
-	sellerAddr := sellerDidDoc.Address()
+	sellerAddr, err := sellerDidDoc.GetVerificationMethodBlockchainAddress(sellerDidDoc.Id)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Address not found")
+	}
 
 	reserveReturns := types.MultiplyDecCoinsByInt(prices, so.BaseOrder.Amount.Amount)
 	reserveReturnsRounded := types.RoundReserveReturns(reserveReturns)
@@ -420,11 +427,14 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 	// WARNING: do not return ok=true if money has already been transferred when error occurs
 
 	// Get swapper address
-	swapperDidDoc, err := k.didKeeper.GetDidDoc(ctx, so.BaseOrder.AccountDid)
-	if err != nil {
-		return err, true
+	swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid))
+	if !exists {
+		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"), true
 	}
-	swapperAddr := swapperDidDoc.Address()
+	swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(swapperDidDoc.Id)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Address not found"), true
+	}
 
 	// Get return for swap
 	reserveBalances := k.GetReserveBalances(ctx, bondDid)
@@ -540,8 +550,15 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid didexported.Did) {
 					logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 					// Return from amount to swapper
-					swapperAddr := k.didKeeper.MustGetDidDoc(ctx, so.BaseOrder.AccountDid).Address()
-					err := k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+					swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid))
+					if !exists {
+						panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
+					}
+					swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(swapperDidDoc.Id)
+					if err != nil {
+						panic(sdkerrors.Wrap(err, "Address not found"))
+					}
+					err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 						types.BatchesIntermediaryAccount, swapperAddr, sdk.Coins{so.BaseOrder.Amount})
 					if err != nil {
 						panic(err)
@@ -610,8 +627,15 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid didexported.Did
 				))
 
 				// Return reserve to buyer
-				buyerAddr := k.didKeeper.MustGetDidDoc(ctx, bo.BaseOrder.AccountDid).Address()
-				err := k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
+				buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid))
+				if !exists {
+					panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
+				}
+				buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(buyerDidDoc.Id)
+				if err != nil {
+					panic(sdkerrors.Wrap(err, "Address not found"))
+				}
+				err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 					types.BatchesIntermediaryAccount, buyerAddr, bo.MaxPrices)
 				if err != nil {
 					panic(err)
