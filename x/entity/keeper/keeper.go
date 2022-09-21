@@ -1,11 +1,14 @@
 package keeper
 
 import (
-	"github.com/CosmWasm/wasmd/x/wasm"
+	"errors"
+
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -15,10 +18,10 @@ type Keeper struct {
 	storeKey    sdk.StoreKey
 	memStoreKey sdk.StoreKey
 	IidKeeper   iidkeeper.Keeper
-	WasmKeeper  wasm.Keeper
+	WasmKeeper  wasmtypes.ContractOpsKeeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasm.Keeper) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmtypes.ContractOpsKeeper) Keeper {
 	return Keeper{
 		cdc:         cdc,
 		storeKey:    key,
@@ -28,7 +31,26 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey
 	}
 }
 
+func (k Keeper) UpdateEntityConfig(ctx sdk.Context, key string, value string) error {
+	ctx.KVStore(k.storeKey).Set(nil, nil)
+	return nil
+}
+
+func (k Keeper) GetEntityConfig(ctx sdk.Context, key types.EntityConfigKey) ([]byte, error) {
+	val := ctx.KVStore(k.storeKey).Get([]byte(key))
+	if val == nil {
+		return nil, sdkerrors.Wrap(errors.New("not found"), "Not found")
+	}
+	return val, nil
+}
+
 func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error {
+
+	signer, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return err
+	}
+
 	did, err := iidtypes.NewDidDocument(msg.Id,
 		iidtypes.WithServices(msg.Services...),
 		iidtypes.WithRights(msg.AccordedRight...),
@@ -55,6 +77,25 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	// now create and persist the metadata
 	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
 	k.IidKeeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
+
+	nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
+	if err != nil {
+		return err
+	}
+
+	nftMsgBytes, err := entitycontracts.Mint{
+		TokenId:  did.Id,
+		Owner:    did.Id,
+		TokenUrl: "",
+	}.Marshal()
+	if err != nil {
+		return err
+	}
+
+	_, err = k.WasmKeeper.Execute(ctx, sdk.AccAddress(nftAddresBytes), signer, nftMsgBytes, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	if err != nil {
+		return err
+	}
 
 	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
 

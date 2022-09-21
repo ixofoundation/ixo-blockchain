@@ -18,6 +18,8 @@ service Msg {
   // // UpdateEntityStatus defines a method for updating a entity's current status.
   rpc UpdateEntityStatus(MsgUpdateEntityStatus) returns (MsgUpdateEntityStatusResponse);
 
+  rpc UpdateEntityConfig(MsgUpdateEntityConfig) returns (MsgUpdateEntityConfigResponse);
+
   // // UpdateProjectDoc defines a method for updating a project's data.
   // rpc UpdateProjectDoc(MsgUpdateProjectDoc) returns (MsgUpdateProjectDocResponse);
 }
@@ -47,6 +49,16 @@ message MsgUpdateEntityStatus {
 
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
 message MsgUpdateEntityStatusResponse{}
+
+message MsgUpdateEntityConfig {
+  option (gogoproto.equal)      = false;
+
+  string nft_contract_address   = 1 [(gogoproto.jsontag) = "nftContractAddress", (gogoproto.moretags) = "yaml:\"nftContractAddress\""];
+  string signer                 = 2 [(gogoproto.jsontag) = "signer", (gogoproto.moretags) = "yaml:\"signer\""];
+}
+
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
+message MsgUpdateEntityConfigResponse{}
 
 // // MsgCreateAgent defines a message for creating an agent on a project.
 // message MsgCreateAgent {

@@ -493,6 +493,18 @@
             <ul>
               
                 <li>
+                  <a href="#entity.QueryEntityConfigRequest"><span class="badge">M</span>QueryEntityConfigRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityConfigResponse"><span class="badge">M</span>QueryEntityConfigResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityConfigResponse.MapEntry"><span class="badge">M</span>QueryEntityConfigResponse.MapEntry</a>
+                </li>
+              
+                <li>
                   <a href="#entity.QueryEntityDocRequest"><span class="badge">M</span>QueryEntityDocRequest</a>
                 </li>
               
@@ -735,6 +747,14 @@
               
                 <li>
                   <a href="#entity.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntityConfig"><span class="badge">M</span>MsgUpdateEntityConfig</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntityConfigResponse"><span class="badge">M</span>MsgUpdateEntityConfigResponse</a>
                 </li>
               
                 <li>
@@ -3653,6 +3673,68 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
       <p></p>
 
       
+        <h3 id="entity.QueryEntityConfigRequest">QueryEntityConfigRequest</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="entity.QueryEntityConfigResponse">QueryEntityConfigResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>map</td>
+                  <td><a href="#entity.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="entity.QueryEntityDocRequest">QueryEntityDocRequest</h3>
         <p>QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.</p>
 
@@ -3750,6 +3832,13 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
                 <td><p></p></td>
               </tr>
             
+              <tr>
+                <td>EntityConfig</td>
+                <td><a href="#entity.QueryEntityConfigRequest">QueryEntityConfigRequest</a></td>
+                <td><a href="#entity.QueryEntityConfigResponse">QueryEntityConfigResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
           </tbody>
         </table>
 
@@ -3784,6 +3873,16 @@ Params params                                 = 2 [(gogoproto.nullable) = false,
                 <td>EntityDoc</td>
                 <td>GET</td>
                 <td>/ixo/entity/{entity_did}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>EntityConfig</td>
+                <td>GET</td>
+                <td>/ixo/entity/config</td>
                 <td></td>
               </tr>
               
@@ -5456,6 +5555,44 @@ relationships that the method is allowed into. </p></td>
 
         
       
+        <h3 id="entity.MsgUpdateEntityConfig">MsgUpdateEntityConfig</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>nft_contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgUpdateEntityConfigResponse">MsgUpdateEntityConfigResponse</h3>
+        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
+
+        
+
+        
+      
         <h3 id="entity.MsgUpdateEntityStatus">MsgUpdateEntityStatus</h3>
         <p>MsgUpdateEntityStatus defines a message for updating a entity's current status.</p>
 
@@ -5513,6 +5650,13 @@ relationships that the method is allowed into. </p></td>
                 <td><a href="#entity.MsgUpdateEntityStatus">MsgUpdateEntityStatus</a></td>
                 <td><a href="#entity.MsgUpdateEntityStatusResponse">MsgUpdateEntityStatusResponse</a></td>
                 <td><p>UpdateEntityStatus defines a method for updating a entity&#39;s current status.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateEntityConfig</td>
+                <td><a href="#entity.MsgUpdateEntityConfig">MsgUpdateEntityConfig</a></td>
+                <td><a href="#entity.MsgUpdateEntityConfigResponse">MsgUpdateEntityConfigResponse</a></td>
+                <td><p></p></td>
               </tr>
             
           </tbody>

@@ -18,6 +18,10 @@ service Query {
     option (google.api.http).get = "/ixo/entity/{entity_did}";
   }
 
+  rpc EntityConfig(QueryEntityConfigRequest) returns (QueryEntityConfigResponse){
+    option (google.api.http).get = "/ixo/entity/config";
+  }
+
   // // ProjectAccounts lists a specific project's accounts.
   // rpc ProjectAccounts(QueryProjectAccountsRequest) returns (QueryProjectAccountsResponse){
   //   option (google.api.http).get = "/ixo/projectAccounts/{project_did}";
@@ -53,6 +57,14 @@ message QueryEntityDocRequest {
 message QueryEntityDocResponse {
   // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
 }
+
+message QueryEntityConfigRequest {}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryEntityConfigResponse {
+  map<string, string> map = 1 [(gogoproto.moretags) = "yaml:\"config\""];
+}
+
 
 // // QueryProjectAccountsRequest is the request type for the Query/ProjectAccounts RPC method.
 // message QueryProjectAccountsRequest {

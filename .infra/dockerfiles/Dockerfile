@@ -61,10 +61,10 @@ ENTRYPOINT ["ixod", "start"]
 ## Build Distrubutiable Blockchain
 ##
 
-FROM gcr.io/distroless/base-debian10 AS distributable
+FROM ubuntu:latest  as distributable
 
-COPY --from=build-binary /build/ixod /app/ixod
-# COPY --from=build-binary /dist/app/.ixod/ /app/.ixod/
+COPY --from=build-binary /go/bin/ixod .
+COPY --from=build-binary /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/ /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/
 
 ONBUILD LABEL world.ixo.blockchain.image.authors="willem.mouton@ixo.world"
 
@@ -73,10 +73,7 @@ ONBUILD WORKDIR /app
 ONBUILD EXPOSE 1317
 ONBUILD EXPOSE 26657
 
-ONBUILD ENV IXOD_ENV=prod
-ONBUILD ENV IXOD_HOME=/app/.ixod-$IXOD_ENV
-
-ONBUILD ENTRYPOINT ["/app/ixod", "--home", "${IXOD_HOME}", "start"]
+ONBUILD ENTRYPOINT ["ixod", "start", "--rpc.laddr", "tcp://0.0.0.0:26657"]
 
 FROM distributable AS dist-devel
 # RUN echo "Fetch genisis file"

@@ -40,6 +40,10 @@ func (k Keeper) EntityList(c context.Context, req *types.QueryEntityListRequest)
 	return &types.QueryEntityListResponse{}, nil
 }
 
+func (k Keeper) EntityConfig(c context.Context, req *types.QueryEntityConfigRequest) (*types.QueryEntityConfigResponse, error) {
+	return &types.QueryEntityConfigResponse{}, nil
+}
+
 // func (k Keeper) ProjectAccounts(c context.Context, req *types.QueryProjectAccountsRequest) (*types.QueryProjectAccountsResponse, error) {
 // 	if req == nil {
 // 		return nil, status.Error(codes.InvalidArgument, "invalid request")

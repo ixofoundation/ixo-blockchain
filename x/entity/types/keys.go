@@ -36,3 +36,9 @@ var (
 // func GetClaimKey(projectDid didexported.Did, claimId string) []byte {
 // 	return append(GetClaimsKey(projectDid), []byte(claimId)...)
 // }
+
+type EntityConfigKey string
+
+const (
+	ConfigNftContractAddress EntityConfigKey = "nft_address"
+)

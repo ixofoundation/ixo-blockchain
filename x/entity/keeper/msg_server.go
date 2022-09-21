@@ -32,6 +32,10 @@ func (s msgServer) UpdateEntityStatus(goCtx context.Context, msg *types.MsgUpdat
 	return &types.MsgUpdateEntityStatusResponse{}, nil
 }
 
+func (s msgServer) UpdateEntityConfig(goCtx context.Context, msg *types.MsgUpdateEntityConfig) (*types.MsgUpdateEntityConfigResponse, error) {
+	return &types.MsgUpdateEntityConfigResponse{}, nil
+}
+
 // func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpdateProjectStatus) (*types.MsgUpdateProjectStatusResponse, error) {
 // 	ctx := sdk.UnwrapSDKContext(goCtx)
 // 	k := s.Keeper
