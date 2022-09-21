@@ -3,6 +3,7 @@ package keeper
 import (
 	"errors"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,13 +22,13 @@ type Keeper struct {
 	WasmKeeper  wasmtypes.ContractOpsKeeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmtypes.ContractOpsKeeper) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper) Keeper {
 	return Keeper{
 		cdc:         cdc,
 		storeKey:    key,
 		memStoreKey: memStoreKey,
 		IidKeeper:   iidKeeper,
-		WasmKeeper:  wasmKeeper,
+		WasmKeeper:  wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 	}
 }
 
