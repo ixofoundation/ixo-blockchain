@@ -486,6 +486,7 @@ func NewIxoApp(
 		keys[entitytypes.MemStoreKey],
 		app.IidKeeper,
 		app.WasmKeeper,
+		app.AccountKeeper,
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified

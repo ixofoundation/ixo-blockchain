@@ -2,12 +2,17 @@ package keeper
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	cryptosecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
@@ -15,20 +20,22 @@ import (
 )
 
 type Keeper struct {
-	cdc         codec.BinaryCodec
-	storeKey    sdk.StoreKey
-	memStoreKey sdk.StoreKey
-	IidKeeper   iidkeeper.Keeper
-	WasmKeeper  wasmtypes.ContractOpsKeeper
+	cdc           codec.BinaryCodec
+	storeKey      sdk.StoreKey
+	memStoreKey   sdk.StoreKey
+	IidKeeper     iidkeeper.Keeper
+	WasmKeeper    wasmtypes.ContractOpsKeeper
+	AccountKeeper authkeeper.AccountKeeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper, accountKeeper authkeeper.AccountKeeper) Keeper {
 	return Keeper{
-		cdc:         cdc,
-		storeKey:    key,
-		memStoreKey: memStoreKey,
-		IidKeeper:   iidKeeper,
-		WasmKeeper:  wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		cdc:           cdc,
+		storeKey:      key,
+		memStoreKey:   memStoreKey,
+		IidKeeper:     iidKeeper,
+		WasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		AccountKeeper: accountKeeper,
 	}
 }
 
@@ -52,12 +59,28 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 		return err
 	}
 
-	did, err := iidtypes.NewDidDocument(msg.Id,
+	privKey := cryptosecp256k1.GenPrivKey()
+	pubKey := privKey.PubKey()
+	address, err := sdk.AccAddressFromHex(string(pubKey.Address()))
+	if err != nil {
+		return err
+	}
+
+	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
+	entityId := fmt.Sprintf("did:ixo:entity:%s:%d", msg.EntityType, account.GetAccountNumber())
+
+	verification := iidtypes.NewAccountVerification(
+		iidtypes.DID(entityId),
+		ctx.ChainID(),
+		string(account.GetAddress()),
+	)
+
+	did, err := iidtypes.NewDidDocument(entityId,
 		iidtypes.WithServices(msg.Services...),
 		iidtypes.WithRights(msg.AccordedRight...),
 		iidtypes.WithResources(msg.LinkedResource...),
-		iidtypes.WithVerifications(msg.Verifications...),
-		iidtypes.WithControllers(msg.Controllers...),
+		iidtypes.WithVerifications(append(msg.Verifications, verification)...),
+		iidtypes.WithControllers(append(msg.Controllers, entityId)...),
 	)
 	if err != nil {
 		// k.Logger(ctx).Error(err.Error())
@@ -65,19 +88,31 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	}
 
 	// check that the did is not already taken
-	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(msg.Id))
+	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(entityId))
 	if found {
-		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", msg.Id)
+		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", entityId)
 		// k.Logger(ctx).Error(err.Error())
 		return err
 	}
 
 	// persist the did document
-	k.IidKeeper.SetDidDocument(ctx, []byte(msg.Id), did)
+	k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 
+	currentTimeUtc := time.Now().UTC()
 	// now create and persist the metadata
 	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
-	k.IidKeeper.SetDidMetadata(ctx, []byte(msg.Id), didM)
+	didM.EntityType = msg.EntityType
+	didM.Deactivated = msg.Deactivated
+	didM.Created = &currentTimeUtc
+	didM.Updated = &currentTimeUtc
+	didM.VersionId = fmt.Sprintf("%s:%d", entityId, 0)
+	didM.Stage = msg.Stage
+	didM.Credentials = msg.Credentials
+	didM.VerifiableCredential = msg.VerifiableCredential
+	didM.StartDate = msg.StartDate
+	didM.EndDate = msg.EndDate
+	didM.RelayerNode = msg.RelayerNode
+	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
 
 	nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
 	if err != nil {
@@ -101,7 +136,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
 
 	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
+	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.Signer)); err != nil {
 		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
 		return err
 	}

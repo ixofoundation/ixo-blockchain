@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "iid/iid.proto";
 import "iid/tx.proto";
 import "entity/entity.proto";
+import "google/protobuf/timestamp.proto";
 
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
@@ -29,14 +30,25 @@ message MsgCreateEntity {
   option (gogoproto.equal)            = false;
   option (gogoproto.goproto_getters)  = false;
 
-  string                id            = 1; // the did
-  repeated string       controllers   = 2; // the list of controller DIDs
-  repeated iid.Context      context        = 3;
-  repeated iid.Verification verifications = 4; // the list of verification methods and relationships
-  repeated iid.Service      services      = 5;
-  repeated iid.AccordedRight accordedRight = 6;
-  repeated iid.LinkedResource linkedResource = 7;
-  string   signer        = 8; // address of the account signing the message
+  // string                id            = 1; // the did
+  string   entityType       = 1 [(gogoproto.jsontag) = "entity_type", (gogoproto.moretags) = "yaml:\"entity_type\""]; // address of the account signing the message
+  int32 entityStatus        = 2 [(gogoproto.jsontag) = "entity_status", (gogoproto.moretags) = "yaml:\"entity_status\""]; // address of the account signing the message
+  repeated string       controllers   = 3; // the list of controller DIDs
+  repeated iid.Context      context        = 4;
+  repeated iid.Verification verifications = 5; // the list of verification methods and relationships
+  repeated iid.Service      services      = 6;
+  repeated iid.AccordedRight accordedRight = 7;
+  repeated iid.LinkedResource linkedResource = 8;
+
+  // string versionId = 8;
+  bool deactivated = 9;
+  google.protobuf.Timestamp startDate = 10 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "start_date", (gogoproto.moretags) = "yaml:\"start_date\""]; // address of the account signing the message
+  google.protobuf.Timestamp endDate = 11 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "end_date", (gogoproto.moretags) = "yaml:\"end_date\""]; // address of the account signing the message
+  string stage = 12;
+  string relayerNode = 13 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
+  string verifiableCredential = 14 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
+  repeated string credentials = 15;
+  string   signer        = 16; // address of the account signing the message
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.

@@ -1,8 +1,11 @@
 package cli
 
 import (
+	"encoding/json"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	"github.com/spf13/cobra"
 )
@@ -25,38 +28,37 @@ func NewTxCmd() *cobra.Command {
 
 func NewCmdCreateEntity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-entity [entity-type] [entity-iid]",
+		Use:   "create-entity [entity-iid]",
 		Short: "Create a new EntityDoc",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// senderDid := args[0]
-			// projectDataStr := args[1]
-			// ixoDidStr := args[2]
 
-			// ixoDid, err := didtypes.UnmarshalIxoDid(ixoDidStr)
-			// if err != nil {
-			// 	return err
-			// }
+			var msg types.MsgCreateEntity
+			err := json.Unmarshal([]byte(args[0]), &msg)
+			if err != nil {
+				return err
+			}
 
-			// clientCtx, err := client.GetClientTxContext(cmd)
-			// if err != nil {
-			// 	return err
-			// }
-			// clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-			// msg := types.NewMsgCreateProject(
-			// 	senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
-			// err = msg.ValidateBasic()
-			// if err != nil {
-			// 	return err
-			// }
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-			// res, err := ixotypes.SignAndBroadcastTxFromStdSignMsg(clientCtx, msg, ixoDid, cmd.Flags())
-			// if err != nil {
-			// 	return err
-			// }
+			msg.Signer, err = cmd.Flags().GetString(flags.FlagFrom)
+			if err != nil {
+				return err
+			}
 
-			// return clientCtx.PrintProto(res)
+			err = tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}

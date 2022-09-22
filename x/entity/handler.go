@@ -23,27 +23,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgUpdateEntityConfig:
 			res, err := msgServer.UpdateEntityConfig(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgUpdateProjectStatus:
-		// 	res, err := msgServer.UpdateProjectStatus(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgCreateAgent:
-		// 	res, err := msgServer.CreateAgent(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgUpdateAgent:
-		// 	res, err := msgServer.UpdateAgent(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgCreateClaim:
-		// 	res, err := msgServer.CreateClaim(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgCreateEvaluation:
-		// 	res, err := msgServer.CreateEvaluation(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgWithdrawFunds:
-		// 	res, err := msgServer.WithdrawFunds(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
-		// case *types.MsgUpdateProjectDoc:
-		// 	res, err := msgServer.UpdateProjectDoc(sdk.WrapSDKContext(ctx), msg)
-		// 	return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			// err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg type: %v", msg.Type())
 			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg")

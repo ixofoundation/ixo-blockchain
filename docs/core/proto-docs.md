@@ -5486,10 +5486,19 @@ relationships that the method is allowed into. </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
+                  <td>entityType</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the did </p></td>
+                  <td><p>string                id            = 1; // the did
+
+address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityStatus</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
                 </tr>
               
                 <tr>
@@ -5530,6 +5539,55 @@ relationships that the method is allowed into. </p></td>
                 <tr>
                   <td>linkedResource</td>
                   <td><a href="#iid.LinkedResource">iid.LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>string versionId = 8; </p></td>
+                </tr>
+              
+                <tr>
+                  <td>startDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>endDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>stage</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relayerNode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifiableCredential</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>credentials</td>
+                  <td><a href="#string">string</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
