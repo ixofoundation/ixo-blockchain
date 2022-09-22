@@ -10,13 +10,15 @@ import (
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateEntity{}, "entity/CreateEntity", nil)
-	cdc.RegisterConcrete(&MsgUpdateEntityStatus{}, "project/UpdateEntityStatus", nil)
+	cdc.RegisterConcrete(&MsgUpdateEntityStatus{}, "entity/UpdateEntityStatus", nil)
+	cdc.RegisterConcrete(&MsgUpdateEntityConfig{}, "entity/UpdateEntityConfig", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateEntity{},
 		&MsgUpdateEntityStatus{},
+		&MsgUpdateEntityConfig{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

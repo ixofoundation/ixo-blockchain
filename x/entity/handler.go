@@ -25,7 +25,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			// err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg type: %v", msg.Type())
-			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg")
+			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized entity Msg")
 			return nil, err
 		}
 	}

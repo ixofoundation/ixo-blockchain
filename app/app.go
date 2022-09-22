@@ -270,11 +270,11 @@ type IxoApp struct {
 	// Custom ixo keepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	IidKeeper      iidmodulekeeper.Keeper
-	EntityKeeper   entitykeeper.Keeper
-	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
-	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
-	ProjectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
+	IidKeeper      iidmodulekeeper.Keeper `json:"iid_keeper"`
+	EntityKeeper   entitykeeper.Keeper    `json:"entity_keeper"`
+	BondsKeeper    bondskeeper.Keeper     `json:"bonds_keeper"`
+	PaymentsKeeper paymentskeeper.Keeper  `json:"payments_keeper,omitempty"`
+	ProjectKeeper  projectkeeper.Keeper   `json:"project_keeper"`
 
 	// the module manager
 	mm *module.Manager `json:"mm,omitempty"`
@@ -307,12 +307,12 @@ func NewIxoApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		wasm.StoreKey,
 		iidtypes.StoreKey,
 		// Custom ixo store keys
 		bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
 		entitytypes.StoreKey,
-		wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -541,8 +541,11 @@ func NewIxoApp(
 		projecttypes.ModuleName,
 		bondstypes.ModuleName,
 		iidtypes.ModuleName,
+		entitytypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
+		// Custom ixo modules
+
 		// Standard Cosmos modules
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
 		distrtypes.ModuleName, evidencetypes.ModuleName, iidtypes.ModuleName, banktypes.ModuleName,
@@ -551,7 +554,7 @@ func NewIxoApp(
 		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
 		feegrant.ModuleName, wasm.ModuleName,
 
-		// Custom ixo modules
+		entitytypes.ModuleName,
 		bondstypes.ModuleName, paymentstypes.ModuleName,
 	)
 
@@ -572,6 +575,7 @@ func NewIxoApp(
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		iidtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
+		entitytypes.ModuleName,
 	)
 
 	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
@@ -960,6 +964,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(entitytypes.ModuleName)
 
 	return paramsKeeper
 }

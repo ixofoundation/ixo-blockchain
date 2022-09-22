@@ -5,12 +5,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 )
 
 type msgServer struct {
-	Keeper    Keeper
-	IIDKeeper iidkeeper.Keeper
+	Keeper Keeper
 }
 
 // NewMsgServerImpl returns an implementation of the project MsgServer interface

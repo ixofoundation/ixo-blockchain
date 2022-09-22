@@ -63,7 +63,7 @@ ENTRYPOINT ["ixod", "start"]
 
 FROM ubuntu:latest  as distributable
 
-COPY --from=build-binary /go/bin/ixod .
+COPY --from=build-binary /go/bin/ixod /app/ixod
 COPY --from=build-binary /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/ /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/
 
 ONBUILD LABEL world.ixo.blockchain.image.authors="willem.mouton@ixo.world"
@@ -73,7 +73,7 @@ ONBUILD WORKDIR /app
 ONBUILD EXPOSE 1317
 ONBUILD EXPOSE 26657
 
-ONBUILD ENTRYPOINT ["ixod", "start", "--rpc.laddr", "tcp://0.0.0.0:26657"]
+ONBUILD ENTRYPOINT ["/app/ixod", "start", "--rpc.laddr", "tcp://0.0.0.0:26657"]
 
 FROM distributable AS dist-devel
 # RUN echo "Fetch genisis file"
