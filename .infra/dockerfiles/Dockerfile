@@ -73,7 +73,7 @@ ONBUILD WORKDIR /app
 ONBUILD EXPOSE 1317
 ONBUILD EXPOSE 26657
 
-ONBUILD ENTRYPOINT ["/app/ixod", "start", "--rpc.laddr", "tcp://0.0.0.0:26657"]
+# ONBUILD ENTRYPOINT ["/app/ixod", "start", "--rpc.laddr", "tcp://0.0.0.0:26657"]
 
 FROM distributable AS dist-devel
 # RUN echo "Fetch genisis file"
