@@ -174,7 +174,7 @@ func IsValidDIDDocument(didDoc *IidDocument) bool {
 	}
 
 	for _, element := range didDoc.Controller {
-		if !IsValidDIDKeyFormat(element) {
+		if !IsValidIIDKeyFormat(element) {
 			return false
 		}
 	}
@@ -403,7 +403,7 @@ func (didDoc *IidDocument) AddControllers(controllers ...string) error {
 		if !IsValidDID(c) {
 			return sdkerrors.Wrapf(ErrInvalidDIDFormat, "did document controller validation error '%s'", c)
 		}
-		if !IsValidDIDKeyFormat(c) {
+		if !IsValidIIDKeyFormat(c) {
 			// TODO: link to the documentation for the error
 			return sdkerrors.Wrapf(ErrInvalidInput, "did document controller '%s' must be of type key", c)
 		}
@@ -1051,7 +1051,7 @@ func UpdateDidMetadata(meta *IidMetadata, versionData []byte, updated time.Time)
 
 // ResolveAccountDID generates a DID document from an address
 func ResolveAccountDID(did, chainID string) (didDoc IidDocument, didMeta IidMetadata, err error) {
-	if !IsValidDIDKeyFormat(did) {
+	if !IsValidIIDKeyFormat(did) {
 		err = ErrInvalidDidMethodFormat
 		return
 	}
