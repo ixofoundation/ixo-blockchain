@@ -197,6 +197,16 @@ func IsValidDIDKeyFormat(did string) bool {
 	return true
 }
 
+func IsValidIIDKeyFormat(did string) bool {
+	if _, err := sdk.AccAddressFromBech32(strings.TrimPrefix(did, DidKeyPrefix)); err != nil {
+		bech32 := strings.Split(did, ":")
+		if _, err := sdk.AccAddressFromBech32(bech32[len(bech32)-1]); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
 // IsValidDIDMetadata tells if a DID metadata is valid,
 // that is if it has a non empty versionId and a non-zero create date
 func IsValidDIDMetadata(didMeta *IidMetadata) bool {
