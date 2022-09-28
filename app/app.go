@@ -487,6 +487,7 @@ func NewIxoApp(
 		app.IidKeeper,
 		app.WasmKeeper,
 		app.AccountKeeper,
+		app.ParamsKeeper,
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -958,12 +959,12 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(wasm.ModuleName)
 	// init params keeper and subspaces (for custom ixo modules)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(iidtypes.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
-	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(entitytypes.ModuleName)
 
 	return paramsKeeper

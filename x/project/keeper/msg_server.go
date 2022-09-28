@@ -83,8 +83,8 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 		iidtypes.WithControllers(msg.ProjectDid),
 		iidtypes.WithVerifications(iidtypes.NewVerification(
 			iidtypes.NewVerificationMethod(msg.ProjectDid, iidtypes.DID(msg.ProjectDid), iidProjectVerificationMethod),
-			[]string{},
-			[]string{},
+			[]string{iidtypes.Authentication},
+			nil,
 		)),
 	)
 	if err != nil {

@@ -13,8 +13,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -26,9 +26,11 @@ type Keeper struct {
 	IidKeeper     iidkeeper.Keeper
 	WasmKeeper    wasmtypes.ContractOpsKeeper
 	AccountKeeper authkeeper.AccountKeeper
+	ParamsKeeper  paramskeeper.Keeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper, accountKeeper authkeeper.AccountKeeper) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
+	accountKeeper authkeeper.AccountKeeper, paramsKeeper paramskeeper.Keeper) Keeper {
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,
@@ -36,6 +38,7 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey
 		IidKeeper:     iidKeeper,
 		WasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 		AccountKeeper: accountKeeper,
+		ParamsKeeper:  paramsKeeper,
 	}
 }
 
@@ -54,26 +57,41 @@ func (k Keeper) GetEntityConfig(ctx sdk.Context, key types.EntityConfigKey) ([]b
 
 func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error {
 
-	signer, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return err
-	}
+	// signer, err := sdk.AccAddressFromBech32(msg.Signer)
+	// if err != nil {
+	// 	return err
+	// }
+
+	fmt.Println("================================================1")
+	fmt.Printf("%+v\n", msg)
 
 	privKey := cryptosecp256k1.GenPrivKey()
 	pubKey := privKey.PubKey()
-	address, err := sdk.AccAddressFromHex(string(pubKey.Address()))
-	if err != nil {
-		return err
-	}
+
+	fmt.Println("================================================12")
+	fmt.Printf("%+v\n", string(pubKey.Address()))
+	address := sdk.AccAddress(pubKey.Address().Bytes())
+	// if err != nil {
+	// 	fmt.Println("================================================1e")
+	// 	fmt.Printf("%s\n", err)
+	// 	return err
+	// }
+
+	fmt.Println("================================================11")
+	fmt.Printf("%s\n", string(address.String()))
 
 	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
-	entityId := fmt.Sprintf("did:ixo:entity:%s:%d", msg.EntityType, account.GetAccountNumber())
+	entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, address.String())
 
 	verification := iidtypes.NewAccountVerification(
 		iidtypes.DID(entityId),
 		ctx.ChainID(),
-		string(account.GetAddress()),
+		account.GetAddress().String(),
+		iidtypes.Authentication,
 	)
+
+	fmt.Println("================================================2")
+	fmt.Printf("%s\n", entityId)
 
 	did, err := iidtypes.NewDidDocument(entityId,
 		iidtypes.WithServices(msg.Services...),
@@ -83,9 +101,15 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 		iidtypes.WithControllers(append(msg.Controllers, entityId)...),
 	)
 	if err != nil {
+		fmt.Println("================================================3")
+		fmt.Printf("%s\n", err)
 		// k.Logger(ctx).Error(err.Error())
 		return err
 	}
+
+	fmt.Println("================================================3")
+	fmt.Printf("%s\n", entityId)
+	fmt.Printf("%+v\n", did)
 
 	// check that the did is not already taken
 	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(entityId))
@@ -96,7 +120,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	}
 
 	// persist the did document
-	k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 
 	currentTimeUtc := time.Now().UTC()
 	// now create and persist the metadata
@@ -112,26 +135,31 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	didM.StartDate = msg.StartDate
 	didM.EndDate = msg.EndDate
 	didM.RelayerNode = msg.RelayerNode
+
+	fmt.Println("===============================================4")
+	fmt.Printf("%+v\n", did)
+
+	k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
 
-	nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
-	if err != nil {
-		return err
-	}
+	// nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
+	// if err != nil {
+	// 	return err
+	// }
 
-	nftMsgBytes, err := entitycontracts.Mint{
-		TokenId:  did.Id,
-		Owner:    did.Id,
-		TokenUrl: "",
-	}.Marshal()
-	if err != nil {
-		return err
-	}
+	// nftMsgBytes, err := entitycontracts.Mint{
+	// 	TokenId:  did.Id,
+	// 	Owner:    did.Id,
+	// 	TokenUrl: "",
+	// }.Marshal()
+	// if err != nil {
+	// 	return err
+	// }
 
-	_, err = k.WasmKeeper.Execute(ctx, sdk.AccAddress(nftAddresBytes), signer, nftMsgBytes, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
-	if err != nil {
-		return err
-	}
+	// _, err = k.WasmKeeper.Execute(ctx, sdk.AccAddress(nftAddresBytes), signer, nftMsgBytes, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	// if err != nil {
+	// return err
+	// }
 
 	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
 
