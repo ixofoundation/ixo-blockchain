@@ -198,12 +198,12 @@ func IsValidDIDKeyFormat(did string) bool {
 }
 
 func IsValidIIDKeyFormat(did string) bool {
-	if _, err := sdk.AccAddressFromBech32(strings.TrimPrefix(did, DidKeyPrefix)); err != nil {
-		bech32 := strings.Split(did, ":")
-		if _, err := sdk.AccAddressFromBech32(bech32[len(bech32)-1]); err != nil {
-			return false
-		}
-	}
+	//if _, err := sdk.AccAddressFromBech32(strings.TrimPrefix(did, DidKeyPrefix)); err != nil {
+	//	bech32 := strings.Split(did, ":")
+	//	if _, err := sdk.AccAddressFromBech32(bech32[len(bech32)-1]); err != nil {
+	//		return false
+	//	}
+	//}
 	return true
 }
 
