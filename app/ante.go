@@ -86,6 +86,11 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewValidateMemoDecorator(options.AccountKeeper),
 		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 		authante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
+		// iidante.NewInjectIidAddress(options.IidKeeper),
+		// iidante.NewIidSetPubKeyDecorator(
+		// 	options.IidKeeper,
+
+		// ),
 		authante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		authante.NewValidateSigCountDecorator(options.AccountKeeper),
 		authante.NewSigGasConsumeDecorator(options.AccountKeeper, sigGasConsumer),

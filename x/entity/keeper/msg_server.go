@@ -21,17 +21,20 @@ func NewMsgServerImpl(k Keeper) types.MsgServer {
 
 func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntity) (*types.MsgCreateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	s.Keeper.CreateEntity(ctx, msg)
-
-	return &types.MsgCreateEntityResponse{}, nil
+	resp, err := s.Keeper.CreateEntity(ctx, msg)
+	return &resp, err
 }
 
-func (s msgServer) UpdateEntityStatus(goCtx context.Context, msg *types.MsgUpdateEntityStatus) (*types.MsgUpdateEntityStatusResponse, error) {
-	return &types.MsgUpdateEntityStatusResponse{}, nil
+func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntity) (*types.MsgUpdateEntityResponse, error) {
+	return &types.MsgUpdateEntityResponse{}, nil
 }
 
 func (s msgServer) UpdateEntityConfig(goCtx context.Context, msg *types.MsgUpdateEntityConfig) (*types.MsgUpdateEntityConfigResponse, error) {
 	return &types.MsgUpdateEntityConfigResponse{}, nil
+}
+
+func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferEntity) (*types.MsgTransferEntityResponse, error) {
+	return &types.MsgTransferEntityResponse{}, nil
 }
 
 // func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpdateProjectStatus) (*types.MsgUpdateProjectStatusResponse, error) {

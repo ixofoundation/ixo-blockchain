@@ -183,7 +183,11 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 
 func (msg MsgCreateBond) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreateBond) Route() string { return RouterKey }
@@ -255,7 +259,11 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 
 func (msg MsgEditBond) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.EditorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgEditBond) Route() string { return RouterKey }
@@ -305,7 +313,11 @@ func (msg MsgSetNextAlpha) GetSignBytes() []byte {
 
 func (msg MsgSetNextAlpha) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgSetNextAlpha) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.EditorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgSetNextAlpha) Route() string { return RouterKey }
@@ -351,7 +363,11 @@ func (msg MsgUpdateBondState) GetSignBytes() []byte {
 
 func (msg MsgUpdateBondState) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgUpdateBondState) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.EditorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgUpdateBondState) Route() string { return RouterKey }
@@ -406,7 +422,11 @@ func (msg MsgBuy) GetSignBytes() []byte {
 
 func (msg MsgBuy) GetSignerDid() didexported.Did { return msg.BuyerDid }
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgBuy) Route() string { return RouterKey }
@@ -454,7 +474,11 @@ func (msg MsgSell) GetSignBytes() []byte {
 
 func (msg MsgSell) GetSignerDid() didexported.Did { return msg.SellerDid }
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SellerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgSell) Route() string { return RouterKey }
@@ -522,7 +546,11 @@ func (msg MsgSwap) GetSignBytes() []byte {
 
 func (msg MsgSwap) GetSignerDid() didexported.Did { return msg.SwapperDid }
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SwapperAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgSwap) Route() string { return RouterKey }
@@ -568,7 +596,11 @@ func (msg MsgMakeOutcomePayment) GetSignBytes() []byte {
 
 func (msg MsgMakeOutcomePayment) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgMakeOutcomePayment) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgMakeOutcomePayment) Route() string { return RouterKey }
@@ -608,7 +640,11 @@ func (msg MsgWithdrawShare) GetSignBytes() []byte {
 
 func (msg MsgWithdrawShare) GetSignerDid() didexported.Did { return msg.RecipientDid }
 func (msg MsgWithdrawShare) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.RecipientAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgWithdrawShare) Route() string { return RouterKey }
@@ -655,7 +691,11 @@ func (msg MsgWithdrawReserve) GetSignBytes() []byte {
 
 func (msg MsgWithdrawReserve) GetSignerDid() didexported.Did { return msg.WithdrawerDid }
 func (msg MsgWithdrawReserve) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.WithdrawerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgWithdrawReserve) Route() string { return RouterKey }

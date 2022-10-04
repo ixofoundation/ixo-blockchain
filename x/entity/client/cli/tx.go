@@ -53,7 +53,7 @@ func NewCmdCreateEntity() *cobra.Command {
 				return err
 			}
 
-			msg.Signer, err = cmd.Flags().GetString(flags.FlagFrom)
+			msg.OwnerAddress, err = cmd.Flags().GetString(flags.FlagFrom)
 			if err != nil {
 				return err
 			}

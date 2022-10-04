@@ -55,7 +55,7 @@ func (k Keeper) GetEntityConfig(ctx sdk.Context, key types.EntityConfigKey) ([]b
 	return val, nil
 }
 
-func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error {
+func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types.MsgCreateEntityResponse, error) {
 
 	// signer, err := sdk.AccAddressFromBech32(msg.Signer)
 	// if err != nil {
@@ -104,7 +104,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 		fmt.Println("================================================3")
 		fmt.Printf("%s\n", err)
 		// k.Logger(ctx).Error(err.Error())
-		return err
+		return types.MsgCreateEntityResponse{}, err
 	}
 
 	fmt.Println("================================================3")
@@ -116,7 +116,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	if found {
 		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", entityId)
 		// k.Logger(ctx).Error(err.Error())
-		return err
+		return types.MsgCreateEntityResponse{}, err
 	}
 
 	// persist the did document
@@ -164,12 +164,17 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) error 
 	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
 
 	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.Signer)); err != nil {
+	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid)); err != nil {
 		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
-		return err
+		return types.MsgCreateEntityResponse{}, err
 	}
 
-	return nil
+	resp := types.MsgCreateEntityResponse{
+		EntityId:     entityId,
+		EntityType:   didM.EntityType,
+		EntityStatus: didM.Status,
+	}
+	return resp, err
 }
 
 // // GetParams returns the total set of project parameters.

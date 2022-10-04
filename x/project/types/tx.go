@@ -100,7 +100,14 @@ func (msg MsgCreateProject) ValidateBasic() error {
 
 func (msg MsgCreateProject) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateProject) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+
+	if !didtypes.IsValidPubKey(msg.PubKey) {
+		return []sdk.AccAddress{}
+	}
+
+	accAddress := didtypes.VerifyKeyToAddr(msg.PubKey)
+
+	return []sdk.AccAddress{accAddress}
 }
 
 func (msg MsgCreateProject) String() string {
@@ -156,7 +163,11 @@ func (msg MsgUpdateProjectStatus) GetSignBytes() []byte {
 
 func (msg MsgUpdateProjectStatus) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.ProjectAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc CreateAgentDoc, projectDid didexported.Did) *MsgCreateAgent {
@@ -196,7 +207,11 @@ func (msg MsgCreateAgent) ValidateBasic() error {
 
 func (msg MsgCreateAgent) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.ProjectAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreateAgent) GetSignBytes() []byte {
@@ -247,7 +262,11 @@ func (msg MsgUpdateAgent) ValidateBasic() error {
 
 func (msg MsgUpdateAgent) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgUpdateAgent) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.ProjectAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgUpdateAgent) GetSignBytes() []byte {
@@ -303,7 +322,11 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 
 func (msg MsgCreateClaim) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.ProjectAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreateClaim) GetSignBytes() []byte {
@@ -355,7 +378,11 @@ func (msg MsgCreateEvaluation) ValidateBasic() error {
 
 func (msg MsgCreateEvaluation) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgCreateEvaluation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.ProjectAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreateEvaluation) GetSignBytes() []byte {
@@ -418,7 +445,11 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 
 func (msg MsgWithdrawFunds) GetSignerDid() didexported.Did { return msg.Data.RecipientDid }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgWithdrawFunds) GetSignBytes() []byte {
@@ -479,5 +510,9 @@ func (msg MsgUpdateProjectDoc) GetSignBytes() []byte {
 
 func (msg MsgUpdateProjectDoc) GetSignerDid() didexported.Did { return msg.ProjectDid }
 func (msg MsgUpdateProjectDoc) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.ProjectAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }

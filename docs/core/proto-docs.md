@@ -2945,6 +2945,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>buyer_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3123,6 +3130,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3196,6 +3210,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>editor_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3236,6 +3257,13 @@
               
                 <tr>
                   <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3286,6 +3314,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>seller_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3326,6 +3361,13 @@
               
                 <tr>
                   <td>editor_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>editor_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3383,6 +3425,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>swapper_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3423,6 +3472,13 @@
               
                 <tr>
                   <td>editor_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>editor_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3473,6 +3529,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>withdrawer_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3506,6 +3569,13 @@
               
                 <tr>
                   <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>recipient_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -5484,7 +5554,7 @@ relationships that the method is allowed into. </p></td>
 
       
         <h3 id="entity.MsgCreateEntity">MsgCreateEntity</h3>
-        <p>MsgCreateProject defines a message for creating a project.</p>
+        <p>MsgCreateEntity defines a message for creating a project.</p>
 
         
           <table class="field-table">
@@ -5616,6 +5686,13 @@ address of the account signing the message </p></td>
                   <td><p>The ownersdid used to sign this transaction. </p></td>
                 </tr>
               
+                <tr>
+                  <td>ownerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -5627,6 +5704,37 @@ address of the account signing the message </p></td>
         <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
 
         
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entityId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityStatus</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
 
         
       
@@ -5648,10 +5756,17 @@ address of the account signing the message </p></td>
                 </tr>
               
                 <tr>
-                  <td>senderDid</td>
+                  <td>controllerDid</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
                 </tr>
               
                 <tr>
@@ -5736,6 +5851,20 @@ address of the account signing the message </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
                 </tr>
               
             </tbody>
@@ -7214,6 +7343,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7248,6 +7384,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 <tr>
                   <td>payment_template</td>
                   <td><a href="#payments.PaymentTemplate">PaymentTemplate</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -7311,6 +7454,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7344,6 +7494,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>payment_contract_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -7401,6 +7558,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>sender_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7441,6 +7605,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>holder</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -7487,6 +7658,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 <tr>
                   <td>authorised</td>
                   <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>payer_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8537,6 +8715,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8589,6 +8774,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8637,6 +8829,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 <tr>
                   <td>data</td>
                   <td><a href="#project.CreateEvaluationDoc">CreateEvaluationDoc</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8700,6 +8899,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8748,6 +8954,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 <tr>
                   <td>data</td>
                   <td><a href="#project.UpdateAgentDoc">UpdateAgentDoc</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8804,6 +9017,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8856,6 +9076,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8890,6 +9117,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 <tr>
                   <td>data</td>
                   <td><a href="#project.WithdrawFundsDoc">WithdrawFundsDoc</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>

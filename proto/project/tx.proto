@@ -43,6 +43,7 @@ message MsgCreateProject {
   string project_did = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   string pub_key     = 4 [(gogoproto.jsontag) = "pubKey", (gogoproto.moretags) = "yaml:\"pubKey\""];
   bytes data         = 5 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address  = 6 [(gogoproto.jsontag) = "project_address", (gogoproto.moretags) = "yaml:\"project_address\""];
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.
@@ -54,6 +55,7 @@ message MsgUpdateProjectStatus {
   string sender_did           = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did          = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   UpdateProjectStatusDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address  = 5 [(gogoproto.jsontag) = "project_address", (gogoproto.moretags) = "yaml:\"project_address\""];
 }
 
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.
@@ -67,6 +69,7 @@ message MsgCreateAgent {
   string sender_did   = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did  = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   CreateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address  = 5 [(gogoproto.jsontag) = "project_address", (gogoproto.moretags) = "yaml:\"project_address\""];
 }
 
 // MsgCreateAgentResponse defines the Msg/CreateAgent response type.
@@ -80,6 +83,7 @@ message MsgUpdateAgent {
   string sender_did   = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did  = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   UpdateAgentDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address  = 5 [(gogoproto.jsontag) = "sender_address", (gogoproto.moretags) = "yaml:\"sender_address\""];
 }
 
 // MsgUpdateAgentResponse defines the Msg/UpdateAgent response type.
@@ -93,6 +97,7 @@ message MsgCreateClaim {
   string sender_did   = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did  = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   CreateClaimDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address  = 5 [(gogoproto.jsontag) = "project_address", (gogoproto.moretags) = "yaml:\"project_address\""];
 }
 
 // MsgCreateClaimResponse defines the Msg/CreateClaim response type.
@@ -106,6 +111,7 @@ message MsgCreateEvaluation {
   string sender_did        = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did       = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   CreateEvaluationDoc data = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address    = 5 [(gogoproto.jsontag) = "project_address", (gogoproto.moretags) = "yaml:\"project_address\""];
 }
 
 // MsgCreateEvaluationResponse defines the Msg/CreateEvaluation response type.
@@ -117,6 +123,7 @@ message MsgWithdrawFunds {
 
   string sender_did     = 1 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   WithdrawFundsDoc data = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"iid\""];
+  string sender_address = 5 [(gogoproto.jsontag) = "sender_address", (gogoproto.moretags) = "yaml:\"sender_address\""];
 }
 
 // MsgWithdrawFundsResponse defines the Msg/WithdrawFunds response type.
@@ -128,6 +135,7 @@ message MsgUpdateProjectDoc {
   string sender_did  = 2 [(gogoproto.jsontag) = "senderDid", (gogoproto.moretags) = "yaml:\"senderDid\""];
   string project_did = 3 [(gogoproto.jsontag) = "projectDid", (gogoproto.moretags) = "yaml:\"projectDid\""];
   bytes data         = 4 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"iid\""];
+  string project_address  = 5 [(gogoproto.jsontag) = "project_address", (gogoproto.moretags) = "yaml:\"project_address\""];
 }
 
 // MsgUpdateProjectDocResponse defines the Msg/UpdateProjectDoc response type.

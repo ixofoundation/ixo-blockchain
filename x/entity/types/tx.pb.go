@@ -33,26 +33,34 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// MsgCreateProject defines a message for creating a project.
+// MsgCreateEntity defines a message for creating a project.
 type MsgCreateEntity struct {
-	// string                id            = 1; // the did
-	EntityType     string                  `protobuf:"bytes,1,opt,name=entityType,proto3" json:"entity_type" yaml:"entity_type"`
-	EntityStatus   int32                   `protobuf:"varint,2,opt,name=entityStatus,proto3" json:"entity_status" yaml:"entity_status"`
-	Controllers    []string                `protobuf:"bytes,3,rep,name=controllers,proto3" json:"controllers,omitempty"`
-	Context        []*types.Context        `protobuf:"bytes,4,rep,name=context,proto3" json:"context,omitempty"`
-	Verifications  []*types.Verification   `protobuf:"bytes,5,rep,name=verifications,proto3" json:"verifications,omitempty"`
-	Services       []*types.Service        `protobuf:"bytes,6,rep,name=services,proto3" json:"services,omitempty"`
-	AccordedRight  []*types.AccordedRight  `protobuf:"bytes,7,rep,name=accordedRight,proto3" json:"accordedRight,omitempty"`
-	LinkedResource []*types.LinkedResource `protobuf:"bytes,8,rep,name=linkedResource,proto3" json:"linkedResource,omitempty"`
-	// string versionId = 8;
-	Deactivated          bool       `protobuf:"varint,9,opt,name=deactivated,proto3" json:"deactivated,omitempty"`
-	StartDate            *time.Time `protobuf:"bytes,10,opt,name=startDate,proto3,stdtime" json:"start_date" yaml:"start_date"`
-	EndDate              *time.Time `protobuf:"bytes,11,opt,name=endDate,proto3,stdtime" json:"end_date" yaml:"end_date"`
-	Stage                string     `protobuf:"bytes,12,opt,name=stage,proto3" json:"stage,omitempty"`
-	RelayerNode          string     `protobuf:"bytes,13,opt,name=relayerNode,proto3" json:"relayer_node" yaml:"relayer_node"`
-	VerifiableCredential string     `protobuf:"bytes,14,opt,name=verifiableCredential,proto3" json:"verifiable_credential" yaml:"verifiable_credential"`
-	Credentials          []string   `protobuf:"bytes,15,rep,name=credentials,proto3" json:"credentials,omitempty"`
-	Signer               string     `protobuf:"bytes,16,opt,name=signer,proto3" json:"signer,omitempty"`
+	// The entity type likely Asset, Project, Investment for now. Validation for this is lacking right now, but will be added when scope is clearer.
+	EntityType string `protobuf:"bytes,1,opt,name=entityType,proto3" json:"entity_type" yaml:"entity_type"`
+	// The status of the entity. Should represent an enum in the client.
+	EntityStatus int32 `protobuf:"varint,2,opt,name=entityStatus,proto3" json:"entity_status" yaml:"entity_status"`
+	// the list of controller DIDs
+	Controllers    []string                `protobuf:"bytes,3,rep,name=controllers,proto3" json:"controllers" yaml:"controllers"`
+	Context        []*types.Context        `protobuf:"bytes,4,rep,name=context,proto3" json:"controllers" yaml:"controllers"`
+	Verifications  []*types.Verification   `protobuf:"bytes,5,rep,name=verifications,proto3" json:"controllers" yaml:"controllers"`
+	Services       []*types.Service        `protobuf:"bytes,6,rep,name=services,proto3" json:"controllers" yaml:"controllers"`
+	AccordedRight  []*types.AccordedRight  `protobuf:"bytes,7,rep,name=accordedRight,proto3" json:"accorded_right" yaml:"accorded_right"`
+	LinkedResource []*types.LinkedResource `protobuf:"bytes,8,rep,name=linkedResource,proto3" json:"linked_resource" yaml:"linked_resource"`
+	LinkedEntity   []*types.LinkedEntity   `protobuf:"bytes,9,rep,name=linkedEntity,proto3" json:"linked_entity" yaml:"linked_entity"`
+	Deactivated    bool                    `protobuf:"varint,10,opt,name=deactivated,proto3" json:"deactivated" yaml:"deactivated"`
+	// refer to iid module for more information
+	StartDate *time.Time `protobuf:"bytes,11,opt,name=startDate,proto3,stdtime" json:"start_date" yaml:"start_date"`
+	// refer to iid module for more information
+	EndDate *time.Time `protobuf:"bytes,12,opt,name=endDate,proto3,stdtime" json:"end_date" yaml:"end_date"`
+	Stage   string     `protobuf:"bytes,13,opt,name=stage,proto3" json:"stage,omitempty"`
+	// refer to iid module for more information
+	RelayerNode string `protobuf:"bytes,14,opt,name=relayerNode,proto3" json:"relayer_node" yaml:"relayer_node"`
+	// refer to iid module for more information
+	VerifiableCredential string `protobuf:"bytes,15,opt,name=verifiableCredential,proto3" json:"verifiable_credential" yaml:"verifiable_credential"`
+	// refer to iid module for more information
+	Credentials  []string `protobuf:"bytes,16,rep,name=credentials,proto3" json:"credentials" yaml:"credentials"`
+	OwnerDid     string   `protobuf:"bytes,17,opt,name=ownerDid,proto3" json:"owner_did" yaml:"owner_did"`
+	OwnerAddress string   `protobuf:"bytes,18,opt,name=ownerAddress,proto3" json:"owner_address" yaml:"owner_address"`
 }
 
 func (m *MsgCreateEntity) Reset()         { *m = MsgCreateEntity{} }
@@ -90,6 +98,9 @@ var xxx_messageInfo_MsgCreateEntity proto.InternalMessageInfo
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.
 type MsgCreateEntityResponse struct {
+	EntityId     string `protobuf:"bytes,1,opt,name=entityId,proto3" json:"entity_id" yaml:"entity_id"`
+	EntityType   string `protobuf:"bytes,2,opt,name=entityType,proto3" json:"entity_type" yaml:"entity_type"`
+	EntityStatus int32  `protobuf:"varint,3,opt,name=entityStatus,proto3" json:"entity_status" yaml:"entity_status"`
 }
 
 func (m *MsgCreateEntityResponse) Reset()         { *m = MsgCreateEntityResponse{} }
@@ -125,67 +136,57 @@ func (m *MsgCreateEntityResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateEntityResponse proto.InternalMessageInfo
 
-// MsgUpdateEntityStatus defines a message for updating a entity's current status.
-type MsgUpdateEntityStatus struct {
-	Status int64 `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
-}
-
-func (m *MsgUpdateEntityStatus) Reset()         { *m = MsgUpdateEntityStatus{} }
-func (m *MsgUpdateEntityStatus) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateEntityStatus) ProtoMessage()    {}
-func (*MsgUpdateEntityStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2b64e8eb791e31d8, []int{2}
-}
-func (m *MsgUpdateEntityStatus) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgUpdateEntityStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgUpdateEntityStatus.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgUpdateEntityStatus) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateEntityStatus.Merge(m, src)
-}
-func (m *MsgUpdateEntityStatus) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgUpdateEntityStatus) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateEntityStatus.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgUpdateEntityStatus proto.InternalMessageInfo
-
-func (m *MsgUpdateEntityStatus) GetStatus() int64 {
+func (m *MsgCreateEntityResponse) GetEntityId() string {
 	if m != nil {
-		return m.Status
+		return m.EntityId
+	}
+	return ""
+}
+
+func (m *MsgCreateEntityResponse) GetEntityType() string {
+	if m != nil {
+		return m.EntityType
+	}
+	return ""
+}
+
+func (m *MsgCreateEntityResponse) GetEntityStatus() int32 {
+	if m != nil {
+		return m.EntityStatus
 	}
 	return 0
 }
 
-// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
-type MsgUpdateEntityStatusResponse struct {
+// MsgUpdateEntityStatus defines a message for updating a entity's current status.
+type MsgUpdateEntity struct {
+	// The status of the entity. Should represent an enum in the client.
+	Status      int32 `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
+	Deactivated bool  `protobuf:"varint,2,opt,name=deactivated,proto3" json:"deactivated" yaml:"deactivated"`
+	// refer to iid module for more information
+	StartDate *time.Time `protobuf:"bytes,3,opt,name=startDate,proto3,stdtime" json:"start_date" yaml:"start_date"`
+	// refer to iid module for more information
+	EndDate *time.Time `protobuf:"bytes,4,opt,name=endDate,proto3,stdtime" json:"end_date" yaml:"end_date"`
+	Stage   string     `protobuf:"bytes,5,opt,name=stage,proto3" json:"stage,omitempty"`
+	// refer to iid module for more information
+	RelayerNode string `protobuf:"bytes,6,opt,name=relayerNode,proto3" json:"relayer_node" yaml:"relayer_node"`
+	// refer to iid module for more information
+	VerifiableCredential string `protobuf:"bytes,7,opt,name=verifiableCredential,proto3" json:"verifiable_credential" yaml:"verifiable_credential"`
+	ControllerDid        string `protobuf:"bytes,8,opt,name=controllerDid,proto3" json:"controller_did" yaml:"controller_did"`
+	ControllerAddress    string `protobuf:"bytes,9,opt,name=controllerAddress,proto3" json:"controller_address" yaml:"controller_address"`
 }
 
-func (m *MsgUpdateEntityStatusResponse) Reset()         { *m = MsgUpdateEntityStatusResponse{} }
-func (m *MsgUpdateEntityStatusResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateEntityStatusResponse) ProtoMessage()    {}
-func (*MsgUpdateEntityStatusResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2b64e8eb791e31d8, []int{3}
+func (m *MsgUpdateEntity) Reset()         { *m = MsgUpdateEntity{} }
+func (m *MsgUpdateEntity) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateEntity) ProtoMessage()    {}
+func (*MsgUpdateEntity) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2b64e8eb791e31d8, []int{2}
 }
-func (m *MsgUpdateEntityStatusResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateEntity) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateEntityStatusResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateEntity) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateEntityStatusResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateEntity.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -195,17 +196,54 @@ func (m *MsgUpdateEntityStatusResponse) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateEntityStatusResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateEntityStatusResponse.Merge(m, src)
+func (m *MsgUpdateEntity) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateEntity.Merge(m, src)
 }
-func (m *MsgUpdateEntityStatusResponse) XXX_Size() int {
+func (m *MsgUpdateEntity) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateEntityStatusResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateEntityStatusResponse.DiscardUnknown(m)
+func (m *MsgUpdateEntity) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateEntity.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateEntityStatusResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateEntity proto.InternalMessageInfo
+
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
+type MsgUpdateEntityResponse struct {
+}
+
+func (m *MsgUpdateEntityResponse) Reset()         { *m = MsgUpdateEntityResponse{} }
+func (m *MsgUpdateEntityResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateEntityResponse) ProtoMessage()    {}
+func (*MsgUpdateEntityResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2b64e8eb791e31d8, []int{3}
+}
+func (m *MsgUpdateEntityResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateEntityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateEntityResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateEntityResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateEntityResponse.Merge(m, src)
+}
+func (m *MsgUpdateEntityResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateEntityResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateEntityResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateEntityResponse proto.InternalMessageInfo
 
 type MsgUpdateEntityConfig struct {
 	NftContractAddress string `protobuf:"bytes,1,opt,name=nft_contract_address,json=nftContractAddress,proto3" json:"nftContractAddress" yaml:"nftContractAddress"`
@@ -245,20 +283,6 @@ func (m *MsgUpdateEntityConfig) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateEntityConfig proto.InternalMessageInfo
 
-func (m *MsgUpdateEntityConfig) GetNftContractAddress() string {
-	if m != nil {
-		return m.NftContractAddress
-	}
-	return ""
-}
-
-func (m *MsgUpdateEntityConfig) GetSigner() string {
-	if m != nil {
-		return m.Signer
-	}
-	return ""
-}
-
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
 type MsgUpdateEntityConfigResponse struct {
 }
@@ -296,71 +320,172 @@ func (m *MsgUpdateEntityConfigResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateEntityConfigResponse proto.InternalMessageInfo
 
+type MsgTransferEntity struct {
+	EntityDid         string `protobuf:"bytes,1,opt,name=entityDid,proto3" json:"entity_did" yaml:"entity_did"`
+	ControllerDid     string `protobuf:"bytes,2,opt,name=controllerDid,proto3" json:"controller_did" yaml:"controller_did"`
+	ControllerAddress string `protobuf:"bytes,3,opt,name=controllerAddress,proto3" json:"controller_address" yaml:"controller_address"`
+	RecipiantDid      string `protobuf:"bytes,4,opt,name=recipiantDid,proto3" json:"recipiant_did" yaml:"recipiant_did"`
+}
+
+func (m *MsgTransferEntity) Reset()         { *m = MsgTransferEntity{} }
+func (m *MsgTransferEntity) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferEntity) ProtoMessage()    {}
+func (*MsgTransferEntity) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2b64e8eb791e31d8, []int{6}
+}
+func (m *MsgTransferEntity) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTransferEntity) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTransferEntity.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTransferEntity) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferEntity.Merge(m, src)
+}
+func (m *MsgTransferEntity) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTransferEntity) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferEntity.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTransferEntity proto.InternalMessageInfo
+
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
+type MsgTransferEntityResponse struct {
+}
+
+func (m *MsgTransferEntityResponse) Reset()         { *m = MsgTransferEntityResponse{} }
+func (m *MsgTransferEntityResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferEntityResponse) ProtoMessage()    {}
+func (*MsgTransferEntityResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2b64e8eb791e31d8, []int{7}
+}
+func (m *MsgTransferEntityResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTransferEntityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTransferEntityResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTransferEntityResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferEntityResponse.Merge(m, src)
+}
+func (m *MsgTransferEntityResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTransferEntityResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferEntityResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTransferEntityResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgCreateEntity)(nil), "entity.MsgCreateEntity")
 	proto.RegisterType((*MsgCreateEntityResponse)(nil), "entity.MsgCreateEntityResponse")
-	proto.RegisterType((*MsgUpdateEntityStatus)(nil), "entity.MsgUpdateEntityStatus")
-	proto.RegisterType((*MsgUpdateEntityStatusResponse)(nil), "entity.MsgUpdateEntityStatusResponse")
+	proto.RegisterType((*MsgUpdateEntity)(nil), "entity.MsgUpdateEntity")
+	proto.RegisterType((*MsgUpdateEntityResponse)(nil), "entity.MsgUpdateEntityResponse")
 	proto.RegisterType((*MsgUpdateEntityConfig)(nil), "entity.MsgUpdateEntityConfig")
 	proto.RegisterType((*MsgUpdateEntityConfigResponse)(nil), "entity.MsgUpdateEntityConfigResponse")
+	proto.RegisterType((*MsgTransferEntity)(nil), "entity.MsgTransferEntity")
+	proto.RegisterType((*MsgTransferEntityResponse)(nil), "entity.MsgTransferEntityResponse")
 }
 
 func init() { proto.RegisterFile("entity/tx.proto", fileDescriptor_2b64e8eb791e31d8) }
 
 var fileDescriptor_2b64e8eb791e31d8 = []byte{
-	// 833 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x55, 0x4d, 0x6f, 0xdb, 0x46,
-	0x10, 0x15, 0xad, 0xd8, 0x96, 0x57, 0x52, 0xdc, 0xac, 0x95, 0x86, 0x51, 0x1b, 0xad, 0xc0, 0x22,
-	0xad, 0x7a, 0xa8, 0x08, 0xd8, 0x40, 0x3f, 0xd2, 0x53, 0xac, 0x06, 0x68, 0x81, 0xba, 0x28, 0x36,
-	0x69, 0x81, 0xe6, 0x22, 0xac, 0xb8, 0x23, 0x7a, 0x11, 0x8a, 0x2b, 0x70, 0x57, 0x86, 0xf5, 0x0b,
-	0xda, 0x63, 0x7e, 0x42, 0xfe, 0x46, 0x4f, 0xbd, 0xf6, 0x98, 0x63, 0x4f, 0x6c, 0x61, 0x5f, 0x0a,
-	0x1d, 0xf5, 0x0b, 0x0a, 0xee, 0x92, 0x32, 0x65, 0xcb, 0xcd, 0xc9, 0x7e, 0xef, 0xcd, 0x7b, 0x24,
-	0x67, 0x67, 0x56, 0x68, 0x1f, 0x62, 0x2d, 0xf4, 0xdc, 0xd7, 0xe7, 0xfd, 0x69, 0x22, 0xb5, 0xc4,
-	0x3b, 0x96, 0x68, 0xb7, 0x42, 0x19, 0x4a, 0x43, 0xf9, 0xd9, 0x7f, 0x56, 0x6d, 0x37, 0x85, 0xe0,
-	0xbe, 0x10, 0x3c, 0x87, 0x8d, 0x0c, 0x16, 0xd6, 0xf6, 0x41, 0x9e, 0x65, 0xff, 0xe4, 0x24, 0x09,
-	0xa5, 0x0c, 0x23, 0xf0, 0x0d, 0x1a, 0xcd, 0xc6, 0xbe, 0x16, 0x13, 0x50, 0x9a, 0x4d, 0xa6, 0xb6,
-	0xc0, 0xfb, 0x63, 0x17, 0xed, 0x9f, 0xa8, 0x70, 0x90, 0x00, 0xd3, 0xf0, 0xcc, 0x58, 0xf1, 0x33,
-	0x84, 0x6c, 0xc8, 0x8b, 0xf9, 0x14, 0x5c, 0xa7, 0xeb, 0xf4, 0xf6, 0x8e, 0x1f, 0x2f, 0x52, 0x52,
-	0xb7, 0xec, 0x50, 0xcf, 0xa7, 0xb0, 0x4c, 0x09, 0x9e, 0xb3, 0x49, 0xf4, 0xc4, 0x2b, 0x91, 0x1e,
-	0x2d, 0x19, 0xf1, 0x09, 0x6a, 0x58, 0xf4, 0x5c, 0x33, 0x3d, 0x53, 0xee, 0x56, 0xd7, 0xe9, 0x6d,
-	0x1f, 0x7f, 0xba, 0x48, 0x49, 0x33, 0xf7, 0x28, 0x23, 0x2c, 0x53, 0xd2, 0x5a, 0x8b, 0xb2, 0xb4,
-	0x47, 0xd7, 0xec, 0xb8, 0x8b, 0xea, 0x81, 0x8c, 0x75, 0x22, 0xa3, 0x08, 0x12, 0xe5, 0x56, 0xbb,
-	0xd5, 0xde, 0x1e, 0x2d, 0x53, 0xf8, 0x63, 0xb4, 0x9b, 0x41, 0x38, 0xd7, 0xee, 0x9d, 0x6e, 0xb5,
-	0x57, 0x3f, 0x6c, 0xf4, 0xb3, 0x66, 0x0d, 0x2c, 0x47, 0x0b, 0x11, 0x7f, 0x81, 0x9a, 0x67, 0x90,
-	0x88, 0xb1, 0x08, 0x98, 0x16, 0x32, 0x56, 0xee, 0xb6, 0xa9, 0xbe, 0x67, 0xaa, 0x7f, 0x2e, 0x29,
-	0x74, 0xbd, 0x0e, 0xf7, 0x50, 0x4d, 0x41, 0x72, 0x26, 0x02, 0x50, 0xee, 0x4e, 0xe9, 0x09, 0xcf,
-	0x2d, 0x49, 0x57, 0x2a, 0xfe, 0x12, 0x35, 0x59, 0x10, 0xc8, 0x84, 0x03, 0xa7, 0x22, 0x3c, 0xd5,
-	0xee, 0xae, 0x29, 0xc7, 0xa6, 0xfc, 0x69, 0x59, 0xa1, 0xeb, 0x85, 0xf8, 0x6b, 0x74, 0x37, 0x12,
-	0xf1, 0x2b, 0xe0, 0x14, 0x94, 0x9c, 0x25, 0x01, 0xb8, 0x35, 0x63, 0x3d, 0x30, 0xd6, 0xef, 0xd7,
-	0x24, 0x7a, 0xad, 0x34, 0xeb, 0x11, 0x07, 0x16, 0x68, 0x71, 0xc6, 0x34, 0x70, 0x77, 0xaf, 0xeb,
-	0xf4, 0x6a, 0xb4, 0x4c, 0x61, 0x86, 0xf6, 0x94, 0x66, 0x89, 0xfe, 0x86, 0x69, 0x70, 0x51, 0xd7,
-	0xe9, 0xd5, 0x0f, 0xdb, 0x7d, 0x3b, 0x24, 0xfd, 0x62, 0x48, 0xfa, 0x2f, 0x8a, 0x21, 0x39, 0xfe,
-	0x64, 0x91, 0x12, 0x64, 0x0c, 0x43, 0xce, 0x74, 0x76, 0xea, 0xf7, 0xec, 0x51, 0x5d, 0x71, 0xde,
-	0xeb, 0xbf, 0x89, 0x43, 0xaf, 0x52, 0xf1, 0x2f, 0x68, 0x17, 0x62, 0x6e, 0x1e, 0x50, 0x7f, 0xe7,
-	0x03, 0x3e, 0x5a, 0xa4, 0xa4, 0x06, 0x31, 0x2f, 0xe2, 0xf7, 0x8b, 0x49, 0xe0, 0xa5, 0xf0, 0x22,
-	0x0f, 0xb7, 0xd0, 0xb6, 0xd2, 0x2c, 0x04, 0xb7, 0x91, 0x0d, 0x25, 0xb5, 0x00, 0x7f, 0x87, 0xea,
-	0x09, 0x44, 0x6c, 0x0e, 0xc9, 0x0f, 0x92, 0x83, 0xdb, 0x34, 0x03, 0x9b, 0xbd, 0x79, 0x23, 0xa7,
-	0x87, 0xb1, 0xe4, 0x59, 0xf8, 0x81, 0x0d, 0x2f, 0xb3, 0x1e, 0x2d, 0x7b, 0xf1, 0x04, 0xb5, 0xec,
-	0x91, 0xb3, 0x51, 0x04, 0x83, 0x04, 0x78, 0x36, 0x82, 0x2c, 0x72, 0xef, 0x9a, 0xcc, 0xaf, 0x16,
-	0x29, 0xb9, 0x7f, 0xa5, 0x0f, 0x83, 0x55, 0xc1, 0x32, 0x25, 0x1f, 0xda, 0xf0, 0x8d, 0xb2, 0x47,
-	0x37, 0xc6, 0x9a, 0x99, 0x5e, 0x21, 0xe5, 0xee, 0xe7, 0x33, 0x7d, 0x45, 0xe1, 0xf7, 0xd1, 0x8e,
-	0x12, 0x61, 0x0c, 0x89, 0xfb, 0x9e, 0xf9, 0xe4, 0x1c, 0x3d, 0xa9, 0xfd, 0xf6, 0x86, 0x54, 0xfe,
-	0x7d, 0x43, 0x2a, 0xde, 0x43, 0xf4, 0xe0, 0xda, 0x02, 0x53, 0x50, 0x53, 0x19, 0x2b, 0xf0, 0x7c,
-	0x74, 0xff, 0x44, 0x85, 0x3f, 0x4d, 0xf9, 0x4a, 0xca, 0x77, 0x29, 0x4b, 0xb5, 0x4b, 0x99, 0x6d,
-	0x77, 0x95, 0xe6, 0xc8, 0x23, 0xe8, 0xd1, 0x46, 0xc3, 0x2a, 0xf1, 0x77, 0xe7, 0x46, 0xe4, 0x40,
-	0xc6, 0x63, 0x11, 0x62, 0x40, 0xad, 0x78, 0xac, 0x87, 0x66, 0x1f, 0x59, 0xa0, 0x87, 0x8c, 0xf3,
-	0x04, 0x94, 0xca, 0xaf, 0x8f, 0xa3, 0x45, 0x4a, 0x70, 0x3c, 0xd6, 0x83, 0x5c, 0x7e, 0x6a, 0xd5,
-	0x65, 0x4a, 0x1e, 0xda, 0xb6, 0xdd, 0xd4, 0x3c, 0xba, 0xc1, 0x80, 0x8f, 0x56, 0xfd, 0xd8, 0x32,
-	0xc1, 0x1f, 0x2c, 0x52, 0x92, 0x33, 0xcb, 0x94, 0x34, 0xf3, 0xe1, 0x34, 0xd8, 0x5b, 0x35, 0xeb,
-	0x8e, 0x69, 0xd4, 0xcd, 0x8f, 0xb3, 0xaf, 0x5e, 0x7c, 0xdc, 0xe1, 0xaf, 0x5b, 0xa8, 0x7a, 0xa2,
-	0x42, 0xfc, 0x2d, 0x6a, 0xac, 0xdd, 0x87, 0x0f, 0xfa, 0xf9, 0x9d, 0x7a, 0xad, 0xcf, 0x6d, 0x72,
-	0x8b, 0x50, 0x24, 0xe2, 0x97, 0x08, 0x6f, 0xe8, 0xfe, 0xa3, 0x92, 0xed, 0xa6, 0xdc, 0x7e, 0xfc,
-	0xbf, 0xf2, 0x6d, 0xd9, 0xf9, 0x31, 0xdc, 0x96, 0x6d, 0xe5, 0x5b, 0xb3, 0xd7, 0x3b, 0x71, 0xfc,
-	0xe3, 0x9f, 0x17, 0x1d, 0xe7, 0xed, 0x45, 0xc7, 0xf9, 0xe7, 0xa2, 0xe3, 0xbc, 0xbe, 0xec, 0x54,
-	0xde, 0x5e, 0x76, 0x2a, 0x7f, 0x5d, 0x76, 0x2a, 0x2f, 0x3f, 0x0f, 0x85, 0x3e, 0x9d, 0x8d, 0xfa,
-	0x81, 0x9c, 0xf8, 0xe2, 0x5c, 0x8e, 0xe5, 0x2c, 0xe6, 0xe6, 0x76, 0xcc, 0xd0, 0x67, 0xa3, 0x48,
-	0x06, 0xaf, 0x82, 0x53, 0x26, 0x62, 0xff, 0xdc, 0x2f, 0x7e, 0xdb, 0xe6, 0x53, 0x50, 0xa3, 0x1d,
-	0xb3, 0xfb, 0x47, 0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0xa3, 0xee, 0x7d, 0xfe, 0xf2, 0x06, 0x00,
+	// 1185 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x57, 0x4f, 0x6f, 0x1b, 0x45,
+	0x14, 0x8f, 0xed, 0xda, 0x71, 0xc6, 0x76, 0x52, 0x4f, 0x9c, 0x76, 0xe3, 0x52, 0x8f, 0xbb, 0xa8,
+	0x22, 0x08, 0xd5, 0x96, 0x12, 0x09, 0x89, 0x4a, 0x1c, 0xe2, 0xb4, 0xa2, 0x95, 0x9a, 0x02, 0xdb,
+	0x80, 0x44, 0x0f, 0x98, 0xc9, 0xee, 0x78, 0x33, 0xd4, 0xd9, 0xb5, 0x76, 0x27, 0x21, 0xfe, 0x06,
+	0x1c, 0xfb, 0x11, 0xfa, 0x45, 0x90, 0xb8, 0x20, 0x71, 0xec, 0x91, 0x0b, 0x0b, 0x4a, 0x84, 0x84,
+	0x7c, 0xe0, 0xe0, 0x4f, 0x80, 0xe6, 0xcf, 0xee, 0xce, 0x3a, 0x4e, 0x89, 0x44, 0x72, 0x8a, 0xe7,
+	0xf7, 0x9b, 0xf7, 0x9b, 0xb7, 0x3b, 0xef, 0xf7, 0x5e, 0x16, 0xac, 0x10, 0x8f, 0x51, 0x36, 0xee,
+	0xb2, 0x93, 0xce, 0x28, 0xf0, 0x99, 0x0f, 0x4b, 0x12, 0x68, 0x36, 0x5c, 0xdf, 0xf5, 0x05, 0xd4,
+	0xe5, 0xbf, 0x24, 0xdb, 0xac, 0x51, 0xea, 0x74, 0x29, 0x75, 0xd4, 0xb2, 0xca, 0x97, 0x71, 0x68,
+	0x73, 0x55, 0x69, 0xc9, 0x3f, 0x0a, 0x44, 0xae, 0xef, 0xbb, 0x43, 0xd2, 0x15, 0xab, 0xfd, 0xa3,
+	0x41, 0x97, 0xd1, 0x43, 0x12, 0x32, 0x7c, 0x38, 0x92, 0x1b, 0xcc, 0xdf, 0x2b, 0x60, 0x65, 0x37,
+	0x74, 0x77, 0x02, 0x82, 0x19, 0x79, 0x2c, 0x42, 0xe1, 0x63, 0x00, 0xa4, 0xc8, 0xde, 0x78, 0x44,
+	0x8c, 0x5c, 0x3b, 0xb7, 0xb1, 0xd4, 0xbb, 0x3f, 0x89, 0x50, 0x45, 0xa2, 0x7d, 0x36, 0x1e, 0x91,
+	0x69, 0x84, 0xe0, 0x18, 0x1f, 0x0e, 0x1f, 0x9a, 0x1a, 0x68, 0x5a, 0x5a, 0x20, 0xdc, 0x05, 0x55,
+	0xb9, 0x7a, 0xc1, 0x30, 0x3b, 0x0a, 0x8d, 0x7c, 0x3b, 0xb7, 0x51, 0xec, 0x7d, 0x38, 0x89, 0x50,
+	0x4d, 0xc5, 0x84, 0x82, 0x98, 0x46, 0xa8, 0x91, 0x91, 0x92, 0xb0, 0x69, 0x65, 0xc2, 0xe1, 0x67,
+	0xa0, 0x62, 0xfb, 0x1e, 0x0b, 0xfc, 0xe1, 0x90, 0x04, 0xa1, 0x51, 0x68, 0x17, 0xe2, 0xb4, 0x34,
+	0x38, 0x4d, 0x4b, 0x03, 0x4d, 0x4b, 0xdf, 0x02, 0x77, 0xc1, 0x22, 0x5f, 0x92, 0x13, 0x66, 0xdc,
+	0x68, 0x17, 0x36, 0x2a, 0x9b, 0xd5, 0x0e, 0x7f, 0xa7, 0x3b, 0x12, 0xbb, 0xac, 0x64, 0xac, 0x01,
+	0xbf, 0x05, 0xb5, 0x63, 0x12, 0xd0, 0x01, 0xb5, 0x31, 0xa3, 0xbe, 0x17, 0x1a, 0x45, 0x21, 0x5a,
+	0x17, 0xa2, 0x5f, 0x6b, 0xcc, 0x65, 0x95, 0xb3, 0x72, 0xf0, 0x73, 0x50, 0x0e, 0x49, 0x70, 0x4c,
+	0x6d, 0x12, 0x1a, 0x25, 0x2d, 0xdf, 0x17, 0x12, 0xbc, 0xac, 0x6a, 0x22, 0x02, 0x09, 0xa8, 0x61,
+	0xdb, 0xf6, 0x03, 0x87, 0x38, 0x16, 0x75, 0x0f, 0x98, 0xb1, 0x28, 0x54, 0xa1, 0x50, 0xdd, 0xd6,
+	0x99, 0xde, 0x47, 0x93, 0x08, 0x2d, 0xc7, 0x9b, 0xfb, 0x01, 0xc7, 0xa6, 0x11, 0x5a, 0x93, 0xf2,
+	0x59, 0xdc, 0xb4, 0xb2, 0xaa, 0xf0, 0x7b, 0xb0, 0x3c, 0xa4, 0xde, 0x2b, 0xe2, 0x58, 0x24, 0xf4,
+	0x8f, 0x02, 0x9b, 0x18, 0x65, 0x71, 0xce, 0xaa, 0x38, 0xe7, 0x59, 0x86, 0xea, 0x3d, 0x98, 0x44,
+	0x68, 0x45, 0x6e, 0xef, 0x07, 0x0a, 0x9c, 0x46, 0xe8, 0x96, 0x3c, 0x69, 0x86, 0x30, 0xad, 0x19,
+	0x65, 0xf8, 0x1d, 0xa8, 0x4a, 0x44, 0x56, 0xb0, 0xb1, 0xa4, 0x5d, 0xc1, 0x33, 0x8d, 0x90, 0xd5,
+	0xa7, 0xe4, 0x64, 0x75, 0xa5, 0xd5, 0x97, 0x81, 0x4d, 0x2b, 0xa3, 0xc8, 0xab, 0xcf, 0x21, 0xd8,
+	0x66, 0xf4, 0x18, 0x33, 0xe2, 0x18, 0xa0, 0x9d, 0xdb, 0x28, 0xcb, 0x57, 0xaf, 0xc1, 0xe9, 0xab,
+	0xd7, 0x40, 0xd3, 0xd2, 0xb7, 0x40, 0x0c, 0x96, 0x42, 0x86, 0x03, 0xf6, 0x08, 0x33, 0x62, 0x54,
+	0xda, 0xb9, 0x8d, 0xca, 0x66, 0xb3, 0x23, 0x5d, 0xda, 0x89, 0x5d, 0xda, 0xd9, 0x8b, 0x5d, 0xda,
+	0xfb, 0x60, 0x12, 0x21, 0x20, 0x02, 0xfa, 0x0e, 0x66, 0xfc, 0x9d, 0xd4, 0xe5, 0x09, 0x29, 0x66,
+	0xbe, 0xfe, 0x03, 0xe5, 0xac, 0x54, 0x15, 0x7e, 0x03, 0x16, 0x89, 0xe7, 0x88, 0x03, 0xaa, 0xff,
+	0x79, 0xc0, 0xfb, 0x93, 0x08, 0x95, 0x89, 0xe7, 0xc4, 0xf2, 0x2b, 0xb1, 0x15, 0x1d, 0x4d, 0x3c,
+	0xd6, 0x83, 0x0d, 0x50, 0x0c, 0x19, 0x76, 0x89, 0x51, 0xe3, 0x5d, 0xc1, 0x92, 0x0b, 0xf8, 0x14,
+	0x54, 0x02, 0x32, 0xc4, 0x63, 0x12, 0x3c, 0xf7, 0x1d, 0x62, 0x2c, 0x8b, 0x8e, 0xc1, 0x33, 0xaf,
+	0x2a, 0xb8, 0xef, 0xf9, 0x0e, 0x17, 0x5f, 0x95, 0xe2, 0x3a, 0x6a, 0x5a, 0x7a, 0x2c, 0x3c, 0x04,
+	0x0d, 0x59, 0xfe, 0x78, 0x7f, 0x48, 0x76, 0x02, 0xe2, 0xf0, 0xeb, 0xc0, 0x43, 0x63, 0x45, 0x68,
+	0x7e, 0x32, 0x89, 0xd0, 0x5a, 0xca, 0xf7, 0xed, 0x64, 0xc3, 0x34, 0x42, 0xef, 0x49, 0xf1, 0xb9,
+	0xb4, 0x69, 0xcd, 0x95, 0x15, 0x4d, 0x25, 0x59, 0x85, 0xc6, 0x4d, 0xad, 0xa9, 0xa4, 0xb0, 0xe6,
+	0xa8, 0x14, 0xe4, 0x4d, 0x25, 0x5d, 0xc1, 0x4f, 0x41, 0xd9, 0xff, 0xc1, 0x23, 0xc1, 0x23, 0xea,
+	0x18, 0x75, 0x91, 0xeb, 0xbd, 0x49, 0x84, 0x96, 0x04, 0xd6, 0x77, 0x28, 0x2f, 0x8d, 0x9b, 0x52,
+	0x23, 0x81, 0x4c, 0x2b, 0x09, 0xe1, 0xbd, 0x52, 0xfc, 0xde, 0x76, 0x9c, 0x80, 0x84, 0xa1, 0x01,
+	0x85, 0x84, 0xa8, 0x56, 0xb9, 0x1f, 0x4b, 0x22, 0xad, 0xd6, 0x0c, 0x6c, 0x5a, 0x99, 0xf0, 0x87,
+	0xe5, 0x1f, 0xdf, 0xa0, 0x85, 0xbf, 0xdf, 0xa0, 0x05, 0xf3, 0x9f, 0x1c, 0xb8, 0x3d, 0xd3, 0xdf,
+	0x2d, 0x12, 0x8e, 0x7c, 0x2f, 0x24, 0x3c, 0x67, 0x59, 0xec, 0x4f, 0x1d, 0xd5, 0xe5, 0x45, 0xce,
+	0xaa, 0x0b, 0xeb, 0x39, 0x27, 0x90, 0x69, 0x25, 0x21, 0x33, 0x63, 0x22, 0x7f, 0x55, 0x63, 0xa2,
+	0xf0, 0xbf, 0xc6, 0x84, 0xf9, 0x73, 0x51, 0x0c, 0xb4, 0xaf, 0x46, 0x4e, 0x3a, 0xd0, 0x6e, 0x81,
+	0x92, 0xdc, 0x2c, 0x1e, 0xb3, 0x68, 0xa9, 0xd5, 0xac, 0xa9, 0xf3, 0x57, 0x63, 0xea, 0xc2, 0x75,
+	0x9b, 0xfa, 0xc6, 0x75, 0x99, 0xba, 0xf8, 0x0e, 0x53, 0x97, 0xae, 0xc1, 0xd4, 0x8b, 0xd7, 0x63,
+	0xea, 0x2f, 0x41, 0x2d, 0x1d, 0x7d, 0xdc, 0x90, 0x65, 0x71, 0x8e, 0x18, 0x66, 0x29, 0xa1, 0x5c,
+	0xb9, 0x36, 0x3b, 0x2b, 0xa5, 0x35, 0xb3, 0x0a, 0x10, 0x83, 0x7a, 0x0a, 0xc4, 0x26, 0x5d, 0x12,
+	0xb2, 0x5b, 0x93, 0x08, 0x41, 0x2d, 0x3c, 0x75, 0xea, 0xfa, 0x39, 0xe9, 0xc4, 0xae, 0xe7, 0xd5,
+	0x34, 0xcf, 0xae, 0x0b, 0xcb, 0xea, 0x15, 0x1c, 0x5b, 0xd6, 0xfc, 0x29, 0x07, 0xd6, 0x66, 0xb8,
+	0x1d, 0xdf, 0x1b, 0x50, 0x17, 0x12, 0xd0, 0xf0, 0x06, 0xac, 0x2f, 0x74, 0xb1, 0xcd, 0xe2, 0xa3,
+	0x94, 0xb1, 0x45, 0x92, 0xde, 0x80, 0xed, 0x28, 0x7a, 0x7b, 0x36, 0xc9, 0xf3, 0x9c, 0x69, 0xcd,
+	0x09, 0x80, 0x5b, 0xa0, 0x14, 0x52, 0xd7, 0x23, 0x81, 0x32, 0xfc, 0x9d, 0x49, 0x84, 0x14, 0x32,
+	0x8d, 0x50, 0x4d, 0x95, 0xb1, 0x58, 0x9b, 0x96, 0x22, 0xb4, 0x47, 0x43, 0xe0, 0xee, 0xdc, 0xf4,
+	0x93, 0x07, 0xfc, 0x2b, 0x0f, 0xea, 0xbb, 0xa1, 0xbb, 0x17, 0x60, 0x2f, 0x1c, 0x90, 0x40, 0x19,
+	0x78, 0x1b, 0xa8, 0xae, 0xc4, 0x6f, 0x53, 0x3e, 0x11, 0x2f, 0x71, 0xd5, 0x46, 0xd4, 0x4d, 0xd6,
+	0x33, 0xdd, 0x41, 0xdc, 0x62, 0x1a, 0x75, 0xbe, 0x28, 0xf2, 0xd7, 0x53, 0x14, 0x85, 0xab, 0x2c,
+	0x0a, 0xde, 0x1c, 0x03, 0x62, 0xd3, 0x11, 0xc5, 0x1e, 0xe3, 0x49, 0xdf, 0x48, 0xe7, 0x42, 0x82,
+	0xab, 0x9c, 0x1b, 0xb1, 0x0d, 0x35, 0xd8, 0xb4, 0x32, 0xe1, 0xda, 0x45, 0xdc, 0x01, 0xeb, 0xe7,
+	0x5e, 0x73, 0x7c, 0x09, 0x9b, 0xbf, 0xe4, 0x41, 0x61, 0x37, 0x74, 0xe1, 0x13, 0x50, 0xcd, 0x7c,
+	0x18, 0xdc, 0xee, 0xa8, 0x8f, 0x8b, 0x99, 0x89, 0xd2, 0x44, 0x17, 0x10, 0xc9, 0xa8, 0x79, 0x02,
+	0xaa, 0x99, 0x8e, 0xac, 0x2b, 0xe9, 0x44, 0x46, 0x69, 0x9e, 0x03, 0xe0, 0x4b, 0x00, 0xe7, 0x54,
+	0xff, 0xdd, 0x0b, 0xc2, 0x24, 0xdd, 0xbc, 0xff, 0x4e, 0x3a, 0xd1, 0x7e, 0x0e, 0x96, 0x67, 0x0a,
+	0x6f, 0x5d, 0x0b, 0xcc, 0x52, 0xcd, 0x7b, 0x17, 0x52, 0xb1, 0x5e, 0xef, 0x8b, 0x5f, 0x4f, 0x5b,
+	0xb9, 0xb7, 0xa7, 0xad, 0xdc, 0x9f, 0xa7, 0xad, 0xdc, 0xeb, 0xb3, 0xd6, 0xc2, 0xdb, 0xb3, 0xd6,
+	0xc2, 0x6f, 0x67, 0xad, 0x85, 0x97, 0x1f, 0xbb, 0x94, 0x1d, 0x1c, 0xed, 0x77, 0x6c, 0xff, 0xb0,
+	0x4b, 0x4f, 0xfc, 0x81, 0x7f, 0xe4, 0x39, 0xe2, 0xff, 0x7d, 0xbe, 0x7a, 0xb0, 0x3f, 0xf4, 0xed,
+	0x57, 0xf6, 0x01, 0xa6, 0x5e, 0xf7, 0xa4, 0x1b, 0x7f, 0x22, 0x8e, 0x47, 0x24, 0xdc, 0x2f, 0x89,
+	0x66, 0xbf, 0xf5, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7a, 0xa1, 0xba, 0xff, 0x39, 0x0e, 0x00,
 	0x00,
 }
 
@@ -379,8 +504,9 @@ type MsgClient interface {
 	// CreateProject defines a method for creating a project.
 	CreateEntity(ctx context.Context, in *MsgCreateEntity, opts ...grpc.CallOption) (*MsgCreateEntityResponse, error)
 	// // UpdateEntityStatus defines a method for updating a entity's current status.
-	UpdateEntityStatus(ctx context.Context, in *MsgUpdateEntityStatus, opts ...grpc.CallOption) (*MsgUpdateEntityStatusResponse, error)
+	UpdateEntity(ctx context.Context, in *MsgUpdateEntity, opts ...grpc.CallOption) (*MsgUpdateEntityResponse, error)
 	UpdateEntityConfig(ctx context.Context, in *MsgUpdateEntityConfig, opts ...grpc.CallOption) (*MsgUpdateEntityConfigResponse, error)
+	TransferEntity(ctx context.Context, in *MsgTransferEntity, opts ...grpc.CallOption) (*MsgTransferEntityResponse, error)
 }
 
 type msgClient struct {
@@ -400,9 +526,9 @@ func (c *msgClient) CreateEntity(ctx context.Context, in *MsgCreateEntity, opts 
 	return out, nil
 }
 
-func (c *msgClient) UpdateEntityStatus(ctx context.Context, in *MsgUpdateEntityStatus, opts ...grpc.CallOption) (*MsgUpdateEntityStatusResponse, error) {
-	out := new(MsgUpdateEntityStatusResponse)
-	err := c.cc.Invoke(ctx, "/entity.Msg/UpdateEntityStatus", in, out, opts...)
+func (c *msgClient) UpdateEntity(ctx context.Context, in *MsgUpdateEntity, opts ...grpc.CallOption) (*MsgUpdateEntityResponse, error) {
+	out := new(MsgUpdateEntityResponse)
+	err := c.cc.Invoke(ctx, "/entity.Msg/UpdateEntity", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -418,13 +544,23 @@ func (c *msgClient) UpdateEntityConfig(ctx context.Context, in *MsgUpdateEntityC
 	return out, nil
 }
 
+func (c *msgClient) TransferEntity(ctx context.Context, in *MsgTransferEntity, opts ...grpc.CallOption) (*MsgTransferEntityResponse, error) {
+	out := new(MsgTransferEntityResponse)
+	err := c.cc.Invoke(ctx, "/entity.Msg/TransferEntity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// CreateProject defines a method for creating a project.
 	CreateEntity(context.Context, *MsgCreateEntity) (*MsgCreateEntityResponse, error)
 	// // UpdateEntityStatus defines a method for updating a entity's current status.
-	UpdateEntityStatus(context.Context, *MsgUpdateEntityStatus) (*MsgUpdateEntityStatusResponse, error)
+	UpdateEntity(context.Context, *MsgUpdateEntity) (*MsgUpdateEntityResponse, error)
 	UpdateEntityConfig(context.Context, *MsgUpdateEntityConfig) (*MsgUpdateEntityConfigResponse, error)
+	TransferEntity(context.Context, *MsgTransferEntity) (*MsgTransferEntityResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -434,11 +570,14 @@ type UnimplementedMsgServer struct {
 func (*UnimplementedMsgServer) CreateEntity(ctx context.Context, req *MsgCreateEntity) (*MsgCreateEntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateEntity not implemented")
 }
-func (*UnimplementedMsgServer) UpdateEntityStatus(ctx context.Context, req *MsgUpdateEntityStatus) (*MsgUpdateEntityStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateEntityStatus not implemented")
+func (*UnimplementedMsgServer) UpdateEntity(ctx context.Context, req *MsgUpdateEntity) (*MsgUpdateEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateEntity not implemented")
 }
 func (*UnimplementedMsgServer) UpdateEntityConfig(ctx context.Context, req *MsgUpdateEntityConfig) (*MsgUpdateEntityConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateEntityConfig not implemented")
+}
+func (*UnimplementedMsgServer) TransferEntity(ctx context.Context, req *MsgTransferEntity) (*MsgTransferEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferEntity not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -463,20 +602,20 @@ func _Msg_CreateEntity_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateEntityStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateEntityStatus)
+func _Msg_UpdateEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateEntity)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateEntityStatus(ctx, in)
+		return srv.(MsgServer).UpdateEntity(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/entity.Msg/UpdateEntityStatus",
+		FullMethod: "/entity.Msg/UpdateEntity",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateEntityStatus(ctx, req.(*MsgUpdateEntityStatus))
+		return srv.(MsgServer).UpdateEntity(ctx, req.(*MsgUpdateEntity))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -499,6 +638,24 @@ func _Msg_UpdateEntityConfig_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_TransferEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferEntity)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).TransferEntity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/entity.Msg/TransferEntity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).TransferEntity(ctx, req.(*MsgTransferEntity))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "entity.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -508,12 +665,16 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreateEntity_Handler,
 		},
 		{
-			MethodName: "UpdateEntityStatus",
-			Handler:    _Msg_UpdateEntityStatus_Handler,
+			MethodName: "UpdateEntity",
+			Handler:    _Msg_UpdateEntity_Handler,
 		},
 		{
 			MethodName: "UpdateEntityConfig",
 			Handler:    _Msg_UpdateEntityConfig_Handler,
+		},
+		{
+			MethodName: "TransferEntity",
+			Handler:    _Msg_TransferEntity_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -540,14 +701,23 @@ func (m *MsgCreateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Signer) > 0 {
-		i -= len(m.Signer)
-		copy(dAtA[i:], m.Signer)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+	if len(m.OwnerAddress) > 0 {
+		i -= len(m.OwnerAddress)
+		copy(dAtA[i:], m.OwnerAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.OwnerAddress)))
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0x82
+		dAtA[i] = 0x92
+	}
+	if len(m.OwnerDid) > 0 {
+		i -= len(m.OwnerDid)
+		copy(dAtA[i:], m.OwnerDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.OwnerDid)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
 	}
 	if len(m.Credentials) > 0 {
 		for iNdEx := len(m.Credentials) - 1; iNdEx >= 0; iNdEx-- {
@@ -555,7 +725,9 @@ func (m *MsgCreateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			copy(dAtA[i:], m.Credentials[iNdEx])
 			i = encodeVarintTx(dAtA, i, uint64(len(m.Credentials[iNdEx])))
 			i--
-			dAtA[i] = 0x7a
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x82
 		}
 	}
 	if len(m.VerifiableCredential) > 0 {
@@ -563,21 +735,21 @@ func (m *MsgCreateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.VerifiableCredential)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.VerifiableCredential)))
 		i--
-		dAtA[i] = 0x72
+		dAtA[i] = 0x7a
 	}
 	if len(m.RelayerNode) > 0 {
 		i -= len(m.RelayerNode)
 		copy(dAtA[i:], m.RelayerNode)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.RelayerNode)))
 		i--
-		dAtA[i] = 0x6a
+		dAtA[i] = 0x72
 	}
 	if len(m.Stage) > 0 {
 		i -= len(m.Stage)
 		copy(dAtA[i:], m.Stage)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Stage)))
 		i--
-		dAtA[i] = 0x62
+		dAtA[i] = 0x6a
 	}
 	if m.EndDate != nil {
 		n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
@@ -587,7 +759,7 @@ func (m *MsgCreateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= n1
 		i = encodeVarintTx(dAtA, i, uint64(n1))
 		i--
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x62
 	}
 	if m.StartDate != nil {
 		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
@@ -597,7 +769,7 @@ func (m *MsgCreateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= n2
 		i = encodeVarintTx(dAtA, i, uint64(n2))
 		i--
-		dAtA[i] = 0x52
+		dAtA[i] = 0x5a
 	}
 	if m.Deactivated {
 		i--
@@ -607,7 +779,21 @@ func (m *MsgCreateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x48
+		dAtA[i] = 0x50
+	}
+	if len(m.LinkedEntity) > 0 {
+		for iNdEx := len(m.LinkedEntity) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.LinkedEntity[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x4a
+		}
 	}
 	if len(m.LinkedResource) > 0 {
 		for iNdEx := len(m.LinkedResource) - 1; iNdEx >= 0; iNdEx-- {
@@ -723,10 +909,29 @@ func (m *MsgCreateEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
+	if m.EntityStatus != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.EntityStatus))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.EntityType) > 0 {
+		i -= len(m.EntityType)
+		copy(dAtA[i:], m.EntityType)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EntityType)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.EntityId) > 0 {
+		i -= len(m.EntityId)
+		copy(dAtA[i:], m.EntityId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EntityId)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateEntityStatus) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateEntity) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -736,16 +941,81 @@ func (m *MsgUpdateEntityStatus) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateEntityStatus) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateEntity) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateEntityStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if len(m.ControllerAddress) > 0 {
+		i -= len(m.ControllerAddress)
+		copy(dAtA[i:], m.ControllerAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerAddress)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.ControllerDid) > 0 {
+		i -= len(m.ControllerDid)
+		copy(dAtA[i:], m.ControllerDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerDid)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.VerifiableCredential) > 0 {
+		i -= len(m.VerifiableCredential)
+		copy(dAtA[i:], m.VerifiableCredential)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.VerifiableCredential)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.RelayerNode) > 0 {
+		i -= len(m.RelayerNode)
+		copy(dAtA[i:], m.RelayerNode)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RelayerNode)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Stage) > 0 {
+		i -= len(m.Stage)
+		copy(dAtA[i:], m.Stage)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Stage)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.EndDate != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintTx(dAtA, i, uint64(n3))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.StartDate != nil {
+		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
+		if err4 != nil {
+			return 0, err4
+		}
+		i -= n4
+		i = encodeVarintTx(dAtA, i, uint64(n4))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Deactivated {
+		i--
+		if m.Deactivated {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
 	if m.Status != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Status))
 		i--
@@ -754,7 +1024,7 @@ func (m *MsgUpdateEntityStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateEntityStatusResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateEntityResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -764,12 +1034,12 @@ func (m *MsgUpdateEntityStatusResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateEntityStatusResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateEntityResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateEntityStatusResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -837,6 +1107,80 @@ func (m *MsgUpdateEntityConfigResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgTransferEntity) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTransferEntity) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTransferEntity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RecipiantDid) > 0 {
+		i -= len(m.RecipiantDid)
+		copy(dAtA[i:], m.RecipiantDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RecipiantDid)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.ControllerAddress) > 0 {
+		i -= len(m.ControllerAddress)
+		copy(dAtA[i:], m.ControllerAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ControllerDid) > 0 {
+		i -= len(m.ControllerDid)
+		copy(dAtA[i:], m.ControllerDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.EntityDid) > 0 {
+		i -= len(m.EntityDid)
+		copy(dAtA[i:], m.EntityDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.EntityDid)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgTransferEntityResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTransferEntityResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTransferEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -897,6 +1241,12 @@ func (m *MsgCreateEntity) Size() (n int) {
 			n += 1 + l + sovTx(uint64(l))
 		}
 	}
+	if len(m.LinkedEntity) > 0 {
+		for _, e := range m.LinkedEntity {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
 	if m.Deactivated {
 		n += 2
 	}
@@ -923,10 +1273,14 @@ func (m *MsgCreateEntity) Size() (n int) {
 	if len(m.Credentials) > 0 {
 		for _, s := range m.Credentials {
 			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
+			n += 2 + l + sovTx(uint64(l))
 		}
 	}
-	l = len(m.Signer)
+	l = len(m.OwnerDid)
+	if l > 0 {
+		n += 2 + l + sovTx(uint64(l))
+	}
+	l = len(m.OwnerAddress)
 	if l > 0 {
 		n += 2 + l + sovTx(uint64(l))
 	}
@@ -939,10 +1293,21 @@ func (m *MsgCreateEntityResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.EntityId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.EntityType)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.EntityStatus != 0 {
+		n += 1 + sovTx(uint64(m.EntityStatus))
+	}
 	return n
 }
 
-func (m *MsgUpdateEntityStatus) Size() (n int) {
+func (m *MsgUpdateEntity) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -951,10 +1316,41 @@ func (m *MsgUpdateEntityStatus) Size() (n int) {
 	if m.Status != 0 {
 		n += 1 + sovTx(uint64(m.Status))
 	}
+	if m.Deactivated {
+		n += 2
+	}
+	if m.StartDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate)
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.EndDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate)
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Stage)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RelayerNode)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.VerifiableCredential)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ControllerDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ControllerAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
-func (m *MsgUpdateEntityStatusResponse) Size() (n int) {
+func (m *MsgUpdateEntityResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -981,6 +1377,40 @@ func (m *MsgUpdateEntityConfig) Size() (n int) {
 }
 
 func (m *MsgUpdateEntityConfigResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgTransferEntity) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.EntityDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ControllerDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ControllerAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RecipiantDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgTransferEntityResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1278,6 +1708,40 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LinkedEntity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LinkedEntity = append(m.LinkedEntity, &types.LinkedEntity{})
+			if err := m.LinkedEntity[len(m.LinkedEntity)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Deactivated", wireType)
 			}
@@ -1297,7 +1761,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.Deactivated = bool(v != 0)
-		case 10:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StartDate", wireType)
 			}
@@ -1333,7 +1797,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 11:
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EndDate", wireType)
 			}
@@ -1369,7 +1833,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 12:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stage", wireType)
 			}
@@ -1401,7 +1865,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			}
 			m.Stage = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 13:
+		case 14:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RelayerNode", wireType)
 			}
@@ -1433,7 +1897,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			}
 			m.RelayerNode = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 14:
+		case 15:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VerifiableCredential", wireType)
 			}
@@ -1465,7 +1929,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			}
 			m.VerifiableCredential = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 15:
+		case 16:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Credentials", wireType)
 			}
@@ -1497,9 +1961,9 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			}
 			m.Credentials = append(m.Credentials, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 16:
+		case 17:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerDid", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1527,7 +1991,39 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Signer = string(dAtA[iNdEx:postIndex])
+			m.OwnerDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 18:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1579,61 +2075,11 @@ func (m *MsgCreateEntityResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgCreateEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgUpdateEntityStatus) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateEntityStatus: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateEntityStatus: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityId", wireType)
 			}
-			m.Status = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -1643,7 +2089,71 @@ func (m *MsgUpdateEntityStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Status |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EntityId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EntityType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityStatus", wireType)
+			}
+			m.EntityStatus = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EntityStatus |= int32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1669,7 +2179,7 @@ func (m *MsgUpdateEntityStatus) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateEntityStatusResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateEntity) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1692,10 +2202,331 @@ func (m *MsgUpdateEntityStatusResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateEntityStatusResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateEntity: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateEntityStatusResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateEntity: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deactivated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Deactivated = bool(v != 0)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.StartDate == nil {
+				m.StartDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDate == nil {
+				m.EndDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Stage", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Stage = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RelayerNode", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RelayerNode = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VerifiableCredential", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VerifiableCredential = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControllerDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControllerDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControllerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControllerAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateEntityResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateEntityResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -1860,6 +2691,234 @@ func (m *MsgUpdateEntityConfigResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgUpdateEntityConfigResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTransferEntity) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTransferEntity: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTransferEntity: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EntityDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControllerDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControllerDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControllerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControllerAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RecipiantDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RecipiantDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTransferEntityResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTransferEntityResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTransferEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

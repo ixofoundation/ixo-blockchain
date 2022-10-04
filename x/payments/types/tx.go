@@ -68,7 +68,11 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 
 func (msg MsgCreatePaymentTemplate) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreatePaymentTemplate) String() string {
@@ -131,7 +135,11 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 
 func (msg MsgCreatePaymentContract) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreatePaymentContract) String() string {
@@ -222,7 +230,11 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 
 func (msg MsgCreateSubscription) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgCreateSubscription) String() string {
@@ -281,7 +293,11 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 
 func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() didexported.Did { return msg.PayerDid }
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.PayerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgSetPaymentContractAuthorisation) String() string {
@@ -333,7 +349,11 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 
 func (msg MsgGrantDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgGrantDiscount) String() string {
@@ -384,7 +404,11 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 
 func (msg MsgRevokeDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgRevokeDiscount) String() string {
@@ -431,7 +455,11 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 
 func (msg MsgEffectPayment) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{nil} // not used in signature verification in ixo AnteHandler
+	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
 }
 
 func (msg MsgEffectPayment) String() string {
