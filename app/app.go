@@ -621,6 +621,9 @@ func NewIxoApp(
 		BankKeeper:      app.BankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		IidKeeper:       app.IidKeeper,
+		wasmConfig:      wasmConfig,
+		txCounterStoreKey: StoreK,
+
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
 	})

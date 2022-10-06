@@ -1,14 +1,21 @@
 package types
 
 import (
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 
+	cryptoed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	libante "github.com/ixofoundation/ixo-blockchain/lib/ante"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/spf13/viper"
 )
 
@@ -48,6 +55,54 @@ func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
 		ProjectDid: projectDid,
 		PubKey:     pubKey,
 		Data:       projectData,
+	}
+}
+
+func (msg MsgCreateProject) FeePayerFromIid(ctx sdk.Context, accountKeeper authante.AccountKeeper, iidKeeper iidkeeper.Keeper) (libante.FeePayer, error) {
+
+	iidDoc, exists := iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	if !exists {
+		return libante.FeePayer{}, errors.New("iid doc does  not exists")
+	}
+
+	var verificationMethod *iidtypes.VerificationMethod
+
+	for _, vm := range iidDoc.VerificationMethod {
+		if vm.Id == msg.SenderDid {
+			verificationMethod = vm
+			break
+		}
+	}
+
+	if verificationMethod == nil {
+		return libante.FeePayer{}, errors.New("iid doc does  not exists")
+	}
+
+	projectAddr, err := sdk.AccAddressFromBech32(msg.PubKey)
+	if err != nil {
+		return libante.FeePayer{}, err
+	}
+
+	switch m := verificationMethod.GetVerificationMaterial().(type) {
+	case *iidtypes.VerificationMethod_PublicKeyHex:
+
+		pubKey, err := hex.DecodeString(m.PublicKeyHex)
+		if err != nil {
+			return libante.FeePayer{}, err
+		}
+
+		payerPubKey := cryptoed25519.PubKey{Key: pubKey}
+		return libante.NewFeePayer(accountKeeper.GetAccount(ctx, payerPubKey.Address().Bytes()), projectAddr), nil
+
+	case *iidtypes.VerificationMethod_BlockchainAccountID:
+		addr, err := sdk.AccAddressFromBech32(iidtypes.BlockchainAccountID(m.BlockchainAccountID).GetAddress())
+		if err != nil {
+			return libante.FeePayer{}, err
+		}
+		return libante.NewFeePayer(accountKeeper.GetAccount(ctx, addr), projectAddr), nil
+
+	default:
+		return libante.FeePayer{}, errors.New("iid doc does  not exists")
 	}
 }
 

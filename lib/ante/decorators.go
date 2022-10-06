@@ -1,95 +1,79 @@
 package ante
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/ixofoundation/ixo-blockchain/x/project/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 )
 
 type IxoFeeHandlerDecorator struct {
-	iidKeeper iidkeeper.Keeper
+	iidKeeper         iidkeeper.Keeper
+	accountKeeper     authante.AccountKeeper
+	bankKeeper        bankkeeper.Keeper
+	defaultFeeHandler authante.DeductFeeDecorator
 }
 
-func NewIxoFeeHandlerDecorator(iidKeeper iidkeeper.Keeper, defaultFeeHandler ante.DeductFeeDecorator) IxoFeeHandlerDecorator {
-	return IxoFeeHandlerDecorator{iidKeeper: iidKeeper}
+func NewIxoFeeHandlerDecorator(iidKeeper iidkeeper.Keeper, accountKeeper authante.AccountKeeper, bankKeeper bankkeeper.Keeper, defaultFeeHandler authante.DeductFeeDecorator) sdk.AnteDecorator {
+	return IxoFeeHandlerDecorator{
+		iidKeeper:         iidKeeper,
+		accountKeeper:     accountKeeper,
+		bankKeeper:        bankKeeper,
+		defaultFeeHandler: defaultFeeHandler,
+	}
 }
 
 func (dec IxoFeeHandlerDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	iidTx, ok := tx.(IidTx)
-	if !ok {
+	feeTx, ok := tx.(IxoFeeTx)
+
+	//Check if feegranter is set. or if not ixoFeeTx
+	if !ok || feeTx.FeeGranter() != nil {
 		// return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a IIDTx")
-		return next(ctx, tx, simulate)
+		fmt.Println("=================== errror 1")
+		return dec.defaultFeeHandler.AnteHandle(ctx, tx, simulate, next)
 	}
 
-	if err := iidTx.VerifyIidControllersAgainstSigniture(ctx, dec.iidKeeper); err != nil {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a signedTx")
+	if addr := dec.accountKeeper.GetModuleAddress(authtypes.FeeCollectorName); addr == nil {
+		return ctx, fmt.Errorf("fee collector module account (%s) has not been set", authtypes.FeeCollectorName)
+	}
+	fmt.Println("=================== errror 2")
+
+	ixoFeeMsgs := feeTx.GetFeePayerMsgs()
+
+	ixoMsgCount := len(ixoFeeMsgs)
+	if len(feeTx.GetMsgs()) != ixoMsgCount && ixoMsgCount == 1 {
+		return ctx, sdkerrors.Wrapf(errors.New("only one custom fee handler msg allowed per transaction"), "expted 1 and got %d", ixoMsgCount)
 	}
 
-	feeTx, ok := tx.(sdk.FeeTx)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
-	}
+	fmt.Println("=================== errror 3")
 
-	if addr := dfd.ak.GetModuleAddress(authtypes.FeeCollectorName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", authtypes.FeeCollectorName))
-	}
-
-	// all messages must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
-	}
-
-	// Get pubKey
-	pubKey, err := dfd.pkg(ctx, msg)
+	feePayer, err := ixoFeeMsgs[0].FeePayerFromIid(ctx, dec.accountKeeper, dec.iidKeeper)
 	if err != nil {
-		return ctx, err
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrUnknownAddress, "fee payer does not exist")
 	}
 
-	// fetch first (and only) signer, who's going to pay the fees
-	feePayer := sdk.AccAddress(pubKey.Address())
-	feePayerAcc := dfd.ak.GetAccount(ctx, feePayer)
+	fmt.Println("=================== errror 4")
 
-	if feePayerAcc == nil {
-		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
-	}
-
-	// confirm that fee is the exact amount expected
-	expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
-		ixotypes.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTotalFee)))
-	if !feeTx.GetFee().IsEqual(expectedTotalFee) {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee")
-	}
-
-	// Calculate transaction fee and project funding
-	transactionFee := sdk.NewCoins(sdk.NewCoin(
-		ixotypes.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTransactionFee)))
-	projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
-
-	// deduct the fees
+	// // deduct the fees
 	if !feeTx.GetFee().IsZero() {
-		// fetch fee payer account
-		feePayerDidDoc, err := dfd.didKeeper.GetDidDoc(ctx, msg.SenderDid)
-		if err != nil {
-			return ctx, err
-		}
-		feePayerAcc, err := ante.GetSignerAcc(ctx, dfd.ak, feePayerDidDoc.Address())
-		if err != nil {
-			return ctx, err
-		}
-
-		err = ante.DeductFees(dfd.bk, ctx, feePayerAcc, transactionFee)
-		if err != nil {
-			return ctx, err
-		}
-
-		projectAddr := sdk.AccAddress(pubKey.Address())
-		err = deductProjectFundingFees(dfd.bk, ctx, feePayerAcc, projectAddr, projectFunding)
+		err = authante.DeductFees(dec.bankKeeper, ctx, feePayer.feePayerAccount, feeTx.GetFee())
 		if err != nil {
 			return ctx, err
 		}
 	}
+
+	fmt.Println("=================== errror 5")
+
+	events := sdk.Events{sdk.NewEvent(sdk.EventTypeTx,
+		sdk.NewAttribute(sdk.AttributeKeyFee, feeTx.GetFee().String()),
+	)}
+	ctx.EventManager().EmitEvents(events)
 
 	return next(ctx, tx, simulate)
 }
