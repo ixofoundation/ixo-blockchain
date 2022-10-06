@@ -10,6 +10,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -17,7 +18,7 @@ type Keeper struct {
 	BankKeeper    bankkeeper.Keeper
 	accountKeeper authkeeper.AccountKeeper
 	StakingKeeper stakingkeeper.Keeper
-	didKeeper     types.DidKeeper
+	iidKeeper     iidkeeper.Keeper
 
 	storeKey   sdk.StoreKey
 	paramSpace paramstypes.Subspace
@@ -26,7 +27,7 @@ type Keeper struct {
 }
 
 func NewKeeper(bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper, stakingKeeper stakingkeeper.Keeper,
-	didKeeper types.DidKeeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryCodec) Keeper {
+	iidKeeper iidkeeper.Keeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryCodec) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {
@@ -37,7 +38,7 @@ func NewKeeper(bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKee
 		BankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
 		StakingKeeper: stakingKeeper,
-		didKeeper:     didKeeper,
+		iidKeeper:     iidKeeper,
 		storeKey:      storeKey,
 		paramSpace:    paramSpace.WithKeyTable(types.ParamKeyTable()),
 		cdc:           cdc,

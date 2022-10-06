@@ -1,5 +1,5 @@
 syntax = "proto3";
-package ixofoundation.ixo.data;
+package iid;
 
 import "google/api/annotations.proto";
 import "iid/iid.proto";

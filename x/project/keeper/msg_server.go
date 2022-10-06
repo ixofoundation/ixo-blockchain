@@ -8,9 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
@@ -70,6 +71,27 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.ProjectDid)); err != nil {
 		return nil, err
 	}
+
+	iidProjectVerificationMethod, err := iidtypes.NewPublicKeyHexFromString(msg.PubKey, iidtypes.DIDVMethodTypeEd25519VerificationKey2018)
+	if err != nil {
+		return nil, err
+	}
+
+	//Create project backed IID
+	did, err := iidtypes.NewDidDocument(
+		msg.ProjectDid,
+		iidtypes.WithControllers(msg.ProjectDid),
+		iidtypes.WithVerifications(iidtypes.NewVerification(
+			iidtypes.NewVerificationMethod(msg.ProjectDid, iidtypes.DID(msg.ProjectDid), iidProjectVerificationMethod),
+			[]string{iidtypes.Authentication},
+			nil,
+		)),
+	)
+	if err != nil {
+		// k.Logger(ctx).Error(err.Error())
+		return nil, err
+	}
+	k.IidKeeper.SetDidDocument(ctx, []byte(msg.ProjectDid), did)
 
 	// Set project doc and initialise list of withdrawal transactions
 	k.SetProjectDoc(ctx, projectDoc)
@@ -371,12 +393,14 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		}
 
 		// Get sender (oracle) address
-		senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-		if err != nil {
-			return nil, err
+		senderDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+		if !exists {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		senderAddr := senderDidDoc.Address()
-
+		senderAddr, err := senderDidDoc.GetVerificationMethodBlockchainAddress(senderDidDoc.Id)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		}
 		// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
 		feePercentage := k.GetParams(ctx).OracleFeePercentage
 		nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
@@ -400,11 +424,14 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 	templateId, err = feesMap.GetPayTemplateId(types.FeeForService)
 	if err == nil && msg.Data.Status == string(types.ApprovedClaim) {
 		// Get claimer address
-		claimerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, claim.ClaimerDid)
-		if err != nil {
-			return nil, err
+		claimerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(claim.ClaimerDid))
+		if !exists {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		claimerAddr := claimerDidDoc.Address()
+		claimerAddr, err := claimerDidDoc.GetVerificationMethodBlockchainAddress(claimerDidDoc.Id)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		}
 
 		// Get recipients (just the claimer)
 		claimApprovedPayRecipients := paymentstypes.NewDistribution(
@@ -563,11 +590,14 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	}
 
 	// Get recipient address
-	recipientDidDoc, err := k.DidKeeper.GetDidDoc(ctx, recipientDid)
-	if err != nil {
-		return err
+	recipientDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(recipientDid))
+	if !exists {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	recipientAddr := recipientDidDoc.Address()
+	recipientAddr, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{amount})
 	if err != nil {

@@ -54,7 +54,7 @@ func RoundFee(f sdk.DecCoin) sdk.Coin {
 	return sdk.NewCoin(f.Denom, roundedAmount)
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func RoundReservePrices(ps sdk.DecCoins) (rounded sdk.Coins) {
 	for _, p := range ps {
 		rounded = rounded.Add(RoundReservePrice(p))
@@ -62,7 +62,7 @@ func RoundReservePrices(ps sdk.DecCoins) (rounded sdk.Coins) {
 	return rounded
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func RoundReserveReturns(rs sdk.DecCoins) (rounded sdk.Coins) {
 	for _, r := range rs {
 		rounded = rounded.Add(RoundReserveReturn(r))
@@ -74,7 +74,7 @@ func MultiplyDecCoinByInt(dc sdk.DecCoin, scale sdk.Int) sdk.DecCoin {
 	return sdk.NewDecCoinFromDec(dc.Denom, dc.Amount.MulInt(scale))
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func MultiplyDecCoinsByInt(dcs sdk.DecCoins, scale sdk.Int) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
 		scaled = scaled.Add(MultiplyDecCoinByInt(dc, scale))
@@ -86,7 +86,7 @@ func MultiplyDecCoinByDec(dc sdk.DecCoin, scale sdk.Dec) sdk.DecCoin {
 	return sdk.NewDecCoinFromDec(dc.Denom, dc.Amount.Mul(scale))
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func MultiplyDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
 		scaled = scaled.Add(MultiplyDecCoinByDec(dc, scale))
@@ -98,7 +98,7 @@ func DivideDecCoinByDec(dc sdk.DecCoin, scale sdk.Dec) sdk.DecCoin {
 	return sdk.NewDecCoinFromDec(dc.Denom, dc.Amount.Quo(scale))
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func DivideDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
 		scaled = scaled.Add(DivideDecCoinByDec(dc, scale))

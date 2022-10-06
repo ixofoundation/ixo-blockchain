@@ -1,0 +1,35 @@
+syntax = "proto3";
+package legacydid;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/lib/legacydid";
+
+// Digital identity credential issued to an ixo DID
+message DidCredential {
+  repeated string cred_type = 1 [(gogoproto.jsontag) = "type", (gogoproto.moretags) = "yaml:\"type\""];
+  string issuer             = 2 [(gogoproto.moretags) = "yaml:\"issuer\""];
+  string issued             = 3 [(gogoproto.moretags) = "yaml:\"issued\""];
+  Claim claim               = 4 [(gogoproto.moretags) = "yaml:\"claim\""];
+}
+
+// The claim section of a credential, indicating if the DID is KYC validated
+message Claim {
+  string id         = 1 [(gogoproto.moretags) = "yaml:\"id\""];
+  bool KYC_validated = 2 [(gogoproto.jsontag) = "KYCValidated", (gogoproto.moretags) = "yaml:\"KYCValidated\""];
+}
+
+// An ixo DID with public and private keys, based on the Sovrin DID spec
+message IxoDid {
+  string did                   = 1 [(gogoproto.moretags) = "yaml:\"did\""];
+  string verify_key            = 2 [(gogoproto.jsontag) = "verifyKey", (gogoproto.moretags) = "yaml:\"verifyKey\""];
+  string encryption_public_key = 3 [(gogoproto.jsontag) = "encryptionPublicKey", (gogoproto.moretags) = "yaml:\"encryptionPublicKey\""];
+  Secret secret                = 4 [(gogoproto.moretags) = "yaml:\"secret\""];
+}
+
+// The private section of an ixo DID, based on the Sovrin DID spec
+message Secret {
+  string seed                   = 1 [(gogoproto.moretags) = "yaml:\"seed\""];
+  string sign_key               = 2 [(gogoproto.jsontag) = "signKey", (gogoproto.moretags) = "yaml:\"signKey\""];
+  string encryption_private_key = 3 [(gogoproto.jsontag) = "encryptionPrivateKey", (gogoproto.moretags) = "yaml:\"encryptionPrivateKey\""];
+}

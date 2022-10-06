@@ -338,21 +338,21 @@ func WithVerifications(verifications ...*Verification) DidDocumentOption {
 	}
 }
 
-//WithServices add optional services
+// WithServices add optional services
 func WithServices(services ...*Service) DidDocumentOption {
 	return func(did *IidDocument) error {
 		return did.AddServices(services...)
 	}
 }
 
-//WithRights add optional Rights
+// WithRights add optional Rights
 func WithRights(rights ...*AccordedRight) DidDocumentOption {
 	return func(did *IidDocument) error {
 		return did.AddAccordedRight(rights...)
 	}
 }
 
-//WithResources add optional resources
+// WithResources add optional resources
 func WithResources(resources ...*LinkedResource) DidDocumentOption {
 	return func(did *IidDocument) error {
 		return did.AddLinkedResource(resources...)
@@ -562,9 +562,13 @@ func (didDoc *IidDocument) setRelationships(methodID string, relationships ...Ve
 
 // GetVerificationMethodBlockchainAddress returns the verification method cosmos blockchain address of a verification method.
 // it fails if the verification method is not supported or if the verification method is not found
-func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string) (address string, err error) {
+func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string) (sdk.AccAddress, error) {
 	for _, vm := range didDoc.VerificationMethod {
 		if vm.Id == methodID {
+			var (
+				address string
+				err     error
+			)
 			switch k := vm.VerificationMaterial.(type) {
 			case *VerificationMethod_BlockchainAccountID:
 				address = BlockchainAccountID(k.BlockchainAccountID).GetAddress()
@@ -573,11 +577,14 @@ func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string
 			case *VerificationMethod_PublicKeyHex:
 				address, err = toAddress(k.PublicKeyHex)
 			}
-			return
+			if err != nil {
+				return sdk.AccAddress{}, err
+			}
+
+			return sdk.AccAddressFromBech32(address)
 		}
 	}
-	err = ErrVerificationMethodNotFound
-	return
+	return sdk.AccAddress{}, ErrVerificationMethodNotFound
 }
 
 // GetVerificationRelationships returns the relationships associated with the

@@ -459,23 +459,11 @@
         
           
           <li>
-            <a href="#did%2fdid.proto">did/did.proto</a>
+            <a href="#entity%2fentity.proto">entity/entity.proto</a>
             <ul>
               
                 <li>
-                  <a href="#did.Claim"><span class="badge">M</span>Claim</a>
-                </li>
-              
-                <li>
-                  <a href="#did.DidCredential"><span class="badge">M</span>DidCredential</a>
-                </li>
-              
-                <li>
-                  <a href="#did.IxoDid"><span class="badge">M</span>IxoDid</a>
-                </li>
-              
-                <li>
-                  <a href="#did.Secret"><span class="badge">M</span>Secret</a>
+                  <a href="#entity.EntityDoc"><span class="badge">M</span>EntityDoc</a>
                 </li>
               
               
@@ -486,11 +474,11 @@
         
           
           <li>
-            <a href="#did%2fdiddoc.proto">did/diddoc.proto</a>
+            <a href="#entity%2fgenesis.proto">entity/genesis.proto</a>
             <ul>
               
                 <li>
-                  <a href="#did.BaseDidDoc"><span class="badge">M</span>BaseDidDoc</a>
+                  <a href="#entity.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
@@ -501,11 +489,82 @@
         
           
           <li>
-            <a href="#did%2fgenesis.proto">did/genesis.proto</a>
+            <a href="#entity%2fquery.proto">entity/query.proto</a>
             <ul>
               
                 <li>
-                  <a href="#did.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#entity.QueryEntityConfigRequest"><span class="badge">M</span>QueryEntityConfigRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityConfigResponse"><span class="badge">M</span>QueryEntityConfigResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityConfigResponse.MapEntry"><span class="badge">M</span>QueryEntityConfigResponse.MapEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityDocRequest"><span class="badge">M</span>QueryEntityDocRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityDocResponse"><span class="badge">M</span>QueryEntityDocResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityListRequest"><span class="badge">M</span>QueryEntityListRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.QueryEntityListResponse"><span class="badge">M</span>QueryEntityListResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#entity.Query"><span class="badge">S</span>Query</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#iid%2fiid.proto">iid/iid.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#iid.AccordedRight"><span class="badge">M</span>AccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.Context"><span class="badge">M</span>Context</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.IidDocument"><span class="badge">M</span>IidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.IidMetadata"><span class="badge">M</span>IidMetadata</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.LinkedEntity"><span class="badge">M</span>LinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.LinkedResource"><span class="badge">M</span>LinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.Service"><span class="badge">M</span>Service</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
                 </li>
               
               
@@ -516,54 +575,162 @@
         
           
           <li>
-            <a href="#did%2fquery.proto">did/query.proto</a>
+            <a href="#iid%2ftx.proto">iid/tx.proto</a>
             <ul>
               
                 <li>
-                  <a href="#did.QueryAddressFromBase58EncodedPubkeyRequest"><span class="badge">M</span>QueryAddressFromBase58EncodedPubkeyRequest</a>
+                  <a href="#iid.MsgAddAccordedRight"><span class="badge">M</span>MsgAddAccordedRight</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAddressFromBase58EncodedPubkeyResponse"><span class="badge">M</span>QueryAddressFromBase58EncodedPubkeyResponse</a>
+                  <a href="#iid.MsgAddAccordedRightResponse"><span class="badge">M</span>MsgAddAccordedRightResponse</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAddressFromDidRequest"><span class="badge">M</span>QueryAddressFromDidRequest</a>
+                  <a href="#iid.MsgAddController"><span class="badge">M</span>MsgAddController</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAddressFromDidResponse"><span class="badge">M</span>QueryAddressFromDidResponse</a>
+                  <a href="#iid.MsgAddControllerResponse"><span class="badge">M</span>MsgAddControllerResponse</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAllDidDocsRequest"><span class="badge">M</span>QueryAllDidDocsRequest</a>
+                  <a href="#iid.MsgAddIidContext"><span class="badge">M</span>MsgAddIidContext</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAllDidDocsResponse"><span class="badge">M</span>QueryAllDidDocsResponse</a>
+                  <a href="#iid.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAllDidsRequest"><span class="badge">M</span>QueryAllDidsRequest</a>
+                  <a href="#iid.MsgAddLinkedEntity"><span class="badge">M</span>MsgAddLinkedEntity</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryAllDidsResponse"><span class="badge">M</span>QueryAllDidsResponse</a>
+                  <a href="#iid.MsgAddLinkedEntityResponse"><span class="badge">M</span>MsgAddLinkedEntityResponse</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryDidDocRequest"><span class="badge">M</span>QueryDidDocRequest</a>
+                  <a href="#iid.MsgAddLinkedResource"><span class="badge">M</span>MsgAddLinkedResource</a>
                 </li>
               
                 <li>
-                  <a href="#did.QueryDidDocResponse"><span class="badge">M</span>QueryDidDocResponse</a>
+                  <a href="#iid.MsgAddLinkedResourceResponse"><span class="badge">M</span>MsgAddLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddService"><span class="badge">M</span>MsgAddService</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddServiceResponse"><span class="badge">M</span>MsgAddServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddVerification"><span class="badge">M</span>MsgAddVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgAddVerificationResponse"><span class="badge">M</span>MsgAddVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgCreateIidDocument"><span class="badge">M</span>MsgCreateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgCreateIidDocumentResponse"><span class="badge">M</span>MsgCreateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteAccordedRightResponse"><span class="badge">M</span>MsgDeleteAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteController"><span class="badge">M</span>MsgDeleteController</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteControllerResponse"><span class="badge">M</span>MsgDeleteControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteIidContext"><span class="badge">M</span>MsgDeleteIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedEntity"><span class="badge">M</span>MsgDeleteLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedEntityResponse"><span class="badge">M</span>MsgDeleteLinkedEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedResource"><span class="badge">M</span>MsgDeleteLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteLinkedResourceResponse"><span class="badge">M</span>MsgDeleteLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteService"><span class="badge">M</span>MsgDeleteService</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeleteServiceResponse"><span class="badge">M</span>MsgDeleteServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgRevokeVerification"><span class="badge">M</span>MsgRevokeVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgRevokeVerificationResponse"><span class="badge">M</span>MsgRevokeVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgSetVerificationRelationships"><span class="badge">M</span>MsgSetVerificationRelationships</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgSetVerificationRelationshipsResponse"><span class="badge">M</span>MsgSetVerificationRelationshipsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidDocument"><span class="badge">M</span>MsgUpdateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidDocumentResponse"><span class="badge">M</span>MsgUpdateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidMeta"><span class="badge">M</span>MsgUpdateIidMeta</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgUpdateIidMetaResponse"><span class="badge">M</span>MsgUpdateIidMetaResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.Verification"><span class="badge">M</span>Verification</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#did.Query"><span class="badge">S</span>Query</a>
+                  <a href="#iid.Msg"><span class="badge">S</span>Msg</a>
                 </li>
               
             </ul>
@@ -571,30 +738,46 @@
         
           
           <li>
-            <a href="#did%2ftx.proto">did/tx.proto</a>
+            <a href="#entity%2ftx.proto">entity/tx.proto</a>
             <ul>
               
                 <li>
-                  <a href="#did.MsgAddCredential"><span class="badge">M</span>MsgAddCredential</a>
+                  <a href="#entity.MsgCreateEntity"><span class="badge">M</span>MsgCreateEntity</a>
                 </li>
               
                 <li>
-                  <a href="#did.MsgAddCredentialResponse"><span class="badge">M</span>MsgAddCredentialResponse</a>
+                  <a href="#entity.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
                 </li>
               
                 <li>
-                  <a href="#did.MsgAddDid"><span class="badge">M</span>MsgAddDid</a>
+                  <a href="#entity.MsgTransferEntity"><span class="badge">M</span>MsgTransferEntity</a>
                 </li>
               
                 <li>
-                  <a href="#did.MsgAddDidResponse"><span class="badge">M</span>MsgAddDidResponse</a>
+                  <a href="#entity.MsgTransferEntityResponse"><span class="badge">M</span>MsgTransferEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntity"><span class="badge">M</span>MsgUpdateEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntityConfig"><span class="badge">M</span>MsgUpdateEntityConfig</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntityConfigResponse"><span class="badge">M</span>MsgUpdateEntityConfigResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#entity.MsgUpdateEntityResponse"><span class="badge">M</span>MsgUpdateEntityResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#did.Msg"><span class="badge">S</span>Msg</a>
+                  <a href="#entity.Msg"><span class="badge">S</span>Msg</a>
                 </li>
               
             </ul>
@@ -606,54 +789,11 @@
             <ul>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.IidDocumentCreatedEvent"><span class="badge">M</span>IidDocumentCreatedEvent</a>
+                  <a href="#iid.IidDocumentCreatedEvent"><span class="badge">M</span>IidDocumentCreatedEvent</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.IidDocumentUpdatedEvent"><span class="badge">M</span>IidDocumentUpdatedEvent</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#iid%2fiid.proto">iid/iid.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.AccordedRight"><span class="badge">M</span>AccordedRight</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.Context"><span class="badge">M</span>Context</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.IidDocument"><span class="badge">M</span>IidDocument</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.IidMetadata"><span class="badge">M</span>IidMetadata</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.LinkedEntity"><span class="badge">M</span>LinkedEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.LinkedResource"><span class="badge">M</span>LinkedResource</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.Service"><span class="badge">M</span>Service</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
+                  <a href="#iid.IidDocumentUpdatedEvent"><span class="badge">M</span>IidDocumentUpdatedEvent</a>
                 </li>
               
               
@@ -668,7 +808,7 @@
             <ul>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#iid.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
@@ -683,34 +823,34 @@
             <ul>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.QueryIidDocumentRequest"><span class="badge">M</span>QueryIidDocumentRequest</a>
+                  <a href="#iid.QueryIidDocumentRequest"><span class="badge">M</span>QueryIidDocumentRequest</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.QueryIidDocumentResponse"><span class="badge">M</span>QueryIidDocumentResponse</a>
+                  <a href="#iid.QueryIidDocumentResponse"><span class="badge">M</span>QueryIidDocumentResponse</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.QueryIidDocumentsRequest"><span class="badge">M</span>QueryIidDocumentsRequest</a>
+                  <a href="#iid.QueryIidDocumentsRequest"><span class="badge">M</span>QueryIidDocumentsRequest</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.QueryIidDocumentsResponse"><span class="badge">M</span>QueryIidDocumentsResponse</a>
+                  <a href="#iid.QueryIidDocumentsResponse"><span class="badge">M</span>QueryIidDocumentsResponse</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.QueryIidMetaDataRequest"><span class="badge">M</span>QueryIidMetaDataRequest</a>
+                  <a href="#iid.QueryIidMetaDataRequest"><span class="badge">M</span>QueryIidMetaDataRequest</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.QueryIidMetaDataResponse"><span class="badge">M</span>QueryIidMetaDataResponse</a>
+                  <a href="#iid.QueryIidMetaDataResponse"><span class="badge">M</span>QueryIidMetaDataResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.Query"><span class="badge">S</span>Query</a>
+                  <a href="#iid.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -718,163 +858,42 @@
         
           
           <li>
-            <a href="#iid%2ftx.proto">iid/tx.proto</a>
+            <a href="#legacy%2fdid%2fdid.proto">legacy/did/did.proto</a>
             <ul>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddAccordedRight"><span class="badge">M</span>MsgAddAccordedRight</a>
+                  <a href="#legacydid.Claim"><span class="badge">M</span>Claim</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddAccordedRightResponse"><span class="badge">M</span>MsgAddAccordedRightResponse</a>
+                  <a href="#legacydid.DidCredential"><span class="badge">M</span>DidCredential</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddController"><span class="badge">M</span>MsgAddController</a>
+                  <a href="#legacydid.IxoDid"><span class="badge">M</span>IxoDid</a>
                 </li>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddControllerResponse"><span class="badge">M</span>MsgAddControllerResponse</a>
+                  <a href="#legacydid.Secret"><span class="badge">M</span>Secret</a>
                 </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#legacy%2fdid%2fdiddoc.proto">legacy/did/diddoc.proto</a>
+            <ul>
               
                 <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddIidContext"><span class="badge">M</span>MsgAddIidContext</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddLinkedEntity"><span class="badge">M</span>MsgAddLinkedEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddLinkedEntityResponse"><span class="badge">M</span>MsgAddLinkedEntityResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddLinkedResource"><span class="badge">M</span>MsgAddLinkedResource</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddLinkedResourceResponse"><span class="badge">M</span>MsgAddLinkedResourceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddService"><span class="badge">M</span>MsgAddService</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddServiceResponse"><span class="badge">M</span>MsgAddServiceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddVerification"><span class="badge">M</span>MsgAddVerification</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgAddVerificationResponse"><span class="badge">M</span>MsgAddVerificationResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgCreateIidDocument"><span class="badge">M</span>MsgCreateIidDocument</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgCreateIidDocumentResponse"><span class="badge">M</span>MsgCreateIidDocumentResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteAccordedRightResponse"><span class="badge">M</span>MsgDeleteAccordedRightResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteController"><span class="badge">M</span>MsgDeleteController</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteControllerResponse"><span class="badge">M</span>MsgDeleteControllerResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteIidContext"><span class="badge">M</span>MsgDeleteIidContext</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntity"><span class="badge">M</span>MsgDeleteLinkedEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse"><span class="badge">M</span>MsgDeleteLinkedEntityResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedResource"><span class="badge">M</span>MsgDeleteLinkedResource</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse"><span class="badge">M</span>MsgDeleteLinkedResourceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteService"><span class="badge">M</span>MsgDeleteService</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgDeleteServiceResponse"><span class="badge">M</span>MsgDeleteServiceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgRevokeVerification"><span class="badge">M</span>MsgRevokeVerification</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgRevokeVerificationResponse"><span class="badge">M</span>MsgRevokeVerificationResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgSetVerificationRelationships"><span class="badge">M</span>MsgSetVerificationRelationships</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse"><span class="badge">M</span>MsgSetVerificationRelationshipsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgUpdateIidDocument"><span class="badge">M</span>MsgUpdateIidDocument</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgUpdateIidDocumentResponse"><span class="badge">M</span>MsgUpdateIidDocumentResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgUpdateIidMeta"><span class="badge">M</span>MsgUpdateIidMeta</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.MsgUpdateIidMetaResponse"><span class="badge">M</span>MsgUpdateIidMetaResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.Verification"><span class="badge">M</span>Verification</a>
+                  <a href="#legacydid.BaseDidDoc"><span class="badge">M</span>BaseDidDoc</a>
                 </li>
               
               
               
-              
-                <li>
-                  <a href="#ixofoundation.ixo.data.Msg"><span class="badge">S</span>Msg</a>
-                </li>
               
             </ul>
           </li>
@@ -2926,6 +2945,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>buyer_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3104,6 +3130,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3177,6 +3210,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>editor_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3217,6 +3257,13 @@
               
                 <tr>
                   <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3267,6 +3314,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>seller_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3307,6 +3361,13 @@
               
                 <tr>
                   <td>editor_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>editor_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3364,6 +3425,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>swapper_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3404,6 +3472,13 @@
               
                 <tr>
                   <td>editor_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>editor_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3454,6 +3529,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>withdrawer_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3487,6 +3569,13 @@
               
                 <tr>
                   <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>recipient_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3597,44 +3686,34 @@
     
       
       <div class="file-heading">
-        <h2 id="did/did.proto">did/did.proto</h2><a href="#title">Top</a>
+        <h2 id="entity/entity.proto">entity/entity.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="did.Claim">Claim</h3>
-        <p>The claim section of a credential, indicating if the DID is KYC validated</p>
+        <h3 id="entity.EntityDoc">EntityDoc</h3>
+        <p>ProjectDoc defines a project (or entity) type with all of its parameters.</p>
 
         
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>KYC_validated</td>
-                  <td><a href="#bool">bool</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
 
         
       
-        <h3 id="did.DidCredential">DidCredential</h3>
-        <p>Digital identity credential issued to an ixo DID</p>
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="entity/genesis.proto">entity/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the project module's genesis state.</p>
 
         
           <table class="field-table">
@@ -3644,114 +3723,11 @@
             <tbody>
               
                 <tr>
-                  <td>cred_type</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity_docs</td>
+                  <td><a href="#entity.EntityDoc">EntityDoc</a></td>
                   <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>issuer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>issued</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>claim</td>
-                  <td><a href="#did.Claim">Claim</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.IxoDid">IxoDid</h3>
-        <p>An ixo DID with public and private keys, based on the Sovrin DID spec</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>verify_key</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>encryption_public_key</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>secret</td>
-                  <td><a href="#did.Secret">Secret</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.Secret">Secret</h3>
-        <p>The private section of an ixo DID, based on the Sovrin DID spec</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>seed</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>sign_key</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>encryption_private_key</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
+                  <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;];
+Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;params\&#34;&#34;]; </p></td>
                 </tr>
               
             </tbody>
@@ -3770,13 +3746,20 @@
     
       
       <div class="file-heading">
-        <h2 id="did/diddoc.proto">did/diddoc.proto</h2><a href="#title">Top</a>
+        <h2 id="entity/query.proto">entity/query.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="did.BaseDidDoc">BaseDidDoc</h3>
-        <p>BaseDidDoc defines a base DID document type. It implements the DidDoc interface.</p>
+        <h3 id="entity.QueryEntityConfigRequest">QueryEntityConfigRequest</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="entity.QueryEntityConfigResponse">QueryEntityConfigResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
           <table class="field-table">
@@ -3786,22 +3769,8 @@
             <tbody>
               
                 <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>pub_key</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>credentials</td>
-                  <td><a href="#did.DidCredential">DidCredential</a></td>
+                  <td>map</td>
+                  <td><a href="#entity.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -3813,22 +3782,8 @@
 
         
       
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="did/genesis.proto">did/genesis.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="did.GenesisState">GenesisState</h3>
-        <p>GenesisState defines the did module's genesis state.</p>
+        <h3 id="entity.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</h3>
+        <p></p>
 
         
           <table class="field-table">
@@ -3838,45 +3793,14 @@
             <tbody>
               
                 <tr>
-                  <td>did_docs</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td>repeated</td>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="did/query.proto">did/query.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="did.QueryAddressFromBase58EncodedPubkeyRequest">QueryAddressFromBase58EncodedPubkeyRequest</h3>
-        <p>QueryAddressFromBase58EncodedPubkeyRequest is the request type for the Query/AddressFromBase58EncodedPubkey RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
                 <tr>
-                  <td>pubKey</td>
+                  <td>value</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3889,8 +3813,8 @@
 
         
       
-        <h3 id="did.QueryAddressFromBase58EncodedPubkeyResponse">QueryAddressFromBase58EncodedPubkeyResponse</h3>
-        <p>QueryAddressFromBase58EncodedPubkeyResponse is the response type for the Query/AddressFromBase58EncodedPubkey RPC method.</p>
+        <h3 id="entity.QueryEntityDocRequest">QueryEntityDocRequest</h3>
+        <p>QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.</p>
 
         
           <table class="field-table">
@@ -3900,7 +3824,7 @@
             <tbody>
               
                 <tr>
-                  <td>address</td>
+                  <td>entity_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3913,8 +3837,15 @@
 
         
       
-        <h3 id="did.QueryAddressFromDidRequest">QueryAddressFromDidRequest</h3>
-        <p>QueryAddressFromDidRequest is the request type for the Query/AddressFromDid RPC method.</p>
+        <h3 id="entity.QueryEntityDocResponse">QueryEntityDocResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+
+        
+      
+        <h3 id="entity.QueryEntityListRequest">QueryEntityListRequest</h3>
+        <p></p>
 
         
           <table class="field-table">
@@ -3924,7 +3855,14 @@
             <tbody>
               
                 <tr>
-                  <td>did</td>
+                  <td>entity_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entity_status</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3937,137 +3875,10 @@
 
         
       
-        <h3 id="did.QueryAddressFromDidResponse">QueryAddressFromDidResponse</h3>
-        <p>QueryAddressFromDidResponse is the response type for the Query/AddressFromDid RPC method.</p>
+        <h3 id="entity.QueryEntityListResponse">QueryEntityListResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAllDidDocsRequest">QueryAllDidDocsRequest</h3>
-        <p>QueryAllDidDocsRequest is the request type for the Query/AllDidDocs RPC method.</p>
-
-        
-
-        
-      
-        <h3 id="did.QueryAllDidDocsResponse">QueryAllDidDocsResponse</h3>
-        <p>QueryAllDidDocsResponse is the response type for the Query/AllDidDocs RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>diddocs</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryAllDidsRequest">QueryAllDidsRequest</h3>
-        <p>QueryAllDidsRequest is the request type for the Query/AllDids RPC method.</p>
-
-        
-
-        
-      
-        <h3 id="did.QueryAllDidsResponse">QueryAllDidsResponse</h3>
-        <p>QueryAllDidsResponse is the response type for the Query/AllDids RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>dids</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryDidDocRequest">QueryDidDocRequest</h3>
-        <p>QueryDidDocRequest is the request type for the Query/DidDoc RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.QueryDidDocResponse">QueryDidDocResponse</h3>
-        <p>QueryDidDocResponse is the response type for the Query/DidDoc RPC method.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>diddoc</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
 
         
       
@@ -4077,7 +3888,7 @@
       
 
       
-        <h3 id="did.Query">Query</h3>
+        <h3 id="entity.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -4086,38 +3897,24 @@
           <tbody>
             
               <tr>
-                <td>DidDoc</td>
-                <td><a href="#did.QueryDidDocRequest">QueryDidDocRequest</a></td>
-                <td><a href="#did.QueryDidDocResponse">QueryDidDocResponse</a></td>
-                <td><p>DidDoc queries info of a specific DID&#39;s DidDoc.</p></td>
+                <td>EntityList</td>
+                <td><a href="#entity.QueryEntityListRequest">QueryEntityListRequest</a></td>
+                <td><a href="#entity.QueryEntityListResponse">QueryEntityListResponse</a></td>
+                <td><p></p></td>
               </tr>
             
               <tr>
-                <td>AllDids</td>
-                <td><a href="#did.QueryAllDidsRequest">QueryAllDidsRequest</a></td>
-                <td><a href="#did.QueryAllDidsResponse">QueryAllDidsResponse</a></td>
-                <td><p>AllDids returns a list of all existing DIDs.</p></td>
+                <td>EntityDoc</td>
+                <td><a href="#entity.QueryEntityDocRequest">QueryEntityDocRequest</a></td>
+                <td><a href="#entity.QueryEntityDocResponse">QueryEntityDocResponse</a></td>
+                <td><p></p></td>
               </tr>
             
               <tr>
-                <td>AllDidDocs</td>
-                <td><a href="#did.QueryAllDidDocsRequest">QueryAllDidDocsRequest</a></td>
-                <td><a href="#did.QueryAllDidDocsResponse">QueryAllDidDocsResponse</a></td>
-                <td><p>AllDidDocs returns a list of all existing DidDocs (i.e. all DIDs along with their DidDoc info).</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddressFromDid</td>
-                <td><a href="#did.QueryAddressFromDidRequest">QueryAddressFromDidRequest</a></td>
-                <td><a href="#did.QueryAddressFromDidResponse">QueryAddressFromDidResponse</a></td>
-                <td><p>AddressFromDid retrieves the cosmos address associated to an ixo DID.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddressFromBase58EncodedPubkey</td>
-                <td><a href="#did.QueryAddressFromBase58EncodedPubkeyRequest">QueryAddressFromBase58EncodedPubkeyRequest</a></td>
-                <td><a href="#did.QueryAddressFromBase58EncodedPubkeyResponse">QueryAddressFromBase58EncodedPubkeyResponse</a></td>
-                <td><p>AddressFromBase58EncodedPubkey retrieves the cosmos address associated to an ixo DID&#39;s pubkey.</p></td>
+                <td>EntityConfig</td>
+                <td><a href="#entity.QueryEntityConfigRequest">QueryEntityConfigRequest</a></td>
+                <td><a href="#entity.QueryEntityConfigResponse">QueryEntityConfigResponse</a></td>
+                <td><p></p></td>
               </tr>
             
           </tbody>
@@ -4141,9 +3938,9 @@
               
               
               <tr>
-                <td>DidDoc</td>
+                <td>EntityList</td>
                 <td>GET</td>
-                <td>/ixo/did/{did}</td>
+                <td>/ixo/entity</td>
                 <td></td>
               </tr>
               
@@ -4151,9 +3948,9 @@
               
               
               <tr>
-                <td>AllDids</td>
+                <td>EntityDoc</td>
                 <td>GET</td>
-                <td>/ixo/did</td>
+                <td>/ixo/entity/{entity_did}</td>
                 <td></td>
               </tr>
               
@@ -4161,29 +3958,9 @@
               
               
               <tr>
-                <td>AllDidDocs</td>
+                <td>EntityConfig</td>
                 <td>GET</td>
-                <td>/ixo/allDidDocs</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>AddressFromDid</td>
-                <td>GET</td>
-                <td>/ixo/didToAddr/{did=**}</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>AddressFromBase58EncodedPubkey</td>
-                <td>GET</td>
-                <td>/ixo/pubKeyToAddr/{pubKey}</td>
+                <td>/ixo/entity/config</td>
                 <td></td>
               </tr>
               
@@ -4192,191 +3969,6 @@
           </table>
           
         
-    
-      
-      <div class="file-heading">
-        <h2 id="did/tx.proto">did/tx.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="did.MsgAddCredential">MsgAddCredential</h3>
-        <p>MsgAddCredential defines a message for adding a credential to the signer's DID.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did_credential</td>
-                  <td><a href="#did.DidCredential">DidCredential</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.MsgAddCredentialResponse">MsgAddCredentialResponse</h3>
-        <p>MsgAddCredentialResponse defines the Msg/AddCredential response type.</p>
-
-        
-
-        
-      
-        <h3 id="did.MsgAddDid">MsgAddDid</h3>
-        <p>MsgAddDid defines a message for adding a DID.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>pubKey</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="did.MsgAddDidResponse">MsgAddDidResponse</h3>
-        <p>MsgAddDidResponse defines the Msg/AddDid response type.</p>
-
-        
-
-        
-      
-
-      
-
-      
-
-      
-        <h3 id="did.Msg">Msg</h3>
-        <p>Msg defines the did Msg service.</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>AddDid</td>
-                <td><a href="#did.MsgAddDid">MsgAddDid</a></td>
-                <td><a href="#did.MsgAddDidResponse">MsgAddDidResponse</a></td>
-                <td><p>AddDid defines a method for adding a DID.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddCredential</td>
-                <td><a href="#did.MsgAddCredential">MsgAddCredential</a></td>
-                <td><a href="#did.MsgAddCredentialResponse">MsgAddCredentialResponse</a></td>
-                <td><p>AddCredential defines a method for adding a credential to the signer&#39;s DID.</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-
-        
-    
-      
-      <div class="file-heading">
-        <h2 id="iid/event.proto">iid/event.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="ixofoundation.ixo.data.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
-        <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did being created </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the signer account creating the did </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.IidDocumentUpdatedEvent">IidDocumentUpdatedEvent</h3>
-        <p>DidDocumentUpdatedEvent is an event triggered on a DID document update</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did being updated </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the signer account of the change </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
     
       
       <div class="file-heading">
@@ -4385,7 +3977,7 @@
       <p></p>
 
       
-        <h3 id="ixofoundation.ixo.data.AccordedRight">AccordedRight</h3>
+        <h3 id="iid.AccordedRight">AccordedRight</h3>
         <p></p>
 
         
@@ -4437,7 +4029,7 @@
 
         
       
-        <h3 id="ixofoundation.ixo.data.Context">Context</h3>
+        <h3 id="iid.Context">Context</h3>
         <p></p>
 
         
@@ -4468,7 +4060,7 @@
 
         
       
-        <h3 id="ixofoundation.ixo.data.IidDocument">IidDocument</h3>
+        <h3 id="iid.IidDocument">IidDocument</h3>
         <p></p>
 
         
@@ -4480,7 +4072,7 @@
               
                 <tr>
                   <td>context</td>
-                  <td><a href="#ixofoundation.ixo.data.Context">Context</a></td>
+                  <td><a href="#iid.Context">Context</a></td>
                   <td>repeated</td>
                   <td><p>@context is spec for did document. </p></td>
                 </tr>
@@ -4502,7 +4094,7 @@ cfr. https://www.w3.org/TR/did-core/#did-controller </p></td>
               
                 <tr>
                   <td>verificationMethod</td>
-                  <td><a href="#ixofoundation.ixo.data.VerificationMethod">VerificationMethod</a></td>
+                  <td><a href="#iid.VerificationMethod">VerificationMethod</a></td>
                   <td>repeated</td>
                   <td><p>A DID document can express verification methods, 
 such as cryptographic public keys, which can be used 
@@ -4512,7 +4104,7 @@ https://www.w3.org/TR/did-core/#verification-methods </p></td>
               
                 <tr>
                   <td>service</td>
-                  <td><a href="#ixofoundation.ixo.data.Service">Service</a></td>
+                  <td><a href="#iid.Service">Service</a></td>
                   <td>repeated</td>
                   <td><p>Services are used in DID documents to express ways of communicating 
 with the DID subject or associated entities.
@@ -4567,21 +4159,21 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>linkedResource</td>
-                  <td><a href="#ixofoundation.ixo.data.LinkedResource">LinkedResource</a></td>
+                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>accordedRight</td>
-                  <td><a href="#ixofoundation.ixo.data.AccordedRight">AccordedRight</a></td>
+                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedEntity</td>
-                  <td><a href="#ixofoundation.ixo.data.LinkedEntity">LinkedEntity</a></td>
+                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -4600,7 +4192,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.IidMetadata">IidMetadata</h3>
+        <h3 id="iid.IidMetadata">IidMetadata</h3>
         <p>DidMetadata defines metadata associated to a did document such as </p><p>the status of the DID document</p>
 
         
@@ -4701,7 +4293,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.LinkedEntity">LinkedEntity</h3>
+        <h3 id="iid.LinkedEntity">LinkedEntity</h3>
         <p></p>
 
         
@@ -4732,7 +4324,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.LinkedResource">LinkedResource</h3>
+        <h3 id="iid.LinkedResource">LinkedResource</h3>
         <p></p>
 
         
@@ -4805,7 +4397,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.Service">Service</h3>
+        <h3 id="iid.Service">Service</h3>
         <p>Service defines how to find data associated with a identifer</p>
 
         
@@ -4843,7 +4435,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.VerificationMethod">VerificationMethod</h3>
+        <h3 id="iid.VerificationMethod">VerificationMethod</h3>
         <p></p>
 
         
@@ -4911,12 +4503,1553 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
     
       
       <div class="file-heading">
+        <h2 id="iid/tx.proto">iid/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.MsgAddAccordedRight">MsgAddAccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td></td>
+                  <td><p>the Accorded right to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddController">MsgAddController</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did of the document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did to add as a controller of the did document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddControllerResponse">MsgAddControllerResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddIidContext">MsgAddIidContext</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">Context</a></td>
+                  <td></td>
+                  <td><p>the context to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddIidContextResponse">MsgAddIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddLinkedEntity">MsgAddLinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the iid </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td></td>
+                  <td><p>the entity to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddLinkedResource">MsgAddLinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td></td>
+                  <td><p>the verification to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddService">MsgAddService</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_data</td>
+                  <td><a href="#iid.Service">Service</a></td>
+                  <td></td>
+                  <td><p>the service data to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddServiceResponse">MsgAddServiceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgAddVerification">MsgAddVerification</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verification</td>
+                  <td><a href="#iid.Verification">Verification</a></td>
+                  <td></td>
+                  <td><p>the verification to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgAddVerificationResponse">MsgAddVerificationResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgCreateIidDocument">MsgCreateIidDocument</h3>
+        <p>MsgCreateDidDocument defines a SDK message for creating a new did.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllers</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of controller DIDs </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">Context</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifications</td>
+                  <td><a href="#iid.Verification">Verification</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of verification methods and relationships </p></td>
+                </tr>
+              
+                <tr>
+                  <td>services</td>
+                  <td><a href="#iid.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>right_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteController">MsgDeleteController</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did of the document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did to remove from the list of controllers of the did document </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteControllerResponse">MsgDeleteControllerResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteIidContext">MsgDeleteIidContext</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contextKey</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the context key </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the iid </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entity_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the entity id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedResource">MsgDeleteLinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>resource_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgDeleteService">MsgDeleteService</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the service id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeleteServiceResponse">MsgDeleteServiceResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgRevokeVerification">MsgRevokeVerification</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the verification method id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgSetVerificationRelationships">MsgSetVerificationRelationships</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the verification method id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relationships</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of relationships to set </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgUpdateIidDocument">MsgUpdateIidDocument</h3>
+        <p>MsgUpdateDidDocument replace an existing did document with a new version</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>doc</td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td></td>
+                  <td><p>the did document to replace </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.MsgUpdateIidMeta">MsgUpdateIidMeta</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>meta</td>
+                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td></td>
+                  <td><p>the context to add </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="iid.Verification">Verification</h3>
+        <p>Verification is a message that allows to assign a verification method</p><p>to one or more verification relationships</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>relationships</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>verificationRelationships defines which relationships
+are allowed to use the verification method
+
+relationships that the method is allowed into. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>method</td>
+                  <td><a href="#iid.VerificationMethod">VerificationMethod</a></td>
+                  <td></td>
+                  <td><p>public key associated with the did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>additional contexts (json ld schemas) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="iid.Msg">Msg</h3>
+        <p>Msg defines the identity Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateIidDocument</td>
+                <td><a href="#iid.MsgCreateIidDocument">MsgCreateIidDocument</a></td>
+                <td><a href="#iid.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</a></td>
+                <td><p>CreateDidDocument defines a method for creating a new identity.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateIidDocument</td>
+                <td><a href="#iid.MsgUpdateIidDocument">MsgUpdateIidDocument</a></td>
+                <td><a href="#iid.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</a></td>
+                <td><p>UpdateDidDocument defines a method for updating an identity.</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddVerification</td>
+                <td><a href="#iid.MsgAddVerification">MsgAddVerification</a></td>
+                <td><a href="#iid.MsgAddVerificationResponse">MsgAddVerificationResponse</a></td>
+                <td><p>AddVerificationMethod adds a new verification method</p></td>
+              </tr>
+            
+              <tr>
+                <td>RevokeVerification</td>
+                <td><a href="#iid.MsgRevokeVerification">MsgRevokeVerification</a></td>
+                <td><a href="#iid.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</a></td>
+                <td><p>RevokeVerification remove the verification method and all associated verification Relations</p></td>
+              </tr>
+            
+              <tr>
+                <td>SetVerificationRelationships</td>
+                <td><a href="#iid.MsgSetVerificationRelationships">MsgSetVerificationRelationships</a></td>
+                <td><a href="#iid.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</a></td>
+                <td><p>SetVerificationRelationships overwrite current verification relationships</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddService</td>
+                <td><a href="#iid.MsgAddService">MsgAddService</a></td>
+                <td><a href="#iid.MsgAddServiceResponse">MsgAddServiceResponse</a></td>
+                <td><p>AddService add a new service</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteService</td>
+                <td><a href="#iid.MsgDeleteService">MsgDeleteService</a></td>
+                <td><a href="#iid.MsgDeleteServiceResponse">MsgDeleteServiceResponse</a></td>
+                <td><p>DeleteService delete an existing service</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddController</td>
+                <td><a href="#iid.MsgAddController">MsgAddController</a></td>
+                <td><a href="#iid.MsgAddControllerResponse">MsgAddControllerResponse</a></td>
+                <td><p>AddService add a new service</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteController</td>
+                <td><a href="#iid.MsgDeleteController">MsgDeleteController</a></td>
+                <td><a href="#iid.MsgDeleteControllerResponse">MsgDeleteControllerResponse</a></td>
+                <td><p>DeleteService delete an existing service</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddLinkedResource</td>
+                <td><a href="#iid.MsgAddLinkedResource">MsgAddLinkedResource</a></td>
+                <td><a href="#iid.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</a></td>
+                <td><p>Add / Delete Linked Resource</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteLinkedResource</td>
+                <td><a href="#iid.MsgDeleteLinkedResource">MsgDeleteLinkedResource</a></td>
+                <td><a href="#iid.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddLinkedEntity</td>
+                <td><a href="#iid.MsgAddLinkedEntity">MsgAddLinkedEntity</a></td>
+                <td><a href="#iid.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</a></td>
+                <td><p>Add / Delete Linked Entity</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteLinkedEntity</td>
+                <td><a href="#iid.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</a></td>
+                <td><a href="#iid.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddAccordedRight</td>
+                <td><a href="#iid.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
+                <td><a href="#iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
+                <td><p>Add / Delete Accorded Right</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteAccordedRight</td>
+                <td><a href="#iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</a></td>
+                <td><a href="#iid.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>AddIidContext</td>
+                <td><a href="#iid.MsgAddIidContext">MsgAddIidContext</a></td>
+                <td><a href="#iid.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
+                <td><p>Add / Delete Context</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteIidContext</td>
+                <td><a href="#iid.MsgDeleteIidContext">MsgDeleteIidContext</a></td>
+                <td><a href="#iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateMetaData</td>
+                <td><a href="#iid.MsgUpdateIidMeta">MsgUpdateIidMeta</a></td>
+                <td><a href="#iid.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</a></td>
+                <td><p>Update META</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="entity/tx.proto">entity/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.MsgCreateEntity">MsgCreateEntity</h3>
+        <p>MsgCreateEntity defines a message for creating a project.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entityType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The entity type likely Asset, Project, Investment for now. Validation for this is lacking right now, but will be added when scope is clearer. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityStatus</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>The status of the entity. Should represent an enum in the client. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllers</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of controller DIDs </p></td>
+                </tr>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#iid.Context">iid.Context</a></td>
+                  <td>repeated</td>
+                  <td><p>refer to iid context for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifications</td>
+                  <td><a href="#iid.Verification">iid.Verification</a></td>
+                  <td>repeated</td>
+                  <td><p>the list of verification methods and relationships </p></td>
+                </tr>
+              
+                <tr>
+                  <td>services</td>
+                  <td><a href="#iid.Service">iid.Service</a></td>
+                  <td>repeated</td>
+                  <td><p>refer to iid for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#iid.AccordedRight">iid.AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#iid.LinkedResource">iid.LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#iid.LinkedEntity">iid.LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>Whether this entity is enabled ot not, basically a soft delete. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>startDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information
+
+address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>endDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information
+
+address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>stage</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>refer to iid module meta data for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relayerNode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifiableCredential</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>credentials</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgCreateEntityResponse">MsgCreateEntityResponse</h3>
+        <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entityId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>entityStatus</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgTransferEntity">MsgTransferEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>entityDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>recipiantDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgTransferEntityResponse">MsgTransferEntityResponse</h3>
+        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
+
+        
+
+        
+      
+        <h3 id="entity.MsgUpdateEntity">MsgUpdateEntity</h3>
+        <p>MsgUpdateEntityStatus defines a message for updating a entity's current status.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>The status of the entity. Should represent an enum in the client. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>Whether this entity is enabled ot not, basically a soft delete. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>startDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information
+
+address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>endDate</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information
+
+address of the account signing the message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>stage</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>refer to iid module meta data for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relayerNode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verifiableCredential</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>refer to iid module for more information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controllerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgUpdateEntityConfig">MsgUpdateEntityConfig</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>nft_contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="entity.MsgUpdateEntityConfigResponse">MsgUpdateEntityConfigResponse</h3>
+        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
+
+        
+
+        
+      
+        <h3 id="entity.MsgUpdateEntityResponse">MsgUpdateEntityResponse</h3>
+        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="entity.Msg">Msg</h3>
+        <p>Msg defines the project Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateEntity</td>
+                <td><a href="#entity.MsgCreateEntity">MsgCreateEntity</a></td>
+                <td><a href="#entity.MsgCreateEntityResponse">MsgCreateEntityResponse</a></td>
+                <td><p>CreateProject defines a method for creating a project.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateEntity</td>
+                <td><a href="#entity.MsgUpdateEntity">MsgUpdateEntity</a></td>
+                <td><a href="#entity.MsgUpdateEntityResponse">MsgUpdateEntityResponse</a></td>
+                <td><p>UpdateEntityStatus defines a method for updating a entity&#39;s current status.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateEntityConfig</td>
+                <td><a href="#entity.MsgUpdateEntityConfig">MsgUpdateEntityConfig</a></td>
+                <td><a href="#entity.MsgUpdateEntityConfigResponse">MsgUpdateEntityConfigResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>TransferEntity</td>
+                <td><a href="#entity.MsgTransferEntity">MsgTransferEntity</a></td>
+                <td><a href="#entity.MsgTransferEntityResponse">MsgTransferEntityResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="iid/event.proto">iid/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="iid.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
+        <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did being created </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account creating the did </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.IidDocumentUpdatedEvent">IidDocumentUpdatedEvent</h3>
+        <p>DidDocumentUpdatedEvent is an event triggered on a DID document update</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did being updated </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account of the change </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
         <h2 id="iid/genesis.proto">iid/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="ixofoundation.ixo.data.GenesisState">GenesisState</h3>
+        <h3 id="iid.GenesisState">GenesisState</h3>
         <p>GenesisState defines the did module's genesis state.</p>
 
         
@@ -4928,14 +6061,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>iid_docs</td>
-                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>iid_meta</td>
-                  <td><a href="#ixofoundation.ixo.data.IidMetadata">IidMetadata</a></td>
+                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -4961,7 +6094,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
       <p></p>
 
       
-        <h3 id="ixofoundation.ixo.data.QueryIidDocumentRequest">QueryIidDocumentRequest</h3>
+        <h3 id="iid.QueryIidDocumentRequest">QueryIidDocumentRequest</h3>
         <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
 
         
@@ -4985,7 +6118,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.QueryIidDocumentResponse">QueryIidDocumentResponse</h3>
+        <h3 id="iid.QueryIidDocumentResponse">QueryIidDocumentResponse</h3>
         <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
 
         
@@ -4997,7 +6130,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>iidDocument</td>
-                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
                   <td></td>
                   <td><p>validators contains all the queried validators.
 
@@ -5011,7 +6144,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.QueryIidDocumentsRequest">QueryIidDocumentsRequest</h3>
+        <h3 id="iid.QueryIidDocumentsRequest">QueryIidDocumentsRequest</h3>
         <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
 
         
@@ -5035,7 +6168,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.QueryIidDocumentsResponse">QueryIidDocumentsResponse</h3>
+        <h3 id="iid.QueryIidDocumentsResponse">QueryIidDocumentsResponse</h3>
         <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
 
         
@@ -5047,7 +6180,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>iidDocuments</td>
-                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
+                  <td><a href="#iid.IidDocument">IidDocument</a></td>
                   <td>repeated</td>
                   <td><p>validators contains all the queried validators. </p></td>
                 </tr>
@@ -5059,7 +6192,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.QueryIidMetaDataRequest">QueryIidMetaDataRequest</h3>
+        <h3 id="iid.QueryIidMetaDataRequest">QueryIidMetaDataRequest</h3>
         <p></p>
 
         
@@ -5083,7 +6216,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.QueryIidMetaDataResponse">QueryIidMetaDataResponse</h3>
+        <h3 id="iid.QueryIidMetaDataResponse">QueryIidMetaDataResponse</h3>
         <p>this line is used by starport scaffolding # 3</p>
 
         
@@ -5095,7 +6228,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>didMetadata</td>
-                  <td><a href="#ixofoundation.ixo.data.IidMetadata">IidMetadata</a></td>
+                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
                   <td></td>
                   <td><p>validators contains all the queried validators.
 IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
@@ -5114,7 +6247,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       
 
       
-        <h3 id="ixofoundation.ixo.data.Query">Query</h3>
+        <h3 id="iid.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -5124,22 +6257,22 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             
               <tr>
                 <td>IidDocuments</td>
-                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentsRequest">QueryIidDocumentsRequest</a></td>
-                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentsResponse">QueryIidDocumentsResponse</a></td>
+                <td><a href="#iid.QueryIidDocumentsRequest">QueryIidDocumentsRequest</a></td>
+                <td><a href="#iid.QueryIidDocumentsResponse">QueryIidDocumentsResponse</a></td>
                 <td><p>IidDocuments queries all iid documents that match the given status.</p></td>
               </tr>
             
               <tr>
                 <td>IidDocument</td>
-                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentRequest">QueryIidDocumentRequest</a></td>
-                <td><a href="#ixofoundation.ixo.data.QueryIidDocumentResponse">QueryIidDocumentResponse</a></td>
+                <td><a href="#iid.QueryIidDocumentRequest">QueryIidDocumentRequest</a></td>
+                <td><a href="#iid.QueryIidDocumentResponse">QueryIidDocumentResponse</a></td>
                 <td><p>IidDocument queries a iid documents with an id.</p></td>
               </tr>
             
               <tr>
                 <td>MetaData</td>
-                <td><a href="#ixofoundation.ixo.data.QueryIidMetaDataRequest">QueryIidMetaDataRequest</a></td>
-                <td><a href="#ixofoundation.ixo.data.QueryIidMetaDataResponse">QueryIidMetaDataResponse</a></td>
+                <td><a href="#iid.QueryIidMetaDataRequest">QueryIidMetaDataRequest</a></td>
+                <td><a href="#iid.QueryIidMetaDataResponse">QueryIidMetaDataResponse</a></td>
                 <td><p>MetaData queries a iid documents with an id.</p></td>
               </tr>
             
@@ -5198,13 +6331,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="iid/tx.proto">iid/tx.proto</h2><a href="#title">Top</a>
+        <h2 id="legacy/did/did.proto">legacy/did/did.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="ixofoundation.ixo.data.MsgAddAccordedRight">MsgAddAccordedRight</h3>
-        <p></p>
+        <h3 id="legacydid.Claim">Claim</h3>
+        <p>The claim section of a credential, indicating if the DID is KYC validated</p>
 
         
           <table class="field-table">
@@ -5217,21 +6350,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the did </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>accordedRight</td>
-                  <td><a href="#ixofoundation.ixo.data.AccordedRight">AccordedRight</a></td>
+                  <td>KYC_validated</td>
+                  <td><a href="#bool">bool</a></td>
                   <td></td>
-                  <td><p>the Accorded right to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -5241,15 +6367,8 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddController">MsgAddController</h3>
-        <p></p>
+        <h3 id="legacydid.DidCredential">DidCredential</h3>
+        <p>Digital identity credential issued to an ixo DID</p>
 
         
           <table class="field-table">
@@ -5259,336 +6378,76 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
+                  <td>cred_type</td>
                   <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did of the document </p></td>
-                </tr>
-              
-                <tr>
-                  <td>controller_did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did to add as a controller of the did document </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddControllerResponse">MsgAddControllerResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddIidContext">MsgAddIidContext</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>context</td>
-                  <td><a href="#ixofoundation.ixo.data.Context">Context</a></td>
-                  <td></td>
-                  <td><p>the context to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddIidContextResponse">MsgAddIidContextResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddLinkedEntity">MsgAddLinkedEntity</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the iid </p></td>
-                </tr>
-              
-                <tr>
-                  <td>linkedEntity</td>
-                  <td><a href="#ixofoundation.ixo.data.LinkedEntity">LinkedEntity</a></td>
-                  <td></td>
-                  <td><p>the entity to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddLinkedResource">MsgAddLinkedResource</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>linkedResource</td>
-                  <td><a href="#ixofoundation.ixo.data.LinkedResource">LinkedResource</a></td>
-                  <td></td>
-                  <td><p>the verification to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddService">MsgAddService</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>service_data</td>
-                  <td><a href="#ixofoundation.ixo.data.Service">Service</a></td>
-                  <td></td>
-                  <td><p>the service data to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddServiceResponse">MsgAddServiceResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddVerification">MsgAddVerification</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>verification</td>
-                  <td><a href="#ixofoundation.ixo.data.Verification">Verification</a></td>
-                  <td></td>
-                  <td><p>the verification to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgAddVerificationResponse">MsgAddVerificationResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgCreateIidDocument">MsgCreateIidDocument</h3>
-        <p>MsgCreateDidDocument defines a SDK message for creating a new did.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>controllers</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>the list of controller DIDs </p></td>
-                </tr>
-              
-                <tr>
-                  <td>context</td>
-                  <td><a href="#ixofoundation.ixo.data.Context">Context</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>verifications</td>
-                  <td><a href="#ixofoundation.ixo.data.Verification">Verification</a></td>
-                  <td>repeated</td>
-                  <td><p>the list of verification methods and relationships </p></td>
-                </tr>
-              
-                <tr>
-                  <td>services</td>
-                  <td><a href="#ixofoundation.ixo.data.Service">Service</a></td>
-                  <td>repeated</td>
+                  <td>issuer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>accordedRight</td>
-                  <td><a href="#ixofoundation.ixo.data.AccordedRight">AccordedRight</a></td>
-                  <td>repeated</td>
+                  <td>issued</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>linkedResource</td>
-                  <td><a href="#ixofoundation.ixo.data.LinkedResource">LinkedResource</a></td>
-                  <td>repeated</td>
+                  <td>claim</td>
+                  <td><a href="#legacydid.Claim">Claim</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="legacydid.IxoDid">IxoDid</h3>
+        <p>An ixo DID with public and private keys, based on the Sovrin DID spec</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>linkedEntity</td>
-                  <td><a href="#ixofoundation.ixo.data.LinkedEntity">LinkedEntity</a></td>
-                  <td>repeated</td>
+                  <td>verify_key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
+                  <td>encryption_public_key</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>address of the account signing the message </p></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>secret</td>
+                  <td><a href="#legacydid.Secret">Secret</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -5598,15 +6457,8 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
-        <p></p>
+        <h3 id="legacydid.Secret">Secret</h3>
+        <p>The private section of an ixo DID, based on the Sovrin DID spec</p>
 
         
           <table class="field-table">
@@ -5616,24 +6468,24 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
+                  <td>seed</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the did </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>right_id</td>
+                  <td>sign_key</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the service id </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
+                  <td>encryption_private_key</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>address of the account signing the message </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -5643,15 +6495,22 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixofoundation.ixo.data.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</h3>
-        <p></p>
 
-        
-
-        
       
-        <h3 id="ixofoundation.ixo.data.MsgDeleteController">MsgDeleteController</h3>
-        <p></p>
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="legacy/did/diddoc.proto">legacy/did/diddoc.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="legacydid.BaseDidDoc">BaseDidDoc</h3>
+        <p>BaseDidDoc defines a base DID document type. It implements the DidDoc interface.</p>
 
         
           <table class="field-table">
@@ -5661,432 +6520,24 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
+                  <td>did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the did of the document </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>controller_did</td>
+                  <td>pub_key</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the did to remove from the list of controllers of the did document </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteControllerResponse">MsgDeleteControllerResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteIidContext">MsgDeleteIidContext</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>contextKey</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the context key </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the iid </p></td>
-                </tr>
-              
-                <tr>
-                  <td>entity_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the entity id </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedResource">MsgDeleteLinkedResource</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>resource_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the service id </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteService">MsgDeleteService</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>service_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the service id </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgDeleteServiceResponse">MsgDeleteServiceResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgRevokeVerification">MsgRevokeVerification</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>method_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the verification method id </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgSetVerificationRelationships">MsgSetVerificationRelationships</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>method_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the verification method id </p></td>
-                </tr>
-              
-                <tr>
-                  <td>relationships</td>
-                  <td><a href="#string">string</a></td>
+                  <td>credentials</td>
+                  <td><a href="#legacydid.DidCredential">DidCredential</a></td>
                   <td>repeated</td>
-                  <td><p>the list of relationships to set </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgUpdateIidDocument">MsgUpdateIidDocument</h3>
-        <p>MsgUpdateDidDocument replace an existing did document with a new version</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>doc</td>
-                  <td><a href="#ixofoundation.ixo.data.IidDocument">IidDocument</a></td>
-                  <td></td>
-                  <td><p>the did document to replace </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgUpdateIidMeta">MsgUpdateIidMeta</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the did </p></td>
-                </tr>
-              
-                <tr>
-                  <td>meta</td>
-                  <td><a href="#ixofoundation.ixo.data.IidMetadata">IidMetadata</a></td>
-                  <td></td>
-                  <td><p>the context to add </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>address of the account signing the message </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixofoundation.ixo.data.Verification">Verification</h3>
-        <p>Verification is a message that allows to assign a verification method</p><p>to one or more verification relationships</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>relationships</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>verificationRelationships defines which relationships
-are allowed to use the verification method
-
-relationships that the method is allowed into. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>method</td>
-                  <td><a href="#ixofoundation.ixo.data.VerificationMethod">VerificationMethod</a></td>
-                  <td></td>
-                  <td><p>public key associated with the did document. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>context</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>additional contexts (json ld schemas) </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -6102,144 +6553,6 @@ relationships that the method is allowed into. </p></td>
       
 
       
-        <h3 id="ixofoundation.ixo.data.Msg">Msg</h3>
-        <p>Msg defines the identity Msg service.</p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>CreateIidDocument</td>
-                <td><a href="#ixofoundation.ixo.data.MsgCreateIidDocument">MsgCreateIidDocument</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</a></td>
-                <td><p>CreateDidDocument defines a method for creating a new identity.</p></td>
-              </tr>
-            
-              <tr>
-                <td>UpdateIidDocument</td>
-                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidDocument">MsgUpdateIidDocument</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</a></td>
-                <td><p>UpdateDidDocument defines a method for updating an identity.</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddVerification</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddVerification">MsgAddVerification</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddVerificationResponse">MsgAddVerificationResponse</a></td>
-                <td><p>AddVerificationMethod adds a new verification method</p></td>
-              </tr>
-            
-              <tr>
-                <td>RevokeVerification</td>
-                <td><a href="#ixofoundation.ixo.data.MsgRevokeVerification">MsgRevokeVerification</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</a></td>
-                <td><p>RevokeVerification remove the verification method and all associated verification Relations</p></td>
-              </tr>
-            
-              <tr>
-                <td>SetVerificationRelationships</td>
-                <td><a href="#ixofoundation.ixo.data.MsgSetVerificationRelationships">MsgSetVerificationRelationships</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</a></td>
-                <td><p>SetVerificationRelationships overwrite current verification relationships</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddService</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddService">MsgAddService</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddServiceResponse">MsgAddServiceResponse</a></td>
-                <td><p>AddService add a new service</p></td>
-              </tr>
-            
-              <tr>
-                <td>DeleteService</td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteService">MsgDeleteService</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteServiceResponse">MsgDeleteServiceResponse</a></td>
-                <td><p>DeleteService delete an existing service</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddController</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddController">MsgAddController</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddControllerResponse">MsgAddControllerResponse</a></td>
-                <td><p>AddService add a new service</p></td>
-              </tr>
-            
-              <tr>
-                <td>DeleteController</td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteController">MsgDeleteController</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteControllerResponse">MsgDeleteControllerResponse</a></td>
-                <td><p>DeleteService delete an existing service</p></td>
-              </tr>
-            
-              <tr>
-                <td>AddLinkedResource</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedResource">MsgAddLinkedResource</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</a></td>
-                <td><p>Add / Delete Linked Resource</p></td>
-              </tr>
-            
-              <tr>
-                <td>DeleteLinkedResource</td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedResource">MsgDeleteLinkedResource</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</a></td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>AddLinkedEntity</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedEntity">MsgAddLinkedEntity</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</a></td>
-                <td><p>Add / Delete Linked Entity</p></td>
-              </tr>
-            
-              <tr>
-                <td>DeleteLinkedEntity</td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</a></td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>AddAccordedRight</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
-                <td><p>Add / Delete Accorded Right</p></td>
-              </tr>
-            
-              <tr>
-                <td>DeleteAccordedRight</td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteAccordedRight">MsgDeleteAccordedRight</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</a></td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>AddIidContext</td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddIidContext">MsgAddIidContext</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
-                <td><p>Add / Delete Context</p></td>
-              </tr>
-            
-              <tr>
-                <td>DeleteIidContext</td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteIidContext">MsgDeleteIidContext</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</a></td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>UpdateMetaData</td>
-                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidMeta">MsgUpdateIidMeta</a></td>
-                <td><a href="#ixofoundation.ixo.data.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</a></td>
-                <td><p>Update META</p></td>
-              </tr>
-            
-          </tbody>
-        </table>
-
-        
     
       
       <div class="file-heading">
@@ -7030,6 +7343,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7064,6 +7384,13 @@ relationships that the method is allowed into. </p></td>
                 <tr>
                   <td>payment_template</td>
                   <td><a href="#payments.PaymentTemplate">PaymentTemplate</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -7127,6 +7454,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7160,6 +7494,13 @@ relationships that the method is allowed into. </p></td>
               
                 <tr>
                   <td>payment_contract_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -7217,6 +7558,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>sender_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7257,6 +7605,13 @@ relationships that the method is allowed into. </p></td>
               
                 <tr>
                   <td>holder</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -7303,6 +7658,13 @@ relationships that the method is allowed into. </p></td>
                 <tr>
                   <td>authorised</td>
                   <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>payer_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8353,6 +8715,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8405,6 +8774,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8453,6 +8829,13 @@ relationships that the method is allowed into. </p></td>
                 <tr>
                   <td>data</td>
                   <td><a href="#project.CreateEvaluationDoc">CreateEvaluationDoc</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8516,6 +8899,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8564,6 +8954,13 @@ relationships that the method is allowed into. </p></td>
                 <tr>
                   <td>data</td>
                   <td><a href="#project.UpdateAgentDoc">UpdateAgentDoc</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8620,6 +9017,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8672,6 +9076,13 @@ relationships that the method is allowed into. </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>project_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -8706,6 +9117,13 @@ relationships that the method is allowed into. </p></td>
                 <tr>
                   <td>data</td>
                   <td><a href="#project.WithdrawFundsDoc">WithdrawFundsDoc</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>

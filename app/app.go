@@ -10,7 +10,6 @@ import (
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
-	WasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -23,14 +22,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	legacytx "github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -93,14 +90,15 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"github.com/ixofoundation/ixo-blockchain/x/did"
-	didkeeper "github.com/ixofoundation/ixo-blockchain/x/did/keeper"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	"github.com/ixofoundation/ixo-blockchain/x/entity"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	entitymodule "github.com/ixofoundation/ixo-blockchain/x/entity"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -164,10 +162,10 @@ var (
 		),
 		wasm.AppModuleBasic{},
 		// Custom ixo modules
-		did.AppModuleBasic{},
 		bonds.AppModuleBasic{},
 		payments.AppModuleBasic{},
 		project.AppModuleBasic{},
+		entity.AppModuleBasic{},
 	)
 
 	// Module account permissions
@@ -262,7 +260,7 @@ type IxoApp struct {
 	EvidenceKeeper   evidencekeeper.Keeper    `json:"evidence_keeper"`
 	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
 	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
-	wasmKeeper       wasm.Keeper
+	WasmKeeper       wasm.Keeper              `json:"wasm_keeper"`
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
@@ -272,11 +270,11 @@ type IxoApp struct {
 	// Custom ixo keepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	IidKeeper      iidmodulekeeper.Keeper
-	DidKeeper      didkeeper.Keeper      `json:"did_keeper"`
-	BondsKeeper    bondskeeper.Keeper    `json:"bonds_keeper"`
-	PaymentsKeeper paymentskeeper.Keeper `json:"payments_keeper,omitempty"`
-	ProjectKeeper  projectkeeper.Keeper  `json:"project_keeper"`
+	IidKeeper      iidmodulekeeper.Keeper `json:"iid_keeper"`
+	EntityKeeper   entitykeeper.Keeper    `json:"entity_keeper"`
+	BondsKeeper    bondskeeper.Keeper     `json:"bonds_keeper"`
+	PaymentsKeeper paymentskeeper.Keeper  `json:"payments_keeper,omitempty"`
+	ProjectKeeper  projectkeeper.Keeper   `json:"project_keeper"`
 
 	// the module manager
 	mm *module.Manager `json:"mm,omitempty"`
@@ -309,11 +307,12 @@ func NewIxoApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		feegrant.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		iidkeeper.StoreKey,
-		// Custom ixo store keys
-		didtypes.StoreKey, bondstypes.StoreKey,
-		paymentstypes.StoreKey, projecttypes.StoreKey,
 		wasm.StoreKey,
+		iidtypes.StoreKey,
+		// Custom ixo store keys
+		bondstypes.StoreKey,
+		paymentstypes.StoreKey, projecttypes.StoreKey,
+		entitytypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -414,10 +413,9 @@ func NewIxoApp(
 
 	app.IidKeeper = *iidmodulekeeper.NewKeeper(
 		appCodec,
-		keys[iidkeeper.StoreKey],
-		keys[iidkeeper.MemStoreKey],
+		keys[iidtypes.StoreKey],
+		keys[iidtypes.MemStoreKey],
 	)
-	iidModule := iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.wasmKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -425,9 +423,9 @@ func NewIxoApp(
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	if len(enabledProposals) != 0 {
-		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
+		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, enabledProposals))
 	}
-	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper))
+	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -446,7 +444,7 @@ func NewIxoApp(
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	supportedFeatures := "iterator,staking,stargate"
-	app.wasmKeeper = wasm.NewKeeper(
+	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
 		app.GetSubspace(wasm.ModuleName),
@@ -475,13 +473,22 @@ func NewIxoApp(
 	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
 	// add keepers (for custom ixo modules)
-	app.DidKeeper = didkeeper.NewKeeper(app.appCodec, keys[didtypes.StoreKey])
-	app.BondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.DidKeeper,
+	app.BondsKeeper = bondskeeper.NewKeeper(app.BankKeeper, app.AccountKeeper, app.StakingKeeper, app.IidKeeper,
 		keys[bondstypes.StoreKey], app.GetSubspace(bondstypes.ModuleName), app.appCodec)
 	app.PaymentsKeeper = paymentskeeper.NewKeeper(app.appCodec, keys[paymentstypes.StoreKey],
-		app.BankKeeper, app.DidKeeper, paymentsReservedIdPrefixes)
+		app.BankKeeper, app.IidKeeper, paymentsReservedIdPrefixes)
 	app.ProjectKeeper = projectkeeper.NewKeeper(app.appCodec, keys[projecttypes.StoreKey],
-		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.DidKeeper, app.PaymentsKeeper)
+		app.GetSubspace(projecttypes.ModuleName), app.AccountKeeper, app.IidKeeper, app.PaymentsKeeper)
+
+	app.EntityKeeper = entitykeeper.NewKeeper(
+		appCodec,
+		keys[entitytypes.StoreKey],
+		keys[entitytypes.MemStoreKey],
+		app.IidKeeper,
+		app.WasmKeeper,
+		app.AccountKeeper,
+		app.ParamsKeeper,
+	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -502,7 +509,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
@@ -511,11 +518,11 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule
-		iidModule,
-		did.NewAppModule(app.DidKeeper),
+		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.WasmKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
+		entitymodule.NewAppModule(app.EntityKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -532,22 +539,24 @@ func NewIxoApp(
 		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
-		didtypes.ModuleName,
 		projecttypes.ModuleName,
 		bondstypes.ModuleName,
-		iidkeeper.ModuleName,
+		iidtypes.ModuleName,
+		entitytypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
+		// Custom ixo modules
+
 		// Standard Cosmos modules
 		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName,
-		distrtypes.ModuleName, evidencetypes.ModuleName, didtypes.ModuleName, banktypes.ModuleName,
+		distrtypes.ModuleName, evidencetypes.ModuleName, iidtypes.ModuleName, banktypes.ModuleName,
 		upgradetypes.ModuleName, ibchost.ModuleName, paramstypes.ModuleName, authtypes.ModuleName,
 		minttypes.ModuleName, projecttypes.ModuleName, genutiltypes.ModuleName, vestingtypes.ModuleName,
 		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
 		feegrant.ModuleName, wasm.ModuleName,
 
-		// Custom ixo modules
-		bondstypes.ModuleName, paymentstypes.ModuleName, iidkeeper.ModuleName,
+		entitytypes.ModuleName,
+		bondstypes.ModuleName, paymentstypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -565,9 +574,9 @@ func NewIxoApp(
 
 		// Custom ixo modules
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		iidkeeper.ModuleName,
-		didtypes.ModuleName, bondstypes.ModuleName,
+		iidtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
+		entitytypes.ModuleName,
 	)
 
 	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
@@ -592,7 +601,7 @@ func NewIxoApp(
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
@@ -607,9 +616,24 @@ func NewIxoApp(
 	app.MountMemoryStores(memKeys)
 
 	// initialize BaseApp
+	ixoAnteHandler, err := IxoAnteHandler(HandlerOptions{
+		AccountKeeper:     app.AccountKeeper,
+		BankKeeper:        app.BankKeeper,
+		FeegrantKeeper:    app.FeeGrantKeeper,
+		IidKeeper:         app.IidKeeper,
+		wasmConfig:        wasmConfig,
+		txCounterStoreKey: keys[wasm.StoreKey],
+
+		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
-	app.SetAnteHandler(NewIxoAnteHandler(app, encodingConfig, wasmConfig, keys[wasm.StoreKey]))
+	app.SetAnteHandler(ixoAnteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
 	if loadLatest {
@@ -806,122 +830,122 @@ type KVStoreKey struct {
 	name string
 }
 
-func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig, wasmConfig WasmTypes.WasmConfig, key sdk.StoreKey) sdk.AnteHandler {
+// func NewIxoAnteHandler(app *IxoApp, encodingConfig params.EncodingConfig, wasmConfig WasmTypes.WasmConfig, key sdk.StoreKey) sdk.AnteHandler {
 
-	// The AnteHandler needs to get the signer's pubkey to verify signatures,
-	// charge gas fees (to the corresponding address), and for other purposes.
-	//
-	// The default Cosmos AnteHandler fetches a signer address' pubkey from the
-	// GetPubKey() function after querying the account from the account keeper.
-	//
-	// In the case of ixo, since signers are DIDs rather than addresses, we get
-	// the DID Doc containing the pubkey from the did/project module (depending
-	// if signer is a user or a project, respectively).
-	//
-	// This is what PubKeyGetters achieve.
-	//
-	// To get a pubkey from the did/project, the did/project must have been
-	// created. But during the did/project creation, we also need the pubkeys,
-	// which we cannot get because the did/project does not even exist yet.
-	// For this purpose, a special didPubKeyGetter and projectPubkeyGetter were
-	// created, which get the pubkey from the did/project creation msg itself,
-	// given that the pubkey is one of the parameters in such messages.
-	//
-	// - did module msgs are signed by did module DIDs
-	// - project module msgs are signed by project module DIDs (a.k.a projects)
-	// - [[default]] remaining ixo module msgs are signed by did module DIDs
-	//
-	// A special case in the project module is the MsgWithdrawFunds message,
-	// which is a project module message signed by a did module DID (instead
-	// of a project DID). The project module PubKeyGetter deals with this
-	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
+// 	// The AnteHandler needs to get the signer's pubkey to verify signatures,
+// 	// charge gas fees (to the corresponding address), and for other purposes.
+// 	//
+// 	// The default Cosmos AnteHandler fetches a signer address' pubkey from the
+// 	// GetPubKey() function after querying the account from the account keeper.
+// 	//
+// 	// In the case of ixo, since signers are DIDs rather than addresses, we get
+// 	// the DID Doc containing the pubkey from the did/project module (depending
+// 	// if signer is a user or a project, respectively).
+// 	//
+// 	// This is what PubKeyGetters achieve.
+// 	//
+// 	// To get a pubkey from the did/project, the did/project must have been
+// 	// created. But during the did/project creation, we also need the pubkeys,
+// 	// which we cannot get because the did/project does not even exist yet.
+// 	// For this purpose, a special didPubKeyGetter and projectPubkeyGetter were
+// 	// created, which get the pubkey from the did/project creation msg itself,
+// 	// given that the pubkey is one of the parameters in such messages.
+// 	//
+// 	// - did module msgs are signed by did module DIDs
+// 	// - project module msgs are signed by project module DIDs (a.k.a projects)
+// 	// - [[default]] remaining ixo module msgs are signed by did module DIDs
+// 	//
+// 	// A special case in the project module is the MsgWithdrawFunds message,
+// 	// which is a project module message signed by a did module DID (instead
+// 	// of a project DID). The project module PubKeyGetter deals with this
+// 	// inconsistency by using the did module pubkey getter for MsgWithdrawFunds.
 
-	defaultPubKeyGetter := did.NewDefaultPubKeyGetter(app.DidKeeper)
-	didPubKeyGetter := did.NewModulePubKeyGetter(app.DidKeeper)
-	projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.DidKeeper)
+// 	defaultPubKeyGetter := iid.NewDefaultPubKeyGetter(app.IidKeeper)
+// 	iidPubKeyGetter := iid.NewModulePubKeyGetter(app.IidKeeper)
+// 	projectPubKeyGetter := project.NewModulePubKeyGetter(app.ProjectKeeper, app.IidKeeper)
 
-	// Since we have parameterised pubkey getters, we can use the same default
-	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
-	// instead of having to implement three unique AnteHandlers.
+// 	// Since we have parameterised pubkey getters, we can use the same default
+// 	// ixo AnteHandler (ixo.NewDefaultAnteHandler) for all three pubkey getters
+// 	// instead of having to implement three unique AnteHandlers.
 
-	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
-		wasmConfig)
-	didAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		didPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
-		wasmConfig)
-	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
-		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
-		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
-		wasmConfig)
+// 	defaultIxoAnteHandler := ixotypes.NewDefaultAnteHandler(
+// 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+// 		defaultPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
+// 		wasmConfig)
+// 	iidAnteHandler := ixotypes.NewDefaultAnteHandler(
+// 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+// 		iidPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
+// 		wasmConfig)
+// 	projectAnteHandler := ixotypes.NewDefaultAnteHandler(
+// 		app.AccountKeeper, app.BankKeeper, ixotypes.IxoSigVerificationGasConsumer,
+// 		projectPubKeyGetter, encodingConfig.TxConfig.SignModeHandler(), key, app.IBCKeeper,
+// 		wasmConfig)
 
-	// The default Cosmos AnteHandler is still used for standard Cosmos messages
-	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
-	// is that we use an IxoSigVerificationGasConsumer instead of the default
-	// one, since the default does not allow ED25519 signatures. Thus, like this
-	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
+// 	// The default Cosmos AnteHandler is still used for standard Cosmos messages
+// 	// implemented in standard Cosmos modules (bank, gov, etc.). The only change
+// 	// is that we use an IxoSigVerificationGasConsumer instead of the default
+// 	// one, since the default does not allow ED25519 signatures. Thus, like this
+// 	// we enable ED25519 (as well as Secp) signing of standard Cosmos messages.
 
-	options := authante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  ixotypes.IxoSigVerificationGasConsumer,
-	}
+// 	options := authante.HandlerOptions{
+// 		AccountKeeper:   app.AccountKeeper,
+// 		BankKeeper:      app.BankKeeper,
+// 		FeegrantKeeper:  app.FeeGrantKeeper,
+// 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+// 		SigGasConsumer:  ixotypes.IxoSigVerificationGasConsumer,
+// 	}
 
-	cosmosAnteHandler, err := authante.NewAnteHandler(options)
+// 	cosmosAnteHandler, err := authante.NewAnteHandler(options)
 
-	if err != nil {
-		panic(sdkerrors.Wrap(err, "could not create Cosmos AnteHandler"))
-	}
+// 	if err != nil {
+// 		panic(sdkerrors.Wrap(err, "could not create Cosmos AnteHandler"))
+// 	}
 
-	// In the case of project creation, besides having a custom pubkey getter,
-	// we also have to use a custom project creation AnteHandler. Recall that
-	// one of the purposes of getting the pubkey is to charge gas fees. So we
-	// expect the signer to have enough tokens to pay for gas fees. Typically,
-	// these are sent to the signer before the signer signs their first message.
-	//
-	// However, in the case of a project, we cannot send tokens to it before its
-	// creation since we do not know the project DID (and thus where to send the
-	// tokens) until exactly before its creation (when project creation is done
-	// through ixo-cellnode). The project however does have an original creator!
-	//
-	// Thus, the gas fees in the case of project creation are instead charged
-	// to the original creator, which is pointed out in the project doc. For
-	// this purpose, a custom project creation AnteHandler had to be created.
+// 	// In the case of project creation, besides having a custom pubkey getter,
+// 	// we also have to use a custom project creation AnteHandler. Recall that
+// 	// one of the purposes of getting the pubkey is to charge gas fees. So we
+// 	// expect the signer to have enough tokens to pay for gas fees. Typically,
+// 	// these are sent to the signer before the signer signs their first message.
+// 	//
+// 	// However, in the case of a project, we cannot send tokens to it before its
+// 	// creation since we do not know the project DID (and thus where to send the
+// 	// tokens) until exactly before its creation (when project creation is done
+// 	// through ixo-cellnode). The project however does have an original creator!
+// 	//
+// 	// Thus, the gas fees in the case of project creation are instead charged
+// 	// to the original creator, which is pointed out in the project doc. For
+// 	// this purpose, a custom project creation AnteHandler had to be created.
 
-	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
-		app.AccountKeeper, app.BankKeeper, app.DidKeeper,
-		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
+// 	projectCreationAnteHandler := project.NewProjectCreationAnteHandler(
+// 		app.AccountKeeper, app.BankKeeper, app.IidKeeper,
+// 		encodingConfig.TxConfig.SignModeHandler(), projectPubKeyGetter)
 
-	// TODO: Routing https://docs.cosmos.network/v0.44/building-modules/msg-services.html#amino-legacymsgs
-	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
-		// Route message based on ixo module router key
-		// Otherwise, route to Cosmos ante handler
-		msg := tx.GetMsgs()[0].(legacytx.LegacyMsg)
+// 	// TODO: Routing https://docs.cosmos.network/v0.44/building-modules/msg-services.html#amino-legacymsgs
+// 	return func(ctx sdk.Context, tx sdk.Tx, simulate bool) (_ sdk.Context, err error) {
+// 		// Route message based on ixo module router key
+// 		// Otherwise, route to Cosmos ante handler
+// 		msg := tx.GetMsgs()[0].(legacytx.LegacyMsg)
 
-		switch msg.Route() {
-		case didtypes.RouterKey:
-			return didAnteHandler(ctx, tx, simulate)
-		case projecttypes.RouterKey:
-			switch msg.Type() {
-			case projecttypes.TypeMsgCreateProject:
-				return projectCreationAnteHandler(ctx, tx, simulate)
-			default:
-				return projectAnteHandler(ctx, tx, simulate)
-			}
+// 		switch msg.Route() {
+// 		case iidtypes.RouterKey:
+// 			return iidAnteHandler(ctx, tx, simulate)
+// 		case projecttypes.RouterKey:
+// 			switch msg.Type() {
+// 			case projecttypes.TypeMsgCreateProject:
+// 				return projectCreationAnteHandler(ctx, tx, simulate)
+// 			default:
+// 				return projectAnteHandler(ctx, tx, simulate)
+// 			}
 
-		case bondstypes.RouterKey:
-			fallthrough
-		case paymentstypes.RouterKey:
-			return defaultIxoAnteHandler(ctx, tx, simulate)
-		default:
-			return cosmosAnteHandler(ctx, tx, simulate)
-		}
-	}
-}
+// 		case bondstypes.RouterKey:
+// 			fallthrough
+// 		case paymentstypes.RouterKey:
+// 			return defaultIxoAnteHandler(ctx, tx, simulate)
+// 		default:
+// 			return cosmosAnteHandler(ctx, tx, simulate)
+// 		}
+// 	}
+// }
 
 // initParamsKeeper init params keeper and its subspaces
 func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
@@ -938,12 +962,13 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(wasm.ModuleName)
 	// init params keeper and subspaces (for custom ixo modules)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(iidkeeper.ModuleName)
+	paramsKeeper.Subspace(iidtypes.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
-	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(entitytypes.ModuleName)
 
 	return paramsKeeper
 }

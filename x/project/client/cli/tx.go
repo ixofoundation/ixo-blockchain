@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -58,6 +58,7 @@ func NewCmdCreateProject() *cobra.Command {
 
 			msg := types.NewMsgCreateProject(
 				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -110,6 +111,7 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -152,6 +154,7 @@ func NewCmdCreateAgent() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -196,6 +199,7 @@ func NewCmdUpdateAgent() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -233,6 +237,7 @@ func NewCmdCreateClaim() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -276,6 +281,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -313,6 +319,7 @@ func NewCmdWithdrawFunds() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
+			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -346,6 +353,7 @@ func NewCmdUpdateProjectDoc() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did)
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

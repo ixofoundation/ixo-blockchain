@@ -1,5 +1,5 @@
 syntax = "proto3";
-package ixofoundation.ixo.data;
+package iid;
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
 

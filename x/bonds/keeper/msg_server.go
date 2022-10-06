@@ -398,7 +398,14 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 
 func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	buyerAddr := k.didKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
+	buyerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+	}
+	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(buyerDid.Id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -427,7 +434,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	}
 
 	// Take max that buyer is willing to pay (enforces maxPrice <= balance)
-	err := k.BankKeeper.SendCoinsFromAccountToModule(ctx, buyerAddr,
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, buyerAddr,
 		types.BatchesIntermediaryAccount, msg.MaxPrices)
 	if err != nil {
 		return nil, err
@@ -466,8 +473,14 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.MsgBuy) (*types.MsgBuyResponse, error) {
-	buyerAddr := keeper.didKeeper.MustGetDidDoc(ctx, msg.BuyerDid).Address()
-
+	buyerDid, exists := keeper.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+	}
+	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(buyerDid.Id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
@@ -486,7 +499,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 	}
 
 	// Use max prices as the amount to send to the liquidity pool (i.e. price)
-	err := keeper.DepositIntoReserve(ctx, bond.BondDid, buyerAddr, msg.MaxPrices)
+	err = keeper.DepositIntoReserve(ctx, bond.BondDid, buyerAddr, msg.MaxPrices)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +540,15 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 
 func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSellResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	sellerAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SellerDid).Address()
+
+	sellerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SellerDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+	}
+	sellerAddr, err := sellerDid.GetVerificationMethodBlockchainAddress(sellerDid.Id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -549,7 +570,7 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 	}
 
 	// Send coins to be burned from seller (enforces sellAmount <= balance)
-	err := k.BankKeeper.SendCoinsFromAccountToModule(ctx, sellerAddr,
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, sellerAddr,
 		types.BondsMintBurnAccount, sdk.Coins{msg.Amount})
 	if err != nil {
 		return nil, err
@@ -595,7 +616,14 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	swapperAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SwapperDid).Address()
+	swapperDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SwapperDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+	}
+	swapperAddr, err := swapperDid.GetVerificationMethodBlockchainAddress(swapperDid.Id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -622,7 +650,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	// Take coins to be swapped from swapper (enforces swapAmount <= balance)
-	err := k.BankKeeper.SendCoinsFromAccountToModule(ctx, swapperAddr,
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, swapperAddr,
 		types.BatchesIntermediaryAccount, sdk.Coins{msg.From})
 	if err != nil {
 		return nil, err
@@ -657,7 +685,14 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeOutcomePayment) (*types.MsgMakeOutcomePaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	senderAddr := k.didKeeper.MustGetDidDoc(ctx, msg.SenderDid).Address()
+	senderDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+	}
+	senderAddr, err := senderDid.GetVerificationMethodBlockchainAddress(senderDid.Id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -671,7 +706,7 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 
 	// Send outcome payment to outcome payment reserve
 	outcomePayment := bond.GetNewReserveCoins(msg.Amount)
-	err := k.DepositOutcomePayment(ctx, bond.BondDid, senderAddr, outcomePayment)
+	err = k.DepositOutcomePayment(ctx, bond.BondDid, senderAddr, outcomePayment)
 	if err != nil {
 		return nil, err
 	}
@@ -695,7 +730,14 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 
 func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawShare) (*types.MsgWithdrawShareResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	recipientAddr := k.didKeeper.MustGetDidDoc(ctx, msg.RecipientDid).Address()
+	recipientDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid))
+	if !exists {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+	}
+	recipientAddr, err := recipientDid.GetVerificationMethodBlockchainAddress(recipientDid.Id)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
@@ -715,7 +757,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	bondTokensOwned := sdk.NewCoin(bond.Token, bondTokensOwnedAmount)
 
 	// Send coins to be burned from recipient
-	err := k.BankKeeper.SendCoinsFromAccountToModule(
+	err = k.BankKeeper.SendCoinsFromAccountToModule(
 		ctx, recipientAddr, types.BondsMintBurnAccount, sdk.NewCoins(bondTokensOwned))
 	if err != nil {
 		return nil, err

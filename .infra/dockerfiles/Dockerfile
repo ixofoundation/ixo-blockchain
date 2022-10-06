@@ -1,6 +1,6 @@
 ## Starport
 
-FROM golang:latest AS starport
+FROM --platform=linux/amd64 golang:latest AS starport
 RUN curl https://get.starport.network/starport! | bash
 
 ##
@@ -20,7 +20,7 @@ ONBUILD WORKDIR /app
 ## Fetch Golang Dependencies
 ##
 
-FROM build-dependencies AS build-tests
+FROM --platform=linux/amd64 build-dependencies AS build-tests
 RUN go test -v ./...
 
 FROM build-dependencies AS build-devel
@@ -38,7 +38,7 @@ COPY ./ .
 ENTRYPOINT [ "starport", "chain", "serve" ]
 
 # Build Golang files
-FROM build-dependencies AS build-binary
+FROM --platform=linux/amd64 build-dependencies AS build-binary
 COPY ./ ./
 
 ENV IXOD_HOME="/home/ixo/"
@@ -61,10 +61,14 @@ ENTRYPOINT ["ixod", "start"]
 ## Build Distrubutiable Blockchain
 ##
 
-FROM gcr.io/distroless/base-debian10 AS distributable
+FROM --platform=linux/amd64 ubuntu:latest  as distributable
 
-COPY --from=build-binary /build/ixod /app/ixod
-# COPY --from=build-binary /dist/app/.ixod/ /app/.ixod/
+COPY --from=build-binary /go/bin/ixod /app/ixod
+COPY --from=build-binary /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/ /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/
+COPY ./.infra/dockerfiles/setups/setup-devnet.sh /root/setup-devnet.sh
+
+ENV HOME=/root/
+RUN rm -rf /root/.ixod/ && chmod +x /root/setup-devnet.sh
 
 ONBUILD LABEL world.ixo.blockchain.image.authors="willem.mouton@ixo.world"
 
@@ -73,10 +77,7 @@ ONBUILD WORKDIR /app
 ONBUILD EXPOSE 1317
 ONBUILD EXPOSE 26657
 
-ONBUILD ENV IXOD_ENV=prod
-ONBUILD ENV IXOD_HOME=/app/.ixod-$IXOD_ENV
-
-ONBUILD ENTRYPOINT ["/app/ixod", "--home", "${IXOD_HOME}", "start"]
+# ONBUILD ENTRYPOINT ["/app/ixod", "start", "--rpc.laddr", "tcp://0.0.0.0:26657"]
 
 FROM distributable AS dist-devel
 # RUN echo "Fetch genisis file"

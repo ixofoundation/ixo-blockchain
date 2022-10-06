@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -44,6 +45,7 @@ func GetTxCmd() *cobra.Command {
 		NewAddIidContextCmd(),
 		NewDeleteIidContextCmd(),
 		NewUpdateIidMetaCmd(),
+		NewCreateIidDocumentFormLegacyDidCmd(),
 	)
 
 	return cmd
@@ -697,8 +699,8 @@ func NewUpdateIidMetaCmd() *cobra.Command {
 			var metaData *types.IidMetadata
 
 			if err := json.Unmarshal([]byte(args[1]), &metaData); err != nil {
-				panic(err)
 				err = fmt.Errorf(err.Error())
+				panic(err)
 			}
 			// document did
 			did := types.NewChainDID(clientCtx.ChainID, args[0])
@@ -720,7 +722,7 @@ func NewUpdateIidMetaCmd() *cobra.Command {
 	return cmd
 }
 
-//Linked Entity
+// Linked Entity
 func NewAddLinkedEntityCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "add-linked-resource [id] [relationship id] [relationship]",

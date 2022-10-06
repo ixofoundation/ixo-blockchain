@@ -1,0 +1,14 @@
+syntax = "proto3";
+package entity;
+
+import "gogoproto/gogo.proto";
+import "entity/entity.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
+
+// GenesisState defines the project module's genesis state.
+message GenesisState {
+  repeated EntityDoc entity_docs              = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"entity_docs\""];
+  // repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"account_maps\""];
+  // Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
+}
