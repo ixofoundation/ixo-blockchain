@@ -128,7 +128,7 @@ echo "Ledgering Miguel DID..."
 echo "Ledgering Francesco DID..."
 # ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
 echo "Ledgering Shaun DID..."
-# ixod_tx did add-did-doc "$SHAUN_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
 
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."

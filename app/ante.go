@@ -7,6 +7,9 @@ import (
 	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
@@ -51,12 +54,14 @@ import (
 // }
 
 type HandlerOptions struct {
-	AccountKeeper   authante.AccountKeeper
-	BankKeeper      bankkeeper.Keeper
-	FeegrantKeeper  authante.FeegrantKeeper
-	IidKeeper       iidkeeper.Keeper
-	SignModeHandler authsigning.SignModeHandler
-	SigGasConsumer  func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
+	AccountKeeper     authante.AccountKeeper
+	BankKeeper        bankkeeper.Keeper
+	FeegrantKeeper    authante.FeegrantKeeper
+	IidKeeper         iidkeeper.Keeper
+	wasmConfig        wasmtypes.WasmConfig
+	txCounterStoreKey sdk.StoreKey
+	SignModeHandler   authsigning.SignModeHandler
+	SigGasConsumer    func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
 }
 
 func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -78,14 +83,32 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	anteDecorators := []sdk.AnteDecorator{
-		authante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		authante.NewSetUpContextDecorator(),                                              // outermost AnteDecorator. SetUpContext must be called first
+		wasmkeeper.NewLimitSimulationGasDecorator(options.wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+		wasmkeeper.NewCountTXDecorator(options.txCounterStoreKey),
 		authante.NewRejectExtensionOptionsDecorator(),
-		authante.NewMempoolFeeDecorator(),
+		// authante.NewMempoolFeeDecorator(),
 		authante.NewValidateBasicDecorator(),
 		authante.NewTxTimeoutHeightDecorator(),
 		authante.NewValidateMemoDecorator(options.AccountKeeper),
 		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		authante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
+		// projectante.NewFundProjectDecorator(
+		// 	options.IidKeeper,
+		// 	options.AccountKeeper,
+		// 	options.BankKeeper,
+		// 	options.FeegrantKeeper,
+		// ),
+		// libante.NewIxoFeeHandlerDecorator(
+		// 	options.IidKeeper,
+		// 	options.AccountKeeper,
+		// 	options.BankKeeper,
+		// 	authante.NewDeductFeeDecorator(
+		// 		options.AccountKeeper,
+		// 		options.BankKeeper,
+		// 		options.FeegrantKeeper,
+		// 	),
+		// ),
+
 		// iidante.NewInjectIidAddress(options.IidKeeper),
 		// iidante.NewIidSetPubKeyDecorator(
 		// 	options.IidKeeper,

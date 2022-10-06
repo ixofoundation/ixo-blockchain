@@ -76,7 +76,7 @@ sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 #ixod config indent true
 #ixod config trust-node true
 
-ixod gentx miguel 1000000uixo --chain-id pandora-4
+yes $PASSWORD | ixod gentx miguel 1000000uixo --chain-id pandora-4
 
 ixod collect-gentxs
 ixod validate-genesis
