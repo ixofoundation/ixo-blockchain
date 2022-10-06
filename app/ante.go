@@ -118,6 +118,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewValidateSigCountDecorator(options.AccountKeeper),
 		authante.NewSigGasConsumeDecorator(options.AccountKeeper, sigGasConsumer),
 		authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
+		// libixo.NewSigGasConsumeDecorator(options.AccountKeeper, libixo.IxoSigVerificationGasConsumer, )
 		authante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		iidante.NewIidResolutionDecorator(options.IidKeeper),
 	}

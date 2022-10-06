@@ -617,12 +617,12 @@ func NewIxoApp(
 
 	// initialize BaseApp
 	ixoAnteHandler, err := IxoAnteHandler(HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IidKeeper:       app.IidKeeper,
-		wasmConfig:      wasmConfig,
-		txCounterStoreKey: StoreK,
+		AccountKeeper:     app.AccountKeeper,
+		BankKeeper:        app.BankKeeper,
+		FeegrantKeeper:    app.FeeGrantKeeper,
+		IidKeeper:         app.IidKeeper,
+		wasmConfig:        wasmConfig,
+		txCounterStoreKey: keys[wasm.StoreKey],
 
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
