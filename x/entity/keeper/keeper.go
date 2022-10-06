@@ -15,6 +15,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -57,10 +58,10 @@ func (k Keeper) GetEntityConfig(ctx sdk.Context, key types.EntityConfigKey) ([]b
 
 func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types.MsgCreateEntityResponse, error) {
 
-	// signer, err := sdk.AccAddressFromBech32(msg.Signer)
-	// if err != nil {
-	// 	return err
-	// }
+	signer, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
 
 	fmt.Println("================================================1")
 	fmt.Printf("%+v\n", msg)
@@ -142,26 +143,26 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
 
-	// nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
-	// if err != nil {
-	// 	return err
-	// }
+	//nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
+	addr := []byte("ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7")
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
+	//ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7
 
-	// nftMsgBytes, err := entitycontracts.Mint{
-	// 	TokenId:  did.Id,
-	// 	Owner:    did.Id,
-	// 	TokenUrl: "",
-	// }.Marshal()
-	// if err != nil {
-	// 	return err
-	// }
+	nftMsgBytes, err := entitycontracts.Mint{
+		TokenId:  did.Id,
+		Owner:    did.Id,
+		TokenUrl: "http://nft.com",
+	}.Marshal()
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
 
-	// _, err = k.WasmKeeper.Execute(ctx, sdk.AccAddress(nftAddresBytes), signer, nftMsgBytes, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
-	// if err != nil {
-	// return err
-	// }
-
-	// k.Logger(ctx).Info("created did document", "did", msg.Id, "controller", msg.Signer)
+	_, err = k.WasmKeeper.Execute(ctx, sdk.AccAddress(addr), signer, nftMsgBytes, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
 
 	// emit the event
 	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid)); err != nil {
