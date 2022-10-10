@@ -34,8 +34,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 func GetCmdQueryIdentifers() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "dids",
-		Short: "Query for all dids",
+		Use:   "iids",
+		Short: "Query for all iids",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -68,8 +68,8 @@ func GetCmdQueryIdentifers() *cobra.Command {
 
 func GetCmdQueryIdentifer() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "did [id]",
-		Short: "Query for an did",
+		Use:   "iid [id]",
+		Short: "Query for an iid",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
