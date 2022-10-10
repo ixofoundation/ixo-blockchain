@@ -3,6 +3,7 @@ package iid
 import ( // this line is used by starport scaffolding # 1
 	"context"
 	"encoding/json"
+
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -43,12 +44,12 @@ func (AppModuleBasic) Name() string {
 	return types.ModuleName
 }
 
-//nolint
+// nolint
 func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
 	types.RegisterCodec(cdc)
 }
 
-//nolint
+// nolint
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	types.RegisterCodec(cdc)
 }
@@ -96,11 +97,11 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule implements the AppModule interface for the capability module.
 type AppModule struct {
 	AppModuleBasic
-	wasmKeeper wasmkeeper.Keeper
+	wasmKeeper *wasmkeeper.Keeper
 	keeper     keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, wasmKeeper wasmkeeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, wasmKeeper *wasmkeeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
@@ -171,7 +172,7 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 
 }
 
-//nolint
+// nolint
 // LegacyQuerierHandler returns the capability module's Querier.
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return nil

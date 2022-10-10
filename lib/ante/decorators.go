@@ -13,6 +13,30 @@ import (
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 )
 
+type CheckTxForIncompatibleMsgsDecorator struct {
+}
+
+func NewCheckTxForIncompatibleMsgsDecorator() sdk.AnteDecorator {
+	return CheckTxForIncompatibleMsgsDecorator{}
+}
+
+func (dec CheckTxForIncompatibleMsgsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
+	// feeTx, ok := tx.(IxoFeeTx)
+
+	//Check if feegranter is set. or if not ixoFeeTx
+	// if !ok || feeTx.FeeGranter() != nil {
+	// 	// return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a IIDTx")
+	// 	panic("")
+	// }
+
+	// events := sdk.Events{sdk.NewEvent(sdk.EventTypeTx,
+	// 	sdk.NewAttribute(sdk.AttributeKeyFee, feeTx.GetFee().String()),
+	// )}
+	// ctx.EventManager().EmitEvents(events)
+
+	return next(ctx, tx, simulate)
+}
+
 type IxoFeeHandlerDecorator struct {
 	iidKeeper         iidkeeper.Keeper
 	accountKeeper     authante.AccountKeeper

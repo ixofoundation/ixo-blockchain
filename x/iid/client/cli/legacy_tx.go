@@ -42,7 +42,7 @@ func NewCreateIidDocumentFormLegacyDidCmd() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			// verification method id
-			vmID := did.NewVerificationMethodID(ixoDid.Address().String())
+			vmID := did.NewVerificationMethodID(ixoDid.Did)
 
 			// understand the vmType
 

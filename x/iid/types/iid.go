@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -563,6 +564,28 @@ func (didDoc *IidDocument) setRelationships(methodID string, relationships ...Ve
 // GetVerificationMethodBlockchainAddress returns the verification method cosmos blockchain address of a verification method.
 // it fails if the verification method is not supported or if the verification method is not found
 func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string) (sdk.AccAddress, error) {
+
+	// switch m := verificationMethod.GetVerificationMaterial().(type) {
+	// case *iidtypes.VerificationMethod_PublicKeyHex:
+
+	// 	pubKey, err := hex.DecodeString(m.PublicKeyHex)
+	// 	if err != nil {
+	// 		fmt.Println("failed4----------------------------------", err)
+	// 		return nil, err
+
+	// 	}
+
+	// 	payerPubKey := ed25519.PubKey{Key: pubKey}
+	// 	return accountKeeper.GetAccount(ctx, payerPubKey.Address().Bytes()), nil
+
+	// case *iidtypes.VerificationMethod_BlockchainAccountID:
+	// 	addr, err := sdk.AccAddressFromBech32(iidtypes.BlockchainAccountID(m.BlockchainAccountID).GetAddress())
+	// 	if err != nil {
+	// 		fmt.Println("failed5----------------------------------", err)
+
+	// 		return nil, err
+	// 	}
+
 	for _, vm := range didDoc.VerificationMethod {
 		if vm.Id == methodID {
 			var (
@@ -573,9 +596,17 @@ func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string
 			case *VerificationMethod_BlockchainAccountID:
 				address = BlockchainAccountID(k.BlockchainAccountID).GetAddress()
 			case *VerificationMethod_PublicKeyMultibase:
-				address, err = toAddress(k.PublicKeyMultibase[1:])
+				if VerificationMaterialType(vm.Type) == DIDVMethodTypeEd25519VerificationKey2018 {
+					address, err = toEd25519Address(k.PublicKeyMultibase[1:])
+				} else {
+					address, err = toAddress(k.PublicKeyMultibase[1:])
+				}
 			case *VerificationMethod_PublicKeyHex:
-				address, err = toAddress(k.PublicKeyHex)
+				if VerificationMaterialType(vm.Type) == DIDVMethodTypeEd25519VerificationKey2018 {
+					address, err = toEd25519Address(k.PublicKeyHex)
+				} else {
+					address, err = toAddress(k.PublicKeyHex)
+				}
 			}
 			if err != nil {
 				return sdk.AccAddress{}, err
@@ -1110,6 +1141,24 @@ func toAddress(hexKey string) (addr string, err error) {
 	}
 	// load the public key
 	pk := &secp256k1.PubKey{Key: pkb}
+	// generate the address
+	addr, err = sdk.Bech32ifyAddressBytes(sdk.GetConfig().GetBech32AccountAddrPrefix(), pk.Address())
+	return
+}
+
+func toEd25519Address(hexKey string) (addr string, err error) {
+	// decode the hex string
+	pkb, err := hex.DecodeString(hexKey)
+	if err != nil {
+		return
+	}
+	// check the size of the decoded byte slice, otherwise the pk.Address will panic
+	if len(pkb) != ed25519.PubKeySize {
+		err = fmt.Errorf("invalid public key size")
+		return
+	}
+	// load the public key
+	pk := &ed25519.PubKey{Key: pkb}
 	// generate the address
 	addr, err = sdk.Bech32ifyAddressBytes(sdk.GetConfig().GetBech32AccountAddrPrefix(), pk.Address())
 	return

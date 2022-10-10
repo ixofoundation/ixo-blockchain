@@ -44,7 +44,7 @@ func createProjectRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey)
+		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -74,7 +74,7 @@ func updateProjectStatusRequestHandler(clientCtx client.Context) http.HandlerFun
 			return
 		}
 
-		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -104,7 +104,7 @@ func createAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -134,7 +134,7 @@ func updateAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -164,7 +164,7 @@ func createClaimRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -195,7 +195,7 @@ func createEvaluationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -223,7 +223,7 @@ func withdrawFundsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data)
+		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -253,7 +253,7 @@ func updateProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateProjectDoc(req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgUpdateProjectDoc(req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

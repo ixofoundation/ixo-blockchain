@@ -9,8 +9,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+
+	// authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
@@ -146,12 +147,12 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type SigGasConsumeDecorator struct {
-	ak             keeper.AccountKeeper
+	ak             ante.AccountKeeper
 	sigGasConsumer ante.SignatureVerificationGasConsumer
 	pkg            PubKeyGetter
 }
 
-func NewSigGasConsumeDecorator(ak keeper.AccountKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pkg PubKeyGetter) SigGasConsumeDecorator {
+func NewSigGasConsumeDecorator(ak ante.AccountKeeper, sigGasConsumer ante.SignatureVerificationGasConsumer, pkg PubKeyGetter) SigGasConsumeDecorator {
 	return SigGasConsumeDecorator{
 		ak:             ak,
 		sigGasConsumer: sigGasConsumer,
@@ -223,12 +224,12 @@ func (sgcd SigGasConsumeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
 type SigVerificationDecorator struct {
-	ak              keeper.AccountKeeper
+	ak              ante.AccountKeeper
 	signModeHandler authsigning.SignModeHandler
 	pkg             PubKeyGetter
 }
 
-func NewSigVerificationDecorator(ak keeper.AccountKeeper, signModeHandler authsigning.SignModeHandler, pkg PubKeyGetter) SigVerificationDecorator {
+func NewSigVerificationDecorator(ak ante.AccountKeeper, signModeHandler authsigning.SignModeHandler, pkg PubKeyGetter) SigVerificationDecorator {
 	return SigVerificationDecorator{
 		ak:              ak,
 		signModeHandler: signModeHandler,
@@ -366,11 +367,11 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 // a reliable way unless sequence numbers are managed and tracked manually by a
 // client. It is recommended to instead use multiple messages in a tx.
 type IncrementSequenceDecorator struct {
-	ak  keeper.AccountKeeper
+	ak  ante.AccountKeeper
 	pkg PubKeyGetter
 }
 
-func NewIncrementSequenceDecorator(ak keeper.AccountKeeper, pkg PubKeyGetter) IncrementSequenceDecorator {
+func NewIncrementSequenceDecorator(ak ante.AccountKeeper, pkg PubKeyGetter) IncrementSequenceDecorator {
 	return IncrementSequenceDecorator{
 		ak:  ak,
 		pkg: pkg,

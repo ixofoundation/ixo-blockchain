@@ -57,7 +57,7 @@ func NewCmdCreateProject() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(
-				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
+				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -110,7 +110,7 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
+			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -153,7 +153,7 @@ func NewCmdCreateAgent() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
+			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -198,7 +198,7 @@ func NewCmdUpdateAgent() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
+			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -236,7 +236,7 @@ func NewCmdCreateClaim() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
+			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -280,7 +280,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
+			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -318,7 +318,7 @@ func NewCmdWithdrawFunds() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
+			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data, ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -352,7 +352,7 @@ func NewCmdUpdateProjectDoc() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did)
+			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {

@@ -5693,6 +5693,13 @@ address of the account signing the message </p></td>
                   <td><p>The ownersdid used to sign this transaction. </p></td>
                 </tr>
               
+                <tr>
+                  <td>data</td>
+                  <td><a href="#bytes">bytes</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
