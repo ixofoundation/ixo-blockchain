@@ -48,13 +48,14 @@ var (
 )
 
 func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
-	projectDid didexported.Did, pubKey string) *MsgCreateProject {
+	projectDid didexported.Did, pubKey string, projectAddress string) *MsgCreateProject {
 	return &MsgCreateProject{
-		TxHash:     "",
-		SenderDid:  senderDid,
-		ProjectDid: projectDid,
-		PubKey:     pubKey,
-		Data:       projectData,
+		TxHash:         "",
+		SenderDid:      senderDid,
+		ProjectDid:     projectDid,
+		PubKey:         pubKey,
+		Data:           projectData,
+		ProjectAddress: projectDid,
 	}
 }
 
@@ -177,12 +178,13 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid didexported.Did) *MsgUpdateProjectStatus {
+func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid didexported.Did, projectAddress string) *MsgUpdateProjectStatus {
 	return &MsgUpdateProjectStatus{
-		TxHash:     "",
-		SenderDid:  senderDid,
-		ProjectDid: projectDid,
-		Data:       updateProjectStatusDoc,
+		TxHash:         "",
+		SenderDid:      senderDid,
+		ProjectDid:     projectDid,
+		Data:           updateProjectStatusDoc,
+		ProjectAddress: projectAddress,
 	}
 }
 func (msg MsgUpdateProjectStatus) GetIidController() string { return msg.ProjectDid }
@@ -225,12 +227,13 @@ func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{address}
 }
 
-func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc CreateAgentDoc, projectDid didexported.Did) *MsgCreateAgent {
+func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc CreateAgentDoc, projectDid didexported.Did, projectAddress string) *MsgCreateAgent {
 	return &MsgCreateAgent{
-		ProjectDid: projectDid,
-		TxHash:     txHash,
-		SenderDid:  senderDid,
-		Data:       createAgentDoc,
+		ProjectDid:     projectDid,
+		TxHash:         txHash,
+		SenderDid:      senderDid,
+		Data:           createAgentDoc,
+		ProjectAddress: projectAddress,
 	}
 }
 
@@ -281,12 +284,13 @@ func (msg MsgCreateAgent) String() string {
 	return string(b)
 }
 
-func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc UpdateAgentDoc, projectDid didexported.Did) *MsgUpdateAgent {
+func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc UpdateAgentDoc, projectDid didexported.Did, projectAddress string) *MsgUpdateAgent {
 	return &MsgUpdateAgent{
-		ProjectDid: projectDid,
-		TxHash:     txHash,
-		SenderDid:  senderDid,
-		Data:       updateAgentDoc,
+		ProjectDid:     projectDid,
+		TxHash:         txHash,
+		SenderDid:      senderDid,
+		Data:           updateAgentDoc,
+		ProjectAddress: projectAddress,
 	}
 }
 func (msg MsgUpdateAgent) GetIidController() string { return msg.ProjectDid }
@@ -337,12 +341,13 @@ func (msg MsgUpdateAgent) String() string {
 	return string(b)
 }
 
-func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc CreateClaimDoc, projectDid didexported.Did) *MsgCreateClaim {
+func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc CreateClaimDoc, projectDid didexported.Did, projectAddress string) *MsgCreateClaim {
 	return &MsgCreateClaim{
-		ProjectDid: projectDid,
-		TxHash:     txHash,
-		SenderDid:  senderDid,
-		Data:       createClaimDoc,
+		ProjectDid:     projectDid,
+		TxHash:         txHash,
+		SenderDid:      senderDid,
+		Data:           createClaimDoc,
+		ProjectAddress: projectAddress,
 	}
 }
 
@@ -397,12 +402,13 @@ func (msg MsgCreateClaim) String() string {
 	return string(b)
 }
 
-func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEvaluationDoc CreateEvaluationDoc, projectDid didexported.Did) *MsgCreateEvaluation {
+func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEvaluationDoc CreateEvaluationDoc, projectDid didexported.Did, projectAddress string) *MsgCreateEvaluation {
 	return &MsgCreateEvaluation{
-		ProjectDid: projectDid,
-		TxHash:     txHash,
-		SenderDid:  senderDid,
-		Data:       createEvaluationDoc,
+		ProjectDid:     projectDid,
+		TxHash:         txHash,
+		SenderDid:      senderDid,
+		Data:           createEvaluationDoc,
+		ProjectAddress: projectAddress,
 	}
 }
 
@@ -453,10 +459,11 @@ func (msg MsgCreateEvaluation) String() string {
 	return string(b)
 }
 
-func NewMsgWithdrawFunds(senderDid didexported.Did, data WithdrawFundsDoc) *MsgWithdrawFunds {
+func NewMsgWithdrawFunds(senderDid didexported.Did, data WithdrawFundsDoc, senderAddress string) *MsgWithdrawFunds {
 	return &MsgWithdrawFunds{
-		SenderDid: senderDid,
-		Data:      data,
+		SenderDid:     senderDid,
+		Data:          data,
+		SenderAddress: senderAddress,
 	}
 }
 func (msg MsgWithdrawFunds) GetIidController() string { return msg.SenderDid }
@@ -520,12 +527,13 @@ func (msg MsgWithdrawFunds) String() string {
 	return string(b)
 }
 
-func NewMsgUpdateProjectDoc(senderDid didexported.Did, projectData json.RawMessage, projectDid didexported.Did) *MsgUpdateProjectDoc {
+func NewMsgUpdateProjectDoc(senderDid didexported.Did, projectData json.RawMessage, projectDid didexported.Did, projectAddress string) *MsgUpdateProjectDoc {
 	return &MsgUpdateProjectDoc{
-		TxHash:     "",
-		SenderDid:  senderDid,
-		ProjectDid: projectDid,
-		Data:       projectData,
+		TxHash:         "",
+		SenderDid:      senderDid,
+		ProjectDid:     projectDid,
+		Data:           projectData,
+		ProjectAddress: projectAddress,
 	}
 }
 

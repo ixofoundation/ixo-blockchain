@@ -5,10 +5,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/iid/types"
-	"time"
 )
 
 type msgServer struct {
@@ -256,7 +257,7 @@ func (k msgServer) DeleteAccordedRight(
 	return &types.MsgDeleteAccordedRightResponse{}, nil
 }
 
-//Contexts
+// Contexts
 func (k msgServer) AddIidContext(
 	goCtx context.Context,
 	msg *types.MsgAddIidContext,

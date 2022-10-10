@@ -37,10 +37,11 @@ var (
 )
 
 func NewMsgCreatePaymentTemplate(template PaymentTemplate,
-	creatorDid didexported.Did) *MsgCreatePaymentTemplate {
+	creatorDid didexported.Did, creatorAddress string) *MsgCreatePaymentTemplate {
 	return &MsgCreatePaymentTemplate{
 		CreatorDid:      creatorDid,
 		PaymentTemplate: template,
+		CreatorAddress:  creatorAddress,
 	}
 }
 func (msg MsgCreatePaymentTemplate) GetIidController() string { return msg.CreatorDid }
@@ -89,7 +90,7 @@ func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
 	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
-	discountId sdk.Uint, creatorDid didexported.Did) *MsgCreatePaymentContract {
+	discountId sdk.Uint, creatorDid didexported.Did, creatorAddress string) *MsgCreatePaymentContract {
 	return &MsgCreatePaymentContract{
 		CreatorDid:        creatorDid,
 		PaymentTemplateId: templateId,
@@ -98,6 +99,7 @@ func NewMsgCreatePaymentContract(templateId, contractId string,
 		Recipients:        recipients,
 		CanDeauthorise:    canDeauthorise,
 		DiscountId:        discountId,
+		CreatorAddress:    creatorAddress,
 	}
 }
 func (msg MsgCreatePaymentContract) GetIidController() string { return msg.CreatorDid }
@@ -155,12 +157,13 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 }
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
-	period Period, creatorDid didexported.Did) *MsgCreateSubscription {
+	period Period, creatorDid didexported.Did, creatorAddress string) *MsgCreateSubscription {
 	msg := &MsgCreateSubscription{
 		CreatorDid:        creatorDid,
 		SubscriptionId:    subscriptionId,
 		PaymentContractId: contractId,
 		MaxPeriods:        maxPeriods,
+		CreatorAddress:    creatorAddress,
 	}
 
 	err := msg.SetPeriod(period)
@@ -258,11 +261,12 @@ func (m MsgCreateSubscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker)
 }
 
 func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
-	payerDid didexported.Did) *MsgSetPaymentContractAuthorisation {
+	payerDid didexported.Did, payersAddress string) *MsgSetPaymentContractAuthorisation {
 	return &MsgSetPaymentContractAuthorisation{
 		PayerDid:          payerDid,
 		PaymentContractId: contractId,
 		Authorised:        authorised,
+		PayerAddress:      payersAddress,
 	}
 }
 func (msg MsgSetPaymentContractAuthorisation) GetIidController() string { return msg.PayerDid }
@@ -313,12 +317,13 @@ func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
 }
 
 func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
-	recipient sdk.AccAddress, creatorDid didexported.Did) *MsgGrantDiscount {
+	recipient sdk.AccAddress, creatorDid didexported.Did, senderAddress string) *MsgGrantDiscount {
 	return &MsgGrantDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
 		DiscountId:        discountId,
 		Recipient:         recipient.String(),
+		SenderAddress:     senderAddress,
 	}
 }
 
@@ -369,11 +374,12 @@ func (msg MsgGrantDiscount) GetSignBytes() []byte {
 }
 
 func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
-	creatorDid didexported.Did) *MsgRevokeDiscount {
+	creatorDid didexported.Did, senderAddress string) *MsgRevokeDiscount {
 	return &MsgRevokeDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
 		Holder:            holder.String(),
+		SenderAddress:     senderAddress,
 	}
 }
 
@@ -423,10 +429,11 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func NewMsgEffectPayment(contractId string, creatorDid didexported.Did) *MsgEffectPayment {
+func NewMsgEffectPayment(contractId string, creatorDid didexported.Did, senderAddress string) *MsgEffectPayment {
 	return &MsgEffectPayment{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
+		SenderAddress:     senderAddress,
 	}
 }
 

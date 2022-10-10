@@ -25,7 +25,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -87,6 +86,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/ixofoundation/ixo-blockchain/client/tx"
+	libixo "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
@@ -621,11 +621,12 @@ func NewIxoApp(
 		BankKeeper:        app.BankKeeper,
 		FeegrantKeeper:    app.FeeGrantKeeper,
 		IidKeeper:         app.IidKeeper,
+		ProjectKeeper:     app.ProjectKeeper,
 		wasmConfig:        wasmConfig,
 		txCounterStoreKey: keys[wasm.StoreKey],
 
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
+		SigGasConsumer:  libixo.IxoSigVerificationGasConsumer,
 	})
 	if err != nil {
 		panic(err)

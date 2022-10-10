@@ -1,6 +1,8 @@
 package project
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -17,6 +19,8 @@ func NewHandler(k keeper.Keeper, pk paymentskeeper.Keeper, bk bankkeeper.Keeper)
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateProject:
+			fmt.Println("creating project---------------------------")
+
 			res, err := msgServer.CreateProject(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgUpdateProjectStatus:

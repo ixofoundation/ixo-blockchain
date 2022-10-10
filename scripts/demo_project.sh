@@ -59,7 +59,7 @@ PROJECT_DID_FULL='{
 }'
 PROJECT_INFO='{
   "nodeDid":"nodeDid",
-  "requiredClaims":"500",
+  "requiredClaims":"5001",
   "serviceEndpoint":"serviceEndpoint",
   "createdOn":"2020-01-01T01:01:01.000Z",
   "createdBy":"Creator",
@@ -124,79 +124,79 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering Miguel DID..."
-# ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$MIGUEL_DID_FULL"
 echo "Ledgering Francesco DID..."
-# ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$FRANCESCO_DID_FULL"
 echo "Ledgering Shaun DID..."
 ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
 
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-# ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
+ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create fee-for-service payment template
 echo "Creating fee-for-service payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-# ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
+ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # Create project and progress status to PENDING
 SENDER_DID="$SHAUN_DID"
 echo "Creating project..."
 ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
-# echo "Updating project to CREATED..."
+echo "Updating project to CREATED..."
 # # ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
-# echo "Updating project to PENDING..."
-# ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
+echo "Updating project to PENDING..."
+ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
 
 # Updating project doc succeeds as project is in status PENDING and tx sender DID
 # # is the same as project sender DID
-# PROJECT_INFO2='{
-#   "nodeDid":"nodeDid",
-#   "requiredClaims":"500",
-#   "serviceEndpoint":"serviceEndpoint",
-#   "createdOn":"2020-01-01T01:01:01.000Z",
-#   "createdBy":"Creator",
-#   "status":"",
-#   "fees":{
-#     "@context":"",
-#     "items": [
-#       {"@type":"OracleFee", "id":"payment:template:oracle-fee"},
-#       {"@type":"FeeForService", "id":"payment:template:fee-for-service"}
-#     ]
-#   },
-#   "newField":"someNewField"
-# }'
-# echo "Updating project doc..."
-# ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO2" "$PROJECT_DID_FULL"
+PROJECT_INFO2='{
+  "nodeDid":"nodeDid",
+  "requiredClaims":"500",
+  "serviceEndpoint":"serviceEndpoint",
+  "createdOn":"2020-01-01T01:01:01.000Z",
+  "createdBy":"Creator",
+  "status":"",
+  "fees":{
+    "@context":"",
+    "items": [
+      {"@type":"OracleFee", "id":"payment:template:oracle-fee"},
+      {"@type":"FeeForService", "id":"payment:template:fee-for-service"}
+    ]
+  },
+  "newField":"someNewField"
+}'
+echo "Updating project doc..."
+ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO2" "$PROJECT_DID_FULL"
 
 # Fund project and progress status to FUNDED
-# FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID")
-# # Delete longest match of pattern ': ' from the beginning
-# PROJECT_ADDR=${FULL_PROJECT_ADDR##*: }
-# echo "Funding project at [$PROJECT_ADDR] with uixo from Francesco..."
-# # ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
-# echo "Updating project to FUNDED..."
-# SENDER_DID="$SHAUN_DID"
-# # ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"
+FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PROJECT_DID")
+# Delete longest match of pattern ': ' from the beginning
+PROJECT_ADDR=${FULL_PROJECT_ADDR##*: }
+echo "Funding project at [$PROJECT_ADDR] with uixo from Francesco..."
+# ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
+echo "Updating project to FUNDED..."
+SENDER_DID="$SHAUN_DID"
+ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"
 
-# # Progress project status to STARTED
-# SENDER_DID="$SHAUN_DID"
-# echo "Updating project to STARTED..."
-# # ixod_tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL"
+# Progress project status to STARTED
+SENDER_DID="$SHAUN_DID"
+echo "Updating project to STARTED..."
+ixod_tx project update-project-status "$SENDER_DID" STARTED "$PROJECT_DID_FULL"
 
-# # If we try updating the project-doc now, the tx fails as the project is in status STARTED
-# echo "Updating project doc fails since project is in status STARTED..."
-# # ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
+# If we try updating the project-doc now, the tx fails as the project is in status STARTED
+echo "Updating project doc fails since project is in status STARTED..."
+ixod_tx project update-project-doc "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 
 # # Create claim and evaluation
-# echo "Creating a claim in project..."
-# SENDER_DID="$SHAUN_DID"
-# # ixod_tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL"
-# echo "Creating an evaluation in project..."
-# SENDER_DID="$MIGUEL_DID"
-# STATUS="1" # create-evaluation updates status of claim from 0 to 1
-# ixod_tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL"
+echo "Creating a claim in project..."
+SENDER_DID="$SHAUN_DID"
+ixod_tx project create-claim "tx_hash" "$SENDER_DID" "claim_id" "template_id" "$PROJECT_DID_FULL"
+echo "Creating an evaluation in project..."
+SENDER_DID="$MIGUEL_DID"
+STATUS="1" # create-evaluation updates status of claim from 0 to 1
+ixod_tx project create-evaluation "tx_hash" "$SENDER_DID" "claim_id" $STATUS "$PROJECT_DID_FULL"
 
 # OracleFeePercentage:  0.1 (10%)
 # NodeFeePercentage:    0.1 (10%)
@@ -215,61 +215,61 @@ ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 
 # Sum of fee accounts: 500,000
 
-# # Progress project status to PAIDOUT
-# SENDER_DID="$SHAUN_DID"
-# echo "Updating project to STOPPED..."
-# # ixod_tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL"
-# echo "Updating project to PAIDOUT..."
-# # ixod_tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL"
-# echo "Project withdrawals query..."
-# # ixod_q project get-project-txs $PROJECT_DID
+# Progress project status to PAIDOUT
+SENDER_DID="$SHAUN_DID"
+echo "Updating project to STOPPED..."
+ixod_tx project update-project-status "$SENDER_DID" STOPPED "$PROJECT_DID_FULL"
+echo "Updating project to PAIDOUT..."
+ixod_tx project update-project-status "$SENDER_DID" PAIDOUT "$PROJECT_DID_FULL"
+echo "Project withdrawals query..."
+ixod_q project get-project-txs $PROJECT_DID
 
-# # Expected withdrawals:
-# # - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
-# # Expected project account balances:
+# Expected withdrawals:
+# - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)
+# Expected project account balances:
 # - InitiatingNodePayFees:        0
 # - IxoFees:                      0
 # - IxoPayFees:                   0
 # - project:             93,000,000
-# # Expected external account balances:
-# # - Miguel:       1,000,004,495,000
-# # - Shaun:        1,000,001,495,000  # 500,000 withdrawal
+# Expected external account balances:
+# - Miguel:       1,000,004,495,000
+# - Shaun:        1,000,001,495,000  # 500,000 withdrawal
 
-# echo "InitiatingNodePayFees"
-# # ixod_q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
-# echo "IxoFees"
-# # ixod_q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
-# echo "IxoPayFees"
-# # ixod_q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
-# echo "(project) did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
-# # ixod_q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
-# echo "(Miguel) did:ixo:4XJLBfGtWSGKSz4BeRxdun"
-# # MIGUEL_FULL_ADDR="$(ixod q did get-address-from-did $MIGUEL_DID)"
-# MIGUEL_ADDR=${MIGUEL_FULL_ADDR##*: }
-# # ixod_q bank balances "$MIGUEL_ADDR"
-# echo "(Shaun) did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-# # SHAUN_FULL_ADDR="$(ixod q did get-address-from-did $SHAUN_DID)"
-# SHAUN_ADDR=${SHAUN_FULL_ADDR##*: }
-# # ixod_q bank balances "$SHAUN_ADDR"
+echo "InitiatingNodePayFees"
+ixod_q bank balances "ixo1xvjy68xrrtxnypwev9r8tmjys9wk0zkkspzjmq"
+echo "IxoFees"
+ixod_q bank balances "ixo1ff9we62w6eyes7wscjup3p40vy4uz0sa7j0ajc"
+echo "IxoPayFees"
+ixod_q bank balances "ixo1udgxtf6yd09mwnnd0ljpmeq4vnyhxdg03uvne3"
+echo "(project) did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+ixod_q bank balances "ixo1rmkak6t606wczsps9ytpga3z4nre4z3nwc04p8"
+echo "(Miguel) did:ixo:4XJLBfGtWSGKSz4BeRxdun"
+MIGUEL_FULL_ADDR="$(ixod q did get-address-from-did $MIGUEL_DID)"
+MIGUEL_ADDR=${MIGUEL_FULL_ADDR##*: }
+ixod_q bank balances "$MIGUEL_ADDR"
+echo "(Shaun) did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
+SHAUN_FULL_ADDR="$(ixod q did get-address-from-did $SHAUN_DID)"
+SHAUN_ADDR=${SHAUN_FULL_ADDR##*: }
+ixod_q bank balances "$SHAUN_ADDR"
 
 # # Withdraw funds (from main project account, i.e. as refund)
 # # --> FAIL since Miguel is not the project owner
-# echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
-# DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
-# # ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
-# echo "Project withdrawals query..."
-# # ixod_q project get-project-txs $PROJECT_DID
+echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
+ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
+echo "Project withdrawals query..."
+ixod_q project get-project-txs $PROJECT_DID
 
 # # Expected external account balances:
 # - Miguel:       1,000,004,490,000 (5,000uixo tx fee deducted)
 
 # Withdraw funds (from main project account, i.e. as refund)
 # # --> SUCCESS since Shaun is the project owner
-# echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
-# DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
-# # ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
-# echo "Project withdrawals query..."
-# ixod_q project get-project-txs $PROJECT_DID
+echo "Withdraw project funds as Shaun (success since Shaun is the owner)..."
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$SHAUN_DID\",\"amount\":\"1000000\",\"isRefund\":true}"
+ixod_tx project withdraw-funds "$SHAUN_DID_FULL" "$DATA"
+echo "Project withdrawals query..."
+ixod_q project get-project-txs $PROJECT_DID
 
 # Expected withdrawals:
 # - 500,000 to ixo (a.k.a Shaun) DID (did:ixo:U4tSpzzv91HHqWW1YmFkHJ)

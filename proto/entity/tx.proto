@@ -58,6 +58,7 @@ message MsgCreateEntity {
   repeated string credentials = 16 [(gogoproto.jsontag) = "credentials", (gogoproto.moretags) = "yaml:\"credentials\""];
   string   ownerDid        = 17 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
   string   ownerAddress        = 18 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
+  bytes data         = 19 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.
