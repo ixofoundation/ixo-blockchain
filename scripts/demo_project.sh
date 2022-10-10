@@ -145,7 +145,7 @@ SENDER_DID="$SHAUN_DID"
 echo "Creating project..."
 ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 echo "Updating project to CREATED..."
-# # ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
+ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
 echo "Updating project to PENDING..."
 ixod_tx project update-project-status "$SENDER_DID" PENDING "$PROJECT_DID_FULL"
 
@@ -175,7 +175,7 @@ FULL_PROJECT_ADDR=$(ixod q project get-project-accounts $PROJECT_DID | grep "$PR
 # Delete longest match of pattern ': ' from the beginning
 PROJECT_ADDR=${FULL_PROJECT_ADDR##*: }
 echo "Funding project at [$PROJECT_ADDR] with uixo from Francesco..."
-# ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
+ixod_tx bank send francesco "$PROJECT_ADDR" 100000000uixo
 echo "Updating project to FUNDED..."
 SENDER_DID="$SHAUN_DID"
 ixod_tx project update-project-status "$SENDER_DID" FUNDED "$PROJECT_DID_FULL"

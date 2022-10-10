@@ -518,7 +518,7 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule
-		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, app.WasmKeeper),
+		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, &app.WasmKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
