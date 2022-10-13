@@ -146,9 +146,32 @@ A service has the following fields:
 
 +++ https://github.com/ixofoundation/ixo-blockchain/blob/devel/entity-module/proto/iid/iid.proto#L96
 
-## DidMetadata
+### Controller
+A Controller is stored as a slice within a IidDocument data structure. Controllers are used to describe communication interfaces for an IID as described in the [W3C DID recommendations](https://w3c.github.io/did-core/#services)
 
-A DidMetadata stores information relative to a DID document. The implementation supports the following fields: 
+A Controller has the following fields:
+
+- `controller` - an iid string identifying the controller
+
+#### Source
+
++++ https://github.com/ixofoundation/ixo-blockchain/blob/devel/entity-module/proto/iid/iid.proto#L96
+
+### Iid Context
+A Context is stored as a slice within a IidDocument data structure. Controllers are used to describe communication interfaces for an IID as described in the [W3C DID recommendations](https://w3c.github.io/did-core/#services)
+
+A Context has the following fields:
+
+- `key` - a string identifying the context mainly for storage purposes
+- `value ` - a string representing the context
+
+#### Source
+
++++ https://github.com/ixofoundation/ixo-blockchain/blob/devel/entity-module/proto/iid/iid.proto#L96
+
+## IidMetadata
+
+A IidMetadata stores information relative to a DID document. The implementation supports the following fields: 
 
 - `versionId` - the version of the last update operation for the did document
 - `updated` - the timestamp of the last update operation for the did document 
