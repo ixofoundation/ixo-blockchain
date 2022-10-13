@@ -68,14 +68,13 @@ var xxx_messageInfo_Context proto.InternalMessageInfo
 type IidDocument struct {
 	// @context is spec for did document.
 	Context []*Context `protobuf:"bytes,1,rep,name=context,proto3" json:"@context,omitempty"`
-	// id represents the id for the did document.
+	// id represents the id for the iid document.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// A DID controller is an entity that is authorized to make changes to a DID document.
-	// cfr. https://www.w3.org/TR/did-core/#did-controller
+	// A IID controller is an entity that is authorized to make changes to a IID document.
 	Controller []string `protobuf:"bytes,3,rep,name=controller,proto3" json:"controller,omitempty"`
-	// A DID document can express verification methods,
+	// A IID document can express verification methods,
 	// such as cryptographic public keys, which can be used
-	// to authenticate or authorize interactions with the DID subject or associated parties.
+	// to authenticate or authorize interactions with the IID subject or associated parties.
 	// https://www.w3.org/TR/did-core/#verification-methods
 	VerificationMethod []*VerificationMethod `protobuf:"bytes,4,rep,name=verificationMethod,proto3" json:"verificationMethod,omitempty"`
 	// Services are used in DID documents to express ways of communicating
