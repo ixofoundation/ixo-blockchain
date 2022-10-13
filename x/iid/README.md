@@ -6,14 +6,16 @@
 
 ## Abstract
 
-`x/iid` is an implementation of a custom Cosmos SDK module, that allows you to create an on chain IID identifier which is an extension of the did spec as noted [here](https://www.w3.org/TR/did-core/) , CRUD functions exist to add or delete objects from the identifier.
-
+Every digital asset in the Cosmos context should have a universally addressable Interchain Identifier (IID).
+Interchain Identifiers are a standards-compliant mechanism for uniquely identifying and referring to digital assets within chain namespaces.
+IIDs also enable (off-chain) assertions to be made about (on-chain) digital assets – for instance, in the form of Verifiable Credentials.
+Each IID is associated with an IID Document, which contains all the data needed to compose and interact with an asset's properties and services.
 * [Concept](#concepts)
     * [Structure](#structure)
-    * [IID](#IID)
-      *[State](./spec/02_state.md)
-      *[Transitions](./spec/03_state_transitions.md) 
-      *[Messages](./spec/04_messages.md)
+      * [IID](#IidDocument)
+        -[State](./spec/02_state.md)
+        -[Transitions](./spec/03_state_transitions.md) 
+        -[Messages](./spec/04_messages.md)
 
 # Concepts
 
@@ -74,14 +76,58 @@ type IidDocument struct {
 }
 ```
 
-## IID
+## DIDs and IIDs
 
-shaun to provide
-# State
+Decentralized Identifiers (DIDs) are the W3C specification for identifying any subject in the physical or digital realm. DIDs implement standardised DID Methods to produce fully-qualified Universal Resource Identifier (URI), as defined by RFC3986.
 
+Interchain Identifiers (IIDs) are a DID Method for identifying on-chain assets – such as NFTs, fungible tokens, namespace records and account wallets.
 ## IidDocument
+Properties of an IID are conceptually stored in the format of an IID Document object. Which contains core properties (as defined by [W3C DID Core](https://w3c.github.io/did-core/)):
+- Identifiers
+    - DID Subject
+    - DID Controller
+    - Also Known As
+- Verification Methods
+    - Cryptographic material
+- Verification Relationships
+    - Authentication
+    - Assertion
+    - Key Agreement
+    - Capability Invocation
+    - Capability Delegation
+- Service
 
-an IID document is composed of the following fields
+As well as two additonal property sets which are unique to digital assets:
+- Linked Resources
+- Accorded Rights
+
+Property extensions may be added by application developers who need to implement their own [DID Method](https://w3c.github.io/did-core/#method-syntax) for a specific use-case (although it is anticipated that the IID method should serve most).
+
+### IID Registry
+
+The IID Module is a [Verifiable Data Registry](https://w3c.github.io/did-core/#dfn-verifiable-data-registry) sytem to CRUD decentralized identifiers and IID documents.
+
+Resolving a given IID using the IID Module services returns the data necessary to produce an IID document in a [DID-conformant format](https://w3c.github.io/did-core/#dfn-did-documents), which can be serialized as JSON-LD.
+
+### IID Method
+
+The IID Method defines a standard way to:
+- Create an IID
+- Set the properties associated with the IID
+- Read (resolve) an IID Document to produce a conformant JSON-LD representation.
+- Update IID Document properties
+- Deactivate an IID
+- Delete an IID
+
+### IID Resolver
+
+The IID resolver is a [DID resolver](https://w3c.github.io/did-core/#dfn-did-resolvers) service that takes an IID as input and produces an IID Document as output (which conforms to the [W3C DID documents](https://w3c.github.io/did-core/#dfn-did-documents) format).
+
+### IID Deactivation
+
+If an IID has been [deactivated](https://w3c.github.io/did-core/#method-operations), the IID document metadata includes a property with the boolean value `true`.
+
+<!--an IID document is composed of the following fields
 * Context: `Context []*Context`
 * Id: `Id string`
 * Controller: `Controller []string`
@@ -95,4 +141,4 @@ an IID document is composed of the following fields
 * Linked Resource: `LinkedResource []*LinkedResource`
 * Accorded Right: `AccordedRight        []*AccordedRight`
 * Linked Entity: `LinkedEntity         []*LinkedEntity`
-* Also known as: `AlsoKnownAs          string`
+* Also known as: `AlsoKnownAs          string` -->
