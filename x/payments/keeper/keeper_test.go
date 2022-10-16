@@ -1,14 +1,6 @@
 package keeper_test
 
-import (
-	"testing"
-	"time"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
-	"github.com/stretchr/testify/require"
-)
-
+/*
 func TestKeeperIdReserver(t *testing.T) {
 	_, app, _ := CreateTestInput()
 
@@ -363,3 +355,5 @@ func TestKeeperSetGet(t *testing.T) {
 // 	err = app.PaymentsKeeper.EffectSubscriptionPayment(ctx, testSubscription.Id)
 // 	require.Nil(t, err)
 // }
+
+*/

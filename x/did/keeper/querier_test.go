@@ -1,5 +1,6 @@
 package keeper_test
 
+/*
 import (
 	"github.com/ixofoundation/ixo-blockchain/x/did/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/did/types"
@@ -38,3 +39,4 @@ func TestQueryDidDocs(t *testing.T) {
 	_, _ = legacyAmino.MarshalJSONIndent(b, "", " ")
 
 }
+*/

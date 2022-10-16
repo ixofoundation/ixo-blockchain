@@ -1,5 +1,6 @@
 package app
 
+/*
 import (
 	"encoding/json"
 	"time"
@@ -78,3 +79,4 @@ type EmptyAppOptions struct{}
 func (ao EmptyAppOptions) Get(o string) interface{} {
 	return nil
 }
+*/

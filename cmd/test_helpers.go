@@ -1,5 +1,6 @@
 package cmd
 
+/*
 import (
 	"encoding/json"
 	"github.com/ixofoundation/ixo-blockchain/app"
@@ -76,3 +77,4 @@ type EmptyAppOptions struct{}
 func (ao EmptyAppOptions) Get(o string) interface{} {
 	return nil
 }
+*/

@@ -1,5 +1,6 @@
 package keeper_test
 
+/*
 import (
 	"testing"
 
@@ -18,3 +19,4 @@ func TestKeeper(t *testing.T) {
 	_, err = appl.DidKeeper.GetDidDoc(ctx, types.ValidDidDoc.GetDid())
 	require.Nil(t, err)
 }
+*/

@@ -194,8 +194,8 @@ func NewCmdCreateSubscription() *cobra.Command {
 				return err
 			}
 
-			//var p *period
-			p, err := parsePeriodString(periodStr)
+			// var p *period
+			p, _ := parsePeriodString(periodStr)
 
 			var period types.Period
 			switch p.Type {

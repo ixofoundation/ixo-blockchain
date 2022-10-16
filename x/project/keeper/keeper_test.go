@@ -1,5 +1,6 @@
 package keeper_test
 
+/*
 import (
 	"testing"
 
@@ -118,3 +119,4 @@ func TestKeeperWithdrawalInfo(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, 2, len(withdrawals.DocsList))
 }
+*/

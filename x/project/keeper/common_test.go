@@ -1,5 +1,7 @@
 package keeper_test
 
+/*
+
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -44,3 +46,4 @@ func CreateTestInput() (*codec.LegacyAmino, *app.IxoApp, sdk.Context) {
 
 	return appl.LegacyAmino(), appl, ctx
 }
+*/
