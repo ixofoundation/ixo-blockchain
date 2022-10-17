@@ -5567,18 +5567,18 @@ relationships that the method is allowed into. </p></td>
                   <td>entityType</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>The entity type likely Asset, Project, Investment for now. Validation for this is lacking right now, but will be added when scope is clearer. </p></td>
+                  <td><p>An Entity Type as defined by the implementer </p></td>
                 </tr>
               
                 <tr>
                   <td>entityStatus</td>
                   <td><a href="#int32">int32</a></td>
                   <td></td>
-                  <td><p>The status of the entity. Should represent an enum in the client. </p></td>
+                  <td><p>Status of the Entity as defined by the implementer and interpreted by Client applications </p></td>
                 </tr>
               
                 <tr>
-                  <td>controllers</td>
+                  <td>controller</td>
                   <td><a href="#string">string</a></td>
                   <td>repeated</td>
                   <td><p>the list of controller DIDs </p></td>
@@ -5588,56 +5588,56 @@ relationships that the method is allowed into. </p></td>
                   <td>context</td>
                   <td><a href="#iid.Context">iid.Context</a></td>
                   <td>repeated</td>
-                  <td><p>refer to iid context for more information </p></td>
+                  <td><p>JSON-LD contexts </p></td>
                 </tr>
               
                 <tr>
-                  <td>verifications</td>
+                  <td>verification</td>
                   <td><a href="#iid.Verification">iid.Verification</a></td>
                   <td>repeated</td>
-                  <td><p>the list of verification methods and relationships </p></td>
+                  <td><p>Verification Methods and Verification Relationships </p></td>
                 </tr>
               
                 <tr>
-                  <td>services</td>
+                  <td>service</td>
                   <td><a href="#iid.Service">iid.Service</a></td>
                   <td>repeated</td>
-                  <td><p>refer to iid for more information </p></td>
+                  <td><p>Service endpoints </p></td>
                 </tr>
               
                 <tr>
                   <td>accordedRight</td>
                   <td><a href="#iid.AccordedRight">iid.AccordedRight</a></td>
                   <td>repeated</td>
-                  <td><p>refer to iid module for more information </p></td>
+                  <td><p>Legal or Electronic Rights and associated Object Capabilities </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedResource</td>
                   <td><a href="#iid.LinkedResource">iid.LinkedResource</a></td>
                   <td>repeated</td>
-                  <td><p>refer to iid module for more information </p></td>
+                  <td><p>Digital resources associated with the Subject </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedEntity</td>
                   <td><a href="#iid.LinkedEntity">iid.LinkedEntity</a></td>
                   <td>repeated</td>
-                  <td><p>refer to iid module for more information </p></td>
+                  <td><p>DID of a linked Entity and its relationship with the Subject </p></td>
                 </tr>
               
                 <tr>
                   <td>deactivated</td>
                   <td><a href="#bool">bool</a></td>
                   <td></td>
-                  <td><p>Whether this entity is enabled ot not, basically a soft delete. </p></td>
+                  <td><p>Operational status of the Entity </p></td>
                 </tr>
               
                 <tr>
                   <td>startDate</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>refer to iid module for more information
+                  <td><p>Start Date of the Entity as defined by the implementer and interpreted by Client applications
 
 address of the account signing the message </p></td>
                 </tr>
@@ -5646,7 +5646,7 @@ address of the account signing the message </p></td>
                   <td>endDate</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>refer to iid module for more information
+                  <td><p>End Date of the Entity as defined by the implementer and interpreted by Client applications
 
 address of the account signing the message </p></td>
                 </tr>
@@ -5655,49 +5655,49 @@ address of the account signing the message </p></td>
                   <td>stage</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>refer to iid module meta data for more information </p></td>
+                  <td><p>State of the Entity as defined by the implementer and interpreted by Client applications </p></td>
                 </tr>
               
                 <tr>
                   <td>relayerNode</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>refer to iid module for more information </p></td>
+                  <td><p>DID of the operator through which the Entity was created </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verificationStatus</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Public proof that the Entity is verified </p></td>
                 </tr>
               
                 <tr>
                   <td>verifiableCredential</td>
                   <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>refer to iid module for more information </p></td>
-                </tr>
-              
-                <tr>
-                  <td>credentials</td>
-                  <td><a href="#string">string</a></td>
                   <td>repeated</td>
-                  <td><p>refer to iid module for more information </p></td>
+                  <td><p>Content ID or Hash of public Verifiable Credentials associated with the  subject </p></td>
                 </tr>
               
                 <tr>
                   <td>ownerDid</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                  <td><p>Owner of the Entity NFT | The ownersdid used to sign this transaction. </p></td>
                 </tr>
               
                 <tr>
                   <td>ownerAddress</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                  <td><p>The ownersdid address used to sign this transaction. </p></td>
                 </tr>
               
                 <tr>
                   <td>data</td>
                   <td><a href="#bytes">bytes</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Extention data </p></td>
                 </tr>
               
             </tbody>

@@ -95,11 +95,11 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	fmt.Printf("%s\n", entityId)
 
 	did, err := iidtypes.NewDidDocument(entityId,
-		iidtypes.WithServices(msg.Services...),
+		iidtypes.WithServices(msg.Service...),
 		iidtypes.WithRights(msg.AccordedRight...),
 		iidtypes.WithResources(msg.LinkedResource...),
-		iidtypes.WithVerifications(append(msg.Verifications, verification)...),
-		iidtypes.WithControllers(append(msg.Controllers, entityId)...),
+		iidtypes.WithVerifications(append(msg.Verification, verification)...),
+		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid)...),
 	)
 	if err != nil {
 		fmt.Println("================================================3")
@@ -131,8 +131,8 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	didM.Updated = &currentTimeUtc
 	didM.VersionId = fmt.Sprintf("%s:%d", entityId, 0)
 	didM.Stage = msg.Stage
-	didM.Credentials = msg.Credentials
-	didM.VerifiableCredential = msg.VerifiableCredential
+	didM.Credentials = msg.VerifiableCredential
+	didM.VerifiableCredential = msg.VerificationStatus
 	didM.StartDate = msg.StartDate
 	didM.EndDate = msg.EndDate
 	didM.RelayerNode = msg.RelayerNode

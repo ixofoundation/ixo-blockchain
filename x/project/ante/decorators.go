@@ -27,6 +27,19 @@ import (
 	// vcskeeper "github.com/allinbits/cosmos-cash/v3/x/verifiable-credential/keeper"
 )
 
+func checkAllMsgs(tx sdk.Tx) (*types.MsgCreateProject, error) {
+	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
+	if !ok {
+		return nil, errors.New("msg must be MsgCreateProject")
+	}
+
+	if len(tx.GetMsgs()) > 1 {
+		return nil, errors.New("transactions with a MsgCreateProject can only contain 1 MsgCreateProject")
+	}
+
+	return msg, nil
+}
+
 func pubKeyGetter(keeper projectkeeper.Keeper, iidKeeper iidkeeper.Keeper) libixo.PubKeyGetter {
 	return func(ctx sdk.Context, msg libixo.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
 
@@ -57,6 +70,11 @@ func NewSetUpContextDecorator() SetUpContextDecorator {
 }
 
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
+	_, err = checkAllMsgs(tx)
+	if err != nil {
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
+	}
+
 	// all transactions must implement GasTx
 	gasTx, ok := tx.(ante.GasTx)
 	if !ok {
@@ -111,9 +129,9 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 	}
 
 	// message must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
+	msg, err := checkAllMsgs(tx)
+	if err != nil {
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
 	}
 
 	// Get project pubKey
@@ -190,35 +208,26 @@ func NewDeductFeeDecorator(projectKeeper projectkeeper.Keeper, ak authante.Accou
 }
 
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	fmt.Println("hiiiiiii---------------------------")
-
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
-	fmt.Println("outer1---------------------------")
-
 	if addr := dfd.ak.GetModuleAddress(authtypes.FeeCollectorName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", authtypes.FeeCollectorName))
 	}
 
-	fmt.Println("outer2---------------------------")
-
 	// all messages must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
+	msg, err := checkAllMsgs(tx)
+	if err != nil {
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
 	}
-	fmt.Println("outer3---------------------------")
 
 	// Get pubKey
 	pubKey, err := pubKeyGetter(dfd.projectKeeper, dfd.projectKeeper.IidKeeper)(ctx, msg)
 	if err != nil {
 		return ctx, err
 	}
-
-	fmt.Println("outer4---------------------------")
 
 	// fetch first (and only) signer, who's going to pay the fees
 	feePayer := sdk.AccAddress(pubKey.Address())
@@ -228,8 +237,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", feePayer)
 	}
 
-	fmt.Println("outer5---------------------------")
-
 	// confirm that fee is the exact amount expected
 	expectedTotalFee := sdk.NewCoins(sdk.NewCoin(
 		libixo.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTotalFee)))
@@ -237,45 +244,33 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, "invalid fee")
 	}
 
-	fmt.Println("outer6---------------------------")
-
 	// Calculate transaction fee and project funding
 	transactionFee := sdk.NewCoins(sdk.NewCoin(
 		libixo.IxoNativeToken, sdk.NewInt(types.MsgCreateProjectTransactionFee)))
 	projectFunding := expectedTotalFee.Sub(transactionFee) // panics if negative result
 
-	fmt.Println("outer7---------------------------")
-
 	// deduct the fees
 	if !feeTx.GetFee().IsZero() {
-
-		fmt.Println("inner1---------------------------")
 		// fetch fee payer account
 		feePayerDidDoc, exists := dfd.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
 		if !exists {
 			return ctx, errors.New("sender did does not exist")
 		}
 
-		fmt.Println("inner2---------------------------")
-
 		account, err := iidutil.GetAccountForVerificationMethod(ctx, dfd.ak, feePayerDidDoc, feePayerDidDoc.Id)
 		if err != nil {
 			return ctx, err
 		}
 
-		fmt.Println("inner3---------------------------")
 		feePayerAcc, err := ante.GetSignerAcc(ctx, dfd.ak, account.GetAddress())
 		if err != nil {
 			return ctx, err
 		}
 
-		fmt.Println("inner4---------------------------")
 		err = ante.DeductFees(dfd.bk, ctx, feePayerAcc, transactionFee)
 		if err != nil {
 			return ctx, err
 		}
-
-		fmt.Println("inner5---------------------------")
 
 		projectAddr := sdk.AccAddress(pubKey.Address())
 		err = deductProjectFundingFees(dfd.bk, ctx, feePayerAcc, projectAddr, projectFunding)
@@ -283,8 +278,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			return ctx, err
 		}
 	}
-
-	fmt.Println("end---------------------------")
 
 	return next(ctx, tx, simulate)
 }
@@ -326,9 +319,9 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	}
 
 	// message must be of type MsgCreateProject
-	msg, ok := tx.GetMsgs()[0].(*types.MsgCreateProject)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "msg must be MsgCreateProject")
+	msg, err := checkAllMsgs(tx)
+	if err != nil {
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
 	}
 
 	// Get signer did pubKey

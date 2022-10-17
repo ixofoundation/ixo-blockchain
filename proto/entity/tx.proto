@@ -32,33 +32,33 @@ message MsgCreateEntity {
   option (gogoproto.equal)            = false;
   option (gogoproto.goproto_getters)  = false;
 
-  // The entity type likely Asset, Project, Investment for now. Validation for this is lacking right now, but will be added when scope is clearer.
+  // An Entity Type as defined by the implementer
   string entityType       = 1 [(gogoproto.jsontag) = "entity_type", (gogoproto.moretags) = "yaml:\"entity_type\""];
-  // The status of the entity. Should represent an enum in the client.
+  // Status of the Entity as defined by the implementer and interpreted by Client applications
   int32 entityStatus        = 2 [(gogoproto.jsontag) = "entity_status", (gogoproto.moretags) = "yaml:\"entity_status\""];
   // the list of controller DIDs
-  repeated string controllers   = 3 [(gogoproto.jsontag) = "controllers", (gogoproto.moretags) = "yaml:\"controllers\""]; 
-  repeated iid.Context context        = 4 [(gogoproto.jsontag) = "controllers", (gogoproto.moretags) = "yaml:\"controllers\""]; // refer to iid context for more information
-  repeated iid.Verification verifications = 5 [(gogoproto.jsontag) = "controllers", (gogoproto.moretags) = "yaml:\"controllers\""]; // the list of verification methods and relationships
-  repeated iid.Service services      = 6 [(gogoproto.jsontag) = "controllers", (gogoproto.moretags) = "yaml:\"controllers\""]; // refer to iid for more information
-  repeated iid.AccordedRight accordedRight = 7 [(gogoproto.jsontag) = "accorded_right", (gogoproto.moretags) = "yaml:\"accorded_right\""]; // refer to iid module for more information
-  repeated iid.LinkedResource linkedResource = 8 [(gogoproto.jsontag) = "linked_resource", (gogoproto.moretags) = "yaml:\"linked_resource\""]; // refer to iid module for more information
-  repeated iid.LinkedEntity linkedEntity = 9 [(gogoproto.jsontag) = "linked_entity", (gogoproto.moretags) = "yaml:\"linked_entity\""]; // refer to iid module for more information
-  bool deactivated = 10 [(gogoproto.jsontag) = "deactivated", (gogoproto.moretags) = "yaml:\"deactivated\""]; // Whether this entity is enabled ot not, basically a soft delete.
-  // refer to iid module for more information
+  repeated string controller   = 3 [(gogoproto.jsontag) = "controller", (gogoproto.moretags) = "yaml:\"controller\""]; 
+  repeated iid.Context context        = 4 [(gogoproto.jsontag) = "context", (gogoproto.moretags) = "yaml:\"context\""]; // JSON-LD contexts
+  repeated iid.Verification verification = 5 [(gogoproto.jsontag) = "verification", (gogoproto.moretags) = "yaml:\"verification\""]; // Verification Methods and Verification Relationships
+  repeated iid.Service service      = 6 [(gogoproto.jsontag) = "service", (gogoproto.moretags) = "yaml:\"service\""]; // Service endpoints
+  repeated iid.AccordedRight accordedRight = 7 [(gogoproto.jsontag) = "accorded_right", (gogoproto.moretags) = "yaml:\"accorded_right\""]; // Legal or Electronic Rights and associated Object Capabilities
+  repeated iid.LinkedResource linkedResource = 8 [(gogoproto.jsontag) = "linked_resource", (gogoproto.moretags) = "yaml:\"linked_resource\""]; // Digital resources associated with the Subject
+  repeated iid.LinkedEntity linkedEntity = 9 [(gogoproto.jsontag) = "linked_entity", (gogoproto.moretags) = "yaml:\"linked_entity\""]; // DID of a linked Entity and its relationship with the Subject
+  bool deactivated = 10 [(gogoproto.jsontag) = "deactivated", (gogoproto.moretags) = "yaml:\"deactivated\""]; // Operational status of the Entity
+  // Start Date of the Entity as defined by the implementer and interpreted by Client applications
   google.protobuf.Timestamp startDate = 11 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "start_date", (gogoproto.moretags) = "yaml:\"start_date\""]; // address of the account signing the message
-  // refer to iid module for more information
+  // End Date of the Entity as defined by the implementer and interpreted by Client applications
   google.protobuf.Timestamp endDate = 12 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "end_date", (gogoproto.moretags) = "yaml:\"end_date\""]; // address of the account signing the message
-  string stage = 13; // refer to iid module meta data for more information
-  // refer to iid module for more information
+  string stage = 13; // State of the Entity as defined by the implementer and interpreted by Client applications
+  // DID of the operator through which the Entity was created
   string relayerNode = 14 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
-  // refer to iid module for more information
-  string verifiableCredential = 15 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
-  // refer to iid module for more information
-  repeated string credentials = 16 [(gogoproto.jsontag) = "credentials", (gogoproto.moretags) = "yaml:\"credentials\""];
-  string   ownerDid        = 17 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
-  string   ownerAddress        = 18 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
-  bytes data         = 19 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""];
+  // Public proof that the Entity is verified
+  string verificationStatus = 15 [(gogoproto.jsontag) = "verification_status", (gogoproto.moretags) = "yaml:\"verification_status\""];
+  // Content ID or Hash of public Verifiable Credentials associated with the  subject
+  repeated string verifiableCredential = 16 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
+  string   ownerDid        = 17 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
+  string   ownerAddress        = 18 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid address used to sign this transaction.
+  bytes data         = 19 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""]; // Extention data
 }
 
 // MsgCreateProjectResponse defines the Msg/CreateProject response type.

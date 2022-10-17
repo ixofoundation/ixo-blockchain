@@ -972,7 +972,11 @@ func (didDoc *IidDocument) DeleteService(serviceID string) {
 
 // GetBytes is a helper for serializing
 func (didDoc IidDocument) GetBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&didDoc))
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&didDoc))
+}
+
+func (did IidDocument) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&did))
 }
 
 // Verifications is a list of verification
@@ -1025,7 +1029,11 @@ func NewVerificationMethod(id string, controller DID, vmr VerificationMaterial) 
 
 // GetBytes is a helper for serializing
 func (did Verification) GetBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&did))
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&did))
+}
+
+func (did Verification) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&did))
 }
 
 // Services are a list of services

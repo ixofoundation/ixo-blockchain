@@ -45,7 +45,8 @@ func (MsgCreateIidDocument) Type() string {
 }
 
 func (msg MsgCreateIidDocument) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -87,7 +88,8 @@ func (MsgUpdateIidDocument) Type() string {
 }
 
 func (msg MsgUpdateIidDocument) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -133,7 +135,8 @@ func (MsgAddVerification) Type() string {
 }
 
 func (msg MsgAddVerification) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -180,7 +183,8 @@ func (MsgRevokeVerification) Type() string {
 }
 
 func (msg MsgRevokeVerification) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -225,7 +229,8 @@ func (MsgSetVerificationRelationships) Type() string {
 }
 
 func (msg MsgSetVerificationRelationships) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -294,7 +299,8 @@ func (MsgAddService) Type() string {
 }
 
 func (msg MsgAddService) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -317,7 +323,8 @@ func (MsgAddLinkedResource) Type() string {
 }
 
 func (msg MsgAddLinkedResource) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -390,7 +397,8 @@ func (MsgDeleteService) Type() string {
 }
 
 func (msg MsgDeleteService) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -412,7 +420,8 @@ func (MsgDeleteLinkedResource) Type() string {
 }
 
 func (msg MsgDeleteLinkedResource) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -466,7 +475,8 @@ func (MsgAddAccordedRight) Type() string {
 }
 
 func (msg MsgAddAccordedRight) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -510,7 +520,8 @@ func (MsgDeleteAccordedRight) Type() string {
 }
 
 func (msg MsgDeleteAccordedRight) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -554,7 +565,8 @@ func (MsgAddController) Type() string {
 }
 
 func (msg MsgAddController) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -598,7 +610,8 @@ func (MsgDeleteController) Type() string {
 }
 
 func (msg MsgDeleteController) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -645,7 +658,8 @@ func (MsgAddIidContext) Type() string {
 }
 
 func (msg MsgAddIidContext) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -689,7 +703,8 @@ func (MsgDeleteIidContext) Type() string {
 }
 
 func (msg MsgDeleteIidContext) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg
@@ -736,7 +751,8 @@ func (MsgUpdateIidMeta) Type() string {
 }
 
 func (msg MsgUpdateIidMeta) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg

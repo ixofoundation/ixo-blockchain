@@ -4,7 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	ixoante "github.com/ixofoundation/ixo-blockchain/lib/ante"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	projectante "github.com/ixofoundation/ixo-blockchain/x/project/ante"
 	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
@@ -105,7 +104,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 			// NOTE: REFER TO THIS FILE FOR MORE INFORMATION: app/ante.md
 			anteDecorators = []sdk.AnteDecorator{
 				projectante.NewSetUpContextDecorator(),
-				ixoante.NewCheckTxForIncompatibleMsgsDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+				// ixoante.NewCheckTxForIncompatibleMsgsDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 				//ante.NewMempoolFeeDecorator(),
 				authante.NewValidateBasicDecorator(),
 				authante.NewValidateMemoDecorator(options.AccountKeeper),
@@ -120,7 +119,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		} else {
 			anteDecorators = []sdk.AnteDecorator{
 				authante.NewSetUpContextDecorator(),
-				ixoante.NewCheckTxForIncompatibleMsgsDecorator(),
+				// ixoante.NewCheckTxForIncompatibleMsgsDecorator(),
 				wasmkeeper.NewLimitSimulationGasDecorator(options.wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
 				wasmkeeper.NewCountTXDecorator(options.txCounterStoreKey),
 				authante.NewRejectExtensionOptionsDecorator(),
