@@ -445,6 +445,27 @@ func (k msgServer) UpdateMetaData(
 	return &types.MsgUpdateIidMetaResponse{}, nil
 }
 
+func (k msgServer) DeactivateIID(
+	goCtx context.Context,
+	msg *types.MsgDeactivateIID,
+) (*types.MsgDeactivateIIDResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	didMeta, found := k.GetDidMetadata(ctx, []byte(msg.Id))
+	if found {
+		didMeta.Deactivated = msg.State
+		txH := sha256.Sum256(ctx.TxBytes())
+		didMeta.VersionId = hex.EncodeToString(txH[:])
+		var upd time.Time
+		upd = ctx.BlockTime()
+		didMeta.Updated = &upd
+		k.SetDidMetadata(ctx, []byte(msg.Id), didMeta)
+	} else {
+		//proper error response
+	}
+
+	return &types.MsgDeactivateIIDResponse{}, nil
+}
+
 // VerificationRelationships for did document manipulation
 type VerificationRelationships []string
 

@@ -643,6 +643,14 @@
                 </li>
               
                 <li>
+                  <a href="#iid.MsgDeactivateIID"><span class="badge">M</span>MsgDeactivateIID</a>
+                </li>
+              
+                <li>
+                  <a href="#iid.MsgDeactivateIIDResponse"><span class="badge">M</span>MsgDeactivateIIDResponse</a>
+                </li>
+              
+                <li>
                   <a href="#iid.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
                 </li>
               
@@ -4910,6 +4918,51 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
+        <h3 id="iid.MsgDeactivateIID">MsgDeactivateIID</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the did </p></td>
+                </tr>
+              
+                <tr>
+                  <td>state</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of the account signing the message </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="iid.MsgDeactivateIIDResponse">MsgDeactivateIIDResponse</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
         <p></p>
 
@@ -5525,6 +5578,13 @@ relationships that the method is allowed into. </p></td>
                 <td><a href="#iid.MsgAddIidContext">MsgAddIidContext</a></td>
                 <td><a href="#iid.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
                 <td><p>Add / Delete Context</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeactivateIID</td>
+                <td><a href="#iid.MsgDeactivateIID">MsgDeactivateIID</a></td>
+                <td><a href="#iid.MsgDeactivateIIDResponse">MsgDeactivateIIDResponse</a></td>
+                <td><p></p></td>
               </tr>
             
               <tr>
