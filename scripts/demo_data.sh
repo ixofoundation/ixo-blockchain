@@ -74,7 +74,7 @@ META3=$(yes $PASSWORD | ixod tx iid update-iid-meta "$NEW_DID" '{"versionID":"2"
 echo "Querying IID METADATA"
 QUERY_DID=$(ixod query iid metadata "$FULL_DID" --chain-id pandora-4 --output json | jq .)
 echo "Deactivating IID"
-DEAC=$(yes $PASSWORD | ixod tx iid deactivate-iid "$NEW_DID" "true"  --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json)
+DEAC=$Fnft(yes $PASSWORD | ixod tx iid deactivate-iid "$NEW_DID" "true"  --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json)
 echo "Querying IID METADATA"
 QUERY_DID=$(ixod query iid metadata "$FULL_DID" --chain-id pandora-4 --output json | jq .)
 echo $QUERY_DID
