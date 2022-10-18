@@ -41,7 +41,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
 	allowSell, allowReserveWithdrawals, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int,
-	bondDid didexported.Did) *MsgCreateBond {
+	bondDid didexported.Did, creatorAddress string) *MsgCreateBond {
 
 	return &MsgCreateBond{
 		BondDid:                  bondDid,
@@ -66,6 +66,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		AlphaBond:                alphaBond,
 		BatchBlocks:              batchBlocks,
 		OutcomePayment:           outcomePayment,
+		CreatorAddress:           creatorAddress,
 	}
 }
 
@@ -195,7 +196,7 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
 func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editorDid, bondDid didexported.Did) *MsgEditBond {
+	sanityMarginPercentage string, editorDid, bondDid didexported.Did, editorAddress string) *MsgEditBond {
 	return &MsgEditBond{
 		BondDid:                bondDid,
 		Name:                   name,
@@ -204,6 +205,7 @@ func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 		SanityRate:             sanityRate,
 		SanityMarginPercentage: sanityMarginPercentage,
 		EditorDid:              editorDid,
+		EditorAddress:          editorAddress,
 	}
 }
 
@@ -270,11 +272,12 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid didexported.Did) *MsgSetNextAlpha {
+func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid didexported.Did, editorAddress string) *MsgSetNextAlpha {
 	return &MsgSetNextAlpha{
-		BondDid:   bondDid,
-		Alpha:     alpha,
-		EditorDid: editorDid,
+		BondDid:       bondDid,
+		Alpha:         alpha,
+		EditorDid:     editorDid,
+		EditorAddress: editorAddress,
 	}
 }
 
@@ -324,11 +327,12 @@ func (msg MsgSetNextAlpha) Route() string { return RouterKey }
 
 func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
 
-func NewMsgUpdateBondState(state BondState, editorDid, bondDid didexported.Did) *MsgUpdateBondState {
+func NewMsgUpdateBondState(state BondState, editorDid, bondDid didexported.Did, editorAddress string) *MsgUpdateBondState {
 	return &MsgUpdateBondState{
-		BondDid:   bondDid,
-		State:     state.String(),
-		EditorDid: editorDid,
+		BondDid:       bondDid,
+		State:         state.String(),
+		EditorDid:     editorDid,
+		EditorAddress: editorAddress,
 	}
 }
 
@@ -375,12 +379,13 @@ func (msg MsgUpdateBondState) Route() string { return RouterKey }
 func (msg MsgUpdateBondState) Type() string { return TypeMsgUpdateBondState }
 
 func NewMsgBuy(buyerDid didexported.Did, amount sdk.Coin, maxPrices sdk.Coins,
-	bondDid didexported.Did) *MsgBuy {
+	bondDid didexported.Did, buyerAddress string) *MsgBuy {
 	return &MsgBuy{
-		BuyerDid:  buyerDid,
-		Amount:    amount,
-		MaxPrices: maxPrices,
-		BondDid:   bondDid,
+		BuyerDid:     buyerDid,
+		Amount:       amount,
+		MaxPrices:    maxPrices,
+		BondDid:      bondDid,
+		BuyerAddress: buyerAddress,
 	}
 }
 
@@ -433,11 +438,12 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return TypeMsgBuy }
 
-func NewMsgSell(sellerDid didexported.Did, amount sdk.Coin, bondDid didexported.Did) *MsgSell {
+func NewMsgSell(sellerDid didexported.Did, amount sdk.Coin, bondDid didexported.Did, sellerAddress string) *MsgSell {
 	return &MsgSell{
-		SellerDid: sellerDid,
-		Amount:    amount,
-		BondDid:   bondDid,
+		SellerDid:     sellerDid,
+		Amount:        amount,
+		BondDid:       bondDid,
+		SellerAddress: sellerAddress,
 	}
 }
 
@@ -486,12 +492,13 @@ func (msg MsgSell) Route() string { return RouterKey }
 func (msg MsgSell) Type() string { return TypeMsgSell }
 
 func NewMsgSwap(swapperDid didexported.Did, from sdk.Coin, toToken string,
-	bondDid didexported.Did) *MsgSwap {
+	bondDid didexported.Did, swapperAddress string) *MsgSwap {
 	return &MsgSwap{
-		SwapperDid: swapperDid,
-		From:       from,
-		ToToken:    toToken,
-		BondDid:    bondDid,
+		SwapperDid:     swapperDid,
+		From:           from,
+		ToToken:        toToken,
+		BondDid:        bondDid,
+		SwapperAddress: swapperAddress,
 	}
 }
 
@@ -557,11 +564,12 @@ func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return TypeMsgSwap }
 
-func NewMsgMakeOutcomePayment(senderDid didexported.Did, amount sdk.Int, bondDid didexported.Did) *MsgMakeOutcomePayment {
+func NewMsgMakeOutcomePayment(senderDid didexported.Did, amount sdk.Int, bondDid didexported.Did, senderAddress string) *MsgMakeOutcomePayment {
 	return &MsgMakeOutcomePayment{
-		SenderDid: senderDid,
-		Amount:    amount,
-		BondDid:   bondDid,
+		SenderDid:     senderDid,
+		Amount:        amount,
+		BondDid:       bondDid,
+		SenderAddress: senderAddress,
 	}
 }
 
@@ -607,10 +615,11 @@ func (msg MsgMakeOutcomePayment) Route() string { return RouterKey }
 
 func (msg MsgMakeOutcomePayment) Type() string { return TypeMsgMakeOutcomePayment }
 
-func NewMsgWithdrawShare(recipientDid, bondDid didexported.Did) *MsgWithdrawShare {
+func NewMsgWithdrawShare(recipientDid, bondDid didexported.Did, recipientAddress string) *MsgWithdrawShare {
 	return &MsgWithdrawShare{
-		RecipientDid: recipientDid,
-		BondDid:      bondDid,
+		RecipientDid:     recipientDid,
+		BondDid:          bondDid,
+		RecipientAddress: recipientAddress,
 	}
 }
 
@@ -652,11 +661,12 @@ func (msg MsgWithdrawShare) Route() string { return RouterKey }
 func (msg MsgWithdrawShare) Type() string { return TypeMsgWithdrawShare }
 
 func NewMsgWithdrawReserve(withdrawerDid didexported.Did, amount sdk.Coins,
-	bondDid didexported.Did) *MsgWithdrawReserve {
+	bondDid didexported.Did, withdrawerAddress string) *MsgWithdrawReserve {
 	return &MsgWithdrawReserve{
-		WithdrawerDid: withdrawerDid,
-		Amount:        amount,
-		BondDid:       bondDid,
+		WithdrawerDid:     withdrawerDid,
+		Amount:            amount,
+		BondDid:           bondDid,
+		WithdrawerAddress: withdrawerAddress,
 	}
 }
 

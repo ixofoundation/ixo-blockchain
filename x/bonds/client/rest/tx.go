@@ -51,6 +51,7 @@ type createBondReq struct {
 	BondDid                  string       `json:"bond_did" yaml:"bond_did"`
 	CreatorDid               string       `json:"creator_did" yaml:"creator_did"`
 	ControllerDid            string       `json:"controller_did" yaml:"controller_did"`
+	CreatorAddress           string       `json:"creator_address" yaml:"creator_address"`
 }
 
 func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -192,7 +193,7 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			reserveTokens, txFeePercentageDec, exitFeePercentageDec, feeAddress,
 			reserveWithdrawalAddress, maxSupply, orderQuantityLimits, sanityRate,
 			sanityMarginPercentage, allowSells, allowReserveWithdrawals, alphaBond,
-			batchBlocks, outcomePayment, req.BondDid)
+			batchBlocks, outcomePayment, req.BondDid, req.CreatorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -210,6 +211,7 @@ type editBondReq struct {
 	SanityMarginPercentage string       `json:"sanity_margin_percentage" yaml:"sanity_margin_percentage"`
 	BondDid                string       `json:"bond_did" yaml:"bond_did"`
 	EditorDid              string       `json:"editor_did" yaml:"editor_did"`
+	EditorAddress          string       `json:"editor_address" yaml:"editor_address"`
 }
 
 func editBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -226,7 +228,7 @@ func editBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgEditBond(req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, req.EditorDid, req.BondDid)
+			req.SanityMarginPercentage, req.EditorDid, req.BondDid, req.EditorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -236,10 +238,11 @@ func editBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type setNextAlphaReq struct {
-	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
-	NewAlpha  string       `json:"new_alpha" yaml:"new_alpha"`
-	BondDid   string       `json:"bond_did" yaml:"bond_did"`
-	EditorDid string       `json:"editor_did" yaml:"editor_did"`
+	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"`
+	NewAlpha      string       `json:"new_alpha" yaml:"new_alpha"`
+	BondDid       string       `json:"bond_did" yaml:"bond_did"`
+	EditorDid     string       `json:"editor_did" yaml:"editor_did"`
+	EditorAddress string       `json:"editor_address" yaml:"editor_address"`
 }
 
 func setNextAlphaRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -260,7 +263,7 @@ func setNextAlphaRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid)
+		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid, req.EditorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -270,10 +273,11 @@ func setNextAlphaRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type updateBondStateReq struct {
-	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
-	NewState  string       `json:"new_state" yaml:"new_state"`
-	BondDid   string       `json:"bond_did" yaml:"bond_did"`
-	EditorDid string       `json:"editor_did" yaml:"editor_did"`
+	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"`
+	NewState      string       `json:"new_state" yaml:"new_state"`
+	BondDid       string       `json:"bond_did" yaml:"bond_did"`
+	EditorDid     string       `json:"editor_did" yaml:"editor_did"`
+	EditorAddress string       `json:"editor_address" yaml:"editor_address"`
 }
 
 func updateBondStateRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -287,7 +291,7 @@ func updateBondStateRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		if !baseReq.ValidateBasic(w) {
 			return
 		}
-		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), req.EditorDid, req.BondDid)
+		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), req.EditorDid, req.BondDid, req.EditorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -297,12 +301,13 @@ func updateBondStateRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type buyReq struct {
-	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondToken  string       `json:"bond_token" yaml:"bond_token"`
-	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
-	MaxPrices  string       `json:"max_prices" yaml:"max_prices"`
-	BondDid    string       `json:"bond_did" yaml:"bond_did"`
-	BuyerDid   string       `json:"buyer_did" yaml:"buyer_did"`
+	BaseReq      rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondToken    string       `json:"bond_token" yaml:"bond_token"`
+	BondAmount   string       `json:"bond_amount" yaml:"bond_amount"`
+	MaxPrices    string       `json:"max_prices" yaml:"max_prices"`
+	BondDid      string       `json:"bond_did" yaml:"bond_did"`
+	BuyerDid     string       `json:"buyer_did" yaml:"buyer_did"`
+	BuyerAddress string       `json:"buyer_address" yaml:"buyer_address"`
 }
 
 func buyRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -327,7 +332,7 @@ func buyRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBuy(req.BuyerDid, bondCoin, maxPrices, req.BondDid)
+		msg := types.NewMsgBuy(req.BuyerDid, bondCoin, maxPrices, req.BondDid, req.BuyerAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -337,11 +342,12 @@ func buyRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type sellReq struct {
-	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondToken  string       `json:"bond_token" yaml:"bond_token"`
-	BondAmount string       `json:"bond_amount" yaml:"bond_amount"`
-	BondDid    string       `json:"bond_did" yaml:"bond_did"`
-	SellerDid  string       `json:"seller_did" yaml:"seller_did"`
+	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondToken     string       `json:"bond_token" yaml:"bond_token"`
+	BondAmount    string       `json:"bond_amount" yaml:"bond_amount"`
+	BondDid       string       `json:"bond_did" yaml:"bond_did"`
+	SellerDid     string       `json:"seller_did" yaml:"seller_did"`
+	SellerAddress string       `json:"seller_address" yaml:"seller_address"`
 }
 
 func sellRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -361,7 +367,7 @@ func sellRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSell(req.SellerDid, bondCoin, req.BondDid)
+		msg := types.NewMsgSell(req.SellerDid, bondCoin, req.BondDid, req.SellerAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -371,12 +377,13 @@ func sellRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type swapReq struct {
-	BaseReq    rest.BaseReq `json:"base_req" yaml:"base_req"`
-	FromAmount string       `json:"from_amount" yaml:"from_amount"`
-	FromToken  string       `json:"from_token" yaml:"from_token"`
-	ToToken    string       `json:"to_token" yaml:"to_token"`
-	BondDid    string       `json:"bond_did" yaml:"bond_did"`
-	SwapperDid string       `json:"swapper_did" yaml:"swapper_did"`
+	BaseReq        rest.BaseReq `json:"base_req" yaml:"base_req"`
+	FromAmount     string       `json:"from_amount" yaml:"from_amount"`
+	FromToken      string       `json:"from_token" yaml:"from_token"`
+	ToToken        string       `json:"to_token" yaml:"to_token"`
+	BondDid        string       `json:"bond_did" yaml:"bond_did"`
+	SwapperDid     string       `json:"swapper_did" yaml:"swapper_did"`
+	SwapperAddress string       `json:"swapper_address" yaml:"swapper_address"`
 }
 
 func swapRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -397,7 +404,7 @@ func swapRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSwap(req.SwapperDid, fromCoin, req.ToToken, req.BondDid)
+		msg := types.NewMsgSwap(req.SwapperDid, fromCoin, req.ToToken, req.BondDid, req.SwapperAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -407,10 +414,11 @@ func swapRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type makeOutcomePaymentReq struct {
-	BaseReq   rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondDid   string       `json:"bond_did" yaml:"bond_did"`
-	Amount    string       `json:"amount" yaml:"amount"`
-	SenderDid string       `json:"sender_did" yaml:"sender_did"`
+	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid       string       `json:"bond_did" yaml:"bond_did"`
+	Amount        string       `json:"amount" yaml:"amount"`
+	SenderDid     string       `json:"sender_did" yaml:"sender_did"`
+	SenderAddress string       `json:"sender_address" yaml:"sender_address"`
 }
 
 func makeOutcomePaymentRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -432,7 +440,7 @@ func makeOutcomePaymentRequestHandler(clientCtx client.Context) http.HandlerFunc
 			return
 		}
 
-		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, amount, req.BondDid)
+		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, amount, req.BondDid, req.SenderAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -442,9 +450,10 @@ func makeOutcomePaymentRequestHandler(clientCtx client.Context) http.HandlerFunc
 }
 
 type withdrawShareReq struct {
-	BaseReq      rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondDid      string       `json:"bond_did" yaml:"bond_did"`
-	RecipientDid string       `json:"recipient_did" yaml:"recipient_did"`
+	BaseReq          rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid          string       `json:"bond_did" yaml:"bond_did"`
+	RecipientDid     string       `json:"recipient_did" yaml:"recipient_did"`
+	RecipientAddress string       `json:"recipient_address" yaml:"recipient_address"`
 }
 
 func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -459,7 +468,7 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawShare(req.RecipientDid, req.BondDid)
+		msg := types.NewMsgWithdrawShare(req.RecipientDid, req.BondDid, req.RecipientAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -469,10 +478,11 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 type withdrawReserveReq struct {
-	BaseReq       rest.BaseReq `json:"base_req" yaml:"base_req"`
-	BondDid       string       `json:"bond_did" yaml:"bond_did"`
-	Amount        string       `json:"amount" yaml:"amount"`
-	WithdrawerDid string       `json:"withdrawer_did" yaml:"withdrawer_did"`
+	BaseReq           rest.BaseReq `json:"base_req" yaml:"base_req"`
+	BondDid           string       `json:"bond_did" yaml:"bond_did"`
+	Amount            string       `json:"amount" yaml:"amount"`
+	WithdrawerDid     string       `json:"withdrawer_did" yaml:"withdrawer_did"`
+	WithdrawerAddress string       `json:"withdrawer_address" yaml:"withdrawer_address"`
 }
 
 func withdrawReserveRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -492,7 +502,7 @@ func withdrawReserveRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawReserve(req.WithdrawerDid, amount, req.BondDid)
+		msg := types.NewMsgWithdrawReserve(req.WithdrawerDid, amount, req.BondDid, req.WithdrawerAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}

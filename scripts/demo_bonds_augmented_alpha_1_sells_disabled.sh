@@ -96,11 +96,11 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$MIGUEL_DID_FULL"
 echo "Ledgering DID 2/3..."
-ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$FRANCESCO_DID_FULL"
 echo "Ledgering DID 3/3..."
-ixod_tx did add-did-doc "$SHAUN_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
 
 # d0 := 1000000 // initial raise (reserve)
 # p0 := 1       // initial price (reserve per token)
