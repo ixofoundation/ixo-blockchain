@@ -41,6 +41,7 @@ service Msg {
   rpc DeleteAccordedRight(MsgDeleteAccordedRight) returns(MsgDeleteAccordedRightResponse);
   //Add / Delete Context
   rpc AddIidContext(MsgAddIidContext) returns(MsgAddIidContextResponse);
+  rpc DeactivateIID(MsgDeactivateIID) returns(MsgDeactivateIIDResponse);
   rpc DeleteIidContext(MsgDeleteIidContext) returns(MsgDeleteIidContextResponse);
   //Update META
   rpc UpdateMetaData(MsgUpdateIidMeta) returns(MsgUpdateIidMetaResponse);
@@ -245,6 +246,14 @@ message MsgAddIidContext {
   string      signer       = 3; // address of the account signing the message
 }
 
+message MsgDeactivateIID {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+  string      id           = 1; // the did
+  bool        state        = 2;
+  string      signer       = 3; // address of the account signing the message
+}
+
 message MsgDeleteIidContext {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
@@ -271,3 +280,4 @@ message MsgDeleteAccordedRightResponse {}
 message MsgAddIidContextResponse {}
 message MsgDeleteIidContextResponse {}
 message MsgUpdateIidMetaResponse {}
+message MsgDeactivateIIDResponse {}

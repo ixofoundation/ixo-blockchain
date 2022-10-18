@@ -280,3 +280,9 @@ func (msg MsgUpdateIidMeta) ValidateBasic() error {
 	}
 	return nil
 }
+func (msg MsgDeactivateIID) ValidateBasic() error {
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
+	return nil
+}

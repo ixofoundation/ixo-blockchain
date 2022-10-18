@@ -740,11 +740,6 @@ func NewMsgUpdateDidMetaData(
 	}
 }
 
-// Route implements sdk.Msg
-func (MsgUpdateIidMeta) Route() string {
-	return RouterKey
-}
-
 // Type implements sdk.Msg
 func (MsgUpdateIidMeta) Type() string {
 	return TypeMsgAddDidMeta
@@ -757,6 +752,40 @@ func (msg MsgUpdateIidMeta) GetSignBytes() []byte {
 
 // GetSigners implements sdk.Msg
 func (msg MsgUpdateIidMeta) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+
+func NewMsgDeactivateIID(
+	id string,
+	state bool,
+	signerAccount string,
+) *MsgDeactivateIID {
+	return &MsgDeactivateIID{
+		Id:     id,
+		State:  state,
+		Signer: signerAccount,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgDeactivateIID) Route() string {
+	return RouterKey
+}
+
+func (MsgDeactivateIID) Type() string {
+	return TypeMsgAddDidMeta
+}
+
+func (msg MsgDeactivateIID) GetSignBytes() []byte {
+	panic("IBC messages do not support amino")
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgDeactivateIID) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
 		panic(err)

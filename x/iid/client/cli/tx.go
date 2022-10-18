@@ -3,7 +3,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -13,6 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -45,6 +45,7 @@ func GetTxCmd() *cobra.Command {
 		NewAddIidContextCmd(),
 		NewDeleteIidContextCmd(),
 		NewUpdateIidMetaCmd(),
+		NewDeactivateIIDCmd(),
 		NewCreateIidDocumentFormLegacyDidCmd(),
 	)
 
@@ -790,6 +791,45 @@ func NewDeleteLinkedEntityCmd() *cobra.Command {
 				return err
 			}
 
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewDeactivateIIDCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "deactivate-iid [iid-id] [state]",
+		Short:   "add a context item to a decentralized (did/IID) document",
+		Example: "adds a context item to a iid document",
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// tx signer
+			signer := clientCtx.GetFromAddress()
+
+			newState, err := strconv.ParseBool(args[1])
+			if err != nil {
+				return err
+			}
+
+			// document did
+			did := types.NewChainDID(clientCtx.ChainID, args[0])
+
+			msg := types.NewMsgDeactivateIID(
+				did.String(),
+				newState,
+				signer.String(),
+			)
+
+			// broadcast
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

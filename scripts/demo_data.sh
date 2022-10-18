@@ -65,15 +65,16 @@ echo $META3
 
 echo "Querying DID..."
 echo $FULL_DID
-QUERY_DID=$(ixod query iid did "$FULL_DID" --chain-id pandora-4 --output json | jq .)
+QUERY_DID=$(ixod query iid iid "$FULL_DID" --chain-id pandora-4 --output json | jq .)
 
 echo $QUERY_DID
 
 echo "Changing metadata..."
 META3=$(yes $PASSWORD | ixod tx iid update-iid-meta "$NEW_DID" '{"versionID":"2","deactivated":false,"entityType":"stove","startDate":null,"endDate":null,"status":1,"stage":"yes","relayerNode":"yes","verifiableCredential":"yes","credentials":[]}'  --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json)
-echo $META3
-echo "Querying DID..."
-echo $FULL_DID
-QUERY_DID=$(ixod query iid did "$FULL_DID" --chain-id pandora-4 --output json | jq .)
-
+echo "Querying IID METADATA"
+QUERY_DID=$(ixod query iid metadata "$FULL_DID" --chain-id pandora-4 --output json | jq .)
+echo "Deactivating IID"
+DEAC=$(yes $PASSWORD | ixod tx iid deactivate-iid "$NEW_DID" "true"  --from miguel --from miguel --chain-id pandora-4 --fees 5000uixo -y --output json)
+echo "Querying IID METADATA"
+QUERY_DID=$(ixod query iid metadata "$FULL_DID" --chain-id pandora-4 --output json | jq .)
 echo $QUERY_DID

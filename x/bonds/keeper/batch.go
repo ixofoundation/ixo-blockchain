@@ -213,7 +213,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	if !exists {
 		return err
 	}
-	buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(buyerDidDoc.Id)
+	buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", buyerDidDoc.Id, buyerDidDoc.Id))
 	if err != nil {
 		return err
 	}
@@ -365,7 +365,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	if !exists {
 		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found")
 	}
-	sellerAddr, err := sellerDidDoc.GetVerificationMethodBlockchainAddress(sellerDidDoc.Id)
+	sellerAddr, err := sellerDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", sellerDidDoc.Id, sellerDidDoc.Id))
 	if err != nil {
 		return sdkerrors.Wrap(err, "Address not found")
 	}
@@ -431,7 +431,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 	if !exists {
 		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"), true
 	}
-	swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(swapperDidDoc.Id)
+	swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", swapperDidDoc.Id, swapperDidDoc.Id))
 	if err != nil {
 		return sdkerrors.Wrap(err, "Address not found"), true
 	}
@@ -554,7 +554,7 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid didexported.Did) {
 					if !exists {
 						panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
 					}
-					swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(swapperDidDoc.Id)
+					swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", swapperDidDoc.Id, swapperDidDoc.Id))
 					if err != nil {
 						panic(sdkerrors.Wrap(err, "Address not found"))
 					}
@@ -631,7 +631,7 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid didexported.Did
 				if !exists {
 					panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
 				}
-				buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(buyerDidDoc.Id)
+				buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", buyerDidDoc.Id, buyerDidDoc.Id))
 				if err != nil {
 					panic(sdkerrors.Wrap(err, "Address not found"))
 				}
