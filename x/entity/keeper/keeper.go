@@ -144,22 +144,28 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
 
 	//nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
-	addr := []byte("ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7")
+
+	add, err := sdk.AccAddressFromBech32("ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7")
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
-	//ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7
 
-	nftMsgBytes, err := entitycontracts.Mint{
+	nftMsgBytes := entitycontracts.Mint{
 		TokenId:  did.Id,
-		Owner:    did.Id,
+		Owner:    msg.OwnerAddress,
 		TokenUrl: "http://nft.com",
-	}.Marshal()
+	}
+	var nftMint entitycontracts.WasmMintNftMessage
+
+	nftMint.Mint = nftMsgBytes
+
+	finalMessage, err := nftMint.Marshal()
+
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
 
-	_, err = k.WasmKeeper.Execute(ctx, sdk.AccAddress(addr), signer, nftMsgBytes, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	_, err = k.WasmKeeper.Execute(ctx, add, signer, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
