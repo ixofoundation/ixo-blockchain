@@ -467,7 +467,7 @@
                 </li>
               
                 <li>
-                  <a href="#entity.Parmas"><span class="badge">M</span>Parmas</a>
+                  <a href="#entity.Params"><span class="badge">M</span>Params</a>
                 </li>
               
               
@@ -3710,7 +3710,7 @@
 
         
       
-        <h3 id="entity.Parmas">Parmas</h3>
+        <h3 id="entity.Params">Params</h3>
         <p></p>
 
         
@@ -3721,7 +3721,7 @@
             <tbody>
               
                 <tr>
-                  <td>nftContractAddress</td>
+                  <td>NftContractAddress</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3762,8 +3762,14 @@
                   <td>entity_docs</td>
                   <td><a href="#entity.EntityDoc">EntityDoc</a></td>
                   <td>repeated</td>
-                  <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;];
-Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;params\&#34;&#34;]; </p></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#entity.Params">Params</a></td>
+                  <td></td>
+                  <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td>
                 </tr>
               
             </tbody>

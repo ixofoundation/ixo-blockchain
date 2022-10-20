@@ -6,6 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	"github.com/spf13/cobra"
 )
@@ -24,6 +27,47 @@ func NewTxCmd() *cobra.Command {
 	)
 
 	return entityTxCmd
+}
+
+// NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
+func NewCmdUpdateEntityParamsProposal() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-entity-params [name] [flags]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Submit a proposal to update entity params",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			content := types.NewParams(args[0])
+
+			from := clientCtx.GetFromAddress()
+
+			depositStr, err := cmd.Flags().GetString(govcli.FlagDeposit)
+			if err != nil {
+				return err
+			}
+			deposit, err := sdk.ParseCoinsNormalized(depositStr)
+			if err != nil {
+				return err
+			}
+
+			msg, err := govtypes.NewMsgSubmitProposal(&content, deposit, from)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().String(govcli.FlagTitle, "", "title of proposal")
+	cmd.Flags().String(govcli.FlagDescription, "", "description of proposal")
+	cmd.Flags().String(govcli.FlagDeposit, "", "deposit of proposal")
+
+	return cmd
 }
 
 func NewCmdCreateEntity() *cobra.Command {

@@ -94,8 +94,10 @@ import (
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	entitymodule "github.com/ixofoundation/ixo-blockchain/x/entity"
+	entityclient "github.com/ixofoundation/ixo-blockchain/x/entity/client"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	entityproposal "github.com/ixofoundation/ixo-blockchain/x/entity/types/proposal"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
@@ -142,9 +144,6 @@ var (
 		staking.AppModuleBasic{},
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
-		gov.NewAppModuleBasic(
-			paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler,
-		),
 		sdkparams.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
@@ -158,7 +157,14 @@ var (
 		feegrantmodule.AppModuleBasic{},
 
 		gov.NewAppModuleBasic(
-			append(wasmclient.ProposalHandlers, paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler)...,
+			append(
+				wasmclient.ProposalHandlers,
+				paramsclient.ProposalHandler,
+				distrclient.ProposalHandler,
+				upgradeclient.ProposalHandler,
+				upgradeclient.CancelProposalHandler,
+				entityclient.ProposalHandler,
+			)...,
 		),
 		wasm.AppModuleBasic{},
 		// Custom ixo modules
@@ -388,6 +394,7 @@ func NewIxoApp(
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(entityproposal.RouterKey, entitymodule.NewEntityParamChangeProposalHandler(app.EntityKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
@@ -488,7 +495,7 @@ func NewIxoApp(
 		app.WasmKeeper,
 		app.AccountKeeper,
 		app.ParamsKeeper,
-		app.GetSubspace(projecttypes.ModuleName),
+		app.GetSubspace(entitytypes.ModuleName),
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified

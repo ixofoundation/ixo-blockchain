@@ -7,7 +7,7 @@ import "cosmos/coin.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 message Params {
-  string nftContractAddress = 1 [(gogoproto.jsontag) = "nft_contract_address", (gogoproto.moretags) = "yaml:\"nft_contract_address\""];
+  string NftContractAddress = 1 [(gogoproto.jsontag) = "NftContractAddress", (gogoproto.moretags) = "yaml:\"NftContractAddress\""];
 }
 
 // UpdateProjectStatusDoc contains details required to update a project's status.

@@ -66,12 +66,12 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	// 	return types.MsgCreateEntityResponse{}, err
 	// }
 
-	nftContractAddress := k.GetParams(ctx).NftContractAddress
-	if len(nftContractAddress) == 0 {
+	nftContractAddressParam := k.GetParams(ctx).NftContractAddress
+	if len(nftContractAddressParam) == 0 {
 		return types.MsgCreateEntityResponse{}, errors.New("nftContractAddress not set")
 	}
 
-	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddress)
+	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
