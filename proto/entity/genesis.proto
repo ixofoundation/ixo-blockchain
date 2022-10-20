@@ -10,5 +10,5 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 message GenesisState {
   repeated EntityDoc entity_docs              = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"entity_docs\""];
   // repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"account_maps\""];
-  // Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
+  Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
 }

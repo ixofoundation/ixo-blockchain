@@ -310,14 +310,14 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		// cannot check sequence directly, and must do it via signature
 		// verification (in the VerifySignature call below).
 		onlyAminoSigners := ante.OnlyLegacyAminoSigners(sig.Data)
-		if !onlyAminoSigners {
-			if sig.Sequence != acc.GetSequence() {
-				return ctx, sdkerrors.Wrapf(
-					sdkerrors.ErrWrongSequence,
-					"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
-				)
-			}
-		}
+		// if !onlyAminoSigners {
+		// 	if sig.Sequence != acc.GetSequence() {
+		// 		return ctx, sdkerrors.Wrapf(
+		// 			sdkerrors.ErrWrongSequence,
+		// 			"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
+		// 		)
+		// 	}
+		// }
 
 		// retrieve signer iid
 		genesis := ctx.BlockHeight() == 0

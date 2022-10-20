@@ -6,9 +6,10 @@ import (
 )
 
 type Mint struct {
-	TokenId  string `json:"token_id"`
-	Owner    string `json:"owner"`
-	TokenUrl string `json:"token_url"`
+	TokenId   string          `json:"token_id"`
+	Owner     string          `json:"owner"`
+	TokenUrl  string          `json:"token_url"`
+	Extention json.RawMessage `json:"extention"`
 }
 
 type WasmMintNftMessage struct {

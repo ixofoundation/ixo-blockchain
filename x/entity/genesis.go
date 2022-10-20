@@ -14,6 +14,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 	// 	metadata := gs.IidMeta[i]
 	// 	k.SetDidMetadata(ctx, []byte(iid.Id), metadata)
 	// }
+
+	// Initialise params
+	keeper.SetParams(ctx, data.Params)
+
 	return []abci.ValidatorUpdate{}
 }
 
@@ -24,6 +28,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	// 	meta, _ := k.GetDidMetadata(ctx, []byte(iid.Id))
 	// 	metas = append(metas, meta)
 	// }
+
+	params := k.GetParams(ctx)
 
 	return &types.GenesisState{}
 }

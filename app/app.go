@@ -488,6 +488,7 @@ func NewIxoApp(
 		app.WasmKeeper,
 		app.AccountKeeper,
 		app.ParamsKeeper,
+		app.GetSubspace(projecttypes.ModuleName),
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified

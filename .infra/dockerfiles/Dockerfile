@@ -9,10 +9,10 @@ RUN curl https://get.starport.network/starport! | bash
 FROM starport AS build-dependencies
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
+# COPY go.mod ./
+# COPY go.sum ./
 
-RUN go mod vendor
+# RUN go mod vendor
 
 ONBUILD WORKDIR /app
 

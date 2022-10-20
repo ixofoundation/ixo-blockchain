@@ -21,7 +21,7 @@ fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-4"
+CHAIN_ID="devnet-1"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
 RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
@@ -32,12 +32,14 @@ ixod_tx() {
   cmd="$1 $2"
   shift
   shift
+  NODE="https://devnet.ixo.earth:443/rpc/"
 
   # Broadcast the transaction
   ixod tx $cmd \
     --gas-prices="$GAS_PRICES" \
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
+    --node="$NODE"
     -y \
     "$@" | jq .
     # The $@ adds any extra arguments to the end

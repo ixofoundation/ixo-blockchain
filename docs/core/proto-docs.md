@@ -466,6 +466,10 @@
                   <a href="#entity.EntityDoc"><span class="badge">M</span>EntityDoc</a>
                 </li>
               
+                <li>
+                  <a href="#entity.Parmas"><span class="badge">M</span>Parmas</a>
+                </li>
+              
               
               
               
@@ -3703,6 +3707,30 @@
         <p>ProjectDoc defines a project (or entity) type with all of its parameters.</p>
 
         
+
+        
+      
+        <h3 id="entity.Parmas">Parmas</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>nftContractAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
 
         
       

@@ -49,8 +49,8 @@ ixod_tx() {
     --gas-prices="$GAS_PRICES" \
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
-    --generate-only \
-    "$@" | ixod tx sign-with-did "$MIGUEL_DID_FULL" -  --chain-id="$CHAIN_ID" --generate-only
+    -y \
+    "$@"
     # The $@ adds any extra arguments to the end
 }
 

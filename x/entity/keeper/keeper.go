@@ -14,6 +14,7 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
@@ -28,10 +29,11 @@ type Keeper struct {
 	WasmKeeper    wasmtypes.ContractOpsKeeper
 	AccountKeeper authkeeper.AccountKeeper
 	ParamsKeeper  paramskeeper.Keeper
+	ParamSpace    paramstypes.Subspace
 }
 
 func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
-	accountKeeper authkeeper.AccountKeeper, paramsKeeper paramskeeper.Keeper) Keeper {
+	accountKeeper authkeeper.AccountKeeper, paramsKeeper paramskeeper.Keeper, paramSpace paramstypes.Subspace) Keeper {
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,
@@ -40,6 +42,7 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey
 		WasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 		AccountKeeper: accountKeeper,
 		ParamsKeeper:  paramsKeeper,
+		ParamSpace:    paramSpace,
 	}
 }
 
@@ -58,28 +61,14 @@ func (k Keeper) GetEntityConfig(ctx sdk.Context, key types.EntityConfigKey) ([]b
 
 func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types.MsgCreateEntityResponse, error) {
 
-	signer, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return types.MsgCreateEntityResponse{}, err
-	}
-
-	fmt.Println("================================================1")
-	fmt.Printf("%+v\n", msg)
+	// signer, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	// if err != nil {
+	// 	return types.MsgCreateEntityResponse{}, err
+	// }
 
 	privKey := cryptosecp256k1.GenPrivKey()
 	pubKey := privKey.PubKey()
-
-	fmt.Println("================================================12")
-	fmt.Printf("%+v\n", string(pubKey.Address()))
 	address := sdk.AccAddress(pubKey.Address().Bytes())
-	// if err != nil {
-	// 	fmt.Println("================================================1e")
-	// 	fmt.Printf("%s\n", err)
-	// 	return err
-	// }
-
-	fmt.Println("================================================11")
-	fmt.Printf("%s\n", string(address.String()))
 
 	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
 	entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, address.String())
@@ -145,19 +134,19 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 
 	//nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
 
-	add, err := sdk.AccAddressFromBech32("ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7")
+	nftContractAddress, err := sdk.AccAddressFromBech32("ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7")
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
 
-	nftMsgBytes := entitycontracts.Mint{
-		TokenId:  did.Id,
-		Owner:    msg.OwnerAddress,
-		TokenUrl: "http://nft.com",
+	nftMint := entitycontracts.WasmMintNftMessage{
+		Mint: entitycontracts.Mint{
+			TokenId:   did.Id,
+			Owner:     msg.OwnerAddress,
+			TokenUrl:  did.Id,
+			Extention: msg.Data,
+		},
 	}
-	var nftMint entitycontracts.WasmMintNftMessage
-
-	nftMint.Mint = nftMsgBytes
 
 	finalMessage, err := nftMint.Marshal()
 
@@ -165,7 +154,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		return types.MsgCreateEntityResponse{}, err
 	}
 
-	_, err = k.WasmKeeper.Execute(ctx, add, signer, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	_, err = k.WasmKeeper.Execute(ctx, nftContractAddress, address, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
@@ -182,6 +171,17 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		EntityStatus: didM.Status,
 	}
 	return resp, err
+}
+
+// GetParams returns the total set of project parameters.
+func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
+	k.ParamSpace.GetParamSet(ctx, &params)
+	return params
+}
+
+// SetParams sets the total set of project parameters.
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
+	k.ParamSpace.SetParamSet(ctx, &params)
 }
 
 // // GetParams returns the total set of project parameters.
