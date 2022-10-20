@@ -66,6 +66,16 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	// 	return types.MsgCreateEntityResponse{}, err
 	// }
 
+	nftContractAddress := k.GetParams(ctx).NftContractAddress
+	if len(nftContractAddress) == 0 {
+		return types.MsgCreateEntityResponse{}, errors.New("nftContractAddress not set")
+	}
+
+	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddress)
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
+
 	privKey := cryptosecp256k1.GenPrivKey()
 	pubKey := privKey.PubKey()
 	address := sdk.AccAddress(pubKey.Address().Bytes())
@@ -121,11 +131,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
 
 	//nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
-
-	nftContractAddress, err := sdk.AccAddressFromBech32("ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7")
-	if err != nil {
-		return types.MsgCreateEntityResponse{}, err
-	}
 
 	nftMint := entitycontracts.WasmMintNftMessage{
 		Mint: entitycontracts.Mint{
