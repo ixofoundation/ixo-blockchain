@@ -1,7 +1,7 @@
 package types
 
 import (
-	params "github.com/cosmos/cosmos-sdk/x/params/types"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // ParamTable for project module.
@@ -19,8 +19,8 @@ func DefaultParams() Params {
 }
 
 // Implements params.ParamSet
-func (p *Params) ParamSetPairs() params.ParamSetPairs {
-	return params.ParamSetPairs{
+func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
+	return paramstypes.ParamSetPairs{
 		{KeyIxoDid, &p.IxoDid, validateIxoDid},
 	}
 }
