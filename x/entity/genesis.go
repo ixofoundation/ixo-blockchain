@@ -16,7 +16,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 	// }
 
 	// Initialise params
-	keeper.SetParams(ctx, data.Params)
+	keeper.SetParams(ctx, gs.Params)
 
 	return []abci.ValidatorUpdate{}
 }
@@ -31,5 +31,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	params := k.GetParams(ctx)
 
-	return &types.GenesisState{}
+	return &types.GenesisState{
+		Params: params,
+	}
 }

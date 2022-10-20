@@ -26,6 +26,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // GenesisState defines the project module's genesis state.
 type GenesisState struct {
 	EntityDocs []EntityDoc `protobuf:"bytes,1,rep,name=entity_docs,json=entityDocs,proto3" json:"entity_docs" yaml:"entity_docs"`
+	Params Params `protobuf:"bytes,2,rep,name=params,json=params,proto3" json:"params" yaml:"params"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }

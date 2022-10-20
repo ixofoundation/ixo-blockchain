@@ -80,9 +80,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		iidtypes.Authentication,
 	)
 
-	fmt.Println("================================================2")
-	fmt.Printf("%s\n", entityId)
-
 	did, err := iidtypes.NewDidDocument(entityId,
 		iidtypes.WithServices(msg.Service...),
 		iidtypes.WithRights(msg.AccordedRight...),
@@ -91,15 +88,9 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid)...),
 	)
 	if err != nil {
-		fmt.Println("================================================3")
-		fmt.Printf("%s\n", err)
 		// k.Logger(ctx).Error(err.Error())
 		return types.MsgCreateEntityResponse{}, err
 	}
-
-	fmt.Println("================================================3")
-	fmt.Printf("%s\n", entityId)
-	fmt.Printf("%+v\n", did)
 
 	// check that the did is not already taken
 	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(entityId))
@@ -125,9 +116,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	didM.StartDate = msg.StartDate
 	didM.EndDate = msg.EndDate
 	didM.RelayerNode = msg.RelayerNode
-
-	fmt.Println("===============================================4")
-	fmt.Printf("%+v\n", did)
 
 	k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
