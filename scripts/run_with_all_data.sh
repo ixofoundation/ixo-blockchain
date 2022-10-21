@@ -72,6 +72,11 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
+MAX_VOTING_PERIOD="30s"  # example: "172800s"
+FROM="\"voting_period\": \"172800s\""
+TO="\"voting_period\": \"$MAX_VOTING_PERIOD\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 # TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
 #ixod config chain-id pandora-4
 #ixod config output json

@@ -35,11 +35,11 @@ ixod_tx() {
   # APPROX=$(ixod tx $cmd --gas=auto --gas-adjustment=1.05 --fees=1uixo --chain-id="$CHAIN_ID" --dry-run "$@" 2>&1)
   # APPROX=${APPROX//gas estimate: /}
   echo "Gas estimate: $APPROX"
-  yes "12345678" | ixod tx $cmd \
+  ixod tx $cmd \
     --fees 5000uixo \
     --chain-id="$CHAIN_ID" \
     -y \
-    "$@" | jq .
+    "$@"
     # The $@ adds any extra arguments to the end
 }
 
@@ -78,11 +78,8 @@ echo "Ledgering DID 2/2..."
 # ixod_tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 
 ENTITY='{
-"entity_type": "asset",
-"entity_status": 0,
-"verificationMethod":[],
-"Service":[],
-"linkedResource":[]
+"entity_type": "assets",
+"entity_status": 1
 }'
 # echo $ENTITY | jq
-ixod_tx entity create-entity "$(echo $ENTITY | jq -rc .)" --from ixo14nevcuw8sfz5ltsq4f6x4fr56cvlhcklraucvn
+ixod_tx entity create-entity "$(echo $ENTITY | jq -rc .)" --from miguel

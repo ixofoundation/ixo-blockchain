@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -22,6 +24,13 @@ func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 }
 
 func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.Params) error {
+	fmt.Printf("propsal handeler =============\n%+v\n", *p)
+	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
+	var xx types.Params
+	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
+	fmt.Printf("%+v\n", xx)
+
+	k.ParamSpace.SetParamSet(ctx, p)
 
 	// for _, c := range p.Changes {
 	// 	ss, ok := k.GetParams()

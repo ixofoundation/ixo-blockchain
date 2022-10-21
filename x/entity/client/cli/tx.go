@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -97,10 +98,9 @@ func NewCmdCreateEntity() *cobra.Command {
 				return err
 			}
 
-			msg.OwnerAddress, err = cmd.Flags().GetString(flags.FlagFrom)
-			if err != nil {
-				return err
-			}
+			msg.OwnerAddress = clientCtx.GetFromAddress().String()
+
+			fmt.Printf("%+v\n", msg)
 
 			err = tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 			if err != nil {

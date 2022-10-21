@@ -16,7 +16,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 	// }
 
 	// Initialise params
-	// k.SetParams(ctx, gs.Params)
+	k.SetParams(ctx, &gs.Params)
 
 	return []abci.ValidatorUpdate{}
 }

@@ -129,25 +129,25 @@ SHAUN_DID_FULL='{
 # Ledger DIDs
 # echo "Ledgering Miguel DID..."
 ixod_tx iid create-iid-from-legacy-did "$MIGUEL_DID_FULL"
-# echo "Ledgering Francesco DID..."
-# ixod_tx iid create-iid-from-legacy-did "$FRANCESCO_DID_FULL"
-# echo "Ledgering Shaun DID..."
-# ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
+echo "Ledgering Francesco DID..."
+ixod_tx iid create-iid-from-legacy-did "$FRANCESCO_DID_FULL"
+echo "Ledgering Shaun DID..."
+ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
 
-# # Create oracle fee payment template
-# echo "Creating oracle fee payment template..."
-# CREATOR="$FRANCESCO_DID_FULL"
-# ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
+# Create oracle fee payment template
+echo "Creating oracle fee payment template..."
+CREATOR="$FRANCESCO_DID_FULL"
+ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
 
-# # Create fee-for-service payment template
-# echo "Creating fee-for-service payment template..."
-# CREATOR="$FRANCESCO_DID_FULL"
-# ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
+# Create fee-for-service payment template
+echo "Creating fee-for-service payment template..."
+CREATOR="$FRANCESCO_DID_FULL"
+ixod_tx payments create-payment-template "$FEE_FOR_SERVICE_PAYMENT_TEMPLATE" "$CREATOR"
 
 # # Create project and progress status to PENDING
-# SENDER_DID="$SHAUN_DID"
-# echo "Creating project..."
-# ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
+SENDER_DID="$SHAUN_DID"
+echo "Creating project..."
+ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 # echo "Updating project to CREATED..."
 # ixod_tx project update-project-status "$SENDER_DID" CREATED "$PROJECT_DID_FULL"
 # echo "Updating project to PENDING..."

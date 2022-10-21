@@ -13,7 +13,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
@@ -28,12 +27,16 @@ type Keeper struct {
 	IidKeeper     iidkeeper.Keeper
 	WasmKeeper    wasmtypes.ContractOpsKeeper
 	AccountKeeper authkeeper.AccountKeeper
-	ParamsKeeper  paramskeeper.Keeper
 	ParamSpace    paramstypes.Subspace
 }
 
 func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
-	accountKeeper authkeeper.AccountKeeper, paramsKeeper paramskeeper.Keeper, paramSpace paramstypes.Subspace) Keeper {
+	accountKeeper authkeeper.AccountKeeper, paramSpace paramstypes.Subspace) Keeper {
+
+	if !paramSpace.HasKeyTable() {
+		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+	}
+
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,
@@ -41,7 +44,6 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey
 		IidKeeper:     iidKeeper,
 		WasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 		AccountKeeper: accountKeeper,
-		ParamsKeeper:  paramsKeeper,
 		ParamSpace:    paramSpace,
 	}
 }
@@ -66,7 +68,13 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	// 	return types.MsgCreateEntityResponse{}, err
 	// }
 
+	// k.SetParams(ctx, &types.Params{
+	// 	NftContractAddress: "ixo1c78rhd5fyqd5t5dqhhqd4w3uf3japl56aurnpq",
+	// })
+
 	nftContractAddressParam := k.GetParams(ctx).NftContractAddress
+
+	fmt.Println("==============\nnftContractAddressParam", nftContractAddressParam)
 	if len(nftContractAddressParam) == 0 {
 		return types.MsgCreateEntityResponse{}, errors.New("nftContractAddress not set")
 	}
@@ -173,8 +181,8 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 }
 
 // SetParams sets the total set of project parameters.
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.ParamSpace.SetParamSet(ctx, &params)
+func (k Keeper) SetParams(ctx sdk.Context, params *types.Params) {
+	k.ParamSpace.SetParamSet(ctx, params)
 }
 
 // // GetParams returns the total set of project parameters.
