@@ -402,7 +402,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", buyerDid.Id, buyerDid.Id))
+	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(buyerDid.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -477,7 +477,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", buyerDid.Id, buyerDid.Id))
+	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(buyerDid.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -545,7 +545,7 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	sellerAddr, err := sellerDid.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", sellerDid.Id, sellerDid.Id))
+	sellerAddr, err := sellerDid.GetVerificationMethodBlockchainAddress(sellerDid.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -620,7 +620,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	swapperAddr, err := swapperDid.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", swapperDid.Id, swapperDid.Id))
+	swapperAddr, err := swapperDid.GetVerificationMethodBlockchainAddress(swapperDid.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -689,7 +689,7 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	senderAddr, err := senderDid.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", senderDid.Id, senderDid.Id))
+	senderAddr, err := senderDid.GetVerificationMethodBlockchainAddress(senderDid.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -734,7 +734,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	recipientAddr, err := recipientDid.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", recipientDid.Id, recipientDid.Id))
+	recipientAddr, err := recipientDid.GetVerificationMethodBlockchainAddress(recipientDid.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}

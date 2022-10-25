@@ -1000,7 +1000,7 @@ func NewVerification(
 func NewAccountVerification(did DID, chainID, accountAddress string, verificationMethods ...string) *Verification {
 	return NewVerification(
 		NewVerificationMethod(
-			fmt.Sprint(did.String(), "#", accountAddress),
+			did.NewVerificationMethodID(accountAddress),
 			did,
 			NewBlockchainAccountID(chainID, accountAddress),
 		),
@@ -1110,6 +1110,7 @@ func ResolveAccountDID(did, chainID string) (didDoc IidDocument, didMeta IidMeta
 		NewVerification(
 			NewVerificationMethod(
 				accountDID.NewVerificationMethodID(account),
+				// account,
 				accountDID, // the controller is the same as the did subject
 				NewBlockchainAccountID(chainID, account),
 			),

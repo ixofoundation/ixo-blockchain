@@ -44,7 +44,11 @@ HOME=/root
 # export FROM=\”ixo_did\“: \“\”
 # export TO=“\”ixo_did\“: \“$IXO_DID\“”
 sed -i 's/"ixo_did" : ""/"ixo_did" : ""/;s/"bond_denom" : "stake"/"bond_denom" : "uixo"/;s/"mint_denom" : "stake"/"mint_denom" : "uixo"/;s/stake/uixo/;s/"Reserved_bond_tokens" : "\[\]"/"Reserved_bond_tokens" : "\[\]"/;s/"minimum-gas-prices" : ""/"minimum-gas-prices" : "0.025uixo"/;s/"enable" : "false"/"enable" : "true"/;s/"swagger" : "false"/"swagger" : "true"/;' $HOME/.ixod/config/genesis.json
-# sed -i '/ixo_did/c\   \"ixo_did\" : \"did:ixo:aaaaaaaaaaa\",' $HOME/.ixod/config/genesis.json
+MAX_VOTING_PERIOD="30s"  # example: "172800s"
+FROM="\"voting_period\": \"172800s\""
+TO="\"voting_period\": \"$MAX_VOTING_PERIOD\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+# sed -i '/ixo_did/c\   \"i xo_did\" : \"did:ixo:aaaaaaaaaaa\",' $HOME/.ixod/config/genesis.json
 
 # Set staking token (both bond_denom and mint_denom)
 # export STAKING_TOKEN=“uixo”

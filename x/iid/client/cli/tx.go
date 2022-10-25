@@ -3,6 +3,8 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -12,7 +14,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -88,7 +89,9 @@ func NewCreateIidDocumentCmd() *cobra.Command {
 			}
 			pubKey := info.GetPubKey()
 			// verification method id
-			vmID := did.NewVerificationMethodID(signer.String())
+			//NOTE: Removed this for consistency when using the rpc messages.
+			// vmID := did.NewVerificationMethodID(signer.String())
+			vmID := signer.String()
 			// understand the vmType
 			vmType, err := deriveVMType(pubKey)
 			if err != nil {
@@ -157,10 +160,10 @@ func NewAddVerificationCmd() *cobra.Command {
 			// document did
 			did := types.NewChainDID(clientCtx.ChainID, args[0])
 			// verification method id
-			vmID := did.NewVerificationMethodID(sdk.MustBech32ifyAddressBytes(
+			vmID := sdk.MustBech32ifyAddressBytes(
 				sdk.GetConfig().GetBech32AccountAddrPrefix(),
 				pk.Address().Bytes(),
-			))
+			)
 
 			verification := types.NewVerification(
 				types.NewVerificationMethod(
@@ -250,7 +253,7 @@ func NewRevokeVerificationCmd() *cobra.Command {
 			// signer
 			signer := clientCtx.GetFromAddress()
 			// verification method id
-			vmID := did.NewVerificationMethodID(args[1])
+			vmID := args[1]
 			// build the message
 			msg := types.NewMsgRevokeVerification(
 				did.String(),
@@ -410,7 +413,8 @@ func NewSetVerificationRelationshipCmd() *cobra.Command {
 			did := types.NewChainDID(clientCtx.ChainID, args[0])
 
 			// method id
-			vmID := did.NewVerificationMethodID(args[1])
+			// vmID := did.NewVerificationMethodID(args[1])
+			vmID := args[1]
 
 			// signer
 			signer := clientCtx.GetFromAddress()

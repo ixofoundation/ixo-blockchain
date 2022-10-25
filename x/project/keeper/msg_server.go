@@ -98,8 +98,17 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 				[]string{iidtypes.Authentication},
 				nil,
 			),
+			iidtypes.NewVerification(
+				iidtypes.NewVerificationMethod(
+					iidtypes.DID(msg.ProjectDid).NewVerificationMethodID(msg.ProjectAddress),
+					iidtypes.DID(msg.ProjectDid),
+					iidProjectVerificationMethod,
+				),
+				[]string{iidtypes.Authentication},
+				nil,
+			),
 		),
-		iidtypes.WithControllers(msg.ProjectDid),
+		iidtypes.WithControllers(msg.ProjectDid, msg.SenderDid),
 	)
 	if err != nil {
 		// k.Logger(ctx).Error(err.Error())

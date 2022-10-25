@@ -18,7 +18,7 @@ func GetAccountForVerificationMethod(ctx sdk.Context, accountKeeper authante.Acc
 
 	fmt.Printf("%+v", iidDoc)
 
-	addr, err := iidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", methodId, methodId))
+	addr, err := iidDoc.GetVerificationMethodBlockchainAddress(iidDoc.Id)
 	if err != nil {
 		fmt.Println("failed5----------------------------------", err)
 

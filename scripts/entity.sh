@@ -79,7 +79,9 @@ echo "Ledgering DID 2/2..."
 
 ENTITY='{
 "entity_type": "assets",
-"entity_status": 1
+"entity_status": 1,
+"owner_did": "did:ixo:4XJLBfGtWSGKSz4BeRxdun",
+"owner_address": "ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"
 }'
 # echo $ENTITY | jq
 ixod_tx entity create-entity "$(echo $ENTITY | jq -rc .)" --from miguel

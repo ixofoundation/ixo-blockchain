@@ -7,6 +7,7 @@ import (
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cryptosecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -89,20 +90,33 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	address := sdk.AccAddress(pubKey.Address().Bytes())
 
 	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
-	entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, address.String())
+	entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, base58.Encode(pubKey.Bytes()[:16]))
 
-	verification := iidtypes.NewAccountVerification(
-		iidtypes.DID(entityId),
-		ctx.ChainID(),
-		account.GetAddress().String(),
-		iidtypes.Authentication,
+	verification := iidtypes.NewVerification(
+		iidtypes.NewVerificationMethod(
+			entityId,
+			iidtypes.DID(entityId),
+			iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
+		),
+		[]string{iidtypes.Authentication},
+		nil,
+	)
+
+	defaultVerification := iidtypes.NewVerification(
+		iidtypes.NewVerificationMethod(
+			iidtypes.DID(entityId).NewVerificationMethodID(account.GetAddress().String()),
+			iidtypes.DID(entityId),
+			iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
+		),
+		[]string{iidtypes.Authentication},
+		nil,
 	)
 
 	did, err := iidtypes.NewDidDocument(entityId,
 		iidtypes.WithServices(msg.Service...),
 		iidtypes.WithRights(msg.AccordedRight...),
 		iidtypes.WithResources(msg.LinkedResource...),
-		iidtypes.WithVerifications(append(msg.Verification, verification)...),
+		iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
 		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid)...),
 	)
 	if err != nil {

@@ -32,6 +32,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -151,6 +154,7 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
+		authzmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		iidmodule.AppModuleBasic{},
@@ -251,6 +255,7 @@ type IxoApp struct {
 	memKeys map[string]*sdk.MemoryStoreKey    `json:"mem_keys,omitempty"`
 
 	// keepers
+	AuthzKeeper      authzkeeper.Keeper       `json:"authz_keeper"`
 	AccountKeeper    authkeeper.AccountKeeper `json:"account_keeper"`
 	BankKeeper       bankkeeper.Keeper        `json:"bank_keeper,omitempty"`
 	CapabilityKeeper *capabilitykeeper.Keeper `json:"capability_keeper,omitempty"`
@@ -311,7 +316,7 @@ func NewIxoApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		feegrant.StoreKey,
+		authzkeeper.StoreKey, feegrant.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		wasm.StoreKey,
 		iidtypes.StoreKey,
@@ -367,6 +372,11 @@ func NewIxoApp(
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.GetSubspace(slashingtypes.ModuleName),
 	)
+
+	app.AuthzKeeper = authzkeeper.NewKeeper(
+		keys[authzkeeper.StoreKey], appCodec, app.BaseApp.MsgServiceRouter(),
+	)
+
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
@@ -521,6 +531,7 @@ func NewIxoApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
 
 		// Custom ixo AppModules
@@ -543,7 +554,7 @@ func NewIxoApp(
 		paymentstypes.ModuleName, genutiltypes.ModuleName, crisistypes.ModuleName,
 		paramstypes.ModuleName, authtypes.ModuleName, capabilitytypes.ModuleName,
 		govtypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName,
-		feegrant.ModuleName, wasm.ModuleName,
+		authz.ModuleName, feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
 		projecttypes.ModuleName,
@@ -560,7 +571,7 @@ func NewIxoApp(
 		upgradetypes.ModuleName, ibchost.ModuleName, paramstypes.ModuleName, authtypes.ModuleName,
 		minttypes.ModuleName, projecttypes.ModuleName, genutiltypes.ModuleName, vestingtypes.ModuleName,
 		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
-		feegrant.ModuleName, wasm.ModuleName,
+		authz.ModuleName, feegrant.ModuleName, wasm.ModuleName,
 
 		entitytypes.ModuleName,
 		bondstypes.ModuleName, paymentstypes.ModuleName,
@@ -576,8 +587,8 @@ func NewIxoApp(
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName,
-		wasm.ModuleName,
+		upgradetypes.ModuleName, paramstypes.ModuleName, vestingtypes.ModuleName, authz.ModuleName,
+		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
 		// this line is used by starport scaffolding # stargate/app/initGenesis
@@ -609,6 +620,7 @@ func NewIxoApp(
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),

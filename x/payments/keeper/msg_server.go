@@ -38,7 +38,7 @@ func (k msgServer) SetPaymentContractAuthorisation(goCtx context.Context, msg *t
 	}
 
 	//TODO: Find this value
-	payerAddr, err := payerDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", payerDidDoc.Id, payerDidDoc.Id))
+	payerAddr, err := payerDidDoc.GetVerificationMethodBlockchainAddress(payerDidDoc.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "signer must be payment contract payer")
 
@@ -156,7 +156,7 @@ func (k msgServer) CreatePaymentContract(goCtx context.Context, msg *types.MsgCr
 	}
 
 	//TODO: Find this value
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", creatorDidDoc.Id, creatorDidDoc.Id))
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -231,7 +231,7 @@ func (k msgServer) CreateSubscription(goCtx context.Context, msg *types.MsgCreat
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", creatorDidDoc.Id, creatorDidDoc.Id))
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Added not found in iid doc")
 	}
@@ -287,7 +287,7 @@ func (k msgServer) GrantDiscount(goCtx context.Context, msg *types.MsgGrantDisco
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", creatorDidDoc.Id, creatorDidDoc.Id))
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -348,7 +348,7 @@ func (k msgServer) RevokeDiscount(goCtx context.Context, msg *types.MsgRevokeDis
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", creatorDidDoc.Id, creatorDidDoc.Id))
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -400,7 +400,7 @@ func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPaym
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(fmt.Sprintf("%s#%s", creatorDidDoc.Id, creatorDidDoc.Id))
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownAddress, "address not found in iid")
 	}

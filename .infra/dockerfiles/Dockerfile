@@ -64,7 +64,7 @@ ENTRYPOINT ["ixod", "start"]
 FROM --platform=linux/amd64 ubuntu:latest  as distributable
 
 COPY --from=build-binary /go/bin/ixod /app/ixod
-COPY --from=build-binary /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/ /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/
+COPY --from=build-binary /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.1.1/internal/api/ /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.1.1/internal/api/
 COPY ./.infra/dockerfiles/setups/setup-devnet.sh /root/setup-devnet.sh
 
 ENV HOME=/root/
