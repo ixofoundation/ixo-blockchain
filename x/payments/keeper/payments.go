@@ -258,7 +258,7 @@ func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.Ac
 }
 
 func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
-	contractId string) (effected bool, err error) {
+	contractId string, partialPaymentAmount sdk.Coins) (effected bool, err error) {
 
 	contract, err := k.GetPaymentContract(ctx, contractId)
 	if err != nil {
@@ -277,7 +277,13 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 
 	// Assume payer will pay PaymentAmount, apply discount (if any),
 	// and calculate initial cumulative (before adjustments)
-	payAmount := template.PaymentAmount
+	var payAmount sdk.Coins
+	if len(partialPaymentAmount) > 0 {
+		payAmount = partialPaymentAmount
+	} else {
+		payAmount = template.PaymentAmount
+	}
+
 	payAmount, err = applyDiscount(template, contract, payAmount)
 	if err != nil {
 		return false, err
