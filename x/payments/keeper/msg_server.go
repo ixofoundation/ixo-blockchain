@@ -414,7 +414,7 @@ func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPaym
 	}
 
 	// Effect payment
-	effected, err := k.Keeper.EffectPayment(ctx, bk, msg.PaymentContractId, msg.PartialPaymentAmount)
+	effected, err := k.Keeper.EffectPaymentPartial(ctx, bk, msg.PaymentContractId, msg.PartialPaymentAmount)
 	if err != nil {
 		return nil, err
 	}
