@@ -19,7 +19,7 @@ https://github.com/ixofoundation/ixo-blockchain/blob/devel/iid-module/proto/iid/
 
 ### MsgCreateIidDocument
 
-A `MsgCreateIidDocument` is used to create a new iid document, it has the following fields
+A `MsgCreateIidDocument` is used to create a new iid document, sit has the following fields
 
 - `id` - the iid string identifying the iid document
 - `controller` - a list of did that are controllers of the iid document

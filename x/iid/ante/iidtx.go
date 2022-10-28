@@ -9,11 +9,11 @@ import (
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 )
 
-type IidTx struct {
-	signing.SigVerifiableTx
-}
+// type IidTx struct {
+// 	signing.SigVerifiableTx
+// }
 
-func (tx *IidTx) GetIidControllers() []IidTxMsg {
+func GetIidControllers(tx signing.SigVerifiableTx) []IidTxMsg {
 	var msgs []IidTxMsg
 
 	for _, txMsg := range tx.GetMsgs() {
@@ -27,7 +27,7 @@ func (tx *IidTx) GetIidControllers() []IidTxMsg {
 	return msgs
 }
 
-func (tx *IidTx) VerifyIidControllersAgainstSigniture(ctx sdk.Context, iidKeeper iidkeeper.Keeper) error {
+func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Context, iidKeeper iidkeeper.Keeper) error {
 
 	pubKeys, err := tx.GetPubKeys()
 	if err != nil {
@@ -35,10 +35,12 @@ func (tx *IidTx) VerifyIidControllersAgainstSigniture(ctx sdk.Context, iidKeeper
 	}
 
 	iidHasPubKey := false
+	controllers := GetIidControllers(tx)
 
-	for _, iidMsg := range tx.GetIidControllers() {
+	for _, iidMsg := range controllers {
 		iid := iidMsg.GetIidController()
 		iidDoc, exists := iidKeeper.GetDidDocument(ctx, []byte(iid))
+
 		if !exists {
 			return sdkerrors.Wrap(errors.New("iid not found"), "iid not found")
 		}
@@ -50,7 +52,7 @@ func (tx *IidTx) VerifyIidControllersAgainstSigniture(ctx sdk.Context, iidKeeper
 		}
 	}
 
-	if !iidHasPubKey {
+	if !iidHasPubKey && len(controllers) > 0 {
 		return sdkerrors.Wrap(errors.New("iid does not match public key in signiture"), "iid does not match public key in signiture")
 	}
 

@@ -137,7 +137,7 @@ ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
 # Create oracle fee payment template
 echo "Creating oracle fee payment template..."
 CREATOR="$FRANCESCO_DID_FULL"
-ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$CREATOR"
+ixod_tx payments create-payment-template "$ORACLE_FEE_PAYMENT_TEMPLATE" "$MIGUEL_DID_FULL"
 
 # Create fee-for-service payment template
 echo "Creating fee-for-service payment template..."
@@ -258,9 +258,9 @@ ixod_tx project create-project "$SENDER_DID" "$PROJECT_INFO" "$PROJECT_DID_FULL"
 
 # # # Withdraw funds (from main project account, i.e. as refund)
 # # # --> FAIL since Miguel is not the project owner
-# echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
-# DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
-# ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
+echo "Withdraw project funds as Miguel (fail since Miguel is not the owner)..."
+DATA="{\"projectDid\":\"$PROJECT_DID\",\"recipientDid\":\"$MIGUEL_DID\",\"amount\":\"100000000\",\"isRefund\":true}"
+ixod_tx project withdraw-funds "$MIGUEL_DID_FULL" "$DATA"
 # echo "Project withdrawals query..."
 # ixod_q project get-project-txs $PROJECT_DID
 

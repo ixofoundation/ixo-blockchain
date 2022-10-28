@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/input"
@@ -20,12 +18,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
-	channelkeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	exported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	"github.com/spf13/pflag"
 )
@@ -47,72 +41,72 @@ func init() {
 	copy(simEd25519Pubkey.Key[:], bz)
 }
 
-type PubKeyGetter func(ctx sdk.Context, msg IxoMsg) (cryptotypes.PubKey, error)
+type PubKeyGetter func(ctx sdk.Context, msg IxoMsg, sigs []signing.SignatureV2) (cryptotypes.PubKey, error)
 
-func NewDefaultAnteHandler(
-	ak authkeeper.AccountKeeper,
-	bk bankkeeper.Keeper,
-	sigGasConsumer ante.SignatureVerificationGasConsumer,
-	pubKeyGetter PubKeyGetter,
-	signModeHandler authsigning.SignModeHandler,
-	txCounterStoreKey sdk.StoreKey,
-	channelKeeper *channelkeeper.Keeper,
-	wasmConfig wasmTypes.WasmConfig,
-) sdk.AnteHandler {
+// func NewDefaultAnteHandler(
+// 	ak authkeeper.AccountKeeper,
+// 	bk bankkeeper.Keeper,
+// 	sigGasConsumer ante.SignatureVerificationGasConsumer,
+// 	pubKeyGetter PubKeyGetter,
+// 	signModeHandler authsigning.SignModeHandler,
+// 	txCounterStoreKey sdk.StoreKey,
+// 	channelKeeper *channelkeeper.Keeper,
+// 	wasmConfig wasmTypes.WasmConfig,
+// ) sdk.AnteHandler {
 
-	// Refer to inline documentation in app/app.go for introduction to why we
-	// need a custom ixo AnteHandler. Below, we will discuss the differences
-	// between the default Cosmos AnteHandler and our custom ixo AnteHandler.
-	//
-	// It is clear below that our custom AnteHandler is not completely custom.
-	// It uses various functions from the Cosmos ante module. However, it also
-	// uses customised decorators, without adding completely new decorators.
-	// Below we present the differences in the customised decorators.
-	//
-	// In general:
-	// - Enforces messages to be of type IxoMsg, to be used with pubKeyGetter.
-	// - Does not allow for multiple messages (to be added in the future).
-	// - Does not allow for multiple signatures (to be added in the future).
-	//
-	// NewSetPubKeyDecorator: as opposed to the Cosmos version...
-	// - Gets signer pubkey from pubKeyGetter argument instead of tx signatures.
-	// - Gets signer address from pubkey instead of the messages' GetSigners().
-	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
-	//
-	// NewDeductFeeDecorator:
-	// - Gets fee payer address from the pubkey obtained from pubKeyGetter
-	//   instead of from the first message's GetSigners() function.
-	//
-	// NewSigGasConsumeDecorator:
-	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
-	//   instead of from the messages' GetSigners() function.
-	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
-	//
-	// NewSigVerificationDecorator:
-	// - Gets the only signer address and account from the pubkey obtained from
-	//   pubKeyGetter instead of from the messages' GetSigners() function.
-	//
-	// NewIncrementSequenceDecorator:
-	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
-	//   instead of from the messages' GetSigners() function.
+// 	// Refer to inline documentation in app/app.go for introduction to why we
+// 	// need a custom ixo AnteHandler. Below, we will discuss the differences
+// 	// between the default Cosmos AnteHandler and our custom ixo AnteHandler.
+// 	//
+// 	// It is clear below that our custom AnteHandler is not completely custom.
+// 	// It uses various functions from the Cosmos ante module. However, it also
+// 	// uses customised decorators, without adding completely new decorators.
+// 	// Below we present the differences in the customised decorators.
+// 	//
+// 	// In general:
+// 	// - Enforces messages to be of type IxoMsg, to be used with pubKeyGetter.
+// 	// - Does not allow for multiple messages (to be added in the future).
+// 	// - Does not allow for multiple signatures (to be added in the future).
+// 	//
+// 	// NewSetPubKeyDecorator: as opposed to the Cosmos version...
+// 	// - Gets signer pubkey from pubKeyGetter argument instead of tx signatures.
+// 	// - Gets signer address from pubkey instead of the messages' GetSigners().
+// 	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
+// 	//
+// 	// NewDeductFeeDecorator:
+// 	// - Gets fee payer address from the pubkey obtained from pubKeyGetter
+// 	//   instead of from the first message's GetSigners() function.
+// 	//
+// 	// NewSigGasConsumeDecorator:
+// 	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
+// 	//   instead of from the messages' GetSigners() function.
+// 	// - Uses simEd25519Pubkey instead of simSecp256k1Pubkey for simulations.
+// 	//
+// 	// NewSigVerificationDecorator:
+// 	// - Gets the only signer address and account from the pubkey obtained from
+// 	//   pubKeyGetter instead of from the messages' GetSigners() function.
+// 	//
+// 	// NewIncrementSequenceDecorator:
+// 	// - Gets the only signer address from the pubkey obtained from pubKeyGetter
+// 	//   instead of from the messages' GetSigners() function.
 
-	return sdk.ChainAnteDecorators(
-		ante.NewSetUpContextDecorator(),                                          // outermost AnteDecorator. SetUpContext must be called
-		wasmkeeper.NewLimitSimulationGasDecorator(wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
-		wasmkeeper.NewCountTXDecorator(txCounterStoreKey),
-		ante.NewMempoolFeeDecorator(),
-		ante.NewValidateBasicDecorator(),
-		ante.NewValidateMemoDecorator(ak),
-		ante.NewConsumeGasForTxSizeDecorator(ak),
-		NewSetPubKeyDecorator(ak, pubKeyGetter), // SetPubKeyDecorator must be called before all signature verification decorators
-		ante.NewValidateSigCountDecorator(ak),
-		NewDeductFeeDecorator(ak, bk, pubKeyGetter),
-		NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
-		NewSigVerificationDecorator(ak, signModeHandler, pubKeyGetter),
-		NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator
-		ibcante.NewAnteDecorator(channelKeeper),
-	)
-}
+// 	return sdk.ChainAnteDecorators(
+// 		ante.NewSetUpContextDecorator(),                                          // outermost AnteDecorator. SetUpContext must be called
+// 		wasmkeeper.NewLimitSimulationGasDecorator(wasmConfig.SimulationGasLimit), // after setup context to enforce limits early
+// 		wasmkeeper.NewCountTXDecorator(txCounterStoreKey),
+// 		ante.NewMempoolFeeDecorator(),
+// 		ante.NewValidateBasicDecorator(),
+// 		ante.NewValidateMemoDecorator(ak),
+// 		ante.NewConsumeGasForTxSizeDecorator(ak),
+// 		NewSetPubKeyDecorator(ak, pubKeyGetter), // SetPubKeyDecorator must be called before all signature verification decorators
+// 		ante.NewValidateSigCountDecorator(ak),
+// 		NewDeductFeeDecorator(ak, bk, pubKeyGetter),
+// 		NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
+// 		NewSigVerificationDecorator(ak, signModeHandler, pubKeyGetter),
+// 		NewIncrementSequenceDecorator(ak, pubKeyGetter), // innermost AnteDecorator
+// 		ibcante.NewAnteDecorator(channelKeeper),
+// 	)
+// }
 
 func GenerateOrBroadcastTxCLI(clientCtx client.Context, flagSet *pflag.FlagSet, ixoDid exported.IxoDid, msg sdk.Msg) error {
 	txf := tx.NewFactoryCLI(clientCtx, flagSet)

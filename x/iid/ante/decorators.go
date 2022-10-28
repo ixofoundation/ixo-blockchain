@@ -3,6 +3,7 @@ package ante
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 )
 
@@ -21,14 +22,13 @@ func NewIidResolutionDecorator(iidKeeper iidkeeper.Keeper) IidResolutionDecorato
 }
 
 func (dec IidResolutionDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	iidTx, ok := tx.(IidTx)
+	iidTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
-		// return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a IIDTx")
-		return next(ctx, tx, simulate)
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a IIDTx")
 	}
 
-	if err := iidTx.VerifyIidControllersAgainstSigniture(ctx, dec.iidKeeper); err != nil {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a signedTx")
+	if err := VerifyIidControllersAgainstSigniture(iidTx, ctx, dec.iidKeeper); err != nil {
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, err.Error())
 	}
 
 	return next(ctx, tx, simulate)
@@ -151,10 +151,10 @@ func NewIidCapabilityVerificationDectorator() IidCapabilityVerificationDectorato
 }
 
 func (dec IidCapabilityVerificationDectorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	_, ok := tx.(IidTx)
-	if !ok {
-		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a IIDTx")
-	}
+	// _, ok := tx.(IidTx)
+	// if !ok {
+	// 	return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a IIDTx")
+	// }
 
 	// if err := iidTx.VerifyIidControllersAgainstSigniture(ctx, dec.iidKeeper); err != nil {
 	// 	return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a signedTx")

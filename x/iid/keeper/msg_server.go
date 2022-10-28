@@ -76,7 +76,7 @@ func (k msgServer) UpdateIidDocument(
 	msg *types.MsgUpdateIidDocument,
 ) (*types.MsgUpdateIidDocumentResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Doc.Id, msg.Signer,
@@ -100,7 +100,7 @@ func (k msgServer) AddVerification(
 	msg *types.MsgAddVerification,
 ) (*types.MsgAddVerificationResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -118,7 +118,7 @@ func (k msgServer) AddService(
 	msg *types.MsgAddService,
 ) (*types.MsgAddServiceResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -136,7 +136,7 @@ func (k msgServer) AddLinkedResource(
 	msg *types.MsgAddLinkedResource,
 ) (*types.MsgAddLinkedResourceResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -154,7 +154,7 @@ func (k msgServer) DeleteLinkedResource(
 	msg *types.MsgDeleteLinkedResource,
 ) (*types.MsgDeleteLinkedResourceResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -178,7 +178,7 @@ func (k msgServer) AddLinkedEntity(
 	msg *types.MsgAddLinkedEntity,
 ) (*types.MsgAddLinkedEntityResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -196,7 +196,7 @@ func (k msgServer) DeleteLinkedEntity(
 	msg *types.MsgDeleteLinkedEntity,
 ) (*types.MsgDeleteLinkedEntityResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -220,7 +220,7 @@ func (k msgServer) AddAccordedRight(
 	msg *types.MsgAddAccordedRight,
 ) (*types.MsgAddAccordedRightResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -238,7 +238,7 @@ func (k msgServer) DeleteAccordedRight(
 	msg *types.MsgDeleteAccordedRight,
 ) (*types.MsgDeleteAccordedRightResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -263,7 +263,7 @@ func (k msgServer) AddIidContext(
 	msg *types.MsgAddIidContext,
 ) (*types.MsgAddIidContextResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -281,7 +281,7 @@ func (k msgServer) DeleteIidContext(
 	msg *types.MsgDeleteIidContext,
 ) (*types.MsgDeleteIidContextResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -306,7 +306,7 @@ func (k msgServer) RevokeVerification(
 	msg *types.MsgRevokeVerification,
 ) (*types.MsgRevokeVerificationResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -325,7 +325,7 @@ func (k msgServer) DeleteService(
 	msg *types.MsgDeleteService,
 ) (*types.MsgDeleteServiceResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -350,7 +350,7 @@ func (k msgServer) SetVerificationRelationships(
 	msg *types.MsgSetVerificationRelationships,
 ) (*types.MsgSetVerificationRelationshipsResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -368,7 +368,7 @@ func (k msgServer) AddController(
 	goCtx context.Context,
 	msg *types.MsgAddController,
 ) (*types.MsgAddControllerResponse, error) {
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
@@ -387,7 +387,7 @@ func (k msgServer) DeleteController(
 	msg *types.MsgDeleteController,
 ) (*types.MsgDeleteControllerResponse, error) {
 
-	if err := executeOnDidWithRelationships(
+	if err := ExecuteOnDidWithRelationships(
 		goCtx, &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer, func(didDoc *types.IidDocument) error {
@@ -473,7 +473,7 @@ func newConstraints(relationships ...string) VerificationRelationships {
 	return relationships
 }
 
-func executeOnDidWithRelationships(goCtx context.Context, k *Keeper, constraints VerificationRelationships, did, signer string, update func(document *types.IidDocument) error) (err error) {
+func ExecuteOnDidWithRelationships(goCtx context.Context, k *Keeper, constraints VerificationRelationships, did, signer string, update func(document *types.IidDocument) error) (err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k.Logger(ctx).Info("request to update a did document", "target did", did)
 	// TODO: fail if the input did is of type KEY (immutable)

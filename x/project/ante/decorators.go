@@ -7,9 +7,11 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
@@ -41,20 +43,33 @@ func checkAllMsgs(tx sdk.Tx) (*types.MsgCreateProject, error) {
 }
 
 func pubKeyGetter(keeper projectkeeper.Keeper, iidKeeper iidkeeper.Keeper) libixo.PubKeyGetter {
-	return func(ctx sdk.Context, msg libixo.IxoMsg) (pubKey cryptotypes.PubKey, err error) {
+	return func(ctx sdk.Context, msg libixo.IxoMsg, sigs []signing.SignatureV2) (pubKey cryptotypes.PubKey, err error) {
 
 		// MsgCreateProject: pubkey from msg since project does not exist yet
 		// MsgWithdrawFunds: signer is user DID, so get pubkey from did module
 		// Other: signer is project DID, so get pubkey from project module
+		// msg.
 
-		var pubKeyEd25519 ed25519.PubKey
-		switch msg := msg.(type) {
-		case *types.MsgCreateProject:
-			pubKeyEd25519.Key = base58.Decode(msg.GetPubKey())
+		projectMsg, ok := msg.(*types.MsgCreateProject)
+		if !ok {
+			return nil, errors.New("pubkey not found")
+		}
+
+		signerPubKey := sigs[0].PubKey
+		switch signerPubKey.(type) {
+		case *ed25519.PubKey:
+			pubKey = &ed25519.PubKey{
+				Key: base58.Decode(projectMsg.GetPubKey()),
+			}
+		case *secp256k1.PubKey:
+			pubKey = &secp256k1.PubKey{
+				Key: base58.Decode(projectMsg.GetPubKey()),
+			}
 		default:
 			return nil, errors.New("pubkey not found")
 		}
-		return &pubKeyEd25519, nil
+
+		return pubKey, nil
 	}
 }
 
@@ -123,7 +138,7 @@ func NewSetPubKeyDecorator(projectKeeper projectkeeper.Keeper, ak AccountKeeper)
 }
 
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	_, ok := tx.(authsigning.SigVerifiableTx)
+	authtx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 	}
@@ -134,8 +149,12 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
 	}
 
+	txSigners, err := authtx.GetSignaturesV2()
+	if err != nil {
+		return ctx, err
+	}
 	// Get project pubKey
-	pubKey, err := pubKeyGetter(spkd.projectKeeper, spkd.projectKeeper.IidKeeper)(ctx, msg)
+	pubKey, err := pubKeyGetter(spkd.projectKeeper, spkd.projectKeeper.IidKeeper)(ctx, msg, txSigners)
 	if err != nil {
 		return ctx, err
 	}
@@ -213,6 +232,11 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
+	authTx, ok := tx.(authsigning.SigVerifiableTx)
+	if !ok {
+		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
+	}
+
 	if addr := dfd.ak.GetModuleAddress(authtypes.FeeCollectorName); addr == nil {
 		panic(fmt.Sprintf("%s module account has not been set", authtypes.FeeCollectorName))
 	}
@@ -224,7 +248,12 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	}
 
 	// Get pubKey
-	pubKey, err := pubKeyGetter(dfd.projectKeeper, dfd.projectKeeper.IidKeeper)(ctx, msg)
+	txSigners, err := authTx.GetSignaturesV2()
+	if err != nil {
+		return ctx, err
+	}
+	// Get project pubKey
+	pubKey, err := pubKeyGetter(dfd.projectKeeper, dfd.projectKeeper.IidKeeper)(ctx, msg, txSigners)
 	if err != nil {
 		return ctx, err
 	}
@@ -325,7 +354,12 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	}
 
 	// Get signer did pubKey
-	pubKey, err := pubKeyGetter(svd.projectKeeper, svd.projectKeeper.IidKeeper)(ctx, msg)
+	txSigners, err := sigTx.GetSignaturesV2()
+	if err != nil {
+		return ctx, err
+	}
+	// Get project pubKey
+	pubKey, err := pubKeyGetter(svd.projectKeeper, svd.projectKeeper.IidKeeper)(ctx, msg, txSigners)
 	if err != nil {
 		return ctx, err
 	}
