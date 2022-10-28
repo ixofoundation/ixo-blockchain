@@ -7601,6 +7601,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 </tr>
               
                 <tr>
+                  <td>partial_payment_amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>sender_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>

@@ -4,6 +4,7 @@ package payments;
 import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
 import "payments/payments.proto";
+import "cosmos/coin.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
 
@@ -119,10 +120,10 @@ message MsgRevokeDiscountResponse {}
 // MsgEffectPayment defines a message for putting a specific payment contract into effect.
 message MsgEffectPayment {
   option (gogoproto.goproto_stringer) = false;
-
   string sender_did          = 1 [(gogoproto.moretags) = "yaml:\"sender_did\""];
   string payment_contract_id = 2 [(gogoproto.moretags) = "yaml:\"payment_contract_id\""];
-  string sender_address  = 3 [(gogoproto.jsontag) = "sender_address", (gogoproto.moretags) = "yaml:\"sender_address\""];
+  repeated cosmos.base.v1beta1.Coin partial_payment_amount    = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"partial_payment_amount\""];
+  string sender_address  = 4 [(gogoproto.jsontag) = "sender_address", (gogoproto.moretags) = "yaml:\"sender_address\""];
 }
 
 // MsgEffectPaymentResponse defines the Msg/EffectPayment response type.
