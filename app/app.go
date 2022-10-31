@@ -2,14 +2,15 @@ package app
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/x/authz"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
-	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cosmos/cosmos-sdk/x/authz"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
@@ -35,9 +36,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/cosmos/cosmos-sdk/x/authz"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
-	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -96,14 +94,12 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	"github.com/ixofoundation/ixo-blockchain/x/entity"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	entitymodule "github.com/ixofoundation/ixo-blockchain/x/entity"
 	entityclient "github.com/ixofoundation/ixo-blockchain/x/entity/client"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	entityproposal "github.com/ixofoundation/ixo-blockchain/x/entity/types/proposal"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
@@ -158,7 +154,6 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		authzmodule.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		iidmodule.AppModuleBasic{},
@@ -179,7 +174,7 @@ var (
 		bonds.AppModuleBasic{},
 		payments.AppModuleBasic{},
 		project.AppModuleBasic{},
-		entity.AppModuleBasic{},
+		entitymodule.AppModuleBasic{},
 	)
 
 	// Module account permissions
@@ -276,7 +271,6 @@ type IxoApp struct {
 	TransferKeeper   ibctransferkeeper.Keeper `json:"transfer_keeper"`
 	FeeGrantKeeper   feegrantkeeper.Keeper    `json:"feegrant_keeper"`
 	WasmKeeper       wasm.Keeper              `json:"wasm_keeper"`
-	AuthzKeeper      authzkeeper.Keeper       `json:"authz_keeper"`
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper `json:"scoped_ibc_keeper"`
@@ -329,7 +323,6 @@ func NewIxoApp(
 		bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
 		entitytypes.StoreKey,
-		authzkeeper.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -386,7 +379,6 @@ func NewIxoApp(
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
-	app.AuthzKeeper = authzkeeper.NewKeeper(keys[authzkeeper.StoreKey], appCodec, app.BaseApp.MsgServiceRouter())
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	// NewKeeper constructs an upgrade Keeper which requires the following arguments:
@@ -496,7 +488,7 @@ func NewIxoApp(
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(entityproposal.RouterKey, entitymodule.NewEntityParamChangeProposalHandler(app.EntityKeeper)).
+		AddRoute(entitytypes.RouterKey, entitymodule.NewEntityParamChangeProposalHandler(app.EntityKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
@@ -540,7 +532,6 @@ func NewIxoApp(
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
-		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule

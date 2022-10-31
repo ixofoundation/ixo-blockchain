@@ -493,6 +493,21 @@
         
           
           <li>
+            <a href="#entity%2fproposal.proto">entity/proposal.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#entity.InitializeNftContract"><span class="badge">M</span>InitializeNftContract</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#entity%2fquery.proto">entity/query.proto</a>
             <ul>
               
@@ -3727,6 +3742,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>NftContractMinter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -3770,6 +3792,51 @@
                   <td><a href="#entity.Params">Params</a></td>
                   <td></td>
                   <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="entity/proposal.proto">entity/proposal.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="entity.InitializeNftContract">InitializeNftContract</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>NftContractCodeId</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>NftMinterAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -5871,7 +5938,7 @@ address of the account signing the message </p></td>
                 </tr>
               
                 <tr>
-                  <td>recipiantDid</td>
+                  <td>recipientDid</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>

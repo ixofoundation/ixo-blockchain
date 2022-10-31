@@ -154,7 +154,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 
 	//nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
 
-	nftMint := entitycontracts.WasmMintNftMessage{
+	nftMint := entitycontracts.WasmMsgMint{
 		Mint: entitycontracts.Mint{
 			TokenId:   did.Id,
 			Owner:     msg.OwnerAddress,
@@ -185,6 +185,143 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		EntityType:   didM.EntityType,
 		EntityStatus: didM.Status,
 	}
+	return resp, err
+}
+
+func (k Keeper) TransferEntity(ctx sdk.Context, msg *types.MsgTransferEntity) (types.MsgTransferEntityResponse, error) {
+
+	// signer, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	// if err != nil {
+	// 	return types.MsgCreateEntityResponse{}, err
+	// }
+
+	// k.SetParams(ctx, &types.Params{
+	// 	NftContractAddress: "ixo1c78rhd5fyqd5t5dqhhqd4w3uf3japl56aurnpq",
+	// })
+
+	nftContractAddressParam := k.GetParams(ctx).NftContractAddress
+
+	fmt.Println("==============\nnftContractAddressParam", nftContractAddressParam)
+	if len(nftContractAddressParam) == 0 {
+		return types.MsgTransferEntityResponse{}, errors.New("nftContractAddress not set")
+	}
+
+	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
+	if err != nil {
+		return types.MsgTransferEntityResponse{}, err
+	}
+
+	err = iidkeeper.ExecuteOnDidWithRelationships(
+		ctx.Context(),
+		&k.IidKeeper,
+		[]string{iidtypes.Authentication},
+		msg.EntityDid,
+		msg.ControllerAddress,
+		func(document *iidtypes.IidDocument) error {
+			document.Controller = []string{
+				document.Id,
+				msg.RecipientDid,
+			}
+			return nil
+		},
+	)
+
+	if err != nil {
+		return types.MsgTransferEntityResponse{}, err
+	}
+
+	// verification := iidtypes.NewVerification(
+	// 	iidtypes.NewVerificationMethod(
+	// 		entityId,
+	// 		iidtypes.DID(entityId),
+	// 		iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
+	// 	),
+	// 	[]string{iidtypes.Authentication},
+	// 	nil,
+	// )
+
+	// defaultVerification := iidtypes.NewVerification(
+	// 	iidtypes.NewVerificationMethod(
+	// 		iidtypes.DID(entityId).NewVerificationMethodID(account.GetAddress().String()),
+	// 		iidtypes.DID(entityId),
+	// 		iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
+	// 	),
+	// 	[]string{iidtypes.Authentication},
+	// 	nil,
+	// )
+
+	// did, err := iidtypes.NewDidDocument(entityId,
+	// 	iidtypes.WithServices(msg.Service...),
+	// 	iidtypes.WithRights(msg.AccordedRight...),
+	// 	iidtypes.WithResources(msg.LinkedResource...),
+	// 	iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
+	// 	iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid)...),
+	// )
+	// if err != nil {
+	// 	// k.Logger(ctx).Error(err.Error())
+	// 	return types.MsgCreateEntityResponse{}, err
+	// }
+
+	// // check that the did is not already taken
+	// _, found := k.IidKeeper.GetDidDocument(ctx, []byte(entityId))
+	// if found {
+	// 	err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", entityId)
+	// 	// k.Logger(ctx).Error(err.Error())
+	// 	return types.MsgCreateEntityResponse{}, err
+	// }
+
+	// persist the did document
+
+	// currentTimeUtc := time.Now().UTC()
+	// // now create and persist the metadata
+	// didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	// didM.EntityType = msg.EntityType
+	// didM.Deactivated = msg.Deactivated
+	// didM.Created = &currentTimeUtc
+	// didM.Updated = &currentTimeUtc
+	// didM.VersionId = fmt.Sprintf("%s:%d", entityId, 0)
+	// didM.Stage = msg.Stage
+	// didM.Credentials = msg.VerifiableCredential
+	// didM.VerifiableCredential = msg.VerificationStatus
+	// didM.StartDate = msg.StartDate
+	// didM.EndDate = msg.EndDate
+	// didM.RelayerNode = msg.RelayerNode
+
+	// k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
+	// k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
+
+	// //nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
+
+	nftMint := entitycontracts.WasmMsgTransferNft{
+		TransferNft: entitycontracts.TransferNft{
+			TokenId:   msg.EntityDid,
+			Recipient: msg.RecipientDid,
+		},
+	}
+
+	finalMessage, err := nftMint.Marshal()
+
+	if err != nil {
+		return types.MsgTransferEntityResponse{}, err
+	}
+
+	callarAddress, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
+	if err != nil {
+		return types.MsgTransferEntityResponse{}, err
+	}
+
+	_, err = k.WasmKeeper.Execute(ctx, nftContractAddress, callarAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	if err != nil {
+		return types.MsgTransferEntityResponse{}, err
+	}
+
+	// emit the event
+	// if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid)); err != nil {
+	// 	// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
+	// 	return types.MsgCreateEntityResponse{}, err
+	// }
+
+	resp := types.MsgTransferEntityResponse{}
 	return resp, err
 }
 

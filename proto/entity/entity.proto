@@ -8,6 +8,7 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 message Params {
   string NftContractAddress = 1 [(gogoproto.jsontag) = "NftContractAddress", (gogoproto.moretags) = "yaml:\"NftContractAddress\""];
+  string NftContractMinter = 2 [(gogoproto.jsontag) = "NftContractMinter", (gogoproto.moretags) = "yaml:\"NftContractMinter\""];
 }
 
 // UpdateProjectStatusDoc contains details required to update a project's status.

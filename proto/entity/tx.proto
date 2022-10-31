@@ -109,7 +109,7 @@ message MsgTransferEntity {
   string entityDid          = 1 [(gogoproto.jsontag) = "entity_did", (gogoproto.moretags) = "yaml:\"entity_did\""];
   string controllerDid      = 2 [(gogoproto.jsontag) = "controller_did", (gogoproto.moretags) = "yaml:\"controller_did\""]; // The ownersdid used to sign this transaction.
   string controllerAddress  = 3 [(gogoproto.jsontag) = "controller_address", (gogoproto.moretags) = "yaml:\"controller_address\""]; // The ownersdid used to sign this transaction.
-  string recipiantDid       = 4 [(gogoproto.jsontag) = "recipiant_did", (gogoproto.moretags) = "yaml:\"recipiant_did\""];
+  string recipientDid       = 4 [(gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
 }
 
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.

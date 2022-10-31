@@ -12,10 +12,6 @@ type Mint struct {
 	Extention json.RawMessage `json:"extention"`
 }
 
-type WasmMintNftMessage struct {
-	Mint Mint `json:"mint"`
-}
-
 func (m Mint) Marshal() ([]byte, error) {
 	jsonBuffer := new(bytes.Buffer)
 	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
@@ -24,7 +20,62 @@ func (m Mint) Marshal() ([]byte, error) {
 	return jsonBuffer.Bytes(), nil
 }
 
-func (m WasmMintNftMessage) Marshal() ([]byte, error) {
+type WasmMsgMint struct {
+	Mint Mint `json:"mint"`
+}
+
+func (m WasmMsgMint) Marshal() ([]byte, error) {
+	jsonBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+		return nil, err
+	}
+	return jsonBuffer.Bytes(), nil
+}
+
+type TransferNft struct {
+	TokenId   string `json:"token_id"`
+	Recipient string `json:"recipient"`
+}
+
+func (m TransferNft) Marshal() ([]byte, error) {
+	jsonBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+		return nil, err
+	}
+	return jsonBuffer.Bytes(), nil
+}
+
+type WasmMsgTransferNft struct {
+	TransferNft TransferNft `json:"transfer_nft"`
+}
+
+func (m WasmMsgTransferNft) Marshal() ([]byte, error) {
+	jsonBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+		return nil, err
+	}
+	return jsonBuffer.Bytes(), nil
+}
+
+type InitiateNftContract struct {
+	Name   string `json:"name"`
+	Symbol string `json:"symbol"`
+	Minter string `json:"minter"`
+}
+
+func (m InitiateNftContract) Marshal() ([]byte, error) {
+	jsonBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+		return nil, err
+	}
+	return jsonBuffer.Bytes(), nil
+}
+
+type WasmMsgInitiateNftContract struct {
+	InitiateNftContract InitiateNftContract `json:"initiate_nft_contract"`
+}
+
+func (m WasmMsgInitiateNftContract) Marshal() ([]byte, error) {
 	jsonBuffer := new(bytes.Buffer)
 	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
 		return nil, err

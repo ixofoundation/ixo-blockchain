@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -33,8 +35,8 @@ func NewTxCmd() *cobra.Command {
 // NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-entity-params [name] [flags]",
-		Args:  cobra.ExactArgs(1),
+		Use:   "update-entity-params [nft_contract_code] [nft_minter_address] [flags]",
+		Args:  cobra.ExactArgs(2),
 		Short: "Submit a proposal to update entity params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -42,7 +44,12 @@ func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 				return err
 			}
 
-			content := types.NewParams(args[0])
+			codeId, err := strconv.ParseUint(args[0], 0, 64)
+			if err != nil {
+				return err
+			}
+
+			content := types.NewInitializeNftContract(codeId, args[1])
 
 			from := clientCtx.GetFromAddress()
 

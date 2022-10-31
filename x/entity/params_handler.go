@@ -5,16 +5,25 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 )
+
+const (
+	EntityNftContractName   = "entity_nft"
+	EntityNftContractSymbol = "entity"
+)
+
+func nftModuleAddress() string { return fmt.Sprintf("%s-minter", types.ModuleName) }
 
 // NewParamChangeProposalHandler creates a new governance Handler for a ParamChangeProposal
 func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
-		case *types.Params:
+		case *types.InitializeNftContract:
 			return handleEntityParameterChangeProposal(ctx, k, c)
 
 		default:
@@ -23,14 +32,60 @@ func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.Params) error {
+func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeNftContract) error {
 	fmt.Printf("propsal handeler =============\n%+v\n", *p)
 	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
 	var xx types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
 	fmt.Printf("%+v\n", xx)
 
-	k.ParamSpace.SetParamSet(ctx, p)
+	// if err := msg.ValidateBasic(); err != nil {
+	// 	return nil, err
+	// }
+	// ctx := sdk.UnwrapSDKContext(goCtx)
+
+	adminAddr := authtypes.NewModuleAddress(nftModuleAddress())
+
+	senderAddr, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
+	if err != nil {
+		return nil
+	}
+	// var adminAddr sdk.AccAddress
+	// if msg.Admin != "" {
+	// 	if adminAddr, err = sdk.AccAddressFromBech32(msg.Admin); err != nil {
+	// 		return nil, sdkerrors.Wrap(err, "admin")
+	// 	}
+	// }
+
+	// ctx.EventManager().EmitEvent(sdk.NewEvent(
+	// 	sdk.EventTypeMessage,
+	// 	sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+	// 	sdk.NewAttribute(sdk.AttributeKeySender, p.),
+	// ))
+
+	initiateNftContractMsg := entitycontracts.WasmMsgInitiateNftContract{
+		InitiateNftContract: entitycontracts.InitiateNftContract{
+			Name:   EntityNftContractName,
+			Symbol: EntityNftContractSymbol,
+			Minter: adminAddr.String(),
+		},
+	}
+
+	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
+	if err != nil {
+		return nil
+	}
+	
+	deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
+
+	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", deposit)
+	if err != nil {
+		return err
+	}
+
+	xx.NftContractAddress = contractAddr.String()
+
+	k.ParamSpace.SetParamSet(ctx, &xx)
 
 	// for _, c := range p.Changes {
 	// 	ss, ok := k.GetParams()

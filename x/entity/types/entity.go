@@ -4,13 +4,11 @@ import (
 	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var (
-	KeyNftContractAddress         = []byte("NftContractAddress")
-	ProposalTypeEntityParamChange = "EntityParamChange"
+	KeyNftContractAddress = []byte("NftContractAddress")
 )
 
 func validateNftContractAddress(i interface{}) error {
@@ -42,8 +40,6 @@ func NewParams(nftContractAddress string) Params {
 	}
 }
 
-var _ govtypes.Content = &Params{}
-
 // default project module parameters
 func DefaultParams() Params {
 	return Params{
@@ -56,22 +52,4 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
 		{KeyNftContractAddress, &p.NftContractAddress, validateNftContractAddress},
 	}
-}
-
-func (p *Params) GetDescription() string {
-	return "update entity paramaters"
-}
-
-func (p *Params) GetTitle() string {
-	return "update entity paramaters"
-}
-
-func (sup *Params) ProposalRoute() string { return RouterKey }
-func (sup *Params) ProposalType() string  { return ProposalTypeEntityParamChange }
-
-func (sup *Params) ValidateBasic() error { return nil }
-
-func init() {
-	govtypes.RegisterProposalType(ProposalTypeEntityParamChange)
-	govtypes.RegisterProposalTypeCodec(&Params{}, "entity.Params")
 }
