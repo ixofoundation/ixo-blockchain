@@ -4,7 +4,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	projectante "github.com/ixofoundation/ixo-blockchain/x/project/ante"
 	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
@@ -135,7 +134,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 				authante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 				authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 				authante.NewIncrementSequenceDecorator(options.AccountKeeper),
-				iidante.NewIidResolutionDecorator(options.IidKeeper),
+				// iidante.NewIidResolutionDecorator(options.IidKeeper),
 			}
 		}
 

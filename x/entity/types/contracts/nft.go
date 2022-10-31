@@ -72,7 +72,7 @@ func (m InitiateNftContract) Marshal() ([]byte, error) {
 }
 
 type WasmMsgInitiateNftContract struct {
-	InitiateNftContract InitiateNftContract `json:"initiate_nft_contract"`
+	InstantiateMsg InitiateNftContract `json:"instantiate_msg"`
 }
 
 func (m WasmMsgInitiateNftContract) Marshal() ([]byte, error) {

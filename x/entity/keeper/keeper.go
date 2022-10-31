@@ -73,7 +73,8 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	// 	NftContractAddress: "ixo1c78rhd5fyqd5t5dqhhqd4w3uf3japl56aurnpq",
 	// })
 
-	nftContractAddressParam := k.GetParams(ctx).NftContractAddress
+	params := k.GetParams(ctx)
+	nftContractAddressParam := params.NftContractAddress
 
 	fmt.Println("==============\nnftContractAddressParam", nftContractAddressParam)
 	if len(nftContractAddressParam) == 0 {
@@ -87,7 +88,10 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 
 	privKey := cryptosecp256k1.GenPrivKey()
 	pubKey := privKey.PubKey()
-	address := sdk.AccAddress(pubKey.Address().Bytes())
+	address, err := sdk.AccAddressFromBech32(params.NftContractMinter)
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
 
 	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
 	entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, base58.Encode(pubKey.Bytes()[:16]))

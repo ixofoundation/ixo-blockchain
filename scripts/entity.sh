@@ -73,7 +73,7 @@ FRANCESCO_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
-# ixod_tx did add-did-doc "$MIGUEL_DID_FULL" --broadcast-mode block -y
+ixod_tx iid create-iid-from-legacy-did "$MIGUEL_DID_FULL" --broadcast-mode block -y
 echo "Ledgering DID 2/2..."
 # ixod_tx did add-did-doc "$FRANCESCO_DID_FULL" --broadcast-mode block -y
 

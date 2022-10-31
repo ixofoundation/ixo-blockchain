@@ -9,6 +9,7 @@ import (
 
 var (
 	KeyNftContractAddress = []byte("NftContractAddress")
+	KeyNftContractMinter  = []byte("NftContractMinter")
 )
 
 func validateNftContractAddress(i interface{}) error {
@@ -34,9 +35,10 @@ func ParamKeyTable() paramstypes.KeyTable {
 	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(nftContractAddress string) Params {
+func NewParams(nftContractAddress string, nftContractMinter string) Params {
 	return Params{
 		NftContractAddress: nftContractAddress,
+		NftContractMinter:  nftContractAddress,
 	}
 }
 
@@ -44,6 +46,7 @@ func NewParams(nftContractAddress string) Params {
 func DefaultParams() Params {
 	return Params{
 		NftContractAddress: "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
+		NftContractMinter:  "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
 	}
 }
 
@@ -51,5 +54,6 @@ func DefaultParams() Params {
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
 		{KeyNftContractAddress, &p.NftContractAddress, validateNftContractAddress},
+		{KeyNftContractMinter, &p.NftContractMinter, validateNftContractAddress},
 	}
 }

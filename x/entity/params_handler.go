@@ -17,8 +17,6 @@ const (
 	EntityNftContractSymbol = "entity"
 )
 
-func nftModuleAddress() string { return fmt.Sprintf("%s-minter", types.ModuleName) }
-
 // NewParamChangeProposalHandler creates a new governance Handler for a ParamChangeProposal
 func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
@@ -44,7 +42,7 @@ func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *ty
 	// }
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
-	adminAddr := authtypes.NewModuleAddress(nftModuleAddress())
+	adminAddr := authtypes.NewModuleAddress(types.NftModuleAddress())
 
 	senderAddr, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
 	if err != nil {
@@ -63,19 +61,17 @@ func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *ty
 	// 	sdk.NewAttribute(sdk.AttributeKeySender, p.),
 	// ))
 
-	initiateNftContractMsg := entitycontracts.WasmMsgInitiateNftContract{
-		InitiateNftContract: entitycontracts.InitiateNftContract{
-			Name:   EntityNftContractName,
-			Symbol: EntityNftContractSymbol,
-			Minter: adminAddr.String(),
-		},
+	initiateNftContractMsg := entitycontracts.InitiateNftContract{
+		Name:   EntityNftContractName,
+		Symbol: EntityNftContractSymbol,
+		Minter: adminAddr.String(),
 	}
 
 	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
 	if err != nil {
 		return nil
 	}
-	
+
 	deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
 
 	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", deposit)
@@ -84,6 +80,7 @@ func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *ty
 	}
 
 	xx.NftContractAddress = contractAddr.String()
+	xx.NftContractMinter = initiateNftContractMsg.Minter
 
 	k.ParamSpace.SetParamSet(ctx, &xx)
 

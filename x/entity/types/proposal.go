@@ -1,13 +1,18 @@
 package types
 
 import (
+	fmt "fmt"
+
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	types "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 var (
 	ProposalTypeInitializeNftContract                  = "InitializeNftContract"
 	_                                 govtypes.Content = &InitializeNftContract{}
 )
+
+func NftModuleAddress() string { return fmt.Sprintf("%s-minter", types.ModuleName) }
 
 func NewInitializeNftContract(nftContractCodeId uint64, nftminteraddress string) InitializeNftContract {
 	return InitializeNftContract{
