@@ -175,43 +175,43 @@
         
           
           <li>
-            <a href="#bonds%2fbonds.proto">bonds/bonds.proto</a>
+            <a href="#ixo%2fbonds%2fv1beta1%2fbonds.proto">ixo/bonds/v1beta1/bonds.proto</a>
             <ul>
               
                 <li>
-                  <a href="#bonds.BaseOrder"><span class="badge">M</span>BaseOrder</a>
+                  <a href="#ixo.bonds.v1beta1.BaseOrder"><span class="badge">M</span>BaseOrder</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.Batch"><span class="badge">M</span>Batch</a>
+                  <a href="#ixo.bonds.v1beta1.Batch"><span class="badge">M</span>Batch</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.Bond"><span class="badge">M</span>Bond</a>
+                  <a href="#ixo.bonds.v1beta1.Bond"><span class="badge">M</span>Bond</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.BondDetails"><span class="badge">M</span>BondDetails</a>
+                  <a href="#ixo.bonds.v1beta1.BondDetails"><span class="badge">M</span>BondDetails</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.BuyOrder"><span class="badge">M</span>BuyOrder</a>
+                  <a href="#ixo.bonds.v1beta1.BuyOrder"><span class="badge">M</span>BuyOrder</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.FunctionParam"><span class="badge">M</span>FunctionParam</a>
+                  <a href="#ixo.bonds.v1beta1.FunctionParam"><span class="badge">M</span>FunctionParam</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.Params"><span class="badge">M</span>Params</a>
+                  <a href="#ixo.bonds.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.SellOrder"><span class="badge">M</span>SellOrder</a>
+                  <a href="#ixo.bonds.v1beta1.SellOrder"><span class="badge">M</span>SellOrder</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.SwapOrder"><span class="badge">M</span>SwapOrder</a>
+                  <a href="#ixo.bonds.v1beta1.SwapOrder"><span class="badge">M</span>SwapOrder</a>
                 </li>
               
               
@@ -222,7 +222,7 @@
         
           
           <li>
-            <a href="#bonds%2fgenesis.proto">bonds/genesis.proto</a>
+            <a href="#ixo%2fbonds%2fv1beta1%2fgenesis.proto">ixo/bonds/v1beta1/genesis.proto</a>
             <ul>
               
                 <li>
@@ -237,7 +237,7 @@
         
           
           <li>
-            <a href="#bonds%2fquery.proto">bonds/query.proto</a>
+            <a href="#ixo%2fbonds%2fv1beta1%2fquery.proto">ixo/bonds/v1beta1/query.proto</a>
             <ul>
               
                 <li>
@@ -364,7 +364,7 @@
         
           
           <li>
-            <a href="#bonds%2ftx.proto">bonds/tx.proto</a>
+            <a href="#ixo%2fbonds%2fv1beta1%2ftx.proto">ixo/bonds/v1beta1/tx.proto</a>
             <ul>
               
                 <li>
@@ -459,15 +459,15 @@
         
           
           <li>
-            <a href="#entity%2fentity.proto">entity/entity.proto</a>
+            <a href="#ixo%2fentity%2fv1beta1%2fentity.proto">ixo/entity/v1beta1/entity.proto</a>
             <ul>
               
                 <li>
-                  <a href="#entity.EntityDoc"><span class="badge">M</span>EntityDoc</a>
+                  <a href="#ixo.entity.v1beta1.EntityDoc"><span class="badge">M</span>EntityDoc</a>
                 </li>
               
                 <li>
-                  <a href="#entity.Params"><span class="badge">M</span>Params</a>
+                  <a href="#ixo.entity.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
               
@@ -478,11 +478,11 @@
         
           
           <li>
-            <a href="#entity%2fgenesis.proto">entity/genesis.proto</a>
+            <a href="#ixo%2fentity%2fv1beta1%2fgenesis.proto">ixo/entity/v1beta1/genesis.proto</a>
             <ul>
               
                 <li>
-                  <a href="#entity.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#ixo.entity.v1beta1.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
@@ -493,11 +493,11 @@
         
           
           <li>
-            <a href="#entity%2fproposal.proto">entity/proposal.proto</a>
+            <a href="#ixo%2fentity%2fv1beta1%2fproposal.proto">ixo/entity/v1beta1/proposal.proto</a>
             <ul>
               
                 <li>
-                  <a href="#entity.InitializeNftContract"><span class="badge">M</span>InitializeNftContract</a>
+                  <a href="#ixo.entity.v1beta1.InitializeNftContract"><span class="badge">M</span>InitializeNftContract</a>
                 </li>
               
               
@@ -508,42 +508,42 @@
         
           
           <li>
-            <a href="#entity%2fquery.proto">entity/query.proto</a>
+            <a href="#ixo%2fentity%2fv1beta1%2fquery.proto">ixo/entity/v1beta1/query.proto</a>
             <ul>
               
                 <li>
-                  <a href="#entity.QueryEntityConfigRequest"><span class="badge">M</span>QueryEntityConfigRequest</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityConfigRequest"><span class="badge">M</span>QueryEntityConfigRequest</a>
                 </li>
               
                 <li>
-                  <a href="#entity.QueryEntityConfigResponse"><span class="badge">M</span>QueryEntityConfigResponse</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityConfigResponse"><span class="badge">M</span>QueryEntityConfigResponse</a>
                 </li>
               
                 <li>
-                  <a href="#entity.QueryEntityConfigResponse.MapEntry"><span class="badge">M</span>QueryEntityConfigResponse.MapEntry</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityConfigResponse.MapEntry"><span class="badge">M</span>QueryEntityConfigResponse.MapEntry</a>
                 </li>
               
                 <li>
-                  <a href="#entity.QueryEntityDocRequest"><span class="badge">M</span>QueryEntityDocRequest</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityDocRequest"><span class="badge">M</span>QueryEntityDocRequest</a>
                 </li>
               
                 <li>
-                  <a href="#entity.QueryEntityDocResponse"><span class="badge">M</span>QueryEntityDocResponse</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityDocResponse"><span class="badge">M</span>QueryEntityDocResponse</a>
                 </li>
               
                 <li>
-                  <a href="#entity.QueryEntityListRequest"><span class="badge">M</span>QueryEntityListRequest</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityListRequest"><span class="badge">M</span>QueryEntityListRequest</a>
                 </li>
               
                 <li>
-                  <a href="#entity.QueryEntityListResponse"><span class="badge">M</span>QueryEntityListResponse</a>
+                  <a href="#ixo.entity.v1beta1.QueryEntityListResponse"><span class="badge">M</span>QueryEntityListResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#entity.Query"><span class="badge">S</span>Query</a>
+                  <a href="#ixo.entity.v1beta1.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -551,276 +551,39 @@
         
           
           <li>
-            <a href="#iid%2fiid.proto">iid/iid.proto</a>
+            <a href="#ixo%2fiid%2fv1beta1%2fiid.proto">ixo/iid/v1beta1/iid.proto</a>
             <ul>
               
                 <li>
-                  <a href="#iid.AccordedRight"><span class="badge">M</span>AccordedRight</a>
+                  <a href="#ixo.iid.v1beta1.AccordedRight"><span class="badge">M</span>AccordedRight</a>
                 </li>
               
                 <li>
-                  <a href="#iid.Context"><span class="badge">M</span>Context</a>
+                  <a href="#ixo.iid.v1beta1.Context"><span class="badge">M</span>Context</a>
                 </li>
               
                 <li>
-                  <a href="#iid.IidDocument"><span class="badge">M</span>IidDocument</a>
+                  <a href="#ixo.iid.v1beta1.IidDocument"><span class="badge">M</span>IidDocument</a>
                 </li>
               
                 <li>
-                  <a href="#iid.IidMetadata"><span class="badge">M</span>IidMetadata</a>
+                  <a href="#ixo.iid.v1beta1.IidMetadata"><span class="badge">M</span>IidMetadata</a>
                 </li>
               
                 <li>
-                  <a href="#iid.LinkedEntity"><span class="badge">M</span>LinkedEntity</a>
+                  <a href="#ixo.iid.v1beta1.LinkedEntity"><span class="badge">M</span>LinkedEntity</a>
                 </li>
               
                 <li>
-                  <a href="#iid.LinkedResource"><span class="badge">M</span>LinkedResource</a>
+                  <a href="#ixo.iid.v1beta1.LinkedResource"><span class="badge">M</span>LinkedResource</a>
                 </li>
               
                 <li>
-                  <a href="#iid.Service"><span class="badge">M</span>Service</a>
+                  <a href="#ixo.iid.v1beta1.Service"><span class="badge">M</span>Service</a>
                 </li>
               
                 <li>
-                  <a href="#iid.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#iid%2ftx.proto">iid/tx.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#iid.MsgAddAccordedRight"><span class="badge">M</span>MsgAddAccordedRight</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddAccordedRightResponse"><span class="badge">M</span>MsgAddAccordedRightResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddController"><span class="badge">M</span>MsgAddController</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddControllerResponse"><span class="badge">M</span>MsgAddControllerResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddIidContext"><span class="badge">M</span>MsgAddIidContext</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddLinkedEntity"><span class="badge">M</span>MsgAddLinkedEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddLinkedEntityResponse"><span class="badge">M</span>MsgAddLinkedEntityResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddLinkedResource"><span class="badge">M</span>MsgAddLinkedResource</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddLinkedResourceResponse"><span class="badge">M</span>MsgAddLinkedResourceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddService"><span class="badge">M</span>MsgAddService</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddServiceResponse"><span class="badge">M</span>MsgAddServiceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddVerification"><span class="badge">M</span>MsgAddVerification</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgAddVerificationResponse"><span class="badge">M</span>MsgAddVerificationResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgCreateIidDocument"><span class="badge">M</span>MsgCreateIidDocument</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgCreateIidDocumentResponse"><span class="badge">M</span>MsgCreateIidDocumentResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeactivateIID"><span class="badge">M</span>MsgDeactivateIID</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeactivateIIDResponse"><span class="badge">M</span>MsgDeactivateIIDResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteAccordedRightResponse"><span class="badge">M</span>MsgDeleteAccordedRightResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteController"><span class="badge">M</span>MsgDeleteController</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteControllerResponse"><span class="badge">M</span>MsgDeleteControllerResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteIidContext"><span class="badge">M</span>MsgDeleteIidContext</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteLinkedEntity"><span class="badge">M</span>MsgDeleteLinkedEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteLinkedEntityResponse"><span class="badge">M</span>MsgDeleteLinkedEntityResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteLinkedResource"><span class="badge">M</span>MsgDeleteLinkedResource</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteLinkedResourceResponse"><span class="badge">M</span>MsgDeleteLinkedResourceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteService"><span class="badge">M</span>MsgDeleteService</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgDeleteServiceResponse"><span class="badge">M</span>MsgDeleteServiceResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgRevokeVerification"><span class="badge">M</span>MsgRevokeVerification</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgRevokeVerificationResponse"><span class="badge">M</span>MsgRevokeVerificationResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgSetVerificationRelationships"><span class="badge">M</span>MsgSetVerificationRelationships</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgSetVerificationRelationshipsResponse"><span class="badge">M</span>MsgSetVerificationRelationshipsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgUpdateIidDocument"><span class="badge">M</span>MsgUpdateIidDocument</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgUpdateIidDocumentResponse"><span class="badge">M</span>MsgUpdateIidDocumentResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgUpdateIidMeta"><span class="badge">M</span>MsgUpdateIidMeta</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.MsgUpdateIidMetaResponse"><span class="badge">M</span>MsgUpdateIidMetaResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.Verification"><span class="badge">M</span>Verification</a>
-                </li>
-              
-              
-              
-              
-                <li>
-                  <a href="#iid.Msg"><span class="badge">S</span>Msg</a>
-                </li>
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#entity%2ftx.proto">entity/tx.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#entity.MsgCreateEntity"><span class="badge">M</span>MsgCreateEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgTransferEntity"><span class="badge">M</span>MsgTransferEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgTransferEntityResponse"><span class="badge">M</span>MsgTransferEntityResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgUpdateEntity"><span class="badge">M</span>MsgUpdateEntity</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgUpdateEntityConfig"><span class="badge">M</span>MsgUpdateEntityConfig</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgUpdateEntityConfigResponse"><span class="badge">M</span>MsgUpdateEntityConfigResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#entity.MsgUpdateEntityResponse"><span class="badge">M</span>MsgUpdateEntityResponse</a>
-                </li>
-              
-              
-              
-              
-                <li>
-                  <a href="#entity.Msg"><span class="badge">S</span>Msg</a>
-                </li>
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#iid%2fevent.proto">iid/event.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#iid.IidDocumentCreatedEvent"><span class="badge">M</span>IidDocumentCreatedEvent</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.IidDocumentUpdatedEvent"><span class="badge">M</span>IidDocumentUpdatedEvent</a>
+                  <a href="#ixo.iid.v1beta1.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
                 </li>
               
               
@@ -831,11 +594,225 @@
         
           
           <li>
-            <a href="#iid%2fgenesis.proto">iid/genesis.proto</a>
+            <a href="#ixo%2fiid%2fv1beta1%2ftx.proto">ixo/iid/v1beta1/tx.proto</a>
             <ul>
               
                 <li>
-                  <a href="#iid.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#ixo.iid.v1beta1.MsgAddAccordedRight"><span class="badge">M</span>MsgAddAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddAccordedRightResponse"><span class="badge">M</span>MsgAddAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddController"><span class="badge">M</span>MsgAddController</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddControllerResponse"><span class="badge">M</span>MsgAddControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddIidContext"><span class="badge">M</span>MsgAddIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddIidContextResponse"><span class="badge">M</span>MsgAddIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddLinkedEntity"><span class="badge">M</span>MsgAddLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddLinkedEntityResponse"><span class="badge">M</span>MsgAddLinkedEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddLinkedResource"><span class="badge">M</span>MsgAddLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddLinkedResourceResponse"><span class="badge">M</span>MsgAddLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddService"><span class="badge">M</span>MsgAddService</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddServiceResponse"><span class="badge">M</span>MsgAddServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddVerification"><span class="badge">M</span>MsgAddVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgAddVerificationResponse"><span class="badge">M</span>MsgAddVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgCreateIidDocument"><span class="badge">M</span>MsgCreateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgCreateIidDocumentResponse"><span class="badge">M</span>MsgCreateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeactivateIID"><span class="badge">M</span>MsgDeactivateIID</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeactivateIIDResponse"><span class="badge">M</span>MsgDeactivateIIDResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteAccordedRight"><span class="badge">M</span>MsgDeleteAccordedRight</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteAccordedRightResponse"><span class="badge">M</span>MsgDeleteAccordedRightResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteController"><span class="badge">M</span>MsgDeleteController</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteControllerResponse"><span class="badge">M</span>MsgDeleteControllerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteIidContext"><span class="badge">M</span>MsgDeleteIidContext</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteIidContextResponse"><span class="badge">M</span>MsgDeleteIidContextResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteLinkedEntity"><span class="badge">M</span>MsgDeleteLinkedEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteLinkedEntityResponse"><span class="badge">M</span>MsgDeleteLinkedEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteLinkedResource"><span class="badge">M</span>MsgDeleteLinkedResource</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteLinkedResourceResponse"><span class="badge">M</span>MsgDeleteLinkedResourceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteService"><span class="badge">M</span>MsgDeleteService</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgDeleteServiceResponse"><span class="badge">M</span>MsgDeleteServiceResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgRevokeVerification"><span class="badge">M</span>MsgRevokeVerification</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgRevokeVerificationResponse"><span class="badge">M</span>MsgRevokeVerificationResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgSetVerificationRelationships"><span class="badge">M</span>MsgSetVerificationRelationships</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgSetVerificationRelationshipsResponse"><span class="badge">M</span>MsgSetVerificationRelationshipsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgUpdateIidDocument"><span class="badge">M</span>MsgUpdateIidDocument</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgUpdateIidDocumentResponse"><span class="badge">M</span>MsgUpdateIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgUpdateIidMeta"><span class="badge">M</span>MsgUpdateIidMeta</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.MsgUpdateIidMetaResponse"><span class="badge">M</span>MsgUpdateIidMetaResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.Verification"><span class="badge">M</span>Verification</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fentity%2fv1beta1%2ftx.proto">ixo/entity/v1beta1/tx.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgCreateEntity"><span class="badge">M</span>MsgCreateEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgTransferEntity"><span class="badge">M</span>MsgTransferEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgTransferEntityResponse"><span class="badge">M</span>MsgTransferEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgUpdateEntity"><span class="badge">M</span>MsgUpdateEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgUpdateEntityResponse"><span class="badge">M</span>MsgUpdateEntityResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fiid%2fv1beta1%2fevent.proto">ixo/iid/v1beta1/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.IidDocumentCreatedEvent"><span class="badge">M</span>IidDocumentCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.IidDocumentUpdatedEvent"><span class="badge">M</span>IidDocumentUpdatedEvent</a>
                 </li>
               
               
@@ -846,38 +823,53 @@
         
           
           <li>
-            <a href="#iid%2fquery.proto">iid/query.proto</a>
+            <a href="#ixo%2fiid%2fv1beta1%2fgenesis.proto">ixo/iid/v1beta1/genesis.proto</a>
             <ul>
               
                 <li>
-                  <a href="#iid.QueryIidDocumentRequest"><span class="badge">M</span>QueryIidDocumentRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.QueryIidDocumentResponse"><span class="badge">M</span>QueryIidDocumentResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.QueryIidDocumentsRequest"><span class="badge">M</span>QueryIidDocumentsRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.QueryIidDocumentsResponse"><span class="badge">M</span>QueryIidDocumentsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.QueryIidMetaDataRequest"><span class="badge">M</span>QueryIidMetaDataRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#iid.QueryIidMetaDataResponse"><span class="badge">M</span>QueryIidMetaDataResponse</a>
+                  <a href="#ixo.iid.v1beta1.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
               
               
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fiid%2fv1beta1%2fquery.proto">ixo/iid/v1beta1/query.proto</a>
+            <ul>
+              
                 <li>
-                  <a href="#iid.Query"><span class="badge">S</span>Query</a>
+                  <a href="#ixo.iid.v1beta1.QueryIidDocumentRequest"><span class="badge">M</span>QueryIidDocumentRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.QueryIidDocumentResponse"><span class="badge">M</span>QueryIidDocumentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.QueryIidDocumentsRequest"><span class="badge">M</span>QueryIidDocumentsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.QueryIidDocumentsResponse"><span class="badge">M</span>QueryIidDocumentsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.QueryIidMetaDataRequest"><span class="badge">M</span>QueryIidMetaDataRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.QueryIidMetaDataResponse"><span class="badge">M</span>QueryIidMetaDataResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -885,7 +877,7 @@
         
           
           <li>
-            <a href="#legacy%2fdid%2fdid.proto">legacy/did/did.proto</a>
+            <a href="#ixo%2flegacy%2fdid%2fdid.proto">ixo/legacy/did/did.proto</a>
             <ul>
               
                 <li>
@@ -912,7 +904,7 @@
         
           
           <li>
-            <a href="#legacy%2fdid%2fdiddoc.proto">legacy/did/diddoc.proto</a>
+            <a href="#ixo%2flegacy%2fdid%2fdiddoc.proto">ixo/legacy/did/diddoc.proto</a>
             <ul>
               
                 <li>
@@ -927,39 +919,39 @@
         
           
           <li>
-            <a href="#payments%2fpayments.proto">payments/payments.proto</a>
+            <a href="#ixo%2fpayments%2fv1%2fpayments.proto">ixo/payments/v1/payments.proto</a>
             <ul>
               
                 <li>
-                  <a href="#payments.BlockPeriod"><span class="badge">M</span>BlockPeriod</a>
+                  <a href="#ixo.payments.v1.BlockPeriod"><span class="badge">M</span>BlockPeriod</a>
                 </li>
               
                 <li>
-                  <a href="#payments.Discount"><span class="badge">M</span>Discount</a>
+                  <a href="#ixo.payments.v1.Discount"><span class="badge">M</span>Discount</a>
                 </li>
               
                 <li>
-                  <a href="#payments.DistributionShare"><span class="badge">M</span>DistributionShare</a>
+                  <a href="#ixo.payments.v1.DistributionShare"><span class="badge">M</span>DistributionShare</a>
                 </li>
               
                 <li>
-                  <a href="#payments.PaymentContract"><span class="badge">M</span>PaymentContract</a>
+                  <a href="#ixo.payments.v1.PaymentContract"><span class="badge">M</span>PaymentContract</a>
                 </li>
               
                 <li>
-                  <a href="#payments.PaymentTemplate"><span class="badge">M</span>PaymentTemplate</a>
+                  <a href="#ixo.payments.v1.PaymentTemplate"><span class="badge">M</span>PaymentTemplate</a>
                 </li>
               
                 <li>
-                  <a href="#payments.Subscription"><span class="badge">M</span>Subscription</a>
+                  <a href="#ixo.payments.v1.Subscription"><span class="badge">M</span>Subscription</a>
                 </li>
               
                 <li>
-                  <a href="#payments.TestPeriod"><span class="badge">M</span>TestPeriod</a>
+                  <a href="#ixo.payments.v1.TestPeriod"><span class="badge">M</span>TestPeriod</a>
                 </li>
               
                 <li>
-                  <a href="#payments.TimePeriod"><span class="badge">M</span>TimePeriod</a>
+                  <a href="#ixo.payments.v1.TimePeriod"><span class="badge">M</span>TimePeriod</a>
                 </li>
               
               
@@ -970,11 +962,11 @@
         
           
           <li>
-            <a href="#payments%2fgenesis.proto">payments/genesis.proto</a>
+            <a href="#ixo%2fpayments%2fv1%2fgenesis.proto">ixo/payments/v1/genesis.proto</a>
             <ul>
               
                 <li>
-                  <a href="#payments.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#ixo.payments.v1.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
@@ -985,46 +977,46 @@
         
           
           <li>
-            <a href="#payments%2fquery.proto">payments/query.proto</a>
+            <a href="#ixo%2fpayments%2fv1%2fquery.proto">ixo/payments/v1/query.proto</a>
             <ul>
               
                 <li>
-                  <a href="#payments.QueryPaymentContractRequest"><span class="badge">M</span>QueryPaymentContractRequest</a>
+                  <a href="#ixo.payments.v1.QueryPaymentContractRequest"><span class="badge">M</span>QueryPaymentContractRequest</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QueryPaymentContractResponse"><span class="badge">M</span>QueryPaymentContractResponse</a>
+                  <a href="#ixo.payments.v1.QueryPaymentContractResponse"><span class="badge">M</span>QueryPaymentContractResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QueryPaymentContractsByIdPrefixRequest"><span class="badge">M</span>QueryPaymentContractsByIdPrefixRequest</a>
+                  <a href="#ixo.payments.v1.QueryPaymentContractsByIdPrefixRequest"><span class="badge">M</span>QueryPaymentContractsByIdPrefixRequest</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QueryPaymentContractsByIdPrefixResponse"><span class="badge">M</span>QueryPaymentContractsByIdPrefixResponse</a>
+                  <a href="#ixo.payments.v1.QueryPaymentContractsByIdPrefixResponse"><span class="badge">M</span>QueryPaymentContractsByIdPrefixResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QueryPaymentTemplateRequest"><span class="badge">M</span>QueryPaymentTemplateRequest</a>
+                  <a href="#ixo.payments.v1.QueryPaymentTemplateRequest"><span class="badge">M</span>QueryPaymentTemplateRequest</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QueryPaymentTemplateResponse"><span class="badge">M</span>QueryPaymentTemplateResponse</a>
+                  <a href="#ixo.payments.v1.QueryPaymentTemplateResponse"><span class="badge">M</span>QueryPaymentTemplateResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QuerySubscriptionRequest"><span class="badge">M</span>QuerySubscriptionRequest</a>
+                  <a href="#ixo.payments.v1.QuerySubscriptionRequest"><span class="badge">M</span>QuerySubscriptionRequest</a>
                 </li>
               
                 <li>
-                  <a href="#payments.QuerySubscriptionResponse"><span class="badge">M</span>QuerySubscriptionResponse</a>
+                  <a href="#ixo.payments.v1.QuerySubscriptionResponse"><span class="badge">M</span>QuerySubscriptionResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#payments.Query"><span class="badge">S</span>Query</a>
+                  <a href="#ixo.payments.v1.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -1032,70 +1024,70 @@
         
           
           <li>
-            <a href="#payments%2ftx.proto">payments/tx.proto</a>
+            <a href="#ixo%2fpayments%2fv1%2ftx.proto">ixo/payments/v1/tx.proto</a>
             <ul>
               
                 <li>
-                  <a href="#payments.MsgCreatePaymentContract"><span class="badge">M</span>MsgCreatePaymentContract</a>
+                  <a href="#ixo.payments.v1.MsgCreatePaymentContract"><span class="badge">M</span>MsgCreatePaymentContract</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgCreatePaymentContractResponse"><span class="badge">M</span>MsgCreatePaymentContractResponse</a>
+                  <a href="#ixo.payments.v1.MsgCreatePaymentContractResponse"><span class="badge">M</span>MsgCreatePaymentContractResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgCreatePaymentTemplate"><span class="badge">M</span>MsgCreatePaymentTemplate</a>
+                  <a href="#ixo.payments.v1.MsgCreatePaymentTemplate"><span class="badge">M</span>MsgCreatePaymentTemplate</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgCreatePaymentTemplateResponse"><span class="badge">M</span>MsgCreatePaymentTemplateResponse</a>
+                  <a href="#ixo.payments.v1.MsgCreatePaymentTemplateResponse"><span class="badge">M</span>MsgCreatePaymentTemplateResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgCreateSubscription"><span class="badge">M</span>MsgCreateSubscription</a>
+                  <a href="#ixo.payments.v1.MsgCreateSubscription"><span class="badge">M</span>MsgCreateSubscription</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgCreateSubscriptionResponse"><span class="badge">M</span>MsgCreateSubscriptionResponse</a>
+                  <a href="#ixo.payments.v1.MsgCreateSubscriptionResponse"><span class="badge">M</span>MsgCreateSubscriptionResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgEffectPayment"><span class="badge">M</span>MsgEffectPayment</a>
+                  <a href="#ixo.payments.v1.MsgEffectPayment"><span class="badge">M</span>MsgEffectPayment</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgEffectPaymentResponse"><span class="badge">M</span>MsgEffectPaymentResponse</a>
+                  <a href="#ixo.payments.v1.MsgEffectPaymentResponse"><span class="badge">M</span>MsgEffectPaymentResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgGrantDiscount"><span class="badge">M</span>MsgGrantDiscount</a>
+                  <a href="#ixo.payments.v1.MsgGrantDiscount"><span class="badge">M</span>MsgGrantDiscount</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgGrantDiscountResponse"><span class="badge">M</span>MsgGrantDiscountResponse</a>
+                  <a href="#ixo.payments.v1.MsgGrantDiscountResponse"><span class="badge">M</span>MsgGrantDiscountResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgRevokeDiscount"><span class="badge">M</span>MsgRevokeDiscount</a>
+                  <a href="#ixo.payments.v1.MsgRevokeDiscount"><span class="badge">M</span>MsgRevokeDiscount</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgRevokeDiscountResponse"><span class="badge">M</span>MsgRevokeDiscountResponse</a>
+                  <a href="#ixo.payments.v1.MsgRevokeDiscountResponse"><span class="badge">M</span>MsgRevokeDiscountResponse</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgSetPaymentContractAuthorisation"><span class="badge">M</span>MsgSetPaymentContractAuthorisation</a>
+                  <a href="#ixo.payments.v1.MsgSetPaymentContractAuthorisation"><span class="badge">M</span>MsgSetPaymentContractAuthorisation</a>
                 </li>
               
                 <li>
-                  <a href="#payments.MsgSetPaymentContractAuthorisationResponse"><span class="badge">M</span>MsgSetPaymentContractAuthorisationResponse</a>
+                  <a href="#ixo.payments.v1.MsgSetPaymentContractAuthorisationResponse"><span class="badge">M</span>MsgSetPaymentContractAuthorisationResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#payments.Msg"><span class="badge">S</span>Msg</a>
+                  <a href="#ixo.payments.v1.Msg"><span class="badge">S</span>Msg</a>
                 </li>
               
             </ul>
@@ -1103,86 +1095,71 @@
         
           
           <li>
-            <a href="#project%2fproject.proto">project/project.proto</a>
+            <a href="#ixo%2fproject%2fv1%2fproject.proto">ixo/project/v1/project.proto</a>
             <ul>
               
                 <li>
-                  <a href="#project.AccountMap"><span class="badge">M</span>AccountMap</a>
+                  <a href="#ixo.project.v1.AccountMap"><span class="badge">M</span>AccountMap</a>
                 </li>
               
                 <li>
-                  <a href="#project.AccountMap.MapEntry"><span class="badge">M</span>AccountMap.MapEntry</a>
+                  <a href="#ixo.project.v1.AccountMap.MapEntry"><span class="badge">M</span>AccountMap.MapEntry</a>
                 </li>
               
                 <li>
-                  <a href="#project.Claim"><span class="badge">M</span>Claim</a>
+                  <a href="#ixo.project.v1.Claim"><span class="badge">M</span>Claim</a>
                 </li>
               
                 <li>
-                  <a href="#project.Claims"><span class="badge">M</span>Claims</a>
+                  <a href="#ixo.project.v1.Claims"><span class="badge">M</span>Claims</a>
                 </li>
               
                 <li>
-                  <a href="#project.CreateAgentDoc"><span class="badge">M</span>CreateAgentDoc</a>
+                  <a href="#ixo.project.v1.CreateAgentDoc"><span class="badge">M</span>CreateAgentDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.CreateClaimDoc"><span class="badge">M</span>CreateClaimDoc</a>
+                  <a href="#ixo.project.v1.CreateClaimDoc"><span class="badge">M</span>CreateClaimDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.CreateEvaluationDoc"><span class="badge">M</span>CreateEvaluationDoc</a>
+                  <a href="#ixo.project.v1.CreateEvaluationDoc"><span class="badge">M</span>CreateEvaluationDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.GenesisAccountMap"><span class="badge">M</span>GenesisAccountMap</a>
+                  <a href="#ixo.project.v1.GenesisAccountMap"><span class="badge">M</span>GenesisAccountMap</a>
                 </li>
               
                 <li>
-                  <a href="#project.GenesisAccountMap.MapEntry"><span class="badge">M</span>GenesisAccountMap.MapEntry</a>
+                  <a href="#ixo.project.v1.GenesisAccountMap.MapEntry"><span class="badge">M</span>GenesisAccountMap.MapEntry</a>
                 </li>
               
                 <li>
-                  <a href="#project.Params"><span class="badge">M</span>Params</a>
+                  <a href="#ixo.project.v1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
                 <li>
-                  <a href="#project.ProjectDoc"><span class="badge">M</span>ProjectDoc</a>
+                  <a href="#ixo.project.v1.ProjectDoc"><span class="badge">M</span>ProjectDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.UpdateAgentDoc"><span class="badge">M</span>UpdateAgentDoc</a>
+                  <a href="#ixo.project.v1.UpdateAgentDoc"><span class="badge">M</span>UpdateAgentDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.UpdateProjectStatusDoc"><span class="badge">M</span>UpdateProjectStatusDoc</a>
+                  <a href="#ixo.project.v1.UpdateProjectStatusDoc"><span class="badge">M</span>UpdateProjectStatusDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.WithdrawFundsDoc"><span class="badge">M</span>WithdrawFundsDoc</a>
+                  <a href="#ixo.project.v1.WithdrawFundsDoc"><span class="badge">M</span>WithdrawFundsDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.WithdrawalInfoDoc"><span class="badge">M</span>WithdrawalInfoDoc</a>
+                  <a href="#ixo.project.v1.WithdrawalInfoDoc"><span class="badge">M</span>WithdrawalInfoDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.WithdrawalInfoDocs"><span class="badge">M</span>WithdrawalInfoDocs</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#project%2fgenesis.proto">project/genesis.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#project.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#ixo.project.v1.WithdrawalInfoDocs"><span class="badge">M</span>WithdrawalInfoDocs</a>
                 </li>
               
               
@@ -1193,46 +1170,61 @@
         
           
           <li>
-            <a href="#project%2fquery.proto">project/query.proto</a>
+            <a href="#ixo%2fproject%2fv1%2fgenesis.proto">ixo/project/v1/genesis.proto</a>
             <ul>
               
                 <li>
-                  <a href="#project.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryProjectAccountsRequest"><span class="badge">M</span>QueryProjectAccountsRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryProjectAccountsResponse"><span class="badge">M</span>QueryProjectAccountsResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryProjectDocRequest"><span class="badge">M</span>QueryProjectDocRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryProjectDocResponse"><span class="badge">M</span>QueryProjectDocResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryProjectTxRequest"><span class="badge">M</span>QueryProjectTxRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#project.QueryProjectTxResponse"><span class="badge">M</span>QueryProjectTxResponse</a>
+                  <a href="#ixo.project.v1.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
               
               
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fproject%2fv1%2fquery.proto">ixo/project/v1/query.proto</a>
+            <ul>
+              
                 <li>
-                  <a href="#project.Query"><span class="badge">S</span>Query</a>
+                  <a href="#ixo.project.v1.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryProjectAccountsRequest"><span class="badge">M</span>QueryProjectAccountsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryProjectAccountsResponse"><span class="badge">M</span>QueryProjectAccountsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryProjectDocRequest"><span class="badge">M</span>QueryProjectDocRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryProjectDocResponse"><span class="badge">M</span>QueryProjectDocResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryProjectTxRequest"><span class="badge">M</span>QueryProjectTxRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.project.v1.QueryProjectTxResponse"><span class="badge">M</span>QueryProjectTxResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.project.v1.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -1240,78 +1232,201 @@
         
           
           <li>
-            <a href="#project%2ftx.proto">project/tx.proto</a>
+            <a href="#ixo%2fproject%2fv1%2ftx.proto">ixo/project/v1/tx.proto</a>
             <ul>
               
                 <li>
-                  <a href="#project.MsgCreateAgent"><span class="badge">M</span>MsgCreateAgent</a>
+                  <a href="#ixo.project.v1.MsgCreateAgent"><span class="badge">M</span>MsgCreateAgent</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateAgentResponse"><span class="badge">M</span>MsgCreateAgentResponse</a>
+                  <a href="#ixo.project.v1.MsgCreateAgentResponse"><span class="badge">M</span>MsgCreateAgentResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateClaim"><span class="badge">M</span>MsgCreateClaim</a>
+                  <a href="#ixo.project.v1.MsgCreateClaim"><span class="badge">M</span>MsgCreateClaim</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateClaimResponse"><span class="badge">M</span>MsgCreateClaimResponse</a>
+                  <a href="#ixo.project.v1.MsgCreateClaimResponse"><span class="badge">M</span>MsgCreateClaimResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateEvaluation"><span class="badge">M</span>MsgCreateEvaluation</a>
+                  <a href="#ixo.project.v1.MsgCreateEvaluation"><span class="badge">M</span>MsgCreateEvaluation</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateEvaluationResponse"><span class="badge">M</span>MsgCreateEvaluationResponse</a>
+                  <a href="#ixo.project.v1.MsgCreateEvaluationResponse"><span class="badge">M</span>MsgCreateEvaluationResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateProject"><span class="badge">M</span>MsgCreateProject</a>
+                  <a href="#ixo.project.v1.MsgCreateProject"><span class="badge">M</span>MsgCreateProject</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgCreateProjectResponse"><span class="badge">M</span>MsgCreateProjectResponse</a>
+                  <a href="#ixo.project.v1.MsgCreateProjectResponse"><span class="badge">M</span>MsgCreateProjectResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgUpdateAgent"><span class="badge">M</span>MsgUpdateAgent</a>
+                  <a href="#ixo.project.v1.MsgUpdateAgent"><span class="badge">M</span>MsgUpdateAgent</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgUpdateAgentResponse"><span class="badge">M</span>MsgUpdateAgentResponse</a>
+                  <a href="#ixo.project.v1.MsgUpdateAgentResponse"><span class="badge">M</span>MsgUpdateAgentResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgUpdateProjectDoc"><span class="badge">M</span>MsgUpdateProjectDoc</a>
+                  <a href="#ixo.project.v1.MsgUpdateProjectDoc"><span class="badge">M</span>MsgUpdateProjectDoc</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgUpdateProjectDocResponse"><span class="badge">M</span>MsgUpdateProjectDocResponse</a>
+                  <a href="#ixo.project.v1.MsgUpdateProjectDocResponse"><span class="badge">M</span>MsgUpdateProjectDocResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgUpdateProjectStatus"><span class="badge">M</span>MsgUpdateProjectStatus</a>
+                  <a href="#ixo.project.v1.MsgUpdateProjectStatus"><span class="badge">M</span>MsgUpdateProjectStatus</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgUpdateProjectStatusResponse"><span class="badge">M</span>MsgUpdateProjectStatusResponse</a>
+                  <a href="#ixo.project.v1.MsgUpdateProjectStatusResponse"><span class="badge">M</span>MsgUpdateProjectStatusResponse</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgWithdrawFunds"><span class="badge">M</span>MsgWithdrawFunds</a>
+                  <a href="#ixo.project.v1.MsgWithdrawFunds"><span class="badge">M</span>MsgWithdrawFunds</a>
                 </li>
               
                 <li>
-                  <a href="#project.MsgWithdrawFundsResponse"><span class="badge">M</span>MsgWithdrawFundsResponse</a>
+                  <a href="#ixo.project.v1.MsgWithdrawFundsResponse"><span class="badge">M</span>MsgWithdrawFundsResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#project.Msg"><span class="badge">S</span>Msg</a>
+                  <a href="#ixo.project.v1.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2ftoken.proto">ixo/token/v1beta1/token.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Params"><span class="badge">M</span>Params</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.TokenDoc"><span class="badge">M</span>TokenDoc</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2fgenesis.proto">ixo/token/v1beta1/genesis.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.GenesisState"><span class="badge">M</span>GenesisState</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2fproposal.proto">ixo/token/v1beta1/proposal.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.InitializeNftContract"><span class="badge">M</span>InitializeNftContract</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2fquery.proto">ixo/token/v1beta1/query.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenConfigRequest"><span class="badge">M</span>QueryTokenConfigRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenConfigResponse"><span class="badge">M</span>QueryTokenConfigResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry"><span class="badge">M</span>QueryTokenConfigResponse.MapEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenDocRequest"><span class="badge">M</span>QueryTokenDocRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenDocResponse"><span class="badge">M</span>QueryTokenDocResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenListRequest"><span class="badge">M</span>QueryTokenListRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryTokenListResponse"><span class="badge">M</span>QueryTokenListResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Query"><span class="badge">S</span>Query</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2ftx.proto">ixo/token/v1beta1/tx.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgCreateToken"><span class="badge">M</span>MsgCreateToken</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgCreateTokenResponse"><span class="badge">M</span>MsgCreateTokenResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgTransferToken"><span class="badge">M</span>MsgTransferToken</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgTransferTokenResponse"><span class="badge">M</span>MsgTransferTokenResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Msg"><span class="badge">S</span>Msg</a>
                 </li>
               
             </ul>
@@ -1324,12 +1439,12 @@
     
       
       <div class="file-heading">
-        <h2 id="bonds/bonds.proto">bonds/bonds.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/bonds/v1beta1/bonds.proto">ixo/bonds/v1beta1/bonds.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="bonds.BaseOrder">BaseOrder</h3>
+        <h3 id="ixo.bonds.v1beta1.BaseOrder">BaseOrder</h3>
         <p>BaseOrder defines a base order type. It contains all the necessary fields for specifying</p><p>the general details about a buy, sell, or swap order.</p>
 
         
@@ -1374,7 +1489,7 @@
 
         
       
-        <h3 id="bonds.Batch">Batch</h3>
+        <h3 id="ixo.bonds.v1beta1.Batch">Batch</h3>
         <p>Batch holds a collection of outstanding buy, sell, and swap orders on a particular bond.</p>
 
         
@@ -1435,21 +1550,21 @@
               
                 <tr>
                   <td>buys</td>
-                  <td><a href="#bonds.BuyOrder">BuyOrder</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.BuyOrder">BuyOrder</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>sells</td>
-                  <td><a href="#bonds.SellOrder">SellOrder</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.SellOrder">SellOrder</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>swaps</td>
-                  <td><a href="#bonds.SwapOrder">SwapOrder</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.SwapOrder">SwapOrder</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -1461,7 +1576,7 @@
 
         
       
-        <h3 id="bonds.Bond">Bond</h3>
+        <h3 id="ixo.bonds.v1beta1.Bond">Bond</h3>
         <p>Bond defines a token bonding curve type with all of its parameters.</p>
 
         
@@ -1515,7 +1630,7 @@
               
                 <tr>
                   <td>function_parameters</td>
-                  <td><a href="#bonds.FunctionParam">FunctionParam</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.FunctionParam">FunctionParam</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -1667,7 +1782,7 @@
 
         
       
-        <h3 id="bonds.BondDetails">BondDetails</h3>
+        <h3 id="ixo.bonds.v1beta1.BondDetails">BondDetails</h3>
         <p>BondDetails contains details about the current state of a given bond.</p>
 
         
@@ -1712,7 +1827,7 @@
 
         
       
-        <h3 id="bonds.BuyOrder">BuyOrder</h3>
+        <h3 id="ixo.bonds.v1beta1.BuyOrder">BuyOrder</h3>
         <p>BuyOrder defines a type for submitting a buy order on a bond, together with the maximum</p><p>amount of reserve tokens the buyer is willing to pay.</p>
 
         
@@ -1724,7 +1839,7 @@
               
                 <tr>
                   <td>base_order</td>
-                  <td><a href="#bonds.BaseOrder">BaseOrder</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.BaseOrder">BaseOrder</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1743,7 +1858,7 @@
 
         
       
-        <h3 id="bonds.FunctionParam">FunctionParam</h3>
+        <h3 id="ixo.bonds.v1beta1.FunctionParam">FunctionParam</h3>
         <p>FunctionParam is a key-value pair used for specifying a specific bond parameter.</p>
 
         
@@ -1774,7 +1889,7 @@
 
         
       
-        <h3 id="bonds.Params">Params</h3>
+        <h3 id="ixo.bonds.v1beta1.Params">Params</h3>
         <p>Params defines the parameters for the bonds module.</p>
 
         
@@ -1798,7 +1913,7 @@
 
         
       
-        <h3 id="bonds.SellOrder">SellOrder</h3>
+        <h3 id="ixo.bonds.v1beta1.SellOrder">SellOrder</h3>
         <p>SellOrder defines a type for submitting a sell order on a bond.</p>
 
         
@@ -1810,7 +1925,7 @@
               
                 <tr>
                   <td>base_order</td>
-                  <td><a href="#bonds.BaseOrder">BaseOrder</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.BaseOrder">BaseOrder</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1822,7 +1937,7 @@
 
         
       
-        <h3 id="bonds.SwapOrder">SwapOrder</h3>
+        <h3 id="ixo.bonds.v1beta1.SwapOrder">SwapOrder</h3>
         <p>SwapOrder defines a type for submitting a swap order between two tokens on a bond.</p>
 
         
@@ -1834,7 +1949,7 @@
               
                 <tr>
                   <td>base_order</td>
-                  <td><a href="#bonds.BaseOrder">BaseOrder</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.BaseOrder">BaseOrder</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1862,7 +1977,7 @@
     
       
       <div class="file-heading">
-        <h2 id="bonds/genesis.proto">bonds/genesis.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/bonds/v1beta1/genesis.proto">ixo/bonds/v1beta1/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -1879,21 +1994,21 @@
               
                 <tr>
                   <td>bonds</td>
-                  <td><a href="#bonds.Bond">Bond</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Bond">ixo.bonds.v1beta1.Bond</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>batches</td>
-                  <td><a href="#bonds.Batch">Batch</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Batch">ixo.bonds.v1beta1.Batch</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#bonds.Params">Params</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Params">ixo.bonds.v1beta1.Params</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -1914,7 +2029,7 @@
     
       
       <div class="file-heading">
-        <h2 id="bonds/query.proto">bonds/query.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/bonds/v1beta1/query.proto">ixo/bonds/v1beta1/query.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -2058,7 +2173,7 @@
               
                 <tr>
                   <td>batch</td>
-                  <td><a href="#bonds.Batch">Batch</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Batch">ixo.bonds.v1beta1.Batch</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2106,7 +2221,7 @@
               
                 <tr>
                   <td>bond</td>
-                  <td><a href="#bonds.Bond">Bond</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Bond">ixo.bonds.v1beta1.Bond</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2137,7 +2252,7 @@
               
                 <tr>
                   <td>bonds_detailed</td>
-                  <td><a href="#bonds.BondDetails">BondDetails</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.BondDetails">ixo.bonds.v1beta1.BondDetails</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -2450,7 +2565,7 @@
               
                 <tr>
                   <td>last_batch</td>
-                  <td><a href="#bonds.Batch">Batch</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Batch">ixo.bonds.v1beta1.Batch</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2481,7 +2596,7 @@
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#bonds.Params">Params</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Params">ixo.bonds.v1beta1.Params</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2929,7 +3044,7 @@
     
       
       <div class="file-heading">
-        <h2 id="bonds/tx.proto">bonds/tx.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/bonds/v1beta1/tx.proto">ixo/bonds/v1beta1/tx.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -3040,7 +3155,7 @@
               
                 <tr>
                   <td>function_parameters</td>
-                  <td><a href="#bonds.FunctionParam">FunctionParam</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.FunctionParam">ixo.bonds.v1beta1.FunctionParam</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -3713,19 +3828,19 @@
     
       
       <div class="file-heading">
-        <h2 id="entity/entity.proto">entity/entity.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/entity/v1beta1/entity.proto">ixo/entity/v1beta1/entity.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="entity.EntityDoc">EntityDoc</h3>
+        <h3 id="ixo.entity.v1beta1.EntityDoc">EntityDoc</h3>
         <p>ProjectDoc defines a project (or entity) type with all of its parameters.</p>
 
         
 
         
       
-        <h3 id="entity.Params">Params</h3>
+        <h3 id="ixo.entity.v1beta1.Params">Params</h3>
         <p></p>
 
         
@@ -3765,12 +3880,12 @@
     
       
       <div class="file-heading">
-        <h2 id="entity/genesis.proto">entity/genesis.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/entity/v1beta1/genesis.proto">ixo/entity/v1beta1/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="entity.GenesisState">GenesisState</h3>
+        <h3 id="ixo.entity.v1beta1.GenesisState">GenesisState</h3>
         <p>GenesisState defines the project module's genesis state.</p>
 
         
@@ -3782,14 +3897,14 @@
               
                 <tr>
                   <td>entity_docs</td>
-                  <td><a href="#entity.EntityDoc">EntityDoc</a></td>
+                  <td><a href="#ixo.entity.v1beta1.EntityDoc">EntityDoc</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#entity.Params">Params</a></td>
+                  <td><a href="#ixo.entity.v1beta1.Params">Params</a></td>
                   <td></td>
                   <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td>
                 </tr>
@@ -3810,12 +3925,12 @@
     
       
       <div class="file-heading">
-        <h2 id="entity/proposal.proto">entity/proposal.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/entity/v1beta1/proposal.proto">ixo/entity/v1beta1/proposal.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="entity.InitializeNftContract">InitializeNftContract</h3>
+        <h3 id="ixo.entity.v1beta1.InitializeNftContract">InitializeNftContract</h3>
         <p></p>
 
         
@@ -3855,19 +3970,19 @@
     
       
       <div class="file-heading">
-        <h2 id="entity/query.proto">entity/query.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/entity/v1beta1/query.proto">ixo/entity/v1beta1/query.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="entity.QueryEntityConfigRequest">QueryEntityConfigRequest</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityConfigRequest">QueryEntityConfigRequest</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="entity.QueryEntityConfigResponse">QueryEntityConfigResponse</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityConfigResponse">QueryEntityConfigResponse</h3>
         <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
@@ -3879,7 +3994,7 @@
               
                 <tr>
                   <td>map</td>
-                  <td><a href="#entity.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</a></td>
+                  <td><a href="#ixo.entity.v1beta1.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -3891,7 +4006,7 @@
 
         
       
-        <h3 id="entity.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityConfigResponse.MapEntry">QueryEntityConfigResponse.MapEntry</h3>
         <p></p>
 
         
@@ -3922,7 +4037,7 @@
 
         
       
-        <h3 id="entity.QueryEntityDocRequest">QueryEntityDocRequest</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityDocRequest">QueryEntityDocRequest</h3>
         <p>QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.</p>
 
         
@@ -3946,14 +4061,14 @@
 
         
       
-        <h3 id="entity.QueryEntityDocResponse">QueryEntityDocResponse</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityDocResponse">QueryEntityDocResponse</h3>
         <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
 
         
       
-        <h3 id="entity.QueryEntityListRequest">QueryEntityListRequest</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityListRequest">QueryEntityListRequest</h3>
         <p></p>
 
         
@@ -3984,7 +4099,7 @@
 
         
       
-        <h3 id="entity.QueryEntityListResponse">QueryEntityListResponse</h3>
+        <h3 id="ixo.entity.v1beta1.QueryEntityListResponse">QueryEntityListResponse</h3>
         <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
@@ -3997,7 +4112,7 @@
       
 
       
-        <h3 id="entity.Query">Query</h3>
+        <h3 id="ixo.entity.v1beta1.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -4007,22 +4122,22 @@
             
               <tr>
                 <td>EntityList</td>
-                <td><a href="#entity.QueryEntityListRequest">QueryEntityListRequest</a></td>
-                <td><a href="#entity.QueryEntityListResponse">QueryEntityListResponse</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryEntityListRequest">QueryEntityListRequest</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryEntityListResponse">QueryEntityListResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>EntityDoc</td>
-                <td><a href="#entity.QueryEntityDocRequest">QueryEntityDocRequest</a></td>
-                <td><a href="#entity.QueryEntityDocResponse">QueryEntityDocResponse</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryEntityDocRequest">QueryEntityDocRequest</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryEntityDocResponse">QueryEntityDocResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>EntityConfig</td>
-                <td><a href="#entity.QueryEntityConfigRequest">QueryEntityConfigRequest</a></td>
-                <td><a href="#entity.QueryEntityConfigResponse">QueryEntityConfigResponse</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryEntityConfigRequest">QueryEntityConfigRequest</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryEntityConfigResponse">QueryEntityConfigResponse</a></td>
                 <td><p></p></td>
               </tr>
             
@@ -4081,12 +4196,12 @@
     
       
       <div class="file-heading">
-        <h2 id="iid/iid.proto">iid/iid.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/iid.proto">ixo/iid/v1beta1/iid.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="iid.AccordedRight">AccordedRight</h3>
+        <h3 id="ixo.iid.v1beta1.AccordedRight">AccordedRight</h3>
         <p></p>
 
         
@@ -4138,7 +4253,7 @@
 
         
       
-        <h3 id="iid.Context">Context</h3>
+        <h3 id="ixo.iid.v1beta1.Context">Context</h3>
         <p></p>
 
         
@@ -4169,7 +4284,7 @@
 
         
       
-        <h3 id="iid.IidDocument">IidDocument</h3>
+        <h3 id="ixo.iid.v1beta1.IidDocument">IidDocument</h3>
         <p></p>
 
         
@@ -4181,7 +4296,7 @@
               
                 <tr>
                   <td>context</td>
-                  <td><a href="#iid.Context">Context</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Context">Context</a></td>
                   <td>repeated</td>
                   <td><p>@context is spec for did document. </p></td>
                 </tr>
@@ -4203,7 +4318,7 @@ cfr. https://www.w3.org/TR/did-core/#did-controller </p></td>
               
                 <tr>
                   <td>verificationMethod</td>
-                  <td><a href="#iid.VerificationMethod">VerificationMethod</a></td>
+                  <td><a href="#ixo.iid.v1beta1.VerificationMethod">VerificationMethod</a></td>
                   <td>repeated</td>
                   <td><p>A DID document can express verification methods, 
 such as cryptographic public keys, which can be used 
@@ -4213,7 +4328,7 @@ https://www.w3.org/TR/did-core/#verification-methods </p></td>
               
                 <tr>
                   <td>service</td>
-                  <td><a href="#iid.Service">Service</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Service">Service</a></td>
                   <td>repeated</td>
                   <td><p>Services are used in DID documents to express ways of communicating 
 with the DID subject or associated entities.
@@ -4268,21 +4383,21 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>linkedResource</td>
-                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedResource">LinkedResource</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>accordedRight</td>
-                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td><a href="#ixo.iid.v1beta1.AccordedRight">AccordedRight</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedEntity</td>
-                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedEntity">LinkedEntity</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -4301,7 +4416,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.IidMetadata">IidMetadata</h3>
+        <h3 id="ixo.iid.v1beta1.IidMetadata">IidMetadata</h3>
         <p>DidMetadata defines metadata associated to a did document such as </p><p>the status of the DID document</p>
 
         
@@ -4402,7 +4517,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.LinkedEntity">LinkedEntity</h3>
+        <h3 id="ixo.iid.v1beta1.LinkedEntity">LinkedEntity</h3>
         <p></p>
 
         
@@ -4433,7 +4548,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.LinkedResource">LinkedResource</h3>
+        <h3 id="ixo.iid.v1beta1.LinkedResource">LinkedResource</h3>
         <p></p>
 
         
@@ -4506,7 +4621,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.Service">Service</h3>
+        <h3 id="ixo.iid.v1beta1.Service">Service</h3>
         <p>Service defines how to find data associated with a identifer</p>
 
         
@@ -4544,7 +4659,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.VerificationMethod">VerificationMethod</h3>
+        <h3 id="ixo.iid.v1beta1.VerificationMethod">VerificationMethod</h3>
         <p></p>
 
         
@@ -4612,12 +4727,12 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
     
       
       <div class="file-heading">
-        <h2 id="iid/tx.proto">iid/tx.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/tx.proto">ixo/iid/v1beta1/tx.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="iid.MsgAddAccordedRight">MsgAddAccordedRight</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddAccordedRight">MsgAddAccordedRight</h3>
         <p></p>
 
         
@@ -4636,7 +4751,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>accordedRight</td>
-                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td><a href="#ixo.iid.v1beta1.AccordedRight">AccordedRight</a></td>
                   <td></td>
                   <td><p>the Accorded right to add </p></td>
                 </tr>
@@ -4655,14 +4770,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgAddController">MsgAddController</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddController">MsgAddController</h3>
         <p></p>
 
         
@@ -4700,14 +4815,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddControllerResponse">MsgAddControllerResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddControllerResponse">MsgAddControllerResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgAddIidContext">MsgAddIidContext</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddIidContext">MsgAddIidContext</h3>
         <p></p>
 
         
@@ -4726,7 +4841,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>context</td>
-                  <td><a href="#iid.Context">Context</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Context">Context</a></td>
                   <td></td>
                   <td><p>the context to add </p></td>
                 </tr>
@@ -4745,14 +4860,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddIidContextResponse">MsgAddIidContextResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddIidContextResponse">MsgAddIidContextResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgAddLinkedEntity">MsgAddLinkedEntity</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddLinkedEntity">MsgAddLinkedEntity</h3>
         <p></p>
 
         
@@ -4771,7 +4886,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>linkedEntity</td>
-                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedEntity">LinkedEntity</a></td>
                   <td></td>
                   <td><p>the entity to add </p></td>
                 </tr>
@@ -4790,14 +4905,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgAddLinkedResource">MsgAddLinkedResource</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddLinkedResource">MsgAddLinkedResource</h3>
         <p></p>
 
         
@@ -4816,7 +4931,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>linkedResource</td>
-                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedResource">LinkedResource</a></td>
                   <td></td>
                   <td><p>the verification to add </p></td>
                 </tr>
@@ -4835,14 +4950,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgAddService">MsgAddService</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddService">MsgAddService</h3>
         <p></p>
 
         
@@ -4861,7 +4976,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>service_data</td>
-                  <td><a href="#iid.Service">Service</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Service">Service</a></td>
                   <td></td>
                   <td><p>the service data to add </p></td>
                 </tr>
@@ -4880,14 +4995,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddServiceResponse">MsgAddServiceResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddServiceResponse">MsgAddServiceResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgAddVerification">MsgAddVerification</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddVerification">MsgAddVerification</h3>
         <p></p>
 
         
@@ -4906,7 +5021,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>verification</td>
-                  <td><a href="#iid.Verification">Verification</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Verification">Verification</a></td>
                   <td></td>
                   <td><p>the verification to add </p></td>
                 </tr>
@@ -4925,14 +5040,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgAddVerificationResponse">MsgAddVerificationResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgAddVerificationResponse">MsgAddVerificationResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgCreateIidDocument">MsgCreateIidDocument</h3>
+        <h3 id="ixo.iid.v1beta1.MsgCreateIidDocument">MsgCreateIidDocument</h3>
         <p>MsgCreateDidDocument defines a SDK message for creating a new did.</p>
 
         
@@ -4958,42 +5073,42 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>context</td>
-                  <td><a href="#iid.Context">Context</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Context">Context</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>verifications</td>
-                  <td><a href="#iid.Verification">Verification</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Verification">Verification</a></td>
                   <td>repeated</td>
                   <td><p>the list of verification methods and relationships </p></td>
                 </tr>
               
                 <tr>
                   <td>services</td>
-                  <td><a href="#iid.Service">Service</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Service">Service</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>accordedRight</td>
-                  <td><a href="#iid.AccordedRight">AccordedRight</a></td>
+                  <td><a href="#ixo.iid.v1beta1.AccordedRight">AccordedRight</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedResource</td>
-                  <td><a href="#iid.LinkedResource">LinkedResource</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedResource">LinkedResource</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedEntity</td>
-                  <td><a href="#iid.LinkedEntity">LinkedEntity</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedEntity">LinkedEntity</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -5012,14 +5127,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeactivateIID">MsgDeactivateIID</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeactivateIID">MsgDeactivateIID</h3>
         <p></p>
 
         
@@ -5057,14 +5172,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeactivateIIDResponse">MsgDeactivateIIDResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeactivateIIDResponse">MsgDeactivateIIDResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteAccordedRight">MsgDeleteAccordedRight</h3>
         <p></p>
 
         
@@ -5102,14 +5217,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeleteController">MsgDeleteController</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteController">MsgDeleteController</h3>
         <p></p>
 
         
@@ -5147,14 +5262,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeleteControllerResponse">MsgDeleteControllerResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteControllerResponse">MsgDeleteControllerResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeleteIidContext">MsgDeleteIidContext</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteIidContext">MsgDeleteIidContext</h3>
         <p></p>
 
         
@@ -5192,14 +5307,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</h3>
         <p></p>
 
         
@@ -5237,14 +5352,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeleteLinkedResource">MsgDeleteLinkedResource</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteLinkedResource">MsgDeleteLinkedResource</h3>
         <p></p>
 
         
@@ -5282,14 +5397,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgDeleteService">MsgDeleteService</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteService">MsgDeleteService</h3>
         <p></p>
 
         
@@ -5327,14 +5442,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgDeleteServiceResponse">MsgDeleteServiceResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgDeleteServiceResponse">MsgDeleteServiceResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgRevokeVerification">MsgRevokeVerification</h3>
+        <h3 id="ixo.iid.v1beta1.MsgRevokeVerification">MsgRevokeVerification</h3>
         <p></p>
 
         
@@ -5372,14 +5487,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgSetVerificationRelationships">MsgSetVerificationRelationships</h3>
+        <h3 id="ixo.iid.v1beta1.MsgSetVerificationRelationships">MsgSetVerificationRelationships</h3>
         <p></p>
 
         
@@ -5424,14 +5539,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgUpdateIidDocument">MsgUpdateIidDocument</h3>
+        <h3 id="ixo.iid.v1beta1.MsgUpdateIidDocument">MsgUpdateIidDocument</h3>
         <p>MsgUpdateDidDocument replace an existing did document with a new version</p>
 
         
@@ -5443,7 +5558,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>doc</td>
-                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td></td>
                   <td><p>the did document to replace </p></td>
                 </tr>
@@ -5462,14 +5577,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.MsgUpdateIidMeta">MsgUpdateIidMeta</h3>
+        <h3 id="ixo.iid.v1beta1.MsgUpdateIidMeta">MsgUpdateIidMeta</h3>
         <p></p>
 
         
@@ -5488,7 +5603,7 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>meta</td>
-                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidMetadata">IidMetadata</a></td>
                   <td></td>
                   <td><p>the context to add </p></td>
                 </tr>
@@ -5507,14 +5622,14 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
 
         
       
-        <h3 id="iid.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</h3>
+        <h3 id="ixo.iid.v1beta1.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="iid.Verification">Verification</h3>
+        <h3 id="ixo.iid.v1beta1.Verification">Verification</h3>
         <p>Verification is a message that allows to assign a verification method</p><p>to one or more verification relationships</p>
 
         
@@ -5536,7 +5651,7 @@ relationships that the method is allowed into. </p></td>
               
                 <tr>
                   <td>method</td>
-                  <td><a href="#iid.VerificationMethod">VerificationMethod</a></td>
+                  <td><a href="#ixo.iid.v1beta1.VerificationMethod">VerificationMethod</a></td>
                   <td></td>
                   <td><p>public key associated with the did document. </p></td>
                 </tr>
@@ -5561,7 +5676,7 @@ relationships that the method is allowed into. </p></td>
       
 
       
-        <h3 id="iid.Msg">Msg</h3>
+        <h3 id="ixo.iid.v1beta1.Msg">Msg</h3>
         <p>Msg defines the identity Msg service.</p>
         <table class="enum-table">
           <thead>
@@ -5571,134 +5686,134 @@ relationships that the method is allowed into. </p></td>
             
               <tr>
                 <td>CreateIidDocument</td>
-                <td><a href="#iid.MsgCreateIidDocument">MsgCreateIidDocument</a></td>
-                <td><a href="#iid.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgCreateIidDocument">MsgCreateIidDocument</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgCreateIidDocumentResponse">MsgCreateIidDocumentResponse</a></td>
                 <td><p>CreateDidDocument defines a method for creating a new identity.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateIidDocument</td>
-                <td><a href="#iid.MsgUpdateIidDocument">MsgUpdateIidDocument</a></td>
-                <td><a href="#iid.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgUpdateIidDocument">MsgUpdateIidDocument</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgUpdateIidDocumentResponse">MsgUpdateIidDocumentResponse</a></td>
                 <td><p>UpdateDidDocument defines a method for updating an identity.</p></td>
               </tr>
             
               <tr>
                 <td>AddVerification</td>
-                <td><a href="#iid.MsgAddVerification">MsgAddVerification</a></td>
-                <td><a href="#iid.MsgAddVerificationResponse">MsgAddVerificationResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddVerification">MsgAddVerification</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddVerificationResponse">MsgAddVerificationResponse</a></td>
                 <td><p>AddVerificationMethod adds a new verification method</p></td>
               </tr>
             
               <tr>
                 <td>RevokeVerification</td>
-                <td><a href="#iid.MsgRevokeVerification">MsgRevokeVerification</a></td>
-                <td><a href="#iid.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgRevokeVerification">MsgRevokeVerification</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgRevokeVerificationResponse">MsgRevokeVerificationResponse</a></td>
                 <td><p>RevokeVerification remove the verification method and all associated verification Relations</p></td>
               </tr>
             
               <tr>
                 <td>SetVerificationRelationships</td>
-                <td><a href="#iid.MsgSetVerificationRelationships">MsgSetVerificationRelationships</a></td>
-                <td><a href="#iid.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgSetVerificationRelationships">MsgSetVerificationRelationships</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgSetVerificationRelationshipsResponse">MsgSetVerificationRelationshipsResponse</a></td>
                 <td><p>SetVerificationRelationships overwrite current verification relationships</p></td>
               </tr>
             
               <tr>
                 <td>AddService</td>
-                <td><a href="#iid.MsgAddService">MsgAddService</a></td>
-                <td><a href="#iid.MsgAddServiceResponse">MsgAddServiceResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddService">MsgAddService</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddServiceResponse">MsgAddServiceResponse</a></td>
                 <td><p>AddService add a new service</p></td>
               </tr>
             
               <tr>
                 <td>DeleteService</td>
-                <td><a href="#iid.MsgDeleteService">MsgDeleteService</a></td>
-                <td><a href="#iid.MsgDeleteServiceResponse">MsgDeleteServiceResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteService">MsgDeleteService</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteServiceResponse">MsgDeleteServiceResponse</a></td>
                 <td><p>DeleteService delete an existing service</p></td>
               </tr>
             
               <tr>
                 <td>AddController</td>
-                <td><a href="#iid.MsgAddController">MsgAddController</a></td>
-                <td><a href="#iid.MsgAddControllerResponse">MsgAddControllerResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddController">MsgAddController</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddControllerResponse">MsgAddControllerResponse</a></td>
                 <td><p>AddService add a new service</p></td>
               </tr>
             
               <tr>
                 <td>DeleteController</td>
-                <td><a href="#iid.MsgDeleteController">MsgDeleteController</a></td>
-                <td><a href="#iid.MsgDeleteControllerResponse">MsgDeleteControllerResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteController">MsgDeleteController</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteControllerResponse">MsgDeleteControllerResponse</a></td>
                 <td><p>DeleteService delete an existing service</p></td>
               </tr>
             
               <tr>
                 <td>AddLinkedResource</td>
-                <td><a href="#iid.MsgAddLinkedResource">MsgAddLinkedResource</a></td>
-                <td><a href="#iid.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddLinkedResource">MsgAddLinkedResource</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddLinkedResourceResponse">MsgAddLinkedResourceResponse</a></td>
                 <td><p>Add / Delete Linked Resource</p></td>
               </tr>
             
               <tr>
                 <td>DeleteLinkedResource</td>
-                <td><a href="#iid.MsgDeleteLinkedResource">MsgDeleteLinkedResource</a></td>
-                <td><a href="#iid.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteLinkedResource">MsgDeleteLinkedResource</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteLinkedResourceResponse">MsgDeleteLinkedResourceResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>AddLinkedEntity</td>
-                <td><a href="#iid.MsgAddLinkedEntity">MsgAddLinkedEntity</a></td>
-                <td><a href="#iid.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddLinkedEntity">MsgAddLinkedEntity</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddLinkedEntityResponse">MsgAddLinkedEntityResponse</a></td>
                 <td><p>Add / Delete Linked Entity</p></td>
               </tr>
             
               <tr>
                 <td>DeleteLinkedEntity</td>
-                <td><a href="#iid.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</a></td>
-                <td><a href="#iid.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteLinkedEntity">MsgDeleteLinkedEntity</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteLinkedEntityResponse">MsgDeleteLinkedEntityResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>AddAccordedRight</td>
-                <td><a href="#iid.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
-                <td><a href="#iid.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddAccordedRight">MsgAddAccordedRight</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddAccordedRightResponse">MsgAddAccordedRightResponse</a></td>
                 <td><p>Add / Delete Accorded Right</p></td>
               </tr>
             
               <tr>
                 <td>DeleteAccordedRight</td>
-                <td><a href="#iid.MsgDeleteAccordedRight">MsgDeleteAccordedRight</a></td>
-                <td><a href="#iid.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteAccordedRight">MsgDeleteAccordedRight</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteAccordedRightResponse">MsgDeleteAccordedRightResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>AddIidContext</td>
-                <td><a href="#iid.MsgAddIidContext">MsgAddIidContext</a></td>
-                <td><a href="#iid.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddIidContext">MsgAddIidContext</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgAddIidContextResponse">MsgAddIidContextResponse</a></td>
                 <td><p>Add / Delete Context</p></td>
               </tr>
             
               <tr>
                 <td>DeactivateIID</td>
-                <td><a href="#iid.MsgDeactivateIID">MsgDeactivateIID</a></td>
-                <td><a href="#iid.MsgDeactivateIIDResponse">MsgDeactivateIIDResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeactivateIID">MsgDeactivateIID</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeactivateIIDResponse">MsgDeactivateIIDResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>DeleteIidContext</td>
-                <td><a href="#iid.MsgDeleteIidContext">MsgDeleteIidContext</a></td>
-                <td><a href="#iid.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteIidContext">MsgDeleteIidContext</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgDeleteIidContextResponse">MsgDeleteIidContextResponse</a></td>
                 <td><p></p></td>
               </tr>
             
               <tr>
                 <td>UpdateMetaData</td>
-                <td><a href="#iid.MsgUpdateIidMeta">MsgUpdateIidMeta</a></td>
-                <td><a href="#iid.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgUpdateIidMeta">MsgUpdateIidMeta</a></td>
+                <td><a href="#ixo.iid.v1beta1.MsgUpdateIidMetaResponse">MsgUpdateIidMetaResponse</a></td>
                 <td><p>Update META</p></td>
               </tr>
             
@@ -5709,12 +5824,12 @@ relationships that the method is allowed into. </p></td>
     
       
       <div class="file-heading">
-        <h2 id="entity/tx.proto">entity/tx.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/entity/v1beta1/tx.proto">ixo/entity/v1beta1/tx.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="entity.MsgCreateEntity">MsgCreateEntity</h3>
+        <h3 id="ixo.entity.v1beta1.MsgCreateEntity">MsgCreateEntity</h3>
         <p>MsgCreateEntity defines a message for creating a project.</p>
 
         
@@ -5747,42 +5862,42 @@ relationships that the method is allowed into. </p></td>
               
                 <tr>
                   <td>context</td>
-                  <td><a href="#iid.Context">iid.Context</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Context">ixo.iid.v1beta1.Context</a></td>
                   <td>repeated</td>
                   <td><p>JSON-LD contexts </p></td>
                 </tr>
               
                 <tr>
                   <td>verification</td>
-                  <td><a href="#iid.Verification">iid.Verification</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Verification">ixo.iid.v1beta1.Verification</a></td>
                   <td>repeated</td>
                   <td><p>Verification Methods and Verification Relationships </p></td>
                 </tr>
               
                 <tr>
                   <td>service</td>
-                  <td><a href="#iid.Service">iid.Service</a></td>
+                  <td><a href="#ixo.iid.v1beta1.Service">ixo.iid.v1beta1.Service</a></td>
                   <td>repeated</td>
                   <td><p>Service endpoints </p></td>
                 </tr>
               
                 <tr>
                   <td>accordedRight</td>
-                  <td><a href="#iid.AccordedRight">iid.AccordedRight</a></td>
+                  <td><a href="#ixo.iid.v1beta1.AccordedRight">ixo.iid.v1beta1.AccordedRight</a></td>
                   <td>repeated</td>
                   <td><p>Legal or Electronic Rights and associated Object Capabilities </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedResource</td>
-                  <td><a href="#iid.LinkedResource">iid.LinkedResource</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedResource">ixo.iid.v1beta1.LinkedResource</a></td>
                   <td>repeated</td>
                   <td><p>Digital resources associated with the Subject </p></td>
                 </tr>
               
                 <tr>
                   <td>linkedEntity</td>
-                  <td><a href="#iid.LinkedEntity">iid.LinkedEntity</a></td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedEntity">ixo.iid.v1beta1.LinkedEntity</a></td>
                   <td>repeated</td>
                   <td><p>DID of a linked Entity and its relationship with the Subject </p></td>
                 </tr>
@@ -5868,7 +5983,7 @@ address of the account signing the message </p></td>
 
         
       
-        <h3 id="entity.MsgCreateEntityResponse">MsgCreateEntityResponse</h3>
+        <h3 id="ixo.entity.v1beta1.MsgCreateEntityResponse">MsgCreateEntityResponse</h3>
         <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
 
         
@@ -5906,7 +6021,7 @@ address of the account signing the message </p></td>
 
         
       
-        <h3 id="entity.MsgTransferEntity">MsgTransferEntity</h3>
+        <h3 id="ixo.entity.v1beta1.MsgTransferEntity">MsgTransferEntity</h3>
         <p></p>
 
         
@@ -5924,14 +6039,14 @@ address of the account signing the message </p></td>
                 </tr>
               
                 <tr>
-                  <td>controllerDid</td>
+                  <td>ownerDid</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>The ownersdid used to sign this transaction. </p></td>
                 </tr>
               
                 <tr>
-                  <td>controllerAddress</td>
+                  <td>ownerAddress</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>The ownersdid used to sign this transaction. </p></td>
@@ -5951,14 +6066,14 @@ address of the account signing the message </p></td>
 
         
       
-        <h3 id="entity.MsgTransferEntityResponse">MsgTransferEntityResponse</h3>
+        <h3 id="ixo.entity.v1beta1.MsgTransferEntityResponse">MsgTransferEntityResponse</h3>
         <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
 
         
 
         
       
-        <h3 id="entity.MsgUpdateEntity">MsgUpdateEntity</h3>
+        <h3 id="ixo.entity.v1beta1.MsgUpdateEntity">MsgUpdateEntity</h3>
         <p>MsgUpdateEntityStatus defines a message for updating a entity's current status.</p>
 
         
@@ -6042,45 +6157,7 @@ address of the account signing the message </p></td>
 
         
       
-        <h3 id="entity.MsgUpdateEntityConfig">MsgUpdateEntityConfig</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>nft_contract_address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="entity.MsgUpdateEntityConfigResponse">MsgUpdateEntityConfigResponse</h3>
-        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
-
-        
-
-        
-      
-        <h3 id="entity.MsgUpdateEntityResponse">MsgUpdateEntityResponse</h3>
+        <h3 id="ixo.entity.v1beta1.MsgUpdateEntityResponse">MsgUpdateEntityResponse</h3>
         <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.</p>
 
         
@@ -6093,7 +6170,7 @@ address of the account signing the message </p></td>
       
 
       
-        <h3 id="entity.Msg">Msg</h3>
+        <h3 id="ixo.entity.v1beta1.Msg">Msg</h3>
         <p>Msg defines the project Msg service.</p>
         <table class="enum-table">
           <thead>
@@ -6103,30 +6180,23 @@ address of the account signing the message </p></td>
             
               <tr>
                 <td>CreateEntity</td>
-                <td><a href="#entity.MsgCreateEntity">MsgCreateEntity</a></td>
-                <td><a href="#entity.MsgCreateEntityResponse">MsgCreateEntityResponse</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgCreateEntity">MsgCreateEntity</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgCreateEntityResponse">MsgCreateEntityResponse</a></td>
                 <td><p>CreateProject defines a method for creating a project.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateEntity</td>
-                <td><a href="#entity.MsgUpdateEntity">MsgUpdateEntity</a></td>
-                <td><a href="#entity.MsgUpdateEntityResponse">MsgUpdateEntityResponse</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgUpdateEntity">MsgUpdateEntity</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgUpdateEntityResponse">MsgUpdateEntityResponse</a></td>
                 <td><p>UpdateEntityStatus defines a method for updating a entity&#39;s current status.</p></td>
               </tr>
             
               <tr>
-                <td>UpdateEntityConfig</td>
-                <td><a href="#entity.MsgUpdateEntityConfig">MsgUpdateEntityConfig</a></td>
-                <td><a href="#entity.MsgUpdateEntityConfigResponse">MsgUpdateEntityConfigResponse</a></td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
                 <td>TransferEntity</td>
-                <td><a href="#entity.MsgTransferEntity">MsgTransferEntity</a></td>
-                <td><a href="#entity.MsgTransferEntityResponse">MsgTransferEntityResponse</a></td>
-                <td><p></p></td>
+                <td><a href="#ixo.entity.v1beta1.MsgTransferEntity">MsgTransferEntity</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgTransferEntityResponse">MsgTransferEntityResponse</a></td>
+                <td><p>Transfers an entity and its nft to the recipient</p></td>
               </tr>
             
           </tbody>
@@ -6136,12 +6206,12 @@ address of the account signing the message </p></td>
     
       
       <div class="file-heading">
-        <h2 id="iid/event.proto">iid/event.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/event.proto">ixo/iid/v1beta1/event.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="iid.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
+        <h3 id="ixo.iid.v1beta1.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
         <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
 
         
@@ -6172,7 +6242,7 @@ address of the account signing the message </p></td>
 
         
       
-        <h3 id="iid.IidDocumentUpdatedEvent">IidDocumentUpdatedEvent</h3>
+        <h3 id="ixo.iid.v1beta1.IidDocumentUpdatedEvent">IidDocumentUpdatedEvent</h3>
         <p>DidDocumentUpdatedEvent is an event triggered on a DID document update</p>
 
         
@@ -6212,12 +6282,12 @@ address of the account signing the message </p></td>
     
       
       <div class="file-heading">
-        <h2 id="iid/genesis.proto">iid/genesis.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/genesis.proto">ixo/iid/v1beta1/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="iid.GenesisState">GenesisState</h3>
+        <h3 id="ixo.iid.v1beta1.GenesisState">GenesisState</h3>
         <p>GenesisState defines the did module's genesis state.</p>
 
         
@@ -6229,14 +6299,14 @@ address of the account signing the message </p></td>
               
                 <tr>
                   <td>iid_docs</td>
-                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>iid_meta</td>
-                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidMetadata">IidMetadata</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -6257,12 +6327,12 @@ address of the account signing the message </p></td>
     
       
       <div class="file-heading">
-        <h2 id="iid/query.proto">iid/query.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/query.proto">ixo/iid/v1beta1/query.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="iid.QueryIidDocumentRequest">QueryIidDocumentRequest</h3>
+        <h3 id="ixo.iid.v1beta1.QueryIidDocumentRequest">QueryIidDocumentRequest</h3>
         <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
 
         
@@ -6286,7 +6356,7 @@ address of the account signing the message </p></td>
 
         
       
-        <h3 id="iid.QueryIidDocumentResponse">QueryIidDocumentResponse</h3>
+        <h3 id="ixo.iid.v1beta1.QueryIidDocumentResponse">QueryIidDocumentResponse</h3>
         <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
 
         
@@ -6298,7 +6368,7 @@ address of the account signing the message </p></td>
               
                 <tr>
                   <td>iidDocument</td>
-                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td></td>
                   <td><p>validators contains all the queried validators.
 
@@ -6312,7 +6382,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="iid.QueryIidDocumentsRequest">QueryIidDocumentsRequest</h3>
+        <h3 id="ixo.iid.v1beta1.QueryIidDocumentsRequest">QueryIidDocumentsRequest</h3>
         <p>QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.</p>
 
         
@@ -6336,7 +6406,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="iid.QueryIidDocumentsResponse">QueryIidDocumentsResponse</h3>
+        <h3 id="ixo.iid.v1beta1.QueryIidDocumentsResponse">QueryIidDocumentsResponse</h3>
         <p>QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method</p>
 
         
@@ -6348,7 +6418,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>iidDocuments</td>
-                  <td><a href="#iid.IidDocument">IidDocument</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td>repeated</td>
                   <td><p>validators contains all the queried validators. </p></td>
                 </tr>
@@ -6360,7 +6430,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="iid.QueryIidMetaDataRequest">QueryIidMetaDataRequest</h3>
+        <h3 id="ixo.iid.v1beta1.QueryIidMetaDataRequest">QueryIidMetaDataRequest</h3>
         <p></p>
 
         
@@ -6384,7 +6454,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="iid.QueryIidMetaDataResponse">QueryIidMetaDataResponse</h3>
+        <h3 id="ixo.iid.v1beta1.QueryIidMetaDataResponse">QueryIidMetaDataResponse</h3>
         <p>this line is used by starport scaffolding # 3</p>
 
         
@@ -6396,7 +6466,7 @@ DidMetadata didMetadata = 2  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>didMetadata</td>
-                  <td><a href="#iid.IidMetadata">IidMetadata</a></td>
+                  <td><a href="#ixo.iid.v1beta1.IidMetadata">IidMetadata</a></td>
                   <td></td>
                   <td><p>validators contains all the queried validators.
 IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
@@ -6415,7 +6485,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       
 
       
-        <h3 id="iid.Query">Query</h3>
+        <h3 id="ixo.iid.v1beta1.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -6425,22 +6495,22 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             
               <tr>
                 <td>IidDocuments</td>
-                <td><a href="#iid.QueryIidDocumentsRequest">QueryIidDocumentsRequest</a></td>
-                <td><a href="#iid.QueryIidDocumentsResponse">QueryIidDocumentsResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.QueryIidDocumentsRequest">QueryIidDocumentsRequest</a></td>
+                <td><a href="#ixo.iid.v1beta1.QueryIidDocumentsResponse">QueryIidDocumentsResponse</a></td>
                 <td><p>IidDocuments queries all iid documents that match the given status.</p></td>
               </tr>
             
               <tr>
                 <td>IidDocument</td>
-                <td><a href="#iid.QueryIidDocumentRequest">QueryIidDocumentRequest</a></td>
-                <td><a href="#iid.QueryIidDocumentResponse">QueryIidDocumentResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.QueryIidDocumentRequest">QueryIidDocumentRequest</a></td>
+                <td><a href="#ixo.iid.v1beta1.QueryIidDocumentResponse">QueryIidDocumentResponse</a></td>
                 <td><p>IidDocument queries a iid documents with an id.</p></td>
               </tr>
             
               <tr>
                 <td>MetaData</td>
-                <td><a href="#iid.QueryIidMetaDataRequest">QueryIidMetaDataRequest</a></td>
-                <td><a href="#iid.QueryIidMetaDataResponse">QueryIidMetaDataResponse</a></td>
+                <td><a href="#ixo.iid.v1beta1.QueryIidMetaDataRequest">QueryIidMetaDataRequest</a></td>
+                <td><a href="#ixo.iid.v1beta1.QueryIidMetaDataResponse">QueryIidMetaDataResponse</a></td>
                 <td><p>MetaData queries a iid documents with an id.</p></td>
               </tr>
             
@@ -6499,7 +6569,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="legacy/did/did.proto">legacy/did/did.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/legacy/did/did.proto">ixo/legacy/did/did.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -6672,7 +6742,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="legacy/did/diddoc.proto">legacy/did/diddoc.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/legacy/did/diddoc.proto">ixo/legacy/did/diddoc.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -6724,12 +6794,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="payments/payments.proto">payments/payments.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/payments/v1/payments.proto">ixo/payments/v1/payments.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="payments.BlockPeriod">BlockPeriod</h3>
+        <h3 id="ixo.payments.v1.BlockPeriod">BlockPeriod</h3>
         <p>BlockPeriod implements the Period interface and specifies a period in terms of number</p><p>of blocks.</p>
 
         
@@ -6760,7 +6830,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.Discount">Discount</h3>
+        <h3 id="ixo.payments.v1.Discount">Discount</h3>
         <p>Discount contains details about a discount which can be granted to payers.</p>
 
         
@@ -6791,7 +6861,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.DistributionShare">DistributionShare</h3>
+        <h3 id="ixo.payments.v1.DistributionShare">DistributionShare</h3>
         <p>DistributionShare specifies the share of a specific payment an address will receive.</p>
 
         
@@ -6822,7 +6892,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.PaymentContract">PaymentContract</h3>
+        <h3 id="ixo.payments.v1.PaymentContract">PaymentContract</h3>
         <p>PaymentContract specifies an agreement between a payer and payee/s which can be invoked</p><p>once or multiple times to effect payment/s.</p>
 
         
@@ -6862,7 +6932,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>recipients</td>
-                  <td><a href="#payments.DistributionShare">DistributionShare</a></td>
+                  <td><a href="#ixo.payments.v1.DistributionShare">DistributionShare</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -6909,7 +6979,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.PaymentTemplate">PaymentTemplate</h3>
+        <h3 id="ixo.payments.v1.PaymentTemplate">PaymentTemplate</h3>
         <p>PaymentTemplate contains details about a payment, with no info about the payer or payee.</p>
 
         
@@ -6949,7 +7019,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>discounts</td>
-                  <td><a href="#payments.Discount">Discount</a></td>
+                  <td><a href="#ixo.payments.v1.Discount">Discount</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -6961,7 +7031,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.Subscription">Subscription</h3>
+        <h3 id="ixo.payments.v1.Subscription">Subscription</h3>
         <p>Subscription specifies details of a payment to be effected periodically.</p>
 
         
@@ -7020,7 +7090,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.TestPeriod">TestPeriod</h3>
+        <h3 id="ixo.payments.v1.TestPeriod">TestPeriod</h3>
         <p>TestPeriod implements the Period interface and is identical to BlockPeriod, except it</p><p>ignores the context in periodEnded() and periodStarted().</p>
 
         
@@ -7051,7 +7121,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.TimePeriod">TimePeriod</h3>
+        <h3 id="ixo.payments.v1.TimePeriod">TimePeriod</h3>
         <p>TimePeriod implements the Period interface and specifies a period in terms of time.</p>
 
         
@@ -7091,12 +7161,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="payments/genesis.proto">payments/genesis.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/payments/v1/genesis.proto">ixo/payments/v1/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="payments.GenesisState">GenesisState</h3>
+        <h3 id="ixo.payments.v1.GenesisState">GenesisState</h3>
         <p>GenesisState defines the payments module's genesis state.</p>
 
         
@@ -7108,21 +7178,21 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>payment_templates</td>
-                  <td><a href="#payments.PaymentTemplate">PaymentTemplate</a></td>
+                  <td><a href="#ixo.payments.v1.PaymentTemplate">PaymentTemplate</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>payment_contracts</td>
-                  <td><a href="#payments.PaymentContract">PaymentContract</a></td>
+                  <td><a href="#ixo.payments.v1.PaymentContract">PaymentContract</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>subscriptions</td>
-                  <td><a href="#payments.Subscription">Subscription</a></td>
+                  <td><a href="#ixo.payments.v1.Subscription">Subscription</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -7143,12 +7213,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="payments/query.proto">payments/query.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/payments/v1/query.proto">ixo/payments/v1/query.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="payments.QueryPaymentContractRequest">QueryPaymentContractRequest</h3>
+        <h3 id="ixo.payments.v1.QueryPaymentContractRequest">QueryPaymentContractRequest</h3>
         <p>QueryPaymentContractRequest is the request type for the Query/PaymentContract RPC method.</p>
 
         
@@ -7172,7 +7242,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QueryPaymentContractResponse">QueryPaymentContractResponse</h3>
+        <h3 id="ixo.payments.v1.QueryPaymentContractResponse">QueryPaymentContractResponse</h3>
         <p>QueryPaymentContractResponse is the response type for the Query/PaymentContract RPC method.</p>
 
         
@@ -7184,7 +7254,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>payment_contract</td>
-                  <td><a href="#payments.PaymentContract">PaymentContract</a></td>
+                  <td><a href="#ixo.payments.v1.PaymentContract">PaymentContract</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -7196,7 +7266,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QueryPaymentContractsByIdPrefixRequest">QueryPaymentContractsByIdPrefixRequest</h3>
+        <h3 id="ixo.payments.v1.QueryPaymentContractsByIdPrefixRequest">QueryPaymentContractsByIdPrefixRequest</h3>
         <p>QueryPaymentContractsByIdPrefixRequest is the request type for the Query/PaymentContractsByIdPrefix RPC method.</p>
 
         
@@ -7220,7 +7290,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QueryPaymentContractsByIdPrefixResponse">QueryPaymentContractsByIdPrefixResponse</h3>
+        <h3 id="ixo.payments.v1.QueryPaymentContractsByIdPrefixResponse">QueryPaymentContractsByIdPrefixResponse</h3>
         <p>QueryPaymentContractsByIdPrefixResponse is the response type for the Query/PaymentContractsByIdPrefix RPC method.</p>
 
         
@@ -7232,7 +7302,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>payment_contracts</td>
-                  <td><a href="#payments.PaymentContract">PaymentContract</a></td>
+                  <td><a href="#ixo.payments.v1.PaymentContract">PaymentContract</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -7244,7 +7314,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QueryPaymentTemplateRequest">QueryPaymentTemplateRequest</h3>
+        <h3 id="ixo.payments.v1.QueryPaymentTemplateRequest">QueryPaymentTemplateRequest</h3>
         <p>QueryPaymentTemplateRequest is the request type for the Query/PaymentTemplate RPC method.</p>
 
         
@@ -7268,7 +7338,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QueryPaymentTemplateResponse">QueryPaymentTemplateResponse</h3>
+        <h3 id="ixo.payments.v1.QueryPaymentTemplateResponse">QueryPaymentTemplateResponse</h3>
         <p>QueryPaymentTemplateResponse is the response type for the Query/PaymentTemplate RPC method.</p>
 
         
@@ -7280,7 +7350,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>payment_template</td>
-                  <td><a href="#payments.PaymentTemplate">PaymentTemplate</a></td>
+                  <td><a href="#ixo.payments.v1.PaymentTemplate">PaymentTemplate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -7292,7 +7362,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QuerySubscriptionRequest">QuerySubscriptionRequest</h3>
+        <h3 id="ixo.payments.v1.QuerySubscriptionRequest">QuerySubscriptionRequest</h3>
         <p>QuerySubscriptionRequest is the request type for the Query/Subscription RPC method.</p>
 
         
@@ -7316,7 +7386,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.QuerySubscriptionResponse">QuerySubscriptionResponse</h3>
+        <h3 id="ixo.payments.v1.QuerySubscriptionResponse">QuerySubscriptionResponse</h3>
         <p>QuerySubscriptionResponse is the response type for the Query/Subscription RPC method.</p>
 
         
@@ -7328,7 +7398,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>subscription</td>
-                  <td><a href="#payments.Subscription">Subscription</a></td>
+                  <td><a href="#ixo.payments.v1.Subscription">Subscription</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -7346,7 +7416,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       
 
       
-        <h3 id="payments.Query">Query</h3>
+        <h3 id="ixo.payments.v1.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -7356,29 +7426,29 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             
               <tr>
                 <td>PaymentTemplate</td>
-                <td><a href="#payments.QueryPaymentTemplateRequest">QueryPaymentTemplateRequest</a></td>
-                <td><a href="#payments.QueryPaymentTemplateResponse">QueryPaymentTemplateResponse</a></td>
+                <td><a href="#ixo.payments.v1.QueryPaymentTemplateRequest">QueryPaymentTemplateRequest</a></td>
+                <td><a href="#ixo.payments.v1.QueryPaymentTemplateResponse">QueryPaymentTemplateResponse</a></td>
                 <td><p>PaymentTemplate queries info of a specific payment template.</p></td>
               </tr>
             
               <tr>
                 <td>PaymentContract</td>
-                <td><a href="#payments.QueryPaymentContractRequest">QueryPaymentContractRequest</a></td>
-                <td><a href="#payments.QueryPaymentContractResponse">QueryPaymentContractResponse</a></td>
+                <td><a href="#ixo.payments.v1.QueryPaymentContractRequest">QueryPaymentContractRequest</a></td>
+                <td><a href="#ixo.payments.v1.QueryPaymentContractResponse">QueryPaymentContractResponse</a></td>
                 <td><p>PaymentContract queries info of a specific payment contract.</p></td>
               </tr>
             
               <tr>
                 <td>PaymentContractsByIdPrefix</td>
-                <td><a href="#payments.QueryPaymentContractsByIdPrefixRequest">QueryPaymentContractsByIdPrefixRequest</a></td>
-                <td><a href="#payments.QueryPaymentContractsByIdPrefixResponse">QueryPaymentContractsByIdPrefixResponse</a></td>
+                <td><a href="#ixo.payments.v1.QueryPaymentContractsByIdPrefixRequest">QueryPaymentContractsByIdPrefixRequest</a></td>
+                <td><a href="#ixo.payments.v1.QueryPaymentContractsByIdPrefixResponse">QueryPaymentContractsByIdPrefixResponse</a></td>
                 <td><p>PaymentContractsByIdPrefix lists all payment contracts having an id with a specific prefix.</p></td>
               </tr>
             
               <tr>
                 <td>Subscription</td>
-                <td><a href="#payments.QuerySubscriptionRequest">QuerySubscriptionRequest</a></td>
-                <td><a href="#payments.QuerySubscriptionResponse">QuerySubscriptionResponse</a></td>
+                <td><a href="#ixo.payments.v1.QuerySubscriptionRequest">QuerySubscriptionRequest</a></td>
+                <td><a href="#ixo.payments.v1.QuerySubscriptionResponse">QuerySubscriptionResponse</a></td>
                 <td><p>Subscription queries info of a specific Subscription.</p></td>
               </tr>
             
@@ -7447,12 +7517,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="payments/tx.proto">payments/tx.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/payments/v1/tx.proto">ixo/payments/v1/tx.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="payments.MsgCreatePaymentContract">MsgCreatePaymentContract</h3>
+        <h3 id="ixo.payments.v1.MsgCreatePaymentContract">MsgCreatePaymentContract</h3>
         <p>MsgCreatePaymentContract defines a message for creating a payment contract.</p>
 
         
@@ -7492,7 +7562,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>recipients</td>
-                  <td><a href="#payments.DistributionShare">DistributionShare</a></td>
+                  <td><a href="#ixo.payments.v1.DistributionShare">DistributionShare</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -7525,14 +7595,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgCreatePaymentContractResponse">MsgCreatePaymentContractResponse</h3>
+        <h3 id="ixo.payments.v1.MsgCreatePaymentContractResponse">MsgCreatePaymentContractResponse</h3>
         <p>MsgCreatePaymentContractResponse defines the Msg/CreatePaymentContract response type.</p>
 
         
 
         
       
-        <h3 id="payments.MsgCreatePaymentTemplate">MsgCreatePaymentTemplate</h3>
+        <h3 id="ixo.payments.v1.MsgCreatePaymentTemplate">MsgCreatePaymentTemplate</h3>
         <p>MsgCreatePaymentTemplate defines a message for creating a payment template.</p>
 
         
@@ -7551,7 +7621,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>payment_template</td>
-                  <td><a href="#payments.PaymentTemplate">PaymentTemplate</a></td>
+                  <td><a href="#ixo.payments.v1.PaymentTemplate">PaymentTemplate</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -7570,14 +7640,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgCreatePaymentTemplateResponse">MsgCreatePaymentTemplateResponse</h3>
+        <h3 id="ixo.payments.v1.MsgCreatePaymentTemplateResponse">MsgCreatePaymentTemplateResponse</h3>
         <p>MsgCreatePaymentTemplateResponse defines the Msg/CreatePaymentTemplate response type.</p>
 
         
 
         
       
-        <h3 id="payments.MsgCreateSubscription">MsgCreateSubscription</h3>
+        <h3 id="ixo.payments.v1.MsgCreateSubscription">MsgCreateSubscription</h3>
         <p>MsgCreateSubscription defines a message for creating a subscription.</p>
 
         
@@ -7636,14 +7706,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgCreateSubscriptionResponse">MsgCreateSubscriptionResponse</h3>
+        <h3 id="ixo.payments.v1.MsgCreateSubscriptionResponse">MsgCreateSubscriptionResponse</h3>
         <p>MsgCreateSubscriptionResponse defines the Msg/CreateSubscription response type.</p>
 
         
 
         
       
-        <h3 id="payments.MsgEffectPayment">MsgEffectPayment</h3>
+        <h3 id="ixo.payments.v1.MsgEffectPayment">MsgEffectPayment</h3>
         <p>MsgEffectPayment defines a message for putting a specific payment contract into effect.</p>
 
         
@@ -7688,14 +7758,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgEffectPaymentResponse">MsgEffectPaymentResponse</h3>
+        <h3 id="ixo.payments.v1.MsgEffectPaymentResponse">MsgEffectPaymentResponse</h3>
         <p>MsgEffectPaymentResponse defines the Msg/EffectPayment response type.</p>
 
         
 
         
       
-        <h3 id="payments.MsgGrantDiscount">MsgGrantDiscount</h3>
+        <h3 id="ixo.payments.v1.MsgGrantDiscount">MsgGrantDiscount</h3>
         <p>MsgGrantDiscount defines a message for granting a discount to a payer on a specific payment contract.</p>
 
         
@@ -7747,14 +7817,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgGrantDiscountResponse">MsgGrantDiscountResponse</h3>
+        <h3 id="ixo.payments.v1.MsgGrantDiscountResponse">MsgGrantDiscountResponse</h3>
         <p>MsgGrantDiscountResponse defines the Msg/GrantDiscount response type.</p>
 
         
 
         
       
-        <h3 id="payments.MsgRevokeDiscount">MsgRevokeDiscount</h3>
+        <h3 id="ixo.payments.v1.MsgRevokeDiscount">MsgRevokeDiscount</h3>
         <p>MsgRevokeDiscount defines a message for revoking a discount previously granted to a payer.</p>
 
         
@@ -7799,14 +7869,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgRevokeDiscountResponse">MsgRevokeDiscountResponse</h3>
+        <h3 id="ixo.payments.v1.MsgRevokeDiscountResponse">MsgRevokeDiscountResponse</h3>
         <p>MsgRevokeDiscountResponse defines the Msg/RevokeDiscount response type.</p>
 
         
 
         
       
-        <h3 id="payments.MsgSetPaymentContractAuthorisation">MsgSetPaymentContractAuthorisation</h3>
+        <h3 id="ixo.payments.v1.MsgSetPaymentContractAuthorisation">MsgSetPaymentContractAuthorisation</h3>
         <p>MsgSetPaymentContractAuthorisation defines a message for authorising or deauthorising a payment contract.</p>
 
         
@@ -7851,7 +7921,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="payments.MsgSetPaymentContractAuthorisationResponse">MsgSetPaymentContractAuthorisationResponse</h3>
+        <h3 id="ixo.payments.v1.MsgSetPaymentContractAuthorisationResponse">MsgSetPaymentContractAuthorisationResponse</h3>
         <p>MsgSetPaymentContractAuthorisationResponse defines the Msg/SetPaymentContractAuthorisation response type.</p>
 
         
@@ -7864,7 +7934,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       
 
       
-        <h3 id="payments.Msg">Msg</h3>
+        <h3 id="ixo.payments.v1.Msg">Msg</h3>
         <p>Msg defines the payments Msg service.</p>
         <table class="enum-table">
           <thead>
@@ -7874,50 +7944,50 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             
               <tr>
                 <td>SetPaymentContractAuthorisation</td>
-                <td><a href="#payments.MsgSetPaymentContractAuthorisation">MsgSetPaymentContractAuthorisation</a></td>
-                <td><a href="#payments.MsgSetPaymentContractAuthorisationResponse">MsgSetPaymentContractAuthorisationResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgSetPaymentContractAuthorisation">MsgSetPaymentContractAuthorisation</a></td>
+                <td><a href="#ixo.payments.v1.MsgSetPaymentContractAuthorisationResponse">MsgSetPaymentContractAuthorisationResponse</a></td>
                 <td><p>SetPaymentContractAuthorisation defines a method for authorising or deauthorising a payment contract.</p></td>
               </tr>
             
               <tr>
                 <td>CreatePaymentTemplate</td>
-                <td><a href="#payments.MsgCreatePaymentTemplate">MsgCreatePaymentTemplate</a></td>
-                <td><a href="#payments.MsgCreatePaymentTemplateResponse">MsgCreatePaymentTemplateResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgCreatePaymentTemplate">MsgCreatePaymentTemplate</a></td>
+                <td><a href="#ixo.payments.v1.MsgCreatePaymentTemplateResponse">MsgCreatePaymentTemplateResponse</a></td>
                 <td><p>CreatePaymentTemplate defines a method for creating a payment template.</p></td>
               </tr>
             
               <tr>
                 <td>CreatePaymentContract</td>
-                <td><a href="#payments.MsgCreatePaymentContract">MsgCreatePaymentContract</a></td>
-                <td><a href="#payments.MsgCreatePaymentContractResponse">MsgCreatePaymentContractResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgCreatePaymentContract">MsgCreatePaymentContract</a></td>
+                <td><a href="#ixo.payments.v1.MsgCreatePaymentContractResponse">MsgCreatePaymentContractResponse</a></td>
                 <td><p>CreatePaymentContract defines a method for creating a payment contract.</p></td>
               </tr>
             
               <tr>
                 <td>CreateSubscription</td>
-                <td><a href="#payments.MsgCreateSubscription">MsgCreateSubscription</a></td>
-                <td><a href="#payments.MsgCreateSubscriptionResponse">MsgCreateSubscriptionResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgCreateSubscription">MsgCreateSubscription</a></td>
+                <td><a href="#ixo.payments.v1.MsgCreateSubscriptionResponse">MsgCreateSubscriptionResponse</a></td>
                 <td><p>CreateSubscription defines a method for creating a subscription.</p></td>
               </tr>
             
               <tr>
                 <td>GrantDiscount</td>
-                <td><a href="#payments.MsgGrantDiscount">MsgGrantDiscount</a></td>
-                <td><a href="#payments.MsgGrantDiscountResponse">MsgGrantDiscountResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgGrantDiscount">MsgGrantDiscount</a></td>
+                <td><a href="#ixo.payments.v1.MsgGrantDiscountResponse">MsgGrantDiscountResponse</a></td>
                 <td><p>GrantDiscount defines a method for granting a discount to a payer on a specific payment contract.</p></td>
               </tr>
             
               <tr>
                 <td>RevokeDiscount</td>
-                <td><a href="#payments.MsgRevokeDiscount">MsgRevokeDiscount</a></td>
-                <td><a href="#payments.MsgRevokeDiscountResponse">MsgRevokeDiscountResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgRevokeDiscount">MsgRevokeDiscount</a></td>
+                <td><a href="#ixo.payments.v1.MsgRevokeDiscountResponse">MsgRevokeDiscountResponse</a></td>
                 <td><p>RevokeDiscount defines a method for revoking a discount previously granted to a payer.</p></td>
               </tr>
             
               <tr>
                 <td>EffectPayment</td>
-                <td><a href="#payments.MsgEffectPayment">MsgEffectPayment</a></td>
-                <td><a href="#payments.MsgEffectPaymentResponse">MsgEffectPaymentResponse</a></td>
+                <td><a href="#ixo.payments.v1.MsgEffectPayment">MsgEffectPayment</a></td>
+                <td><a href="#ixo.payments.v1.MsgEffectPaymentResponse">MsgEffectPaymentResponse</a></td>
                 <td><p>EffectPayment defines a method for putting a specific payment contract into effect.</p></td>
               </tr>
             
@@ -7928,12 +7998,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="project/project.proto">project/project.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/project/v1/project.proto">ixo/project/v1/project.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="project.AccountMap">AccountMap</h3>
+        <h3 id="ixo.project.v1.AccountMap">AccountMap</h3>
         <p>AccountMap maps a specific project's account names to the accounts' addresses.</p>
 
         
@@ -7945,7 +8015,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>map</td>
-                  <td><a href="#project.AccountMap.MapEntry">AccountMap.MapEntry</a></td>
+                  <td><a href="#ixo.project.v1.AccountMap.MapEntry">AccountMap.MapEntry</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -7957,7 +8027,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.AccountMap.MapEntry">AccountMap.MapEntry</h3>
+        <h3 id="ixo.project.v1.AccountMap.MapEntry">AccountMap.MapEntry</h3>
         <p></p>
 
         
@@ -7988,7 +8058,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.Claim">Claim</h3>
+        <h3 id="ixo.project.v1.Claim">Claim</h3>
         <p>Claim contains details required to start a claim on a project.</p>
 
         
@@ -8033,7 +8103,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.Claims">Claims</h3>
+        <h3 id="ixo.project.v1.Claims">Claims</h3>
         <p>Claims contains a list of type Claim.</p>
 
         
@@ -8045,7 +8115,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>claims_list</td>
-                  <td><a href="#project.Claim">Claim</a></td>
+                  <td><a href="#ixo.project.v1.Claim">Claim</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -8057,7 +8127,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.CreateAgentDoc">CreateAgentDoc</h3>
+        <h3 id="ixo.project.v1.CreateAgentDoc">CreateAgentDoc</h3>
         <p>CreateAgentDoc contains details required to create an agent.</p>
 
         
@@ -8088,7 +8158,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.CreateClaimDoc">CreateClaimDoc</h3>
+        <h3 id="ixo.project.v1.CreateClaimDoc">CreateClaimDoc</h3>
         <p>CreateClaimDoc contains details required to create a claim on a project.</p>
 
         
@@ -8119,7 +8189,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.CreateEvaluationDoc">CreateEvaluationDoc</h3>
+        <h3 id="ixo.project.v1.CreateEvaluationDoc">CreateEvaluationDoc</h3>
         <p>CreateEvaluationDoc contains details required to create an evaluation for a specific claim on a project.</p>
 
         
@@ -8150,7 +8220,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.GenesisAccountMap">GenesisAccountMap</h3>
+        <h3 id="ixo.project.v1.GenesisAccountMap">GenesisAccountMap</h3>
         <p>GenesisAccountMap is a type used at genesis that maps a specific project's account names to the accounts' addresses.</p>
 
         
@@ -8162,7 +8232,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>map</td>
-                  <td><a href="#project.GenesisAccountMap.MapEntry">GenesisAccountMap.MapEntry</a></td>
+                  <td><a href="#ixo.project.v1.GenesisAccountMap.MapEntry">GenesisAccountMap.MapEntry</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -8174,7 +8244,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.GenesisAccountMap.MapEntry">GenesisAccountMap.MapEntry</h3>
+        <h3 id="ixo.project.v1.GenesisAccountMap.MapEntry">GenesisAccountMap.MapEntry</h3>
         <p></p>
 
         
@@ -8205,7 +8275,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.Params">Params</h3>
+        <h3 id="ixo.project.v1.Params">Params</h3>
         <p>Params defines the parameters for the project module.</p>
 
         
@@ -8250,7 +8320,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.ProjectDoc">ProjectDoc</h3>
+        <h3 id="ixo.project.v1.ProjectDoc">ProjectDoc</h3>
         <p>ProjectDoc defines a project (or entity) type with all of its parameters.</p>
 
         
@@ -8309,7 +8379,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.UpdateAgentDoc">UpdateAgentDoc</h3>
+        <h3 id="ixo.project.v1.UpdateAgentDoc">UpdateAgentDoc</h3>
         <p>UpdateAgentDoc contains details required to update an agent.</p>
 
         
@@ -8347,7 +8417,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.UpdateProjectStatusDoc">UpdateProjectStatusDoc</h3>
+        <h3 id="ixo.project.v1.UpdateProjectStatusDoc">UpdateProjectStatusDoc</h3>
         <p>UpdateProjectStatusDoc contains details required to update a project's status.</p>
 
         
@@ -8378,7 +8448,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.WithdrawFundsDoc">WithdrawFundsDoc</h3>
+        <h3 id="ixo.project.v1.WithdrawFundsDoc">WithdrawFundsDoc</h3>
         <p>WithdrawFundsDoc contains details required to withdraw funds from a specific project.</p>
 
         
@@ -8423,7 +8493,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.WithdrawalInfoDoc">WithdrawalInfoDoc</h3>
+        <h3 id="ixo.project.v1.WithdrawalInfoDoc">WithdrawalInfoDoc</h3>
         <p>WithdrawalInfoDoc contains details required to withdraw from a specific project.</p>
 
         
@@ -8461,7 +8531,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.WithdrawalInfoDocs">WithdrawalInfoDocs</h3>
+        <h3 id="ixo.project.v1.WithdrawalInfoDocs">WithdrawalInfoDocs</h3>
         <p>WithdrawalInfoDocs contains a list of type WithdrawalInfoDoc.</p>
 
         
@@ -8473,7 +8543,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>docs_list</td>
-                  <td><a href="#project.WithdrawalInfoDoc">WithdrawalInfoDoc</a></td>
+                  <td><a href="#ixo.project.v1.WithdrawalInfoDoc">WithdrawalInfoDoc</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -8494,12 +8564,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="project/genesis.proto">project/genesis.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/project/v1/genesis.proto">ixo/project/v1/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="project.GenesisState">GenesisState</h3>
+        <h3 id="ixo.project.v1.GenesisState">GenesisState</h3>
         <p>GenesisState defines the project module's genesis state.</p>
 
         
@@ -8511,35 +8581,35 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>project_docs</td>
-                  <td><a href="#project.ProjectDoc">ProjectDoc</a></td>
+                  <td><a href="#ixo.project.v1.ProjectDoc">ProjectDoc</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>account_maps</td>
-                  <td><a href="#project.GenesisAccountMap">GenesisAccountMap</a></td>
+                  <td><a href="#ixo.project.v1.GenesisAccountMap">GenesisAccountMap</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>withdrawals_infos</td>
-                  <td><a href="#project.WithdrawalInfoDocs">WithdrawalInfoDocs</a></td>
+                  <td><a href="#ixo.project.v1.WithdrawalInfoDocs">WithdrawalInfoDocs</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>claims</td>
-                  <td><a href="#project.Claims">Claims</a></td>
+                  <td><a href="#ixo.project.v1.Claims">Claims</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#project.Params">Params</a></td>
+                  <td><a href="#ixo.project.v1.Params">Params</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8560,19 +8630,19 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="project/query.proto">project/query.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/project/v1/query.proto">ixo/project/v1/query.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="project.QueryParamsRequest">QueryParamsRequest</h3>
+        <h3 id="ixo.project.v1.QueryParamsRequest">QueryParamsRequest</h3>
         <p>QueryParamsRequest is the request type for the Query/Params RPC method.</p>
 
         
 
         
       
-        <h3 id="project.QueryParamsResponse">QueryParamsResponse</h3>
+        <h3 id="ixo.project.v1.QueryParamsResponse">QueryParamsResponse</h3>
         <p>QueryParamsResponse is the response type for the Query/Params RPC method.</p>
 
         
@@ -8584,7 +8654,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#project.Params">Params</a></td>
+                  <td><a href="#ixo.project.v1.Params">Params</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8596,7 +8666,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.QueryProjectAccountsRequest">QueryProjectAccountsRequest</h3>
+        <h3 id="ixo.project.v1.QueryProjectAccountsRequest">QueryProjectAccountsRequest</h3>
         <p>QueryProjectAccountsRequest is the request type for the Query/ProjectAccounts RPC method.</p>
 
         
@@ -8620,7 +8690,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.QueryProjectAccountsResponse">QueryProjectAccountsResponse</h3>
+        <h3 id="ixo.project.v1.QueryProjectAccountsResponse">QueryProjectAccountsResponse</h3>
         <p>QueryProjectAccountsResponse is the response type for the Query/ProjectAccounts RPC method.</p>
 
         
@@ -8632,7 +8702,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>account_map</td>
-                  <td><a href="#project.AccountMap">AccountMap</a></td>
+                  <td><a href="#ixo.project.v1.AccountMap">AccountMap</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8644,7 +8714,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.QueryProjectDocRequest">QueryProjectDocRequest</h3>
+        <h3 id="ixo.project.v1.QueryProjectDocRequest">QueryProjectDocRequest</h3>
         <p>QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.</p>
 
         
@@ -8668,7 +8738,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.QueryProjectDocResponse">QueryProjectDocResponse</h3>
+        <h3 id="ixo.project.v1.QueryProjectDocResponse">QueryProjectDocResponse</h3>
         <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
@@ -8680,7 +8750,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>project_doc</td>
-                  <td><a href="#project.ProjectDoc">ProjectDoc</a></td>
+                  <td><a href="#ixo.project.v1.ProjectDoc">ProjectDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8692,7 +8762,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.QueryProjectTxRequest">QueryProjectTxRequest</h3>
+        <h3 id="ixo.project.v1.QueryProjectTxRequest">QueryProjectTxRequest</h3>
         <p>QueryProjectTxRequest is the request type for the Query/ProjectTx RPC method.</p>
 
         
@@ -8716,7 +8786,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.QueryProjectTxResponse">QueryProjectTxResponse</h3>
+        <h3 id="ixo.project.v1.QueryProjectTxResponse">QueryProjectTxResponse</h3>
         <p>QueryProjectTxResponse is the response type for the Query/ProjectTx RPC method.</p>
 
         
@@ -8728,7 +8798,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>txs</td>
-                  <td><a href="#project.WithdrawalInfoDocs">WithdrawalInfoDocs</a></td>
+                  <td><a href="#ixo.project.v1.WithdrawalInfoDocs">WithdrawalInfoDocs</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8746,7 +8816,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       
 
       
-        <h3 id="project.Query">Query</h3>
+        <h3 id="ixo.project.v1.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -8756,29 +8826,29 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             
               <tr>
                 <td>ProjectDoc</td>
-                <td><a href="#project.QueryProjectDocRequest">QueryProjectDocRequest</a></td>
-                <td><a href="#project.QueryProjectDocResponse">QueryProjectDocResponse</a></td>
+                <td><a href="#ixo.project.v1.QueryProjectDocRequest">QueryProjectDocRequest</a></td>
+                <td><a href="#ixo.project.v1.QueryProjectDocResponse">QueryProjectDocResponse</a></td>
                 <td><p>ProjectDoc queries info of a specific project.</p></td>
               </tr>
             
               <tr>
                 <td>ProjectAccounts</td>
-                <td><a href="#project.QueryProjectAccountsRequest">QueryProjectAccountsRequest</a></td>
-                <td><a href="#project.QueryProjectAccountsResponse">QueryProjectAccountsResponse</a></td>
+                <td><a href="#ixo.project.v1.QueryProjectAccountsRequest">QueryProjectAccountsRequest</a></td>
+                <td><a href="#ixo.project.v1.QueryProjectAccountsResponse">QueryProjectAccountsResponse</a></td>
                 <td><p>ProjectAccounts lists a specific project&#39;s accounts.</p></td>
               </tr>
             
               <tr>
                 <td>ProjectTx</td>
-                <td><a href="#project.QueryProjectTxRequest">QueryProjectTxRequest</a></td>
-                <td><a href="#project.QueryProjectTxResponse">QueryProjectTxResponse</a></td>
+                <td><a href="#ixo.project.v1.QueryProjectTxRequest">QueryProjectTxRequest</a></td>
+                <td><a href="#ixo.project.v1.QueryProjectTxResponse">QueryProjectTxResponse</a></td>
                 <td><p>ProjectTx lists a specific project&#39;s transactions.</p></td>
               </tr>
             
               <tr>
                 <td>Params</td>
-                <td><a href="#project.QueryParamsRequest">QueryParamsRequest</a></td>
-                <td><a href="#project.QueryParamsResponse">QueryParamsResponse</a></td>
+                <td><a href="#ixo.project.v1.QueryParamsRequest">QueryParamsRequest</a></td>
+                <td><a href="#ixo.project.v1.QueryParamsResponse">QueryParamsResponse</a></td>
                 <td><p>Params queries the paramaters of x/project module.</p></td>
               </tr>
             
@@ -8847,12 +8917,12 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
     
       
       <div class="file-heading">
-        <h2 id="project/tx.proto">project/tx.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/project/v1/tx.proto">ixo/project/v1/tx.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="project.MsgCreateAgent">MsgCreateAgent</h3>
+        <h3 id="ixo.project.v1.MsgCreateAgent">MsgCreateAgent</h3>
         <p>MsgCreateAgent defines a message for creating an agent on a project.</p>
 
         
@@ -8885,7 +8955,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>data</td>
-                  <td><a href="#project.CreateAgentDoc">CreateAgentDoc</a></td>
+                  <td><a href="#ixo.project.v1.CreateAgentDoc">CreateAgentDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8904,14 +8974,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgCreateAgentResponse">MsgCreateAgentResponse</h3>
+        <h3 id="ixo.project.v1.MsgCreateAgentResponse">MsgCreateAgentResponse</h3>
         <p>MsgCreateAgentResponse defines the Msg/CreateAgent response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgCreateClaim">MsgCreateClaim</h3>
+        <h3 id="ixo.project.v1.MsgCreateClaim">MsgCreateClaim</h3>
         <p>MsgCreateClaim defines a message for creating a claim on a project.</p>
 
         
@@ -8944,7 +9014,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>data</td>
-                  <td><a href="#project.CreateClaimDoc">CreateClaimDoc</a></td>
+                  <td><a href="#ixo.project.v1.CreateClaimDoc">CreateClaimDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8963,14 +9033,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgCreateClaimResponse">MsgCreateClaimResponse</h3>
+        <h3 id="ixo.project.v1.MsgCreateClaimResponse">MsgCreateClaimResponse</h3>
         <p>MsgCreateClaimResponse defines the Msg/CreateClaim response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgCreateEvaluation">MsgCreateEvaluation</h3>
+        <h3 id="ixo.project.v1.MsgCreateEvaluation">MsgCreateEvaluation</h3>
         <p>MsgCreateEvaluation defines a message for creating an evaluation for a specific claim on a project.</p>
 
         
@@ -9003,7 +9073,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>data</td>
-                  <td><a href="#project.CreateEvaluationDoc">CreateEvaluationDoc</a></td>
+                  <td><a href="#ixo.project.v1.CreateEvaluationDoc">CreateEvaluationDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -9022,14 +9092,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgCreateEvaluationResponse">MsgCreateEvaluationResponse</h3>
+        <h3 id="ixo.project.v1.MsgCreateEvaluationResponse">MsgCreateEvaluationResponse</h3>
         <p>MsgCreateEvaluationResponse defines the Msg/CreateEvaluation response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgCreateProject">MsgCreateProject</h3>
+        <h3 id="ixo.project.v1.MsgCreateProject">MsgCreateProject</h3>
         <p>MsgCreateProject defines a message for creating a project.</p>
 
         
@@ -9088,14 +9158,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgCreateProjectResponse">MsgCreateProjectResponse</h3>
+        <h3 id="ixo.project.v1.MsgCreateProjectResponse">MsgCreateProjectResponse</h3>
         <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgUpdateAgent">MsgUpdateAgent</h3>
+        <h3 id="ixo.project.v1.MsgUpdateAgent">MsgUpdateAgent</h3>
         <p>MsgUpdateAgent defines a message for updating an agent on a project.</p>
 
         
@@ -9128,7 +9198,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>data</td>
-                  <td><a href="#project.UpdateAgentDoc">UpdateAgentDoc</a></td>
+                  <td><a href="#ixo.project.v1.UpdateAgentDoc">UpdateAgentDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -9147,14 +9217,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgUpdateAgentResponse">MsgUpdateAgentResponse</h3>
+        <h3 id="ixo.project.v1.MsgUpdateAgentResponse">MsgUpdateAgentResponse</h3>
         <p>MsgUpdateAgentResponse defines the Msg/UpdateAgent response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgUpdateProjectDoc">MsgUpdateProjectDoc</h3>
+        <h3 id="ixo.project.v1.MsgUpdateProjectDoc">MsgUpdateProjectDoc</h3>
         <p>MsgUpdateProjectDoc defines a message for updating a project's data.</p>
 
         
@@ -9206,14 +9276,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgUpdateProjectDocResponse">MsgUpdateProjectDocResponse</h3>
+        <h3 id="ixo.project.v1.MsgUpdateProjectDocResponse">MsgUpdateProjectDocResponse</h3>
         <p>MsgUpdateProjectDocResponse defines the Msg/UpdateProjectDoc response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgUpdateProjectStatus">MsgUpdateProjectStatus</h3>
+        <h3 id="ixo.project.v1.MsgUpdateProjectStatus">MsgUpdateProjectStatus</h3>
         <p>MsgUpdateProjectStatus defines a message for updating a project's current status.</p>
 
         
@@ -9246,7 +9316,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>data</td>
-                  <td><a href="#project.UpdateProjectStatusDoc">UpdateProjectStatusDoc</a></td>
+                  <td><a href="#ixo.project.v1.UpdateProjectStatusDoc">UpdateProjectStatusDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -9265,14 +9335,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgUpdateProjectStatusResponse">MsgUpdateProjectStatusResponse</h3>
+        <h3 id="ixo.project.v1.MsgUpdateProjectStatusResponse">MsgUpdateProjectStatusResponse</h3>
         <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.</p>
 
         
 
         
       
-        <h3 id="project.MsgWithdrawFunds">MsgWithdrawFunds</h3>
+        <h3 id="ixo.project.v1.MsgWithdrawFunds">MsgWithdrawFunds</h3>
         <p>MsgWithdrawFunds defines a message for project agents to withdraw their funds from a project.</p>
 
         
@@ -9291,7 +9361,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               
                 <tr>
                   <td>data</td>
-                  <td><a href="#project.WithdrawFundsDoc">WithdrawFundsDoc</a></td>
+                  <td><a href="#ixo.project.v1.WithdrawFundsDoc">WithdrawFundsDoc</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -9310,7 +9380,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="project.MsgWithdrawFundsResponse">MsgWithdrawFundsResponse</h3>
+        <h3 id="ixo.project.v1.MsgWithdrawFundsResponse">MsgWithdrawFundsResponse</h3>
         <p>MsgWithdrawFundsResponse defines the Msg/WithdrawFunds response type.</p>
 
         
@@ -9323,7 +9393,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       
 
       
-        <h3 id="project.Msg">Msg</h3>
+        <h3 id="ixo.project.v1.Msg">Msg</h3>
         <p>Msg defines the project Msg service.</p>
         <table class="enum-table">
           <thead>
@@ -9333,58 +9403,558 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             
               <tr>
                 <td>CreateProject</td>
-                <td><a href="#project.MsgCreateProject">MsgCreateProject</a></td>
-                <td><a href="#project.MsgCreateProjectResponse">MsgCreateProjectResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateProject">MsgCreateProject</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateProjectResponse">MsgCreateProjectResponse</a></td>
                 <td><p>CreateProject defines a method for creating a project.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateProjectStatus</td>
-                <td><a href="#project.MsgUpdateProjectStatus">MsgUpdateProjectStatus</a></td>
-                <td><a href="#project.MsgUpdateProjectStatusResponse">MsgUpdateProjectStatusResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgUpdateProjectStatus">MsgUpdateProjectStatus</a></td>
+                <td><a href="#ixo.project.v1.MsgUpdateProjectStatusResponse">MsgUpdateProjectStatusResponse</a></td>
                 <td><p>UpdateProjectStatus defines a method for updating a project&#39;s current status.</p></td>
               </tr>
             
               <tr>
                 <td>CreateAgent</td>
-                <td><a href="#project.MsgCreateAgent">MsgCreateAgent</a></td>
-                <td><a href="#project.MsgCreateAgentResponse">MsgCreateAgentResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateAgent">MsgCreateAgent</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateAgentResponse">MsgCreateAgentResponse</a></td>
                 <td><p>CreateAgent defines a method for creating an agent on a project.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateAgent</td>
-                <td><a href="#project.MsgUpdateAgent">MsgUpdateAgent</a></td>
-                <td><a href="#project.MsgUpdateAgentResponse">MsgUpdateAgentResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgUpdateAgent">MsgUpdateAgent</a></td>
+                <td><a href="#ixo.project.v1.MsgUpdateAgentResponse">MsgUpdateAgentResponse</a></td>
                 <td><p>UpdateAgent defines a method for updating an agent on a project.</p></td>
               </tr>
             
               <tr>
                 <td>CreateClaim</td>
-                <td><a href="#project.MsgCreateClaim">MsgCreateClaim</a></td>
-                <td><a href="#project.MsgCreateClaimResponse">MsgCreateClaimResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateClaim">MsgCreateClaim</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateClaimResponse">MsgCreateClaimResponse</a></td>
                 <td><p>CreateClaim defines a method for creating a claim on a project.</p></td>
               </tr>
             
               <tr>
                 <td>CreateEvaluation</td>
-                <td><a href="#project.MsgCreateEvaluation">MsgCreateEvaluation</a></td>
-                <td><a href="#project.MsgCreateEvaluationResponse">MsgCreateEvaluationResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateEvaluation">MsgCreateEvaluation</a></td>
+                <td><a href="#ixo.project.v1.MsgCreateEvaluationResponse">MsgCreateEvaluationResponse</a></td>
                 <td><p>CreateEvaluation defines a method for creating an evaluation for a specific claim on a project.</p></td>
               </tr>
             
               <tr>
                 <td>WithdrawFunds</td>
-                <td><a href="#project.MsgWithdrawFunds">MsgWithdrawFunds</a></td>
-                <td><a href="#project.MsgWithdrawFundsResponse">MsgWithdrawFundsResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgWithdrawFunds">MsgWithdrawFunds</a></td>
+                <td><a href="#ixo.project.v1.MsgWithdrawFundsResponse">MsgWithdrawFundsResponse</a></td>
                 <td><p>WithdrawFunds defines a method for project agents to withdraw their funds from a project.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateProjectDoc</td>
-                <td><a href="#project.MsgUpdateProjectDoc">MsgUpdateProjectDoc</a></td>
-                <td><a href="#project.MsgUpdateProjectDocResponse">MsgUpdateProjectDocResponse</a></td>
+                <td><a href="#ixo.project.v1.MsgUpdateProjectDoc">MsgUpdateProjectDoc</a></td>
+                <td><a href="#ixo.project.v1.MsgUpdateProjectDocResponse">MsgUpdateProjectDocResponse</a></td>
                 <td><p>UpdateProjectDoc defines a method for updating a project&#39;s data.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/token.proto">ixo/token/v1beta1/token.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.Params">Params</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>NftContractAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>NftContractMinter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.TokenDoc">TokenDoc</h3>
+        <p>ProjectDoc defines a project (or token) type with all of its parameters.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/genesis.proto">ixo/token/v1beta1/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the project module's genesis state.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>token_docs</td>
+                  <td><a href="#ixo.token.v1beta1.TokenDoc">TokenDoc</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#ixo.token.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/proposal.proto">ixo/token/v1beta1/proposal.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.InitializeNftContract">InitializeNftContract</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>NftContractCodeId</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>NftMinterAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/query.proto">ixo/token/v1beta1/query.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenConfigRequest">QueryTokenConfigRequest</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenConfigResponse">QueryTokenConfigResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>map</td>
+                  <td><a href="#ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry">QueryTokenConfigResponse.MapEntry</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry">QueryTokenConfigResponse.MapEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenDocRequest">QueryTokenDocRequest</h3>
+        <p>QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>token_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenDocResponse">QueryTokenDocResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenListRequest">QueryTokenListRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>token_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>token_status</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryTokenListResponse">QueryTokenListResponse</h3>
+        <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixo.token.v1beta1.Query">Query</h3>
+        <p>Query defines the gRPC querier service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>TokenList</td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenListRequest">QueryTokenListRequest</a></td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenListResponse">QueryTokenListResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>TokenDoc</td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenDocRequest">QueryTokenDocRequest</a></td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenDocResponse">QueryTokenDocResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>TokenConfig</td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenConfigRequest">QueryTokenConfigRequest</a></td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenConfigResponse">QueryTokenConfigResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>TokenList</td>
+                <td>GET</td>
+                <td>/ixo/token</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>TokenDoc</td>
+                <td>GET</td>
+                <td>/ixo/token/{token_did}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>TokenConfig</td>
+                <td>GET</td>
+                <td>/ixo/token/config</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/tx.proto">ixo/token/v1beta1/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.MsgCreateToken">MsgCreateToken</h3>
+        <p>MsgCreateToken defines a message for creating a project.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>ownerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>An Token Type as defined by the implementer
+
+Owner of the Token NFT | The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid address used to sign this transaction. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgCreateTokenResponse">MsgCreateTokenResponse</h3>
+        <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgTransferToken">MsgTransferToken</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tokenDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownerAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The ownersdid used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>recipientDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgTransferTokenResponse">MsgTransferTokenResponse</h3>
+        <p>MsgUpdateProjectStatusResponse defines the Msg/UpdateTokenStatus response type.</p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixo.token.v1beta1.Msg">Msg</h3>
+        <p>Msg defines the project Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateToken</td>
+                <td><a href="#ixo.token.v1beta1.MsgCreateToken">MsgCreateToken</a></td>
+                <td><a href="#ixo.token.v1beta1.MsgCreateTokenResponse">MsgCreateTokenResponse</a></td>
+                <td><p>CreateProject defines a method for creating a project.</p></td>
+              </tr>
+            
+              <tr>
+                <td>TransferToken</td>
+                <td><a href="#ixo.token.v1beta1.MsgTransferToken">MsgTransferToken</a></td>
+                <td><a href="#ixo.token.v1beta1.MsgTransferTokenResponse">MsgTransferTokenResponse</a></td>
+                <td><p>Transfers an token and its nft to the recipient</p></td>
               </tr>
             
           </tbody>

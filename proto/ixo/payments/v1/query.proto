@@ -1,0 +1,71 @@
+syntax = "proto3";
+package ixo.payments.v1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "ixo/payments/v1/payments.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // PaymentTemplate queries info of a specific payment template.
+  rpc PaymentTemplate(QueryPaymentTemplateRequest) returns (QueryPaymentTemplateResponse){
+    option (google.api.http).get = "/ixo/payments/templates/{payment_template_id}"; //this is a REST endpoint - see Query service here https://docs.cosmos.network/master/migrations/app_and_modules.html
+  }
+
+  // PaymentContract queries info of a specific payment contract.
+  rpc PaymentContract(QueryPaymentContractRequest) returns (QueryPaymentContractResponse){
+    option (google.api.http).get = "/ixo/payments/contracts/{payment_contract_id}";
+  }
+
+  // PaymentContractsByIdPrefix lists all payment contracts having an id with a specific prefix.
+  rpc PaymentContractsByIdPrefix(QueryPaymentContractsByIdPrefixRequest) returns (QueryPaymentContractsByIdPrefixResponse) {
+    option (google.api.http).get = "/ixo/payments/contracts_by_id_prefix/{payment_contracts_id_prefix}";
+  }
+
+  // Subscription queries info of a specific Subscription.
+  rpc Subscription(QuerySubscriptionRequest) returns (QuerySubscriptionResponse) {
+    option (google.api.http).get = "/ixo/payments/subscriptions/{subscription_id}";
+  }
+}
+
+// QueryPaymentTemplateRequest is the request type for the Query/PaymentTemplate RPC method.
+message QueryPaymentTemplateRequest {
+  string payment_template_id = 1 [(gogoproto.moretags) = "yaml:\"payment_template_id\""];
+}
+
+// QueryPaymentTemplateResponse is the response type for the Query/PaymentTemplate RPC method.
+message QueryPaymentTemplateResponse {
+  ixo.payments.v1.PaymentTemplate payment_template = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"payment_template\""];
+}
+
+// QueryPaymentContractRequest is the request type for the Query/PaymentContract RPC method.
+message QueryPaymentContractRequest {
+  string payment_contract_id = 1 [(gogoproto.moretags) = "yaml:\"payment_contract_id\""];
+}
+
+// QueryPaymentContractResponse is the response type for the Query/PaymentContract RPC method.
+message QueryPaymentContractResponse {
+  ixo.payments.v1.PaymentContract payment_contract = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"payment_contract\""];
+}
+
+// QueryPaymentContractsByIdPrefixRequest is the request type for the Query/PaymentContractsByIdPrefix RPC method.
+message QueryPaymentContractsByIdPrefixRequest {
+  string payment_contracts_id_prefix = 1 [(gogoproto.moretags) = "yaml:\"payment_contracts_id_prefix\""];
+}
+
+// QueryPaymentContractsByIdPrefixResponse is the response type for the Query/PaymentContractsByIdPrefix RPC method.
+message QueryPaymentContractsByIdPrefixResponse {
+  repeated ixo.payments.v1.PaymentContract payment_contracts = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"payment_contracts\""];
+}
+
+// QuerySubscriptionRequest is the request type for the Query/Subscription RPC method.
+message QuerySubscriptionRequest {
+  string subscription_id = 1 [(gogoproto.moretags) = "yaml:\"subscription_id\""];
+}
+
+// QuerySubscriptionResponse is the response type for the Query/Subscription RPC method.
+message QuerySubscriptionResponse {
+  ixo.payments.v1.Subscription subscription = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"subscription\""];
+}

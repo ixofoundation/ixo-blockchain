@@ -1,0 +1,101 @@
+syntax = "proto3";
+package ixo.entity.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/iid/v1beta1/iid.proto";
+import "ixo/iid/v1beta1/tx.proto";
+import "ixo/entity/v1beta1/entity.proto";
+import "google/protobuf/timestamp.proto";
+
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
+
+// Msg defines the project Msg service.
+service Msg {
+
+   // CreateProject defines a method for creating a project.
+  rpc CreateEntity(MsgCreateEntity) returns (MsgCreateEntityResponse);
+
+  // UpdateEntityStatus defines a method for updating a entity's current status.
+  rpc UpdateEntity(MsgUpdateEntity) returns (MsgUpdateEntityResponse);
+  
+  // Transfers an entity and its nft to the recipient
+  rpc TransferEntity(MsgTransferEntity) returns (MsgTransferEntityResponse);
+}
+
+// MsgCreateEntity defines a message for creating a project.
+message MsgCreateEntity {
+  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_getters)  = false;
+
+  // An Entity Type as defined by the implementer
+  string entityType       = 1 [(gogoproto.jsontag) = "entity_type", (gogoproto.moretags) = "yaml:\"entity_type\""];
+  // Status of the Entity as defined by the implementer and interpreted by Client applications
+  int32 entityStatus        = 2 [(gogoproto.jsontag) = "entity_status", (gogoproto.moretags) = "yaml:\"entity_status\""];
+  // the list of controller DIDs
+  repeated string controller   = 3 [(gogoproto.jsontag) = "controller", (gogoproto.moretags) = "yaml:\"controller\""]; 
+  repeated ixo.iid.v1beta1.Context context        = 4 [(gogoproto.jsontag) = "context", (gogoproto.moretags) = "yaml:\"context\""]; // JSON-LD contexts
+  repeated ixo.iid.v1beta1.Verification verification = 5 [(gogoproto.jsontag) = "verification", (gogoproto.moretags) = "yaml:\"verification\""]; // Verification Methods and Verification Relationships
+  repeated ixo.iid.v1beta1.Service service      = 6 [(gogoproto.jsontag) = "service", (gogoproto.moretags) = "yaml:\"service\""]; // Service endpoints
+  repeated ixo.iid.v1beta1.AccordedRight accordedRight = 7 [(gogoproto.jsontag) = "accorded_right", (gogoproto.moretags) = "yaml:\"accorded_right\""]; // Legal or Electronic Rights and associated Object Capabilities
+  repeated ixo.iid.v1beta1.LinkedResource linkedResource = 8 [(gogoproto.jsontag) = "linked_resource", (gogoproto.moretags) = "yaml:\"linked_resource\""]; // Digital resources associated with the Subject
+  repeated ixo.iid.v1beta1.LinkedEntity linkedEntity = 9 [(gogoproto.jsontag) = "linked_entity", (gogoproto.moretags) = "yaml:\"linked_entity\""]; // DID of a linked Entity and its relationship with the Subject
+  bool deactivated = 10 [(gogoproto.jsontag) = "deactivated", (gogoproto.moretags) = "yaml:\"deactivated\""]; // Operational status of the Entity
+  // Start Date of the Entity as defined by the implementer and interpreted by Client applications
+  google.protobuf.Timestamp startDate = 11 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "start_date", (gogoproto.moretags) = "yaml:\"start_date\""]; // address of the account signing the message
+  // End Date of the Entity as defined by the implementer and interpreted by Client applications
+  google.protobuf.Timestamp endDate = 12 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "end_date", (gogoproto.moretags) = "yaml:\"end_date\""]; // address of the account signing the message
+  string stage = 13; // State of the Entity as defined by the implementer and interpreted by Client applications
+  // DID of the operator through which the Entity was created
+  string relayerNode = 14 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
+  // Public proof that the Entity is verified
+  string verificationStatus = 15 [(gogoproto.jsontag) = "verification_status", (gogoproto.moretags) = "yaml:\"verification_status\""];
+  // Content ID or Hash of public Verifiable Credentials associated with the  subject
+  repeated string verifiableCredential = 16 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
+  string   ownerDid        = 17 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
+  string   ownerAddress        = 18 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid address used to sign this transaction.
+  bytes data         = 19 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""]; // Extention data
+}
+
+// MsgCreateProjectResponse defines the Msg/CreateProject response type.
+message MsgCreateEntityResponse {
+  string entityId = 1 [(gogoproto.jsontag) = "entity_id", (gogoproto.moretags) = "yaml:\"entity_id\""];
+  string entityType       = 2 [(gogoproto.jsontag) = "entity_type", (gogoproto.moretags) = "yaml:\"entity_type\""];
+  int32 entityStatus        = 3 [(gogoproto.jsontag) = "entity_status", (gogoproto.moretags) = "yaml:\"entity_status\""];
+}
+
+// MsgUpdateEntityStatus defines a message for updating a entity's current status.
+message MsgUpdateEntity {
+  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_getters)  = false;
+  // The status of the entity. Should represent an enum in the client.
+  int32 status = 1;
+  bool deactivated = 2 [(gogoproto.jsontag) = "deactivated", (gogoproto.moretags) = "yaml:\"deactivated\""]; // Whether this entity is enabled ot not, basically a soft delete.
+  // refer to iid module for more information
+  google.protobuf.Timestamp startDate = 3 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "start_date", (gogoproto.moretags) = "yaml:\"start_date\""]; // address of the account signing the message
+  // refer to iid module for more information
+  google.protobuf.Timestamp endDate = 4 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "end_date", (gogoproto.moretags) = "yaml:\"end_date\""]; // address of the account signing the message
+  string stage = 5; // refer to iid module meta data for more information
+  // refer to iid module for more information
+  string relayerNode = 6 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
+  // refer to iid module for more information
+  string verifiableCredential = 7 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
+  string   controllerDid        = 8 [(gogoproto.jsontag) = "controller_did", (gogoproto.moretags) = "yaml:\"controller_did\""]; // The ownersdid used to sign this transaction.
+  string   controllerAddress        = 9 [(gogoproto.jsontag) = "controller_address", (gogoproto.moretags) = "yaml:\"controller_address\""]; // The ownersdid used to sign this transaction.
+}
+
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
+message MsgUpdateEntityResponse{}
+
+message MsgTransferEntity {
+  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.equal)      = false;
+
+  string entityDid          = 1 [(gogoproto.jsontag) = "entity_did", (gogoproto.moretags) = "yaml:\"entity_did\""];
+  string ownerDid      = 2 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
+  string ownerAddress  = 3 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
+  string recipientDid       = 4 [(gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
+}
+
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
+message MsgTransferEntityResponse{}

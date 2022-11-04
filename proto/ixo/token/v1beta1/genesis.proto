@@ -1,0 +1,14 @@
+syntax = "proto3";
+package ixo.token.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/token/v1beta1/token.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+
+// GenesisState defines the project module's genesis state.
+message GenesisState {
+  repeated ixo.token.v1beta1.TokenDoc token_docs              = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"token_docs\""];
+  // repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"account_maps\""];
+  ixo.token.v1beta1.Params params                                 = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
+}

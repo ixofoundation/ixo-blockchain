@@ -1,0 +1,47 @@
+syntax = "proto3";
+package ixo.token.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/iid/v1beta1/iid.proto";
+import "ixo/iid/v1beta1/tx.proto";
+import "ixo/token/v1beta1/token.proto";
+import "google/protobuf/timestamp.proto";
+
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+
+// Msg defines the project Msg service.
+service Msg {
+
+   // CreateProject defines a method for creating a project.
+  rpc CreateToken(MsgCreateToken) returns (MsgCreateTokenResponse);
+  
+  // Transfers an token and its nft to the recipient
+  rpc TransferToken(MsgTransferToken) returns (MsgTransferTokenResponse);
+}
+
+// MsgCreateToken defines a message for creating a project.
+message MsgCreateToken {
+  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_getters)  = false;
+
+  // An Token Type as defined by the implementer
+  string   ownerDid        = 1 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // Owner of the Token NFT | The ownersdid used to sign this transaction.
+  string   ownerAddress        = 2 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid address used to sign this transaction.
+}
+
+// MsgCreateProjectResponse defines the Msg/CreateProject response type.
+message MsgCreateTokenResponse {}
+
+message MsgTransferToken {
+  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.equal)      = false;
+
+  string tokenDid          = 1 [(gogoproto.jsontag) = "token_did", (gogoproto.moretags) = "yaml:\"token_did\""];
+  string ownerDid      = 2 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
+  string ownerAddress  = 3 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
+  string recipientDid       = 4 [(gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
+}
+
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateTokenStatus response type.
+message MsgTransferTokenResponse{}

@@ -1,0 +1,51 @@
+syntax = "proto3";
+package ixo.entity.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/coin.proto";
+import "ixo/entity/v1beta1/entity.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  rpc EntityList(QueryEntityListRequest) returns (QueryEntityListResponse){
+    option (google.api.http).get = "/ixo/entity";
+  }
+
+  rpc EntityDoc(QueryEntityDocRequest) returns (QueryEntityDocResponse){
+    option (google.api.http).get = "/ixo/entity/{entity_did}";
+  }
+
+  rpc EntityConfig(QueryEntityConfigRequest) returns (QueryEntityConfigResponse){
+    option (google.api.http).get = "/ixo/entity/config";
+  }
+}
+
+message QueryEntityListRequest {
+  string entity_type = 1 [(gogoproto.moretags) = "yaml:\"entity_type\""];
+  string entity_status = 2 [(gogoproto.moretags) = "yaml:\"entity_status\""];
+}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryEntityListResponse {
+  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
+}
+
+// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
+message QueryEntityDocRequest {
+  string entity_did = 1 [(gogoproto.moretags) = "yaml:\"entity_did\""];
+}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryEntityDocResponse {
+  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
+}
+
+message QueryEntityConfigRequest {}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryEntityConfigResponse {
+  map<string, string> map = 1 [(gogoproto.moretags) = "yaml:\"config\""];
+}
