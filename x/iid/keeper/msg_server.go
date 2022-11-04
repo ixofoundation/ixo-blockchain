@@ -77,7 +77,7 @@ func (k msgServer) UpdateIidDocument(
 ) (*types.MsgUpdateIidDocumentResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Doc.Id, msg.Signer,
 		//XXX: check this assignment during audit
@@ -101,7 +101,7 @@ func (k msgServer) AddVerification(
 ) (*types.MsgAddVerificationResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -119,7 +119,7 @@ func (k msgServer) AddService(
 ) (*types.MsgAddServiceResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -137,7 +137,7 @@ func (k msgServer) AddLinkedResource(
 ) (*types.MsgAddLinkedResourceResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -155,7 +155,7 @@ func (k msgServer) DeleteLinkedResource(
 ) (*types.MsgDeleteLinkedResourceResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -179,7 +179,7 @@ func (k msgServer) AddLinkedEntity(
 ) (*types.MsgAddLinkedEntityResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -197,7 +197,7 @@ func (k msgServer) DeleteLinkedEntity(
 ) (*types.MsgDeleteLinkedEntityResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -221,7 +221,7 @@ func (k msgServer) AddAccordedRight(
 ) (*types.MsgAddAccordedRightResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -239,7 +239,7 @@ func (k msgServer) DeleteAccordedRight(
 ) (*types.MsgDeleteAccordedRightResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -264,7 +264,7 @@ func (k msgServer) AddIidContext(
 ) (*types.MsgAddIidContextResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -282,7 +282,7 @@ func (k msgServer) DeleteIidContext(
 ) (*types.MsgDeleteIidContextResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -307,7 +307,7 @@ func (k msgServer) RevokeVerification(
 ) (*types.MsgRevokeVerificationResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -326,7 +326,7 @@ func (k msgServer) DeleteService(
 ) (*types.MsgDeleteServiceResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -351,7 +351,7 @@ func (k msgServer) SetVerificationRelationships(
 ) (*types.MsgSetVerificationRelationshipsResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -369,7 +369,7 @@ func (k msgServer) AddController(
 	msg *types.MsgAddController,
 ) (*types.MsgAddControllerResponse, error) {
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
@@ -388,7 +388,7 @@ func (k msgServer) DeleteController(
 ) (*types.MsgDeleteControllerResponse, error) {
 
 	if err := ExecuteOnDidWithRelationships(
-		goCtx, &k.Keeper,
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer, func(didDoc *types.IidDocument) error {
 			return didDoc.DeleteControllers(msg.ControllerDid)
@@ -473,8 +473,7 @@ func newConstraints(relationships ...string) VerificationRelationships {
 	return relationships
 }
 
-func ExecuteOnDidWithRelationships(goCtx context.Context, k *Keeper, constraints VerificationRelationships, did, signer string, update func(document *types.IidDocument) error) (err error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+func ExecuteOnDidWithRelationships(ctx sdk.Context, k *Keeper, constraints VerificationRelationships, did, signer string, update func(document *types.IidDocument) error) (err error) {
 	k.Logger(ctx).Info("request to update a did document", "target did", did)
 	// TODO: fail if the input did is of type KEY (immutable)
 	// eg: ErrInvalidState, "did document key is immutable"
@@ -490,8 +489,8 @@ func ExecuteOnDidWithRelationships(goCtx context.Context, k *Keeper, constraints
 	// Any verification method in the authentication relationship can update the DID document
 	if !didDoc.HasRelationship(types.NewBlockchainAccountID(ctx.ChainID(), signer), constraints...) {
 		// check also the controllers
-		signerDID := types.NewKeyDID(signer)
-		if !didDoc.HasController(signerDID) {
+		// signerDID := types.NewKeyDID(signer)
+		if !didDoc.HasController(types.DID(signer)) {
 			// if also the controller was not set the error
 			err = sdkerrors.Wrapf(
 				types.ErrUnauthorized,

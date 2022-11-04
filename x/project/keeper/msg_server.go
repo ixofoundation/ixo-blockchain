@@ -12,6 +12,7 @@ import (
 	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
@@ -275,33 +276,39 @@ func (s msgServer) CreateAgent(goCtx context.Context, msg *types.MsgCreateAgent)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
 
-	// Check if project exists
-	_, err := k.GetProjectDoc(ctx, msg.ProjectDid)
-	if err != nil {
-		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
+	createAgentFunc := func(document *iidtypes.IidDocument) error {
+		_, err := createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.Data.AgentDid))
+		if err != nil {
+			return err
+		}
+
+		ctx.EventManager().EmitEvents(sdk.Events{
+			sdk.NewEvent(
+				types.EventTypeCreateAgent,
+				sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+				sdk.NewAttribute(types.AttributeKeyProjectDid, document.Id),
+				sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
+				sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
+			),
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			),
+		})
+		return nil
 	}
 
-	// Create account in project accounts for the agent
-	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.Data.AgentDid))
-	if err != nil {
-		return nil, err
-	}
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeCreateAgent,
-			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
-			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
-			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
+	err := iidkeeper.ExecuteOnDidWithRelationships(
+		ctx,
+		&k.IidKeeper,
+		[]string{iidtypes.Authentication},
+		msg.ProjectDid,
+		msg.ProjectAddress,
+		createAgentFunc,
+	)
 
-	return &types.MsgCreateAgentResponse{}, nil
+	return &types.MsgCreateAgentResponse{}, err
 }
 
 func (s msgServer) UpdateAgent(goCtx context.Context, msg *types.MsgUpdateAgent) (*types.MsgUpdateAgentResponse, error) {
@@ -339,42 +346,52 @@ func (s msgServer) CreateClaim(goCtx context.Context, msg *types.MsgCreateClaim)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
 
-	// Check if project exists
-	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
-	if err != nil {
-		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
+	createClaimFunc := func(document *iidtypes.IidDocument) error {
+		// Check if project exists
+		projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
+		if err != nil {
+			return sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
+		}
+
+		// Check that project status is STARTED
+		if types.ProjectStatusFromString(projectDoc.Status) != types.StartedStatus {
+			return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "project not in STARTED status")
+		}
+
+		// Check if claim already exists
+		if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimId) {
+			return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "claim already exists")
+		}
+
+		// Create and set claim
+		claim := types.NewClaim(msg.Data.ClaimId, msg.Data.ClaimTemplateId, msg.SenderDid)
+		k.SetClaim(ctx, msg.ProjectDid, claim)
+
+		ctx.EventManager().EmitEvents(sdk.Events{
+			sdk.NewEvent(
+				types.EventTypeCreateClaim,
+				sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+				sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+				sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimId),
+				sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateId),
+			),
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			),
+		})
+		return nil
 	}
 
-	// Check that project status is STARTED
-	if types.ProjectStatusFromString(projectDoc.Status) != types.StartedStatus {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "project not in STARTED status")
-	}
-
-	// Check if claim already exists
-	if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimId) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "claim already exists")
-	}
-
-	// Create and set claim
-	claim := types.NewClaim(msg.Data.ClaimId, msg.Data.ClaimTemplateId, msg.SenderDid)
-	k.SetClaim(ctx, msg.ProjectDid, claim)
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeCreateClaim,
-			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
-			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimId),
-			sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateId),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
-
-	return &types.MsgCreateClaimResponse{}, nil
+	return &types.MsgCreateClaimResponse{}, iidkeeper.ExecuteOnDidWithRelationships(
+		ctx,
+		&k.IidKeeper,
+		[]string{iidtypes.Authentication},
+		msg.ProjectDid,
+		msg.ProjectAddress,
+		createClaimFunc,
+	)
 }
 
 func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateEvaluation) (*types.MsgCreateEvaluationResponse, error) {

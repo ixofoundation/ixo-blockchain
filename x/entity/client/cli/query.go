@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"context"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
@@ -27,23 +29,21 @@ func GetCmdEntityDocs() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-entity-doc",
 		Short: "Query EntityDocs",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// clientCtx, err := client.GetClientQueryContext(cmd)
-			// if err != nil {
-			// 	return err
-			// }
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
-			// didAddr := args[0]
+			queryClient := types.NewQueryClient(clientCtx)
 
-			// queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.EntityList(context.Background(), &types.QueryEntityListRequest{})
+			if err != nil {
+				return err
+			}
 
-			// res, err := queryClient.ProjectDoc(context.Background(), &types.QueryProjectDocRequest{ProjectDid: didAddr})
-			// if err != nil {
-			// 	return err
-			// }
-
-			// return clientCtx.PrintProto(res)
+			return clientCtx.PrintProto(res)
 			return nil
 		},
 	}

@@ -32,6 +32,9 @@ func (k Keeper) EntityList(c context.Context, req *types.QueryEntityListRequest)
 
 	// ctx := sdk.UnwrapSDKContext(c)
 
+	// wasmkeeper.Querier(&k.WasmKeeper).SmartContractState()
+	// k.WasmKeeper.Execute()
+
 	// storedDoc, err := k.GetProjectDoc(ctx, req.ProjectDid)
 	// if err != nil {
 	// 	return nil, err
