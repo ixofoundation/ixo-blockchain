@@ -8,33 +8,33 @@ import (
 )
 
 var (
-	ProposalTypeInitializeNftContract                  = "InitializeNftContract"
-	_                                 govtypes.Content = &InitializeNftContract{}
+	ProposalTypeInitializeNftContract                  = "InitializeTokenContract"
+	_                                 govtypes.Content = &InitializeTokenContract{}
 )
 
 func NftModuleAddress() string { return fmt.Sprintf("%s-minter", types.ModuleName) }
 
-func NewInitializeNftContract(nftContractCodeId uint64, nftminteraddress string) InitializeNftContract {
-	return InitializeNftContract{
+func NewInitializeNftContract(nftContractCodeId uint64, nftminteraddress string) InitializeTokenContract {
+	return InitializeTokenContract{
 		NftContractCodeId: nftContractCodeId,
 		NftMinterAddress:  nftminteraddress,
 	}
 }
 
-func (p *InitializeNftContract) GetDescription() string {
+func (p *InitializeTokenContract) GetDescription() string {
 	return "update token paramaters"
 }
 
-func (p *InitializeNftContract) GetTitle() string {
+func (p *InitializeTokenContract) GetTitle() string {
 	return "update token paramaters"
 }
 
-func (sup *InitializeNftContract) ProposalRoute() string { return RouterKey }
-func (sup *InitializeNftContract) ProposalType() string  { return ProposalTypeInitializeNftContract }
+func (sup *InitializeTokenContract) ProposalRoute() string { return RouterKey }
+func (sup *InitializeTokenContract) ProposalType() string  { return ProposalTypeInitializeNftContract }
 
-func (sup *InitializeNftContract) ValidateBasic() error { return nil }
+func (sup *InitializeTokenContract) ValidateBasic() error { return nil }
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeInitializeNftContract)
-	govtypes.RegisterProposalTypeCodec(&InitializeNftContract{}, "token.InitializeNftContract")
+	govtypes.RegisterProposalTypeCodec(&InitializeTokenContract{}, "token.InitializeTokenContract")
 }

@@ -1349,7 +1349,7 @@
             <ul>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.InitializeNftContract"><span class="badge">M</span>InitializeNftContract</a>
+                  <a href="#ixo.token.v1beta1.InitializeTokenContract"><span class="badge">M</span>InitializeTokenContract</a>
                 </li>
               
               
@@ -9566,7 +9566,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       <p></p>
 
       
-        <h3 id="ixo.token.v1beta1.InitializeNftContract">InitializeNftContract</h3>
+        <h3 id="ixo.token.v1beta1.InitializeTokenContract">InitializeTokenContract</h3>
         <p></p>
 
         

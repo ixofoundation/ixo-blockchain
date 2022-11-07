@@ -290,7 +290,7 @@ type IxoApp struct {
 
 	IidKeeper      iidmodulekeeper.Keeper `json:"iid_keeper"`
 	EntityKeeper   entitykeeper.Keeper    `json:"entity_keeper"`
-	TokenKeeper   tokenkeeper.Keeper    `json:"token_keeper"`
+	TokenKeeper    tokenkeeper.Keeper     `json:"token_keeper"`
 	BondsKeeper    bondskeeper.Keeper     `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper  `json:"payments_keeper,omitempty"`
 	ProjectKeeper  projectkeeper.Keeper   `json:"project_keeper"`
@@ -1011,6 +1011,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(entitytypes.ModuleName)
+	paramsKeeper.Subspace(tokentypes.ModuleName)
 
 	return paramsKeeper
 }

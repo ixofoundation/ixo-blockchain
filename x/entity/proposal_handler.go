@@ -22,7 +22,7 @@ func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.InitializeNftContract:
-			return handleEntityParameterChangeProposal(ctx, k, c)
+			return handleTokenParameterChangeProposal(ctx, k, c)
 
 		default:
 			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized param proposal content type: %T", c)
@@ -30,7 +30,7 @@ func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleEntityParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeNftContract) error {
+func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeNftContract) error {
 	fmt.Printf("propsal handeler =============\n%+v\n", *p)
 	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
 	var xx types.Params
