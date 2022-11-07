@@ -100,6 +100,12 @@ import (
 	entityclient "github.com/ixofoundation/ixo-blockchain/x/entity/client"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
+
+	tokenmodule "github.com/ixofoundation/ixo-blockchain/x/token"
+	tokenclient "github.com/ixofoundation/ixo-blockchain/x/token/client"
+	tokenkeeper "github.com/ixofoundation/ixo-blockchain/x/token/keeper"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/x/token/types"
+
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
@@ -167,6 +173,7 @@ var (
 				upgradeclient.ProposalHandler,
 				upgradeclient.CancelProposalHandler,
 				entityclient.ProposalHandler,
+				tokenclient.ProposalHandler,
 			)...,
 		),
 		wasm.AppModuleBasic{},
@@ -175,6 +182,7 @@ var (
 		payments.AppModuleBasic{},
 		project.AppModuleBasic{},
 		entitymodule.AppModuleBasic{},
+		tokenmodule.AppModuleBasic{},
 	)
 
 	// Module account permissions
@@ -282,6 +290,7 @@ type IxoApp struct {
 
 	IidKeeper      iidmodulekeeper.Keeper `json:"iid_keeper"`
 	EntityKeeper   entitykeeper.Keeper    `json:"entity_keeper"`
+	TokenKeeper   tokenkeeper.Keeper    `json:"token_keeper"`
 	BondsKeeper    bondskeeper.Keeper     `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper  `json:"payments_keeper,omitempty"`
 	ProjectKeeper  projectkeeper.Keeper   `json:"project_keeper"`
@@ -323,6 +332,7 @@ func NewIxoApp(
 		bondstypes.StoreKey,
 		paymentstypes.StoreKey, projecttypes.StoreKey,
 		entitytypes.StoreKey,
+		tokentypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -484,11 +494,22 @@ func NewIxoApp(
 		app.GetSubspace(entitytypes.ModuleName),
 	)
 
+	app.TokenKeeper = tokenkeeper.NewKeeper(
+		appCodec,
+		keys[tokentypes.StoreKey],
+		keys[tokentypes.MemStoreKey],
+		app.IidKeeper,
+		app.WasmKeeper,
+		app.AccountKeeper,
+		app.GetSubspace(tokentypes.ModuleName),
+	)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(entitytypes.RouterKey, entitymodule.NewEntityParamChangeProposalHandler(app.EntityKeeper)).
+		AddRoute(tokentypes.RouterKey, tokenmodule.NewTokenParamChangeProposalHandler(app.TokenKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
@@ -540,6 +561,7 @@ func NewIxoApp(
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
 		entitymodule.NewAppModule(app.EntityKeeper),
+		tokenmodule.NewAppModule(app.TokenKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -560,6 +582,7 @@ func NewIxoApp(
 		bondstypes.ModuleName,
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
+		tokentypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Custom ixo modules
@@ -572,7 +595,7 @@ func NewIxoApp(
 		capabilitytypes.ModuleName, slashingtypes.ModuleName, ibctransfertypes.ModuleName,
 		authz.ModuleName, feegrant.ModuleName, wasm.ModuleName,
 
-		entitytypes.ModuleName,
+		entitytypes.ModuleName, tokentypes.ModuleName,
 		bondstypes.ModuleName, paymentstypes.ModuleName,
 	)
 
@@ -593,7 +616,7 @@ func NewIxoApp(
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		iidtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
-		entitytypes.ModuleName,
+		tokentypes.ModuleName, entitytypes.ModuleName,
 	)
 
 	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)

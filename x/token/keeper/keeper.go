@@ -3,22 +3,17 @@ package keeper
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/codec"
-	cryptosecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/ixofoundation/ixo-blockchain/x/token/types"
-	tokencontracts "github.com/ixofoundation/ixo-blockchain/x/token/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/x/token/types"
+	tokencontracts "github.com/ixofoundation/ixo-blockchain/x/token/types/contracts"
 )
 
 type Keeper struct {
@@ -62,118 +57,118 @@ func (k Keeper) CreateToken(ctx sdk.Context, msg *types.MsgCreateToken) (types.M
 	if len(nftContractAddressParam) == 0 {
 		return types.MsgCreateTokenResponse{}, errors.New("nftContractAddress not set")
 	}
+	return types.MsgCreateTokenResponse{}, errors.New("nftContractAddress not set")
+	// nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
+	// if err != nil {
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
-	if err != nil {
-		return types.MsgCreateTokenResponse{}, err
-	}
+	// privKey := cryptosecp256k1.GenPrivKey()
+	// pubKey := privKey.PubKey()
+	// address, err := sdk.AccAddressFromBech32(params.NftContractMinter)
+	// if err != nil {
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	privKey := cryptosecp256k1.GenPrivKey()
-	pubKey := privKey.PubKey()
-	address, err := sdk.AccAddressFromBech32(params.NftContractMinter)
-	if err != nil {
-		return types.MsgCreateTokenResponse{}, err
-	}
+	// account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
+	// tokenId := fmt.Sprintf("did:ixo:token:%s:%s", msg.TokenType, base58.Encode(pubKey.Bytes()[:16]))
 
-	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
-	tokenId := fmt.Sprintf("did:ixo:token:%s:%s", msg.TokenType, base58.Encode(pubKey.Bytes()[:16]))
+	// verification := iidtypes.NewVerification(
+	// 	iidtypes.NewVerificationMethod(
+	// 		tokenId,
+	// 		iidtypes.DID(tokenId),
+	// 		iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
+	// 	),
+	// 	[]string{iidtypes.Authentication},
+	// 	nil,
+	// )
 
-	verification := iidtypes.NewVerification(
-		iidtypes.NewVerificationMethod(
-			tokenId,
-			iidtypes.DID(tokenId),
-			iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
-		),
-		[]string{iidtypes.Authentication},
-		nil,
-	)
+	// defaultVerification := iidtypes.NewVerification(
+	// 	iidtypes.NewVerificationMethod(
+	// 		iidtypes.DID(tokenId).NewVerificationMethodID(account.GetAddress().String()),
+	// 		iidtypes.DID(tokenId),
+	// 		iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
+	// 	),
+	// 	[]string{iidtypes.Authentication},
+	// 	nil,
+	// )
 
-	defaultVerification := iidtypes.NewVerification(
-		iidtypes.NewVerificationMethod(
-			iidtypes.DID(tokenId).NewVerificationMethodID(account.GetAddress().String()),
-			iidtypes.DID(tokenId),
-			iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
-		),
-		[]string{iidtypes.Authentication},
-		nil,
-	)
+	// did, err := iidtypes.NewDidDocument(tokenId,
+	// 	iidtypes.WithServices(msg.Service...),
+	// 	iidtypes.WithRights(msg.AccordedRight...),
+	// 	iidtypes.WithResources(msg.LinkedResource...),
+	// 	iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
+	// 	iidtypes.WithControllers(append(msg.Controller, tokenId, msg.OwnerDid)...),
+	// )
+	// if err != nil {
+	// 	// k.Logger(ctx).Error(err.Error())
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	did, err := iidtypes.NewDidDocument(tokenId,
-		iidtypes.WithServices(msg.Service...),
-		iidtypes.WithRights(msg.AccordedRight...),
-		iidtypes.WithResources(msg.LinkedResource...),
-		iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
-		iidtypes.WithControllers(append(msg.Controller, tokenId, msg.OwnerDid)...),
-	)
-	if err != nil {
-		// k.Logger(ctx).Error(err.Error())
-		return types.MsgCreateTokenResponse{}, err
-	}
+	// // check that the did is not already taken
+	// _, found := k.IidKeeper.GetDidDocument(ctx, []byte(tokenId))
+	// if found {
+	// 	err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", tokenId)
+	// 	// k.Logger(ctx).Error(err.Error())
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	// check that the did is not already taken
-	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(tokenId))
-	if found {
-		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", tokenId)
-		// k.Logger(ctx).Error(err.Error())
-		return types.MsgCreateTokenResponse{}, err
-	}
+	// // persist the did document
 
-	// persist the did document
+	// currentTimeUtc := time.Now().UTC()
+	// // now create and persist the metadata
+	// did.Context = msg.Context
 
-	currentTimeUtc := time.Now().UTC()
-	// now create and persist the metadata
-	did.Context = msg.Context
+	// didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	// didM.TokenType = msg.TokenType
+	// didM.Deactivated = msg.Deactivated
+	// didM.Created = &currentTimeUtc
+	// didM.Updated = &currentTimeUtc
+	// didM.VersionId = fmt.Sprintf("%s:%d", tokenId, 0)
+	// didM.Stage = msg.Stage
+	// didM.Credentials = msg.VerifiableCredential
+	// didM.VerifiableCredential = msg.VerificationStatus
+	// didM.StartDate = msg.StartDate
+	// didM.EndDate = msg.EndDate
+	// didM.RelayerNode = msg.RelayerNode
 
-	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
-	didM.TokenType = msg.TokenType
-	didM.Deactivated = msg.Deactivated
-	didM.Created = &currentTimeUtc
-	didM.Updated = &currentTimeUtc
-	didM.VersionId = fmt.Sprintf("%s:%d", tokenId, 0)
-	didM.Stage = msg.Stage
-	didM.Credentials = msg.VerifiableCredential
-	didM.VerifiableCredential = msg.VerificationStatus
-	didM.StartDate = msg.StartDate
-	didM.EndDate = msg.EndDate
-	didM.RelayerNode = msg.RelayerNode
+	// k.IidKeeper.SetDidDocument(ctx, []byte(tokenId), did)
+	// k.IidKeeper.SetDidMetadata(ctx, []byte(tokenId), didM)
 
-	k.IidKeeper.SetDidDocument(ctx, []byte(tokenId), did)
-	k.IidKeeper.SetDidMetadata(ctx, []byte(tokenId), didM)
+	// //nftAddresBytes, err := k.GetTokenConfig(ctx, types.ConfigNftContractAddress)
 
-	//nftAddresBytes, err := k.GetTokenConfig(ctx, types.ConfigNftContractAddress)
+	// nftMint := tokencontracts.WasmMsgMint{
+	// 	Mint: tokencontracts.Mint{
+	// 		TokenId:   did.Id,
+	// 		Owner:     msg.OwnerAddress,
+	// 		TokenUri:  did.Id,
+	// 		Extension: msg.Data,
+	// 	},
+	// }
 
-	nftMint := tokencontracts.WasmMsgMint{
-		Mint: tokencontracts.Mint{
-			TokenId:   did.Id,
-			Owner:     msg.OwnerAddress,
-			TokenUri:  did.Id,
-			Extension: msg.Data,
-		},
-	}
+	// finalMessage, err := nftMint.Marshal()
 
-	finalMessage, err := nftMint.Marshal()
+	// if err != nil {
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	if err != nil {
-		return types.MsgCreateTokenResponse{}, err
-	}
+	// _, err = k.WasmKeeper.Execute(ctx, nftContractAddress, address, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	// if err != nil {
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	_, err = k.WasmKeeper.Execute(ctx, nftContractAddress, address, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
-	if err != nil {
-		return types.MsgCreateTokenResponse{}, err
-	}
+	// // emit the event
+	// if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(tokenId, msg.OwnerDid)); err != nil {
+	// 	// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
+	// 	return types.MsgCreateTokenResponse{}, err
+	// }
 
-	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(tokenId, msg.OwnerDid)); err != nil {
-		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
-		return types.MsgCreateTokenResponse{}, err
-	}
-
-	resp := types.MsgCreateTokenResponse{
-		TokenId:     tokenId,
-		TokenType:   didM.TokenType,
-		TokenStatus: didM.Status,
-	}
-	return resp, err
+	// resp := types.MsgCreateTokenResponse{
+	// 	TokenId:     tokenId,
+	// 	TokenType:   didM.TokenType,
+	// 	TokenStatus: didM.Status,
+	// }
+	// return resp, err
 }
 
 func (k Keeper) TransferToken(ctx sdk.Context, msg *types.MsgTransferToken) (*types.MsgTransferTokenResponse, error) {
@@ -184,7 +179,7 @@ func (k Keeper) TransferToken(ctx sdk.Context, msg *types.MsgTransferToken) (*ty
 		return nil, errors.New("nftContractAddress not set")
 	}
 
-	controllerAddress, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
+	controllerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +204,7 @@ func (k Keeper) TransferToken(ctx sdk.Context, msg *types.MsgTransferToken) (*ty
 		&k.IidKeeper,
 		[]string{iidtypes.Authentication},
 		msg.TokenDid,
-		msg.ControllerDid,
+		msg.OwnerDid,
 		func(document *iidtypes.IidDocument) error {
 			document.Controller = []string{
 				document.Id,

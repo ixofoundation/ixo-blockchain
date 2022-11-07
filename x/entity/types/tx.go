@@ -53,29 +53,11 @@ func (msg MsgUpdateEntity) GetSignBytes() []byte {
 // func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
 func (msg MsgUpdateEntity) Route() string { return RouterKey }
 
-func (msg MsgUpdateEntityConfig) GetIidController() string { return "" }
-func (msg MsgUpdateEntityConfig) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgUpdateEntityConfig) ValidateBasic() error {
-	return nil
-}
-
-func (msg MsgUpdateEntityConfig) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 // func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
-func (msg MsgUpdateEntityConfig) Route() string { return RouterKey }
 
-func (msg MsgTransferEntity) GetIidController() string { return msg.ControllerDid }
+func (msg MsgTransferEntity) GetIidController() string { return msg.OwnerDid }
 func (msg MsgTransferEntity) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
+	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}

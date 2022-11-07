@@ -184,7 +184,7 @@ func (k Keeper) TransferEntity(ctx sdk.Context, msg *types.MsgTransferEntity) (*
 		return nil, errors.New("nftContractAddress not set")
 	}
 
-	controllerAddress, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
+	controllerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (k Keeper) TransferEntity(ctx sdk.Context, msg *types.MsgTransferEntity) (*
 		&k.IidKeeper,
 		[]string{iidtypes.Authentication},
 		msg.EntityDid,
-		msg.ControllerDid,
+		msg.OwnerDid,
 		func(document *iidtypes.IidDocument) error {
 			document.Controller = []string{
 				document.Id,

@@ -17,12 +17,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreateToken:
 			res, err := msgServer.CreateToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateToken:
-			res, err := msgServer.UpdateToken(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateTokenConfig:
-			res, err := msgServer.UpdateTokenConfig(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgTransferToken:
 			res, err := msgServer.TransferToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)

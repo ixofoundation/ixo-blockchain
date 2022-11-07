@@ -9,7 +9,7 @@ import (
 
 func ProposalRESTHandler(clientCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
-		SubRoute: "entity_param_change",
+		SubRoute: "token_param_change",
 		Handler:  postProposalHandlerFn(clientCtx),
 	}
 }

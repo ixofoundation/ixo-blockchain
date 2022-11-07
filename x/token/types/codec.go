@@ -11,8 +11,6 @@ import (
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateToken{}, "token/CreateToken", nil)
-	cdc.RegisterConcrete(&MsgUpdateToken{}, "token/UpdateToken", nil)
-	cdc.RegisterConcrete(&MsgUpdateTokenConfig{}, "token/UpdateTokenConfig", nil)
 	cdc.RegisterConcrete(&MsgTransferToken{}, "token/TransferToken", nil)
 }
 
@@ -20,8 +18,6 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateToken{},
-		&MsgUpdateToken{},
-		&MsgUpdateTokenConfig{},
 		&MsgTransferToken{},
 	)
 
