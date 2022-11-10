@@ -3,7 +3,6 @@ package ixo.entity.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos/coin.proto";
 import "ixo/entity/v1beta1/entity.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";

@@ -2,7 +2,7 @@ syntax = "proto3";
 package bonds;
 
 import "gogoproto/gogo.proto";
-import "cosmos/coin.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";

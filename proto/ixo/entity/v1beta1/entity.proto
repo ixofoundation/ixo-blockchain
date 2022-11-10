@@ -2,7 +2,6 @@ syntax = "proto3";
 package ixo.entity.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "cosmos/coin.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
