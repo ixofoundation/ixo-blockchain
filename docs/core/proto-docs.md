@@ -4427,6 +4427,13 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
             <tbody>
               
                 <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>versionId</td>
                   <td><a href="#string">string</a></td>
                   <td></td>

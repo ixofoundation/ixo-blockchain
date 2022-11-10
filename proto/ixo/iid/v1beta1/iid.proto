@@ -129,16 +129,17 @@ message Service {
 message IidMetadata {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
-  string versionId = 1;
-  google.protobuf.Timestamp created = 2 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated = 3 [(gogoproto.stdtime) = true];
-  bool deactivated = 4;
-  string entityType = 5;
-  google.protobuf.Timestamp startDate = 6 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp endDate = 7 [(gogoproto.stdtime) = true];
-  int32 status = 8;
-  string stage = 9;
-  string relayerNode = 10;
-  string verifiableCredential = 11;
-  repeated string credentials =12;
+  string id = 1;
+  string versionId = 2;
+  google.protobuf.Timestamp created = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated = 4 [(gogoproto.stdtime) = true];
+  bool deactivated = 5;
+  string entityType = 6;
+  google.protobuf.Timestamp startDate = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp endDate = 8 [(gogoproto.stdtime) = true];
+  int32 status = 9;
+  string stage = 10;
+  string relayerNode = 11;
+  string verifiableCredential = 12;
+  repeated string credentials =13;
 }
