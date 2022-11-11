@@ -5,11 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
-	tokencontracts "github.com/ixofoundation/ixo-blockchain/x/token/types/contracts"
 )
 
 const (
@@ -31,7 +29,7 @@ func NewTokenParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 }
 
 func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeTokenContract) error {
-	fmt.Printf("propsal handeler =============\n%+v\n", *p)
+	fmt.Printf("token propsal handeler =============\n%+v\n", *p)
 	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
 	var xx types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
@@ -42,12 +40,12 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	// }
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
-	adminAddr := authtypes.NewModuleAddress(types.NftModuleAddress())
+	// adminAddr := authtypes.NewModuleAddress(types.NftModuleAddress())
 
-	senderAddr, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
-	if err != nil {
-		return nil
-	}
+	// senderAddr, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
+	// if err != nil {
+	// 	return nil
+	// }
 	// var adminAddr sdk.AccAddress
 	// if msg.Admin != "" {
 	// 	if adminAddr, err = sdk.AccAddressFromBech32(msg.Admin); err != nil {
@@ -61,28 +59,28 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	// 	sdk.NewAttribute(sdk.AttributeKeySender, p.),
 	// ))
 
-	initiateNftContractMsg := tokencontracts.InitiateNftContract{
-		Name:   TokenNftContractName,
-		Symbol: TokenNftContractSymbol,
-		Minter: adminAddr.String(),
-	}
+	// initiateNftContractMsg := tokencontracts.InitiateNftContract{
+	// 	Name:   TokenNftContractName,
+	// 	Symbol: TokenNftContractSymbol,
+	// 	Minter: adminAddr.String(),
+	// }
 
-	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
-	if err != nil {
-		return nil
-	}
+	// encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
+	// if err != nil {
+	// 	return nil
+	// }
 
-	deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
+	// deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
 
-	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_token_nft_contract", deposit)
-	if err != nil {
-		return err
-	}
+	// contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_token_nft_contract", deposit)
+	// if err != nil {
+	// 	return err
+	// }
 
-	xx.NftContractAddress = contractAddr.String()
-	xx.NftContractMinter = initiateNftContractMsg.Minter
+	// xx.NftContractAddress = contractAddr.String()
+	// xx.NftContractMinter = initiateNftContractMsg.Minter
 
-	k.ParamSpace.SetParamSet(ctx, &xx)
+	// k.ParamSpace.SetParamSet(ctx, &xx)
 
 	// for _, c := range p.Changes {
 	// 	ss, ok := k.GetParams()

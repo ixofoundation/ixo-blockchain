@@ -125,6 +125,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	did.Context = msg.Context
 
 	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	didM.Id = entityId
 	didM.EntityType = msg.EntityType
 	didM.Deactivated = msg.Deactivated
 	didM.Created = &currentTimeUtc

@@ -11,9 +11,7 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
-	tokencontracts "github.com/ixofoundation/ixo-blockchain/x/token/types/contracts"
 )
 
 type Keeper struct {
@@ -179,64 +177,64 @@ func (k Keeper) TransferToken(ctx sdk.Context, msg *types.MsgTransferToken) (*ty
 		return nil, errors.New("nftContractAddress not set")
 	}
 
-	controllerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return nil, err
-	}
+	// controllerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	recipientDidDoc, found := k.IidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid))
-	if !found {
-		return nil, errors.New("recipient did not found")
-	}
+	// recipientDidDoc, found := k.IidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid))
+	// if !found {
+	// 	return nil, errors.New("recipient did not found")
+	// }
 
-	recipientAddress, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
-	if err != nil {
-		return nil, err
-	}
+	// recipientAddress, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
-	if err != nil {
-		return nil, err
-	}
+	// nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	err = iidkeeper.ExecuteOnDidWithRelationships(
-		ctx,
-		&k.IidKeeper,
-		[]string{iidtypes.Authentication},
-		msg.TokenDid,
-		msg.OwnerDid,
-		func(document *iidtypes.IidDocument) error {
-			document.Controller = []string{
-				document.Id,
-				msg.RecipientDid,
-			}
-			return nil
-		},
-	)
+	// err = iidkeeper.ExecuteOnDidWithRelationships(
+	// 	ctx,
+	// 	&k.IidKeeper,
+	// 	[]string{iidtypes.Authentication},
+	// 	msg.TokenDid,
+	// 	msg.OwnerDid,
+	// 	func(document *iidtypes.IidDocument) error {
+	// 		document.Controller = []string{
+	// 			document.Id,
+	// 			msg.RecipientDid,
+	// 		}
+	// 		return nil
+	// 	},
+	// )
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	nftTranferMsg := tokencontracts.WasmMsgTransferNft{
-		TransferNft: tokencontracts.TransferNft{
-			TokenId:   msg.TokenDid,
-			Recipient: recipientAddress.String(),
-		},
-	}
+	// nftTranferMsg := tokencontracts.WasmMsgTransferNft{
+	// 	TransferNft: tokencontracts.WasmMsgTransferNft{
+	// 		TokenId:   msg.TokenDid,
+	// 		Recipient: recipientAddress.String(),
+	// 	},
+	// }
 
-	finalMessage, err := nftTranferMsg.Marshal()
+	// finalMessage, err := nftTranferMsg.Marshal()
 
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	_, err = k.WasmKeeper.Execute(ctx, nftContractAddress, controllerAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
-	if err != nil {
-		return nil, err
-	}
+	// _, err = k.WasmKeeper.Execute(ctx, nftContractAddress, controllerAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return &types.MsgTransferTokenResponse{}, err
+	return &types.MsgTransferTokenResponse{}, nil
 }
 
 // GetParams returns the total set of project parameters.

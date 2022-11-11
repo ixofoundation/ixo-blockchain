@@ -36,5 +36,5 @@ func (sup *InitializeTokenContract) ValidateBasic() error { return nil }
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeInitializeNftContract)
-	govtypes.RegisterProposalTypeCodec(&InitializeTokenContract{}, "token.InitializeTokenContract")
+	govtypes.RegisterProposalTypeCodec(&InitializeTokenContract{}, "token.ixo.token.v1beta1.InitializeTokenContract")
 }

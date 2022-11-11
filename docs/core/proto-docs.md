@@ -226,7 +226,7 @@
             <ul>
               
                 <li>
-                  <a href="#bonds.GenesisState"><span class="badge">M</span>GenesisState</a>
+                  <a href="#ixo.bonds.v1beta1.GenesisState"><span class="badge">M</span>GenesisState</a>
                 </li>
               
               
@@ -241,122 +241,122 @@
             <ul>
               
                 <li>
-                  <a href="#bonds.QueryAlphaMaximumsRequest"><span class="badge">M</span>QueryAlphaMaximumsRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryAlphaMaximumsRequest"><span class="badge">M</span>QueryAlphaMaximumsRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryAlphaMaximumsResponse"><span class="badge">M</span>QueryAlphaMaximumsResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryAlphaMaximumsResponse"><span class="badge">M</span>QueryAlphaMaximumsResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryAvailableReserveRequest"><span class="badge">M</span>QueryAvailableReserveRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryAvailableReserveRequest"><span class="badge">M</span>QueryAvailableReserveRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryAvailableReserveResponse"><span class="badge">M</span>QueryAvailableReserveResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryAvailableReserveResponse"><span class="badge">M</span>QueryAvailableReserveResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBatchRequest"><span class="badge">M</span>QueryBatchRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBatchRequest"><span class="badge">M</span>QueryBatchRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBatchResponse"><span class="badge">M</span>QueryBatchResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBatchResponse"><span class="badge">M</span>QueryBatchResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBondRequest"><span class="badge">M</span>QueryBondRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBondRequest"><span class="badge">M</span>QueryBondRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBondResponse"><span class="badge">M</span>QueryBondResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBondResponse"><span class="badge">M</span>QueryBondResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBondsDetailedRequest"><span class="badge">M</span>QueryBondsDetailedRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBondsDetailedRequest"><span class="badge">M</span>QueryBondsDetailedRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBondsDetailedResponse"><span class="badge">M</span>QueryBondsDetailedResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBondsDetailedResponse"><span class="badge">M</span>QueryBondsDetailedResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBondsRequest"><span class="badge">M</span>QueryBondsRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBondsRequest"><span class="badge">M</span>QueryBondsRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBondsResponse"><span class="badge">M</span>QueryBondsResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBondsResponse"><span class="badge">M</span>QueryBondsResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBuyPriceRequest"><span class="badge">M</span>QueryBuyPriceRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBuyPriceRequest"><span class="badge">M</span>QueryBuyPriceRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryBuyPriceResponse"><span class="badge">M</span>QueryBuyPriceResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryBuyPriceResponse"><span class="badge">M</span>QueryBuyPriceResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryCurrentPriceRequest"><span class="badge">M</span>QueryCurrentPriceRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryCurrentPriceRequest"><span class="badge">M</span>QueryCurrentPriceRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryCurrentPriceResponse"><span class="badge">M</span>QueryCurrentPriceResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryCurrentPriceResponse"><span class="badge">M</span>QueryCurrentPriceResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryCurrentReserveRequest"><span class="badge">M</span>QueryCurrentReserveRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryCurrentReserveRequest"><span class="badge">M</span>QueryCurrentReserveRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryCurrentReserveResponse"><span class="badge">M</span>QueryCurrentReserveResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryCurrentReserveResponse"><span class="badge">M</span>QueryCurrentReserveResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryCustomPriceRequest"><span class="badge">M</span>QueryCustomPriceRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryCustomPriceRequest"><span class="badge">M</span>QueryCustomPriceRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryCustomPriceResponse"><span class="badge">M</span>QueryCustomPriceResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryCustomPriceResponse"><span class="badge">M</span>QueryCustomPriceResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryLastBatchRequest"><span class="badge">M</span>QueryLastBatchRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryLastBatchRequest"><span class="badge">M</span>QueryLastBatchRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryLastBatchResponse"><span class="badge">M</span>QueryLastBatchResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryLastBatchResponse"><span class="badge">M</span>QueryLastBatchResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QuerySellReturnRequest"><span class="badge">M</span>QuerySellReturnRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QuerySellReturnRequest"><span class="badge">M</span>QuerySellReturnRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QuerySellReturnResponse"><span class="badge">M</span>QuerySellReturnResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QuerySellReturnResponse"><span class="badge">M</span>QuerySellReturnResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QuerySwapReturnRequest"><span class="badge">M</span>QuerySwapReturnRequest</a>
+                  <a href="#ixo.bonds.v1beta1.QuerySwapReturnRequest"><span class="badge">M</span>QuerySwapReturnRequest</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.QuerySwapReturnResponse"><span class="badge">M</span>QuerySwapReturnResponse</a>
+                  <a href="#ixo.bonds.v1beta1.QuerySwapReturnResponse"><span class="badge">M</span>QuerySwapReturnResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#bonds.Query"><span class="badge">S</span>Query</a>
+                  <a href="#ixo.bonds.v1beta1.Query"><span class="badge">S</span>Query</a>
                 </li>
               
             </ul>
@@ -368,90 +368,90 @@
             <ul>
               
                 <li>
-                  <a href="#bonds.MsgBuy"><span class="badge">M</span>MsgBuy</a>
+                  <a href="#ixo.bonds.v1beta1.MsgBuy"><span class="badge">M</span>MsgBuy</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgBuyResponse"><span class="badge">M</span>MsgBuyResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgBuyResponse"><span class="badge">M</span>MsgBuyResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgCreateBond"><span class="badge">M</span>MsgCreateBond</a>
+                  <a href="#ixo.bonds.v1beta1.MsgCreateBond"><span class="badge">M</span>MsgCreateBond</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgCreateBondResponse"><span class="badge">M</span>MsgCreateBondResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgCreateBondResponse"><span class="badge">M</span>MsgCreateBondResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgEditBond"><span class="badge">M</span>MsgEditBond</a>
+                  <a href="#ixo.bonds.v1beta1.MsgEditBond"><span class="badge">M</span>MsgEditBond</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgEditBondResponse"><span class="badge">M</span>MsgEditBondResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgEditBondResponse"><span class="badge">M</span>MsgEditBondResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgMakeOutcomePayment"><span class="badge">M</span>MsgMakeOutcomePayment</a>
+                  <a href="#ixo.bonds.v1beta1.MsgMakeOutcomePayment"><span class="badge">M</span>MsgMakeOutcomePayment</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgMakeOutcomePaymentResponse"><span class="badge">M</span>MsgMakeOutcomePaymentResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgMakeOutcomePaymentResponse"><span class="badge">M</span>MsgMakeOutcomePaymentResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgSell"><span class="badge">M</span>MsgSell</a>
+                  <a href="#ixo.bonds.v1beta1.MsgSell"><span class="badge">M</span>MsgSell</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgSellResponse"><span class="badge">M</span>MsgSellResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgSellResponse"><span class="badge">M</span>MsgSellResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgSetNextAlpha"><span class="badge">M</span>MsgSetNextAlpha</a>
+                  <a href="#ixo.bonds.v1beta1.MsgSetNextAlpha"><span class="badge">M</span>MsgSetNextAlpha</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgSetNextAlphaResponse"><span class="badge">M</span>MsgSetNextAlphaResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgSetNextAlphaResponse"><span class="badge">M</span>MsgSetNextAlphaResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgSwap"><span class="badge">M</span>MsgSwap</a>
+                  <a href="#ixo.bonds.v1beta1.MsgSwap"><span class="badge">M</span>MsgSwap</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgSwapResponse"><span class="badge">M</span>MsgSwapResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgSwapResponse"><span class="badge">M</span>MsgSwapResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgUpdateBondState"><span class="badge">M</span>MsgUpdateBondState</a>
+                  <a href="#ixo.bonds.v1beta1.MsgUpdateBondState"><span class="badge">M</span>MsgUpdateBondState</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgUpdateBondStateResponse"><span class="badge">M</span>MsgUpdateBondStateResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgUpdateBondStateResponse"><span class="badge">M</span>MsgUpdateBondStateResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgWithdrawReserve"><span class="badge">M</span>MsgWithdrawReserve</a>
+                  <a href="#ixo.bonds.v1beta1.MsgWithdrawReserve"><span class="badge">M</span>MsgWithdrawReserve</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgWithdrawReserveResponse"><span class="badge">M</span>MsgWithdrawReserveResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgWithdrawReserveResponse"><span class="badge">M</span>MsgWithdrawReserveResponse</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgWithdrawShare"><span class="badge">M</span>MsgWithdrawShare</a>
+                  <a href="#ixo.bonds.v1beta1.MsgWithdrawShare"><span class="badge">M</span>MsgWithdrawShare</a>
                 </li>
               
                 <li>
-                  <a href="#bonds.MsgWithdrawShareResponse"><span class="badge">M</span>MsgWithdrawShareResponse</a>
+                  <a href="#ixo.bonds.v1beta1.MsgWithdrawShareResponse"><span class="badge">M</span>MsgWithdrawShareResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#bonds.Msg"><span class="badge">S</span>Msg</a>
+                  <a href="#ixo.bonds.v1beta1.Msg"><span class="badge">S</span>Msg</a>
                 </li>
               
             </ul>
@@ -1982,7 +1982,7 @@
       <p></p>
 
       
-        <h3 id="bonds.GenesisState">GenesisState</h3>
+        <h3 id="ixo.bonds.v1beta1.GenesisState">GenesisState</h3>
         <p>GenesisState defines the bonds module's genesis state.</p>
 
         
@@ -1994,21 +1994,21 @@
               
                 <tr>
                   <td>bonds</td>
-                  <td><a href="#ixo.bonds.v1beta1.Bond">ixo.bonds.v1beta1.Bond</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Bond">Bond</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>batches</td>
-                  <td><a href="#ixo.bonds.v1beta1.Batch">ixo.bonds.v1beta1.Batch</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Batch">Batch</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#ixo.bonds.v1beta1.Params">ixo.bonds.v1beta1.Params</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Params">Params</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2034,7 +2034,7 @@
       <p></p>
 
       
-        <h3 id="bonds.QueryAlphaMaximumsRequest">QueryAlphaMaximumsRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryAlphaMaximumsRequest">QueryAlphaMaximumsRequest</h3>
         <p>QueryAlphaMaximumsRequest is the request type for the Query/AlphaMaximums RPC method.</p>
 
         
@@ -2058,7 +2058,7 @@
 
         
       
-        <h3 id="bonds.QueryAlphaMaximumsResponse">QueryAlphaMaximumsResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryAlphaMaximumsResponse">QueryAlphaMaximumsResponse</h3>
         <p>QueryAlphaMaximumsResponse is the response type for the Query/AlphaMaximums RPC method.</p>
 
         
@@ -2089,7 +2089,7 @@
 
         
       
-        <h3 id="bonds.QueryAvailableReserveRequest">QueryAvailableReserveRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryAvailableReserveRequest">QueryAvailableReserveRequest</h3>
         <p>QueryAvailableReserveRequest is the request type for the Query/AvailableReserve RPC method.</p>
 
         
@@ -2113,7 +2113,7 @@
 
         
       
-        <h3 id="bonds.QueryAvailableReserveResponse">QueryAvailableReserveResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryAvailableReserveResponse">QueryAvailableReserveResponse</h3>
         <p>QueryAvailableReserveResponse is the response type for the Query/AvailableReserve RPC method.</p>
 
         
@@ -2137,7 +2137,7 @@
 
         
       
-        <h3 id="bonds.QueryBatchRequest">QueryBatchRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBatchRequest">QueryBatchRequest</h3>
         <p>QueryBatchRequest is the request type for the Query/Batch RPC method.</p>
 
         
@@ -2161,7 +2161,7 @@
 
         
       
-        <h3 id="bonds.QueryBatchResponse">QueryBatchResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBatchResponse">QueryBatchResponse</h3>
         <p>QueryBatchResponse is the response type for the Query/Batch RPC method.</p>
 
         
@@ -2173,7 +2173,7 @@
               
                 <tr>
                   <td>batch</td>
-                  <td><a href="#ixo.bonds.v1beta1.Batch">ixo.bonds.v1beta1.Batch</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Batch">Batch</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2185,7 +2185,7 @@
 
         
       
-        <h3 id="bonds.QueryBondRequest">QueryBondRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBondRequest">QueryBondRequest</h3>
         <p>QueryBondRequest is the request type for the Query/Bond RPC method.</p>
 
         
@@ -2209,7 +2209,7 @@
 
         
       
-        <h3 id="bonds.QueryBondResponse">QueryBondResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBondResponse">QueryBondResponse</h3>
         <p>QueryBondResponse is the response type for the Query/Bond RPC method.</p>
 
         
@@ -2221,7 +2221,7 @@
               
                 <tr>
                   <td>bond</td>
-                  <td><a href="#ixo.bonds.v1beta1.Bond">ixo.bonds.v1beta1.Bond</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Bond">Bond</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2233,14 +2233,14 @@
 
         
       
-        <h3 id="bonds.QueryBondsDetailedRequest">QueryBondsDetailedRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBondsDetailedRequest">QueryBondsDetailedRequest</h3>
         <p>QueryBondsDetailedRequest is the request type for the Query/BondsDetailed RPC method.</p>
 
         
 
         
       
-        <h3 id="bonds.QueryBondsDetailedResponse">QueryBondsDetailedResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBondsDetailedResponse">QueryBondsDetailedResponse</h3>
         <p>QueryBondsDetailedResponse is the response type for the Query/BondsDetailed RPC method.</p>
 
         
@@ -2252,7 +2252,7 @@
               
                 <tr>
                   <td>bonds_detailed</td>
-                  <td><a href="#ixo.bonds.v1beta1.BondDetails">ixo.bonds.v1beta1.BondDetails</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.BondDetails">BondDetails</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -2264,14 +2264,14 @@
 
         
       
-        <h3 id="bonds.QueryBondsRequest">QueryBondsRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBondsRequest">QueryBondsRequest</h3>
         <p>QueryBondsRequest is the request type for the Query/Bonds RPC method.</p>
 
         
 
         
       
-        <h3 id="bonds.QueryBondsResponse">QueryBondsResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBondsResponse">QueryBondsResponse</h3>
         <p>QueryBondsResponse is the response type for the Query/Bonds RPC method.</p>
 
         
@@ -2295,7 +2295,7 @@
 
         
       
-        <h3 id="bonds.QueryBuyPriceRequest">QueryBuyPriceRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBuyPriceRequest">QueryBuyPriceRequest</h3>
         <p>QueryCustomPriceRequest is the request type for the Query/BuyPrice RPC method.</p>
 
         
@@ -2326,7 +2326,7 @@
 
         
       
-        <h3 id="bonds.QueryBuyPriceResponse">QueryBuyPriceResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryBuyPriceResponse">QueryBuyPriceResponse</h3>
         <p>QueryCustomPriceResponse is the response type for the Query/BuyPrice RPC method.</p>
 
         
@@ -2378,7 +2378,7 @@
 
         
       
-        <h3 id="bonds.QueryCurrentPriceRequest">QueryCurrentPriceRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryCurrentPriceRequest">QueryCurrentPriceRequest</h3>
         <p>QueryCurrentPriceRequest is the request type for the Query/CurrentPrice RPC method.</p>
 
         
@@ -2402,7 +2402,7 @@
 
         
       
-        <h3 id="bonds.QueryCurrentPriceResponse">QueryCurrentPriceResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryCurrentPriceResponse">QueryCurrentPriceResponse</h3>
         <p>QueryCurrentPriceResponse is the response type for the Query/CurrentPrice RPC method.</p>
 
         
@@ -2426,7 +2426,7 @@
 
         
       
-        <h3 id="bonds.QueryCurrentReserveRequest">QueryCurrentReserveRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryCurrentReserveRequest">QueryCurrentReserveRequest</h3>
         <p>QueryCurrentReserveRequest is the request type for the Query/CurrentReserve RPC method.</p>
 
         
@@ -2450,7 +2450,7 @@
 
         
       
-        <h3 id="bonds.QueryCurrentReserveResponse">QueryCurrentReserveResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryCurrentReserveResponse">QueryCurrentReserveResponse</h3>
         <p>QueryCurrentReserveResponse is the response type for the Query/CurrentReserve RPC method.</p>
 
         
@@ -2474,7 +2474,7 @@
 
         
       
-        <h3 id="bonds.QueryCustomPriceRequest">QueryCustomPriceRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryCustomPriceRequest">QueryCustomPriceRequest</h3>
         <p>QueryCustomPriceRequest is the request type for the Query/CustomPrice RPC method.</p>
 
         
@@ -2505,7 +2505,7 @@
 
         
       
-        <h3 id="bonds.QueryCustomPriceResponse">QueryCustomPriceResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryCustomPriceResponse">QueryCustomPriceResponse</h3>
         <p>QueryCustomPriceResponse is the response type for the Query/CustomPrice RPC method.</p>
 
         
@@ -2529,7 +2529,7 @@
 
         
       
-        <h3 id="bonds.QueryLastBatchRequest">QueryLastBatchRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryLastBatchRequest">QueryLastBatchRequest</h3>
         <p>QueryLastBatchRequest is the request type for the Query/LastBatch RPC method.</p>
 
         
@@ -2553,7 +2553,7 @@
 
         
       
-        <h3 id="bonds.QueryLastBatchResponse">QueryLastBatchResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryLastBatchResponse">QueryLastBatchResponse</h3>
         <p>QueryLastBatchResponse is the response type for the Query/LastBatch RPC method.</p>
 
         
@@ -2565,7 +2565,7 @@
               
                 <tr>
                   <td>last_batch</td>
-                  <td><a href="#ixo.bonds.v1beta1.Batch">ixo.bonds.v1beta1.Batch</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Batch">Batch</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2577,14 +2577,14 @@
 
         
       
-        <h3 id="bonds.QueryParamsRequest">QueryParamsRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryParamsRequest">QueryParamsRequest</h3>
         <p>QueryParamsRequest is the request type for the Query/Params RPC method.</p>
 
         
 
         
       
-        <h3 id="bonds.QueryParamsResponse">QueryParamsResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QueryParamsResponse">QueryParamsResponse</h3>
         <p>QueryParamsResponse is the response type for the Query/Params RPC method.</p>
 
         
@@ -2596,7 +2596,7 @@
               
                 <tr>
                   <td>params</td>
-                  <td><a href="#ixo.bonds.v1beta1.Params">ixo.bonds.v1beta1.Params</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.Params">Params</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -2608,7 +2608,7 @@
 
         
       
-        <h3 id="bonds.QuerySellReturnRequest">QuerySellReturnRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QuerySellReturnRequest">QuerySellReturnRequest</h3>
         <p>QuerySellReturnRequest is the request type for the Query/SellReturn RPC method.</p>
 
         
@@ -2639,7 +2639,7 @@
 
         
       
-        <h3 id="bonds.QuerySellReturnResponse">QuerySellReturnResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QuerySellReturnResponse">QuerySellReturnResponse</h3>
         <p>QuerySellReturnResponse is the response type for the Query/SellReturn RPC method.</p>
 
         
@@ -2698,7 +2698,7 @@
 
         
       
-        <h3 id="bonds.QuerySwapReturnRequest">QuerySwapReturnRequest</h3>
+        <h3 id="ixo.bonds.v1beta1.QuerySwapReturnRequest">QuerySwapReturnRequest</h3>
         <p>QuerySwapReturnRequest is the request type for the Query/SwapReturn RPC method.</p>
 
         
@@ -2736,7 +2736,7 @@
 
         
       
-        <h3 id="bonds.QuerySwapReturnResponse">QuerySwapReturnResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.QuerySwapReturnResponse">QuerySwapReturnResponse</h3>
         <p>QuerySwapReturnResponse is the response type for the Query/SwapReturn RPC method.</p>
 
         
@@ -2773,7 +2773,7 @@
       
 
       
-        <h3 id="bonds.Query">Query</h3>
+        <h3 id="ixo.bonds.v1beta1.Query">Query</h3>
         <p>Query defines the gRPC querier service.</p>
         <table class="enum-table">
           <thead>
@@ -2783,99 +2783,99 @@
             
               <tr>
                 <td>Bonds</td>
-                <td><a href="#bonds.QueryBondsRequest">QueryBondsRequest</a></td>
-                <td><a href="#bonds.QueryBondsResponse">QueryBondsResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBondsRequest">QueryBondsRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBondsResponse">QueryBondsResponse</a></td>
                 <td><p>Bonds returns all existing bonds.</p></td>
               </tr>
             
               <tr>
                 <td>BondsDetailed</td>
-                <td><a href="#bonds.QueryBondsDetailedRequest">QueryBondsDetailedRequest</a></td>
-                <td><a href="#bonds.QueryBondsDetailedResponse">QueryBondsDetailedResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBondsDetailedRequest">QueryBondsDetailedRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBondsDetailedResponse">QueryBondsDetailedResponse</a></td>
                 <td><p>BondsDetailed returns a list of all existing bonds with some details about their current state.</p></td>
               </tr>
             
               <tr>
                 <td>Params</td>
-                <td><a href="#bonds.QueryParamsRequest">QueryParamsRequest</a></td>
-                <td><a href="#bonds.QueryParamsResponse">QueryParamsResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryParamsRequest">QueryParamsRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryParamsResponse">QueryParamsResponse</a></td>
                 <td><p>Params queries the paramaters of x/bonds module.</p></td>
               </tr>
             
               <tr>
                 <td>Bond</td>
-                <td><a href="#bonds.QueryBondRequest">QueryBondRequest</a></td>
-                <td><a href="#bonds.QueryBondResponse">QueryBondResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBondRequest">QueryBondRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBondResponse">QueryBondResponse</a></td>
                 <td><p>Bond queries info of a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>Batch</td>
-                <td><a href="#bonds.QueryBatchRequest">QueryBatchRequest</a></td>
-                <td><a href="#bonds.QueryBatchResponse">QueryBatchResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBatchRequest">QueryBatchRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBatchResponse">QueryBatchResponse</a></td>
                 <td><p>Batch queries info of a specific bond&#39;s current batch.</p></td>
               </tr>
             
               <tr>
                 <td>LastBatch</td>
-                <td><a href="#bonds.QueryLastBatchRequest">QueryLastBatchRequest</a></td>
-                <td><a href="#bonds.QueryLastBatchResponse">QueryLastBatchResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryLastBatchRequest">QueryLastBatchRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryLastBatchResponse">QueryLastBatchResponse</a></td>
                 <td><p>LastBatch queries info of a specific bond&#39;s last batch.</p></td>
               </tr>
             
               <tr>
                 <td>CurrentPrice</td>
-                <td><a href="#bonds.QueryCurrentPriceRequest">QueryCurrentPriceRequest</a></td>
-                <td><a href="#bonds.QueryCurrentPriceResponse">QueryCurrentPriceResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryCurrentPriceRequest">QueryCurrentPriceRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryCurrentPriceResponse">QueryCurrentPriceResponse</a></td>
                 <td><p>CurrentPrice queries the current price/s of a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>CurrentReserve</td>
-                <td><a href="#bonds.QueryCurrentReserveRequest">QueryCurrentReserveRequest</a></td>
-                <td><a href="#bonds.QueryCurrentReserveResponse">QueryCurrentReserveResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryCurrentReserveRequest">QueryCurrentReserveRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryCurrentReserveResponse">QueryCurrentReserveResponse</a></td>
                 <td><p>CurrentReserve queries the current balance/s of the reserve pool for a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>AvailableReserve</td>
-                <td><a href="#bonds.QueryAvailableReserveRequest">QueryAvailableReserveRequest</a></td>
-                <td><a href="#bonds.QueryAvailableReserveResponse">QueryAvailableReserveResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryAvailableReserveRequest">QueryAvailableReserveRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryAvailableReserveResponse">QueryAvailableReserveResponse</a></td>
                 <td><p>AvailableReserve queries current available balance/s of the reserve pool for a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>CustomPrice</td>
-                <td><a href="#bonds.QueryCustomPriceRequest">QueryCustomPriceRequest</a></td>
-                <td><a href="#bonds.QueryCustomPriceResponse">QueryCustomPriceResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryCustomPriceRequest">QueryCustomPriceRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryCustomPriceResponse">QueryCustomPriceResponse</a></td>
                 <td><p>CustomPrice queries price/s of a specific bond at a specific supply.</p></td>
               </tr>
             
               <tr>
                 <td>BuyPrice</td>
-                <td><a href="#bonds.QueryBuyPriceRequest">QueryBuyPriceRequest</a></td>
-                <td><a href="#bonds.QueryBuyPriceResponse">QueryBuyPriceResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBuyPriceRequest">QueryBuyPriceRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryBuyPriceResponse">QueryBuyPriceResponse</a></td>
                 <td><p>BuyPrice queries price/s of buying an amount of tokens from a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>SellReturn</td>
-                <td><a href="#bonds.QuerySellReturnRequest">QuerySellReturnRequest</a></td>
-                <td><a href="#bonds.QuerySellReturnResponse">QuerySellReturnResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QuerySellReturnRequest">QuerySellReturnRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QuerySellReturnResponse">QuerySellReturnResponse</a></td>
                 <td><p>SellReturn queries return/s on selling an amount of tokens of a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>SwapReturn</td>
-                <td><a href="#bonds.QuerySwapReturnRequest">QuerySwapReturnRequest</a></td>
-                <td><a href="#bonds.QuerySwapReturnResponse">QuerySwapReturnResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QuerySwapReturnRequest">QuerySwapReturnRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QuerySwapReturnResponse">QuerySwapReturnResponse</a></td>
                 <td><p>SwapReturn queries return/s on swapping an amount of tokens to another token of a specific bond.</p></td>
               </tr>
             
               <tr>
                 <td>AlphaMaximums</td>
-                <td><a href="#bonds.QueryAlphaMaximumsRequest">QueryAlphaMaximumsRequest</a></td>
-                <td><a href="#bonds.QueryAlphaMaximumsResponse">QueryAlphaMaximumsResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryAlphaMaximumsRequest">QueryAlphaMaximumsRequest</a></td>
+                <td><a href="#ixo.bonds.v1beta1.QueryAlphaMaximumsResponse">QueryAlphaMaximumsResponse</a></td>
                 <td><p>AlphaMaximums queries alpha maximums for a specific augmented bonding curve.</p></td>
               </tr>
             
@@ -3049,7 +3049,7 @@
       <p></p>
 
       
-        <h3 id="bonds.MsgBuy">MsgBuy</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgBuy">MsgBuy</h3>
         <p>MsgBuy defines a message for buying from a bond.</p>
 
         
@@ -3101,14 +3101,14 @@
 
         
       
-        <h3 id="bonds.MsgBuyResponse">MsgBuyResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgBuyResponse">MsgBuyResponse</h3>
         <p>MsgBuyResponse defines the Msg/Buy response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgCreateBond">MsgCreateBond</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgCreateBond">MsgCreateBond</h3>
         <p>MsgCreateBond defines a message for creating a new bond.</p>
 
         
@@ -3155,7 +3155,7 @@
               
                 <tr>
                   <td>function_parameters</td>
-                  <td><a href="#ixo.bonds.v1beta1.FunctionParam">ixo.bonds.v1beta1.FunctionParam</a></td>
+                  <td><a href="#ixo.bonds.v1beta1.FunctionParam">FunctionParam</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -3286,14 +3286,14 @@
 
         
       
-        <h3 id="bonds.MsgCreateBondResponse">MsgCreateBondResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgCreateBondResponse">MsgCreateBondResponse</h3>
         <p>MsgCreateBondResponse defines the Msg/CreateBond response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgEditBond">MsgEditBond</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgEditBond">MsgEditBond</h3>
         <p>MsgEditBond defines a message for editing an existing bond.</p>
 
         
@@ -3366,14 +3366,14 @@
 
         
       
-        <h3 id="bonds.MsgEditBondResponse">MsgEditBondResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgEditBondResponse">MsgEditBondResponse</h3>
         <p>MsgEditBondResponse defines the Msg/EditBond response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgMakeOutcomePayment">MsgMakeOutcomePayment</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgMakeOutcomePayment">MsgMakeOutcomePayment</h3>
         <p>MsgMakeOutcomePayment defines a message for making an outcome payment to a bond.</p>
 
         
@@ -3418,14 +3418,14 @@
 
         
       
-        <h3 id="bonds.MsgMakeOutcomePaymentResponse">MsgMakeOutcomePaymentResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgMakeOutcomePaymentResponse">MsgMakeOutcomePaymentResponse</h3>
         <p>MsgMakeOutcomePaymentResponse defines the Msg/MakeOutcomePayment response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgSell">MsgSell</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgSell">MsgSell</h3>
         <p>MsgSell defines a message for selling from a bond.</p>
 
         
@@ -3470,14 +3470,14 @@
 
         
       
-        <h3 id="bonds.MsgSellResponse">MsgSellResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgSellResponse">MsgSellResponse</h3>
         <p>MsgSellResponse defines the Msg/Sell response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgSetNextAlpha">MsgSetNextAlpha</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgSetNextAlpha">MsgSetNextAlpha</h3>
         <p>MsgSetNextAlpha defines a message for editing a bond's alpha parameter.</p>
 
         
@@ -3522,14 +3522,14 @@
 
         
       
-        <h3 id="bonds.MsgSetNextAlphaResponse">MsgSetNextAlphaResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgSetNextAlphaResponse">MsgSetNextAlphaResponse</h3>
         <p></p>
 
         
 
         
       
-        <h3 id="bonds.MsgSwap">MsgSwap</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgSwap">MsgSwap</h3>
         <p>MsgSwap defines a message for swapping from one reserve bond token to another.</p>
 
         
@@ -3581,14 +3581,14 @@
 
         
       
-        <h3 id="bonds.MsgSwapResponse">MsgSwapResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgSwapResponse">MsgSwapResponse</h3>
         <p>MsgSwapResponse defines the Msg/Swap response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgUpdateBondState">MsgUpdateBondState</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgUpdateBondState">MsgUpdateBondState</h3>
         <p>MsgUpdateBondState defines a message for updating a bond's current state.</p>
 
         
@@ -3633,14 +3633,14 @@
 
         
       
-        <h3 id="bonds.MsgUpdateBondStateResponse">MsgUpdateBondStateResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgUpdateBondStateResponse">MsgUpdateBondStateResponse</h3>
         <p>MsgUpdateBondStateResponse defines the Msg/UpdateBondState response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgWithdrawReserve">MsgWithdrawReserve</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgWithdrawReserve">MsgWithdrawReserve</h3>
         <p>MsgWithdrawReserve defines a message for withdrawing reserve from a bond.</p>
 
         
@@ -3685,14 +3685,14 @@
 
         
       
-        <h3 id="bonds.MsgWithdrawReserveResponse">MsgWithdrawReserveResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgWithdrawReserveResponse">MsgWithdrawReserveResponse</h3>
         <p>MsgWithdrawReserveResponse defines the Msg/WithdrawReserve response type.</p>
 
         
 
         
       
-        <h3 id="bonds.MsgWithdrawShare">MsgWithdrawShare</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgWithdrawShare">MsgWithdrawShare</h3>
         <p>MsgWithdrawShare defines a message for withdrawing a share from a bond that is in the SETTLE stage.</p>
 
         
@@ -3730,7 +3730,7 @@
 
         
       
-        <h3 id="bonds.MsgWithdrawShareResponse">MsgWithdrawShareResponse</h3>
+        <h3 id="ixo.bonds.v1beta1.MsgWithdrawShareResponse">MsgWithdrawShareResponse</h3>
         <p>MsgWithdrawShareResponse defines the Msg/WithdrawShare response type.</p>
 
         
@@ -3743,7 +3743,7 @@
       
 
       
-        <h3 id="bonds.Msg">Msg</h3>
+        <h3 id="ixo.bonds.v1beta1.Msg">Msg</h3>
         <p>Msg defines the bonds Msg service.</p>
         <table class="enum-table">
           <thead>
@@ -3753,71 +3753,71 @@
             
               <tr>
                 <td>CreateBond</td>
-                <td><a href="#bonds.MsgCreateBond">MsgCreateBond</a></td>
-                <td><a href="#bonds.MsgCreateBondResponse">MsgCreateBondResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgCreateBond">MsgCreateBond</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgCreateBondResponse">MsgCreateBondResponse</a></td>
                 <td><p>CreateBond defines a method for creating a bond.</p></td>
               </tr>
             
               <tr>
                 <td>EditBond</td>
-                <td><a href="#bonds.MsgEditBond">MsgEditBond</a></td>
-                <td><a href="#bonds.MsgEditBondResponse">MsgEditBondResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgEditBond">MsgEditBond</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgEditBondResponse">MsgEditBondResponse</a></td>
                 <td><p>EditBond defines a method for editing a bond.</p></td>
               </tr>
             
               <tr>
                 <td>SetNextAlpha</td>
-                <td><a href="#bonds.MsgSetNextAlpha">MsgSetNextAlpha</a></td>
-                <td><a href="#bonds.MsgSetNextAlphaResponse">MsgSetNextAlphaResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgSetNextAlpha">MsgSetNextAlpha</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgSetNextAlphaResponse">MsgSetNextAlphaResponse</a></td>
                 <td><p>SetNextAlpha defines a method for editing a bond&#39;s alpha parameter.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateBondState</td>
-                <td><a href="#bonds.MsgUpdateBondState">MsgUpdateBondState</a></td>
-                <td><a href="#bonds.MsgUpdateBondStateResponse">MsgUpdateBondStateResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgUpdateBondState">MsgUpdateBondState</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgUpdateBondStateResponse">MsgUpdateBondStateResponse</a></td>
                 <td><p>UpdateBondState defines a method for updating a bond&#39;s current state.</p></td>
               </tr>
             
               <tr>
                 <td>Buy</td>
-                <td><a href="#bonds.MsgBuy">MsgBuy</a></td>
-                <td><a href="#bonds.MsgBuyResponse">MsgBuyResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgBuy">MsgBuy</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgBuyResponse">MsgBuyResponse</a></td>
                 <td><p>Buy defines a method for buying from a bond.</p></td>
               </tr>
             
               <tr>
                 <td>Sell</td>
-                <td><a href="#bonds.MsgSell">MsgSell</a></td>
-                <td><a href="#bonds.MsgSellResponse">MsgSellResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgSell">MsgSell</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgSellResponse">MsgSellResponse</a></td>
                 <td><p>Sell defines a method for selling from a bond.</p></td>
               </tr>
             
               <tr>
                 <td>Swap</td>
-                <td><a href="#bonds.MsgSwap">MsgSwap</a></td>
-                <td><a href="#bonds.MsgSwapResponse">MsgSwapResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgSwap">MsgSwap</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgSwapResponse">MsgSwapResponse</a></td>
                 <td><p>Swap defines a method for swapping from one reserve bond token to another.</p></td>
               </tr>
             
               <tr>
                 <td>MakeOutcomePayment</td>
-                <td><a href="#bonds.MsgMakeOutcomePayment">MsgMakeOutcomePayment</a></td>
-                <td><a href="#bonds.MsgMakeOutcomePaymentResponse">MsgMakeOutcomePaymentResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgMakeOutcomePayment">MsgMakeOutcomePayment</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgMakeOutcomePaymentResponse">MsgMakeOutcomePaymentResponse</a></td>
                 <td><p>MakeOutcomePayment defines a method for making an outcome payment to a bond.</p></td>
               </tr>
             
               <tr>
                 <td>WithdrawShare</td>
-                <td><a href="#bonds.MsgWithdrawShare">MsgWithdrawShare</a></td>
-                <td><a href="#bonds.MsgWithdrawShareResponse">MsgWithdrawShareResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgWithdrawShare">MsgWithdrawShare</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgWithdrawShareResponse">MsgWithdrawShareResponse</a></td>
                 <td><p>WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage.</p></td>
               </tr>
             
               <tr>
                 <td>WithdrawReserve</td>
-                <td><a href="#bonds.MsgWithdrawReserve">MsgWithdrawReserve</a></td>
-                <td><a href="#bonds.MsgWithdrawReserveResponse">MsgWithdrawReserveResponse</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgWithdrawReserve">MsgWithdrawReserve</a></td>
+                <td><a href="#ixo.bonds.v1beta1.MsgWithdrawReserveResponse">MsgWithdrawReserveResponse</a></td>
                 <td><p>WithdrawReserve defines a method for withdrawing reserve from a bond.</p></td>
               </tr>
             

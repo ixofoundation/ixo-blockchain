@@ -9,11 +9,19 @@ import (
 
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abci.ValidatorUpdate {
 	//save did docs to the store
-	for i, iid := range gs.IidDocs {
-		k.SetDidDocument(ctx, []byte(iid.Id), iid)
-		metadata := gs.IidMeta[i]
-		k.SetDidMetadata(ctx, []byte(iid.Id), metadata)
-	}
+
+	go func() {
+		for _, iid := range gs.IidDocs {
+			k.SetDidDocument(ctx, []byte(iid.Id), iid)
+		}
+	}()
+
+	go func() {
+		for _, meta := range gs.IidMeta {
+			k.SetDidMetadata(ctx, []byte(meta.Id), meta)
+		}
+	}()
+
 	return []abci.ValidatorUpdate{}
 }
 
