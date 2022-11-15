@@ -31,6 +31,7 @@ services:
       context: .
       dockerfile: .infra/dockerfiles/Dockerfile
       target: build-devel
+    tty: true
     image: ixo-chain:devel
     restart: unless-stopped
     volumes:
