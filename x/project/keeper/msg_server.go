@@ -42,7 +42,6 @@ func NewMsgServerImpl(k Keeper, bk bankkeeper.Keeper, pk paymentskeeper.Keeper) 
 }
 
 func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProject) (*types.MsgCreateProjectResponse, error) {
-	fmt.Println("creating project--------------------------- msg server")
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
 
@@ -58,35 +57,22 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 	// Get and validate project fees map
 	err := k.ValidateProjectFeesMap(ctx, projectDoc.GetProjectFeesMap())
 	if err != nil {
-		fmt.Println("creating project err -1 --------------------------- msg server", err)
 		return nil, err
 	}
-
-	fmt.Println("creating project 2--------------------------- msg server")
 
 	// Create all necessary initial project accounts
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountFeesId); err != nil {
-		fmt.Println("creating project err 0--------------------------- msg server", err)
-
 		return nil, err
 	}
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, IxoAccountPayFeesId); err != nil {
-		fmt.Println("creating project err 1--------------------------- msg server", err)
-
 		return nil, err
 	}
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, InitiatingNodeAccountPayFeesId); err != nil {
-		fmt.Println("creating project err 2--------------------------- msg server", err)
-
 		return nil, err
 	}
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.ProjectDid)); err != nil {
-		fmt.Println("creating project err 3--------------------------- msg server", err)
-
 		return nil, err
 	}
-
-	fmt.Println("creating project 3--------------------------- msg server")
 
 	iidProjectVerificationMethod := iidtypes.NewPublicKeyMultibase(base58.Decode(msg.PubKey), iidtypes.DIDVMethodTypeEd25519VerificationKey2018)
 
@@ -113,20 +99,14 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 	)
 	if err != nil {
 		// k.Logger(ctx).Error(err.Error())
-		fmt.Println("creating project err 5--------------------------- msg server", err)
-
 		return nil, err
 	}
 
-	fmt.Println("creating project 4--------------------------- msg server")
-
 	k.IidKeeper.SetDidDocument(ctx, []byte(msg.ProjectDid), did)
-	fmt.Println("creating project 5--------------------------- msg server")
 
 	// Set project doc and initialise list of withdrawal transactions
 	k.SetProjectDoc(ctx, projectDoc)
 	k.SetProjectWithdrawalTransactions(ctx, msg.ProjectDid, types.WithdrawalInfoDocs{})
-	fmt.Println("creating project 5--------------------------- msg server")
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(

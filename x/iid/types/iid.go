@@ -570,7 +570,6 @@ func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string
 
 	// 	pubKey, err := hex.DecodeString(m.PublicKeyHex)
 	// 	if err != nil {
-	// 		fmt.Println("failed4----------------------------------", err)
 	// 		return nil, err
 
 	// 	}
@@ -581,8 +580,6 @@ func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string
 	// case *iidtypes.VerificationMethod_BlockchainAccountID:
 	// 	addr, err := sdk.AccAddressFromBech32(iidtypes.BlockchainAccountID(m.BlockchainAccountID).GetAddress())
 	// 	if err != nil {
-	// 		fmt.Println("failed5----------------------------------", err)
-
 	// 		return nil, err
 	// 	}
 

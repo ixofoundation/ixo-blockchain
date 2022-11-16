@@ -48,8 +48,6 @@ func ValidateGenesisCmd(mbm module.BasicManager) *cobra.Command {
 
 			for _, b := range mbm {
 				if err := b.ValidateGenesis(cdc, clientCtx.TxConfig, genState[b.Name()]); err != nil {
-
-					fmt.Println(b.Name())
 					debug.PrintStack()
 					return fmt.Errorf("error validating genesis file %s: %s", genesis, err.Error())
 				}

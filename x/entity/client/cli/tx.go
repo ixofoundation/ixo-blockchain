@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"strconv"
 
@@ -87,13 +86,9 @@ func NewCmdCreateEntity() *cobra.Command {
 
 			var msg types.MsgCreateEntity
 			err := json.Unmarshal([]byte(args[0]), &msg)
-			// fmt.Println("hiiiiii")
 			if err != nil {
-				// fmt.Println(err)
-
 				return err
 			}
-			// fmt.Println(msg)
 
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -106,8 +101,6 @@ func NewCmdCreateEntity() *cobra.Command {
 			}
 
 			msg.OwnerAddress = clientCtx.GetFromAddress().String()
-
-			fmt.Printf("%+v\n", msg)
 
 			err = tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 			if err != nil {

@@ -638,7 +638,6 @@ func NewAddIidContextCmd() *cobra.Command {
 				didContext,
 				signer.String(),
 			)
-			fmt.Println(msg)
 			// broadcast
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -715,7 +714,6 @@ func NewUpdateIidMetaCmd() *cobra.Command {
 				metaData,
 				signer.String(),
 			)
-			fmt.Println(msg)
 
 			// broadcast
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)

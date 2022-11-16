@@ -43,12 +43,9 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
 	adminAddr := authtypes.NewModuleAddress(types.NftModuleAddress())
-	fmt.Println("================ehere1:")
 
 	senderAddr, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
 	if err != nil {
-		fmt.Println("================error1:", err)
-
 		return err
 	}
 	// var adminAddr sdk.AccAddress
@@ -70,26 +67,18 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 		Minter: adminAddr.String(),
 	}
 
-	fmt.Println("================ehere2:")
 	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
 
 	if err != nil {
-		fmt.Println("================error2:", err)
-
 		return err
 	}
 
 	deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
-	fmt.Println("================ehere3:")
 
 	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", deposit)
 	if err != nil {
-		fmt.Println("================error3:", err)
-
 		return err
 	}
-
-	fmt.Println(contractAddr)
 
 	xx.NftContractAddress = contractAddr.String()
 	xx.NftContractMinter = initiateNftContractMsg.Minter
