@@ -450,7 +450,7 @@ func queryParams(ctx sdk.Context, k Keeper, legacyQuerierCdc *codec.LegacyAmino)
 
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, params)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal data %s", err)
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal iid %s", err)
 	}
 
 	return bz, nil

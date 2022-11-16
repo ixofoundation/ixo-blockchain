@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/btcsuite/btcutil/base58"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
@@ -70,6 +73,36 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 	if _, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.ProjectDid)); err != nil {
 		return nil, err
 	}
+
+	iidProjectVerificationMethod := iidtypes.NewPublicKeyMultibase(base58.Decode(msg.PubKey), iidtypes.DIDVMethodTypeEd25519VerificationKey2018)
+
+	//Create project backed IID
+	did, err := iidtypes.NewDidDocument(
+		msg.ProjectDid,
+		iidtypes.WithVerifications(
+			iidtypes.NewVerification(
+				iidtypes.NewVerificationMethod(msg.ProjectDid, iidtypes.DID(msg.ProjectDid), iidProjectVerificationMethod),
+				[]string{iidtypes.Authentication},
+				nil,
+			),
+			iidtypes.NewVerification(
+				iidtypes.NewVerificationMethod(
+					iidtypes.DID(msg.ProjectDid).NewVerificationMethodID(msg.ProjectAddress),
+					iidtypes.DID(msg.ProjectDid),
+					iidProjectVerificationMethod,
+				),
+				[]string{iidtypes.Authentication},
+				nil,
+			),
+		),
+		iidtypes.WithControllers(msg.ProjectDid, msg.SenderDid),
+	)
+	if err != nil {
+		// k.Logger(ctx).Error(err.Error())
+		return nil, err
+	}
+
+	k.IidKeeper.SetDidDocument(ctx, []byte(msg.ProjectDid), did)
 
 	// Set project doc and initialise list of withdrawal transactions
 	k.SetProjectDoc(ctx, projectDoc)
@@ -223,33 +256,39 @@ func (s msgServer) CreateAgent(goCtx context.Context, msg *types.MsgCreateAgent)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
 
-	// Check if project exists
-	_, err := k.GetProjectDoc(ctx, msg.ProjectDid)
-	if err != nil {
-		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
+	createAgentFunc := func(document *iidtypes.IidDocument) error {
+		_, err := createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.Data.AgentDid))
+		if err != nil {
+			return err
+		}
+
+		ctx.EventManager().EmitEvents(sdk.Events{
+			sdk.NewEvent(
+				types.EventTypeCreateAgent,
+				sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+				sdk.NewAttribute(types.AttributeKeyProjectDid, document.Id),
+				sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
+				sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
+			),
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			),
+		})
+		return nil
 	}
 
-	// Create account in project accounts for the agent
-	_, err = createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.Data.AgentDid))
-	if err != nil {
-		return nil, err
-	}
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeCreateAgent,
-			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
-			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
-			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
+	err := iidkeeper.ExecuteOnDidWithRelationships(
+		ctx,
+		&k.IidKeeper,
+		[]string{iidtypes.Authentication},
+		msg.ProjectDid,
+		msg.ProjectAddress,
+		createAgentFunc,
+	)
 
-	return &types.MsgCreateAgentResponse{}, nil
+	return &types.MsgCreateAgentResponse{}, err
 }
 
 func (s msgServer) UpdateAgent(goCtx context.Context, msg *types.MsgUpdateAgent) (*types.MsgUpdateAgentResponse, error) {
@@ -287,42 +326,52 @@ func (s msgServer) CreateClaim(goCtx context.Context, msg *types.MsgCreateClaim)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k := s.Keeper
 
-	// Check if project exists
-	projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
-	if err != nil {
-		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
+	createClaimFunc := func(document *iidtypes.IidDocument) error {
+		// Check if project exists
+		projectDoc, err := k.GetProjectDoc(ctx, msg.ProjectDid)
+		if err != nil {
+			return sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
+		}
+
+		// Check that project status is STARTED
+		if types.ProjectStatusFromString(projectDoc.Status) != types.StartedStatus {
+			return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "project not in STARTED status")
+		}
+
+		// Check if claim already exists
+		if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimId) {
+			return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "claim already exists")
+		}
+
+		// Create and set claim
+		claim := types.NewClaim(msg.Data.ClaimId, msg.Data.ClaimTemplateId, msg.SenderDid)
+		k.SetClaim(ctx, msg.ProjectDid, claim)
+
+		ctx.EventManager().EmitEvents(sdk.Events{
+			sdk.NewEvent(
+				types.EventTypeCreateClaim,
+				sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
+				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+				sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
+				sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimId),
+				sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateId),
+			),
+			sdk.NewEvent(
+				sdk.EventTypeMessage,
+				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+			),
+		})
+		return nil
 	}
 
-	// Check that project status is STARTED
-	if types.ProjectStatusFromString(projectDoc.Status) != types.StartedStatus {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "project not in STARTED status")
-	}
-
-	// Check if claim already exists
-	if k.ClaimExists(ctx, msg.ProjectDid, msg.Data.ClaimId) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "claim already exists")
-	}
-
-	// Create and set claim
-	claim := types.NewClaim(msg.Data.ClaimId, msg.Data.ClaimTemplateId, msg.SenderDid)
-	k.SetClaim(ctx, msg.ProjectDid, claim)
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeCreateClaim,
-			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
-			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimId),
-			sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateId),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	})
-
-	return &types.MsgCreateClaimResponse{}, nil
+	return &types.MsgCreateClaimResponse{}, iidkeeper.ExecuteOnDidWithRelationships(
+		ctx,
+		&k.IidKeeper,
+		[]string{iidtypes.Authentication},
+		msg.ProjectDid,
+		msg.ProjectAddress,
+		createClaimFunc,
+	)
 }
 
 func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateEvaluation) (*types.MsgCreateEvaluationResponse, error) {
@@ -371,12 +420,14 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		}
 
 		// Get sender (oracle) address
-		senderDidDoc, err := k.DidKeeper.GetDidDoc(ctx, msg.SenderDid)
-		if err != nil {
-			return nil, err
+		senderDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+		if !exists {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		senderAddr := senderDidDoc.Address()
-
+		senderAddr, err := senderDidDoc.GetVerificationMethodBlockchainAddress(senderDidDoc.Id)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		}
 		// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
 		feePercentage := k.GetParams(ctx).OracleFeePercentage
 		nodeFeeShare := feePercentage.Mul(k.GetParams(ctx).NodeFeePercentage.QuoInt64(100))
@@ -400,11 +451,14 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 	templateId, err = feesMap.GetPayTemplateId(types.FeeForService)
 	if err == nil && msg.Data.Status == string(types.ApprovedClaim) {
 		// Get claimer address
-		claimerDidDoc, err := k.DidKeeper.GetDidDoc(ctx, claim.ClaimerDid)
-		if err != nil {
-			return nil, err
+		claimerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(claim.ClaimerDid))
+		if !exists {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		claimerAddr := claimerDidDoc.Address()
+		claimerAddr, err := claimerDidDoc.GetVerificationMethodBlockchainAddress(claimerDidDoc.Id)
+		if err != nil {
+			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		}
 
 		// Get recipients (just the claimer)
 		claimApprovedPayRecipients := paymentstypes.NewDistribution(
@@ -451,10 +505,10 @@ func (s msgServer) WithdrawFunds(goCtx context.Context, msg *types.MsgWithdrawFu
 		return nil, sdkerrors.Wrap(didtypes.ErrInvalidDid, "could not find project")
 	}
 
-	if projectDoc.Status != string(types.PaidoutStatus) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
-			"project not in PAIDOUT status")
-	}
+	//if projectDoc.Status != string(types.PaidoutStatus) {
+	//	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+	//		"project not in PAIDOUT status")
+	//}
 
 	projectDid := withdrawFundsDoc.ProjectDid
 	recipientDid := withdrawFundsDoc.RecipientDid
@@ -563,11 +617,14 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	}
 
 	// Get recipient address
-	recipientDidDoc, err := k.DidKeeper.GetDidDoc(ctx, recipientDid)
-	if err != nil {
-		return err
+	recipientDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(recipientDid))
+	if !exists {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	recipientAddr := recipientDidDoc.Address()
+	recipientAddr, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
+	if err != nil {
+		return sdkerrors.Wrap(err, "Address not found in iid doc")
+	}
 
 	err = bk.SendCoins(ctx, fromAccount, recipientAddr, sdk.Coins{amount})
 	if err != nil {

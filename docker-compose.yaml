@@ -31,8 +31,11 @@ services:
       context: .
       dockerfile: .infra/dockerfiles/Dockerfile
       target: build-devel
+    tty: true
     image: ixo-chain:devel
     restart: unless-stopped
+    volumes:
+      - "./:/app"
     ports:
       - "1317:1317" # API
-      - "26657:26657" # 
+      - "26658:26657" # 

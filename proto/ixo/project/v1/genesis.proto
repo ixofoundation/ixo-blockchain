@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ixo.project.v1;
+
+import "gogoproto/gogo.proto";
+import "ixo/project/v1/project.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/project/types";
+
+// GenesisState defines the project module's genesis state.
+message GenesisState {
+  repeated ixo.project.v1.ProjectDoc project_docs              = 1 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"project_docs\""];
+  repeated ixo.project.v1.GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"account_maps\""];
+  repeated ixo.project.v1.WithdrawalInfoDocs withdrawals_infos = 3 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "withdrawal_infos", (gogoproto.moretags) = "yaml:\"withdrawal_infos\""];
+  repeated ixo.project.v1.Claims claims                        = 4 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"claims\""];
+  Params params                                 = 5 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"params\""];
+}

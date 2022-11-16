@@ -14,14 +14,14 @@ wait() {
   done
 }
 
-RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
-  wait
-fi
+# RET=$(ixod status 2>&1)
+# if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
+#   wait
+# fi
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-4"
+CHAIN_ID="devnet-1"
 FEE=$(yes $PASSWORD | ixod keys show fee -a)
 RESERVE_OUT=$(yes $PASSWORD | ixod keys show reserveOut -a)
 
@@ -32,12 +32,14 @@ ixod_tx() {
   cmd="$1 $2"
   shift
   shift
+  NODE="https://devnet.ixo.earth:443/rpc/"
 
   # Broadcast the transaction
   ixod tx $cmd \
     --gas-prices="$GAS_PRICES" \
     --chain-id="$CHAIN_ID" \
     --broadcast-mode block \
+    --node="$NODE" \
     -y \
     "$@" | jq .
     # The $@ adds any extra arguments to the end
@@ -96,11 +98,11 @@ SHAUN_DID_FULL='{
 
 # Ledger DIDs
 echo "Ledgering DID 1/3..."
-ixod_tx did add-did-doc "$MIGUEL_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$MIGUEL_DID_FULL"
 echo "Ledgering DID 2/3..."
-ixod_tx did add-did-doc "$FRANCESCO_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$FRANCESCO_DID_FULL"
 echo "Ledgering DID 3/3..."
-ixod_tx did add-did-doc "$SHAUN_DID_FULL"
+ixod_tx iid create-iid-from-legacy-did "$SHAUN_DID_FULL"
 
 # d0 := 1000000 // initial raise (reserve)
 # p0 := 1       // initial price (reserve per token)

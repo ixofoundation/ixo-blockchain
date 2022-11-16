@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	didtypes "github.com/ixofoundation/ixo-blockchain/x/did/types"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -37,7 +37,7 @@ func NewTxCmd() *cobra.Command {
 
 func NewCmdCreateProject() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-project [sender-did] [project-data-json] [ixo-did]",
+		Use:   "create-project [sender-did] [project-iid-json] [ixo-did]",
 		Short: "Create a new ProjectDoc signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -57,7 +57,8 @@ func NewCmdCreateProject() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(
-				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey)
+				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -90,15 +91,15 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			}
 
 			projectStatus := types.ProjectStatus(status)
-			if projectStatus != types.CreatedProject &&
-				projectStatus != types.PendingStatus &&
-				projectStatus != types.FundedStatus &&
-				projectStatus != types.StartedStatus &&
-				projectStatus != types.StoppedStatus &&
-				projectStatus != types.PaidoutStatus {
-				return errors.New("The status must be one of 'CREATED', " +
-					"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
-			}
+			//if projectStatus != types.CreatedProject &&
+			//	projectStatus != types.PendingStatus &&
+			//	projectStatus != types.FundedStatus &&
+			//	projectStatus != types.StartedStatus &&
+			//	projectStatus != types.StoppedStatus &&
+			//	projectStatus != types.PaidoutStatus {
+			//	return errors.New("The status must be one of 'CREATED', " +
+			//		"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
+			//}
 
 			updateProjectStatusDoc := types.NewUpdateProjectStatusDoc(
 				projectStatus, "")
@@ -109,7 +110,8 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
+			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -151,7 +153,8 @@ func NewCmdCreateAgent() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
+			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -195,7 +198,8 @@ func NewCmdUpdateAgent() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
+			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -232,7 +236,8 @@ func NewCmdCreateClaim() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
+			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -275,7 +280,8 @@ func NewCmdCreateEvaluation() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
+			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -291,7 +297,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 
 func NewCmdWithdrawFunds() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-funds [sender-did] [data]",
+		Use:   "withdraw-funds [sender-did] [iid]",
 		Short: "Withdraw funds.",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -312,7 +318,8 @@ func NewCmdWithdrawFunds() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
+			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data, ixoDid.Address().String())
+			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -328,8 +335,8 @@ func NewCmdWithdrawFunds() *cobra.Command {
 
 func NewCmdUpdateProjectDoc() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-project-doc [sender-did] [project-data-json] [ixo-did]",
-		Short: "Update a project's data signed by the ixoDid of the project",
+		Use:   "update-project-doc [sender-did] [project-iid-json] [ixo-did]",
+		Short: "Update a project's iid signed by the ixoDid of the project",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			senderDid := args[0]
@@ -345,7 +352,8 @@ func NewCmdUpdateProjectDoc() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did)
+			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.Address().String())
+			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

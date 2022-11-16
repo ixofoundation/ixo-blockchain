@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	"github.com/tendermint/go-amino"
 )
 

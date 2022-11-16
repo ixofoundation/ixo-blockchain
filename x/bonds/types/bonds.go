@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
 type (
@@ -634,12 +634,12 @@ func (bond Bond) GetFees(reserveAmounts sdk.DecCoins, percentage sdk.Dec) (fees 
 	return fees
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func (bond Bond) GetTxFees(reserveAmounts sdk.DecCoins) (fees sdk.Coins) {
 	return bond.GetFees(reserveAmounts, bond.TxFeePercentage)
 }
 
-//noinspection GoNilness
+// noinspection GoNilness
 func (bond Bond) GetExitFees(reserveAmounts sdk.DecCoins) (fees sdk.Coins) {
 	return bond.GetFees(reserveAmounts, bond.ExitFeePercentage)
 }

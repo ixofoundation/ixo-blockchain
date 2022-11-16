@@ -5325,8 +5325,8 @@
             },
             a = ":A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD",
             u = {
-                ID_ATTRIBUTE_NAME: "data-reactid",
-                ROOT_ATTRIBUTE_NAME: "data-reactroot",
+                ID_ATTRIBUTE_NAME: "iid-reactid",
+                ROOT_ATTRIBUTE_NAME: "iid-reactroot",
                 ATTRIBUTE_NAME_START_CHAR: a,
                 ATTRIBUTE_NAME_CHAR: a + "\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040",
                 properties: {},
@@ -7555,7 +7555,7 @@
                 r = e.getIn(["meta", "paths"].concat((0, i.default)(t)), (0, s.fromJS)({})),
                 o = M(e, t),
                 a = n.get("parameters") || new s.List,
-                u = r.get("consumes_value") ? r.get("consumes_value") : T(a, "file") ? "multipart/form-data" : T(a, "formData") ? "application/x-www-form-urlencoded" : void 0;
+                u = r.get("consumes_value") ? r.get("consumes_value") : T(a, "file") ? "multipart/form-iid" : T(a, "formData") ? "application/x-www-form-urlencoded" : void 0;
             return (0, s.fromJS)({
                 requestContentType: u,
                 responseContentType: o
@@ -10493,7 +10493,7 @@
                     }
                     t.push(null)
                 }), e.on("data", function(o) {
-                    (d("wrapped data"), n.decoder && (o = n.decoder.write(o)), !n.objectMode || null !== o && void 0 !== o) && ((n.objectMode || o && o.length) && (t.push(o) || (r = !0, e.pause())))
+                    (d("wrapped iid"), n.decoder && (o = n.decoder.write(o)), !n.objectMode || null !== o && void 0 !== o) && ((n.objectMode || o && o.length) && (t.push(o) || (r = !0, e.pause())))
                 }), e) void 0 === this[o] && "function" == typeof e[o] && (this[o] = function(t) {
                     return function() {
                         return e[t].apply(e, arguments)
@@ -15500,7 +15500,7 @@
                     spec: n
                 })).body || t.form || u) a ? t.headers["Content-Type"] = a : Array.isArray(r.consumes) ? t.headers["Content-Type"] = r.consumes[0] : Array.isArray(n.consumes) ? t.headers["Content-Type"] = n.consumes[0] : r.parameters && r.parameters.filter(function(e) {
                     return "file" === e.type
-                }).length ? t.headers["Content-Type"] = "multipart/form-data" : r.parameters && r.parameters.filter(function(e) {
+                }).length ? t.headers["Content-Type"] = "multipart/form-iid" : r.parameters && r.parameters.filter(function(e) {
                     return "formData" === e.in
                 }).length && (t.headers["Content-Type"] = "application/x-www-form-urlencoded");
                 else if (a) {
@@ -16587,7 +16587,7 @@
         };
         var r = !1
     }, function(e, t) {
-        e.exports = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwcHgiICBoZWlnaHQ9IjIwMHB4IiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGNsYXNzPSJsZHMtcm9sbGluZyIgc3R5bGU9ImJhY2tncm91bmQtaW1hZ2U6IG5vbmU7IGJhY2tncm91bmQtcG9zaXRpb246IGluaXRpYWwgaW5pdGlhbDsgYmFja2dyb3VuZC1yZXBlYXQ6IGluaXRpYWwgaW5pdGlhbDsiPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIGZpbGw9Im5vbmUiIG5nLWF0dHItc3Ryb2tlPSJ7e2NvbmZpZy5jb2xvcn19IiBuZy1hdHRyLXN0cm9rZS13aWR0aD0ie3tjb25maWcud2lkdGh9fSIgbmctYXR0ci1yPSJ7e2NvbmZpZy5yYWRpdXN9fSIgbmctYXR0ci1zdHJva2UtZGFzaGFycmF5PSJ7e2NvbmZpZy5kYXNoYXJyYXl9fSIgc3Ryb2tlPSIjNTU1NTU1IiBzdHJva2Utd2lkdGg9IjEwIiByPSIzNSIgc3Ryb2tlLWRhc2hhcnJheT0iMTY0LjkzMzYxNDMxMzQ2NDE1IDU2Ljk3Nzg3MTQzNzgyMTM4Ij48YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgY2FsY01vZGU9ImxpbmVhciIgdmFsdWVzPSIwIDUwIDUwOzM2MCA1MCA1MCIga2V5VGltZXM9IjA7MSIgZHVyPSIxcyIgYmVnaW49IjBzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSI+PC9hbmltYXRlVHJhbnNmb3JtPjwvY2lyY2xlPjwvc3ZnPgo="
+        e.exports = "iid:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwcHgiICBoZWlnaHQ9IjIwMHB4IiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGNsYXNzPSJsZHMtcm9sbGluZyIgc3R5bGU9ImJhY2tncm91bmQtaW1hZ2U6IG5vbmU7IGJhY2tncm91bmQtcG9zaXRpb246IGluaXRpYWwgaW5pdGlhbDsgYmFja2dyb3VuZC1yZXBlYXQ6IGluaXRpYWwgaW5pdGlhbDsiPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIGZpbGw9Im5vbmUiIG5nLWF0dHItc3Ryb2tlPSJ7e2NvbmZpZy5jb2xvcn19IiBuZy1hdHRyLXN0cm9rZS13aWR0aD0ie3tjb25maWcud2lkdGh9fSIgbmctYXR0ci1yPSJ7e2NvbmZpZy5yYWRpdXN9fSIgbmctYXR0ci1zdHJva2UtZGFzaGFycmF5PSJ7e2NvbmZpZy5kYXNoYXJyYXl9fSIgc3Ryb2tlPSIjNTU1NTU1IiBzdHJva2Utd2lkdGg9IjEwIiByPSIzNSIgc3Ryb2tlLWRhc2hhcnJheT0iMTY0LjkzMzYxNDMxMzQ2NDE1IDU2Ljk3Nzg3MTQzNzgyMTM4Ij48YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgY2FsY01vZGU9ImxpbmVhciIgdmFsdWVzPSIwIDUwIDUwOzM2MCA1MCA1MCIga2V5VGltZXM9IjA7MSIgZHVyPSIxcyIgYmVnaW49IjBzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSI+PC9hbmltYXRlVHJhbnNmb3JtPjwvY2lyY2xlPjwvc3ZnPgo="
     }, function(e, t, n) {
         "use strict";
         Object.defineProperty(t, "__esModule", {
@@ -28269,7 +28269,7 @@
             u = r.injection.HAS_POSITIVE_NUMERIC_VALUE,
             s = r.injection.HAS_OVERLOADED_BOOLEAN_VALUE,
             l = {
-                isCustomAttribute: RegExp.prototype.test.bind(new RegExp("^(data|aria)-[" + r.ATTRIBUTE_NAME_CHAR + "]*$")),
+                isCustomAttribute: RegExp.prototype.test.bind(new RegExp("^(iid|aria)-[" + r.ATTRIBUTE_NAME_CHAR + "]*$")),
                 Properties: {
                     accept: 0,
                     acceptCharset: 0,
@@ -30917,7 +30917,7 @@
             o = /\/?>/,
             i = /^<\!\-\-/,
             a = {
-                CHECKSUM_ATTR_NAME: "data-react-checksum",
+                CHECKSUM_ATTR_NAME: "iid-react-checksum",
                 addChecksumToMarkup: function(e) {
                     var t = r(e);
                     return i.test(e) ? e : e.replace(o, " " + a.CHECKSUM_ATTR_NAME + '="' + t + '"$&')
@@ -34162,7 +34162,7 @@
                         onClick: this.close
                     }, "Close"))), d && d.size ? l.default.createElement("div", null, l.default.createElement("div", {
                         className: "scope-def"
-                    }, l.default.createElement("p", null, "Scopes are used to grant an application different levels of access to data on behalf of the end user. Each API may declare one or more scopes."), l.default.createElement("p", null, "API requires the following scopes. Select which ones you want to grant to Swagger UI.")), n.filter(function(e) {
+                    }, l.default.createElement("p", null, "Scopes are used to grant an application different levels of access to iid on behalf of the end user. Each API may declare one or more scopes."), l.default.createElement("p", null, "API requires the following scopes. Select which ones you want to grant to Swagger UI.")), n.filter(function(e) {
                         return "oauth2" === e.get("type")
                     }).map(function(e, t) {
                         return l.default.createElement("div", {
@@ -37534,7 +37534,7 @@
                 }
             }
             if (e.get("body"))
-                if ("multipart/form-data" === n && "POST" === e.get("method")) {
+                if ("multipart/form-iid" === n && "POST" === e.get("method")) {
                     var g = !0,
                         y = !1,
                         b = void 0;
@@ -40913,7 +40913,7 @@
                                 e = F(e)
                             } catch (e) {}
                             var r = new U;
-                            r.responseType = "document", r.open("GET", "data:text/html;charset=utf-8," + e, !1), r.send(null), t = r.response
+                            r.responseType = "document", r.open("GET", "iid:text/html;charset=utf-8," + e, !1), r.send(null), t = r.response
                         }
                         if (C) try {
                             t = (new D).parseFromString(e, "text/html")
@@ -40987,7 +40987,7 @@
                                         if (!oe[o] || ue[o]) continue;
                                         if (Se[o]);
                                         else if (te.test(r.replace(ee, "")));
-                                        else if ("src" !== o && "xlink:href" !== o || 0 !== r.indexOf("data:") || !xe[e.nodeName.toLowerCase()])
+                                        else if ("src" !== o && "xlink:href" !== o || 0 !== r.indexOf("iid:") || !xe[e.nodeName.toLowerCase()])
                                             if (ce && !Q.test(r.replace(ee, "")));
                                             else if (r) continue
                                     }

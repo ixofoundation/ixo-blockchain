@@ -37,6 +37,8 @@ yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,100000
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "ixo19h3lqj50uhzdrv8mkafnp55nqmz4ghc2sd3m48" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "ixo1ry6cr975sttlzxptakxs2tsygh2z56vgle88jc" 1000000000000uixo,1000000000000res,1000000000000rez
+yes $PASSWORD | ixod add-genesis-account "ixo1ky7wad4d7gjtcy5yklc83geev76cudcevmnhhn" 1000000000000uixo,1000000000000res,1000000000000rez
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
@@ -70,13 +72,18 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
+MAX_VOTING_PERIOD="90s"  # example: "172800s"
+FROM="\"voting_period\": \"172800s\""
+TO="\"voting_period\": \"$MAX_VOTING_PERIOD\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 # TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
 #ixod config chain-id pandora-4
 #ixod config output json
 #ixod config indent true
 #ixod config trust-node true
 
-ixod gentx miguel 1000000uixo --chain-id pandora-4
+yes $PASSWORD | ixod gentx miguel 1000000uixo --chain-id pandora-4
 
 ixod collect-gentxs
 ixod validate-genesis
@@ -84,17 +91,17 @@ ixod validate-genesis
 # Enable REST API (assumed to be at line 104 of app.toml)
 FROM="enable = false"
 TO="enable = true"
-sed -i "104s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 # Enable Swagger docs (assumed to be at line 107 of app.toml)
 FROM="swagger = false"
 TO="swagger = true"
-sed -i "107s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
 # Uncomment the below to broadcast node RPC endpoint
-#FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
-#TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
-#sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
+FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
+TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 # Uncomment the below to set timeouts to 1s for shorter block times
 #sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml

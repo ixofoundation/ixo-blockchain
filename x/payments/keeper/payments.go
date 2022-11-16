@@ -257,6 +257,123 @@ func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.Ac
 	return true
 }
 
+func (k Keeper) EffectPaymentPartial(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
+	contractId string, partialPaymentAmount sdk.Coins) (effected bool, err error) {
+
+	contract, err := k.GetPaymentContract(ctx, contractId)
+	if err != nil {
+		return false, err
+	}
+
+	template, err := k.GetPaymentTemplate(ctx, contract.PaymentTemplateId)
+	if err != nil {
+		return false, err
+	}
+
+	// Check if can effect payment (this is false if e.g. max pay has been reached)
+	if !contract.CanEffectPayment(template) {
+		return false, nil
+	}
+
+	// Assume payer will pay PaymentAmount, apply discount (if any),
+	// and calculate initial cumulative (before adjustments)
+	var payAmount sdk.Coins
+	if len(partialPaymentAmount) > 0 {
+		payAmount = partialPaymentAmount
+	} else {
+		payAmount = template.PaymentAmount
+	}
+
+	payAmount, err = applyDiscount(template, contract, payAmount)
+	if err != nil {
+		return false, err
+	}
+	cumulative := contract.CumulativePay.Add(payAmount...)
+
+	// In-place cumulative adjustments (i.e. considering minimums and maximums)
+	adjustForMinimums(template, contract, cumulative)
+	adjustForMaximums(template, cumulative)
+
+	// Find actual pay from adjusted cumulative:
+	//    adjustedCumul = previousCumul + actualPay
+	// => actualPay = adjustedCumul - previousCumul
+	pay := cumulative.Sub(contract.CumulativePay)
+
+	contractPayerAddr, err := sdk.AccAddressFromBech32(contract.Payer)
+	if err != nil {
+		return false, err
+	}
+
+	// Stop if payer doesn't have enough coins. However, this is not considered
+	// an error but the caller should be looking at the 'effected' bool result
+	if !HasBalances(ctx, bankKeeper, contractPayerAddr, pay) {
+		return false, nil
+	}
+
+	// Total input is pay plus current remainder in PayRemainderPool
+	inputFromPayRemainderPool := contract.CurrentRemainder
+	totalInputAmount := pay.Add(inputFromPayRemainderPool...)
+
+	// Calculate list of outputs and calculate the total output to payees based
+	// on the calculated wallet distributions
+	var outputToPayees sdk.Coins
+	var outputs []banktypes.Output
+	var contractRecipients types.Distribution = contract.Recipients
+	distributions := contractRecipients.GetDistributionsFor(totalInputAmount)
+	for i, share := range distributions {
+		// Get integer output
+		outputAmt, _ := share.TruncateDecimal()
+
+		// If amount not zero, update total and add as output
+		if !outputAmt.IsZero() {
+			outputToPayees = outputToPayees.Add(outputAmt...)
+			address := contractRecipients[i].Address
+			accAddress, err := sdk.AccAddressFromBech32(address)
+			if err != nil {
+				return false, err
+			}
+			outputs = append(outputs, banktypes.NewOutput(accAddress, outputAmt))
+		}
+	}
+
+	// Remainder (not output to payees) goes to PayRemainderPool if not zero
+	outputToPayRemainderPool := totalInputAmount.Sub(outputToPayees)
+	if !outputToPayRemainderPool.IsZero() {
+		payRemainderPoolAddr := authtypes.NewModuleAddress(types.PayRemainderPool)
+		outputs = append(outputs, banktypes.NewOutput(payRemainderPoolAddr, outputToPayRemainderPool))
+	}
+
+	// Construct list of inputs (pay and from PayRemainderPool if non zero)
+	inputs := []banktypes.Input{banktypes.NewInput(contractPayerAddr, pay)}
+	if !inputFromPayRemainderPool.IsZero() {
+		payRemainderPoolAddr := authtypes.NewModuleAddress(types.PayRemainderPool)
+		inputs = append(inputs, banktypes.NewInput(payRemainderPoolAddr, inputFromPayRemainderPool))
+	}
+
+	// Distribute the payment according to the outputs
+	err = bankKeeper.InputOutputCoins(ctx, inputs, outputs)
+	if err != nil {
+		return false, err
+	}
+
+	// Update and save payment contract
+	contract.CumulativePay = contract.CumulativePay.Add(pay...)
+	contract.CurrentRemainder = contract.CurrentRemainder.Add(
+		outputToPayRemainderPool...).Sub(inputFromPayRemainderPool)
+	k.SetPaymentContract(ctx, contract)
+
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		types.EventTypeEffectPayment,
+		sdk.NewAttribute(types.AttributeKeyPaymentContractId, contract.Id),
+		sdk.NewAttribute(types.AttributeKeyInputFromPayRemainderPool, inputFromPayRemainderPool.String()),
+		sdk.NewAttribute(types.AttributeKeyInputFromPayer, pay.String()),
+		sdk.NewAttribute(types.AttributeKeyOutputToPayRemainderPool, outputToPayRemainderPool.String()),
+		sdk.NewAttribute(types.AttributeKeyOutputToPayees, outputToPayees.String()),
+	))
+
+	return true, nil
+}
+
 func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 	contractId string) (effected bool, err error) {
 
@@ -277,7 +394,9 @@ func (k Keeper) EffectPayment(ctx sdk.Context, bankKeeper bankkeeper.Keeper,
 
 	// Assume payer will pay PaymentAmount, apply discount (if any),
 	// and calculate initial cumulative (before adjustments)
+
 	payAmount := template.PaymentAmount
+
 	payAmount, err = applyDiscount(template, contract, payAmount)
 	if err != nil {
 		return false, err

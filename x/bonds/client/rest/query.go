@@ -257,7 +257,7 @@ func queryParamsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			keeper.QueryParams), nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query data %s", err.Error())))
+			_, _ = w.Write([]byte(fmt.Sprintf("Couldn't get query iid %s", err.Error())))
 			return
 		}
 

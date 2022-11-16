@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
 type (
-	InternalAccountID string
+	InternalAccountID          string
 	ProjectStatus              string
 	ProjectStatusTransitionMap map[ProjectStatus][]ProjectStatus
 	ProjectDataMap             map[string]json.RawMessage

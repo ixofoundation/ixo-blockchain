@@ -1,0 +1,78 @@
+syntax = "proto3";
+package ixo.payments.v1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/payments/types";
+
+// PaymentTemplate contains details about a payment, with no info about the payer or payee.
+message PaymentTemplate {
+  string id                                         = 1 [(gogoproto.moretags) = "yaml:\"id\""];
+  repeated cosmos.base.v1beta1.Coin payment_amount  = 2 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"payment_amount\""];
+  repeated cosmos.base.v1beta1.Coin payment_minimum = 3 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"payment_minimum\""];
+  repeated cosmos.base.v1beta1.Coin payment_maximum = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"payment_maximum\""];
+  repeated Discount discounts                       = 5 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"discounts\""];
+}
+
+// Discount contains details about a discount which can be granted to payers.
+message Discount {
+  string id      = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"id\""];
+  string percent = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"percent\""];
+}
+
+// DistributionShare specifies the share of a specific payment an address will receive.
+message DistributionShare {
+  string address    = 1 [(gogoproto.moretags) = "yaml:\"address\""];
+  string percentage = 2 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"percentage\""];
+}
+
+// PaymentContract specifies an agreement between a payer and payee/s which can be invoked
+// once or multiple times to effect payment/s.
+message PaymentContract {
+  string id                                           = 1 [(gogoproto.moretags) = "yaml:\"id\""];
+  string payment_template_id                          = 2 [(gogoproto.moretags) = "yaml:\"payment_template_id\""];
+  string creator                                      = 3 [(gogoproto.moretags) = "yaml:\"creator\""];
+  string payer                                        = 4 [(gogoproto.moretags) = "yaml:\"payer\""];
+  repeated DistributionShare recipients               = 5 [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"recipients\""];
+  repeated cosmos.base.v1beta1.Coin cumulative_pay    = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"cumulative_pay\""];
+  repeated cosmos.base.v1beta1.Coin current_remainder = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "yaml:\"current_remainder\""];
+  bool can_deauthorise                                = 8 [(gogoproto.moretags) = "yaml:\"can_deauthorise\""];
+  bool authorised                                     = 9 [(gogoproto.moretags) = "yaml:\"authorised\""];
+  string discount_id                                  = 10 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"discount_id\""];
+}
+
+// Subscription specifies details of a payment to be effected periodically.
+message Subscription {
+  option (gogoproto.goproto_getters)  = false;
+
+  string id                  = 1 [(gogoproto.moretags) = "yaml:\"id\""];
+  string payment_contract_id = 2 [(gogoproto.moretags) = "yaml:\"payment_contract_id\""];
+  string periods_so_far      = 3 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"periods_so_far\""];
+  string max_periods         = 4 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"max_periods\""];
+  string periods_accumulated = 5 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint", (gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"periods_accumulated\""];
+  google.protobuf.Any period = 6 [(gogoproto.moretags) = "yaml:\"period\""];
+}
+
+// BlockPeriod implements the Period interface and specifies a period in terms of number
+// of blocks.
+message BlockPeriod {
+  int64 period_length      = 1 [(gogoproto.moretags) = "yaml:\"period_length\""];
+  int64 period_start_block = 2 [(gogoproto.moretags) = "yaml:\"period_start_block\""];
+}
+
+// TimePeriod implements the Period interface and specifies a period in terms of time.
+message TimePeriod {
+  google.protobuf.Duration period_duration_ns = 1 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true, (gogoproto.moretags) = "yaml:\"period_duration_ns\""];
+  google.protobuf.Timestamp period_start_time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (gogoproto.moretags) = "yaml:\"period_start_time\""];
+}
+
+// TestPeriod implements the Period interface and is identical to BlockPeriod, except it
+// ignores the context in periodEnded() and periodStarted().
+message TestPeriod {
+  int64 period_length      = 1[(gogoproto.moretags) = "yaml:\"period_length\""];
+  int64 period_start_block = 2[(gogoproto.moretags) = "yaml:\"period_start_block\""];
+}

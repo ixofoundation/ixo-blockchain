@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
@@ -29,7 +29,7 @@ type createProjectReq struct {
 	SenderDid  didexported.Did `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did `json:"projectDid" yaml:"projectDid"`
 	PubKey     string          `json:"pubKey" yaml:"pubKey"`
-	Data       json.RawMessage `json:"data" yaml:"data"`
+	Data       json.RawMessage `json:"iid" yaml:"iid"`
 }
 
 func createProjectRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -44,7 +44,7 @@ func createProjectRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey)
+		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -59,7 +59,7 @@ type updateProjectStatusReq struct {
 	TxHash     string                       `json:"txHash" yaml:"txHash"`
 	SenderDid  didexported.Did              `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did              `json:"projectDid" yaml:"projectDid"`
-	Data       types.UpdateProjectStatusDoc `json:"data" yaml:"data"`
+	Data       types.UpdateProjectStatusDoc `json:"iid" yaml:"iid"`
 }
 
 func updateProjectStatusRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -74,7 +74,7 @@ func updateProjectStatusRequestHandler(clientCtx client.Context) http.HandlerFun
 			return
 		}
 
-		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -89,7 +89,7 @@ type createAgentReq struct {
 	TxHash     string               `json:"txHash" yaml:"txHash"`
 	SenderDid  didexported.Did      `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did      `json:"projectDid" yaml:"projectDid"`
-	Data       types.CreateAgentDoc `json:"data" yaml:"data"`
+	Data       types.CreateAgentDoc `json:"iid" yaml:"iid"`
 }
 
 func createAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -104,7 +104,7 @@ func createAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -119,7 +119,7 @@ type updateAgentReq struct {
 	TxHash     string               `json:"txHash" yaml:"txHash"`
 	SenderDid  didexported.Did      `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did      `json:"projectDid" yaml:"projectDid"`
-	Data       types.UpdateAgentDoc `json:"data" yaml:"data"`
+	Data       types.UpdateAgentDoc `json:"iid" yaml:"iid"`
 }
 
 func updateAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -134,7 +134,7 @@ func updateAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -149,7 +149,7 @@ type createClaimReq struct {
 	TxHash     string               `json:"txHash" yaml:"txHash"`
 	SenderDid  didexported.Did      `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did      `json:"projectDid" yaml:"projectDid"`
-	Data       types.CreateClaimDoc `json:"data" yaml:"data"`
+	Data       types.CreateClaimDoc `json:"iid" yaml:"iid"`
 }
 
 func createClaimRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -164,7 +164,7 @@ func createClaimRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -180,7 +180,7 @@ type createEvaluationReq struct {
 	TxHash     string                    `json:"txHash" yaml:"txHash"`
 	SenderDid  didexported.Did           `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did           `json:"projectDid" yaml:"projectDid"`
-	Data       types.CreateEvaluationDoc `json:"data" yaml:"data"`
+	Data       types.CreateEvaluationDoc `json:"iid" yaml:"iid"`
 }
 
 func createEvaluationRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -195,7 +195,7 @@ func createEvaluationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -208,7 +208,7 @@ func createEvaluationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 type withdrawFundsReq struct {
 	BaseReq   rest.BaseReq           `json:"base_req" yaml:"base_req"`
 	SenderDid didexported.Did        `json:"senderDid" yaml:"senderDid"`
-	Data      types.WithdrawFundsDoc `json:"data" yaml:"data"`
+	Data      types.WithdrawFundsDoc `json:"iid" yaml:"iid"`
 }
 
 func withdrawFundsRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -223,7 +223,7 @@ func withdrawFundsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data)
+		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -238,7 +238,7 @@ type updateProjectDocReq struct {
 	TxHash     string          `json:"txHash" yaml:"txHash"`
 	SenderDid  didexported.Did `json:"senderDid" yaml:"senderDid"`
 	ProjectDid didexported.Did `json:"projectDid" yaml:"projectDid"`
-	Data       json.RawMessage `json:"data" yaml:"data"`
+	Data       json.RawMessage `json:"iid" yaml:"iid"`
 }
 
 func updateProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -253,7 +253,7 @@ func updateProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateProjectDoc(req.SenderDid, req.Data, req.ProjectDid)
+		msg := types.NewMsgUpdateProjectDoc(req.SenderDid, req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

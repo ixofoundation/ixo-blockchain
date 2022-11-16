@@ -13,8 +13,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 	"github.com/gorilla/mux"
 	"github.com/ixofoundation/ixo-blockchain/compatibility"
-	didexported "github.com/ixofoundation/ixo-blockchain/x/did/exported"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/x/ixo/types"
+	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 

@@ -47,7 +47,7 @@ ixod_q() {
   ixod q "$@" --output=json | jq .
 }
 
-BOND_DID="did:ixo:U7GK8p8rVhJMKhBVRCJJ8c"
+BOND_DID="did:ixo:A7GK8p8rVhJMKhBVRCJJ8c"
 #BOND_DID_FULL='{
 #  "did":"did:ixo:U7GK8p8rVhJMKhBVRCJJ8c",
 #  "verifyKey":"FmwNAfvV2xEqHwszrVJVBR3JgQ8AFCQEVzo1p6x4L8VW",

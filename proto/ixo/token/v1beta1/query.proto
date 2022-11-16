@@ -1,0 +1,50 @@
+syntax = "proto3";
+package ixo.token.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "ixo/token/v1beta1/token.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse){
+    option (google.api.http).get = "/ixo/token";
+  }
+
+  rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse){
+    option (google.api.http).get = "/ixo/token/{token_did}";
+  }
+
+  rpc TokenConfig(QueryTokenConfigRequest) returns (QueryTokenConfigResponse){
+    option (google.api.http).get = "/ixo/token/config";
+  }
+}
+
+message QueryTokenListRequest {
+  string token_type = 1 [(gogoproto.moretags) = "yaml:\"token_type\""];
+  string token_status = 2 [(gogoproto.moretags) = "yaml:\"token_status\""];
+}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryTokenListResponse {
+  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
+}
+
+// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
+message QueryTokenDocRequest {
+  string token_did = 1 [(gogoproto.moretags) = "yaml:\"token_did\""];
+}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryTokenDocResponse {
+  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
+}
+
+message QueryTokenConfigRequest {}
+
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+message QueryTokenConfigResponse {
+  map<string, string> map = 1 [(gogoproto.moretags) = "yaml:\"config\""];
+}

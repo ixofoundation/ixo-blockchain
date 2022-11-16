@@ -7,17 +7,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func NewPaymentTemplate(id string, paymentAmount, paymentMinimum,
-	paymentMaximum sdk.Coins, discounts Discounts) PaymentTemplate {
-	return PaymentTemplate{
-		Id:             id,
-		PaymentAmount:  paymentAmount,
-		PaymentMinimum: paymentMinimum,
-		PaymentMaximum: paymentMaximum,
-		Discounts:      discounts,
-	}
-}
-
 func (pt PaymentTemplate) GetDiscountPercent(discountId sdk.Uint) (sdk.Dec, error) {
 	for _, discount := range pt.Discounts {
 		if discount.Id.Equal(discountId) {
