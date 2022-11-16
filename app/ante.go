@@ -4,6 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
+	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	projectante "github.com/ixofoundation/ixo-blockchain/x/project/ante"
 	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
@@ -13,7 +14,6 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -110,7 +110,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 				authante.NewValidateMemoDecorator(options.AccountKeeper),
 				authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 				projectante.NewSetPubKeyDecorator(options.ProjectKeeper, options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
-				ante.NewValidateSigCountDecorator(options.AccountKeeper),
+				authante.NewValidateSigCountDecorator(options.AccountKeeper),
 				projectante.NewDeductFeeDecorator(options.ProjectKeeper, options.AccountKeeper, options.BankKeeper, options.IidKeeper),
 				//ixo.NewSigGasConsumeDecorator(ak, sigGasConsumer, pubKeyGetter),
 				projectante.NewSigVerificationDecorator(options.AccountKeeper, options.ProjectKeeper, options.SignModeHandler),
@@ -134,7 +134,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 				authante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 				authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 				authante.NewIncrementSequenceDecorator(options.AccountKeeper),
-				// iidante.NewIidResolutionDecorator(options.IidKeeper),
+				iidante.NewIidResolutionDecorator(options.IidKeeper),
 			}
 		}
 
