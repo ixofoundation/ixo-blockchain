@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"errors"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	"github.com/prometheus/client_golang/prometheus"
 	"io"
 	"os"
 	"path/filepath"
