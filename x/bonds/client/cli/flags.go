@@ -28,6 +28,7 @@ const (
 	FlagBondDid                  = "bond-did"
 	FlagCreatorDid               = "creator-did"
 	FlagControllerDid            = "controller-did"
+	FlagOracleDid                = "oracle-did"
 	FlagEditorDid                = "editor-did"
 )
 

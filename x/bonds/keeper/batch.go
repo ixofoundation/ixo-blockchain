@@ -65,7 +65,7 @@ func (k Keeper) AddBuyOrder(ctx sdk.Context, bondDid didexported.Did, bo types.B
 	k.SetBatch(ctx, bondDid, batch)
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("added buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid))
+	logger.Info(fmt.Sprintf("added buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid.String()))
 }
 
 func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid didexported.Did, so types.SellOrder, buyPrices, sellPrices sdk.DecCoins) {
@@ -77,7 +77,7 @@ func (k Keeper) AddSellOrder(ctx sdk.Context, bondDid didexported.Did, so types.
 	k.SetBatch(ctx, bondDid, batch)
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("added sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid))
+	logger.Info(fmt.Sprintf("added sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid.String()))
 }
 
 func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid didexported.Did, so types.SwapOrder) {
@@ -86,7 +86,7 @@ func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid didexported.Did, so types.
 	k.SetBatch(ctx, bondDid, batch)
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("added swap order for %s to %s from %s", so.BaseOrder.Amount.String(), so.ToToken, so.BaseOrder.AccountDid))
+	logger.Info(fmt.Sprintf("added swap order for %s to %s from %s", so.BaseOrder.Amount.String(), so.ToToken, so.BaseOrder.AccountDid.String()))
 }
 
 func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch types.Batch) (buyPricesPT, sellPricesPT sdk.DecCoins, err error) {
@@ -209,11 +209,11 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	var extraEventAttributes []sdk.Attribute
 
 	// Get buyer address
-	buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid))
+	buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid.Did()))
 	if !exists {
 		return err
 	}
-	buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(buyerDidDoc.Id)
+	buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(bo.BaseOrder.AccountDid.String())
 	if err != nil {
 		return err
 	}
@@ -333,7 +333,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 	k.SetCurrentSupply(ctx, bondDid, bond.CurrentSupply.Add(bo.BaseOrder.Amount))
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid))
+	logger.Info(fmt.Sprintf("performed buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid.String()))
 
 	// Get new bond token balance
 	bondTokenBalance := k.BankKeeper.GetBalance(ctx, buyerAddr, bond.Token).Amount
@@ -342,7 +342,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid didexported.Did, bo t
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, bo.BaseOrder.AccountDid),
+		sdk.NewAttribute(types.AttributeKeyAddress, bo.BaseOrder.AccountDid.String()),
 		sdk.NewAttribute(types.AttributeKeyTokensMinted, bo.BaseOrder.Amount.Amount.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedPrices, reservePricesRounded.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
@@ -361,11 +361,11 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	bond := k.MustGetBond(ctx, bondDid)
 
 	// Get seller address
-	sellerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid))
+	sellerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid.Did()))
 	if !exists {
 		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found")
 	}
-	sellerAddr, err := sellerDidDoc.GetVerificationMethodBlockchainAddress(sellerDidDoc.Id)
+	sellerAddr, err := sellerDidDoc.GetVerificationMethodBlockchainAddress(so.BaseOrder.AccountDid.String())
 	if err != nil {
 		return sdkerrors.Wrap(err, "Address not found")
 	}
@@ -402,7 +402,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 	k.SetCurrentSupply(ctx, bondDid, bond.CurrentSupply.Sub(so.BaseOrder.Amount))
 
 	logger := k.Logger(ctx)
-	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid))
+	logger.Info(fmt.Sprintf("performed sell order for %s from %s", so.BaseOrder.Amount.String(), so.BaseOrder.AccountDid.String()))
 
 	// Get new bond token balance
 	bondTokenBalance := k.BankKeeper.GetBalance(ctx, sellerAddr, bond.Token).Amount
@@ -411,7 +411,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid didexported.Did, so 
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSellOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, so.BaseOrder.AccountDid),
+		sdk.NewAttribute(types.AttributeKeyAddress, so.BaseOrder.AccountDid.String()),
 		sdk.NewAttribute(types.AttributeKeyTokensBurned, so.BaseOrder.Amount.Amount.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, totalReturns.String()),
@@ -427,11 +427,11 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 	// WARNING: do not return ok=true if money has already been transferred when error occurs
 
 	// Get swapper address
-	swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid))
+	swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid.Did()))
 	if !exists {
 		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"), true
 	}
-	swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(swapperDidDoc.Id)
+	swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(so.BaseOrder.AccountDid.String())
 	if err != nil {
 		return sdkerrors.Wrap(err, "Address not found"), true
 	}
@@ -485,7 +485,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid didexported.Did, so types.S
 		types.EventTypeOrderFulfill,
 		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
 		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSwapOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, so.BaseOrder.AccountDid),
+		sdk.NewAttribute(types.AttributeKeyAddress, so.BaseOrder.AccountDid.String()),
 		sdk.NewAttribute(types.AttributeKeyTokensSwapped, adjustedInput.String()),
 		sdk.NewAttribute(types.AttributeKeyChargedFees, txFee.String()),
 		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, reserveReturns.String()),
@@ -550,11 +550,11 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid didexported.Did) {
 					logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 					// Return from amount to swapper
-					swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid))
+					swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid.Did()))
 					if !exists {
 						panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
 					}
-					swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(swapperDidDoc.Id)
+					swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(so.BaseOrder.String())
 					if err != nil {
 						panic(sdkerrors.Wrap(err, "Address not found"))
 					}
@@ -615,23 +615,23 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid didexported.Did
 				batch.TotalBuyAmount = batch.TotalBuyAmount.Sub(bo.BaseOrder.Amount)
 				cancelledOrders += 1
 
-				logger.Info(fmt.Sprintf("cancelled buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid))
+				logger.Info(fmt.Sprintf("cancelled buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid.String()))
 				logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 				ctx.EventManager().EmitEvent(sdk.NewEvent(
 					types.EventTypeOrderCancel,
 					sdk.NewAttribute(types.AttributeKeyBondDid, bondDid),
 					sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
-					sdk.NewAttribute(types.AttributeKeyAddress, bo.BaseOrder.AccountDid),
+					sdk.NewAttribute(types.AttributeKeyAddress, bo.BaseOrder.AccountDid.String()),
 					sdk.NewAttribute(types.AttributeKeyCancelReason, bo.BaseOrder.CancelReason),
 				))
 
 				// Return reserve to buyer
-				buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid))
+				buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid.Did()))
 				if !exists {
 					panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
 				}
-				buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(buyerDidDoc.Id)
+				buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(bo.BaseOrder.AccountDid.String())
 				if err != nil {
 					panic(sdkerrors.Wrap(err, "Address not found"))
 				}

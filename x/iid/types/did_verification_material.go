@@ -17,6 +17,43 @@ const (
 	DIDVMethodTypeX25519KeyAgreementKey2019         VerificationMaterialType = "X25519KeyAgreementKey2019"
 )
 
+type DIDFragment string
+
+func (df DIDFragment) String() string { return string(df) }
+
+func (df DIDFragment) Did() string {
+	didFragmentParts := strings.SplitAfter(df.String(), "#")
+	if len(didFragmentParts) == 0 {
+		return ""
+	}
+
+	for index, part := range didFragmentParts {
+		if index == 0 {
+			return part
+		}
+	}
+	return ""
+}
+
+func (df DIDFragment) HasFragment() (exists bool) {
+	_, exists = df.Fragment()
+	return
+}
+
+func (df DIDFragment) Fragment() (string, bool) {
+	didFragmentParts := strings.SplitAfter(df.String(), "#")
+	if len(didFragmentParts) == 0 {
+		return "", false
+	}
+
+	for index, part := range didFragmentParts {
+		if index == 1 {
+			return part, true
+		}
+	}
+	return "", false
+}
+
 // String return string name for the Verification Method type
 func (p VerificationMaterialType) String() string {
 	return string(p)

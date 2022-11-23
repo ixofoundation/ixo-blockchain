@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 type (
@@ -223,7 +224,7 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	return nil
 }
 
-func NewBond(token, name, description string, creatorDid, controllerDid didexported.Did,
+func NewBond(token, name, description string, creatorDid, controllerDid, orcaleDid iidtypes.DIDFragment,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
@@ -240,6 +241,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid didexpor
 		Description:                  description,
 		CreatorDid:                   creatorDid,
 		ControllerDid:                controllerDid,
+		OracleDid:                    orcaleDid,
 		FunctionType:                 functionType,
 		FunctionParameters:           functionParameters,
 		ReserveTokens:                reserveTokens,

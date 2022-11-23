@@ -109,7 +109,7 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 				nil,
 			),
 		),
-		iidtypes.WithControllers(msg.ProjectDid, msg.SenderDid),
+		iidtypes.WithControllers(msg.ProjectDid, msg.SenderDid.Did()),
 	)
 	if err != nil {
 		// k.Logger(ctx).Error(err.Error())
@@ -132,7 +132,7 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 		sdk.NewEvent(
 			types.EventTypeCreateProject,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyPubKey, msg.PubKey),
 		),
@@ -206,7 +206,7 @@ func (s msgServer) UpdateProjectStatus(goCtx context.Context, msg *types.MsgUpda
 		sdk.NewEvent(
 			types.EventTypeUpdateProjectStatus,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyEthFundingTxnID, msg.Data.EthFundingTxnId),
 			sdk.NewAttribute(types.AttributeKeyUpdatedStatus, fmt.Sprint(msg.Data.Status)),
@@ -234,7 +234,7 @@ func payoutFees(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid dide
 
 	ixoDid := k.GetParams(ctx).IxoDid
 	amount := getIxoAmount(ctx, k, bk, projectDid, IxoAccountFeesId)
-	err = payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, ixoDid, amount)
+	err = payoutAndRecon(ctx, k, bk, projectDid, IxoAccountFeesId, iidtypes.DIDFragment(ixoDid), amount)
 	if err != nil {
 		return err
 	}
@@ -277,7 +277,7 @@ func (s msgServer) CreateAgent(goCtx context.Context, msg *types.MsgCreateAgent)
 	k := s.Keeper
 
 	createAgentFunc := func(document *iidtypes.IidDocument) error {
-		_, err := createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.Data.AgentDid))
+		_, err := createAccountInProjectAccounts(ctx, k, msg.ProjectDid, types.InternalAccountID(msg.Data.AgentDid.Did()))
 		if err != nil {
 			return err
 		}
@@ -286,9 +286,9 @@ func (s msgServer) CreateAgent(goCtx context.Context, msg *types.MsgCreateAgent)
 			sdk.NewEvent(
 				types.EventTypeCreateAgent,
 				sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 				sdk.NewAttribute(types.AttributeKeyProjectDid, document.Id),
-				sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid),
+				sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.AgentDid.String()),
 				sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
 			),
 			sdk.NewEvent(
@@ -327,7 +327,7 @@ func (s msgServer) UpdateAgent(goCtx context.Context, msg *types.MsgUpdateAgent)
 		sdk.NewEvent(
 			types.EventTypeUpdateAgent,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyAgentDid, msg.Data.Did),
 			sdk.NewAttribute(types.AttributeKeyAgentRole, msg.Data.Role),
@@ -371,7 +371,7 @@ func (s msgServer) CreateClaim(goCtx context.Context, msg *types.MsgCreateClaim)
 			sdk.NewEvent(
 				types.EventTypeCreateClaim,
 				sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+				sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 				sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 				sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimId),
 				sdk.NewAttribute(types.AttributeKeyClaimTemplateID, msg.Data.ClaimTemplateId),
@@ -440,11 +440,11 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		}
 
 		// Get sender (oracle) address
-		senderDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+		senderDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 		if !exists {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		senderAddr, err := senderDidDoc.GetVerificationMethodBlockchainAddress(senderDidDoc.Id)
+		senderAddr, err := senderDidDoc.GetVerificationMethodBlockchainAddress(msg.SenderDid.String())
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 		}
@@ -471,11 +471,11 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 	templateId, err = feesMap.GetPayTemplateId(types.FeeForService)
 	if err == nil && msg.Data.Status == string(types.ApprovedClaim) {
 		// Get claimer address
-		claimerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(claim.ClaimerDid))
+		claimerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(claim.ClaimerDid.Did()))
 		if !exists {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 		}
-		claimerAddr, err := claimerDidDoc.GetVerificationMethodBlockchainAddress(claimerDidDoc.Id)
+		claimerAddr, err := claimerDidDoc.GetVerificationMethodBlockchainAddress(claim.ClaimerDid.String())
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 		}
@@ -500,7 +500,7 @@ func (s msgServer) CreateEvaluation(goCtx context.Context, msg *types.MsgCreateE
 		sdk.NewEvent(
 			types.EventTypeCreateEvaluation,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 			sdk.NewAttribute(types.AttributeKeyClaimID, msg.Data.ClaimId),
 			sdk.NewAttribute(types.AttributeKeyClaimStatus, fmt.Sprint(msg.Data.Status)),
@@ -556,9 +556,9 @@ func (s msgServer) WithdrawFunds(goCtx context.Context, msg *types.MsgWithdrawFu
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeWithdrawFunds,
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.Data.ProjectDid),
-			sdk.NewAttribute(types.AttributeKeyRecipientDid, msg.Data.RecipientDid),
+			sdk.NewAttribute(types.AttributeKeyRecipientDid, msg.Data.RecipientDid.String()),
 			sdk.NewAttribute(types.AttributeKeyAmount, msg.Data.Amount.String()),
 			sdk.NewAttribute(types.AttributeKeyIsRefund, strconv.FormatBool(msg.Data.IsRefund)),
 		),
@@ -587,7 +587,7 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 	}
 
 	// Editor of project doc has to be the same as project creator
-	if msg.SenderDid != projectDoc.SenderDid {
+	if msg.SenderDid.Did() != projectDoc.SenderDid.Did() {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
 			"only project creator can edit project doc")
 	}
@@ -607,7 +607,7 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 		sdk.NewEvent(
 			types.EventTypeUpdateProjectDoc,
 			sdk.NewAttribute(types.AttributeKeyTxHash, msg.TxHash),
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyProjectDid, msg.ProjectDid),
 		),
 		sdk.NewEvent(
@@ -620,7 +620,7 @@ func (s msgServer) UpdateProjectDoc(goCtx context.Context, msg *types.MsgUpdateP
 }
 
 func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid didexported.Did,
-	fromAccountId types.InternalAccountID, recipientDid didexported.Did, amount sdk.Coin) error {
+	fromAccountId types.InternalAccountID, recipientDid iidtypes.DIDFragment, amount sdk.Coin) error {
 
 	if amount.IsZero() {
 		return nil
@@ -637,11 +637,11 @@ func payoutAndRecon(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, projectDid 
 	}
 
 	// Get recipient address
-	recipientDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(recipientDid))
+	recipientDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(recipientDid.Did()))
 	if !exists {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	recipientAddr, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
+	recipientAddr, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDid.String())
 	if err != nil {
 		return sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -720,7 +720,7 @@ func checkAccountInProjectAccounts(ctx sdk.Context, k Keeper, projectDid didexpo
 }
 
 func addProjectWithdrawalTransaction(ctx sdk.Context, k Keeper,
-	projectDid didexported.Did, recipientDid didexported.Did, amount sdk.Coin) {
+	projectDid didexported.Did, recipientDid iidtypes.DIDFragment, amount sdk.Coin) {
 
 	withdrawalInfo := types.WithdrawalInfoDoc{
 		ProjectDid:   projectDid,

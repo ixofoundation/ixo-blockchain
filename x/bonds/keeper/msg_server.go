@@ -123,7 +123,7 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 	}
 
 	bond := types.NewBond(msg.Token, msg.Name, msg.Description, msg.CreatorDid,
-		msg.ControllerDid, msg.FunctionType, msg.FunctionParameters,
+		msg.ControllerDid, msg.OracleDid, msg.FunctionType, msg.FunctionParameters,
 		msg.ReserveTokens, msg.TxFeePercentage, msg.ExitFeePercentage,
 		feeAddr, reserveWithdrawalAddress, msg.MaxSupply, msg.OrderQuantityLimits,
 		msg.SanityRate, msg.SanityMarginPercentage, msg.AllowSells,
@@ -147,8 +147,8 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
 			sdk.NewAttribute(types.AttributeKeyFunctionType, msg.FunctionType),
 			sdk.NewAttribute(types.AttributeKeyFunctionParameters, msg.FunctionParameters.String()),
-			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
-			sdk.NewAttribute(types.AttributeKeyControllerDid, msg.ControllerDid),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid.String()),
+			sdk.NewAttribute(types.AttributeKeyControllerDid, msg.ControllerDid.String()),
 			sdk.NewAttribute(types.AttributeKeyReserveTokens, types.StringsToString(msg.ReserveTokens)),
 			sdk.NewAttribute(types.AttributeKeyTxFeePercentage, msg.TxFeePercentage.String()),
 			sdk.NewAttribute(types.AttributeKeyExitFeePercentage, msg.ExitFeePercentage.String()),
@@ -168,7 +168,7 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.CreatorDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.CreatorDid.String()),
 		),
 	})
 
@@ -246,7 +246,7 @@ func (k msgServer) EditBond(goCtx context.Context, msg *types.MsgEditBond) (*typ
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid.String()),
 		),
 	})
 
@@ -270,7 +270,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
 	case bond.State != types.OpenState.String():
 		return nil, types.ErrInvalidStateForAction
-	case bond.ControllerDid != msg.EditorDid:
+	case bond.OracleDid.Did() != msg.OracleDid.Did():
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "editor must be the controller of the bond")
 	}
 
@@ -350,7 +350,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 
 		logger := k.Logger(ctx)
 		logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
-			msg.BondDid, msg.EditorDid))
+			msg.BondDid, msg.OracleDid.String()))
 
 		ctx.EventManager().EmitEvents(sdk.Events{
 			sdk.NewEvent(
@@ -361,7 +361,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 			sdk.NewEvent(
 				sdk.EventTypeMessage,
 				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.OracleDid.String()),
 			),
 		})
 	} else if bond.FunctionType == types.BondingFunction {
@@ -394,7 +394,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 
 		logger := k.Logger(ctx)
 		logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
-			msg.BondDid, msg.EditorDid))
+			msg.BondDid, msg.OracleDid.String()))
 
 		ctx.EventManager().EmitEvents(sdk.Events{
 			sdk.NewEvent(
@@ -405,7 +405,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 			sdk.NewEvent(
 				sdk.EventTypeMessage,
 				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+				sdk.NewAttribute(sdk.AttributeKeySender, msg.OracleDid.String()),
 			),
 		})
 	}
@@ -454,7 +454,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid.String()),
 		),
 	})
 
@@ -463,11 +463,11 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 
 func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	buyerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid))
+	buyerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(buyerDid.Id)
+	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(msg.BuyerDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -530,7 +530,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.BuyerDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.BuyerDid.String()),
 		),
 	})
 
@@ -538,11 +538,11 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 }
 
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.MsgBuy) (*types.MsgBuyResponse, error) {
-	buyerDid, exists := keeper.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid))
+	buyerDid, exists := keeper.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(buyerDid.Id)
+	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(msg.BuyerDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -596,7 +596,7 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.BuyerDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.BuyerDid.String()),
 		),
 	})
 
@@ -606,11 +606,11 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSellResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	sellerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SellerDid))
+	sellerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SellerDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	sellerAddr, err := sellerDid.GetVerificationMethodBlockchainAddress(sellerDid.Id)
+	sellerAddr, err := sellerDid.GetVerificationMethodBlockchainAddress(msg.SellerDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -672,7 +672,7 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SellerDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.SellerDid.String()),
 		),
 	})
 
@@ -681,11 +681,11 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	swapperDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SwapperDid))
+	swapperDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SwapperDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	swapperAddr, err := swapperDid.GetVerificationMethodBlockchainAddress(swapperDid.Id)
+	swapperAddr, err := swapperDid.GetVerificationMethodBlockchainAddress(msg.SwapperDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -741,7 +741,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SwapperDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.SwapperDid.String()),
 		),
 	})
 
@@ -750,11 +750,11 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeOutcomePayment) (*types.MsgMakeOutcomePaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	senderDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	senderDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	senderAddr, err := senderDid.GetVerificationMethodBlockchainAddress(senderDid.Id)
+	senderAddr, err := senderDid.GetVerificationMethodBlockchainAddress(msg.SenderDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -786,7 +786,7 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SenderDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.SenderDid.String()),
 		),
 	})
 
@@ -795,11 +795,11 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 
 func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawShare) (*types.MsgWithdrawShareResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	recipientDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid))
+	recipientDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	recipientAddr, err := recipientDid.GetVerificationMethodBlockchainAddress(recipientDid.Id)
+	recipientAddr, err := recipientDid.GetVerificationMethodBlockchainAddress(msg.RecipientDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -860,7 +860,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.RecipientDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.RecipientDid.String()),
 		),
 	})
 
@@ -929,7 +929,7 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.WithdrawerDid),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.WithdrawerDid.String()),
 		),
 	})
 

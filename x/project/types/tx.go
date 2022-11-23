@@ -1,20 +1,14 @@
 package types
 
 import (
-	"encoding/hex"
 	"encoding/json"
-	"errors"
 
-	cryptoed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
-	libante "github.com/ixofoundation/ixo-blockchain/lib/ante"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/spf13/viper"
 )
@@ -47,7 +41,7 @@ var (
 	_ ixotypes.IxoMsg = &MsgUpdateProjectDoc{}
 )
 
-func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
+func NewMsgCreateProject(senderDid iidtypes.DIDFragment, projectData json.RawMessage,
 	projectDid didexported.Did, pubKey string, projectAddress string) *MsgCreateProject {
 	return &MsgCreateProject{
 		TxHash:         "",
@@ -59,55 +53,9 @@ func NewMsgCreateProject(senderDid didexported.Did, projectData json.RawMessage,
 	}
 }
 
-func (msg MsgCreateProject) FeePayerFromIid(ctx sdk.Context, accountKeeper authante.AccountKeeper, iidKeeper iidkeeper.Keeper) (libante.FeePayer, error) {
-
-	iidDoc, exists := iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
-	if !exists {
-		return libante.FeePayer{}, errors.New("iid doc does  not exists")
-	}
-
-	var verificationMethod *iidtypes.VerificationMethod
-
-	for _, vm := range iidDoc.VerificationMethod {
-		if vm.Id == msg.SenderDid {
-			verificationMethod = vm
-			break
-		}
-	}
-
-	if verificationMethod == nil {
-		return libante.FeePayer{}, errors.New("iid doc does  not exists")
-	}
-
-	projectAddr, err := sdk.AccAddressFromBech32(msg.PubKey)
-	if err != nil {
-		return libante.FeePayer{}, err
-	}
-
-	switch m := verificationMethod.GetVerificationMaterial().(type) {
-	case *iidtypes.VerificationMethod_PublicKeyHex:
-
-		pubKey, err := hex.DecodeString(m.PublicKeyHex)
-		if err != nil {
-			return libante.FeePayer{}, err
-		}
-
-		payerPubKey := cryptoed25519.PubKey{Key: pubKey}
-		return libante.NewFeePayer(accountKeeper.GetAccount(ctx, payerPubKey.Address().Bytes()), projectAddr), nil
-
-	case *iidtypes.VerificationMethod_BlockchainAccountID:
-		addr, err := sdk.AccAddressFromBech32(iidtypes.BlockchainAccountID(m.BlockchainAccountID).GetAddress())
-		if err != nil {
-			return libante.FeePayer{}, err
-		}
-		return libante.NewFeePayer(accountKeeper.GetAccount(ctx, addr), projectAddr), nil
-
-	default:
-		return libante.FeePayer{}, errors.New("iid doc does  not exists")
-	}
+func (msg MsgCreateProject) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
 }
-
-func (msg MsgCreateProject) GetIidController() string { return msg.ProjectDid }
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
 	accNum, accSeq := uint64(0), uint64(0)
@@ -178,7 +126,7 @@ func (msg MsgCreateProject) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid didexported.Did, projectAddress string) *MsgUpdateProjectStatus {
+func NewMsgUpdateProjectStatus(senderDid iidtypes.DIDFragment, updateProjectStatusDoc UpdateProjectStatusDoc, projectDid didexported.Did, projectAddress string) *MsgUpdateProjectStatus {
 	return &MsgUpdateProjectStatus{
 		TxHash:         "",
 		SenderDid:      senderDid,
@@ -187,7 +135,9 @@ func NewMsgUpdateProjectStatus(senderDid didexported.Did, updateProjectStatusDoc
 		ProjectAddress: projectAddress,
 	}
 }
-func (msg MsgUpdateProjectStatus) GetIidController() string { return msg.ProjectDid }
+func (msg MsgUpdateProjectStatus) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
+}
 
 func (msg MsgUpdateProjectStatus) Type() string  { return TypeMsgUpdateProjectStatus }
 func (msg MsgUpdateProjectStatus) Route() string { return RouterKey }
@@ -196,7 +146,7 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	}
 
@@ -205,7 +155,7 @@ func (msg MsgUpdateProjectStatus) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
@@ -227,7 +177,7 @@ func (msg MsgUpdateProjectStatus) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{address}
 }
 
-func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc CreateAgentDoc, projectDid didexported.Did, projectAddress string) *MsgCreateAgent {
+func NewMsgCreateAgent(txHash string, senderDid iidtypes.DIDFragment, createAgentDoc CreateAgentDoc, projectDid didexported.Did, projectAddress string) *MsgCreateAgent {
 	return &MsgCreateAgent{
 		ProjectDid:     projectDid,
 		TxHash:         txHash,
@@ -237,7 +187,9 @@ func NewMsgCreateAgent(txHash string, senderDid didexported.Did, createAgentDoc 
 	}
 }
 
-func (msg MsgCreateAgent) GetIidController() string { return msg.ProjectDid }
+func (msg MsgCreateAgent) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
+}
 
 func (msg MsgCreateAgent) Type() string  { return TypeMsgCreateAgent }
 func (msg MsgCreateAgent) Route() string { return RouterKey }
@@ -245,7 +197,7 @@ func (msg MsgCreateAgent) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	}
 
@@ -254,9 +206,9 @@ func (msg MsgCreateAgent) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
-	} else if !didtypes.IsValidDid(msg.Data.AgentDid) {
+	} else if !didtypes.IsValidDid(msg.Data.AgentDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "agent DID is invalid")
 	}
 
@@ -284,7 +236,7 @@ func (msg MsgCreateAgent) String() string {
 	return string(b)
 }
 
-func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc UpdateAgentDoc, projectDid didexported.Did, projectAddress string) *MsgUpdateAgent {
+func NewMsgUpdateAgent(txHash string, senderDid iidtypes.DIDFragment, updateAgentDoc UpdateAgentDoc, projectDid didexported.Did, projectAddress string) *MsgUpdateAgent {
 	return &MsgUpdateAgent{
 		ProjectDid:     projectDid,
 		TxHash:         txHash,
@@ -293,7 +245,9 @@ func NewMsgUpdateAgent(txHash string, senderDid didexported.Did, updateAgentDoc 
 		ProjectAddress: projectAddress,
 	}
 }
-func (msg MsgUpdateAgent) GetIidController() string { return msg.ProjectDid }
+func (msg MsgUpdateAgent) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
+}
 
 func (msg MsgUpdateAgent) Type() string  { return TypeMsgUpdateAgent }
 func (msg MsgUpdateAgent) Route() string { return RouterKey }
@@ -301,7 +255,7 @@ func (msg MsgUpdateAgent) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	}
 
@@ -310,7 +264,7 @@ func (msg MsgUpdateAgent) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	} else if !didtypes.IsValidDid(msg.Data.Did) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "agent DID is invalid")
@@ -341,7 +295,7 @@ func (msg MsgUpdateAgent) String() string {
 	return string(b)
 }
 
-func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc CreateClaimDoc, projectDid didexported.Did, projectAddress string) *MsgCreateClaim {
+func NewMsgCreateClaim(txHash string, senderDid iidtypes.DIDFragment, createClaimDoc CreateClaimDoc, projectDid didexported.Did, projectAddress string) *MsgCreateClaim {
 	return &MsgCreateClaim{
 		ProjectDid:     projectDid,
 		TxHash:         txHash,
@@ -351,7 +305,9 @@ func NewMsgCreateClaim(txHash string, senderDid didexported.Did, createClaimDoc 
 	}
 }
 
-func (msg MsgCreateClaim) GetIidController() string { return msg.ProjectDid }
+func (msg MsgCreateClaim) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
+}
 
 func (msg MsgCreateClaim) Type() string  { return TypeMsgCreateClaim }
 func (msg MsgCreateClaim) Route() string { return RouterKey }
@@ -360,7 +316,7 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.Data.ClaimId, "ClaimID"); !valid {
 		return err
@@ -373,7 +329,7 @@ func (msg MsgCreateClaim) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
@@ -402,7 +358,7 @@ func (msg MsgCreateClaim) String() string {
 	return string(b)
 }
 
-func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEvaluationDoc CreateEvaluationDoc, projectDid didexported.Did, projectAddress string) *MsgCreateEvaluation {
+func NewMsgCreateEvaluation(txHash string, senderDid iidtypes.DIDFragment, createEvaluationDoc CreateEvaluationDoc, projectDid didexported.Did, projectAddress string) *MsgCreateEvaluation {
 	return &MsgCreateEvaluation{
 		ProjectDid:     projectDid,
 		TxHash:         txHash,
@@ -412,7 +368,9 @@ func NewMsgCreateEvaluation(txHash string, senderDid didexported.Did, createEval
 	}
 }
 
-func (msg MsgCreateEvaluation) GetIidController() string { return msg.ProjectDid }
+func (msg MsgCreateEvaluation) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
+}
 
 func (msg MsgCreateEvaluation) Type() string  { return TypeMsgCreateEvaluation }
 func (msg MsgCreateEvaluation) Route() string { return RouterKey }
@@ -421,7 +379,7 @@ func (msg MsgCreateEvaluation) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	}
 
@@ -430,7 +388,7 @@ func (msg MsgCreateEvaluation) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
@@ -459,36 +417,36 @@ func (msg MsgCreateEvaluation) String() string {
 	return string(b)
 }
 
-func NewMsgWithdrawFunds(senderDid didexported.Did, data WithdrawFundsDoc, senderAddress string) *MsgWithdrawFunds {
+func NewMsgWithdrawFunds(senderDid iidtypes.DIDFragment, data WithdrawFundsDoc, senderAddress string) *MsgWithdrawFunds {
 	return &MsgWithdrawFunds{
 		SenderDid:     senderDid,
 		Data:          data,
 		SenderAddress: senderAddress,
 	}
 }
-func (msg MsgWithdrawFunds) GetIidController() string { return msg.SenderDid }
+func (msg MsgWithdrawFunds) GetIidController() iidtypes.DIDFragment { return msg.SenderDid }
 
 func (msg MsgWithdrawFunds) Type() string  { return TypeMsgWithdrawFunds }
 func (msg MsgWithdrawFunds) Route() string { return RouterKey }
 
 func (msg MsgWithdrawFunds) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	} else if valid, err := CheckNotEmpty(msg.Data.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.Data.RecipientDid, "RecipientDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.Data.RecipientDid.Did(), "RecipientDid"); !valid {
 		return err
 	}
 
 	// TODO: perform some checks on the Data (of type WithdrawFundsDoc)
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.SenderDid) {
+	if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	} else if !didtypes.IsValidDid(msg.Data.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.Data.RecipientDid) {
+	} else if !didtypes.IsValidDid(msg.Data.RecipientDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "recipient DID is invalid")
 	}
 
@@ -505,7 +463,7 @@ func (msg MsgWithdrawFunds) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgWithdrawFunds) GetSignerDid() didexported.Did { return msg.Data.RecipientDid }
+func (msg MsgWithdrawFunds) GetSignerDid() didexported.Did { return msg.Data.RecipientDid.Did() }
 func (msg MsgWithdrawFunds) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
 	if err != nil {
@@ -527,7 +485,7 @@ func (msg MsgWithdrawFunds) String() string {
 	return string(b)
 }
 
-func NewMsgUpdateProjectDoc(senderDid didexported.Did, projectData json.RawMessage, projectDid didexported.Did, projectAddress string) *MsgUpdateProjectDoc {
+func NewMsgUpdateProjectDoc(senderDid iidtypes.DIDFragment, projectData json.RawMessage, projectDid didexported.Did, projectAddress string) *MsgUpdateProjectDoc {
 	return &MsgUpdateProjectDoc{
 		TxHash:         "",
 		SenderDid:      senderDid,
@@ -537,7 +495,9 @@ func NewMsgUpdateProjectDoc(senderDid didexported.Did, projectData json.RawMessa
 	}
 }
 
-func (msg MsgUpdateProjectDoc) GetIidController() string { return msg.ProjectDid }
+func (msg MsgUpdateProjectDoc) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.ProjectDid)
+}
 
 func (msg MsgUpdateProjectDoc) Type() string  { return TypeMsgUpdateProjectDoc }
 func (msg MsgUpdateProjectDoc) Route() string { return RouterKey }
@@ -546,7 +506,7 @@ func (msg MsgUpdateProjectDoc) ValidateBasic() error {
 	// Check that not empty
 	if valid, err := CheckNotEmpty(msg.ProjectDid, "ProjectDid"); !valid {
 		return err
-	} else if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	} else if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	}
 
@@ -560,7 +520,7 @@ func (msg MsgUpdateProjectDoc) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.ProjectDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "project DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 

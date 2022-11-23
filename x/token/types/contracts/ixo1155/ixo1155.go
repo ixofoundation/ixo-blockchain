@@ -1,4 +1,4 @@
-package contracts
+package ixo1155
 
 import "time"
 
@@ -14,7 +14,7 @@ type Expiration struct {
 }
 
 // SendFrom / SendFrom is a base message to move tokens
-/// if `env.sender` is the owner or has sufficient pre-approval.
+// / if `env.sender` is the owner or has sufficient pre-approval.
 type SendFrom struct {
 	From string
 	/// If `to` is not contract `msg` should be `None`
@@ -26,7 +26,7 @@ type SendFrom struct {
 }
 
 // BatchSendFrom / BatchSendFrom is a base message to move multiple types of tokens in batch
-/// if `env.sender` is the owner or has sufficient pre-approval.
+// / if `env.sender` is the owner or has sufficient pre-approval.
 type BatchSendFrom struct {
 	From string
 	/// if `to` is not contract `msg` should be `None`
@@ -69,7 +69,7 @@ type BatchBurn struct {
 }
 
 // ApproveAll / Allows operator to transfer / send any token from the owner's account.
-/// If expiration is set then this allowance has a time/height limit
+// / If expiration is set then this allowance has a time/height limit
 type ApproveAll struct {
 	Operator string
 	Expires  Expiration
@@ -87,14 +87,14 @@ type Balance struct {
 }
 
 // BatchBalance BatchBalance / Returns the current balance of the given address for a batch of tokens 0 if unset.
-//#[returns(BatchBalanceResponse)]
+// #[returns(BatchBalanceResponse)]
 type BatchBalance struct {
 	Owner     string
 	Token_ids []TokenId
 }
 
 // ApprovedForAll / List all operators that can access all of the owner's tokens.
-//#[returns(ApprovedForAllResponse)]
+// #[returns(ApprovedForAllResponse)]
 type ApprovedForAll struct {
 	Owner string
 	/// unset or false will filter out expired approvals you must set to true to see them
@@ -104,20 +104,20 @@ type ApprovedForAll struct {
 }
 
 // IsApprovedForAll / Query approved status `owner` granted to `operator`.
-//#[returns(IsApprovedForAllResponse)]
+// #[returns(IsApprovedForAllResponse)]
 type IsApprovedForAll struct {
 	Owner    string
 	Operator string
 }
 
 // TokenInfo / With MetaData Extension.
-/// Query metadata of token
-//#[returns(TokenInfoResponse)]
+// / Query metadata of token
+// #[returns(TokenInfoResponse)]
 type TokenInfo struct{ Token_id TokenId }
 
 // Tokens / With Enumerable extension.
-/// Returns all tokens owned by the given address [] if unset.
-//#[returns(TokensResponse)]
+// / Returns all tokens owned by the given address [] if unset.
+// #[returns(TokensResponse)]
 type Tokens struct {
 	Owner       string
 	Start_after string
@@ -125,8 +125,8 @@ type Tokens struct {
 }
 
 // AllTokens / With Enumerable extension.
-/// Requires pagination. Lists all token_ids controlled by the contract.
-//#[returns(TokensResponse)]
+// / Requires pagination. Lists all token_ids controlled by the contract.
+// #[returns(TokensResponse)]
 type AllTokens struct {
 	Start_after string
 	Limit       uint32

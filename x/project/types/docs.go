@@ -5,9 +5,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
-func NewProjectDoc(txHash string, projectDid, senderDid didexported.Did,
+func NewProjectDoc(txHash string, projectDid string, senderDid iidtypes.DIDFragment,
 	pubKey string, status ProjectStatus, data json.RawMessage) ProjectDoc {
 	return ProjectDoc{
 		TxHash:     txHash,
@@ -45,7 +46,7 @@ func NewUpdateProjectStatusDoc(status ProjectStatus, ethFundingTxnID string) Upd
 
 func NewCreateAgentDoc(agentDid didexported.Did, role string) CreateAgentDoc {
 	return CreateAgentDoc{
-		AgentDid: agentDid,
+		AgentDid: iidtypes.DIDFragment(agentDid),
 		Role:     role,
 	}
 }
@@ -72,7 +73,7 @@ func NewCreateEvaluationDoc(claimId string, status ClaimStatus) CreateEvaluation
 	}
 }
 
-func NewWithdrawalInfoDoc(projectDid, recipientDid didexported.Did, amount sdk.Coin) WithdrawalInfoDoc {
+func NewWithdrawalInfoDoc(projectDid didexported.Did, recipientDid iidtypes.DIDFragment, amount sdk.Coin) WithdrawalInfoDoc {
 	return WithdrawalInfoDoc{
 		ProjectDid:   projectDid,
 		RecipientDid: recipientDid,
@@ -80,7 +81,7 @@ func NewWithdrawalInfoDoc(projectDid, recipientDid didexported.Did, amount sdk.C
 	}
 }
 
-func NewWithdrawFundsDoc(projectDid, recipientDid didexported.Did, amount sdk.Int, isRefund bool) WithdrawFundsDoc {
+func NewWithdrawFundsDoc(projectDid didexported.Did, recipientDid iidtypes.DIDFragment, amount sdk.Int, isRefund bool) WithdrawFundsDoc {
 	return WithdrawFundsDoc{
 		ProjectDid:   projectDid,
 		RecipientDid: recipientDid,

@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 // func didToAddressSplitter(did string) (sdk.AccAddress, error) {
@@ -13,7 +14,9 @@ import (
 // 	return address, nil
 // }
 
-func (msg MsgCreateToken) GetIidController() string { return msg.OwnerDid }
+func (msg MsgCreateToken) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.OwnerDid)
+}
 func (msg MsgCreateToken) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
@@ -33,7 +36,9 @@ func (msg MsgCreateToken) GetSignBytes() []byte {
 // func (msg MsgCreateToken) Type() string  { return TypeMsgCreateToken }
 func (msg MsgCreateToken) Route() string { return RouterKey }
 
-func (msg MsgTransferToken) GetIidController() string { return msg.OwnerDid }
+func (msg MsgTransferToken) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.OwnerDid)
+}
 func (msg MsgTransferToken) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {

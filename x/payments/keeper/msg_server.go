@@ -32,13 +32,13 @@ func (k msgServer) SetPaymentContractAuthorisation(goCtx context.Context, msg *t
 	}
 
 	// Get payer address
-	payerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.PayerDid))
+	payerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.PayerDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 
 	//TODO: Find this value
-	payerAddr, err := payerDidDoc.GetVerificationMethodBlockchainAddress(payerDidDoc.Id)
+	payerAddr, err := payerDidDoc.GetVerificationMethodBlockchainAddress(msg.PayerDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "signer must be payment contract payer")
 
@@ -63,7 +63,7 @@ func (k msgServer) SetPaymentContractAuthorisation(goCtx context.Context, msg *t
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypePaymentContractAuthorisation,
-			sdk.NewAttribute(types.AttributeKeyPayerDid, msg.PayerDid),
+			sdk.NewAttribute(types.AttributeKeyPayerDid, msg.PayerDid.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyAuthorised, strconv.FormatBool(msg.Authorised)),
 		),
@@ -102,7 +102,7 @@ func (k msgServer) CreatePaymentTemplate(goCtx context.Context, msg *types.MsgCr
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreatePaymentTemplate,
-			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid.String()),
 			sdk.NewAttribute(types.AttributeKeyAttributeKeyId, msg.PaymentTemplate.Id),
 			sdk.NewAttribute(types.AttributeKeyPaymentAmount, msg.PaymentTemplate.PaymentAmount.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentMinimum, msg.PaymentTemplate.PaymentMinimum.String()),
@@ -150,13 +150,13 @@ func (k msgServer) CreatePaymentContract(goCtx context.Context, msg *types.MsgCr
 	}
 
 	// Get creator address
-	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.CreatorDid))
+	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.CreatorDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 
 	//TODO: Find this value
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(msg.CreatorDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -188,7 +188,7 @@ func (k msgServer) CreatePaymentContract(goCtx context.Context, msg *types.MsgCr
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeCreatePaymentContract,
-			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentTemplateId, msg.PaymentTemplateId),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyPayer, msg.Payer),
@@ -227,11 +227,11 @@ func (k msgServer) CreateSubscription(goCtx context.Context, msg *types.MsgCreat
 	}
 
 	// Get creator address
-	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.CreatorDid))
+	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.CreatorDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(msg.CreatorDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Added not found in iid doc")
 	}
@@ -262,7 +262,7 @@ func (k msgServer) CreateSubscription(goCtx context.Context, msg *types.MsgCreat
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyMaxPeriods, msg.MaxPeriods.String()),
 			sdk.NewAttribute(types.AttributeKeyPeriod, msg.GetPeriod().GetPeriodUnit()),
-			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid),
+			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -283,11 +283,11 @@ func (k msgServer) GrantDiscount(goCtx context.Context, msg *types.MsgGrantDisco
 	}
 
 	// Get creator address
-	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(msg.SenderDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -320,7 +320,7 @@ func (k msgServer) GrantDiscount(goCtx context.Context, msg *types.MsgGrantDisco
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeGrantDiscount,
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyDiscountId, msg.DiscountId.String()),
 			sdk.NewAttribute(types.AttributeKeyRecipient, msg.Recipient),
@@ -344,11 +344,11 @@ func (k msgServer) RevokeDiscount(goCtx context.Context, msg *types.MsgRevokeDis
 	}
 
 	// Get creator address
-	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(msg.SenderDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
 	}
@@ -372,7 +372,7 @@ func (k msgServer) RevokeDiscount(goCtx context.Context, msg *types.MsgRevokeDis
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeRevokeDiscount,
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 			sdk.NewAttribute(types.AttributeKeyHolder, msg.Holder),
 		),
@@ -396,11 +396,11 @@ func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPaym
 	}
 
 	// Get creator address
-	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+	creatorDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 	if !exists {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
-	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(creatorDidDoc.Id)
+	creatorAddr, err := creatorDidDoc.GetVerificationMethodBlockchainAddress(msg.SenderDid.String())
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownAddress, "address not found in iid")
 	}
@@ -427,7 +427,7 @@ func (k msgServer) EffectPayment(goCtx context.Context, msg *types.MsgEffectPaym
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventTypeEffectPayment,
-			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid),
+			sdk.NewAttribute(types.AttributeKeySenderDid, msg.SenderDid.String()),
 			sdk.NewAttribute(types.AttributeKeyPaymentContractId, msg.PaymentContractId),
 		),
 		sdk.NewEvent(
