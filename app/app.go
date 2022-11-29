@@ -497,10 +497,10 @@ func NewIxoApp(
 	app.TokenKeeper = tokenkeeper.NewKeeper(
 		appCodec,
 		keys[tokentypes.StoreKey],
-		keys[tokentypes.MemStoreKey],
 		app.IidKeeper,
 		app.WasmKeeper,
 		app.AccountKeeper,
+		app.AuthzKeeper,
 		app.GetSubspace(tokentypes.ModuleName),
 	)
 

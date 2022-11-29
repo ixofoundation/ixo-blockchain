@@ -19,7 +19,7 @@ const (
 func NewTokenParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
-		case *types.InitializeTokenContract:
+		case *types.SetTokenContractCodes:
 			return handleTokenParameterChangeProposal(ctx, k, c)
 
 		default:
@@ -28,7 +28,7 @@ func NewTokenParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeTokenContract) error {
+func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.SetTokenContractCodes) error {
 	fmt.Printf("token propsal handeler =============\n%+v\n", *p)
 	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
 	var xx types.Params

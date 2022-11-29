@@ -37,11 +37,8 @@ yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,100000
 yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "ixo19h3lqj50uhzdrv8mkafnp55nqmz4ghc2sd3m48" 1000000000000uixo,1000000000000res,1000000000000rez
-<<<<<<< HEAD
 yes $PASSWORD | ixod add-genesis-account "ixo1ry6cr975sttlzxptakxs2tsygh2z56vgle88jc" 1000000000000uixo,1000000000000res,1000000000000rez
 yes $PASSWORD | ixod add-genesis-account "ixo1ky7wad4d7gjtcy5yklc83geev76cudcevmnhhn" 1000000000000uixo,1000000000000res,1000000000000rez
-=======
->>>>>>> upstream/devel/ben-alpha
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"

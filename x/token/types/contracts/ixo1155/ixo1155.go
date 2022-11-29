@@ -1,6 +1,25 @@
 package ixo1155
 
-import "time"
+import (
+	"bytes"
+	"encoding/json"
+	"time"
+)
+
+type InstantiateMsg struct {
+	/// The minter is the only one who can create new tokens.
+	/// This is designed for a base token platform that is controlled by an external program or
+	/// contract.
+	Minter string `json:"minter"`
+}
+
+func (m InstantiateMsg) Marshal() ([]byte, error) {
+	jsonBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+		return nil, err
+	}
+	return jsonBuffer.Bytes(), nil
+}
 
 type TokenId string
 type Batch struct {
@@ -39,11 +58,19 @@ type BatchSendFrom struct {
 // Mint / Mint is a base message to mint tokens.
 type Mint struct {
 	/// If `to` is not contract `msg` should be `None`
-	To       string
-	Token_id TokenId
-	Value    uint64
+	To      string  `json:"to"`
+	TokenId TokenId `json:"token_id"`
+	Value   uint64  `json:"value"`
 	/// `None` means don't call the receiver interface
 	Msg []byte
+}
+
+func (m Mint) Marshal() ([]byte, error) {
+	jsonBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+		return nil, err
+	}
+	return jsonBuffer.Bytes(), nil
 }
 
 // BatchMint / BatchMint is a base message to mint multiple types of tokens in batch.

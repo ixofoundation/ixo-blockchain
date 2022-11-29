@@ -36,7 +36,7 @@ func NewTxCmd() *cobra.Command {
 func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-token-params [nft_contract_code] [nft_minter_address] [flags]",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		Short: "Submit a proposal to update token params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -44,12 +44,22 @@ func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 				return err
 			}
 
-			codeId, err := strconv.ParseUint(args[0], 0, 64)
+			cw20CodeId, err := strconv.ParseUint(args[0], 0, 64)
 			if err != nil {
 				return err
 			}
 
-			content := types.NewInitializeNftContract(codeId, args[1])
+			cw721CodeId, err := strconv.ParseUint(args[1], 0, 64)
+			if err != nil {
+				return err
+			}
+
+			ixo1155CodeId, err := strconv.ParseUint(args[2], 0, 64)
+			if err != nil {
+				return err
+			}
+
+			content := types.NewSetTokenContract(cw20CodeId, cw721CodeId, ixo1155CodeId)
 
 			from := clientCtx.GetFromAddress()
 
@@ -85,7 +95,7 @@ func NewCmdCreateToken() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			var msg types.MsgCreateToken
+			var msg types.MsgMint
 			err := json.Unmarshal([]byte(args[0]), &msg)
 			// fmt.Println("hiiiiii")
 			if err != nil {
@@ -105,7 +115,7 @@ func NewCmdCreateToken() *cobra.Command {
 				return err
 			}
 
-			msg.OwnerAddress = clientCtx.GetFromAddress().String()
+			msg.MinterAddress = clientCtx.GetFromAddress().String()
 
 			fmt.Printf("%+v\n", msg)
 

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package ixo.token.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/iid/v1beta1/iid.proto";
+import "ixo/iid/v1beta1/tx.proto";
+import "ixo/token/v1beta1/token.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/cosmos.proto";
+
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+
+
+message MintAuthorization {
+  option (cosmos_proto.implements_interface) = "Authorization";
+
+  string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
+  repeated MintConstraints constraints = 2 [(gogoproto.jsontag) = "cw20_limits", (gogoproto.moretags) = "yaml:\"cw20_limits\""];
+}

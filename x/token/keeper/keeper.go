@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"errors"
 	"fmt"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -9,23 +8,25 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
 )
 
 type Keeper struct {
 	cdc           codec.BinaryCodec
 	storeKey      sdk.StoreKey
-	memStoreKey   sdk.StoreKey
 	IidKeeper     iidkeeper.Keeper
 	WasmKeeper    wasmtypes.ContractOpsKeeper
 	AccountKeeper authkeeper.AccountKeeper
+	AuthzKeeper   authzkeeper.Keeper
 	ParamSpace    paramstypes.Subspace
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
-	accountKeeper authkeeper.AccountKeeper, paramSpace paramstypes.Subspace) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
+	accountKeeper authkeeper.AccountKeeper, authzKeeper authzkeeper.Keeper, paramSpace paramstypes.Subspace) Keeper {
 
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
@@ -34,206 +35,54 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      key,
-		memStoreKey:   memStoreKey,
 		IidKeeper:     iidKeeper,
 		WasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 		AccountKeeper: accountKeeper,
+		AuthzKeeper:   authzKeeper,
 		ParamSpace:    paramSpace,
 	}
 }
 
-func (k Keeper) UpdateTokenConfig(ctx sdk.Context, key string, value string) error {
-	ctx.KVStore(k.storeKey).Set(nil, nil)
+func (k Keeper) SetMinter(ctx sdk.Context, value types.TokenMinter) error {
+	minterBytes, err := value.Marshal()
+	if err != nil {
+		return err
+	}
+
+	key := fmt.Sprintf("%s#%s", value.MinterDid.Did(), value.ContractAddress)
+	ctx.KVStore(k.storeKey).Set([]byte(key), minterBytes)
 	return nil
 }
 
-func (k Keeper) CreateToken(ctx sdk.Context, msg *types.MsgCreateToken) (types.MsgCreateTokenResponse, error) {
-	params := k.GetParams(ctx)
-	nftContractAddressParam := params.NftContractAddress
-
-	fmt.Println("==============\nnftContractAddressParam", nftContractAddressParam)
-	if len(nftContractAddressParam) == 0 {
-		return types.MsgCreateTokenResponse{}, errors.New("nftContractAddress not set")
+func (k Keeper) GetMinterContract(ctx sdk.Context, minterDid iidtypes.DIDFragment, contractAddress string) (types.TokenMinter, error) {
+	key := fmt.Sprintf("%s#%s", minterDid.Did(), contractAddress)
+	raw := ctx.KVStore(k.storeKey).Get([]byte(key))
+	var minterContract types.TokenMinter
+	err := k.cdc.Unmarshal(raw, &minterContract)
+	if err != nil {
+		return types.TokenMinter{}, err
 	}
-	return types.MsgCreateTokenResponse{}, errors.New("nftContractAddress not set")
-	// nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
-	// if err != nil {
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
 
-	// privKey := cryptosecp256k1.GenPrivKey()
-	// pubKey := privKey.PubKey()
-	// address, err := sdk.AccAddressFromBech32(params.NftContractMinter)
-	// if err != nil {
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
-
-	// account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
-	// tokenId := fmt.Sprintf("did:ixo:token:%s:%s", msg.TokenType, base58.Encode(pubKey.Bytes()[:16]))
-
-	// verification := iidtypes.NewVerification(
-	// 	iidtypes.NewVerificationMethod(
-	// 		tokenId,
-	// 		iidtypes.DID(tokenId),
-	// 		iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
-	// 	),
-	// 	[]string{iidtypes.Authentication},
-	// 	nil,
-	// )
-
-	// defaultVerification := iidtypes.NewVerification(
-	// 	iidtypes.NewVerificationMethod(
-	// 		iidtypes.DID(tokenId).NewVerificationMethodID(account.GetAddress().String()),
-	// 		iidtypes.DID(tokenId),
-	// 		iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
-	// 	),
-	// 	[]string{iidtypes.Authentication},
-	// 	nil,
-	// )
-
-	// did, err := iidtypes.NewDidDocument(tokenId,
-	// 	iidtypes.WithServices(msg.Service...),
-	// 	iidtypes.WithRights(msg.AccordedRight...),
-	// 	iidtypes.WithResources(msg.LinkedResource...),
-	// 	iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
-	// 	iidtypes.WithControllers(append(msg.Controller, tokenId, msg.OwnerDid)...),
-	// )
-	// if err != nil {
-	// 	// k.Logger(ctx).Error(err.Error())
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
-
-	// // check that the did is not already taken
-	// _, found := k.IidKeeper.GetDidDocument(ctx, []byte(tokenId))
-	// if found {
-	// 	err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", tokenId)
-	// 	// k.Logger(ctx).Error(err.Error())
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
-
-	// // persist the did document
-
-	// currentTimeUtc := time.Now().UTC()
-	// // now create and persist the metadata
-	// did.Context = msg.Context
-
-	// didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
-	// didM.TokenType = msg.TokenType
-	// didM.Deactivated = msg.Deactivated
-	// didM.Created = &currentTimeUtc
-	// didM.Updated = &currentTimeUtc
-	// didM.VersionId = fmt.Sprintf("%s:%d", tokenId, 0)
-	// didM.Stage = msg.Stage
-	// didM.Credentials = msg.VerifiableCredential
-	// didM.VerifiableCredential = msg.VerificationStatus
-	// didM.StartDate = msg.StartDate
-	// didM.EndDate = msg.EndDate
-	// didM.RelayerNode = msg.RelayerNode
-
-	// k.IidKeeper.SetDidDocument(ctx, []byte(tokenId), did)
-	// k.IidKeeper.SetDidMetadata(ctx, []byte(tokenId), didM)
-
-	// //nftAddresBytes, err := k.GetTokenConfig(ctx, types.ConfigNftContractAddress)
-
-	// nftMint := tokencontracts.WasmMsgMint{
-	// 	Mint: tokencontracts.Mint{
-	// 		TokenId:   did.Id,
-	// 		Owner:     msg.OwnerAddress,
-	// 		TokenUri:  did.Id,
-	// 		Extension: msg.Data,
-	// 	},
-	// }
-
-	// finalMessage, err := nftMint.Marshal()
-
-	// if err != nil {
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
-
-	// _, err = k.WasmKeeper.Execute(ctx, nftContractAddress, address, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
-	// if err != nil {
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
-
-	// // emit the event
-	// if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(tokenId, msg.OwnerDid)); err != nil {
-	// 	// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
-	// 	return types.MsgCreateTokenResponse{}, err
-	// }
-
-	// resp := types.MsgCreateTokenResponse{
-	// 	TokenId:     tokenId,
-	// 	TokenType:   didM.TokenType,
-	// 	TokenStatus: didM.Status,
-	// }
-	// return resp, err
+	return minterContract, nil
 }
 
-func (k Keeper) TransferToken(ctx sdk.Context, msg *types.MsgTransferToken) (*types.MsgTransferTokenResponse, error) {
-	params := k.GetParams(ctx)
-	nftContractAddressParam := params.NftContractAddress
+func (k Keeper) GetMinterContracts(ctx sdk.Context, minterDid string) []types.TokenMinter {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(minterDid))
 
-	if len(nftContractAddressParam) == 0 {
-		return nil, errors.New("nftContractAddress not set")
+	minterContracts := []types.TokenMinter{}
+	for ; iterator.Valid(); iterator.Next() {
+		var minterContract types.TokenMinter
+		k.cdc.MustUnmarshal(iterator.Value(), &minterContract)
+		minterContracts = append(minterContracts, minterContract)
 	}
 
-	// controllerAddress, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	return minterContracts
+}
 
-	// recipientDidDoc, found := k.IidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid))
-	// if !found {
-	// 	return nil, errors.New("recipient did not found")
-	// }
+// func (k Keeper) Mint()
 
-	// recipientAddress, err := recipientDidDoc.GetVerificationMethodBlockchainAddress(recipientDidDoc.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// err = iidkeeper.ExecuteOnDidWithRelationships(
-	// 	ctx,
-	// 	&k.IidKeeper,
-	// 	[]string{iidtypes.Authentication},
-	// 	msg.TokenDid,
-	// 	msg.OwnerDid,
-	// 	func(document *iidtypes.IidDocument) error {
-	// 		document.Controller = []string{
-	// 			document.Id,
-	// 			msg.RecipientDid,
-	// 		}
-	// 		return nil
-	// 	},
-	// )
-
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// nftTranferMsg := tokencontracts.WasmMsgTransferNft{
-	// 	TransferNft: tokencontracts.WasmMsgTransferNft{
-	// 		TokenId:   msg.TokenDid,
-	// 		Recipient: recipientAddress.String(),
-	// 	},
-	// }
-
-	// finalMessage, err := nftTranferMsg.Marshal()
-
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// _, err = k.WasmKeeper.Execute(ctx, nftContractAddress, controllerAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
+func (k Keeper) TransferToken(ctx sdk.Context, msg *types.MsgTransferToken) (*types.MsgTransferTokenResponse, error) {
 	return &types.MsgTransferTokenResponse{}, nil
 }
 

@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+
+	"github.com/btcsuite/btcutil/base58"
 )
 
 // VerificationMaterialType encode the verification material type
@@ -227,3 +229,39 @@ func NewPublicKeyHexFromString(pubKeyHex string, vmType VerificationMaterialType
 //	}
 //	return
 //}
+
+type PublicKeyBase58 struct {
+	data   []byte
+	vmType VerificationMaterialType
+}
+
+// EncodeToString returns the string representation of the key in hex format. F is the hex format prefix
+// https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03#appendix-B.1
+func (pkb58 PublicKeyBase58) EncodeToString() string {
+	return base58.Encode(pkb58.data)
+}
+
+// Type the verification material type
+// https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03#appendix-B.1
+func (pkh PublicKeyBase58) Type() VerificationMaterialType {
+	return pkh.vmType
+}
+
+// NewPublicKeyMultibase build a new blockchain account ID struct
+func NewPublicKeyBase58(pubKey []byte, vmType VerificationMaterialType) PublicKeyBase58 {
+	return PublicKeyBase58{
+		data:   pubKey,
+		vmType: vmType,
+	}
+}
+
+// NewPublicKeyMultibaseFromHex build a new blockchain account ID struct
+func NewPublicKeyBase58FromString(pubKeyString string, vmType VerificationMaterialType) (pkm PublicKeyBase58, err error) {
+	pkb := base58.Decode(pubKeyString)
+	// TODO: shall we check if it is conform to the verification material? probably
+	pkm = PublicKeyBase58{
+		data:   pkb,
+		vmType: vmType,
+	}
+	return
+}

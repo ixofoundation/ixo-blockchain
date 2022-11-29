@@ -2,29 +2,38 @@ package types
 
 import (
 	fmt "fmt"
+	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var (
-	KeyNftContractAddress = []byte("NftContractAddress")
-	KeyNftContractMinter  = []byte("NftContractMinter")
+	KeyCw20ContractCode    = []byte("Cw20ContractCode")
+	KeyCw721ContractCode   = []byte("Cw721ContractCode")
+	KeyIxo1155ContractCode = []byte("Ixo1155ContractCode")
 )
 
-func validateNftContractAddress(i interface{}) error {
-	addr, ok := i.(string)
+func parseCode(stringCode string) (uint64, error) {
+	code, err := strconv.ParseUint(stringCode, 0, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return code, nil
+}
+
+func validateContractCode(i interface{}) error {
+	codeString, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T expected string", i)
 	}
-
-	if len(addr) == 0 {
-		return fmt.Errorf("nft contract adderess can not be empty cannot be empty")
-	}
-
-	_, err := sdk.AccAddressFromBech32(addr)
+	code, err := parseCode(codeString)
 	if err != nil {
 		return err
+	}
+
+	if code < 0 {
+		return fmt.Errorf("invalid contract code")
 	}
 
 	return nil
@@ -37,23 +46,52 @@ func ParamKeyTable() paramstypes.KeyTable {
 
 func NewParams(nftContractAddress string, nftContractMinter string) Params {
 	return Params{
-		NftContractAddress: nftContractAddress,
-		NftContractMinter:  nftContractAddress,
+		Cw20ContractCode:    "0",
+		Cw721ContractCode:   "0",
+		Ixo1155ContractCode: "0",
 	}
 }
 
-// default project module parameters
+// func (p Params) MustCw20ContractCode() (uint64, error) {
+
+// }
+
+// // default project module parameters
 func DefaultParams() Params {
 	return Params{
-		NftContractAddress: "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
-		NftContractMinter:  "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
+		Cw20ContractCode:    "0",
+		Cw721ContractCode:   "0",
+		Ixo1155ContractCode: "0",
 	}
 }
 
-// Implements params.ParamSet
+func (p *Params) GetCw20ContractCode() uint64 {
+	code, err := parseCode(p.Cw20ContractCode)
+	if err != nil {
+		panic(err)
+	}
+	return code
+}
+func (p *Params) GetCw721ContractCode() uint64 {
+	code, err := parseCode(p.Cw721ContractCode)
+	if err != nil {
+		panic(err)
+	}
+	return code
+}
+func (p *Params) GetIxo1155ContractCode() uint64 {
+	code, err := parseCode(p.Ixo1155ContractCode)
+	if err != nil {
+		panic(err)
+	}
+	return code
+}
+
+// // Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
-		{KeyNftContractAddress, &p.NftContractAddress, validateNftContractAddress},
-		{KeyNftContractMinter, &p.NftContractMinter, validateNftContractAddress},
+		{KeyCw20ContractCode, &p.Cw20ContractCode, validateContractCode},
+		{KeyCw721ContractCode, &p.Cw721ContractCode, validateContractCode},
+		{KeyIxo1155ContractCode, &p.Ixo1155ContractCode, validateContractCode},
 	}
 }
