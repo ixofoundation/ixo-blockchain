@@ -6,7 +6,7 @@ import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/tx.proto";
 import "ixo/token/v1beta1/token.proto";
 import "google/protobuf/timestamp.proto";
-import "cosmos/cosmos.proto";
+import "cosmos_proto/cosmos.proto";
 
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
