@@ -1319,10 +1319,6 @@
                 </li>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.MintConstraints"><span class="badge">M</span>MintConstraints</a>
-                </li>
-              
-                <li>
                   <a href="#ixo.token.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
@@ -1342,7 +1338,23 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.token.v1beta1.Cw1155Constraints"><span class="badge">M</span>Cw1155Constraints</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Cw20Constraints"><span class="badge">M</span>Cw20Constraints</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Cw721Constraints"><span class="badge">M</span>Cw721Constraints</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.token.v1beta1.MintAuthorization"><span class="badge">M</span>MintAuthorization</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MintConstraints"><span class="badge">M</span>MintConstraints</a>
                 </li>
               
               
@@ -9594,37 +9606,6 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixo.token.v1beta1.MintConstraints">MintConstraints</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>limit</td>
-                  <td><a href="#int64">int64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
         <h3 id="ixo.token.v1beta1.Params">Params</h3>
         <p></p>
 
@@ -9729,6 +9710,61 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       <p></p>
 
       
+        <h3 id="ixo.token.v1beta1.Cw1155Constraints">Cw1155Constraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.Cw20Constraints">Cw20Constraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>maxAmmount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.Cw721Constraints">Cw721Constraints</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="ixo.token.v1beta1.MintAuthorization">MintAuthorization</h3>
         <p></p>
 
@@ -9750,6 +9786,58 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td>constraints</td>
                   <td><a href="#ixo.token.v1beta1.MintConstraints">MintConstraints</a></td>
                   <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MintConstraints">MintConstraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contractAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>limit</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20Constraints</td>
+                  <td><a href="#ixo.token.v1beta1.Cw20Constraints">Cw20Constraints</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw721Constraints</td>
+                  <td><a href="#ixo.token.v1beta1.Cw721Constraints">Cw721Constraints</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155Constraints</td>
+                  <td><a href="#ixo.token.v1beta1.Cw1155Constraints">Cw1155Constraints</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               

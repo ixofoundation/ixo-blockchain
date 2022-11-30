@@ -5,12 +5,6 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
-message MintConstraints {
-  string id = 1 [(gogoproto.jsontag) = "id", (gogoproto.moretags) = "yaml:\"id\""];
-  int64 limit = 2 [(gogoproto.jsontag) = "limit", (gogoproto.moretags) = "yaml:\"limit\""];
-
-}
-
 message Contract {
   string id = 1 [(gogoproto.jsontag) = "id", (gogoproto.moretags) = "yaml:\"id\""]; 
   string address = 2 [(gogoproto.jsontag) = "address", (gogoproto.moretags) = "yaml:\"address\""];

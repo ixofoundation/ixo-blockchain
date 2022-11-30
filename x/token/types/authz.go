@@ -39,17 +39,29 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrapf("authorized minter (%s) did not match the minter in the msg %s", a.MinterDid.Did(), mMint.MinterDid.Did())
 	}
 
-	switch mMint.MintContract.(type) {
-	case *MsgMint_Cw20:
-		// a.MintLimit.Cw20 = a.MintLimit.Cw20 - 1
-	case *MsgMint_Cw721:
-		// a.MintLimit.Cw721 = a.MintLimit.Cw721 - 1
-	case *MsgMint_Cw1155:
-		// a.MintLimit.Ixo1155 = a.MintLimit.Ixo1155 - 1
-	default:
-		// err := sdkerrors.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("invalid contract provided")
+	updatedConstraints := []*MintConstraints{}
+	var matched bool
+
+	for _, constraints := range a.Constraints {
+		if constraints.ContractAddress != mMint.ContractAddress {
+			updatedConstraints = append(updatedConstraints, constraints)
+		}
+
+		// state that a match was found becuase if this is full the result will deny, as this must match at least on contract.
+		matched = true
+
+		if constraints.Limit == 0 {
+			return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("contract mint limit reached")
+		}
+
+		constraints.Limit = constraints.Limit - 1
+		updatedConstraints = append(updatedConstraints, constraints)
 	}
+
+	if !matched {
+		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("no contract matched the constraints specified in the grant.")
+	}
+	a.Constraints = updatedConstraints
 
 	// if a.MintLimit.Cw20 == 0 && a.MintLimit.Cw721 == 0 && a.MintLimit.Ixo1155 == 0 {
 	// 	return authz.AcceptResponse{Accept: true, Delete: true}, nil
@@ -61,14 +73,11 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 // ValidateBasic implements Authorization.ValidateBasic.
 func (a MintAuthorization) ValidateBasic() error {
 
-	// if a.MintLimit.Cw20 >= 0 {
-	// 	return sdkerrors.ErrInvalidCoins.Wrap("spend limit cannot be nil")
-	// }
-	// if a.MintLimit.Cw721 >= 0 {
-	// 	return sdkerrors.ErrInvalidCoins.Wrap("spend limit cannot be nil")
-	// }
-	// if a.MintLimit.Ixo1155 >= 0 {
-	// 	return sdkerrors.ErrInvalidCoins.Wrap("spend limit cannot be nil")
-	// }
+	for _, constraints := range a.Constraints {
+		if constraints.Limit <= 0 {
+			return sdkerrors.ErrInvalidCoins.Wrap("spend limit cannot be nil")
+		}
+	}
+
 	return nil
 }
