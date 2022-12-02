@@ -89,6 +89,10 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
 
+	if err != nil {
+		return &types.MsgSetupMinterResponse{}, err
+	}
+
 	tokenMinter := types.TokenMinter{
 		MinterDid:       msg.MinterDid,
 		MinterAddress:   minterAddress.String(),
@@ -99,7 +103,7 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 	s.Keeper.SetMinter(ctx, tokenMinter)
 
 	if err := ctx.EventManager().EmitTypedEvent(&tokenMinter); err != nil {
-		s.iidKeeper().Logger(ctx).Error("failed to emit DidDocumentUpdatedEvent", err)
+		s.iidKeeper().Logger(ctx).Error("failed to emit TokerMinterEvent", err)
 	}
 
 	return &types.MsgSetupMinterResponse{}, nil
