@@ -57,6 +57,7 @@ message MsgTransferTokenResponse{}
 message SetupCw20 {
   string symbol = 1 [(gogoproto.jsontag) = "symbol", (gogoproto.moretags) = "yaml:\"symbol\""];
   uint32 decimals = 2 [(gogoproto.jsontag) = "decimals", (gogoproto.moretags) = "yaml:\"decimals\""];
+  uint64 cap = 3 [(gogoproto.jsontag) = "cap", (gogoproto.moretags) = "yaml:\"cap\""];
 }
 
 message SetupCw721 {

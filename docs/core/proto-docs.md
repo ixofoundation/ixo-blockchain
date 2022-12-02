@@ -10032,7 +10032,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>token_did</td>
+                  <td>minter_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contract_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -10063,14 +10070,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>token_type</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>token_status</td>
+                  <td>minter_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -10087,6 +10087,23 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
         <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contracts</td>
+                  <td><a href="#ixo.token.v1beta1.TokenMinter">TokenMinter</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
 
         
       
@@ -10148,7 +10165,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               <tr>
                 <td>TokenList</td>
                 <td>GET</td>
-                <td>/ixo/token</td>
+                <td>/ixo/token/{minter_did}</td>
                 <td></td>
               </tr>
               
@@ -10158,7 +10175,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               <tr>
                 <td>TokenDoc</td>
                 <td>GET</td>
-                <td>/ixo/token/{token_did}</td>
+                <td>/ixo/token/{minter_did}/{contract_address}</td>
                 <td></td>
               </tr>
               
@@ -10531,6 +10548,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 <tr>
                   <td>decimals</td>
                   <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cap</td>
+                  <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>

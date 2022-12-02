@@ -66,15 +66,15 @@ func (k Keeper) GetMinterContract(ctx sdk.Context, minterDid iidtypes.DIDFragmen
 	return minterContract, nil
 }
 
-func (k Keeper) GetMinterContracts(ctx sdk.Context, minterDid string) []types.TokenMinter {
+func (k Keeper) GetMinterContracts(ctx sdk.Context, minterDid string) []*types.TokenMinter {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, []byte(minterDid))
 
-	minterContracts := []types.TokenMinter{}
+	minterContracts := []*types.TokenMinter{}
 	for ; iterator.Valid(); iterator.Next() {
 		var minterContract types.TokenMinter
 		k.cdc.MustUnmarshal(iterator.Value(), &minterContract)
-		minterContracts = append(minterContracts, minterContract)
+		minterContracts = append(minterContracts, &minterContract)
 	}
 
 	return minterContracts

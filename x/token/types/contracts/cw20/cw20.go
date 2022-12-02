@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 )
 
+type MinterResponse struct {
+	Minter string `json:"minter"`
+	Cap    *uint  `json:"cap,omitempty"`
+}
+
 type InstantiateMarketingInfo struct {
 	Project     string `json:"project"`
 	Description string `json:"description"`
@@ -13,12 +18,12 @@ type InstantiateMarketingInfo struct {
 }
 
 type InstantiateMsg struct {
-	Name     string `json:"name"`
-	Symbol   string `json:"symbol"`
-	Decimals uint32 `json:"decimals"`
+	Name      string                   `json:"name"`
+	Symbol    string                   `json:"symbol"`
+	Decimals  uint32                   `json:"decimals"`
+	Mint      MinterResponse           `json:"mint"`
+	Marketing InstantiateMarketingInfo `json:"marketing,omitempty"`
 	// InitialBalances []Cw20Coin
-	// Mint            MinterResponse
-	Marketing InstantiateMarketingInfo
 }
 
 func (m InstantiateMsg) Marshal() ([]byte, error) {

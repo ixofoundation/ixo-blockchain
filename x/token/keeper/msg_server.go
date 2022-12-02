@@ -48,10 +48,16 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 
 	switch contractInfo := msg.ContractInfo.(type) {
 	case *types.MsgSetupMinter_Cw20:
+
+		cap := uint(contractInfo.Cw20.Cap)
 		encodedInitiateMessage, err = cw20.InstantiateMsg{
 			Name:     msg.Name,
 			Symbol:   contractInfo.Cw20.Symbol,
 			Decimals: contractInfo.Cw20.Decimals,
+			Mint: cw20.MinterResponse{
+				Minter: msg.MinterAddress,
+				Cap:    &cap,
+			},
 		}.Marshal()
 	case *types.MsgSetupMinter_Cw721:
 		encodedInitiateMessage, err = cw721.InitiateNftContract{
@@ -83,13 +89,18 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
 
-	s.Keeper.SetMinter(ctx, types.TokenMinter{
+	tokenMinter := types.TokenMinter{
 		MinterDid:       msg.MinterDid,
 		MinterAddress:   minterAddress.String(),
 		ContractAddress: contractAddr.String(),
 		Name:            msg.Name,
 		Description:     msg.Description,
-	})
+	}
+	s.Keeper.SetMinter(ctx, tokenMinter)
+
+	if err := ctx.EventManager().EmitTypedEvent(&tokenMinter); err != nil {
+		s.iidKeeper().Logger(ctx).Error("failed to emit DidDocumentUpdatedEvent", err)
+	}
 
 	return &types.MsgSetupMinterResponse{}, nil
 }
