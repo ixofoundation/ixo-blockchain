@@ -2,6 +2,7 @@ package token
 
 import (
 	"fmt"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -77,10 +78,11 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	// 	return err
 	// }
 
-	// xx.NftContractAddress = contractAddr.String()
-	// xx.NftContractMinter = initiateNftContractMsg.Minter
+	xx.Cw20ContractCode = strconv.FormatUint(p.Cw20ContractCode, 10)
+	xx.Cw721ContractCode = strconv.FormatUint(p.Cw721ContractCode, 10)
+	xx.Ixo1155ContractCode = strconv.FormatUint(p.Ixo1155ContractCode, 10)
 
-	// k.ParamSpace.SetParamSet(ctx, &xx)
+	k.ParamSpace.SetParamSet(ctx, &xx)
 
 	// for _, c := range p.Changes {
 	// 	ss, ok := k.GetParams()

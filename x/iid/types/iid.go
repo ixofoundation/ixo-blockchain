@@ -669,7 +669,7 @@ func (didDoc IidDocument) HasRelationship(
 				continue
 			}
 		case *VerificationMethod_PublicKeyBase58:
-			addr, err := toAddress(k.PublicKeyBase58)
+			addr, err := toAddressFromBase58(k.PublicKeyBase58)
 			if err != nil || !signer.MatchAddress(addr) {
 				continue
 			}
@@ -704,7 +704,7 @@ func (didDoc IidDocument) HasPublicKey(pubkey cryptotypes.PubKey) bool {
 				return true
 			}
 		case *VerificationMethod_PublicKeyBase58:
-			if key.PublicKeyBase58 == hex.EncodeToString(pubkey.Bytes()) {
+			if key.PublicKeyBase58 == base58.Encode(pubkey.Bytes()) {
 				return true
 			}
 		}

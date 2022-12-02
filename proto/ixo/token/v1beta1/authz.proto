@@ -13,22 +13,22 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 
 message Cw20Constraints {
-  uint64 maxAmmount = 1 [(gogoproto.jsontag) = "max_ammount", (gogoproto.moretags) = "yaml:\"max_ammount\""];;;
+  uint64 maxAmmount = 1 [(gogoproto.jsontag) = "max_ammount", (gogoproto.moretags) = "yaml:\"max_ammount\""];
 }
 
 message Cw721Constraints {}
 
 message Cw1155Constraints {
-  uint64 value = 1 [(gogoproto.jsontag) = "value", (gogoproto.moretags) = "yaml:\"value\""];;;
+  uint64 value = 1 [(gogoproto.jsontag) = "value", (gogoproto.moretags) = "yaml:\"value\""];
 }
  
 message MintConstraints {
-  string contractAddress = 1 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];;
+  string contractAddress = 1 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];
   int64 limit = 2 [(gogoproto.jsontag) = "limit", (gogoproto.moretags) = "yaml:\"limit\""];
   oneof contract_constraints {
-    Cw20Constraints cw20Constraints = 3 [(gogoproto.jsontag) = "cw20_constraints", (gogoproto.moretags) = "yaml:\"cw20_constraints\""];;
-    Cw721Constraints cw721Constraints = 4 [(gogoproto.jsontag) = "cw721_constraints", (gogoproto.moretags) = "yaml:\"cw721_constraints\""];;
-    Cw1155Constraints cw1155Constraints = 5 [(gogoproto.jsontag) = "cw1155_constraints", (gogoproto.moretags) = "yaml:\"cw1155_constraints\""];;
+    Cw20Constraints cw20Constraints = 3 [(gogoproto.jsontag) = "cw20_constraints", (gogoproto.moretags) = "yaml:\"cw20_constraints\""];
+    Cw721Constraints cw721Constraints = 4 [(gogoproto.jsontag) = "cw721_constraints", (gogoproto.moretags) = "yaml:\"cw721_constraints\""];
+    Cw1155Constraints cw1155Constraints = 5 [(gogoproto.jsontag) = "cw1155_constraints", (gogoproto.moretags) = "yaml:\"cw1155_constraints\""];
   }
 }
 
