@@ -44,11 +44,16 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		return &types.MsgSetupMinterResponse{}, err
 	}
 
+	var codeId uint64
+	var label string
+	var contractType types.ContractType
 	var encodedInitiateMessage []byte
 
 	switch contractInfo := msg.ContractInfo.(type) {
 	case *types.MsgSetupMinter_Cw20:
-
+		codeId = params.GetCw20ContractCode()
+		label = fmt.Sprintf("%s-cw20-contract", msg.MinterDid.String())
+		contractType = types.ContractType_CW20
 		cap := uint(contractInfo.Cw20.Cap)
 		encodedInitiateMessage, err = cw20.InstantiateMsg{
 			Name:     msg.Name,
@@ -60,6 +65,9 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 			},
 		}.Marshal()
 	case *types.MsgSetupMinter_Cw721:
+		codeId = params.GetCw721ContractCode()
+		label = fmt.Sprintf("%s-cw721-contract", msg.MinterDid.String())
+		contractType = types.ContractType_CW721
 		encodedInitiateMessage, err = cw721.InitiateNftContract{
 			Name:   msg.Name,
 			Symbol: contractInfo.Cw721.Symbol,
@@ -67,6 +75,9 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		}.Marshal()
 
 	case *types.MsgSetupMinter_Cw1155:
+		codeId = params.GetIxo1155ContractCode()
+		label = fmt.Sprintf("%s-cw1155-contract", msg.MinterDid.String())
+		contractType = types.ContractType_IXO1155
 		encodedInitiateMessage, err = ixo1155.InstantiateMsg{
 			Minter: minterAddress.String(),
 		}.Marshal()
@@ -81,11 +92,11 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 
 	contractAddr, _, err := s.wasmKeeper().Instantiate(
 		ctx,
-		params.GetCw20ContractCode(),
+		codeId,
 		minterAddress,
 		minterAddress,
 		encodedInitiateMessage,
-		fmt.Sprintf("%s-cw20-contract", msg.MinterDid.String()),
+		label,
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
 
@@ -97,6 +108,7 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		MinterDid:       msg.MinterDid,
 		MinterAddress:   minterAddress.String(),
 		ContractAddress: contractAddr.String(),
+		ContractType:    contractType,
 		Name:            msg.Name,
 		Description:     msg.Description,
 	}
@@ -141,12 +153,18 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMint) (*types.
 
 	switch mintInfo := msg.MintContract.(type) {
 	case *types.MsgMint_Cw20:
+		if tokenMinter.ContractType != types.ContractType_CW20 {
+			return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw20 contract type")
+		}
 		encodedMintMessage, err = cw20.Mint{
 			Recipient: ownerAddress.String(),
 			Amount:    uint(mintInfo.Cw20.Amount),
 		}.Marshal()
 
 	case *types.MsgMint_Cw721:
+		if tokenMinter.ContractType != types.ContractType_CW721 {
+			return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw721 contract type")
+		}
 
 		uri := func() string {
 			switch uri := mintInfo.Cw721.TokenUri.(type) {
@@ -168,6 +186,9 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMint) (*types.
 		}.Marshal()
 
 	case *types.MsgMint_Cw1155:
+		if tokenMinter.ContractType != types.ContractType_IXO1155 {
+			return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw1155 contract type")
+		}
 		encodedMintMessage, err = ixo1155.Mint{
 			To:      ownerAddress.String(),
 			TokenId: ixo1155.TokenId(msg.OwnerDid.Did()),

@@ -62,7 +62,7 @@ type Mint struct {
 	TokenId TokenId `json:"token_id"`
 	Value   uint64  `json:"value"`
 	/// `None` means don't call the receiver interface
-	Msg []byte
+	Msg []byte `json:"msg,omitempty"`
 }
 
 func (m Mint) Marshal() ([]byte, error) {

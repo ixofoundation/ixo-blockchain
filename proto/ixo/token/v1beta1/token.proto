@@ -25,12 +25,19 @@ message Params {
 //   Contract ixo1155Contract = 4 [(gogoproto.jsontag) = "ixo1155_contract", (gogoproto.moretags) = "yaml:\"ixo1155_contract\""];
 // }
 
+enum ContractType {
+  CW20 = 0;
+  CW721 = 1;
+  IXO1155 = 2;
+}
+
 message TokenMinter {
   option (gogoproto.goproto_getters)  = false;
   
   string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
   string minterAddress = 2 [(gogoproto.jsontag) = "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""];
   string contractAddress = 3 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];
-  string name = 4 [(gogoproto.jsontag) = "name", (gogoproto.moretags) = "yaml:\"name\""];
-  string description = 5 [(gogoproto.jsontag) = "description", (gogoproto.moretags) = "yaml:\"description\""];
+  ContractType contractType = 4 [(gogoproto.jsontag) = "contract_type", (gogoproto.moretags) = "yaml:\"contract_type\""];
+  string name = 5 [(gogoproto.jsontag) = "name", (gogoproto.moretags) = "yaml:\"name\""];
+  string description = 6 [(gogoproto.jsontag) = "description", (gogoproto.moretags) = "yaml:\"description\""];
 }

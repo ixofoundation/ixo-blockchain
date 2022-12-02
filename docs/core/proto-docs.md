@@ -1327,6 +1327,10 @@
                 </li>
               
               
+                <li>
+                  <a href="#ixo.token.v1beta1.ContractType"><span class="badge">E</span>ContractType</a>
+                </li>
+              
               
               
             </ul>
@@ -9676,6 +9680,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                 </tr>
               
                 <tr>
+                  <td>contractType</td>
+                  <td><a href="#ixo.token.v1beta1.ContractType">ContractType</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
@@ -9697,6 +9708,35 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
         
       
 
+      
+        <h3 id="ixo.token.v1beta1.ContractType">ContractType</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CW20</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CW721</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IXO1155</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
       
 
       
