@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -31,35 +29,14 @@ func NewEntityParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 }
 
 func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeNftContract) error {
-	fmt.Printf("propsal handeler =============\n%+v\n", *p)
-	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
 	var xx types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
-	fmt.Printf("%+v\n", xx)
-
-	// if err := msg.ValidateBasic(); err != nil {
-	// 	return nil, err
-	// }
-	// ctx := sdk.UnwrapSDKContext(goCtx)
-
 	adminAddr := authtypes.NewModuleAddress(types.NftModuleAddress())
 
 	senderAddr, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
 	if err != nil {
 		return err
 	}
-	// var adminAddr sdk.AccAddress
-	// if msg.Admin != "" {
-	// 	if adminAddr, err = sdk.AccAddressFromBech32(msg.Admin); err != nil {
-	// 		return nil, sdkerrors.Wrap(err, "admin")
-	// 	}
-	// }
-
-	// ctx.EventManager().EmitEvent(sdk.NewEvent(
-	// 	sdk.EventTypeMessage,
-	// 	sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
-	// 	sdk.NewAttribute(sdk.AttributeKeySender, p.),
-	// ))
 
 	initiateNftContractMsg := entitycontracts.InitiateNftContract{
 		Name:   EntityNftContractName,
@@ -87,23 +64,6 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 
 	var yy types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &yy)
-	fmt.Println("address after sent ======", contractAddr)
-	fmt.Println(yy)
-
-	// for _, c := range p.Changes {
-	// 	ss, ok := k.GetParams()
-	// 	if !ok {
-	// 		return sdkerrors.Wrap(proposal.ErrUnknownSubspace, c.Subspace)
-	// 	}
-
-	// 	// k.Logger(ctx).Info(
-	// 	// 	fmt.Sprintf("attempt to set new parameter value; key: %s, value: %s", c.Key, c.Value),
-	// 	// )
-
-	// 	if err := ss.Update(ctx, []byte(c.Key), []byte(c.Value)); err != nil {
-	// 		return sdkerrors.Wrapf(proposal.ErrSettingParameter, "key: %s, value: %s, err: %s", c.Key, c.Value, err.Error())
-	// 	}
-	// }
 
 	return nil
 }

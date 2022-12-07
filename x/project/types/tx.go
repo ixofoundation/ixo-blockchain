@@ -53,13 +53,9 @@ func NewMsgCreateProject(senderDid iidtypes.DIDFragment, projectData json.RawMes
 	}
 }
 
-<<<<<<< HEAD
-func (msg MsgCreateProject) GetIidController() string { return msg.ProjectDid }
-=======
 func (msg MsgCreateProject) GetIidController() iidtypes.DIDFragment {
 	return iidtypes.DIDFragment(msg.ProjectDid)
 }
->>>>>>> devel/entity-module-precleanup
 
 func (msg MsgCreateProject) ToStdSignMsg(fee int64) legacytx.StdSignMsg {
 	accNum, accSeq := uint64(0), uint64(0)

@@ -58,7 +58,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	params := k.GetParams(ctx)
 	nftContractAddressParam := params.NftContractAddress
 
-	fmt.Println("==============\nnftContractAddressParam", nftContractAddressParam)
 	if len(nftContractAddressParam) == 0 {
 		return types.MsgCreateEntityResponse{}, errors.New("nftContractAddress not set")
 	}

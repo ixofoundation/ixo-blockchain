@@ -25,20 +25,16 @@ func (df DIDFragment) String() string { return string(df) }
 
 func (df DIDFragment) Did() string {
 	didFragmentParts := strings.Split(df.String(), "#")
-	fmt.Println("validate DID ==================", didFragmentParts)
 	if len(didFragmentParts) == 0 {
-		fmt.Println("validate DID error 1 ==================", len(didFragmentParts))
 		return ""
 	}
 
 	for index, part := range didFragmentParts {
 		if index == 0 {
-			fmt.Println("validate DID ==================", part)
 			return part
 		}
 	}
 
-	fmt.Println("validate DID error 2 ==================")
 	return ""
 }
 

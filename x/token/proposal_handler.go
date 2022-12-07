@@ -1,7 +1,6 @@
 package token
 
 import (
-	"fmt"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -32,7 +31,6 @@ func NewTokenParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.SetTokenContractCodes) error {
 	var xx types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
-	fmt.Printf("%+v\n", xx)
 
 	xx.Cw20ContractCode = strconv.FormatUint(p.Cw20ContractCode, 10)
 	xx.Cw721ContractCode = strconv.FormatUint(p.Cw721ContractCode, 10)
