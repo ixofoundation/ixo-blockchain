@@ -37,8 +37,8 @@ var (
 // 	return append(GetClaimsKey(projectDid), []byte(claimId)...)
 // }
 
-type TokenConfigKey string
+// type TokenConfigKey string
 
-const (
-	ConfigNftContractAddress TokenConfigKey = "nft_address"
-)
+// const (
+// 	ConfigNftContractAddress TokenConfigKey = "nft_address"
+// )

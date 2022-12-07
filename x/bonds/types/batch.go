@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 func (b Batch) MoreBuysThanSells() bool { return b.TotalSellAmount.IsLT(b.TotalBuyAmount) }
@@ -21,7 +22,7 @@ func NewBatch(bondDid didexported.Did, token string, blocks sdk.Uint) Batch {
 	}
 }
 
-func NewBaseOrder(accountDid didexported.Did, amount sdk.Coin) BaseOrder {
+func NewBaseOrder(accountDid iidtypes.DIDFragment, amount sdk.Coin) BaseOrder {
 	return BaseOrder{
 		AccountDid:   accountDid,
 		Amount:       amount,
@@ -34,20 +35,20 @@ func (bo BaseOrder) IsCancelled() bool {
 	return bo.Cancelled == true
 }
 
-func NewBuyOrder(buyerDid didexported.Did, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {
+func NewBuyOrder(buyerDid iidtypes.DIDFragment, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {
 	return BuyOrder{
 		BaseOrder: NewBaseOrder(buyerDid, amount),
 		MaxPrices: maxPrices,
 	}
 }
 
-func NewSellOrder(sellerDid didexported.Did, amount sdk.Coin) SellOrder {
+func NewSellOrder(sellerDid iidtypes.DIDFragment, amount sdk.Coin) SellOrder {
 	return SellOrder{
 		BaseOrder: NewBaseOrder(sellerDid, amount),
 	}
 }
 
-func NewSwapOrder(swapperDid didexported.Did, from sdk.Coin, toToken string) SwapOrder {
+func NewSwapOrder(swapperDid iidtypes.DIDFragment, from sdk.Coin, toToken string) SwapOrder {
 	return SwapOrder{
 		BaseOrder: NewBaseOrder(swapperDid, from),
 		ToToken:   toToken,

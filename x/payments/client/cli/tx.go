@@ -12,6 +12,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/spf13/cobra"
 )
@@ -102,7 +103,7 @@ func NewCmdCreatePaymentTemplate() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreatePaymentTemplate(template, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgCreatePaymentTemplate(template, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.CreatorAddress = ixoDid.Address().String()
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
@@ -162,7 +163,7 @@ func NewCmdCreatePaymentContract() *cobra.Command {
 
 			msg := types.NewMsgCreatePaymentContract(templateIdStr,
 				contractIdStr, payerAddr, recipients, canDeauthorise,
-				discountId, ixoDid.Did, ixoDid.Address().String())
+				discountId, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.CreatorAddress = ixoDid.Address().String()
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
@@ -220,7 +221,7 @@ func NewCmdCreateSubscription() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateSubscription(subIdStr,
-				contractIdStr, maxPeriods, period, ixoDid.Did, ixoDid.Address().String())
+				contractIdStr, maxPeriods, period, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.CreatorAddress = ixoDid.Address().String()
 
 			err = msg.ValidateBasic()
@@ -264,7 +265,7 @@ func NewCmdSetPaymentContractAuthorisation() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgSetPaymentContractAuthorisation(
-				contractIdStr, authorised, ixoDid.Did, ixoDid.Address().String())
+				contractIdStr, authorised, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.PayerAddress = ixoDid.Address().String()
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
@@ -309,7 +310,7 @@ func NewCmdGrantPaymentDiscount() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgGrantDiscount(
-				contractIdStr, discountId, recipientAddr, ixoDid.Did, ixoDid.Address().String())
+				contractIdStr, discountId, recipientAddr, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -351,7 +352,7 @@ func NewCmdRevokePaymentDiscount() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgRevokeDiscount(
-				contractIdStr, holderAddr, ixoDid.Did, ixoDid.Address().String())
+				contractIdStr, holderAddr, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -386,7 +387,7 @@ func NewCmdEffectPayment() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgEffectPayment(contractIdStr, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgEffectPayment(contractIdStr, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {

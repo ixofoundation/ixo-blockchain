@@ -1315,11 +1315,50 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.token.v1beta1.Contract"><span class="badge">M</span>Contract</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.token.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.TokenDoc"><span class="badge">M</span>TokenDoc</a>
+                  <a href="#ixo.token.v1beta1.TokenMinter"><span class="badge">M</span>TokenMinter</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.ContractType"><span class="badge">E</span>ContractType</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2fauthz.proto">ixo/token/v1beta1/authz.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Cw1155Constraints"><span class="badge">M</span>Cw1155Constraints</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Cw20Constraints"><span class="badge">M</span>Cw20Constraints</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.Cw721Constraints"><span class="badge">M</span>Cw721Constraints</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MintAuthorization"><span class="badge">M</span>MintAuthorization</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MintConstraints"><span class="badge">M</span>MintConstraints</a>
                 </li>
               
               
@@ -1349,7 +1388,7 @@
             <ul>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.InitializeTokenContract"><span class="badge">M</span>InitializeTokenContract</a>
+                  <a href="#ixo.token.v1beta1.SetTokenContractCodes"><span class="badge">M</span>SetTokenContractCodes</a>
                 </li>
               
               
@@ -1407,11 +1446,39 @@
             <ul>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.MsgCreateToken"><span class="badge">M</span>MsgCreateToken</a>
+                  <a href="#ixo.token.v1beta1.Cw20Coin"><span class="badge">M</span>Cw20Coin</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MintCw1155"><span class="badge">M</span>MintCw1155</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MintCw20"><span class="badge">M</span>MintCw20</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MintCw721"><span class="badge">M</span>MintCw721</a>
                 </li>
               
                 <li>
                   <a href="#ixo.token.v1beta1.MsgCreateTokenResponse"><span class="badge">M</span>MsgCreateTokenResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgMint"><span class="badge">M</span>MsgMint</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgMintResponse"><span class="badge">M</span>MsgMintResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgSetupMinter"><span class="badge">M</span>MsgSetupMinter</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.MsgSetupMinterResponse"><span class="badge">M</span>MsgSetupMinterResponse</a>
                 </li>
               
                 <li>
@@ -1420,6 +1487,18 @@
               
                 <li>
                   <a href="#ixo.token.v1beta1.MsgTransferTokenResponse"><span class="badge">M</span>MsgTransferTokenResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.SetupCw1155"><span class="badge">M</span>SetupCw1155</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.SetupCw20"><span class="badge">M</span>SetupCw20</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.SetupCw721"><span class="badge">M</span>SetupCw721</a>
                 </li>
               
               
@@ -1770,6 +1849,13 @@
               
                 <tr>
                   <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>oracle_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -3175,6 +3261,13 @@
                 </tr>
               
                 <tr>
+                  <td>oracle_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
                   <td>reserve_tokens</td>
                   <td><a href="#string">string</a></td>
                   <td>repeated</td>
@@ -3502,14 +3595,21 @@
                 </tr>
               
                 <tr>
-                  <td>editor_did</td>
+                  <td>delta</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>editor_address</td>
+                  <td>oracle_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>oracle_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -4713,6 +4813,13 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
               
                 <tr>
                   <td>publicKeyMultibase</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyBase58</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -9476,7 +9583,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       <p></p>
 
       
-        <h3 id="ixo.token.v1beta1.Params">Params</h3>
+        <h3 id="ixo.token.v1beta1.Contract">Contract</h3>
         <p></p>
 
         
@@ -9487,14 +9594,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>NftContractAddress</td>
+                  <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>NftContractMinter</td>
+                  <td>address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -9507,10 +9614,281 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
 
         
       
-        <h3 id="ixo.token.v1beta1.TokenDoc">TokenDoc</h3>
-        <p>ProjectDoc defines a project (or token) type with all of its parameters.</p>
+        <h3 id="ixo.token.v1beta1.Params">Params</h3>
+        <p></p>
 
         
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>cw20ContractCode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw721ContractCode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ixo1155ContractCode</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.TokenMinter">TokenMinter</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>minterDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>minterAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contractAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contractType</td>
+                  <td><a href="#ixo.token.v1beta1.ContractType">ContractType</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+        <h3 id="ixo.token.v1beta1.ContractType">ContractType</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CW20</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CW721</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IXO1155</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/authz.proto">ixo/token/v1beta1/authz.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.Cw1155Constraints">Cw1155Constraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.Cw20Constraints">Cw20Constraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>maxAmmount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.Cw721Constraints">Cw721Constraints</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MintAuthorization">MintAuthorization</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>minterDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>constraints</td>
+                  <td><a href="#ixo.token.v1beta1.MintConstraints">MintConstraints</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MintConstraints">MintConstraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contractAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>limit</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20Constraints</td>
+                  <td><a href="#ixo.token.v1beta1.Cw20Constraints">Cw20Constraints</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw721Constraints</td>
+                  <td><a href="#ixo.token.v1beta1.Cw721Constraints">Cw721Constraints</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155Constraints</td>
+                  <td><a href="#ixo.token.v1beta1.Cw1155Constraints">Cw1155Constraints</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
 
         
       
@@ -9539,14 +9917,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>token_docs</td>
-                  <td><a href="#ixo.token.v1beta1.TokenDoc">TokenDoc</a></td>
+                  <td>tokenMinters</td>
+                  <td><a href="#ixo.token.v1beta1.TokenMinter">TokenMinter</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>params</td>
+                  <td>Params</td>
                   <td><a href="#ixo.token.v1beta1.Params">Params</a></td>
                   <td></td>
                   <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td>
@@ -9573,7 +9951,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       <p></p>
 
       
-        <h3 id="ixo.token.v1beta1.InitializeTokenContract">InitializeTokenContract</h3>
+        <h3 id="ixo.token.v1beta1.SetTokenContractCodes">SetTokenContractCodes</h3>
         <p></p>
 
         
@@ -9584,15 +9962,22 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>NftContractCodeId</td>
+                  <td>cw20ContractCode</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>NftMinterAddress</td>
-                  <td><a href="#string">string</a></td>
+                  <td>cw721ContractCode</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ixo1155ContractCode</td>
+                  <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -9691,7 +10076,14 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>token_did</td>
+                  <td>minter_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contract_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -9722,14 +10114,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>token_type</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>token_status</td>
+                  <td>minter_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -9746,6 +10131,23 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
         <p>QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.</p>
 
         
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contracts</td>
+                  <td><a href="#ixo.token.v1beta1.TokenMinter">TokenMinter</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
 
         
       
@@ -9807,7 +10209,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               <tr>
                 <td>TokenList</td>
                 <td>GET</td>
-                <td>/ixo/token</td>
+                <td>/ixo/token/{minter_did}</td>
                 <td></td>
               </tr>
               
@@ -9817,7 +10219,7 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
               <tr>
                 <td>TokenDoc</td>
                 <td>GET</td>
-                <td>/ixo/token/{token_did}</td>
+                <td>/ixo/token/{minter_did}/{contract_address}</td>
                 <td></td>
               </tr>
               
@@ -9844,8 +10246,8 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       <p></p>
 
       
-        <h3 id="ixo.token.v1beta1.MsgCreateToken">MsgCreateToken</h3>
-        <p>MsgCreateToken defines a message for creating a project.</p>
+        <h3 id="ixo.token.v1beta1.Cw20Coin">Cw20Coin</h3>
+        <p></p>
 
         
           <table class="field-table">
@@ -9855,19 +10257,131 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
             <tbody>
               
                 <tr>
-                  <td>ownerDid</td>
+                  <td>address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>An Token Type as defined by the implementer
-
-Owner of the Token NFT | The ownersdid used to sign this transaction. </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>ownerAddress</td>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MintCw1155">MintCw1155</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>The ownersdid address used to sign this transaction. </p></td>
+                  <td><p>An IID that identifies the asset that this token represents </p></td>
+                </tr>
+              
+                <tr>
+                  <td>image</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>A URI pointing to a resource with media type image/* representing the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>uri</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Uri </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MintCw20">MintCw20</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MintCw721">MintCw721</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>An IID that identifies the asset that this token represents </p></td>
+                </tr>
+              
+                <tr>
+                  <td>image</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>A URI pointing to a resource with media type image/* representing the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>uri</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Uri </p></td>
+                </tr>
+              
+                <tr>
+                  <td>properties</td>
+                  <td><a href="#bytes">bytes</a></td>
+                  <td></td>
+                  <td><p>&#34;Arbitrary properties. Values may be strings, numbers, object or arrays.&#34;]; </p></td>
                 </tr>
               
             </tbody>
@@ -9879,6 +10393,152 @@ Owner of the Token NFT | The ownersdid used to sign this transaction. </p></td>
       
         <h3 id="ixo.token.v1beta1.MsgCreateTokenResponse">MsgCreateTokenResponse</h3>
         <p>MsgCreateProjectResponse defines the Msg/CreateProject response type.</p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgMint">MsgMint</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>minterDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>minterAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contractAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ownerDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20</td>
+                  <td><a href="#ixo.token.v1beta1.MintCw20">MintCw20</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw721</td>
+                  <td><a href="#ixo.token.v1beta1.MintCw721">MintCw721</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155</td>
+                  <td><a href="#ixo.token.v1beta1.MintCw1155">MintCw1155</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgMintResponse">MsgMintResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgSetupMinter">MsgSetupMinter</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>minterDid</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>minterAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20</td>
+                  <td><a href="#ixo.token.v1beta1.SetupCw20">SetupCw20</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw721</td>
+                  <td><a href="#ixo.token.v1beta1.SetupCw721">SetupCw721</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155</td>
+                  <td><a href="#ixo.token.v1beta1.SetupCw1155">SetupCw1155</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.MsgSetupMinterResponse">MsgSetupMinterResponse</h3>
+        <p></p>
 
         
 
@@ -9936,6 +10596,82 @@ Owner of the Token NFT | The ownersdid used to sign this transaction. </p></td>
 
         
       
+        <h3 id="ixo.token.v1beta1.SetupCw1155">SetupCw1155</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.SetupCw20">SetupCw20</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>symbol</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>decimals</td>
+                  <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cap</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>instialBalances</td>
+                  <td><a href="#ixo.token.v1beta1.Cw20Coin">Cw20Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.SetupCw721">SetupCw721</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>symbol</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
 
       
 
@@ -9951,10 +10687,17 @@ Owner of the Token NFT | The ownersdid used to sign this transaction. </p></td>
           <tbody>
             
               <tr>
-                <td>CreateToken</td>
-                <td><a href="#ixo.token.v1beta1.MsgCreateToken">MsgCreateToken</a></td>
-                <td><a href="#ixo.token.v1beta1.MsgCreateTokenResponse">MsgCreateTokenResponse</a></td>
+                <td>SetupMinter</td>
+                <td><a href="#ixo.token.v1beta1.MsgSetupMinter">MsgSetupMinter</a></td>
+                <td><a href="#ixo.token.v1beta1.MsgSetupMinterResponse">MsgSetupMinterResponse</a></td>
                 <td><p>CreateProject defines a method for creating a project.</p></td>
+              </tr>
+            
+              <tr>
+                <td>MintToken</td>
+                <td><a href="#ixo.token.v1beta1.MsgMint">MsgMint</a></td>
+                <td><a href="#ixo.token.v1beta1.MsgMintResponse">MsgMintResponse</a></td>
+                <td><p></p></td>
               </tr>
             
               <tr>

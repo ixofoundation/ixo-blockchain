@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,7 +31,9 @@ func (k Keeper) TokenList(c context.Context, req *types.QueryTokenListRequest) (
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	// ctx := sdk.UnwrapSDKContext(c)
+	ctx := sdk.UnwrapSDKContext(c)
+
+	contracts := k.GetMinterContracts(ctx, req.MinterDid)
 
 	// wasmkeeper.Querier(&k.WasmKeeper).SmartContractState()
 	// k.WasmKeeper.Execute()
@@ -40,7 +43,7 @@ func (k Keeper) TokenList(c context.Context, req *types.QueryTokenListRequest) (
 	// 	return nil, err
 	// }
 
-	return &types.QueryTokenListResponse{}, nil
+	return &types.QueryTokenListResponse{Contracts: contracts}, nil
 }
 
 func (k Keeper) TokenConfig(c context.Context, req *types.QueryTokenConfigRequest) (*types.QueryTokenConfigResponse, error) {

@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 // func didToAddressSplitter(did string) (sdk.AccAddress, error) {
@@ -13,7 +14,7 @@ import (
 // 	return address, nil
 // }
 
-func (msg MsgCreateEntity) GetIidController() string { return msg.OwnerDid }
+func (msg MsgCreateEntity) GetIidController() iidtypes.DIDFragment { return msg.OwnerDid }
 func (msg MsgCreateEntity) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
@@ -33,7 +34,7 @@ func (msg MsgCreateEntity) GetSignBytes() []byte {
 // func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
 func (msg MsgCreateEntity) Route() string { return RouterKey }
 
-func (msg MsgUpdateEntity) GetIidController() string { return msg.ControllerDid }
+func (msg MsgUpdateEntity) GetIidController() iidtypes.DIDFragment { return msg.ControllerDid }
 func (msg MsgUpdateEntity) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
 	if err != nil {
@@ -55,7 +56,7 @@ func (msg MsgUpdateEntity) Route() string { return RouterKey }
 
 // func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
 
-func (msg MsgTransferEntity) GetIidController() string { return msg.OwnerDid }
+func (msg MsgTransferEntity) GetIidController() iidtypes.DIDFragment { return msg.OwnerDid }
 func (msg MsgTransferEntity) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {

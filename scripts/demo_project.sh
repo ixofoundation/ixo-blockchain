@@ -104,7 +104,6 @@ FEE_FOR_SERVICE_PAYMENT_TEMPLATE='{
 MIGUEL_DID="did:ixo:4XJLBfGtWSGKSz4BeRxdun"
 FRANCESCO_DID="did:ixo:UKzkhVSHc3qEFva5EY2XHt"
 SHAUN_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
-
 FRANCESCO_DID_FULL='{
   "did":"did:ixo:UKzkhVSHc3qEFva5EY2XHt",
   "verifyKey":"Ftsqjc2pEvGLqBtgvVx69VXLe1dj2mFzoi4kqQNGo3Ej",

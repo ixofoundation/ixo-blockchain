@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -57,7 +58,7 @@ func NewCmdCreateProject() *cobra.Command {
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
 			msg := types.NewMsgCreateProject(
-				senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey, ixoDid.Address().String())
+				iidtypes.DIDFragment(senderDid), json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -110,7 +111,7 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgUpdateProjectStatus(iidtypes.DIDFragment(senderDid), updateProjectStatusDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -153,7 +154,7 @@ func NewCmdCreateAgent() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgCreateAgent(txHash, iidtypes.DIDFragment(senderDid), createAgentDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -198,7 +199,7 @@ func NewCmdUpdateAgent() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgUpdateAgent(txHash, iidtypes.DIDFragment(senderDid), updateAgentDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -236,7 +237,7 @@ func NewCmdCreateClaim() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgCreateClaim(txHash, iidtypes.DIDFragment(senderDid), createClaimDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -280,7 +281,7 @@ func NewCmdCreateEvaluation() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgCreateEvaluation(txHash, iidtypes.DIDFragment(senderDid), createEvaluationDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -318,7 +319,7 @@ func NewCmdWithdrawFunds() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data, ixoDid.Address().String())
+			msg := types.NewMsgWithdrawFunds(iidtypes.DIDFragment(ixoDid.Did), data, ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {
@@ -352,7 +353,7 @@ func NewCmdUpdateProjectDoc() *cobra.Command {
 			}
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
 
-			msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.Address().String())
+			msg := types.NewMsgUpdateProjectDoc(iidtypes.DIDFragment(senderDid), json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
 			err = msg.ValidateBasic()
 			if err != nil {

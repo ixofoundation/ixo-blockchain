@@ -8,12 +8,12 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
-	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 const (
@@ -27,35 +27,35 @@ const (
 )
 
 var (
-	_ ixotypes.IxoMsg = &MsgCreatePaymentTemplate{}
-	_ ixotypes.IxoMsg = &MsgCreatePaymentContract{}
-	_ ixotypes.IxoMsg = &MsgCreateSubscription{}
-	_ ixotypes.IxoMsg = &MsgSetPaymentContractAuthorisation{}
-	_ ixotypes.IxoMsg = &MsgGrantDiscount{}
-	_ ixotypes.IxoMsg = &MsgRevokeDiscount{}
-	_ ixotypes.IxoMsg = &MsgEffectPayment{}
+	_ iidante.IidTxMsg = &MsgCreatePaymentTemplate{}
+	_ iidante.IidTxMsg = &MsgCreatePaymentContract{}
+	_ iidante.IidTxMsg = &MsgCreateSubscription{}
+	_ iidante.IidTxMsg = &MsgSetPaymentContractAuthorisation{}
+	_ iidante.IidTxMsg = &MsgGrantDiscount{}
+	_ iidante.IidTxMsg = &MsgRevokeDiscount{}
+	_ iidante.IidTxMsg = &MsgEffectPayment{}
 )
 
 func NewMsgCreatePaymentTemplate(template PaymentTemplate,
-	creatorDid didexported.Did, creatorAddress string) *MsgCreatePaymentTemplate {
+	creatorDid iidtypes.DIDFragment, creatorAddress string) *MsgCreatePaymentTemplate {
 	return &MsgCreatePaymentTemplate{
 		CreatorDid:      creatorDid,
 		PaymentTemplate: template,
 		CreatorAddress:  creatorAddress,
 	}
 }
-func (msg MsgCreatePaymentTemplate) GetIidController() string { return msg.CreatorDid }
+func (msg MsgCreatePaymentTemplate) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
 
 func (msg MsgCreatePaymentTemplate) Type() string  { return TypeMsgCreatePaymentTemplate }
 func (msg MsgCreatePaymentTemplate) Route() string { return RouterKey }
 func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.CreatorDid.Did(), "CreatorDid"); !valid {
 		return err
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.CreatorDid) {
+	if !didtypes.IsValidDid(msg.CreatorDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID is invalid")
 	}
 
@@ -67,7 +67,7 @@ func (msg MsgCreatePaymentTemplate) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreatePaymentTemplate) GetSignerDid() didexported.Did { return msg.CreatorDid }
+// func (msg MsgCreatePaymentTemplate) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreatePaymentTemplate) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
 	if err != nil {
@@ -90,7 +90,7 @@ func (msg MsgCreatePaymentTemplate) GetSignBytes() []byte {
 
 func NewMsgCreatePaymentContract(templateId, contractId string,
 	payer sdk.AccAddress, recipients Distribution, canDeauthorise bool,
-	discountId sdk.Uint, creatorDid didexported.Did, creatorAddress string) *MsgCreatePaymentContract {
+	discountId sdk.Uint, creatorDid iidtypes.DIDFragment, creatorAddress string) *MsgCreatePaymentContract {
 	return &MsgCreatePaymentContract{
 		CreatorDid:        creatorDid,
 		PaymentTemplateId: templateId,
@@ -102,20 +102,20 @@ func NewMsgCreatePaymentContract(templateId, contractId string,
 		CreatorAddress:    creatorAddress,
 	}
 }
-func (msg MsgCreatePaymentContract) GetIidController() string { return msg.CreatorDid }
+func (msg MsgCreatePaymentContract) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
 
 func (msg MsgCreatePaymentContract) Type() string  { return TypeMsgCreatePaymentContract }
 func (msg MsgCreatePaymentContract) Route() string { return RouterKey }
 func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.CreatorDid.Did(), "CreatorDid"); !valid {
 		return err
 	} else if strings.TrimSpace(msg.Payer) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "payer address is empty")
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.CreatorDid) {
+	if !didtypes.IsValidDid(msg.CreatorDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID is invalid")
 	}
 
@@ -135,7 +135,7 @@ func (msg MsgCreatePaymentContract) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreatePaymentContract) GetSignerDid() didexported.Did { return msg.CreatorDid }
+// func (msg MsgCreatePaymentContract) GetSignerDid() didexported.Did { return msg.CreatorDid.Did() }
 func (msg MsgCreatePaymentContract) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
 	if err != nil {
@@ -157,7 +157,7 @@ func (msg MsgCreatePaymentContract) GetSignBytes() []byte {
 }
 
 func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.Uint,
-	period Period, creatorDid didexported.Did, creatorAddress string) *MsgCreateSubscription {
+	period Period, creatorDid iidtypes.DIDFragment, creatorAddress string) *MsgCreateSubscription {
 	msg := &MsgCreateSubscription{
 		CreatorDid:        creatorDid,
 		SubscriptionId:    subscriptionId,
@@ -174,7 +174,7 @@ func NewMsgCreateSubscription(subscriptionId, contractId string, maxPeriods sdk.
 	return msg
 }
 
-func (msg MsgCreateSubscription) GetIidController() string { return msg.CreatorDid }
+func (msg MsgCreateSubscription) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
 
 func (msg *MsgCreateSubscription) SetPeriod(period Period) error {
 	m, ok := period.(proto.Message)
@@ -203,12 +203,12 @@ func (msg MsgCreateSubscription) Type() string  { return TypeMsgCreateSubscripti
 func (msg MsgCreateSubscription) Route() string { return RouterKey }
 func (msg MsgCreateSubscription) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.CreatorDid, "CreatorDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.CreatorDid.Did(), "CreatorDid"); !valid {
 		return err
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.CreatorDid) {
+	if !didtypes.IsValidDid(msg.CreatorDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID is invalid")
 	}
 
@@ -231,7 +231,7 @@ func (msg MsgCreateSubscription) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgCreateSubscription) GetSignerDid() didexported.Did { return msg.CreatorDid }
+// func (msg MsgCreateSubscription) GetSignerDid() didexported.Did { return msg.CreatorDid }
 func (msg MsgCreateSubscription) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
 	if err != nil {
@@ -261,7 +261,7 @@ func (m MsgCreateSubscription) UnpackInterfaces(unpacker codectypes.AnyUnpacker)
 }
 
 func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
-	payerDid didexported.Did, payersAddress string) *MsgSetPaymentContractAuthorisation {
+	payerDid iidtypes.DIDFragment, payersAddress string) *MsgSetPaymentContractAuthorisation {
 	return &MsgSetPaymentContractAuthorisation{
 		PayerDid:          payerDid,
 		PaymentContractId: contractId,
@@ -269,7 +269,9 @@ func NewMsgSetPaymentContractAuthorisation(contractId string, authorised bool,
 		PayerAddress:      payersAddress,
 	}
 }
-func (msg MsgSetPaymentContractAuthorisation) GetIidController() string { return msg.PayerDid }
+func (msg MsgSetPaymentContractAuthorisation) GetIidController() iidtypes.DIDFragment {
+	return msg.PayerDid
+}
 
 func (msg MsgSetPaymentContractAuthorisation) Type() string {
 	return TypeMsgSetPaymentContractAuthorisation
@@ -277,12 +279,12 @@ func (msg MsgSetPaymentContractAuthorisation) Type() string {
 func (msg MsgSetPaymentContractAuthorisation) Route() string { return RouterKey }
 func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.PayerDid, "PayerDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.PayerDid.Did(), "PayerDid"); !valid {
 		return err
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.PayerDid) {
+	if !didtypes.IsValidDid(msg.PayerDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "payer DID is invalid")
 
 	}
@@ -295,7 +297,7 @@ func (msg MsgSetPaymentContractAuthorisation) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() didexported.Did { return msg.PayerDid }
+// func (msg MsgSetPaymentContractAuthorisation) GetSignerDid() didexported.Did { return msg.PayerDid }
 func (msg MsgSetPaymentContractAuthorisation) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.PayerAddress)
 	if err != nil {
@@ -317,7 +319,7 @@ func (msg MsgSetPaymentContractAuthorisation) GetSignBytes() []byte {
 }
 
 func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
-	recipient sdk.AccAddress, creatorDid didexported.Did, senderAddress string) *MsgGrantDiscount {
+	recipient sdk.AccAddress, creatorDid iidtypes.DIDFragment, senderAddress string) *MsgGrantDiscount {
 	return &MsgGrantDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
@@ -327,20 +329,20 @@ func NewMsgGrantDiscount(contractId string, discountId sdk.Uint,
 	}
 }
 
-func (msg MsgGrantDiscount) GetIidController() string { return msg.SenderDid }
+func (msg MsgGrantDiscount) GetIidController() iidtypes.DIDFragment { return msg.SenderDid }
 
 func (msg MsgGrantDiscount) Type() string  { return TypeMsgGrantDiscount }
 func (msg MsgGrantDiscount) Route() string { return RouterKey }
 func (msg MsgGrantDiscount) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	} else if strings.TrimSpace(msg.Recipient) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "recipient address is empty")
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.SenderDid) {
+	if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
@@ -352,7 +354,7 @@ func (msg MsgGrantDiscount) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgGrantDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
+// func (msg MsgGrantDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgGrantDiscount) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
 	if err != nil {
@@ -374,7 +376,7 @@ func (msg MsgGrantDiscount) GetSignBytes() []byte {
 }
 
 func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
-	creatorDid didexported.Did, senderAddress string) *MsgRevokeDiscount {
+	creatorDid iidtypes.DIDFragment, senderAddress string) *MsgRevokeDiscount {
 	return &MsgRevokeDiscount{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
@@ -383,20 +385,20 @@ func NewMsgRevokeDiscount(contractId string, holder sdk.AccAddress,
 	}
 }
 
-func (msg MsgRevokeDiscount) GetIidController() string { return msg.SenderDid }
+func (msg MsgRevokeDiscount) GetIidController() iidtypes.DIDFragment { return msg.SenderDid }
 
 func (msg MsgRevokeDiscount) Type() string  { return TypeMsgRevokeDiscount }
 func (msg MsgRevokeDiscount) Route() string { return RouterKey }
 func (msg MsgRevokeDiscount) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	} else if strings.TrimSpace(msg.Holder) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "holder address is empty")
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.SenderDid) {
+	if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
@@ -408,7 +410,7 @@ func (msg MsgRevokeDiscount) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgRevokeDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
+// func (msg MsgRevokeDiscount) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgRevokeDiscount) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
 	if err != nil {
@@ -429,7 +431,7 @@ func (msg MsgRevokeDiscount) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func NewMsgEffectPayment(contractId string, creatorDid didexported.Did, senderAddress string) *MsgEffectPayment {
+func NewMsgEffectPayment(contractId string, creatorDid iidtypes.DIDFragment, senderAddress string) *MsgEffectPayment {
 	return &MsgEffectPayment{
 		SenderDid:         creatorDid,
 		PaymentContractId: contractId,
@@ -437,18 +439,18 @@ func NewMsgEffectPayment(contractId string, creatorDid didexported.Did, senderAd
 	}
 }
 
-func (msg MsgEffectPayment) GetIidController() string { return msg.SenderDid }
+func (msg MsgEffectPayment) GetIidController() iidtypes.DIDFragment { return msg.SenderDid }
 
 func (msg MsgEffectPayment) Type() string  { return TypeMsgEffectPayment }
 func (msg MsgEffectPayment) Route() string { return RouterKey }
 func (msg MsgEffectPayment) ValidateBasic() error {
 	// Check that not empty
-	if valid, err := CheckNotEmpty(msg.SenderDid, "SenderDid"); !valid {
+	if valid, err := CheckNotEmpty(msg.SenderDid.Did(), "SenderDid"); !valid {
 		return err
 	}
 
 	// Check that DIDs valid
-	if !didtypes.IsValidDid(msg.SenderDid) {
+	if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID is invalid")
 	}
 
@@ -460,7 +462,7 @@ func (msg MsgEffectPayment) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgEffectPayment) GetSignerDid() didexported.Did { return msg.SenderDid }
+// func (msg MsgEffectPayment) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgEffectPayment) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
 	if err != nil {

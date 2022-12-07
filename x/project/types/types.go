@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 type (
@@ -101,7 +102,7 @@ const (
 	RejectedClaim ClaimStatus = "2"
 )
 
-func NewClaim(id string, templateId string, claimerDid didexported.Did) Claim {
+func NewClaim(id string, templateId string, claimerDid iidtypes.DIDFragment) Claim {
 	return Claim{
 		Id:         id,
 		TemplateId: templateId,

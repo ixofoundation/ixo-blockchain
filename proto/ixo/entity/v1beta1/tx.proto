@@ -52,7 +52,7 @@ message MsgCreateEntity {
   string verificationStatus = 15 [(gogoproto.jsontag) = "verification_status", (gogoproto.moretags) = "yaml:\"verification_status\""];
   // Content ID or Hash of public Verifiable Credentials associated with the  subject
   repeated string verifiableCredential = 16 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
-  string   ownerDid        = 17 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
+  string   ownerDid        = 17 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
   string   ownerAddress        = 18 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid address used to sign this transaction.
   bytes data         = 19 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""]; // Extention data
 }
@@ -80,7 +80,7 @@ message MsgUpdateEntity {
   string relayerNode = 6 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
   // refer to iid module for more information
   string verifiableCredential = 7 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
-  string   controllerDid        = 8 [(gogoproto.jsontag) = "controller_did", (gogoproto.moretags) = "yaml:\"controller_did\""]; // The ownersdid used to sign this transaction.
+  string   controllerDid        = 8 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "controller_did", (gogoproto.moretags) = "yaml:\"controller_did\""]; // The ownersdid used to sign this transaction.
   string   controllerAddress        = 9 [(gogoproto.jsontag) = "controller_address", (gogoproto.moretags) = "yaml:\"controller_address\""]; // The ownersdid used to sign this transaction.
 }
 
@@ -92,9 +92,9 @@ message MsgTransferEntity {
   option (gogoproto.equal)      = false;
 
   string entityDid          = 1 [(gogoproto.jsontag) = "entity_did", (gogoproto.moretags) = "yaml:\"entity_did\""];
-  string ownerDid      = 2 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
+  string ownerDid      = 2 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
   string ownerAddress  = 3 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
-  string recipientDid       = 4 [(gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
+  string recipientDid       = 4 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
 }
 
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.

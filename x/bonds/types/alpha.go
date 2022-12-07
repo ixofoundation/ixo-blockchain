@@ -20,6 +20,7 @@ func SystemAlpha(publicAlpha sdk.Dec, S0, S1, R, C sdk.Int) sdk.Dec {
 	x := sdk.NewDecFromInt(S1R)
 	y := sdk.NewDecFromInt(S1R.Sub(S0R).Add(S0C))
 	return publicAlpha.Mul(x.Quo(y))
+	// return sdk.NewDecWithPrec(05, 1)
 }
 
 func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {

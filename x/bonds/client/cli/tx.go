@@ -14,6 +14,7 @@ import (
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 func NewTxCmd() *cobra.Command {
@@ -68,6 +69,7 @@ func NewCmdCreateBond() *cobra.Command {
 			_bondDid, _ := cmd.Flags().GetString(FlagBondDid)
 			_creatorDid, _ := cmd.Flags().GetString(FlagCreatorDid)
 			_controllerDid, _ := cmd.Flags().GetString(FlagControllerDid)
+			_oracleDid, _ := cmd.Flags().GetString(FlagOracleDid)
 
 			// Parse function parameters
 			functionParams, err := bondsclient.ParseFunctionParams(_functionParameters)
@@ -157,7 +159,7 @@ func NewCmdCreateBond() *cobra.Command {
 			cliCtx = cliCtx.WithFromAddress(creatorDid.Address())
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
-				creatorDid.Did, _controllerDid, _functionType, functionParams,
+				iidtypes.DIDFragment(creatorDid.Did), iidtypes.DIDFragment(_controllerDid), iidtypes.DIDFragment(_oracleDid), _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
 				reserveWithdrawalAddress, maxSupply, orderQuantityLimits,
 				sanityRate, sanityMarginPercentage, _allowSells,
@@ -225,7 +227,7 @@ func NewCmdEditBond() *cobra.Command {
 			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
-				_sanityRate, _sanityMarginPercentage, editorDid.Did, _bondDid, editorDid.Address().String())
+				_sanityRate, _sanityMarginPercentage, iidtypes.DIDFragment(editorDid.Did), _bondDid, editorDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -273,7 +275,7 @@ func NewCmdSetNextAlpha() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgSetNextAlpha(alpha, editorDid.Did, _bondDid, editorDid.Address().String())
+			msg := types.NewMsgSetNextAlpha(alpha, iidtypes.DIDFragment(editorDid.Did), _bondDid, editorDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -310,7 +312,7 @@ func NewCmdUpdateBondState() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
-			msg := types.NewMsgUpdateBondState(types.BondState(_state), editorDid.Did, _bondDid, editorDid.Address().String())
+			msg := types.NewMsgUpdateBondState(types.BondState(_state), iidtypes.DIDFragment(editorDid.Did), _bondDid, editorDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -357,7 +359,7 @@ func NewCmdBuy() *cobra.Command {
 			cliCtx = cliCtx.WithFromAddress(buyerDid.Address())
 
 			msg := types.NewMsgBuy(
-				buyerDid.Did, bondCoinWithAmount, maxPrices, args[2], buyerDid.Address().String())
+				iidtypes.DIDFragment(buyerDid.Did), bondCoinWithAmount, maxPrices, args[2], buyerDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -396,7 +398,7 @@ func NewCmdSell() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(sellerDid.Address())
 
-			msg := types.NewMsgSell(sellerDid.Did, bondCoinWithAmount, args[1], sellerDid.Address().String())
+			msg := types.NewMsgSell(iidtypes.DIDFragment(sellerDid.Did), bondCoinWithAmount, args[1], sellerDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -438,7 +440,7 @@ func NewCmdSwap() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(swapperDid.Address())
 
-			msg := types.NewMsgSwap(swapperDid.Did, from, args[2], args[3], swapperDid.Address().String())
+			msg := types.NewMsgSwap(iidtypes.DIDFragment(swapperDid.Did), from, args[2], args[3], swapperDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -477,7 +479,7 @@ func NewCmdMakeOutcomePayment() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(sender.Address())
 
-			msg := types.NewMsgMakeOutcomePayment(sender.Did, amount, args[0], sender.Address().String())
+			msg := types.NewMsgMakeOutcomePayment(iidtypes.DIDFragment(sender.Did), amount, args[0], sender.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -511,7 +513,7 @@ func NewCmdWithdrawShare() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(recipientDid.Address())
 
-			msg := types.NewMsgWithdrawShare(recipientDid.Did, args[0], recipientDid.Address().String())
+			msg := types.NewMsgWithdrawShare(iidtypes.DIDFragment(recipientDid.Did), args[0], recipientDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -550,7 +552,7 @@ func NewCmdWithdrawReserve() *cobra.Command {
 			}
 			cliCtx = cliCtx.WithFromAddress(withdrawerDid.Address())
 
-			msg := types.NewMsgWithdrawReserve(withdrawerDid.Did, amount, args[0], withdrawerDid.Address().String())
+			msg := types.NewMsgWithdrawReserve(iidtypes.DIDFragment(withdrawerDid.Did), amount, args[0], withdrawerDid.Address().String())
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
