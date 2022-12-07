@@ -1,7 +1,6 @@
 package types
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/btcsuite/btcutil/base58"
@@ -14,6 +13,5 @@ func TestPubkey(t *testing.T) {
 	pubKeyBytes := base58.Decode(pubKeyString)
 	result := len(pubKeyBytes) == 256
 
-	fmt.Println(len(pubKeyBytes))
 	assert.True(t, result)
 }

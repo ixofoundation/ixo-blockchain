@@ -281,7 +281,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	// deduct the fees
 	if !feeTx.GetFee().IsZero() {
 		// fetch fee payer account
-		feePayerDidDoc, exists := dfd.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid))
+		feePayerDidDoc, exists := dfd.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 		if !exists {
 			return ctx, errors.New("sender did does not exist")
 		}

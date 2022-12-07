@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -265,6 +266,11 @@ func ValidateVerification(v *Verification, allowedControllers ...string) (err er
 		}
 	case *VerificationMethod_PublicKeyHex:
 		if IsEmpty(x.PublicKeyHex) {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "verification material pubkey invalid for verification method %s", v.Method.Id)
+			return
+		}
+	case *VerificationMethod_PublicKeyBase58:
+		if IsEmpty(x.PublicKeyBase58) {
 			err = sdkerrors.Wrapf(ErrInvalidInput, "verification material pubkey invalid for verification method %s", v.Method.Id)
 			return
 		}
@@ -604,7 +610,14 @@ func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string
 				} else {
 					address, err = toAddress(k.PublicKeyHex)
 				}
+			case *VerificationMethod_PublicKeyBase58:
+				if VerificationMaterialType(vm.Type) == DIDVMethodTypeEd25519VerificationKey2018 {
+					address, err = toEd25519AddressFromBase58(k.PublicKeyBase58)
+				} else {
+					address, err = toAddressFromBase58(k.PublicKeyBase58)
+				}
 			}
+
 			if err != nil {
 				return sdk.AccAddress{}, err
 			}
@@ -652,6 +665,11 @@ func (didDoc IidDocument) HasRelationship(
 			if err != nil || !signer.MatchAddress(addr) {
 				continue
 			}
+		case *VerificationMethod_PublicKeyBase58:
+			addr, err := toAddressFromBase58(k.PublicKeyBase58)
+			if err != nil || !signer.MatchAddress(addr) {
+				continue
+			}
 		}
 		vrs := didDoc.GetVerificationRelationships(vm.Id)
 		if len(intersection(vrs, relationships)) > 0 {
@@ -680,6 +698,10 @@ func (didDoc IidDocument) HasPublicKey(pubkey cryptotypes.PubKey) bool {
 
 		case *VerificationMethod_PublicKeyHex:
 			if key.PublicKeyHex == hex.EncodeToString(pubkey.Bytes()) {
+				return true
+			}
+		case *VerificationMethod_PublicKeyBase58:
+			if key.PublicKeyBase58 == base58.Encode(pubkey.Bytes()) {
 				return true
 			}
 		}
@@ -1020,6 +1042,8 @@ func NewVerificationMethod(id string, controller DID, vmr VerificationMaterial) 
 		vm.VerificationMaterial = &VerificationMethod_PublicKeyMultibase{vmr.EncodeToString()}
 	case PublicKeyHex:
 		vm.VerificationMaterial = &VerificationMethod_PublicKeyHex{vmr.EncodeToString()}
+	case PublicKeyBase58:
+		vm.VerificationMaterial = &VerificationMethod_PublicKeyBase58{vmr.EncodeToString()}
 	}
 	return vm
 }
@@ -1158,6 +1182,38 @@ func toEd25519Address(hexKey string) (addr string, err error) {
 	if err != nil {
 		return
 	}
+	// check the size of the decoded byte slice, otherwise the pk.Address will panic
+	if len(pkb) != ed25519.PubKeySize {
+		err = fmt.Errorf("invalid public key size")
+		return
+	}
+	// load the public key
+	pk := &ed25519.PubKey{Key: pkb}
+	// generate the address
+	addr, err = sdk.Bech32ifyAddressBytes(sdk.GetConfig().GetBech32AccountAddrPrefix(), pk.Address())
+	return
+}
+
+func toAddressFromBase58(base58Key string) (addr string, err error) {
+	// decode the base58 string
+	pkb := base58.Decode(base58Key)
+
+	// check the size of the decoded byte slice, otherwise the pk.Address will panic
+	if len(pkb) != secp256k1.PubKeySize {
+		err = fmt.Errorf("invalid public key size")
+		return
+	}
+	// load the public key
+	pk := &secp256k1.PubKey{Key: pkb}
+	// generate the address
+	addr, err = sdk.Bech32ifyAddressBytes(sdk.GetConfig().GetBech32AccountAddrPrefix(), pk.Address())
+	return
+}
+
+func toEd25519AddressFromBase58(base58Key string) (addr string, err error) {
+	// decode the base58 string
+	pkb := base58.Decode(base58Key)
+
 	// check the size of the decoded byte slice, otherwise the pk.Address will panic
 	if len(pkb) != ed25519.PubKeySize {
 		err = fmt.Errorf("invalid public key size")

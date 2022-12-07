@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+
+	"github.com/btcsuite/btcutil/base58"
 )
 
 // VerificationMaterialType encode the verification material type
@@ -16,6 +18,44 @@ const (
 	DIDVMethodTypeCosmosAccountAddress              VerificationMaterialType = "CosmosAccountAddress"
 	DIDVMethodTypeX25519KeyAgreementKey2019         VerificationMaterialType = "X25519KeyAgreementKey2019"
 )
+
+type DIDFragment string
+
+func (df DIDFragment) String() string { return string(df) }
+
+func (df DIDFragment) Did() string {
+	didFragmentParts := strings.Split(df.String(), "#")
+	if len(didFragmentParts) == 0 {
+		return ""
+	}
+
+	for index, part := range didFragmentParts {
+		if index == 0 {
+			return part
+		}
+	}
+
+	return ""
+}
+
+func (df DIDFragment) HasFragment() (exists bool) {
+	_, exists = df.Fragment()
+	return
+}
+
+func (df DIDFragment) Fragment() (string, bool) {
+	didFragmentParts := strings.SplitAfter(df.String(), "#")
+	if len(didFragmentParts) == 0 {
+		return "", false
+	}
+
+	for index, part := range didFragmentParts {
+		if index == 1 {
+			return part, true
+		}
+	}
+	return "", false
+}
 
 // String return string name for the Verification Method type
 func (p VerificationMaterialType) String() string {
@@ -190,3 +230,39 @@ func NewPublicKeyHexFromString(pubKeyHex string, vmType VerificationMaterialType
 //	}
 //	return
 //}
+
+type PublicKeyBase58 struct {
+	data   []byte
+	vmType VerificationMaterialType
+}
+
+// EncodeToString returns the string representation of the key in hex format. F is the hex format prefix
+// https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03#appendix-B.1
+func (pkb58 PublicKeyBase58) EncodeToString() string {
+	return base58.Encode(pkb58.data)
+}
+
+// Type the verification material type
+// https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03#appendix-B.1
+func (pkh PublicKeyBase58) Type() VerificationMaterialType {
+	return pkh.vmType
+}
+
+// NewPublicKeyMultibase build a new blockchain account ID struct
+func NewPublicKeyBase58(pubKey []byte, vmType VerificationMaterialType) PublicKeyBase58 {
+	return PublicKeyBase58{
+		data:   pubKey,
+		vmType: vmType,
+	}
+}
+
+// NewPublicKeyMultibaseFromHex build a new blockchain account ID struct
+func NewPublicKeyBase58FromString(pubKeyString string, vmType VerificationMaterialType) (pkm PublicKeyBase58, err error) {
+	pkb := base58.Decode(pubKeyString)
+	// TODO: shall we check if it is conform to the verification material? probably
+	pkm = PublicKeyBase58{
+		data:   pkb,
+		vmType: vmType,
+	}
+	return
+}

@@ -58,7 +58,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	params := k.GetParams(ctx)
 	nftContractAddressParam := params.NftContractAddress
 
-	fmt.Println("==============\nnftContractAddressParam", nftContractAddressParam)
 	if len(nftContractAddressParam) == 0 {
 		return types.MsgCreateEntityResponse{}, errors.New("nftContractAddress not set")
 	}
@@ -103,7 +102,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		iidtypes.WithRights(msg.AccordedRight...),
 		iidtypes.WithResources(msg.LinkedResource...),
 		iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
-		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid)...),
+		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid.Did())...),
 	)
 	if err != nil {
 		// k.Logger(ctx).Error(err.Error())
@@ -164,7 +163,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	}
 
 	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid)); err != nil {
+	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid.Did())); err != nil {
 		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
 		return types.MsgCreateEntityResponse{}, err
 	}
@@ -210,11 +209,11 @@ func (k Keeper) TransferEntity(ctx sdk.Context, msg *types.MsgTransferEntity) (*
 		&k.IidKeeper,
 		[]string{iidtypes.Authentication},
 		msg.EntityDid,
-		msg.OwnerDid,
+		msg.OwnerDid.Did(),
 		func(document *iidtypes.IidDocument) error {
 			document.Controller = []string{
 				document.Id,
-				msg.RecipientDid,
+				msg.RecipientDid.Did(),
 			}
 			return nil
 		},

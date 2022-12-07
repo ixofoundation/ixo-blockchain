@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
@@ -51,6 +52,7 @@ type createBondReq struct {
 	BondDid                  string       `json:"bond_did" yaml:"bond_did"`
 	CreatorDid               string       `json:"creator_did" yaml:"creator_did"`
 	ControllerDid            string       `json:"controller_did" yaml:"controller_did"`
+	OracleDid                string       `json:"oracle_did" yaml:"oracle_did"`
 	CreatorAddress           string       `json:"creator_address" yaml:"creator_address"`
 }
 
@@ -189,7 +191,7 @@ func createBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		msg := types.NewMsgCreateBond(req.Token, req.Name, req.Description,
-			req.CreatorDid, req.ControllerDid, req.FunctionType, functionParams,
+			iidtypes.DIDFragment(req.CreatorDid), iidtypes.DIDFragment(req.ControllerDid), iidtypes.DIDFragment(req.OracleDid), req.FunctionType, functionParams,
 			reserveTokens, txFeePercentageDec, exitFeePercentageDec, feeAddress,
 			reserveWithdrawalAddress, maxSupply, orderQuantityLimits, sanityRate,
 			sanityMarginPercentage, allowSells, allowReserveWithdrawals, alphaBond,
@@ -228,7 +230,7 @@ func editBondRequestHandler(clientCtx client.Context) http.HandlerFunc {
 
 		msg := types.NewMsgEditBond(req.Name, req.Description,
 			req.OrderQuantityLimits, req.SanityRate,
-			req.SanityMarginPercentage, req.EditorDid, req.BondDid, req.EditorAddress)
+			req.SanityMarginPercentage, iidtypes.DIDFragment(req.EditorDid), req.BondDid, req.EditorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -263,7 +265,7 @@ func setNextAlphaRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSetNextAlpha(newAlpha, req.EditorDid, req.BondDid, req.EditorAddress)
+		msg := types.NewMsgSetNextAlpha(newAlpha, iidtypes.DIDFragment(req.EditorDid), req.BondDid, req.EditorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -291,7 +293,7 @@ func updateBondStateRequestHandler(clientCtx client.Context) http.HandlerFunc {
 		if !baseReq.ValidateBasic(w) {
 			return
 		}
-		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), req.EditorDid, req.BondDid, req.EditorAddress)
+		msg := types.NewMsgUpdateBondState(types.BondState(req.NewState), iidtypes.DIDFragment(req.EditorDid), req.BondDid, req.EditorAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -332,7 +334,7 @@ func buyRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgBuy(req.BuyerDid, bondCoin, maxPrices, req.BondDid, req.BuyerAddress)
+		msg := types.NewMsgBuy(iidtypes.DIDFragment(req.BuyerDid), bondCoin, maxPrices, req.BondDid, req.BuyerAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -367,7 +369,7 @@ func sellRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSell(req.SellerDid, bondCoin, req.BondDid, req.SellerAddress)
+		msg := types.NewMsgSell(iidtypes.DIDFragment(req.SellerDid), bondCoin, req.BondDid, req.SellerAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -404,7 +406,7 @@ func swapRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgSwap(req.SwapperDid, fromCoin, req.ToToken, req.BondDid, req.SwapperAddress)
+		msg := types.NewMsgSwap(iidtypes.DIDFragment(req.SwapperDid), fromCoin, req.ToToken, req.BondDid, req.SwapperAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -440,7 +442,7 @@ func makeOutcomePaymentRequestHandler(clientCtx client.Context) http.HandlerFunc
 			return
 		}
 
-		msg := types.NewMsgMakeOutcomePayment(req.SenderDid, amount, req.BondDid, req.SenderAddress)
+		msg := types.NewMsgMakeOutcomePayment(iidtypes.DIDFragment(req.SenderDid), amount, req.BondDid, req.SenderAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -468,7 +470,7 @@ func withdrawShareRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawShare(req.RecipientDid, req.BondDid, req.RecipientAddress)
+		msg := types.NewMsgWithdrawShare(iidtypes.DIDFragment(req.RecipientDid), req.BondDid, req.RecipientAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -502,7 +504,7 @@ func withdrawReserveRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawReserve(req.WithdrawerDid, amount, req.BondDid, req.WithdrawerAddress)
+		msg := types.NewMsgWithdrawReserve(iidtypes.DIDFragment(req.WithdrawerDid), amount, req.BondDid, req.WithdrawerAddress)
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}

@@ -111,6 +111,7 @@ message VerificationMethod {
     string blockchainAccountID = 4;
     string publicKeyHex = 5;
     string publicKeyMultibase = 6;
+    string publicKeyBase58 = 7;
   }
 }
 

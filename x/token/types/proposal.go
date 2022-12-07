@@ -1,40 +1,36 @@
 package types
 
 import (
-	fmt "fmt"
-
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	types "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 var (
-	ProposalTypeInitializeNftContract                  = "InitializeTokenContract"
-	_                                 govtypes.Content = &InitializeTokenContract{}
+	ProposalTypeSetTokenContractCodes                  = "SetTokenContractCodes"
+	_                                 govtypes.Content = &SetTokenContractCodes{}
 )
 
-func NftModuleAddress() string { return fmt.Sprintf("%s-minter", types.ModuleName) }
-
-func NewInitializeNftContract(nftContractCodeId uint64, nftminteraddress string) InitializeTokenContract {
-	return InitializeTokenContract{
-		NftContractCodeId: nftContractCodeId,
-		NftMinterAddress:  nftminteraddress,
+func NewSetTokenContract(cw20Code, cw721Code, ixo1155Code uint64) SetTokenContractCodes {
+	return SetTokenContractCodes{
+		Cw20ContractCode:    cw20Code,
+		Cw721ContractCode:   cw721Code,
+		Ixo1155ContractCode: ixo1155Code,
 	}
 }
 
-func (p *InitializeTokenContract) GetDescription() string {
-	return "update token paramaters"
+func (p *SetTokenContractCodes) GetDescription() string {
+	return "update token contract codes"
 }
 
-func (p *InitializeTokenContract) GetTitle() string {
-	return "update token paramaters"
+func (p *SetTokenContractCodes) GetTitle() string {
+	return "set token contract codes"
 }
 
-func (sup *InitializeTokenContract) ProposalRoute() string { return RouterKey }
-func (sup *InitializeTokenContract) ProposalType() string  { return ProposalTypeInitializeNftContract }
+func (sup *SetTokenContractCodes) ProposalRoute() string { return RouterKey }
+func (sup *SetTokenContractCodes) ProposalType() string  { return ProposalTypeSetTokenContractCodes }
 
-func (sup *InitializeTokenContract) ValidateBasic() error { return nil }
+func (sup *SetTokenContractCodes) ValidateBasic() error { return nil }
 
 func init() {
-	govtypes.RegisterProposalType(ProposalTypeInitializeNftContract)
-	govtypes.RegisterProposalTypeCodec(&InitializeTokenContract{}, "token.ixo.token.v1beta1.InitializeTokenContract")
+	govtypes.RegisterProposalType(ProposalTypeSetTokenContractCodes)
+	govtypes.RegisterProposalTypeCodec(&SetTokenContractCodes{}, "token.ixo.token.v1beta1.SetTokenContractCodes")
 }

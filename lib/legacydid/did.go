@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	ValidDid      = regexp.MustCompile(`^did:(ixo:|sov:)([a-zA-Z0-9]){21,22}([/][a-zA-Z0-9:]+|)$`)
+	ValidDid      = regexp.MustCompile(`^did\:[a-z0-9]+\:(?:([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])*\:)*(?:[A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])+(?:#[a-zA-Z0-9-\._]+)?$`)
 	ValidPubKey   = regexp.MustCompile(`^[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]{43,44}$`)
 	IsValidDid    = ValidDid.MatchString
 	IsValidPubKey = ValidPubKey.MatchString

@@ -88,9 +88,23 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 			}
 		}
 
+		// For augmented, if hatch phase and newSupply >= S0, go to open phase
+		if bond.FunctionType == types.BondingFunction &&
+			bond.State == types.HatchState.String() {
+			args := bond.FunctionParameters.AsMap()
+			if bond.CurrentSupply.Amount.ToDec().GTE(args["Hatch_Supply"]) {
+				keeper.SetBondState(ctx, bond.BondDid, types.OpenState.String())
+				bond = keeper.MustGetBond(ctx, bond.BondDid) // get updated bond
+			}
+		}
+
 		// Update alpha value if in open state and next alpha is not null
 		if bond.State == types.OpenState.String() && batch.HasNextAlpha() {
-			keeper.UpdateAlpha(ctx, bond.BondDid)
+			if bond.FunctionType == types.BondingFunction {
+				keeper.HandleBondingFunctionAlphaUpdate(ctx, bond.BondDid)
+			} else {
+				keeper.UpdateAlpha(ctx, bond.BondDid)
+			}
 		}
 
 		// Save current batch as last batch and reset current batch
@@ -98,16 +112,55 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 		keeper.SetBatch(ctx, bond.BondDid, types.NewBatch(bond.BondDid, bond.Token, bond.BatchBlocks))
 
 		// If reserve has not changed, no need to recalculate I0; rest of function can be skipped
-		if bond.CurrentReserve.IsEqual(reserveBeforeOrderProcessing) {
+		if bond.CurrentReserve.IsEqual(reserveBeforeOrderProcessing) && !batch.HasNextAlpha() {
 			continue
 		}
 
 		// Recalculate and re-set I0 if alpha bond
-		if bond.AlphaBond {
-			paramsMap := bond.FunctionParameters.AsMap()
-			newI0 := types.InvariantI(bond.OutcomePayment, paramsMap["systemAlpha"],
-				bond.CurrentReserve[0].Amount)
-			bond.FunctionParameters.ReplaceParam("I0", newI0)
+		if bond.AlphaBond && bond.FunctionType == types.AugmentedFunction {
+			bond = keeper.MustGetBond(ctx, bond.BondDid)
+			bondFunctions := bond.FunctionParameters.AsMap()
+
+			// I0 := bondFunctions["I0"]
+			currentSystemAlpha := bondFunctions["systemAlpha"]
+			S := bond.CurrentSupply.Amount
+			//fmt.Println("S: ", S)
+			R := bond.CurrentReserve[0].Amount
+			C := bond.OutcomePayment
+			// Kappa := bondFunctions["kappa"]
+			// Recalculate kappa and V0 using new alpha
+
+			// Set new function parameters
+			if bond.State == types.OpenState.String() {
+				//fmt.Println("Updating I0 -------------------")
+				//fmt.Println("Current Supply: ", S)
+				//fmt.Println("Current Reserve: ", R)
+				//fmt.Println("Current I0: ", I0)
+				//fmt.Println("Current Kappa: ", Kappa)
+				//fmt.Println("Current SystemAlpha: ", currentSystemAlpha)
+
+				newI0 := types.InvariantI(C, currentSystemAlpha, R)
+				//fmt.Println("New I0: ", newI0)
+
+				newKappa := types.Kappa(newI0, C, currentSystemAlpha)
+				//fmt.Println("newKappa: ", newKappa)
+
+				newV0, err := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
+				if err != nil {
+					ctx.EventManager().EmitEvent(sdk.NewEvent(
+						types.EventTypeEditAlphaFailed,
+						sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
+						sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
+						sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
+					))
+					//fmt.Println(err)
+					continue
+				}
+				//fmt.Println("new V0: ", newV0)
+				bond.FunctionParameters.ReplaceParam("V0", newV0)
+				bond.FunctionParameters.ReplaceParam("kappa", newKappa)
+				bond.FunctionParameters.ReplaceParam("I0", newI0)
+			}
 		}
 
 		// Save bond

@@ -7,6 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 // type IidTx struct {
@@ -38,7 +39,7 @@ func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Co
 	controllers := GetIidControllers(tx)
 
 	for _, iidMsg := range controllers {
-		iid := iidMsg.GetIidController()
+		iid := iidMsg.GetIidController().Did()
 		iidDoc, exists := iidKeeper.GetDidDocument(ctx, []byte(iid))
 
 		if !exists {
@@ -60,5 +61,5 @@ func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Co
 }
 
 type IidTxMsg interface {
-	GetIidController() string
+	GetIidController() iidtypes.DIDFragment
 }

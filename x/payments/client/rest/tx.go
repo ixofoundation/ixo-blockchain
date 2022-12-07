@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments/types"
 )
 
@@ -40,7 +41,7 @@ func newCreatePaymentTemplateRequestHandlerFn(clientCtx client.Context) http.Han
 			return
 		}
 
-		msg := types.NewMsgCreatePaymentTemplate(req.PaymentTemplate, req.CreatorDid, "")
+		msg := types.NewMsgCreatePaymentTemplate(req.PaymentTemplate, iidtypes.DIDFragment(req.CreatorDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -74,7 +75,7 @@ func newCreatePaymentContractRequestHandlerFn(clientCtx client.Context) http.Han
 
 		msg := types.NewMsgCreatePaymentContract(req.PaymentTemplateId,
 			req.PaymentContractId, req.Payer, req.Recipients,
-			req.CanDeauthorise, req.DiscountId, req.CreatorDid, "")
+			req.CanDeauthorise, req.DiscountId, iidtypes.DIDFragment(req.CreatorDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -105,7 +106,7 @@ func newCreateSubscriptionRequestHandlerFn(clientCtx client.Context) http.Handle
 		}
 
 		msg := types.NewMsgCreateSubscription(req.SubscriptionId, req.PaymentContractId,
-			req.MaxPeriods, req.Period, req.CreatorDid, "")
+			req.MaxPeriods, req.Period, iidtypes.DIDFragment(req.CreatorDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -134,7 +135,7 @@ func newSetPaymentContractAuthorisationRequestHandlerFn(clientCtx client.Context
 		}
 
 		msg := types.NewMsgSetPaymentContractAuthorisation(req.PaymentContractId,
-			req.Authorised, req.PayerDid, "")
+			req.Authorised, iidtypes.DIDFragment(req.PayerDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -164,7 +165,7 @@ func newGrantDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFunc
 		}
 
 		msg := types.NewMsgGrantDiscount(req.PaymentContractId, req.DiscountId,
-			req.Recipient, req.SenderDid, "")
+			req.Recipient, iidtypes.DIDFragment(req.SenderDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -192,7 +193,7 @@ func newRevokeDiscountRequestHandlerFn(clientCtx client.Context) http.HandlerFun
 			return
 		}
 
-		msg := types.NewMsgRevokeDiscount(req.PaymentContractId, req.Holder, req.SenderDid, "")
+		msg := types.NewMsgRevokeDiscount(req.PaymentContractId, req.Holder, iidtypes.DIDFragment(req.SenderDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}
@@ -220,7 +221,7 @@ func newEffectPaymentRequestHandlerFn(clientCtx client.Context) http.HandlerFunc
 			return
 		}
 
-		msg := types.NewMsgEffectPayment(req.PaymentContractId, req.SenderDid, "")
+		msg := types.NewMsgEffectPayment(req.PaymentContractId, iidtypes.DIDFragment(req.SenderDid), "")
 		if rest.CheckBadRequestError(w, msg.ValidateBasic()) {
 			return
 		}

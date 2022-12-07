@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project/types"
 )
 
@@ -44,7 +45,7 @@ func createProjectRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateProject(req.SenderDid, req.Data, req.ProjectDid, req.PubKey, "")
+		msg := types.NewMsgCreateProject(iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, req.PubKey, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -74,7 +75,7 @@ func updateProjectStatusRequestHandler(clientCtx client.Context) http.HandlerFun
 			return
 		}
 
-		msg := types.NewMsgUpdateProjectStatus(req.SenderDid, req.Data, req.ProjectDid, "")
+		msg := types.NewMsgUpdateProjectStatus(iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -104,7 +105,7 @@ func createAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
+		msg := types.NewMsgCreateAgent(req.TxHash, iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -134,7 +135,7 @@ func updateAgentRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateAgent(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
+		msg := types.NewMsgUpdateAgent(req.TxHash, iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -164,7 +165,7 @@ func createClaimRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateClaim(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
+		msg := types.NewMsgCreateClaim(req.TxHash, iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -195,7 +196,7 @@ func createEvaluationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgCreateEvaluation(req.TxHash, req.SenderDid, req.Data, req.ProjectDid, "")
+		msg := types.NewMsgCreateEvaluation(req.TxHash, iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -223,7 +224,7 @@ func withdrawFundsRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgWithdrawFunds(req.SenderDid, req.Data, "")
+		msg := types.NewMsgWithdrawFunds(iidtypes.DIDFragment(req.SenderDid), req.Data, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -253,7 +254,7 @@ func updateProjectDocRequestHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgUpdateProjectDoc(req.SenderDid, req.Data, req.ProjectDid, "")
+		msg := types.NewMsgUpdateProjectDoc(iidtypes.DIDFragment(req.SenderDid), req.Data, req.ProjectDid, "")
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

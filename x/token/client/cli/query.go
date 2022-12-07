@@ -29,7 +29,7 @@ func GetCmdTokenDocs() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-token-doc",
 		Short: "Query TokenDocs",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -38,13 +38,14 @@ func GetCmdTokenDocs() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.TokenList(context.Background(), &types.QueryTokenListRequest{})
+			minterDid := args[0]
+
+			res, err := queryClient.TokenList(context.Background(), &types.QueryTokenListRequest{MinterDid: minterDid})
 			if err != nil {
 				return err
 			}
 
 			return clientCtx.PrintProto(res)
-			return nil
 		},
 	}
 

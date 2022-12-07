@@ -1,7 +1,7 @@
 package token
 
 import (
-	"fmt"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -19,7 +19,7 @@ const (
 func NewTokenParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
-		case *types.InitializeTokenContract:
+		case *types.SetTokenContractCodes:
 			return handleTokenParameterChangeProposal(ctx, k, c)
 
 		default:
@@ -28,12 +28,15 @@ func NewTokenParamChangeProposalHandler(k keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.InitializeTokenContract) error {
-	fmt.Printf("token propsal handeler =============\n%+v\n", *p)
-	fmt.Println("Supspace", k.ParamSpace.Name(), k.ParamSpace.HasKeyTable())
+func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *types.SetTokenContractCodes) error {
 	var xx types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
-	fmt.Printf("%+v\n", xx)
+
+	xx.Cw20ContractCode = strconv.FormatUint(p.Cw20ContractCode, 10)
+	xx.Cw721ContractCode = strconv.FormatUint(p.Cw721ContractCode, 10)
+	xx.Ixo1155ContractCode = strconv.FormatUint(p.Ixo1155ContractCode, 10)
+
+	k.ParamSpace.SetParamSet(ctx, &xx)
 
 	return nil
 }

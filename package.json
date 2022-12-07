@@ -16,7 +16,7 @@
     "@commitlint/cli": "^14.1.0",
     "@commitlint/config-conventional": "^14.1.0",
     "concurrently": "^7.0.0",
-    "snyk": "^1.996.0"
+    "snyk": "^1.833.0"
   },
   "dependencies": {
     "sovrin-did": "^1.4.0"

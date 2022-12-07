@@ -5,9 +5,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
+	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 const (
@@ -24,19 +25,19 @@ const (
 )
 
 var (
-	_ ixotypes.IxoMsg = &MsgCreateBond{}
-	_ ixotypes.IxoMsg = &MsgEditBond{}
-	_ ixotypes.IxoMsg = &MsgSetNextAlpha{}
-	_ ixotypes.IxoMsg = &MsgUpdateBondState{}
-	_ ixotypes.IxoMsg = &MsgBuy{}
-	_ ixotypes.IxoMsg = &MsgSell{}
-	_ ixotypes.IxoMsg = &MsgSwap{}
-	_ ixotypes.IxoMsg = &MsgMakeOutcomePayment{}
-	_ ixotypes.IxoMsg = &MsgWithdrawShare{}
-	_ ixotypes.IxoMsg = &MsgWithdrawReserve{}
+	_ iidante.IidTxMsg = &MsgCreateBond{}
+	_ iidante.IidTxMsg = &MsgEditBond{}
+	_ iidante.IidTxMsg = &MsgSetNextAlpha{}
+	_ iidante.IidTxMsg = &MsgUpdateBondState{}
+	_ iidante.IidTxMsg = &MsgBuy{}
+	_ iidante.IidTxMsg = &MsgSell{}
+	_ iidante.IidTxMsg = &MsgSwap{}
+	_ iidante.IidTxMsg = &MsgMakeOutcomePayment{}
+	_ iidante.IidTxMsg = &MsgWithdrawShare{}
+	_ iidante.IidTxMsg = &MsgWithdrawReserve{}
 )
 
-func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid didexported.Did,
+func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid, oracleDid iidtypes.DIDFragment,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
@@ -70,7 +71,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 	}
 }
 
-func (msg MsgCreateBond) GetIidController() string { return msg.CreatorDid }
+func (msg MsgCreateBond) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
 
 func (msg MsgCreateBond) ValidateBasic() error {
 	// Check if empty
@@ -82,10 +83,12 @@ func (msg MsgCreateBond) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "name")
 	} else if strings.TrimSpace(msg.Description) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "description")
-	} else if strings.TrimSpace(msg.CreatorDid) == "" {
+	} else if strings.TrimSpace(msg.CreatorDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "creator DID")
-	} else if strings.TrimSpace(msg.ControllerDid) == "" {
+	} else if strings.TrimSpace(msg.ControllerDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "controller DID")
+	} else if strings.TrimSpace(msg.OracleDid.String()) == "" {
+		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "oracle DID")
 	} else if len(msg.ReserveTokens) == 0 {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "reserve tokens")
 	} else if strings.TrimSpace(msg.FeeAddress) == "" {
@@ -166,7 +169,7 @@ func (msg MsgCreateBond) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.CreatorDid) {
+	} else if !didtypes.IsValidDid(msg.CreatorDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "creator DID")
 	}
 
@@ -182,7 +185,7 @@ func (msg MsgCreateBond) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgCreateBond) GetSignerDid() didexported.Did { return msg.CreatorDid }
+// func (msg MsgCreateBond) GetSignerDid() didexported.Did { return msg.CreatorDid.Did() }
 func (msg MsgCreateBond) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
 	if err != nil {
@@ -196,7 +199,7 @@ func (msg MsgCreateBond) Route() string { return RouterKey }
 func (msg MsgCreateBond) Type() string { return TypeMsgCreateBond }
 
 func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
-	sanityMarginPercentage string, editorDid, bondDid didexported.Did, editorAddress string) *MsgEditBond {
+	sanityMarginPercentage string, editorDid iidtypes.DIDFragment, bondDid didexported.Did, editorAddress string) *MsgEditBond {
 	return &MsgEditBond{
 		BondDid:                bondDid,
 		Name:                   name,
@@ -209,7 +212,7 @@ func NewMsgEditBond(name, description, orderQuantityLimits, sanityRate,
 	}
 }
 
-func (msg MsgEditBond) GetIidController() string { return msg.EditorDid }
+func (msg MsgEditBond) GetIidController() iidtypes.DIDFragment { return msg.EditorDid }
 
 func (msg MsgEditBond) ValidateBasic() error {
 	// Check if empty
@@ -223,7 +226,7 @@ func (msg MsgEditBond) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity rate")
 	} else if strings.TrimSpace(msg.SanityMarginPercentage) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sanity margin percentage")
-	} else if strings.TrimSpace(msg.EditorDid) == "" {
+	} else if strings.TrimSpace(msg.EditorDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "editor DID")
 	}
 	// Note: order quantity limits can be blank
@@ -248,7 +251,7 @@ func (msg MsgEditBond) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.EditorDid) {
+	} else if !didtypes.IsValidDid(msg.EditorDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "editor DID")
 	}
 
@@ -259,7 +262,7 @@ func (msg MsgEditBond) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgEditBond) GetSignerDid() didexported.Did { return msg.EditorDid }
+// func (msg MsgEditBond) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgEditBond) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.EditorAddress)
 	if err != nil {
@@ -272,22 +275,22 @@ func (msg MsgEditBond) Route() string { return RouterKey }
 
 func (msg MsgEditBond) Type() string { return TypeMsgEditBond }
 
-func NewMsgSetNextAlpha(alpha sdk.Dec, editorDid, bondDid didexported.Did, editorAddress string) *MsgSetNextAlpha {
+func NewMsgSetNextAlpha(alpha sdk.Dec, oracleDid iidtypes.DIDFragment, bondDid didexported.Did, oracleAddress string) *MsgSetNextAlpha {
 	return &MsgSetNextAlpha{
 		BondDid:       bondDid,
 		Alpha:         alpha,
-		EditorDid:     editorDid,
-		EditorAddress: editorAddress,
+		OracleDid:     oracleDid,
+		OracleAddress: oracleAddress,
 	}
 }
 
-func (msg MsgSetNextAlpha) GetIidController() string { return msg.EditorDid }
+func (msg MsgSetNextAlpha) GetIidController() iidtypes.DIDFragment { return msg.OracleDid }
 
 func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
-	} else if strings.TrimSpace(msg.EditorDid) == "" {
+	} else if strings.TrimSpace(msg.OracleDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}
 
@@ -303,7 +306,7 @@ func (msg MsgSetNextAlpha) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond did is invalid")
-	} else if !didtypes.IsValidDid(msg.EditorDid) {
+	} else if !didtypes.IsValidDid(msg.OracleDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "editor did is invalid")
 	}
 
@@ -314,9 +317,9 @@ func (msg MsgSetNextAlpha) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSetNextAlpha) GetSignerDid() didexported.Did { return msg.EditorDid }
+// func (msg MsgSetNextAlpha) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgSetNextAlpha) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.EditorAddress)
+	address, err := sdk.AccAddressFromBech32(msg.OracleAddress)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}
@@ -327,7 +330,7 @@ func (msg MsgSetNextAlpha) Route() string { return RouterKey }
 
 func (msg MsgSetNextAlpha) Type() string { return TypeMsgSetNextAlpha }
 
-func NewMsgUpdateBondState(state BondState, editorDid, bondDid didexported.Did, editorAddress string) *MsgUpdateBondState {
+func NewMsgUpdateBondState(state BondState, editorDid iidtypes.DIDFragment, bondDid didexported.Did, editorAddress string) *MsgUpdateBondState {
 	return &MsgUpdateBondState{
 		BondDid:       bondDid,
 		State:         state.String(),
@@ -336,13 +339,13 @@ func NewMsgUpdateBondState(state BondState, editorDid, bondDid didexported.Did, 
 	}
 }
 
-func (msg MsgUpdateBondState) GetIidController() string { return msg.EditorDid }
+func (msg MsgUpdateBondState) GetIidController() iidtypes.DIDFragment { return msg.EditorDid }
 
 func (msg MsgUpdateBondState) ValidateBasic() error {
 	// Check if empty
 	if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "BondDid")
-	} else if strings.TrimSpace(msg.EditorDid) == "" {
+	} else if strings.TrimSpace(msg.EditorDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "EditorDid")
 	}
 
@@ -354,7 +357,7 @@ func (msg MsgUpdateBondState) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond did is invalid")
-	} else if !didtypes.IsValidDid(msg.EditorDid) {
+	} else if !didtypes.IsValidDid(msg.EditorDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "editor did is invalid")
 	}
 
@@ -365,7 +368,7 @@ func (msg MsgUpdateBondState) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgUpdateBondState) GetSignerDid() didexported.Did { return msg.EditorDid }
+// func (msg MsgUpdateBondState) GetSignerDid() didexported.Did { return msg.EditorDid }
 func (msg MsgUpdateBondState) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.EditorAddress)
 	if err != nil {
@@ -378,7 +381,7 @@ func (msg MsgUpdateBondState) Route() string { return RouterKey }
 
 func (msg MsgUpdateBondState) Type() string { return TypeMsgUpdateBondState }
 
-func NewMsgBuy(buyerDid didexported.Did, amount sdk.Coin, maxPrices sdk.Coins,
+func NewMsgBuy(buyerDid iidtypes.DIDFragment, amount sdk.Coin, maxPrices sdk.Coins,
 	bondDid didexported.Did, buyerAddress string) *MsgBuy {
 	return &MsgBuy{
 		BuyerDid:     buyerDid,
@@ -389,11 +392,11 @@ func NewMsgBuy(buyerDid didexported.Did, amount sdk.Coin, maxPrices sdk.Coins,
 	}
 }
 
-func (msg MsgBuy) GetIidController() string { return msg.BuyerDid }
+func (msg MsgBuy) GetIidController() iidtypes.DIDFragment { return msg.BuyerDid }
 
 func (msg MsgBuy) ValidateBasic() error {
 	// Check if empty
-	if strings.TrimSpace(msg.BuyerDid) == "" {
+	if strings.TrimSpace(msg.BuyerDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "buyer DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
@@ -414,7 +417,7 @@ func (msg MsgBuy) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.BuyerDid) {
+	} else if !didtypes.IsValidDid(msg.BuyerDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "buyer DID")
 	}
 
@@ -425,7 +428,7 @@ func (msg MsgBuy) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgBuy) GetSignerDid() didexported.Did { return msg.BuyerDid }
+// func (msg MsgBuy) GetSignerDid() didexported.Did { return msg.BuyerDid }
 func (msg MsgBuy) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.BuyerAddress)
 	if err != nil {
@@ -438,7 +441,7 @@ func (msg MsgBuy) Route() string { return RouterKey }
 
 func (msg MsgBuy) Type() string { return TypeMsgBuy }
 
-func NewMsgSell(sellerDid didexported.Did, amount sdk.Coin, bondDid didexported.Did, sellerAddress string) *MsgSell {
+func NewMsgSell(sellerDid iidtypes.DIDFragment, amount sdk.Coin, bondDid didexported.Did, sellerAddress string) *MsgSell {
 	return &MsgSell{
 		SellerDid:     sellerDid,
 		Amount:        amount,
@@ -447,11 +450,11 @@ func NewMsgSell(sellerDid didexported.Did, amount sdk.Coin, bondDid didexported.
 	}
 }
 
-func (msg MsgSell) GetIidController() string { return msg.SellerDid }
+func (msg MsgSell) GetIidController() iidtypes.DIDFragment { return msg.SellerDid }
 
 func (msg MsgSell) ValidateBasic() error {
 	// Check if empty
-	if strings.TrimSpace(msg.SellerDid) == "" {
+	if strings.TrimSpace(msg.SellerDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "seller DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
@@ -467,7 +470,7 @@ func (msg MsgSell) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.SellerDid) {
+	} else if !didtypes.IsValidDid(msg.SellerDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "seller DID")
 	}
 
@@ -478,7 +481,7 @@ func (msg MsgSell) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSell) GetSignerDid() didexported.Did { return msg.SellerDid }
+// func (msg MsgSell) GetSignerDid() didexported.Did { return msg.SellerDid }
 func (msg MsgSell) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SellerAddress)
 	if err != nil {
@@ -491,7 +494,7 @@ func (msg MsgSell) Route() string { return RouterKey }
 
 func (msg MsgSell) Type() string { return TypeMsgSell }
 
-func NewMsgSwap(swapperDid didexported.Did, from sdk.Coin, toToken string,
+func NewMsgSwap(swapperDid iidtypes.DIDFragment, from sdk.Coin, toToken string,
 	bondDid didexported.Did, swapperAddress string) *MsgSwap {
 	return &MsgSwap{
 		SwapperDid:     swapperDid,
@@ -502,11 +505,11 @@ func NewMsgSwap(swapperDid didexported.Did, from sdk.Coin, toToken string,
 	}
 }
 
-func (msg MsgSwap) GetIidController() string { return msg.SwapperDid }
+func (msg MsgSwap) GetIidController() iidtypes.DIDFragment { return msg.SwapperDid }
 
 func (msg MsgSwap) ValidateBasic() error {
 	// Check if empty
-	if strings.TrimSpace(msg.SwapperDid) == "" {
+	if strings.TrimSpace(msg.SwapperDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "swapper DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
@@ -540,7 +543,7 @@ func (msg MsgSwap) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID is invalid")
-	} else if !didtypes.IsValidDid(msg.SwapperDid) {
+	} else if !didtypes.IsValidDid(msg.SwapperDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "swapper DID is invalid")
 	}
 
@@ -551,7 +554,7 @@ func (msg MsgSwap) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSwap) GetSignerDid() didexported.Did { return msg.SwapperDid }
+// func (msg MsgSwap) GetSignerDid() didexported.Did { return msg.SwapperDid }
 func (msg MsgSwap) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SwapperAddress)
 	if err != nil {
@@ -564,7 +567,7 @@ func (msg MsgSwap) Route() string { return RouterKey }
 
 func (msg MsgSwap) Type() string { return TypeMsgSwap }
 
-func NewMsgMakeOutcomePayment(senderDid didexported.Did, amount sdk.Int, bondDid didexported.Did, senderAddress string) *MsgMakeOutcomePayment {
+func NewMsgMakeOutcomePayment(senderDid iidtypes.DIDFragment, amount sdk.Int, bondDid didexported.Did, senderAddress string) *MsgMakeOutcomePayment {
 	return &MsgMakeOutcomePayment{
 		SenderDid:     senderDid,
 		Amount:        amount,
@@ -573,11 +576,11 @@ func NewMsgMakeOutcomePayment(senderDid didexported.Did, amount sdk.Int, bondDid
 	}
 }
 
-func (msg MsgMakeOutcomePayment) GetIidController() string { return msg.SenderDid }
+func (msg MsgMakeOutcomePayment) GetIidController() iidtypes.DIDFragment { return msg.SenderDid }
 
 func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 	// Check if empty
-	if strings.TrimSpace(msg.SenderDid) == "" {
+	if strings.TrimSpace(msg.SenderDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "sender DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
@@ -591,7 +594,7 @@ func (msg MsgMakeOutcomePayment) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.SenderDid) {
+	} else if !didtypes.IsValidDid(msg.SenderDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "sender DID")
 	}
 
@@ -602,7 +605,7 @@ func (msg MsgMakeOutcomePayment) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgMakeOutcomePayment) GetSignerDid() didexported.Did { return msg.SenderDid }
+// func (msg MsgMakeOutcomePayment) GetSignerDid() didexported.Did { return msg.SenderDid }
 func (msg MsgMakeOutcomePayment) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.SenderAddress)
 	if err != nil {
@@ -615,7 +618,7 @@ func (msg MsgMakeOutcomePayment) Route() string { return RouterKey }
 
 func (msg MsgMakeOutcomePayment) Type() string { return TypeMsgMakeOutcomePayment }
 
-func NewMsgWithdrawShare(recipientDid, bondDid didexported.Did, recipientAddress string) *MsgWithdrawShare {
+func NewMsgWithdrawShare(recipientDid iidtypes.DIDFragment, bondDid didexported.Did, recipientAddress string) *MsgWithdrawShare {
 	return &MsgWithdrawShare{
 		RecipientDid:     recipientDid,
 		BondDid:          bondDid,
@@ -623,11 +626,11 @@ func NewMsgWithdrawShare(recipientDid, bondDid didexported.Did, recipientAddress
 	}
 }
 
-func (msg MsgWithdrawShare) GetIidController() string { return msg.RecipientDid }
+func (msg MsgWithdrawShare) GetIidController() iidtypes.DIDFragment { return msg.RecipientDid }
 
 func (msg MsgWithdrawShare) ValidateBasic() error {
 	// Check if empty
-	if strings.TrimSpace(msg.RecipientDid) == "" {
+	if strings.TrimSpace(msg.RecipientDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "recipient DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
@@ -636,7 +639,7 @@ func (msg MsgWithdrawShare) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.RecipientDid) {
+	} else if !didtypes.IsValidDid(msg.RecipientDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "recipient DID")
 	}
 
@@ -647,7 +650,7 @@ func (msg MsgWithdrawShare) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgWithdrawShare) GetSignerDid() didexported.Did { return msg.RecipientDid }
+// func (msg MsgWithdrawShare) GetSignerDid() didexported.Did { return msg.RecipientDid }
 func (msg MsgWithdrawShare) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.RecipientAddress)
 	if err != nil {
@@ -660,7 +663,7 @@ func (msg MsgWithdrawShare) Route() string { return RouterKey }
 
 func (msg MsgWithdrawShare) Type() string { return TypeMsgWithdrawShare }
 
-func NewMsgWithdrawReserve(withdrawerDid didexported.Did, amount sdk.Coins,
+func NewMsgWithdrawReserve(withdrawerDid iidtypes.DIDFragment, amount sdk.Coins,
 	bondDid didexported.Did, withdrawerAddress string) *MsgWithdrawReserve {
 	return &MsgWithdrawReserve{
 		WithdrawerDid:     withdrawerDid,
@@ -670,11 +673,11 @@ func NewMsgWithdrawReserve(withdrawerDid didexported.Did, amount sdk.Coins,
 	}
 }
 
-func (msg MsgWithdrawReserve) GetIidController() string { return msg.WithdrawerDid }
+func (msg MsgWithdrawReserve) GetIidController() iidtypes.DIDFragment { return msg.WithdrawerDid }
 
 func (msg MsgWithdrawReserve) ValidateBasic() error {
 	// Check if empty
-	if strings.TrimSpace(msg.WithdrawerDid) == "" {
+	if strings.TrimSpace(msg.WithdrawerDid.String()) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "withdrawer DID")
 	} else if strings.TrimSpace(msg.BondDid) == "" {
 		return sdkerrors.Wrap(ErrArgumentCannotBeEmpty, "bond DID")
@@ -688,7 +691,7 @@ func (msg MsgWithdrawReserve) ValidateBasic() error {
 	// Check that DIDs valid
 	if !didtypes.IsValidDid(msg.BondDid) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "bond DID")
-	} else if !didtypes.IsValidDid(msg.WithdrawerDid) {
+	} else if !didtypes.IsValidDid(msg.WithdrawerDid.Did()) {
 		return sdkerrors.Wrap(didtypes.ErrInvalidDid, "withdrawer DID")
 	}
 
@@ -699,7 +702,7 @@ func (msg MsgWithdrawReserve) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgWithdrawReserve) GetSignerDid() didexported.Did { return msg.WithdrawerDid }
+// func (msg MsgWithdrawReserve) GetSignerDid() didexported.Did { return msg.WithdrawerDid }
 func (msg MsgWithdrawReserve) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.WithdrawerAddress)
 	if err != nil {
