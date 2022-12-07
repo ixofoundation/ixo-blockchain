@@ -32,12 +32,19 @@ func (a MintAuthorization) MsgTypeURL() string {
 func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
 	mMint, ok := msg.(*MsgMint)
 	if !ok {
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("type mismatch")
+		return authz.AcceptResponse{Accept: false}, sdkerrors.ErrInvalidType.Wrap("type mismatch")
 	}
 
 	if a.MinterDid.Did() != mMint.MinterDid.Did() {
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrapf("authorized minter (%s) did not match the minter in the msg %s", a.MinterDid.Did(), mMint.MinterDid.Did())
+		return authz.AcceptResponse{Accept: false}, sdkerrors.ErrInvalidType.Wrapf("authorized minter (%s) did not match the minter in the msg %s", a.MinterDid.Did(), mMint.MinterDid.Did())
 	}
+
+	// var foundContractInAuthorization bool = false
+	// var allLimitsAreZero bool = true
+
+	// for _, constraints := range a.Constraints {
+
+	// }
 
 	updatedConstraints := []*MintConstraints{}
 	var matched bool
@@ -45,13 +52,14 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 	for _, constraints := range a.Constraints {
 		if constraints.ContractAddress != mMint.ContractAddress {
 			updatedConstraints = append(updatedConstraints, constraints)
+			continue
 		}
 
 		// state that a match was found becuase if this is full the result will deny, as this must match at least on contract.
 		matched = true
 
 		if constraints.Limit == 0 {
-			return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("contract mint limit reached")
+			return authz.AcceptResponse{Accept: false, Delete: true, Updated: &a}, sdkerrors.ErrInvalidType.Wrap("contract mint limit reached")
 		}
 
 		constraints.Limit = constraints.Limit - 1
@@ -59,7 +67,7 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 	}
 
 	if !matched {
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("no contract matched the constraints specified in the grant.")
+		return authz.AcceptResponse{Accept: false, Delete: false, Updated: &a}, sdkerrors.ErrInvalidType.Wrap("no contract matched the constraints specified in the grant.")
 	}
 	a.Constraints = updatedConstraints
 

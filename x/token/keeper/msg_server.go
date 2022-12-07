@@ -54,14 +54,20 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		codeId = params.GetCw20ContractCode()
 		label = fmt.Sprintf("%s-cw20-contract", msg.MinterDid.String())
 		contractType = types.ContractType_CW20
-		cap := uint(contractInfo.Cw20.Cap)
+		// uint := uint(contractInfo.Cw20.Cap)
 		encodedInitiateMessage, err = cw20.InstantiateMsg{
 			Name:     msg.Name,
 			Symbol:   contractInfo.Cw20.Symbol,
 			Decimals: contractInfo.Cw20.Decimals,
+			InitialBalances: func() (coins []cw20.Cw20Coin) {
+				for _, bal := range contractInfo.Cw20.InstialBalances {
+					coins = append(coins, cw20.Cw20Coin{Address: bal.Address, Amount: bal.Amount})
+				}
+				return
+			}(),
 			Mint: cw20.MinterResponse{
 				Minter: msg.MinterAddress,
-				Cap:    &cap,
+				// Cap:    &contractInfo.Cw20.Cap,
 			},
 		}.Marshal()
 	case *types.MsgSetupMinter_Cw721:

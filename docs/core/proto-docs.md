@@ -1446,6 +1446,10 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.token.v1beta1.Cw20Coin"><span class="badge">M</span>Cw20Coin</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.token.v1beta1.MintCw1155"><span class="badge">M</span>MintCw1155</a>
                 </li>
               
@@ -10242,6 +10246,37 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
       <p></p>
 
       
+        <h3 id="ixo.token.v1beta1.Cw20Coin">Cw20Coin</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.token.v1beta1.MintCw1155">MintCw1155</h3>
         <p></p>
 
@@ -10596,6 +10631,13 @@ IidDocument iidDocument = 1  [(gogoproto.nullable) = false]; </p></td>
                   <td>cap</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>instialBalances</td>
+                  <td><a href="#ixo.token.v1beta1.Cw20Coin">Cw20Coin</a></td>
+                  <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               

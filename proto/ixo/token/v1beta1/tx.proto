@@ -53,11 +53,16 @@ message MsgTransferToken {
 // MsgUpdateProjectStatusResponse defines the Msg/UpdateTokenStatus response type.
 message MsgTransferTokenResponse{}
 
+message Cw20Coin {
+  string address = 1[(gogoproto.jsontag) = "address", (gogoproto.moretags) = "yaml:\"address\""]; 
+  uint64 amount = 2[(gogoproto.jsontag) = "amount", (gogoproto.moretags) = "yaml:\"amount\""]; 
+}
 
 message SetupCw20 {
   string symbol = 1 [(gogoproto.jsontag) = "symbol", (gogoproto.moretags) = "yaml:\"symbol\""];
   uint32 decimals = 2 [(gogoproto.jsontag) = "decimals", (gogoproto.moretags) = "yaml:\"decimals\""];
-  uint64 cap = 3 [(gogoproto.jsontag) = "cap", (gogoproto.moretags) = "yaml:\"cap\""];
+  uint64 cap = 3 [(gogoproto.nullable) = true, (gogoproto.jsontag) = "cap", (gogoproto.moretags) = "yaml:\"cap\""];
+  repeated Cw20Coin instialBalances = 4 [(gogoproto.nullable) = true, (gogoproto.jsontag) = "instial_balances", (gogoproto.moretags) = "yaml:\"instial_balances\""];
 }
 
 message SetupCw721 {
