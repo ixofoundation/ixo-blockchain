@@ -2,7 +2,7 @@ package compatibility
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -130,7 +130,7 @@ func BroadcastTxRequest(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req BroadcastReq
 
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if rest.CheckBadRequestError(w, err) {
 			return
 		}

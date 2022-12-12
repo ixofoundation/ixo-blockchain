@@ -27,13 +27,9 @@ func validateContractCode(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T expected string", i)
 	}
-	code, err := parseCode(codeString)
+	_, err := parseCode(codeString)
 	if err != nil {
 		return err
-	}
-
-	if code < 0 {
-		return fmt.Errorf("invalid contract code")
 	}
 
 	return nil

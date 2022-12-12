@@ -2,7 +2,7 @@ package tx
 
 import (
 	"encoding/hex"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -43,7 +43,7 @@ func SignDataRequest(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req SignDataReq
 
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if rest.CheckBadRequestError(w, err) {
 			return
 		}
