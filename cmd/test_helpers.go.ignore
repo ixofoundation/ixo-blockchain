@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"encoding/json"
-	"github.com/ixofoundation/ixo-blockchain/app"
 	"time"
+
+	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/ixofoundation/ixo-blockchain/app"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -37,7 +39,7 @@ var DefaultConsensusParams = &abci.ConsensusParams{
 func setup(withGenesis bool, invCheckPeriod uint) (*app.IxoApp, app.GenesisState) {
 	db := dbm.NewMemDB()
 	encCdc := app.MakeTestEncodingConfig()
-	appl := app.NewIxoApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, app.DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
+	appl := app.NewIxoApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, app.DefaultNodeHome, invCheckPeriod, encCdc, []types.ProposalType{}, EmptyAppOptions{}, nil)
 	if withGenesis {
 		return appl, app.NewDefaultGenesisState(encCdc.Marshaler)
 	}
