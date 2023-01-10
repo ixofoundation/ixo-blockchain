@@ -3,7 +3,6 @@ package keeper
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -119,7 +118,7 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 
 	// persist the did document
 
-	currentTimeUtc := time.Now().UTC()
+	currentTimeUtc := ctx.BlockTime().UTC()
 	// now create and persist the metadata
 	did.Context = msg.Context
 
