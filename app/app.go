@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -232,18 +231,20 @@ var _ simapp.App = (*IxoApp)(nil)
 var _ servertypes.Application = (*IxoApp)(nil)
 
 func GetEnabledProposals() []wasm.ProposalType {
-	if EnableSpecificProposals == "" {
-		if ProposalsEnabled == "true" {
-			return wasm.EnableAllProposals
-		}
-		return wasm.DisableAllProposals
-	}
-	chunks := strings.Split(EnableSpecificProposals, ",")
-	proposals, err := wasm.ConvertToProposals(chunks)
-	if err != nil {
-		panic(err)
-	}
-	return proposals
+	// if EnableSpecificProposals == "" {
+	// if ProposalsEnabled == "true" {
+	// return wasm.EnableAllProposals
+	// }
+	// return wasm.DisableAllProposals
+	// }
+	// chunks := strings.Split(EnableSpecificProposals, ",")
+	// proposals, err := wasm.ConvertToProposals(chunks)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// return proposals
+	return wasm.EnableAllProposals
+
 }
 
 // Extended ABCI application
