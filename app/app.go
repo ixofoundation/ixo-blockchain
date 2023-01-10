@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -231,20 +232,18 @@ var _ simapp.App = (*IxoApp)(nil)
 var _ servertypes.Application = (*IxoApp)(nil)
 
 func GetEnabledProposals() []wasm.ProposalType {
-	// if EnableSpecificProposals == "" {
-	// if ProposalsEnabled == "true" {
-	// return wasm.EnableAllProposals
-	// }
-	// return wasm.DisableAllProposals
-	// }
-	// chunks := strings.Split(EnableSpecificProposals, ",")
-	// proposals, err := wasm.ConvertToProposals(chunks)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// return proposals
-	return wasm.EnableAllProposals
-
+	if EnableSpecificProposals == "" {
+		if ProposalsEnabled == "true" {
+			return wasm.EnableAllProposals
+		}
+		return wasm.DisableAllProposals
+	}
+	chunks := strings.Split(EnableSpecificProposals, ",")
+	proposals, err := wasm.ConvertToProposals(chunks)
+	if err != nil {
+		panic(err)
+	}
+	return proposals
 }
 
 // Extended ABCI application
@@ -513,7 +512,9 @@ func NewIxoApp(
 		AddRoute(tokentypes.RouterKey, tokenmodule.NewTokenParamChangeProposalHandler(app.TokenKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, wasm.EnableAllProposals))
+
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,
@@ -522,9 +523,9 @@ func NewIxoApp(
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	if len(enabledProposals) != 0 {
-		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, enabledProposals))
-	}
+	// if len(enabledProposals) != 0 {
+	// govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, enabledProposals))
+	// }
 	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.WasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
