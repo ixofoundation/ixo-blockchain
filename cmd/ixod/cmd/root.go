@@ -62,9 +62,32 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		Use:   "ixod",
 		Short: "ixod app",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+
+			// set the default command outputs
+			cmd.SetOut(cmd.OutOrStdout())
+			cmd.SetErr(cmd.ErrOrStderr())
+
+			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			// initClientCtx, err = clientconfig.ReadFromClientConfig(initClientCtx)
+			// if err != nil {
+			// 	return err
+			// }
+
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
+
+			// customAppTemplate, customAppConfig := initAppConfig()
+
+			// return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
+
+			// if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
+			// 	return err
+			// }
 
 			return server.InterceptConfigsPreRunHandler(cmd, "", nil)
 		},
