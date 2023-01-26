@@ -27,16 +27,7 @@ func NewCreateIidDocumentFormLegacyDidCmd() *cobra.Command {
 				return err
 			}
 
-			// chaincmd.Flags().GetString(flags.FlagChainID)
-			// if err != nil {
-			// 	return err
-			// }
-			// did
 			did := types.DID(ixoDid.Did)
-			// verification
-			// signer := clientCtx.GetFromAddress()
-			// pubkey
-
 			pubKey := ixoDid.VerifyKey
 
 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
@@ -56,6 +47,7 @@ func NewCreateIidDocumentFormLegacyDidCmd() *cobra.Command {
 			msg := types.NewMsgCreateIidDocument(
 				did.String(),
 				types.Verifications{auth},
+				append(make([]string, 1), did.String()),
 				types.Services{},
 				types.AccordedRights{},
 				types.LinkedResources{},

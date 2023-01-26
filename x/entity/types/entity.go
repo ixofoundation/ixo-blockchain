@@ -10,6 +10,7 @@ import (
 var (
 	KeyNftContractAddress = []byte("NftContractAddress")
 	KeyNftContractMinter  = []byte("NftContractMinter")
+	KeyCreateSequence  = []byte("CreateSequence")
 )
 
 func validateNftContractAddress(i interface{}) error {
@@ -30,15 +31,25 @@ func validateNftContractAddress(i interface{}) error {
 	return nil
 }
 
+func validateCreateSequence(i interface{}) error {
+	_, ok := i.(uint64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T expected uint64", i)
+	}
+
+	return nil
+}
+
 // ParamTable for project module.
 func ParamKeyTable() paramstypes.KeyTable {
 	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(nftContractAddress string, nftContractMinter string) Params {
+func NewParams(nftContractAddress string, nftContractMinter string, createSequence uint64) Params {
 	return Params{
 		NftContractAddress: nftContractAddress,
 		NftContractMinter:  nftContractAddress,
+		CreateSequence: createSequence,
 	}
 }
 
@@ -47,13 +58,15 @@ func DefaultParams() Params {
 	return Params{
 		NftContractAddress: "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
 		NftContractMinter:  "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
+		CreateSequence: 0,
 	}
 }
 
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
-		{KeyNftContractAddress, &p.NftContractAddress, validateNftContractAddress},
-		{KeyNftContractMinter, &p.NftContractMinter, validateNftContractAddress},
+		paramstypes.ParamSetPair{Key: KeyNftContractAddress, Value: &p.NftContractAddress, ValidatorFn: validateNftContractAddress},
+		paramstypes.ParamSetPair{Key: KeyNftContractMinter, Value: &p.NftContractMinter, ValidatorFn: validateNftContractAddress},
+		paramstypes.ParamSetPair{Key: KeyCreateSequence, Value: &p.CreateSequence, ValidatorFn: validateCreateSequence},
 	}
 }

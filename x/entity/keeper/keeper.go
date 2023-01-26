@@ -1,18 +1,16 @@
 package keeper
 
 import (
+	"crypto/sha256"
 	"errors"
 	"fmt"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/codec"
-	cryptosecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
@@ -66,47 +64,14 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		return types.MsgCreateEntityResponse{}, err
 	}
 
-	privKey := cryptosecp256k1.GenPrivKey()
-	pubKey := privKey.PubKey()
 	address, err := sdk.AccAddressFromBech32(params.NftContractMinter)
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
 
-	account := k.AccountKeeper.NewAccount(ctx, authtypes.NewBaseAccount(address, pubKey, 0, 0))
-	entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, base58.Encode(pubKey.Bytes()[:16]))
-
-	verification := iidtypes.NewVerification(
-		iidtypes.NewVerificationMethod(
-			entityId,
-			iidtypes.DID(entityId),
-			iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
-		),
-		[]string{iidtypes.Authentication},
-		nil,
-	)
-
-	defaultVerification := iidtypes.NewVerification(
-		iidtypes.NewVerificationMethod(
-			iidtypes.DID(entityId).NewVerificationMethodID(account.GetAddress().String()),
-			iidtypes.DID(entityId),
-			iidtypes.NewBlockchainAccountID(ctx.ChainID(), account.GetAddress().String()),
-		),
-		[]string{iidtypes.Authentication},
-		nil,
-	)
-
-	did, err := iidtypes.NewDidDocument(entityId,
-		iidtypes.WithServices(msg.Service...),
-		iidtypes.WithRights(msg.AccordedRight...),
-		iidtypes.WithResources(msg.LinkedResource...),
-		iidtypes.WithVerifications(append(msg.Verification, defaultVerification, verification)...),
-		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid.Did())...),
-	)
-	if err != nil {
-		// k.Logger(ctx).Error(err.Error())
-		return types.MsgCreateEntityResponse{}, err
-	}
+	generatedId := sha256.Sum256([]byte(fmt.Sprintf("%s/%d", nftContractAddressParam, params.CreateSequence)))
+	// entityId := fmt.Sprintf("did:ixo:entity:%s:%s", msg.EntityType, base58.Encode(generatedId[:16]))
+	entityId := fmt.Sprintf("did:ixo:entity:%s:%x", msg.EntityType, generatedId)
 
 	// check that the did is not already taken
 	_, found := k.IidKeeper.GetDidDocument(ctx, []byte(entityId))
@@ -116,13 +81,22 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 		return types.MsgCreateEntityResponse{}, err
 	}
 
-	// persist the did document
+	// create and persist the did document
+	did, err := iidtypes.NewDidDocument(entityId,
+		iidtypes.WithServices(msg.Service...),
+		iidtypes.WithRights(msg.AccordedRight...),
+		iidtypes.WithResources(msg.LinkedResource...),
+		iidtypes.WithVerifications(msg.Verification...),
+		iidtypes.WithControllers(append(msg.Controller, entityId, msg.OwnerDid.Did())...),
+	)
+	if err != nil {
+		return types.MsgCreateEntityResponse{}, err
+	}
 
 	currentTimeUtc := ctx.BlockTime().UTC()
-	// now create and persist the metadata
 	did.Context = msg.Context
 
-	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
+	didM := iidtypes.NewDidMetadata(ctx.TxBytes(), currentTimeUtc)
 	didM.Id = entityId
 	didM.EntityType = msg.EntityType
 	didM.Deactivated = msg.Deactivated
@@ -139,8 +113,11 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	k.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 	k.IidKeeper.SetDidMetadata(ctx, []byte(entityId), didM)
 
-	//nftAddresBytes, err := k.GetEntityConfig(ctx, types.ConfigNftContractAddress)
+	// update and persist createSequence
+	params.CreateSequence++
+	k.ParamSpace.SetParamSet(ctx, &params)
 
+	// create the nft cw721
 	nftMint := entitycontracts.WasmMsgMint{
 		Mint: entitycontracts.Mint{
 			TokenId:   did.Id,
@@ -151,7 +128,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 	}
 
 	finalMessage, err := nftMint.Marshal()
-
 	if err != nil {
 		return types.MsgCreateEntityResponse{}, err
 	}
@@ -163,7 +139,6 @@ func (k Keeper) CreateEntity(ctx sdk.Context, msg *types.MsgCreateEntity) (types
 
 	// emit the event
 	if err := ctx.EventManager().EmitTypedEvents(iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid.Did())); err != nil {
-		// k.Logger(ctx).Error("failed to emit DidDocumentCreatedEvent", "did", msg.Id, "signer", msg.Signer, "err", err)
 		return types.MsgCreateEntityResponse{}, err
 	}
 

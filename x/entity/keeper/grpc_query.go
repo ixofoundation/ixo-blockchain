@@ -46,38 +46,3 @@ func (k Keeper) EntityList(c context.Context, req *types.QueryEntityListRequest)
 func (k Keeper) EntityConfig(c context.Context, req *types.QueryEntityConfigRequest) (*types.QueryEntityConfigResponse, error) {
 	return &types.QueryEntityConfigResponse{}, nil
 }
-
-// func (k Keeper) ProjectAccounts(c context.Context, req *types.QueryProjectAccountsRequest) (*types.QueryProjectAccountsResponse, error) {
-// 	if req == nil {
-// 		return nil, status.Error(codes.InvalidArgument, "invalid request")
-// 	}
-
-// 	ctx := sdk.UnwrapSDKContext(c)
-
-// 	resp := k.GetAccountMap(ctx, req.ProjectDid)
-
-// 	return &types.QueryProjectAccountsResponse{AccountMap: &resp}, nil
-// }
-
-// func (k Keeper) ProjectTx(c context.Context, req *types.QueryProjectTxRequest) (*types.QueryProjectTxResponse, error) {
-// 	if req == nil {
-// 		return nil, status.Error(codes.InvalidArgument, "invalid request")
-// 	}
-
-// 	ctx := sdk.UnwrapSDKContext(c)
-
-// 	info, err := k.GetProjectWithdrawalTransactions(ctx, req.ProjectDid)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &types.QueryProjectTxResponse{Txs: &info}, nil
-// }
-
-// func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
-// 	ctx := sdk.UnwrapSDKContext(c)
-
-// 	params := k.GetParams(ctx)
-
-// 	return &types.QueryParamsResponse{Params: params}, nil
-// }

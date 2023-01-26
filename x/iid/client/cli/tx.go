@@ -69,60 +69,66 @@ func deriveVMType(pubKey cryptotypes.PubKey) (vmType types.VerificationMaterialT
 // NewCreateDidDocumentCmd defines the command to create a new IBC light client.
 func NewCreateIidDocumentCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "create-iid [id] [chain name]",
+		Use:     "create-iid [didDoc]",
 		Short:   "create decentralized did (did) document",
 		Example: "creates a did document for users",
-		Args:    cobra.ExactArgs(2),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgCreateIidDocument
+			err := json.Unmarshal([]byte(args[0]), &msg)
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// did
-			did := types.NewChainDID(args[1], args[0])
-			// verification
-			signer := clientCtx.GetFromAddress()
-			// pubkey
-			info, err := clientCtx.Keyring.KeyByAddress(signer)
-			if err != nil {
-				return err
-			}
-			pubKey := info.GetPubKey()
-			// verification method id
-			//NOTE: Removed this for consistency when using the rpc messages.
-			// vmID := did.NewVerificationMethodID(signer.String())
-			vmID := signer.String()
-			// understand the vmType
-			vmType, err := deriveVMType(pubKey)
-			if err != nil {
-				return err
-			}
-			auth := types.NewVerification(
-				types.NewVerificationMethod(
-					vmID,
-					did,
-					types.NewPublicKeyMultibase(pubKey.Bytes(), vmType),
-				),
-				[]string{types.Authentication},
-				nil,
-			)
-			// create the message
-			msg := types.NewMsgCreateIidDocument(
-				did.String(),
-				types.Verifications{auth},
-				types.Services{},
-				types.AccordedRights{},
-				types.LinkedResources{},
-				types.LinkedEntities{},
-				signer.String(),
-				types.Contexts{},
-			)
+
+			// UNCOMMENTED did doc generation
+			// did := args[0]
+			// signer := clientCtx.GetFromAddress()
+			
+			// info, err := clientCtx.Keyring.KeyByAddress(signer)
+			// if err != nil {
+			// 	return err
+			// }
+
+			// pubKey := info.GetPubKey()
+			// vmType, err := deriveVMType(pubKey)
+			// if err != nil {
+			// 	return err
+			// }
+
+			// auth := types.NewVerification(
+			// 	types.NewVerificationMethod(
+			// 		did,
+			// 		types.DID(did),
+			// 		types.NewPublicKeyMultibase(pubKey.Bytes(), vmType),
+			// 	),
+			// 	[]string{types.Authentication},
+			// 	nil,
+			// )
+
+			// // create the message
+			// msg := types.NewMsgCreateIidDocument(
+			// 	did,
+			// 	types.Verifications{auth},
+			// 	append(make([]string, 1), did),
+			// 	types.Services{},
+			// 	types.AccordedRights{},
+			// 	types.LinkedResources{},
+			// 	types.LinkedEntities{},
+			// 	signer.String(),
+			// 	types.Contexts{},
+			// )
+
 			// validate
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 			// execute
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 

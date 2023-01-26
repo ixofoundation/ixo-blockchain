@@ -45,14 +45,11 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	}
 
 	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
-
 	if err != nil {
 		return err
 	}
 
-	deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
-
-	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", deposit)
+	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
 	if err != nil {
 		return err
 	}
@@ -61,9 +58,6 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	xx.NftContractMinter = initiateNftContractMsg.Minter
 
 	k.ParamSpace.SetParamSet(ctx, &xx)
-
-	var yy types.Params
-	k.ParamSpace.GetParamSetIfExists(ctx, &yy)
 
 	return nil
 }

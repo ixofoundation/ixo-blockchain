@@ -3964,6 +3964,13 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>CreateSequence</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 

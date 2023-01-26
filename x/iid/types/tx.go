@@ -15,6 +15,7 @@ var _ sdk.Msg = &MsgCreateIidDocument{}
 func NewMsgCreateIidDocument(
 	id string,
 	verifications []*Verification,
+	controllers []string,
 	services []*Service,
 	rights []*AccordedRight,
 	resources []*LinkedResource,
@@ -31,6 +32,7 @@ func NewMsgCreateIidDocument(
 		LinkedEntity:   entity,
 		Context:        didContexts,
 		Signer:         signerAccount,
+		Controllers:    controllers,
 	}
 }
 
