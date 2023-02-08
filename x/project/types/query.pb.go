@@ -29,7 +29,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
+// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC
+// method.
 type QueryProjectDocRequest struct {
 	ProjectDid string `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"project_did,omitempty" yaml:"project_did"`
 }
@@ -74,7 +75,8 @@ func (m *QueryProjectDocRequest) GetProjectDid() string {
 	return ""
 }
 
-// QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 type QueryProjectDocResponse struct {
 	ProjectDoc *ProjectDoc `protobuf:"bytes,1,opt,name=project_doc,json=projectDoc,proto3" json:"project_doc,omitempty" yaml:"project_doc"`
 }
@@ -119,7 +121,8 @@ func (m *QueryProjectDocResponse) GetProjectDoc() *ProjectDoc {
 	return nil
 }
 
-// QueryProjectAccountsRequest is the request type for the Query/ProjectAccounts RPC method.
+// QueryProjectAccountsRequest is the request type for the Query/ProjectAccounts
+// RPC method.
 type QueryProjectAccountsRequest struct {
 	ProjectDid string `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"project_did,omitempty" yaml:"project_did"`
 }
@@ -164,7 +167,8 @@ func (m *QueryProjectAccountsRequest) GetProjectDid() string {
 	return ""
 }
 
-// QueryProjectAccountsResponse is the response type for the Query/ProjectAccounts RPC method.
+// QueryProjectAccountsResponse is the response type for the
+// Query/ProjectAccounts RPC method.
 type QueryProjectAccountsResponse struct {
 	AccountMap *AccountMap `protobuf:"bytes,1,opt,name=account_map,json=accountMap,proto3" json:"account_map,omitempty" yaml:"account_map"`
 }
@@ -254,7 +258,8 @@ func (m *QueryProjectTxRequest) GetProjectDid() string {
 	return ""
 }
 
-// QueryProjectTxResponse is the response type for the Query/ProjectTx RPC method.
+// QueryProjectTxResponse is the response type for the Query/ProjectTx RPC
+// method.
 type QueryProjectTxResponse struct {
 	Txs *WithdrawalInfoDocs `protobuf:"bytes,1,opt,name=txs,proto3" json:"txs,omitempty" yaml:"txs"`
 }

@@ -6,23 +6,28 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 message Contract {
-  string id = 1 [(gogoproto.jsontag) = "id", (gogoproto.moretags) = "yaml:\"id\""]; 
-  string address = 2 [(gogoproto.jsontag) = "address", (gogoproto.moretags) = "yaml:\"address\""];
+  string id = 1;
+  string address = 2;
 }
 
 message Params {
-  option (gogoproto.goproto_getters)  = false;
+  option (gogoproto.goproto_getters) = false;
 
-  string cw20ContractCode = 1 [(gogoproto.jsontag) = "cw20_contract_code", (gogoproto.moretags) = "yaml:\"cw20_contract_code\""];
-  string cw721ContractCode = 2 [(gogoproto.jsontag) = "cw721_contract_code", (gogoproto.moretags) = "yaml:\"cw721_contract_code\""];
-  string ixo1155ContractCode = 3 [(gogoproto.jsontag) = "ixo1155_contract_code", (gogoproto.moretags) = "yaml:\"ixo1155_contract_code\""];
+  uint64 cw20_contract_code = 1;
+  uint64 cw721_contract_code = 2;
+  uint64 ixo1155_contract_code = 3;
 }
 
 // message TokenDoc {
-//   string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-//   repeated Contract cw20Contracts = 2 [(gogoproto.jsontag) = "cw20_contracts", (gogoproto.moretags) = "yaml:\"cw20_contracts\""];
-//   Contract cw721Contract = 3 [(gogoproto.jsontag) = "cw721_contract", (gogoproto.moretags) = "yaml:\"cw721_contract\""];
-//   Contract ixo1155Contract = 4 [(gogoproto.jsontag) = "ixo1155_contract", (gogoproto.moretags) = "yaml:\"ixo1155_contract\""];
+//   string minterDid = 1 [(gogoproto.casttype) =
+//   "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment",
+//   (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) =
+//   "yaml:\"minter_did\""]; repeated Contract cw20Contracts = 2
+//   [(gogoproto.jsontag) = "cw20_contracts", (gogoproto.moretags) =
+//   "yaml:\"cw20_contracts\""]; Contract cw721Contract = 3 [(gogoproto.jsontag)
+//   = "cw721_contract", (gogoproto.moretags) = "yaml:\"cw721_contract\""];
+//   Contract ixo1155Contract = 4 [(gogoproto.jsontag) = "ixo1155_contract",
+//   (gogoproto.moretags) = "yaml:\"ixo1155_contract\""];
 // }
 
 enum ContractType {
@@ -32,12 +37,14 @@ enum ContractType {
 }
 
 message TokenMinter {
-  option (gogoproto.goproto_getters)  = false;
-  
-  string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-  string minterAddress = 2 [(gogoproto.jsontag) = "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""];
-  string contractAddress = 3 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];
-  ContractType contractType = 4 [(gogoproto.jsontag) = "contract_type", (gogoproto.moretags) = "yaml:\"contract_type\""];
-  string name = 5 [(gogoproto.jsontag) = "name", (gogoproto.moretags) = "yaml:\"name\""];
-  string description = 6 [(gogoproto.jsontag) = "description", (gogoproto.moretags) = "yaml:\"description\""];
+  option (gogoproto.goproto_getters) = false;
+
+  string minter_did = 1
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string minter_address = 2;
+  string contract_address = 3;
+  ContractType contract_type = 4;
+  string name = 5;
+  string description = 6;
 }

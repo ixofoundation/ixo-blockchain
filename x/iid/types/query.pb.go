@@ -6,6 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
@@ -29,10 +30,9 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.
 type QueryIidDocumentsRequest struct {
-	// status enables to query for validators matching a given status.
-	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// pagination defines an optional pagination for the request.
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryIidDocumentsRequest) Reset()         { *m = QueryIidDocumentsRequest{} }
@@ -68,17 +68,17 @@ func (m *QueryIidDocumentsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryIidDocumentsRequest proto.InternalMessageInfo
 
-func (m *QueryIidDocumentsRequest) GetStatus() string {
+func (m *QueryIidDocumentsRequest) GetPagination() *query.PageRequest {
 	if m != nil {
-		return m.Status
+		return m.Pagination
 	}
-	return ""
+	return nil
 }
 
-// QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method
 type QueryIidDocumentsResponse struct {
-	// validators contains all the queried validators.
 	IidDocuments []IidDocument `protobuf:"bytes,1,rep,name=iidDocuments,proto3" json:"iidDocuments"`
+	// pagination defines the pagination in the response.
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryIidDocumentsResponse) Reset()         { *m = QueryIidDocumentsResponse{} }
@@ -121,9 +121,15 @@ func (m *QueryIidDocumentsResponse) GetIidDocuments() []IidDocument {
 	return nil
 }
 
-// QueryDidDocumentsRequest is request type for Query/DidDocuments RPC method.
+func (m *QueryIidDocumentsResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 type QueryIidDocumentRequest struct {
-	// status enables to query for validators matching a given status.
+	// did id of iid document querying
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
@@ -167,9 +173,7 @@ func (m *QueryIidDocumentRequest) GetId() string {
 	return ""
 }
 
-// QueryDidDocumentsResponse is response type for the Query/DidDocuments RPC method
 type QueryIidDocumentResponse struct {
-	// validators contains all the queried validators.
 	IidDocument IidDocument `protobuf:"bytes,1,opt,name=iidDocument,proto3" json:"iidDocument"`
 }
 
@@ -213,138 +217,45 @@ func (m *QueryIidDocumentResponse) GetIidDocument() IidDocument {
 	return IidDocument{}
 }
 
-type QueryIidMetaDataRequest struct {
-	// status enables to query for validators matching a given status.
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (m *QueryIidMetaDataRequest) Reset()         { *m = QueryIidMetaDataRequest{} }
-func (m *QueryIidMetaDataRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryIidMetaDataRequest) ProtoMessage()    {}
-func (*QueryIidMetaDataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_4950ee37c7844ad4, []int{4}
-}
-func (m *QueryIidMetaDataRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryIidMetaDataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryIidMetaDataRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryIidMetaDataRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryIidMetaDataRequest.Merge(m, src)
-}
-func (m *QueryIidMetaDataRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryIidMetaDataRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryIidMetaDataRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryIidMetaDataRequest proto.InternalMessageInfo
-
-func (m *QueryIidMetaDataRequest) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-type QueryIidMetaDataResponse struct {
-	// validators contains all the queried validators.
-	//IidDocument iidDocument = 1  [(gogoproto.nullable) = false];
-	DidMetadata IidMetadata `protobuf:"bytes,2,opt,name=didMetadata,proto3" json:"didMetadata"`
-}
-
-func (m *QueryIidMetaDataResponse) Reset()         { *m = QueryIidMetaDataResponse{} }
-func (m *QueryIidMetaDataResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryIidMetaDataResponse) ProtoMessage()    {}
-func (*QueryIidMetaDataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_4950ee37c7844ad4, []int{5}
-}
-func (m *QueryIidMetaDataResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryIidMetaDataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryIidMetaDataResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryIidMetaDataResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryIidMetaDataResponse.Merge(m, src)
-}
-func (m *QueryIidMetaDataResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryIidMetaDataResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryIidMetaDataResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryIidMetaDataResponse proto.InternalMessageInfo
-
-func (m *QueryIidMetaDataResponse) GetDidMetadata() IidMetadata {
-	if m != nil {
-		return m.DidMetadata
-	}
-	return IidMetadata{}
-}
-
 func init() {
 	proto.RegisterType((*QueryIidDocumentsRequest)(nil), "ixo.iid.v1beta1.QueryIidDocumentsRequest")
 	proto.RegisterType((*QueryIidDocumentsResponse)(nil), "ixo.iid.v1beta1.QueryIidDocumentsResponse")
 	proto.RegisterType((*QueryIidDocumentRequest)(nil), "ixo.iid.v1beta1.QueryIidDocumentRequest")
 	proto.RegisterType((*QueryIidDocumentResponse)(nil), "ixo.iid.v1beta1.QueryIidDocumentResponse")
-	proto.RegisterType((*QueryIidMetaDataRequest)(nil), "ixo.iid.v1beta1.QueryIidMetaDataRequest")
-	proto.RegisterType((*QueryIidMetaDataResponse)(nil), "ixo.iid.v1beta1.QueryIidMetaDataResponse")
 }
 
 func init() { proto.RegisterFile("ixo/iid/v1beta1/query.proto", fileDescriptor_4950ee37c7844ad4) }
 
 var fileDescriptor_4950ee37c7844ad4 = []byte{
-	// 436 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xcd, 0x6e, 0xd3, 0x40,
-	0x14, 0x85, 0x6d, 0x17, 0x2a, 0x98, 0x14, 0x2a, 0x8d, 0x0a, 0xb8, 0xa6, 0x32, 0x95, 0x57, 0x09,
-	0x12, 0x1e, 0x35, 0x7d, 0x83, 0x2a, 0x42, 0x62, 0xd1, 0x05, 0x59, 0xb2, 0x62, 0xec, 0x19, 0xdc,
-	0x2b, 0x1a, 0x8f, 0x93, 0x19, 0xa3, 0x44, 0x01, 0x16, 0x79, 0x02, 0x24, 0x5e, 0x2a, 0xcb, 0x48,
-	0x6c, 0x58, 0x21, 0x94, 0xf0, 0x20, 0xc8, 0x7f, 0x64, 0xe2, 0x90, 0xd4, 0x8b, 0x48, 0xf3, 0x73,
-	0xce, 0x3d, 0xdf, 0xe4, 0xfa, 0xa2, 0xe7, 0x30, 0x16, 0x04, 0x80, 0x91, 0x4f, 0x17, 0x01, 0x57,
-	0xf4, 0x82, 0x0c, 0x53, 0x3e, 0x9a, 0xf8, 0xc9, 0x48, 0x28, 0x81, 0x8f, 0x61, 0x2c, 0x7c, 0x00,
-	0xe6, 0x97, 0x97, 0xce, 0x59, 0x24, 0x44, 0x74, 0xcb, 0x09, 0x4d, 0x80, 0xd0, 0x38, 0x16, 0x8a,
-	0x2a, 0x10, 0xb1, 0x2c, 0xe4, 0xce, 0x69, 0xbd, 0x56, 0x66, 0x2d, 0xae, 0x4e, 0x22, 0x11, 0x89,
-	0x7c, 0x49, 0xb2, 0x55, 0x71, 0xea, 0x75, 0x91, 0xfd, 0x36, 0x8b, 0x7b, 0x03, 0xac, 0x27, 0xc2,
-	0x74, 0xc0, 0x63, 0x25, 0xfb, 0x7c, 0x98, 0x72, 0xa9, 0xf0, 0x53, 0x74, 0x28, 0x15, 0x55, 0xa9,
-	0xb4, 0xcd, 0x73, 0xb3, 0xfd, 0xb0, 0x5f, 0xee, 0xbc, 0x10, 0x9d, 0xfe, 0xc7, 0x23, 0x13, 0x11,
-	0x4b, 0x8e, 0x5f, 0xa3, 0x23, 0xd0, 0xce, 0x6d, 0xf3, 0xfc, 0xa0, 0xdd, 0xea, 0x9e, 0xf9, 0xb5,
-	0x77, 0xf8, 0x9a, 0xf9, 0xea, 0xde, 0xfc, 0xd7, 0x0b, 0xa3, 0xbf, 0xe1, 0xf3, 0x3a, 0xe8, 0x59,
-	0x3d, 0xa4, 0xe2, 0x7a, 0x8c, 0x2c, 0x60, 0x25, 0x93, 0x05, 0xcc, 0x7b, 0xbf, 0xfd, 0x86, 0x7f,
-	0x38, 0x3d, 0xd4, 0xd2, 0xca, 0xe6, 0xa6, 0x66, 0x34, 0xba, 0x4d, 0x87, 0xb9, 0xe6, 0x8a, 0xf6,
-	0xa8, 0xa2, 0x0d, 0x60, 0xd6, 0xd2, 0x35, 0x0c, 0x2b, 0x8e, 0x19, 0x55, 0xd4, 0xb6, 0x76, 0xc3,
-	0x54, 0x9a, 0x0a, 0x46, 0xb3, 0x75, 0x67, 0x07, 0xe8, 0x7e, 0x1e, 0x81, 0x3f, 0xa3, 0x23, 0xbd,
-	0x07, 0xb8, 0xb3, 0x55, 0x6a, 0x57, 0x6f, 0x9d, 0x97, 0x4d, 0xa4, 0x05, 0xb6, 0xf7, 0x64, 0xf6,
-	0xe3, 0xcf, 0x77, 0xeb, 0x18, 0x3f, 0x22, 0xd9, 0xd7, 0xc5, 0x80, 0x65, 0x3f, 0x89, 0xbf, 0xa2,
-	0x96, 0x26, 0xc7, 0xed, 0x3b, 0x2b, 0x56, 0xd9, 0x9d, 0x06, 0xca, 0x32, 0xda, 0xc9, 0xa3, 0x4f,
-	0x30, 0xde, 0x88, 0x26, 0x53, 0x60, 0x5f, 0xf0, 0x14, 0x3d, 0xa8, 0xfe, 0xe1, 0x3d, 0xe1, 0xb5,
-	0x7e, 0xed, 0x09, 0xaf, 0xb7, 0x6b, 0x5f, 0xf8, 0xd5, 0xf5, 0x7c, 0xe9, 0x9a, 0x8b, 0xa5, 0x6b,
-	0xfe, 0x5e, 0xba, 0xe6, 0xb7, 0x95, 0x6b, 0x2c, 0x56, 0xae, 0xf1, 0x73, 0xe5, 0x1a, 0xef, 0x2e,
-	0x23, 0x50, 0x37, 0x69, 0xe0, 0x87, 0x62, 0x90, 0xf9, 0x3e, 0x88, 0x34, 0x66, 0xf9, 0x8c, 0x66,
-	0xbb, 0x57, 0xc1, 0xad, 0x08, 0x3f, 0x86, 0x37, 0x14, 0x62, 0x32, 0xce, 0x07, 0x55, 0x4d, 0x12,
-	0x2e, 0x83, 0xc3, 0x7c, 0x1a, 0x2f, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0xa0, 0x9f, 0xcd, 0x0a,
-	0x0c, 0x04, 0x00, 0x00,
+	// 442 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0x4d, 0x6b, 0x14, 0x31,
+	0x18, 0xde, 0x19, 0x3f, 0xc0, 0x6c, 0xb5, 0x10, 0x2a, 0x6e, 0xd7, 0x32, 0x96, 0x3d, 0xe8, 0x6e,
+	0xc1, 0x84, 0x6e, 0xff, 0x41, 0x29, 0x15, 0x0f, 0x82, 0xce, 0xd1, 0x93, 0x99, 0x49, 0x9c, 0xbe,
+	0xd8, 0xcd, 0x3b, 0x6d, 0x32, 0xb2, 0xc5, 0x8f, 0x83, 0xe0, 0x5d, 0xf0, 0x6f, 0xf8, 0x43, 0x7a,
+	0x2c, 0x78, 0xf1, 0x24, 0xb2, 0xeb, 0x0f, 0x91, 0x24, 0xd3, 0x3a, 0xb3, 0x55, 0xba, 0x87, 0x85,
+	0x6c, 0xf2, 0x7c, 0xbd, 0x4f, 0x32, 0xe4, 0x3e, 0x4c, 0x91, 0x03, 0x48, 0xfe, 0x76, 0x3b, 0x53,
+	0x56, 0x6c, 0xf3, 0xa3, 0x4a, 0x1d, 0x9f, 0xb0, 0xf2, 0x18, 0x2d, 0xd2, 0x55, 0x98, 0x22, 0x03,
+	0x90, 0xac, 0x3e, 0xec, 0x6f, 0x14, 0x88, 0xc5, 0xa1, 0xe2, 0xa2, 0x04, 0x2e, 0xb4, 0x46, 0x2b,
+	0x2c, 0xa0, 0x36, 0x01, 0xde, 0x5f, 0x5f, 0xd4, 0x72, 0xd4, 0x70, 0xb4, 0x56, 0x60, 0x81, 0x7e,
+	0xc9, 0xdd, 0xaa, 0xde, 0xdd, 0xca, 0xd1, 0x4c, 0xd0, 0xf0, 0x4c, 0x18, 0x15, 0x8c, 0x2f, 0xa8,
+	0xa5, 0x28, 0x40, 0x7b, 0xf5, 0x80, 0x1d, 0x64, 0xa4, 0xf7, 0xc2, 0x21, 0x9e, 0x82, 0xdc, 0xc3,
+	0xbc, 0x9a, 0x28, 0x6d, 0x4d, 0xaa, 0x8e, 0x2a, 0x65, 0x2c, 0xdd, 0x27, 0xe4, 0x2f, 0xbe, 0x17,
+	0x6d, 0x46, 0xc3, 0xee, 0xf8, 0x21, 0x0b, 0xe2, 0xcc, 0x89, 0xb3, 0x30, 0x55, 0x2d, 0xce, 0x9e,
+	0x8b, 0x42, 0xd5, 0xdc, 0xb4, 0xc1, 0x1c, 0x7c, 0x8b, 0xc8, 0xfa, 0x3f, 0x4c, 0x4c, 0x89, 0xda,
+	0x28, 0xba, 0x4f, 0x56, 0xa0, 0xb1, 0xdf, 0x8b, 0x36, 0xaf, 0x0d, 0xbb, 0xe3, 0x0d, 0xb6, 0x50,
+	0x12, 0x6b, 0x90, 0x77, 0xaf, 0x9f, 0xfe, 0x7c, 0xd0, 0x49, 0x5b, 0x3c, 0xfa, 0xa4, 0x95, 0x36,
+	0xf6, 0x69, 0x1f, 0x5d, 0x99, 0x36, 0x84, 0x68, 0xc5, 0x1d, 0x91, 0x7b, 0x8b, 0x69, 0xcf, 0x1b,
+	0xb9, 0x43, 0x62, 0x90, 0xbe, 0x89, 0x5b, 0x69, 0x0c, 0x72, 0xf0, 0xea, 0x72, 0x7b, 0x17, 0x73,
+	0xed, 0x91, 0x6e, 0x23, 0x5f, 0x5d, 0xdf, 0x32, 0x63, 0x35, 0x69, 0xe3, 0xcf, 0x31, 0xb9, 0xe1,
+	0x2d, 0xe8, 0x7b, 0xb2, 0xd2, 0xec, 0x8f, 0x8e, 0x2e, 0x49, 0xfd, 0xef, 0x22, 0xfb, 0x5b, 0xcb,
+	0x40, 0x43, 0xec, 0xc1, 0xdd, 0x4f, 0xdf, 0x7f, 0x7f, 0x8d, 0x57, 0xe9, 0x6d, 0xee, 0x9e, 0x9d,
+	0x04, 0xe9, 0x7e, 0x86, 0x7e, 0x24, 0xdd, 0x06, 0x9c, 0x0e, 0xaf, 0x54, 0x3c, 0xf7, 0x1e, 0x2d,
+	0x81, 0xac, 0xad, 0xfb, 0xde, 0x7a, 0x8d, 0xd2, 0x96, 0x35, 0x7f, 0x07, 0xf2, 0xc3, 0xee, 0xb3,
+	0xd3, 0x59, 0x12, 0x9d, 0xcd, 0x92, 0xe8, 0xd7, 0x2c, 0x89, 0xbe, 0xcc, 0x93, 0xce, 0xd9, 0x3c,
+	0xe9, 0xfc, 0x98, 0x27, 0x9d, 0x97, 0x3b, 0x05, 0xd8, 0x83, 0x2a, 0x63, 0x39, 0x4e, 0x1c, 0xef,
+	0x35, 0x56, 0x5a, 0xfa, 0x8b, 0x74, 0xff, 0x1e, 0x67, 0x87, 0x98, 0xbf, 0xc9, 0x0f, 0x04, 0x68,
+	0x3e, 0xf5, 0x1f, 0x91, 0x3d, 0x29, 0x95, 0xc9, 0x6e, 0xfa, 0xd7, 0xbf, 0xf3, 0x27, 0x00, 0x00,
+	0xff, 0xff, 0x27, 0xc7, 0x8d, 0x6b, 0xa8, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -363,8 +274,6 @@ type QueryClient interface {
 	IidDocuments(ctx context.Context, in *QueryIidDocumentsRequest, opts ...grpc.CallOption) (*QueryIidDocumentsResponse, error)
 	// IidDocument queries a iid documents with an id.
 	IidDocument(ctx context.Context, in *QueryIidDocumentRequest, opts ...grpc.CallOption) (*QueryIidDocumentResponse, error)
-	// MetaData queries a iid documents with an id.
-	MetaData(ctx context.Context, in *QueryIidMetaDataRequest, opts ...grpc.CallOption) (*QueryIidMetaDataResponse, error)
 }
 
 type queryClient struct {
@@ -393,23 +302,12 @@ func (c *queryClient) IidDocument(ctx context.Context, in *QueryIidDocumentReque
 	return out, nil
 }
 
-func (c *queryClient) MetaData(ctx context.Context, in *QueryIidMetaDataRequest, opts ...grpc.CallOption) (*QueryIidMetaDataResponse, error) {
-	out := new(QueryIidMetaDataResponse)
-	err := c.cc.Invoke(ctx, "/ixo.iid.v1beta1.Query/MetaData", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// IidDocuments queries all iid documents that match the given status.
 	IidDocuments(context.Context, *QueryIidDocumentsRequest) (*QueryIidDocumentsResponse, error)
 	// IidDocument queries a iid documents with an id.
 	IidDocument(context.Context, *QueryIidDocumentRequest) (*QueryIidDocumentResponse, error)
-	// MetaData queries a iid documents with an id.
-	MetaData(context.Context, *QueryIidMetaDataRequest) (*QueryIidMetaDataResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -421,9 +319,6 @@ func (*UnimplementedQueryServer) IidDocuments(ctx context.Context, req *QueryIid
 }
 func (*UnimplementedQueryServer) IidDocument(ctx context.Context, req *QueryIidDocumentRequest) (*QueryIidDocumentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IidDocument not implemented")
-}
-func (*UnimplementedQueryServer) MetaData(ctx context.Context, req *QueryIidMetaDataRequest) (*QueryIidMetaDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MetaData not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -466,24 +361,6 @@ func _Query_IidDocument_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_MetaData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryIidMetaDataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).MetaData(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ixo.iid.v1beta1.Query/MetaData",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).MetaData(ctx, req.(*QueryIidMetaDataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ixo.iid.v1beta1.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -495,10 +372,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IidDocument",
 			Handler:    _Query_IidDocument_Handler,
-		},
-		{
-			MethodName: "MetaData",
-			Handler:    _Query_MetaData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -525,10 +398,15 @@ func (m *QueryIidDocumentsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
-	if len(m.Status) > 0 {
-		i -= len(m.Status)
-		copy(dAtA[i:], m.Status)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Status)))
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -555,6 +433,18 @@ func (m *QueryIidDocumentsResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	_ = i
 	var l int
 	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
 	if len(m.IidDocuments) > 0 {
 		for iNdEx := len(m.IidDocuments) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -635,69 +525,6 @@ func (m *QueryIidDocumentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryIidMetaDataRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryIidMetaDataRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryIidMetaDataRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Id) > 0 {
-		i -= len(m.Id)
-		copy(dAtA[i:], m.Id)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryIidMetaDataResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryIidMetaDataResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryIidMetaDataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.DidMetadata.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintQuery(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x12
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -715,8 +542,8 @@ func (m *QueryIidDocumentsRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Status)
-	if l > 0 {
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -733,6 +560,10 @@ func (m *QueryIidDocumentsResponse) Size() (n int) {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
@@ -757,30 +588,6 @@ func (m *QueryIidDocumentResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.IidDocument.Size()
-	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
-func (m *QueryIidMetaDataRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Id)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryIidMetaDataResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.DidMetadata.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
@@ -822,9 +629,9 @@ func (m *QueryIidDocumentsRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -834,23 +641,27 @@ func (m *QueryIidDocumentsRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Status = string(dAtA[iNdEx:postIndex])
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -933,6 +744,42 @@ func (m *QueryIidDocumentsResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.IidDocuments = append(m.IidDocuments, IidDocument{})
 			if err := m.IidDocuments[len(m.IidDocuments)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1098,171 +945,6 @@ func (m *QueryIidDocumentResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.IidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryIidMetaDataRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryIidMetaDataRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryIidMetaDataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Id = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryIidMetaDataResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryIidMetaDataResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryIidMetaDataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DidMetadata", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.DidMetadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -9,42 +9,48 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse){
+  rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse) {
     option (google.api.http).get = "/ixo/token/{minter_did}";
   }
 
-  rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse){
+  rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse) {
     option (google.api.http).get = "/ixo/token/{minter_did}/{contract_address}";
   }
 
-  rpc TokenConfig(QueryTokenConfigRequest) returns (QueryTokenConfigResponse){
+  rpc TokenConfig(QueryTokenConfigRequest) returns (QueryTokenConfigResponse) {
     option (google.api.http).get = "/ixo/token/config";
   }
 }
 
 message QueryTokenListRequest {
-  string minter_did = 1 [(gogoproto.moretags) = "yaml:\"minter_did\""];
+  string minter_did = 1 [ (gogoproto.moretags) = "yaml:\"minter_did\"" ];
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 message QueryTokenListResponse {
-  repeated TokenMinter contracts = 1 [(gogoproto.moretags) = "yaml:\"contracts\""];
+  repeated TokenMinter contracts = 1
+      [ (gogoproto.moretags) = "yaml:\"contracts\"" ];
 }
 
-// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
+// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC
+// method.
 message QueryTokenDocRequest {
-  string minter_did = 1 [(gogoproto.moretags) = "yaml:\"minter_did\""];
-  string contract_address = 2 [(gogoproto.moretags) = "yaml:\"contract_address\""];
+  string minter_did = 1 [ (gogoproto.moretags) = "yaml:\"minter_did\"" ];
+  string contract_address = 2
+      [ (gogoproto.moretags) = "yaml:\"contract_address\"" ];
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 message QueryTokenDocResponse {
   // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
 }
 
 message QueryTokenConfigRequest {}
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 message QueryTokenConfigResponse {
-  map<string, string> map = 1 [(gogoproto.moretags) = "yaml:\"config\""];
+  map<string, string> map = 1 [ (gogoproto.moretags) = "yaml:\"config\"" ];
 }

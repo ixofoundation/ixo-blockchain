@@ -151,7 +151,8 @@ func (m *MsgCreateProjectResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateProjectResponse proto.InternalMessageInfo
 
-// MsgUpdateProjectStatus defines a message for updating a project's current status.
+// MsgUpdateProjectStatus defines a message for updating a project's current
+// status.
 type MsgUpdateProjectStatus struct {
 	TxHash         string                                                          `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid      github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"senderDid" yaml:"senderDid"`
@@ -228,7 +229,8 @@ func (m *MsgUpdateProjectStatus) GetProjectAddress() string {
 	return ""
 }
 
-// MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response type.
+// MsgUpdateProjectStatusResponse defines the Msg/UpdateProjectStatus response
+// type.
 type MsgUpdateProjectStatusResponse struct {
 }
 
@@ -604,7 +606,8 @@ func (m *MsgCreateClaimResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateClaimResponse proto.InternalMessageInfo
 
-// MsgCreateEvaluation defines a message for creating an evaluation for a specific claim on a project.
+// MsgCreateEvaluation defines a message for creating an evaluation for a
+// specific claim on a project.
 type MsgCreateEvaluation struct {
 	TxHash         string                                                          `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"txHash" yaml:"txHash"`
 	SenderDid      github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=sender_did,json=senderDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"senderDid" yaml:"senderDid"`
@@ -717,7 +720,8 @@ func (m *MsgCreateEvaluationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateEvaluationResponse proto.InternalMessageInfo
 
-// MsgWithdrawFunds defines a message for project agents to withdraw their funds from a project.
+// MsgWithdrawFunds defines a message for project agents to withdraw their funds
+// from a project.
 type MsgWithdrawFunds struct {
 	SenderDid     github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"senderDid" yaml:"senderDid"`
 	Data          WithdrawFundsDoc                                                `protobuf:"bytes,2,opt,name=data,proto3" json:"data" yaml:"iid"`
@@ -1022,7 +1026,8 @@ const _ = grpc.SupportPackageIsVersion4
 type MsgClient interface {
 	// CreateProject defines a method for creating a project.
 	CreateProject(ctx context.Context, in *MsgCreateProject, opts ...grpc.CallOption) (*MsgCreateProjectResponse, error)
-	// UpdateProjectStatus defines a method for updating a project's current status.
+	// UpdateProjectStatus defines a method for updating a project's current
+	// status.
 	UpdateProjectStatus(ctx context.Context, in *MsgUpdateProjectStatus, opts ...grpc.CallOption) (*MsgUpdateProjectStatusResponse, error)
 	// CreateAgent defines a method for creating an agent on a project.
 	CreateAgent(ctx context.Context, in *MsgCreateAgent, opts ...grpc.CallOption) (*MsgCreateAgentResponse, error)
@@ -1030,9 +1035,11 @@ type MsgClient interface {
 	UpdateAgent(ctx context.Context, in *MsgUpdateAgent, opts ...grpc.CallOption) (*MsgUpdateAgentResponse, error)
 	// CreateClaim defines a method for creating a claim on a project.
 	CreateClaim(ctx context.Context, in *MsgCreateClaim, opts ...grpc.CallOption) (*MsgCreateClaimResponse, error)
-	// CreateEvaluation defines a method for creating an evaluation for a specific claim on a project.
+	// CreateEvaluation defines a method for creating an evaluation for a specific
+	// claim on a project.
 	CreateEvaluation(ctx context.Context, in *MsgCreateEvaluation, opts ...grpc.CallOption) (*MsgCreateEvaluationResponse, error)
-	// WithdrawFunds defines a method for project agents to withdraw their funds from a project.
+	// WithdrawFunds defines a method for project agents to withdraw their funds
+	// from a project.
 	WithdrawFunds(ctx context.Context, in *MsgWithdrawFunds, opts ...grpc.CallOption) (*MsgWithdrawFundsResponse, error)
 	// UpdateProjectDoc defines a method for updating a project's data.
 	UpdateProjectDoc(ctx context.Context, in *MsgUpdateProjectDoc, opts ...grpc.CallOption) (*MsgUpdateProjectDocResponse, error)
@@ -1122,7 +1129,8 @@ func (c *msgClient) UpdateProjectDoc(ctx context.Context, in *MsgUpdateProjectDo
 type MsgServer interface {
 	// CreateProject defines a method for creating a project.
 	CreateProject(context.Context, *MsgCreateProject) (*MsgCreateProjectResponse, error)
-	// UpdateProjectStatus defines a method for updating a project's current status.
+	// UpdateProjectStatus defines a method for updating a project's current
+	// status.
 	UpdateProjectStatus(context.Context, *MsgUpdateProjectStatus) (*MsgUpdateProjectStatusResponse, error)
 	// CreateAgent defines a method for creating an agent on a project.
 	CreateAgent(context.Context, *MsgCreateAgent) (*MsgCreateAgentResponse, error)
@@ -1130,9 +1138,11 @@ type MsgServer interface {
 	UpdateAgent(context.Context, *MsgUpdateAgent) (*MsgUpdateAgentResponse, error)
 	// CreateClaim defines a method for creating a claim on a project.
 	CreateClaim(context.Context, *MsgCreateClaim) (*MsgCreateClaimResponse, error)
-	// CreateEvaluation defines a method for creating an evaluation for a specific claim on a project.
+	// CreateEvaluation defines a method for creating an evaluation for a specific
+	// claim on a project.
 	CreateEvaluation(context.Context, *MsgCreateEvaluation) (*MsgCreateEvaluationResponse, error)
-	// WithdrawFunds defines a method for project agents to withdraw their funds from a project.
+	// WithdrawFunds defines a method for project agents to withdraw their funds
+	// from a project.
 	WithdrawFunds(context.Context, *MsgWithdrawFunds) (*MsgWithdrawFundsResponse, error)
 	// UpdateProjectDoc defines a method for updating a project's data.
 	UpdateProjectDoc(context.Context, *MsgUpdateProjectDoc) (*MsgUpdateProjectDocResponse, error)

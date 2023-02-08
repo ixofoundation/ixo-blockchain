@@ -1,6 +1,6 @@
 package types
 
-// NewDidDocumentCreatedEvent constructs a new did_created sdk.Event
+// NewIidDocumentCreatedEvent constructs a new did_created sdk.Event
 func NewIidDocumentCreatedEvent(did, owner string) *IidDocumentCreatedEvent {
 	return &IidDocumentCreatedEvent{
 		Did:    did,
@@ -8,7 +8,7 @@ func NewIidDocumentCreatedEvent(did, owner string) *IidDocumentCreatedEvent {
 	}
 }
 
-// NewDidDocumentUpdatedEvent constructs a new did_created sdk.Event
+// NewIidDocumentUpdatedEvent constructs a new did_updated sdk.Event
 func NewIidDocumentUpdatedEvent(did, signer string) *IidDocumentUpdatedEvent {
 	return &IidDocumentUpdatedEvent{
 		Did:    did,

@@ -6,9 +6,11 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
+	types "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -29,16 +31,375 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type QueryEntityRequest struct {
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryEntityRequest) Reset()         { *m = QueryEntityRequest{} }
+func (m *QueryEntityRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityRequest) ProtoMessage()    {}
+func (*QueryEntityRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{0}
+}
+func (m *QueryEntityRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityRequest.Merge(m, src)
+}
+func (m *QueryEntityRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityRequest proto.InternalMessageInfo
+
+func (m *QueryEntityRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type QueryEntityResponse struct {
+	Entity      Entity            `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+	IidDocument types.IidDocument `protobuf:"bytes,2,opt,name=iidDocument,proto3" json:"iidDocument"`
+}
+
+func (m *QueryEntityResponse) Reset()         { *m = QueryEntityResponse{} }
+func (m *QueryEntityResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityResponse) ProtoMessage()    {}
+func (*QueryEntityResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{1}
+}
+func (m *QueryEntityResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityResponse.Merge(m, src)
+}
+func (m *QueryEntityResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityResponse proto.InternalMessageInfo
+
+func (m *QueryEntityResponse) GetEntity() Entity {
+	if m != nil {
+		return m.Entity
+	}
+	return Entity{}
+}
+
+func (m *QueryEntityResponse) GetIidDocument() types.IidDocument {
+	if m != nil {
+		return m.IidDocument
+	}
+	return types.IidDocument{}
+}
+
+type QueryEntityMetadataRequest struct {
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryEntityMetadataRequest) Reset()         { *m = QueryEntityMetadataRequest{} }
+func (m *QueryEntityMetadataRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityMetadataRequest) ProtoMessage()    {}
+func (*QueryEntityMetadataRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{2}
+}
+func (m *QueryEntityMetadataRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityMetadataRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityMetadataRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityMetadataRequest.Merge(m, src)
+}
+func (m *QueryEntityMetadataRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityMetadataRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityMetadataRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityMetadataRequest proto.InternalMessageInfo
+
+func (m *QueryEntityMetadataRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type QueryEntityMetadataResponse struct {
+	Entity Entity `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity"`
+}
+
+func (m *QueryEntityMetadataResponse) Reset()         { *m = QueryEntityMetadataResponse{} }
+func (m *QueryEntityMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityMetadataResponse) ProtoMessage()    {}
+func (*QueryEntityMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{3}
+}
+func (m *QueryEntityMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityMetadataResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityMetadataResponse.Merge(m, src)
+}
+func (m *QueryEntityMetadataResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityMetadataResponse proto.InternalMessageInfo
+
+func (m *QueryEntityMetadataResponse) GetEntity() Entity {
+	if m != nil {
+		return m.Entity
+	}
+	return Entity{}
+}
+
+type QueryEntityIidDocumentRequest struct {
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryEntityIidDocumentRequest) Reset()         { *m = QueryEntityIidDocumentRequest{} }
+func (m *QueryEntityIidDocumentRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityIidDocumentRequest) ProtoMessage()    {}
+func (*QueryEntityIidDocumentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{4}
+}
+func (m *QueryEntityIidDocumentRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityIidDocumentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityIidDocumentRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityIidDocumentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityIidDocumentRequest.Merge(m, src)
+}
+func (m *QueryEntityIidDocumentRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityIidDocumentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityIidDocumentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityIidDocumentRequest proto.InternalMessageInfo
+
+func (m *QueryEntityIidDocumentRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type QueryEntityIidDocumentResponse struct {
+	IidDocument types.IidDocument `protobuf:"bytes,1,opt,name=iidDocument,proto3" json:"iidDocument"`
+}
+
+func (m *QueryEntityIidDocumentResponse) Reset()         { *m = QueryEntityIidDocumentResponse{} }
+func (m *QueryEntityIidDocumentResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityIidDocumentResponse) ProtoMessage()    {}
+func (*QueryEntityIidDocumentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{5}
+}
+func (m *QueryEntityIidDocumentResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityIidDocumentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityIidDocumentResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityIidDocumentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityIidDocumentResponse.Merge(m, src)
+}
+func (m *QueryEntityIidDocumentResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityIidDocumentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityIidDocumentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityIidDocumentResponse proto.InternalMessageInfo
+
+func (m *QueryEntityIidDocumentResponse) GetIidDocument() types.IidDocument {
+	if m != nil {
+		return m.IidDocument
+	}
+	return types.IidDocument{}
+}
+
+type QueryEntityVerifiedRequest struct {
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryEntityVerifiedRequest) Reset()         { *m = QueryEntityVerifiedRequest{} }
+func (m *QueryEntityVerifiedRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityVerifiedRequest) ProtoMessage()    {}
+func (*QueryEntityVerifiedRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{6}
+}
+func (m *QueryEntityVerifiedRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityVerifiedRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityVerifiedRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityVerifiedRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityVerifiedRequest.Merge(m, src)
+}
+func (m *QueryEntityVerifiedRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityVerifiedRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityVerifiedRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityVerifiedRequest proto.InternalMessageInfo
+
+func (m *QueryEntityVerifiedRequest) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type QueryEntityVerifiedResponse struct {
+	EntityVerified bool `protobuf:"varint,1,opt,name=entity_verified,json=entityVerified,proto3" json:"entity_verified,omitempty"`
+}
+
+func (m *QueryEntityVerifiedResponse) Reset()         { *m = QueryEntityVerifiedResponse{} }
+func (m *QueryEntityVerifiedResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryEntityVerifiedResponse) ProtoMessage()    {}
+func (*QueryEntityVerifiedResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_45d5ce4a4abd6232, []int{7}
+}
+func (m *QueryEntityVerifiedResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryEntityVerifiedResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryEntityVerifiedResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryEntityVerifiedResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryEntityVerifiedResponse.Merge(m, src)
+}
+func (m *QueryEntityVerifiedResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryEntityVerifiedResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryEntityVerifiedResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryEntityVerifiedResponse proto.InternalMessageInfo
+
+func (m *QueryEntityVerifiedResponse) GetEntityVerified() bool {
+	if m != nil {
+		return m.EntityVerified
+	}
+	return false
+}
+
 type QueryEntityListRequest struct {
-	EntityType   string `protobuf:"bytes,1,opt,name=entity_type,json=entityType,proto3" json:"entity_type,omitempty" yaml:"entity_type"`
-	EntityStatus string `protobuf:"bytes,2,opt,name=entity_status,json=entityStatus,proto3" json:"entity_status,omitempty" yaml:"entity_status"`
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryEntityListRequest) Reset()         { *m = QueryEntityListRequest{} }
 func (m *QueryEntityListRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryEntityListRequest) ProtoMessage()    {}
 func (*QueryEntityListRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_45d5ce4a4abd6232, []int{0}
+	return fileDescriptor_45d5ce4a4abd6232, []int{8}
 }
 func (m *QueryEntityListRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -67,29 +428,23 @@ func (m *QueryEntityListRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryEntityListRequest proto.InternalMessageInfo
 
-func (m *QueryEntityListRequest) GetEntityType() string {
+func (m *QueryEntityListRequest) GetPagination() *query.PageRequest {
 	if m != nil {
-		return m.EntityType
+		return m.Pagination
 	}
-	return ""
+	return nil
 }
 
-func (m *QueryEntityListRequest) GetEntityStatus() string {
-	if m != nil {
-		return m.EntityStatus
-	}
-	return ""
-}
-
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
 type QueryEntityListResponse struct {
+	Entities   []Entity            `protobuf:"bytes,1,rep,name=entities,proto3" json:"entities"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryEntityListResponse) Reset()         { *m = QueryEntityListResponse{} }
 func (m *QueryEntityListResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryEntityListResponse) ProtoMessage()    {}
 func (*QueryEntityListResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_45d5ce4a4abd6232, []int{1}
+	return fileDescriptor_45d5ce4a4abd6232, []int{9}
 }
 func (m *QueryEntityListResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -118,217 +473,77 @@ func (m *QueryEntityListResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryEntityListResponse proto.InternalMessageInfo
 
-// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
-type QueryEntityDocRequest struct {
-	EntityDid string `protobuf:"bytes,1,opt,name=entity_did,json=entityDid,proto3" json:"entity_did,omitempty" yaml:"entity_did"`
-}
-
-func (m *QueryEntityDocRequest) Reset()         { *m = QueryEntityDocRequest{} }
-func (m *QueryEntityDocRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryEntityDocRequest) ProtoMessage()    {}
-func (*QueryEntityDocRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_45d5ce4a4abd6232, []int{2}
-}
-func (m *QueryEntityDocRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryEntityDocRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryEntityDocRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryEntityDocRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryEntityDocRequest.Merge(m, src)
-}
-func (m *QueryEntityDocRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryEntityDocRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryEntityDocRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryEntityDocRequest proto.InternalMessageInfo
-
-func (m *QueryEntityDocRequest) GetEntityDid() string {
+func (m *QueryEntityListResponse) GetEntities() []Entity {
 	if m != nil {
-		return m.EntityDid
+		return m.Entities
 	}
-	return ""
+	return nil
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
-type QueryEntityDocResponse struct {
-}
-
-func (m *QueryEntityDocResponse) Reset()         { *m = QueryEntityDocResponse{} }
-func (m *QueryEntityDocResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryEntityDocResponse) ProtoMessage()    {}
-func (*QueryEntityDocResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_45d5ce4a4abd6232, []int{3}
-}
-func (m *QueryEntityDocResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryEntityDocResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryEntityDocResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryEntityDocResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryEntityDocResponse.Merge(m, src)
-}
-func (m *QueryEntityDocResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryEntityDocResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryEntityDocResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryEntityDocResponse proto.InternalMessageInfo
-
-type QueryEntityConfigRequest struct {
-}
-
-func (m *QueryEntityConfigRequest) Reset()         { *m = QueryEntityConfigRequest{} }
-func (m *QueryEntityConfigRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryEntityConfigRequest) ProtoMessage()    {}
-func (*QueryEntityConfigRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_45d5ce4a4abd6232, []int{4}
-}
-func (m *QueryEntityConfigRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryEntityConfigRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryEntityConfigRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryEntityConfigRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryEntityConfigRequest.Merge(m, src)
-}
-func (m *QueryEntityConfigRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryEntityConfigRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryEntityConfigRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryEntityConfigRequest proto.InternalMessageInfo
-
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
-type QueryEntityConfigResponse struct {
-	Map map[string]string `protobuf:"bytes,1,rep,name=map,proto3" json:"map,omitempty" yaml:"config" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-}
-
-func (m *QueryEntityConfigResponse) Reset()         { *m = QueryEntityConfigResponse{} }
-func (m *QueryEntityConfigResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryEntityConfigResponse) ProtoMessage()    {}
-func (*QueryEntityConfigResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_45d5ce4a4abd6232, []int{5}
-}
-func (m *QueryEntityConfigResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryEntityConfigResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryEntityConfigResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryEntityConfigResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryEntityConfigResponse.Merge(m, src)
-}
-func (m *QueryEntityConfigResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryEntityConfigResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryEntityConfigResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryEntityConfigResponse proto.InternalMessageInfo
-
-func (m *QueryEntityConfigResponse) GetMap() map[string]string {
+func (m *QueryEntityListResponse) GetPagination() *query.PageResponse {
 	if m != nil {
-		return m.Map
+		return m.Pagination
 	}
 	return nil
 }
 
 func init() {
+	proto.RegisterType((*QueryEntityRequest)(nil), "ixo.entity.v1beta1.QueryEntityRequest")
+	proto.RegisterType((*QueryEntityResponse)(nil), "ixo.entity.v1beta1.QueryEntityResponse")
+	proto.RegisterType((*QueryEntityMetadataRequest)(nil), "ixo.entity.v1beta1.QueryEntityMetadataRequest")
+	proto.RegisterType((*QueryEntityMetadataResponse)(nil), "ixo.entity.v1beta1.QueryEntityMetadataResponse")
+	proto.RegisterType((*QueryEntityIidDocumentRequest)(nil), "ixo.entity.v1beta1.QueryEntityIidDocumentRequest")
+	proto.RegisterType((*QueryEntityIidDocumentResponse)(nil), "ixo.entity.v1beta1.QueryEntityIidDocumentResponse")
+	proto.RegisterType((*QueryEntityVerifiedRequest)(nil), "ixo.entity.v1beta1.QueryEntityVerifiedRequest")
+	proto.RegisterType((*QueryEntityVerifiedResponse)(nil), "ixo.entity.v1beta1.QueryEntityVerifiedResponse")
 	proto.RegisterType((*QueryEntityListRequest)(nil), "ixo.entity.v1beta1.QueryEntityListRequest")
 	proto.RegisterType((*QueryEntityListResponse)(nil), "ixo.entity.v1beta1.QueryEntityListResponse")
-	proto.RegisterType((*QueryEntityDocRequest)(nil), "ixo.entity.v1beta1.QueryEntityDocRequest")
-	proto.RegisterType((*QueryEntityDocResponse)(nil), "ixo.entity.v1beta1.QueryEntityDocResponse")
-	proto.RegisterType((*QueryEntityConfigRequest)(nil), "ixo.entity.v1beta1.QueryEntityConfigRequest")
-	proto.RegisterType((*QueryEntityConfigResponse)(nil), "ixo.entity.v1beta1.QueryEntityConfigResponse")
-	proto.RegisterMapType((map[string]string)(nil), "ixo.entity.v1beta1.QueryEntityConfigResponse.MapEntry")
 }
 
 func init() { proto.RegisterFile("ixo/entity/v1beta1/query.proto", fileDescriptor_45d5ce4a4abd6232) }
 
 var fileDescriptor_45d5ce4a4abd6232 = []byte{
-	// 535 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x41, 0x6f, 0xd3, 0x30,
-	0x18, 0xad, 0x5b, 0x0d, 0x51, 0x77, 0x95, 0x98, 0xe9, 0x46, 0x16, 0xa1, 0xa4, 0xf2, 0x69, 0x0c,
-	0x96, 0x68, 0x03, 0x15, 0x34, 0x89, 0x4b, 0xd9, 0x6e, 0x4c, 0x82, 0xc0, 0x09, 0x0e, 0x93, 0x9b,
-	0x78, 0x99, 0xb5, 0x36, 0xce, 0x1a, 0x67, 0x6a, 0x40, 0x5c, 0x10, 0x12, 0xd7, 0x49, 0xf0, 0x43,
-	0xf8, 0x19, 0x1c, 0x27, 0x71, 0xe1, 0x54, 0xa1, 0x96, 0x5f, 0xd0, 0x5f, 0x80, 0x62, 0xbb, 0x34,
-	0xd5, 0x86, 0x56, 0x6e, 0x79, 0x79, 0xef, 0xfb, 0xde, 0xf3, 0xf7, 0xd9, 0xd0, 0x62, 0x03, 0xee,
-	0xd2, 0x48, 0x30, 0x91, 0xb9, 0x67, 0xdb, 0x1d, 0x2a, 0xc8, 0xb6, 0x7b, 0x9a, 0xd2, 0x7e, 0xe6,
-	0xc4, 0x7d, 0x2e, 0x38, 0x42, 0x6c, 0xc0, 0x1d, 0xc5, 0x3b, 0x9a, 0x37, 0x1b, 0x21, 0x0f, 0xb9,
-	0xa4, 0xdd, 0xfc, 0x4b, 0x29, 0xcd, 0xbb, 0x21, 0xe7, 0x61, 0x97, 0xba, 0x24, 0x66, 0x2e, 0x89,
-	0x22, 0x2e, 0x88, 0x60, 0x3c, 0x4a, 0x34, 0x6b, 0x5f, 0xe1, 0xa3, 0xdb, 0x4a, 0x01, 0x3e, 0x07,
-	0x70, 0xed, 0x65, 0x6e, 0xbc, 0x2f, 0xff, 0x3e, 0x67, 0x89, 0xf0, 0xe8, 0x69, 0x4a, 0x13, 0x81,
-	0x1e, 0xc3, 0x9a, 0x92, 0x1e, 0x8a, 0x2c, 0xa6, 0x06, 0x68, 0x82, 0x8d, 0x6a, 0x7b, 0x6d, 0x32,
-	0xb4, 0x51, 0x46, 0x7a, 0xdd, 0x5d, 0x5c, 0x20, 0xb1, 0x07, 0x15, 0x7a, 0x9d, 0xc5, 0x14, 0x3d,
-	0x85, 0x75, 0xcd, 0x25, 0x82, 0x88, 0x34, 0x31, 0xca, 0xb2, 0xd4, 0x98, 0x0c, 0xed, 0xc6, 0x5c,
-	0xa9, 0xa2, 0xb1, 0xb7, 0xac, 0xf0, 0x2b, 0x05, 0xd7, 0xe1, 0x9d, 0x4b, 0x89, 0x92, 0x98, 0x47,
-	0x09, 0xc5, 0x07, 0x70, 0xb5, 0x40, 0xed, 0x71, 0x7f, 0x9a, 0xf5, 0x11, 0xd4, 0x01, 0x0e, 0x03,
-	0x16, 0xe8, 0xa8, 0xab, 0x93, 0xa1, 0xbd, 0x32, 0xe7, 0x17, 0xb0, 0x00, 0x7b, 0x55, 0x05, 0xf6,
-	0x58, 0x80, 0x8d, 0xb9, 0xb3, 0xcb, 0x76, 0xda, 0xc8, 0x84, 0x46, 0x81, 0x79, 0xc6, 0xa3, 0x23,
-	0x16, 0x6a, 0x2f, 0xfc, 0x0d, 0xc0, 0xf5, 0x2b, 0x48, 0x55, 0x89, 0xde, 0xc2, 0x4a, 0x8f, 0xc4,
-	0x06, 0x68, 0x56, 0x36, 0x6a, 0x3b, 0x2d, 0xe7, 0xf2, 0x1e, 0x9d, 0x7f, 0xd6, 0x3a, 0x07, 0x24,
-	0xde, 0x8f, 0x44, 0x3f, 0x6b, 0xaf, 0x4c, 0x86, 0x76, 0x5d, 0x45, 0xf7, 0xa5, 0x04, 0x7b, 0x79,
-	0x57, 0xb3, 0x05, 0x6f, 0x4e, 0x35, 0xe8, 0x16, 0xac, 0x9c, 0xd0, 0x4c, 0x9d, 0xd5, 0xcb, 0x3f,
-	0x51, 0x03, 0x2e, 0x9d, 0x91, 0x6e, 0x4a, 0xd5, 0xbc, 0x3d, 0x05, 0x76, 0xcb, 0x4f, 0xc0, 0xce,
-	0xd7, 0x0a, 0x5c, 0x92, 0xb6, 0xe8, 0x1d, 0x84, 0xb3, 0xb9, 0xa2, 0xcd, 0x6b, 0xf2, 0x15, 0xae,
-	0x83, 0x79, 0x7f, 0x21, 0xad, 0x9e, 0xdf, 0xed, 0x8f, 0x3f, 0x7e, 0x7f, 0x29, 0xd7, 0x51, 0xcd,
-	0x9d, 0x5d, 0x40, 0xf4, 0x09, 0xc0, 0xea, 0xdf, 0x51, 0xa3, 0x7b, 0xd7, 0xf4, 0x9b, 0x6d, 0xd7,
-	0xdc, 0x5c, 0x44, 0xaa, 0x9d, 0x9b, 0xd2, 0xd9, 0x44, 0x46, 0xc1, 0xd9, 0x7d, 0x3f, 0xbb, 0x00,
-	0x1f, 0xd0, 0x67, 0x00, 0x97, 0x8b, 0xe3, 0x47, 0x0f, 0x16, 0xdc, 0x92, 0x0a, 0xb3, 0xf5, 0x5f,
-	0x3b, 0xc5, 0xa6, 0xcc, 0xd3, 0x40, 0xa8, 0x98, 0x47, 0x2d, 0xb5, 0xfd, 0xe2, 0xfb, 0xc8, 0x02,
-	0x17, 0x23, 0x0b, 0xfc, 0x1a, 0x59, 0xe0, 0x7c, 0x6c, 0x95, 0x2e, 0xc6, 0x56, 0xe9, 0xe7, 0xd8,
-	0x2a, 0xbd, 0x69, 0x85, 0x4c, 0x1c, 0xa7, 0x1d, 0xc7, 0xe7, 0xbd, 0xbc, 0xee, 0x88, 0xa7, 0x51,
-	0x20, 0x1f, 0x76, 0x8e, 0xb6, 0x3a, 0x5d, 0xee, 0x9f, 0xf8, 0xc7, 0x84, 0x45, 0xee, 0x60, 0xda,
-	0x32, 0x7f, 0x86, 0x49, 0xe7, 0x86, 0x7c, 0xd5, 0x0f, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xc5,
-	0x6c, 0x0f, 0x13, 0x60, 0x04, 0x00, 0x00,
+	// 637 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x95, 0xc1, 0x6e, 0xd3, 0x4c,
+	0x10, 0xc7, 0xe3, 0x7c, 0x5f, 0xab, 0xb2, 0x15, 0x05, 0xb6, 0x08, 0x52, 0x37, 0xb8, 0xc5, 0xaa,
+	0x1a, 0x54, 0xc0, 0xab, 0x04, 0x09, 0x71, 0xe0, 0x54, 0x85, 0x22, 0x24, 0x90, 0x4a, 0x0e, 0x20,
+	0x71, 0x81, 0x4d, 0xbc, 0x71, 0x47, 0x34, 0xde, 0x34, 0xde, 0x54, 0x09, 0x88, 0x0b, 0x4f, 0x80,
+	0x04, 0xdc, 0xfb, 0x38, 0xe5, 0x56, 0x89, 0x0b, 0x27, 0x84, 0x12, 0x1e, 0x04, 0x79, 0x77, 0x1d,
+	0x3b, 0x71, 0x82, 0x83, 0xe0, 0x96, 0x68, 0xfe, 0xff, 0x99, 0xdf, 0x8c, 0x67, 0x6c, 0x64, 0x41,
+	0x8f, 0x13, 0xe6, 0x0b, 0x10, 0x7d, 0x72, 0x5c, 0xae, 0x33, 0x41, 0xcb, 0xe4, 0xa8, 0xcb, 0x3a,
+	0x7d, 0xa7, 0xdd, 0xe1, 0x82, 0x63, 0x0c, 0x3d, 0xee, 0xa8, 0xb8, 0xa3, 0xe3, 0xe6, 0x65, 0x8f,
+	0x7b, 0x5c, 0x86, 0x49, 0xf8, 0x4b, 0x29, 0xcd, 0xa2, 0xc7, 0xb9, 0x77, 0xc8, 0x08, 0x6d, 0x03,
+	0xa1, 0xbe, 0xcf, 0x05, 0x15, 0xc0, 0xfd, 0x40, 0x47, 0x37, 0xa6, 0xd4, 0xd1, 0x69, 0x95, 0x60,
+	0x2d, 0x14, 0x00, 0xb8, 0xa3, 0x28, 0x80, 0xab, 0x43, 0x3b, 0x0d, 0x1e, 0xb4, 0x78, 0x40, 0xea,
+	0x34, 0x60, 0x0a, 0x6e, 0x24, 0x6a, 0x53, 0x0f, 0x7c, 0x59, 0x48, 0x69, 0xed, 0x2d, 0x84, 0x9f,
+	0x86, 0x8a, 0x07, 0x32, 0x77, 0x8d, 0x1d, 0x75, 0x59, 0x20, 0xf0, 0x0a, 0xca, 0x83, 0x5b, 0x30,
+	0x36, 0x8d, 0x1b, 0xe7, 0x6a, 0x79, 0x70, 0xed, 0xcf, 0x06, 0x5a, 0x1d, 0x93, 0x05, 0x6d, 0xee,
+	0x07, 0x0c, 0xdf, 0x43, 0x8b, 0x0a, 0x4a, 0x6a, 0x97, 0x2b, 0xa6, 0x93, 0x6e, 0xdf, 0x51, 0x9e,
+	0xdd, 0xff, 0x4f, 0xbf, 0x6f, 0xe4, 0x6a, 0x5a, 0x8f, 0xab, 0x68, 0x19, 0xc0, 0xad, 0xf2, 0x46,
+	0xb7, 0xc5, 0x7c, 0x51, 0xc8, 0x4b, 0x7b, 0x51, 0xda, 0xc3, 0x46, 0x22, 0xef, 0xa3, 0x58, 0xa3,
+	0x13, 0x24, 0x6d, 0xf6, 0x2d, 0x64, 0x26, 0xb0, 0x9e, 0x30, 0x41, 0x5d, 0x2a, 0xe8, 0xac, 0x2e,
+	0x9e, 0xa3, 0xf5, 0xa9, 0xea, 0xbf, 0x6d, 0xc6, 0x26, 0xe8, 0x5a, 0x22, 0x71, 0x82, 0x79, 0x16,
+	0x49, 0x13, 0x59, 0xb3, 0x0c, 0x1a, 0x66, 0x62, 0x3e, 0xc6, 0xbf, 0x98, 0xcf, 0x33, 0xd6, 0x81,
+	0x26, 0x30, 0x77, 0x16, 0xd5, 0xde, 0xd8, 0x7c, 0x62, 0xb5, 0x46, 0x2a, 0xa1, 0x0b, 0xaa, 0xdf,
+	0x97, 0xc7, 0x3a, 0x24, 0xbd, 0x4b, 0xb5, 0x15, 0x36, 0x66, 0xb0, 0x5f, 0xa1, 0x2b, 0x89, 0x3c,
+	0x8f, 0x21, 0x18, 0xcd, 0x61, 0x0f, 0xa1, 0x78, 0x03, 0x75, 0x53, 0xdb, 0x8e, 0x5a, 0x57, 0x27,
+	0x5c, 0x57, 0x47, 0xdd, 0x52, 0xd4, 0xde, 0x3e, 0xf5, 0x98, 0xf6, 0xd6, 0x12, 0x4e, 0xfb, 0xc4,
+	0x40, 0x57, 0x53, 0x25, 0x34, 0xe6, 0x7d, 0xb4, 0x24, 0x79, 0x80, 0x05, 0x05, 0x63, 0xf3, 0xbf,
+	0xb9, 0x1e, 0xe4, 0xc8, 0x81, 0x1f, 0x8e, 0x11, 0xaa, 0xb5, 0x2c, 0x65, 0x12, 0xaa, 0xd2, 0x49,
+	0xc4, 0xca, 0x97, 0x05, 0xb4, 0x20, 0x11, 0x71, 0x80, 0x16, 0x55, 0x31, 0xbc, 0x3d, 0x0d, 0x24,
+	0x7d, 0x7e, 0x66, 0x29, 0x53, 0xa7, 0x0a, 0xda, 0x85, 0xf7, 0x5f, 0x7f, 0x7e, 0xcc, 0x63, 0x7c,
+	0x91, 0x24, 0x5e, 0x17, 0x6f, 0xc1, 0x7d, 0x87, 0x3f, 0x19, 0x68, 0x25, 0xde, 0xf3, 0x2a, 0x15,
+	0x14, 0x3b, 0x19, 0x59, 0x27, 0xce, 0xc7, 0x24, 0x73, 0xeb, 0x35, 0xcd, 0x75, 0x49, 0xb3, 0x8e,
+	0xd7, 0x26, 0x69, 0x48, 0x4b, 0x4b, 0xf1, 0x89, 0x81, 0x2e, 0xa5, 0x96, 0x1e, 0x97, 0x33, 0x2a,
+	0xa5, 0x2f, 0xca, 0xac, 0xfc, 0x89, 0x45, 0xf3, 0x6d, 0x49, 0x3e, 0x0b, 0x17, 0x53, 0x7c, 0x00,
+	0xae, 0x1b, 0xc1, 0xc4, 0x93, 0x8b, 0x16, 0x3a, 0x73, 0x72, 0x13, 0x87, 0x95, 0x39, 0xb9, 0xc9,
+	0xd3, 0xfa, 0xcd, 0xe4, 0xa2, 0x53, 0xc3, 0x6f, 0x10, 0x8a, 0x97, 0x1d, 0xef, 0x64, 0x54, 0x48,
+	0x1c, 0x9d, 0x79, 0x73, 0x2e, 0xad, 0x26, 0x59, 0x95, 0x24, 0xe7, 0xf1, 0x72, 0x82, 0x64, 0x77,
+	0xff, 0x74, 0x60, 0x19, 0x67, 0x03, 0xcb, 0xf8, 0x31, 0xb0, 0x8c, 0x0f, 0x43, 0x2b, 0x77, 0x36,
+	0xb4, 0x72, 0xdf, 0x86, 0x56, 0xee, 0xc5, 0x5d, 0x0f, 0xc4, 0x41, 0xb7, 0xee, 0x34, 0x78, 0x2b,
+	0x34, 0x34, 0x79, 0xd7, 0x77, 0xe5, 0xfe, 0x87, 0xff, 0x6e, 0xd7, 0x0f, 0x79, 0xe3, 0x75, 0xe3,
+	0x80, 0x82, 0x4f, 0x7a, 0x51, 0x57, 0xa2, 0xdf, 0x66, 0x41, 0x7d, 0x51, 0x7e, 0x7d, 0xee, 0xfc,
+	0x0a, 0x00, 0x00, 0xff, 0xff, 0xcb, 0x22, 0xec, 0x7c, 0x4f, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -343,9 +558,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	Entity(ctx context.Context, in *QueryEntityRequest, opts ...grpc.CallOption) (*QueryEntityResponse, error)
+	EntityMetaData(ctx context.Context, in *QueryEntityMetadataRequest, opts ...grpc.CallOption) (*QueryEntityMetadataResponse, error)
+	EntityIidDocument(ctx context.Context, in *QueryEntityIidDocumentRequest, opts ...grpc.CallOption) (*QueryEntityIidDocumentResponse, error)
+	EntityVerified(ctx context.Context, in *QueryEntityVerifiedRequest, opts ...grpc.CallOption) (*QueryEntityVerifiedResponse, error)
 	EntityList(ctx context.Context, in *QueryEntityListRequest, opts ...grpc.CallOption) (*QueryEntityListResponse, error)
-	EntityDoc(ctx context.Context, in *QueryEntityDocRequest, opts ...grpc.CallOption) (*QueryEntityDocResponse, error)
-	EntityConfig(ctx context.Context, in *QueryEntityConfigRequest, opts ...grpc.CallOption) (*QueryEntityConfigResponse, error)
 }
 
 type queryClient struct {
@@ -354,6 +571,42 @@ type queryClient struct {
 
 func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
+}
+
+func (c *queryClient) Entity(ctx context.Context, in *QueryEntityRequest, opts ...grpc.CallOption) (*QueryEntityResponse, error) {
+	out := new(QueryEntityResponse)
+	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Query/Entity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) EntityMetaData(ctx context.Context, in *QueryEntityMetadataRequest, opts ...grpc.CallOption) (*QueryEntityMetadataResponse, error) {
+	out := new(QueryEntityMetadataResponse)
+	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Query/EntityMetaData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) EntityIidDocument(ctx context.Context, in *QueryEntityIidDocumentRequest, opts ...grpc.CallOption) (*QueryEntityIidDocumentResponse, error) {
+	out := new(QueryEntityIidDocumentResponse)
+	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Query/EntityIidDocument", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) EntityVerified(ctx context.Context, in *QueryEntityVerifiedRequest, opts ...grpc.CallOption) (*QueryEntityVerifiedResponse, error) {
+	out := new(QueryEntityVerifiedResponse)
+	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Query/EntityVerified", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *queryClient) EntityList(ctx context.Context, in *QueryEntityListRequest, opts ...grpc.CallOption) (*QueryEntityListResponse, error) {
@@ -365,47 +618,109 @@ func (c *queryClient) EntityList(ctx context.Context, in *QueryEntityListRequest
 	return out, nil
 }
 
-func (c *queryClient) EntityDoc(ctx context.Context, in *QueryEntityDocRequest, opts ...grpc.CallOption) (*QueryEntityDocResponse, error) {
-	out := new(QueryEntityDocResponse)
-	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Query/EntityDoc", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) EntityConfig(ctx context.Context, in *QueryEntityConfigRequest, opts ...grpc.CallOption) (*QueryEntityConfigResponse, error) {
-	out := new(QueryEntityConfigResponse)
-	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Query/EntityConfig", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	Entity(context.Context, *QueryEntityRequest) (*QueryEntityResponse, error)
+	EntityMetaData(context.Context, *QueryEntityMetadataRequest) (*QueryEntityMetadataResponse, error)
+	EntityIidDocument(context.Context, *QueryEntityIidDocumentRequest) (*QueryEntityIidDocumentResponse, error)
+	EntityVerified(context.Context, *QueryEntityVerifiedRequest) (*QueryEntityVerifiedResponse, error)
 	EntityList(context.Context, *QueryEntityListRequest) (*QueryEntityListResponse, error)
-	EntityDoc(context.Context, *QueryEntityDocRequest) (*QueryEntityDocResponse, error)
-	EntityConfig(context.Context, *QueryEntityConfigRequest) (*QueryEntityConfigResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
+func (*UnimplementedQueryServer) Entity(ctx context.Context, req *QueryEntityRequest) (*QueryEntityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Entity not implemented")
+}
+func (*UnimplementedQueryServer) EntityMetaData(ctx context.Context, req *QueryEntityMetadataRequest) (*QueryEntityMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EntityMetaData not implemented")
+}
+func (*UnimplementedQueryServer) EntityIidDocument(ctx context.Context, req *QueryEntityIidDocumentRequest) (*QueryEntityIidDocumentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EntityIidDocument not implemented")
+}
+func (*UnimplementedQueryServer) EntityVerified(ctx context.Context, req *QueryEntityVerifiedRequest) (*QueryEntityVerifiedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EntityVerified not implemented")
+}
 func (*UnimplementedQueryServer) EntityList(ctx context.Context, req *QueryEntityListRequest) (*QueryEntityListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EntityList not implemented")
-}
-func (*UnimplementedQueryServer) EntityDoc(ctx context.Context, req *QueryEntityDocRequest) (*QueryEntityDocResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EntityDoc not implemented")
-}
-func (*UnimplementedQueryServer) EntityConfig(ctx context.Context, req *QueryEntityConfigRequest) (*QueryEntityConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EntityConfig not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
+}
+
+func _Query_Entity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryEntityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Entity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.entity.v1beta1.Query/Entity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Entity(ctx, req.(*QueryEntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_EntityMetaData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryEntityMetadataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).EntityMetaData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.entity.v1beta1.Query/EntityMetaData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).EntityMetaData(ctx, req.(*QueryEntityMetadataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_EntityIidDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryEntityIidDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).EntityIidDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.entity.v1beta1.Query/EntityIidDocument",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).EntityIidDocument(ctx, req.(*QueryEntityIidDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_EntityVerified_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryEntityVerifiedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).EntityVerified(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.entity.v1beta1.Query/EntityVerified",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).EntityVerified(ctx, req.(*QueryEntityVerifiedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_EntityList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -426,61 +741,295 @@ func _Query_EntityList_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_EntityDoc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryEntityDocRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).EntityDoc(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ixo.entity.v1beta1.Query/EntityDoc",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).EntityDoc(ctx, req.(*QueryEntityDocRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_EntityConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryEntityConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).EntityConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ixo.entity.v1beta1.Query/EntityConfig",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).EntityConfig(ctx, req.(*QueryEntityConfigRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ixo.entity.v1beta1.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Entity",
+			Handler:    _Query_Entity_Handler,
+		},
+		{
+			MethodName: "EntityMetaData",
+			Handler:    _Query_EntityMetaData_Handler,
+		},
+		{
+			MethodName: "EntityIidDocument",
+			Handler:    _Query_EntityIidDocument_Handler,
+		},
+		{
+			MethodName: "EntityVerified",
+			Handler:    _Query_EntityVerified_Handler,
+		},
+		{
 			MethodName: "EntityList",
 			Handler:    _Query_EntityList_Handler,
-		},
-		{
-			MethodName: "EntityDoc",
-			Handler:    _Query_EntityDoc_Handler,
-		},
-		{
-			MethodName: "EntityConfig",
-			Handler:    _Query_EntityConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ixo/entity/v1beta1/query.proto",
+}
+
+func (m *QueryEntityRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.IidDocument.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	{
+		size, err := m.Entity.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityMetadataRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityMetadataRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityMetadataRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityMetadataResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Entity.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityIidDocumentRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityIidDocumentRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityIidDocumentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityIidDocumentResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityIidDocumentResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityIidDocumentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.IidDocument.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityVerifiedRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityVerifiedRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityVerifiedRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryEntityVerifiedResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryEntityVerifiedResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryEntityVerifiedResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.EntityVerified {
+		i--
+		if m.EntityVerified {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *QueryEntityListRequest) Marshal() (dAtA []byte, err error) {
@@ -503,17 +1052,15 @@ func (m *QueryEntityListRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
-	if len(m.EntityStatus) > 0 {
-		i -= len(m.EntityStatus)
-		copy(dAtA[i:], m.EntityStatus)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.EntityStatus)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.EntityType) > 0 {
-		i -= len(m.EntityType)
-		copy(dAtA[i:], m.EntityType)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.EntityType)))
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -540,120 +1087,28 @@ func (m *QueryEntityListResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryEntityDocRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryEntityDocRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryEntityDocRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.EntityDid) > 0 {
-		i -= len(m.EntityDid)
-		copy(dAtA[i:], m.EntityDid)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.EntityDid)))
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
 	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryEntityDocResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryEntityDocResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryEntityDocResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryEntityConfigRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryEntityConfigRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryEntityConfigRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryEntityConfigResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryEntityConfigResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryEntityConfigResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Map) > 0 {
-		for k := range m.Map {
-			v := m.Map[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintQuery(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintQuery(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintQuery(dAtA, i, uint64(baseI-i))
+	if len(m.Entities) > 0 {
+		for iNdEx := len(m.Entities) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Entities[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
 			i--
 			dAtA[i] = 0xa
 		}
@@ -672,18 +1127,113 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *QueryEntityRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryEntityResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Entity.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	l = m.IidDocument.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryEntityMetadataRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryEntityMetadataResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Entity.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryEntityIidDocumentRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryEntityIidDocumentResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.IidDocument.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryEntityVerifiedRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryEntityVerifiedResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.EntityVerified {
+		n += 2
+	}
+	return n
+}
+
 func (m *QueryEntityListRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.EntityType)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	l = len(m.EntityStatus)
-	if l > 0 {
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -695,53 +1245,15 @@ func (m *QueryEntityListResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	return n
-}
-
-func (m *QueryEntityDocRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.EntityDid)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryEntityDocResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *QueryEntityConfigRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *QueryEntityConfigResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Map) > 0 {
-		for k, v := range m.Map {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovQuery(uint64(len(k))) + 1 + len(v) + sovQuery(uint64(len(v)))
-			n += mapEntrySize + 1 + sovQuery(uint64(mapEntrySize))
+	if len(m.Entities) > 0 {
+		for _, e := range m.Entities {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
 		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
@@ -751,6 +1263,686 @@ func sovQuery(x uint64) (n int) {
 }
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *QueryEntityRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Entity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Entity.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IidDocument", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.IidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityMetadataRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityMetadataRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityMetadataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityMetadataResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityMetadataResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Entity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Entity.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityIidDocumentRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityIidDocumentRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityIidDocumentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityIidDocumentResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityIidDocumentResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityIidDocumentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IidDocument", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.IidDocument.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityVerifiedRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityVerifiedRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityVerifiedRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryEntityVerifiedResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryEntityVerifiedResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryEntityVerifiedResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityVerified", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.EntityVerified = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *QueryEntityListRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -783,9 +1975,9 @@ func (m *QueryEntityListRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EntityType", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -795,55 +1987,27 @@ func (m *QueryEntityListRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.EntityType = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EntityStatus", wireType)
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
 			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EntityStatus = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -895,241 +2059,9 @@ func (m *QueryEntityListResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: QueryEntityListResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryEntityDocRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryEntityDocRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryEntityDocRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EntityDid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EntityDid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryEntityDocResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryEntityDocResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryEntityDocResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryEntityConfigRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryEntityConfigRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryEntityConfigRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryEntityConfigResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryEntityConfigResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryEntityConfigResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Map", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Entities", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1156,103 +2088,46 @@ func (m *QueryEntityConfigResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Map == nil {
-				m.Map = make(map[string]string)
+			m.Entities = append(m.Entities, Entity{})
+			if err := m.Entities[len(m.Entities)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowQuery
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
 				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowQuery
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthQuery
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthQuery
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowQuery
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthQuery
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthQuery
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipQuery(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthQuery
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
 				}
 			}
-			m.Map[mapkey] = mapvalue
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

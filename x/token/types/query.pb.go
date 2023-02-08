@@ -73,7 +73,8 @@ func (m *QueryTokenListRequest) GetMinterDid() string {
 	return ""
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 type QueryTokenListResponse struct {
 	Contracts []*TokenMinter `protobuf:"bytes,1,rep,name=contracts,proto3" json:"contracts,omitempty" yaml:"contracts"`
 }
@@ -118,7 +119,8 @@ func (m *QueryTokenListResponse) GetContracts() []*TokenMinter {
 	return nil
 }
 
-// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
+// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC
+// method.
 type QueryTokenDocRequest struct {
 	MinterDid       string `protobuf:"bytes,1,opt,name=minter_did,json=minterDid,proto3" json:"minter_did,omitempty" yaml:"minter_did"`
 	ContractAddress string `protobuf:"bytes,2,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty" yaml:"contract_address"`
@@ -171,7 +173,8 @@ func (m *QueryTokenDocRequest) GetContractAddress() string {
 	return ""
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 type QueryTokenDocResponse struct {
 }
 
@@ -244,7 +247,8 @@ func (m *QueryTokenConfigRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryTokenConfigRequest proto.InternalMessageInfo
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
+// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
+// method.
 type QueryTokenConfigResponse struct {
 	Map map[string]string `protobuf:"bytes,1,rep,name=map,proto3" json:"map,omitempty" yaml:"config" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }

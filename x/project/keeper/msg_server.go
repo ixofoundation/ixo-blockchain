@@ -78,6 +78,7 @@ func (s msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 
 	//Create project backed IID
 	did, err := iidtypes.NewDidDocument(
+		ctx,
 		msg.ProjectDid,
 		iidtypes.WithVerifications(
 			iidtypes.NewVerification(

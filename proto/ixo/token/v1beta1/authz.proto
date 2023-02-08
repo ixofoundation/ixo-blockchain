@@ -8,33 +8,29 @@ import "ixo/token/v1beta1/token.proto";
 import "google/protobuf/timestamp.proto";
 import "cosmos_proto/cosmos.proto";
 
-
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
-
-message Cw20Constraints {
-  uint64 maxAmmount = 1 [(gogoproto.jsontag) = "max_ammount", (gogoproto.moretags) = "yaml:\"max_ammount\""];
-}
+message Cw20Constraints { uint64 max_amount = 1; }
 
 message Cw721Constraints {}
 
-message Cw1155Constraints {
-  uint64 value = 1 [(gogoproto.jsontag) = "value", (gogoproto.moretags) = "yaml:\"value\""];
-}
- 
+message Cw1155Constraints { uint64 value = 1; }
+
 message MintConstraints {
-  string contractAddress = 1 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];
-  int64 limit = 2 [(gogoproto.jsontag) = "limit", (gogoproto.moretags) = "yaml:\"limit\""];
+  string contract_address = 1;
+  int64 limit = 2;
   oneof contract_constraints {
-    Cw20Constraints cw20Constraints = 3 [(gogoproto.jsontag) = "cw20_constraints", (gogoproto.moretags) = "yaml:\"cw20_constraints\""];
-    Cw721Constraints cw721Constraints = 4 [(gogoproto.jsontag) = "cw721_constraints", (gogoproto.moretags) = "yaml:\"cw721_constraints\""];
-    Cw1155Constraints cw1155Constraints = 5 [(gogoproto.jsontag) = "cw1155_constraints", (gogoproto.moretags) = "yaml:\"cw1155_constraints\""];
+    Cw20Constraints cw20_constraints = 3;
+    Cw721Constraints cw721_constraints = 4;
+    Cw1155Constraints cw1155_constraints = 5;
   }
 }
 
 message MintAuthorization {
   option (cosmos_proto.implements_interface) = "Authorization";
 
-  string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-  repeated MintConstraints constraints = 2 [(gogoproto.jsontag) = "cw20_limits", (gogoproto.moretags) = "yaml:\"cw20_limits\""];
+  string minter_did = 1
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  repeated MintConstraints constraints = 2;
 }

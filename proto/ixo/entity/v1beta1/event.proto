@@ -1,0 +1,53 @@
+syntax = "proto3";
+package ixo.entity.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
+
+import "gogoproto/gogo.proto";
+
+// EntityCreatedEvent is an event triggered on a Entity creation
+message EntityCreatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // the id of entity being created
+  string id = 1;
+  // the entity owner
+  string owner = 2;
+}
+
+// EntityUpdatedEvent is an event triggered on a entity document update
+message EntityUpdatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // the id being updated
+  string id = 1;
+  // the signer account of the change
+  string signer = 2;
+}
+
+// EntityVerifiedUpdatedEvent is an event triggered on a entity verified
+// document update
+message EntityVerifiedUpdatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // the id being updated
+  string id = 1;
+  // the signer account of the change
+  string signer = 2;
+  // whether entity is verified or not
+  bool entity_verified = 3;
+}
+
+// EntityTransferredEvent is an event triggered on a entity transfer
+message EntityTransferredEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // the id if entity being transferred
+  string id = 1;
+  // the new owner of the entity
+  string owner = 2;
+}

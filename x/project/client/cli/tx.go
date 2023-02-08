@@ -60,10 +60,6 @@ func NewCmdCreateProject() *cobra.Command {
 			msg := types.NewMsgCreateProject(
 				iidtypes.DIDFragment(senderDid), json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.VerifyKey, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			res, err := ixotypes.SignAndBroadcastTxFromStdSignMsg(clientCtx, msg, ixoDid, cmd.Flags())
 			if err != nil {
@@ -113,10 +109,6 @@ func NewCmdUpdateProjectStatus() *cobra.Command {
 
 			msg := types.NewMsgUpdateProjectStatus(iidtypes.DIDFragment(senderDid), updateProjectStatusDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -156,10 +148,6 @@ func NewCmdCreateAgent() *cobra.Command {
 
 			msg := types.NewMsgCreateAgent(txHash, iidtypes.DIDFragment(senderDid), createAgentDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -201,10 +189,6 @@ func NewCmdUpdateAgent() *cobra.Command {
 
 			msg := types.NewMsgUpdateAgent(txHash, iidtypes.DIDFragment(senderDid), updateAgentDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -239,10 +223,6 @@ func NewCmdCreateClaim() *cobra.Command {
 
 			msg := types.NewMsgCreateClaim(txHash, iidtypes.DIDFragment(senderDid), createClaimDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -283,10 +263,6 @@ func NewCmdCreateEvaluation() *cobra.Command {
 
 			msg := types.NewMsgCreateEvaluation(txHash, iidtypes.DIDFragment(senderDid), createEvaluationDoc, ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -321,10 +297,6 @@ func NewCmdWithdrawFunds() *cobra.Command {
 
 			msg := types.NewMsgWithdrawFunds(iidtypes.DIDFragment(ixoDid.Did), data, ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -355,10 +327,6 @@ func NewCmdUpdateProjectDoc() *cobra.Command {
 
 			msg := types.NewMsgUpdateProjectDoc(iidtypes.DIDFragment(senderDid), json.RawMessage(projectDataStr), ixoDid.Did, ixoDid.Address().String())
 			msg.ProjectAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},

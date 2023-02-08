@@ -224,11 +224,6 @@ func NewCmdCreateSubscription() *cobra.Command {
 				contractIdStr, maxPeriods, period, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.CreatorAddress = ixoDid.Address().String()
 
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
-
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
 	}
@@ -312,10 +307,6 @@ func NewCmdGrantPaymentDiscount() *cobra.Command {
 			msg := types.NewMsgGrantDiscount(
 				contractIdStr, discountId, recipientAddr, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -354,10 +345,6 @@ func NewCmdRevokePaymentDiscount() *cobra.Command {
 			msg := types.NewMsgRevokeDiscount(
 				contractIdStr, holderAddr, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},
@@ -389,10 +376,6 @@ func NewCmdEffectPayment() *cobra.Command {
 
 			msg := types.NewMsgEffectPayment(contractIdStr, iidtypes.DIDFragment(ixoDid.Did), ixoDid.Address().String())
 			msg.SenderAddress = ixoDid.Address().String()
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
 
 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
 		},

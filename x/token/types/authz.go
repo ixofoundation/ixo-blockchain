@@ -25,12 +25,12 @@ func NewMintAuthorization(minterDid iidtypes.DIDFragment, cw20Limit, cw721Limit,
 
 // MsgTypeURL implements Authorization.MsgTypeURL.
 func (a MintAuthorization) MsgTypeURL() string {
-	return sdk.MsgTypeURL(&MsgMint{})
+	return sdk.MsgTypeURL(&MsgMintToken{})
 }
 
 // Accept implements Authorization.Accept.
 func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
-	mMint, ok := msg.(*MsgMint)
+	mMint, ok := msg.(*MsgMintToken)
 	if !ok {
 		return authz.AcceptResponse{Accept: false}, sdkerrors.ErrInvalidType.Wrap("type mismatch")
 	}

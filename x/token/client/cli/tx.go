@@ -34,7 +34,7 @@ func NewTxCmd() *cobra.Command {
 // NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-token-params [nft_contract_code] [nft_minter_address] [flags]",
+		Use:   "update-token-params [cw20-code-id] [cw721-code-id] [ixo1155-code-id] [flags]",
 		Args:  cobra.ExactArgs(3),
 		Short: "Submit a proposal to update token params",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -94,7 +94,7 @@ func NewCmdCreateToken() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			var msg types.MsgMint
+			var msg types.MsgMintToken
 			err := json.Unmarshal([]byte(args[0]), &msg)
 			if err != nil {
 				return err

@@ -99,8 +99,12 @@ func (baID BlockchainAccountID) GetAddress() string {
 }
 
 // NewBlockchainAccountID build a new blockchain account ID struct
-func NewBlockchainAccountID(chainID, account string) BlockchainAccountID {
-	return BlockchainAccountID(fmt.Sprint("cosmos:", chainID, ":", account))
+//
+//	func NewBlockchainAccountID(chainID, account string) BlockchainAccountID {
+//		return BlockchainAccountID(fmt.Sprint("cosmos:", chainID, ":", account))
+//	}
+func NewBlockchainAccountID(account string) BlockchainAccountID {
+	return BlockchainAccountID(account)
 }
 
 // PublicKeyMultibase formats an account address as per the CAIP-10 Account ID specification.

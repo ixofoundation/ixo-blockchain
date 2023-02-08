@@ -6,13 +6,18 @@ import "ixo/legacy/did/did.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/lib/legacydid";
 
-// BaseDidDoc defines a base DID document type. It implements the DidDoc interface.
+// BaseDidDoc defines a base DID document type. It implements the DidDoc
+// interface.
 message BaseDidDoc {
   // option (gogoproto.goproto_stringer) = false;
-  option (gogoproto.goproto_getters)  = false;
-  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.equal) = false;
 
-  string did                          = 1 [(gogoproto.moretags) = "yaml:\"did\"" ];
-  string pub_key                      = 2 [(gogoproto.jsontag) = "pubKey", (gogoproto.moretags) = "yaml:\"pubKey\"" ];
-  repeated DidCredential credentials  = 3 [(gogoproto.moretags) = "yaml:\"credentials\""];
+  string did = 1 [ (gogoproto.moretags) = "yaml:\"did\"" ];
+  string pub_key = 2 [
+    (gogoproto.jsontag) = "pubKey",
+    (gogoproto.moretags) = "yaml:\"pubKey\""
+  ];
+  repeated DidCredential credentials = 3
+      [ (gogoproto.moretags) = "yaml:\"credentials\"" ];
 }

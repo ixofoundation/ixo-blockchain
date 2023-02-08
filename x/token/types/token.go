@@ -2,7 +2,6 @@ package types
 
 import (
 	fmt "fmt"
-	"strconv"
 
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -13,27 +12,10 @@ var (
 	KeyIxo1155ContractCode = []byte("Ixo1155ContractCode")
 )
 
-func parseCode(stringCode string) (uint64, error) {
-	code, err := strconv.ParseUint(stringCode, 0, 64)
-	if err != nil {
-		return 0, err
-	}
-
-	return code, nil
-}
-
 func validateContractCode(i interface{}) error {
-	codeString, ok := i.(string)
+	_, ok := i.(uint64)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T expected string", i)
-	}
-	code, err := parseCode(codeString)
-	if err != nil {
-		return err
-	}
-
-	if code < 0 {
-		return fmt.Errorf("invalid contract code")
+		return fmt.Errorf("invalid parameter type: %T expected uint64", i)
 	}
 
 	return nil
@@ -44,54 +26,27 @@ func ParamKeyTable() paramstypes.KeyTable {
 	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(nftContractAddress string, nftContractMinter string) Params {
+func NewParams(cw20ContractCode uint64, cw721ContractCode uint64, ixo1155ContractCode uint64) Params {
 	return Params{
-		Cw20ContractCode:    "0",
-		Cw721ContractCode:   "0",
-		Ixo1155ContractCode: "0",
+		Cw20ContractCode:    cw20ContractCode,
+		Cw721ContractCode:   cw721ContractCode,
+		Ixo1155ContractCode: ixo1155ContractCode,
 	}
 }
 
-// func (p Params) MustCw20ContractCode() (uint64, error) {
-
-// }
-
-// // default project module parameters
 func DefaultParams() Params {
 	return Params{
-		Cw20ContractCode:    "0",
-		Cw721ContractCode:   "0",
-		Ixo1155ContractCode: "0",
+		Cw20ContractCode:    0,
+		Cw721ContractCode:   0,
+		Ixo1155ContractCode: 0,
 	}
 }
 
-func (p *Params) GetCw20ContractCode() uint64 {
-	code, err := parseCode(p.Cw20ContractCode)
-	if err != nil {
-		panic(err)
-	}
-	return code
-}
-func (p *Params) GetCw721ContractCode() uint64 {
-	code, err := parseCode(p.Cw721ContractCode)
-	if err != nil {
-		panic(err)
-	}
-	return code
-}
-func (p *Params) GetIxo1155ContractCode() uint64 {
-	code, err := parseCode(p.Ixo1155ContractCode)
-	if err != nil {
-		panic(err)
-	}
-	return code
-}
-
-// // Implements params.ParamSet
+// Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
-		{KeyCw20ContractCode, &p.Cw20ContractCode, validateContractCode},
-		{KeyCw721ContractCode, &p.Cw721ContractCode, validateContractCode},
-		{KeyIxo1155ContractCode, &p.Ixo1155ContractCode, validateContractCode},
+		paramstypes.ParamSetPair{Key: KeyCw20ContractCode, Value: &p.Cw20ContractCode, ValidatorFn: validateContractCode},
+		paramstypes.ParamSetPair{Key: KeyCw721ContractCode, Value: &p.Cw721ContractCode, ValidatorFn: validateContractCode},
+		paramstypes.ParamSetPair{Key: KeyIxo1155ContractCode, Value: &p.Ixo1155ContractCode, ValidatorFn: validateContractCode},
 	}
 }

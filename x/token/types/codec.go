@@ -12,15 +12,14 @@ import (
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSetupMinter{}, "token/SetupMinter", nil)
-	cdc.RegisterConcrete(&MsgMint{}, "token/MintToken", nil)
+	cdc.RegisterConcrete(&MsgMintToken{}, "token/MintToken", nil)
 	cdc.RegisterConcrete(&MsgTransferToken{}, "token/TransferToken", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
-
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSetupMinter{},
-		&MsgMint{},
+		&MsgMintToken{},
 		&MsgTransferToken{},
 	)
 
@@ -52,4 +51,5 @@ var (
 func init() {
 	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
 }

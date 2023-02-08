@@ -2,16 +2,17 @@ package cli
 
 import (
 	"encoding/json"
-
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/spf13/cobra"
 )
 
@@ -26,6 +27,9 @@ func NewTxCmd() *cobra.Command {
 
 	entityTxCmd.AddCommand(
 		NewCmdCreateEntity(),
+		NewCmdUpdateEntity(),
+		NewCmdUpdateEntityVerified(),
+		NewCmdTransferEntity(),
 	)
 
 	return entityTxCmd
@@ -34,7 +38,7 @@ func NewTxCmd() *cobra.Command {
 // NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-entity-params [nft_contract_code] [nft_minter_address] [flags]",
+		Use:   "update-entity-params [nft-contract-code] [nft-minter-address] [flags]",
 		Args:  cobra.ExactArgs(2),
 		Short: "Submit a proposal to update entity params",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -79,19 +83,12 @@ func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 
 func NewCmdCreateEntity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-entity [entity-iid]",
-		Short: "Create a new EntityDoc",
+		Use:   "create-entity [create-entity-doc]",
+		Short: "Create a new Entity - flag is raw json with struct of MsgCreateEntity",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			var msg types.MsgCreateEntity
-			err := json.Unmarshal([]byte(args[0]), &msg)
-			if err != nil {
-				return err
-			}
-
-			err = msg.ValidateBasic()
-			if err != nil {
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
 				return err
 			}
 
@@ -100,14 +97,111 @@ func NewCmdCreateEntity() *cobra.Command {
 				return err
 			}
 
-			msg.OwnerAddress = clientCtx.GetFromAddress().String()
+			var verJson iidtypes.VerificationsJSON
+			if err := json.Unmarshal([]byte(args[0]), &verJson); err != nil {
+				return err
+			}
 
-			err = tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+			// Manually generate verifications based of json values
+			verifications, err := iidtypes.GenerateVerificationsFromJson(verJson)
 			if err != nil {
 				return err
 			}
 
-			return nil
+			msg.Verification = verifications
+			msg.OwnerAddress = clientCtx.GetFromAddress().String()
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// When using this function it updates all fields, even if dopnt provide fields it will use the proto defaults
+func NewCmdUpdateEntity() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-entity [update-entity-doc]",
+		Short: "Update an Entity - flag is raw json with struct of MsgUpdateEntity",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgUpdateEntity
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg.ControllerAddress = clientCtx.GetFromAddress().String()
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdUpdateEntityVerified() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-entity-verified [id] [verified] [relayer-did]",
+		Short: "Update if an Entity is verified, only the relayer-node can verify",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			argId := args[0]
+			argRelayerDid := args[1]
+			argVerified, err := strconv.ParseBool(args[2])
+			if err != nil {
+				return sdkerrors.Wrapf(err, "verified must be a boolean value")
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgUpdateEntityVerified{
+				Id:                 argId,
+				RelayerNodeDid:     iidtypes.DIDFragment(argRelayerDid),
+				EntityVerified:     argVerified,
+				RelayerNodeAddress: clientCtx.GetFromAddress().String(),
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdTransferEntity() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "transfer-entity [id] [owner-did] [recipient-did]",
+		Short: "Transfer an Entity",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			argId := args[0]
+			argOwnerDid := args[1]
+			argRecipientDid := args[2]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgTransferEntity{
+				Id:           argId,
+				OwnerDid:     iidtypes.DIDFragment(argOwnerDid),
+				RecipientDid: iidtypes.DIDFragment(argRecipientDid),
+				OwnerAddress: clientCtx.GetFromAddress().String(),
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 

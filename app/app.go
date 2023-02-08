@@ -500,6 +500,7 @@ func NewIxoApp(
 	app.TokenKeeper = tokenkeeper.NewKeeper(
 		appCodec,
 		keys[tokentypes.StoreKey],
+		keys[tokentypes.MemStoreKey],
 		app.IidKeeper,
 		app.WasmKeeper,
 		app.AccountKeeper,
@@ -561,7 +562,7 @@ func NewIxoApp(
 
 		// Custom ixo AppModules
 		// this line is used by starport scaffolding # stargate/app/appModule
-		iidmodule.NewAppModule(app.appCodec, app.IidKeeper, &app.WasmKeeper),
+		iidmodule.NewAppModule(app.appCodec, app.IidKeeper),
 		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
 		payments.NewAppModule(app.PaymentsKeeper, app.BankKeeper),
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
@@ -618,9 +619,8 @@ func NewIxoApp(
 		feegrant.ModuleName, wasm.ModuleName,
 
 		// Custom ixo modules
-		// this line is used by starport scaffolding # stargate/app/initGenesis
 		iidtypes.ModuleName, bondstypes.ModuleName,
-		paymentstypes.ModuleName, projecttypes.ModuleName, wasm.ModuleName,
+		paymentstypes.ModuleName, projecttypes.ModuleName,
 		tokentypes.ModuleName, entitytypes.ModuleName,
 	)
 
@@ -1010,7 +1010,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	// init params keeper and subspaces (for custom ixo modules)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(iidtypes.ModuleName)
 	paramsKeeper.Subspace(bondstypes.ModuleName)
 	paramsKeeper.Subspace(projecttypes.ModuleName)

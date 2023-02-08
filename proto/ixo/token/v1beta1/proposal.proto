@@ -7,7 +7,7 @@ import "ixo/token/v1beta1/token.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 message SetTokenContractCodes {
-  uint64 cw20ContractCode = 1 [(gogoproto.jsontag) = "cw20_contract_code", (gogoproto.moretags) = "yaml:\"cw20_contract_code\""];
-  uint64 cw721ContractCode = 2 [(gogoproto.jsontag) = "cw721_contract_code", (gogoproto.moretags) = "yaml:\"cw721_contract_code\""];
-  uint64 ixo1155ContractCode = 3 [(gogoproto.jsontag) = "ixo1155_contract_code", (gogoproto.moretags) = "yaml:\"ixo1155_contract_code\""];
+  uint64 cw20_contract_code = 1;
+  uint64 cw721_contract_code = 2;
+  uint64 ixo1155_contract_code = 3;
 }

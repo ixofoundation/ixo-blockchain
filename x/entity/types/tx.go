@@ -1,7 +1,10 @@
 package types
 
 import (
+	time "time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -14,7 +17,64 @@ import (
 // 	return address, nil
 // }
 
+var (
+	_ iidante.IidTxMsg = &MsgCreateEntity{}
+	_ iidante.IidTxMsg = &MsgTransferEntity{}
+	_ iidante.IidTxMsg = &MsgUpdateEntity{}
+	_ iidante.IidTxMsg = &MsgUpdateEntityVerified{}
+)
+
+// --------------------------
+// CREATE ENTITY
+// --------------------------
+const TypeMsgCreateEntity = "create_entity"
+
+var _ sdk.Msg = &MsgCreateEntity{}
+
+func NewMsgCreateEntity(
+	entityType string,
+	entityStatus int32,
+	controller []string,
+	context []*iidtypes.Context,
+	verification []*iidtypes.Verification,
+	service []*iidtypes.Service,
+	accordedRight []*iidtypes.AccordedRight,
+	linkedResource []*iidtypes.LinkedResource,
+	linkedEntity []*iidtypes.LinkedEntity,
+	startDate *time.Time,
+	endDate *time.Time,
+	relayerNode string,
+	credentials []string,
+	ownerDid iidtypes.DIDFragment,
+	ownerAddress string,
+	data []byte,
+) *MsgCreateEntity {
+	return &MsgCreateEntity{
+		EntityType:     entityType,
+		EntityStatus:   entityStatus,
+		Controller:     controller,
+		Context:        context,
+		Verification:   verification,
+		Service:        service,
+		AccordedRight:  accordedRight,
+		LinkedResource: linkedResource,
+		LinkedEntity:   linkedEntity,
+		StartDate:      startDate,
+		EndDate:        endDate,
+		RelayerNode:    relayerNode,
+		Credentials:    credentials,
+		OwnerDid:       ownerDid,
+		OwnerAddress:   ownerAddress,
+		Data:           data,
+	}
+}
+
+func (msg MsgCreateEntity) Type() string {
+	return TypeMsgCreateEntity
+}
+
 func (msg MsgCreateEntity) GetIidController() iidtypes.DIDFragment { return msg.OwnerDid }
+
 func (msg MsgCreateEntity) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
@@ -23,18 +83,45 @@ func (msg MsgCreateEntity) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{address}
 }
 
-func (msg MsgCreateEntity) ValidateBasic() error {
-	return nil
-}
-
 func (msg MsgCreateEntity) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-// func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
 func (msg MsgCreateEntity) Route() string { return RouterKey }
 
+// --------------------------
+// UPDATE ENTITY
+// --------------------------
+const TypeMsgUpdateEntity = "update_entity"
+
+var _ sdk.Msg = &MsgUpdateEntity{}
+
+func NewMsgUpdateEntity(
+	id string,
+	entityStatus int32,
+	startDate *time.Time,
+	endDate *time.Time,
+	credentials []string,
+	controllerDid iidtypes.DIDFragment,
+	controllerAddress string,
+) *MsgUpdateEntity {
+	return &MsgUpdateEntity{
+		Id:                id,
+		EntityStatus:      entityStatus,
+		StartDate:         startDate,
+		EndDate:           endDate,
+		Credentials:       credentials,
+		ControllerDid:     controllerDid,
+		ControllerAddress: controllerAddress,
+	}
+}
+
+func (msg MsgUpdateEntity) Type() string {
+	return TypeMsgUpdateEntity
+}
+
 func (msg MsgUpdateEntity) GetIidController() iidtypes.DIDFragment { return msg.ControllerDid }
+
 func (msg MsgUpdateEntity) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
 	if err != nil {
@@ -43,20 +130,80 @@ func (msg MsgUpdateEntity) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{address}
 }
 
-func (msg MsgUpdateEntity) ValidateBasic() error {
-	return nil
-}
-
 func (msg MsgUpdateEntity) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-// func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
 func (msg MsgUpdateEntity) Route() string { return RouterKey }
 
-// func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
+// --------------------------
+// UPDATE ENTITY VERIFIED
+// --------------------------
+const TypeMsgUpdateEntityVerified = "update_entity_verification"
+
+var _ sdk.Msg = &MsgUpdateEntityVerified{}
+
+func NewMsgUpdateEntityVerified(
+	id string,
+	entityVerified bool,
+	relayerNodeDid iidtypes.DIDFragment,
+	relayerNodeAddress string,
+) *MsgUpdateEntityVerified {
+	return &MsgUpdateEntityVerified{
+		Id:                 id,
+		EntityVerified:     entityVerified,
+		RelayerNodeDid:     relayerNodeDid,
+		RelayerNodeAddress: relayerNodeAddress,
+	}
+}
+
+func (msg MsgUpdateEntityVerified) Type() string {
+	return TypeMsgUpdateEntityVerified
+}
+
+func (msg MsgUpdateEntityVerified) GetIidController() iidtypes.DIDFragment { return msg.RelayerNodeDid }
+
+func (msg MsgUpdateEntityVerified) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.RelayerNodeAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgUpdateEntityVerified) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgUpdateEntityVerified) Route() string { return RouterKey }
+
+// --------------------------
+// TRANSFER ENTITY
+// --------------------------
+const TypeMsgTransferEntity = "transfer_entity"
+
+var _ sdk.Msg = &MsgTransferEntity{}
+
+func NewMsgTransferEntity(
+	id string,
+	ownerDid iidtypes.DIDFragment,
+	ownerAddress string,
+	recipientDid iidtypes.DIDFragment,
+) *MsgTransferEntity {
+	return &MsgTransferEntity{
+		Id:           id,
+		OwnerDid:     ownerDid,
+		OwnerAddress: ownerAddress,
+		RecipientDid: recipientDid,
+	}
+}
+
+func (msg MsgTransferEntity) Type() string {
+	return TypeMsgTransferEntity
+}
 
 func (msg MsgTransferEntity) GetIidController() iidtypes.DIDFragment { return msg.OwnerDid }
+
 func (msg MsgTransferEntity) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
@@ -65,13 +212,8 @@ func (msg MsgTransferEntity) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{address}
 }
 
-func (msg MsgTransferEntity) ValidateBasic() error {
-	return nil
-}
-
 func (msg MsgTransferEntity) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-// func (msg MsgCreateEntity) Type() string  { return TypeMsgCreateEntity }
 func (msg MsgTransferEntity) Route() string { return RouterKey }

@@ -1,18 +1,12 @@
 package ante
 
 import (
-	"errors"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
-
-// type IidTx struct {
-// 	signing.SigVerifiableTx
-// }
 
 func GetIidControllers(tx signing.SigVerifiableTx) []IidTxMsg {
 	var msgs []IidTxMsg
@@ -32,7 +26,7 @@ func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Co
 
 	pubKeys, err := tx.GetPubKeys()
 	if err != nil {
-		return sdkerrors.Wrap(err, "Tx must be a IIDTx")
+		return sdkerrors.Wrap(err, "TX must be signed with pubkey")
 	}
 
 	iidHasPubKey := false
@@ -43,7 +37,7 @@ func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Co
 		iidDoc, exists := iidKeeper.GetDidDocument(ctx, []byte(iid))
 
 		if !exists {
-			return sdkerrors.Wrap(errors.New("iid not found"), "iid not found")
+			return sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document %s not found", iid)
 		}
 
 		for _, pk := range pubKeys {
@@ -54,7 +48,7 @@ func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Co
 	}
 
 	if !iidHasPubKey && len(controllers) > 0 {
-		return sdkerrors.Wrap(errors.New("iid does not match public key in signiture"), "iid does not match public key in signiture")
+		return sdkerrors.Wrap(iidtypes.ErrDidPubKeyMismatch, "one of the dids provided mismatch with signed pubkey")
 	}
 
 	return nil

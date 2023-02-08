@@ -1,50 +1,9 @@
 #!/usr/bin/env bash
 
-wait() {
-  echo "Waiting for chain to start..."
-  while :; do
-    RET=$(ixod status 2>&1)
-    if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
-      sleep 1
-    else
-      echo "A few more seconds..."
-      sleep 6
-      break
-    fi
-  done
-}
+# Must be run from root path inside ixo-blockchain for source to work
+source ./scripts/constants.sh
 
-RET=$(ixod status 2>&1)
-if [[ ($RET == Error*) || ($RET == *'"latest_block_height":"0"'*) ]]; then
-  wait
-fi
-
-PASSWORD="12345678"
-GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-4"
-
-ixod_tx() {
-  # Helper function to broadcast a transaction and supply the necessary args
-
-  # Get module ($1) and specific tx ($1), which forms the tx command
-  cmd="$1 $2"
-  shift
-  shift
-
-  # Broadcast the transaction
-  ixod tx $cmd \
-    --gas-prices="$GAS_PRICES" \
-    --chain-id="$CHAIN_ID" \
-    -y \
-    "$@" | jq .
-    # The $@ adds any extra arguments to the end
-
-    # NOTE: broadcast-mode=block intentionally excluded
-}
-
-ixod_q() {
-  ixod q "$@" --output=json | jq .
-}
+wait_chain_start
 
 FEE1=$(yes $PASSWORD | ixod keys show fee -a)
 FEE2=$(yes $PASSWORD | ixod keys show fee2 -a)

@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/cw20"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/cw721"
@@ -18,10 +17,9 @@ type msgServer struct {
 	Keeper Keeper
 }
 
-func (s msgServer) wasmKeeper() wasmtypes.ContractOpsKeeper { return s.Keeper.WasmKeeper }
-func (s msgServer) iidKeeper() iidkeeper.Keeper             { return s.Keeper.IidKeeper }
+var _ types.MsgServer = msgServer{}
 
-// NewMsgServerImpl returns an implementation of the project MsgServer interface
+// NewMsgServerImpl returns an implementation of the module MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(k Keeper) types.MsgServer {
 	return &msgServer{
@@ -33,15 +31,14 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	params := s.Keeper.GetParams(ctx)
 
-	// s.wasmKeeper().
-	minterDidDoc, found := s.iidKeeper().GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
+	minterDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
 	if !found {
-		return &types.MsgSetupMinterResponse{}, nil
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for minter not found")
 	}
 
 	minterAddress, err := minterDidDoc.GetVerificationMethodBlockchainAddress(msg.MinterDid.String())
 	if err != nil {
-		return &types.MsgSetupMinterResponse{}, err
+		return nil, err
 	}
 
 	var codeId uint64
@@ -51,7 +48,7 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 
 	switch contractInfo := msg.ContractInfo.(type) {
 	case *types.MsgSetupMinter_Cw20:
-		codeId = params.GetCw20ContractCode()
+		codeId = params.Cw20ContractCode
 		label = fmt.Sprintf("%s-cw20-contract", msg.MinterDid.String())
 		contractType = types.ContractType_CW20
 		// uint := uint(contractInfo.Cw20.Cap)
@@ -60,7 +57,7 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 			Symbol:   contractInfo.Cw20.Symbol,
 			Decimals: contractInfo.Cw20.Decimals,
 			InitialBalances: func() (coins []cw20.Cw20Coin) {
-				for _, bal := range contractInfo.Cw20.InstialBalances {
+				for _, bal := range contractInfo.Cw20.InitialBalances {
 					coins = append(coins, cw20.Cw20Coin{Address: bal.Address, Amount: bal.Amount})
 				}
 				return
@@ -70,8 +67,9 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 				// Cap:    &contractInfo.Cw20.Cap,
 			},
 		}.Marshal()
+
 	case *types.MsgSetupMinter_Cw721:
-		codeId = params.GetCw721ContractCode()
+		codeId = params.Cw721ContractCode
 		label = fmt.Sprintf("%s-cw721-contract", msg.MinterDid.String())
 		contractType = types.ContractType_CW721
 		encodedInitiateMessage, err = cw721.InitiateNftContract{
@@ -81,22 +79,21 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		}.Marshal()
 
 	case *types.MsgSetupMinter_Cw1155:
-		codeId = params.GetIxo1155ContractCode()
+		codeId = params.Ixo1155ContractCode
 		label = fmt.Sprintf("%s-cw1155-contract", msg.MinterDid.String())
 		contractType = types.ContractType_IXO1155
 		encodedInitiateMessage, err = ixo1155.InstantiateMsg{
 			Minter: minterAddress.String(),
 		}.Marshal()
+
 	default:
-		// err := sdkerrors.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
 		return &types.MsgSetupMinterResponse{}, sdkerrors.ErrInvalidType.Wrap("invalid contract provided")
 	}
-
 	if err != nil {
 		return &types.MsgSetupMinterResponse{}, err
 	}
 
-	contractAddr, _, err := s.wasmKeeper().Instantiate(
+	contractAddr, _, err := s.Keeper.WasmKeeper.Instantiate(
 		ctx,
 		codeId,
 		minterAddress,
@@ -105,9 +102,8 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		label,
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
-
 	if err != nil {
-		return &types.MsgSetupMinterResponse{}, err
+		return nil, err
 	}
 
 	tokenMinter := types.TokenMinter{
@@ -121,55 +117,55 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 	s.Keeper.SetMinter(ctx, tokenMinter)
 
 	if err := ctx.EventManager().EmitTypedEvent(&tokenMinter); err != nil {
-		s.iidKeeper().Logger(ctx).Error("failed to emit TokerMinterEvent", err)
+		s.Keeper.IidKeeper.Logger(ctx).Error("failed to emit TokerMinterEvent", err)
 	}
 
 	return &types.MsgSetupMinterResponse{}, nil
 }
 
-func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
+func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*types.MsgMintTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	tokenMinter, err := s.Keeper.GetMinterContract(ctx, msg.MinterDid, msg.ContractAddress)
 	if err != nil {
-		return &types.MsgMintResponse{}, err
+		return nil, err
 	}
 
-	minterDidDoc, found := s.iidKeeper().GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
+	minterDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
 	if !found {
-		return &types.MsgMintResponse{}, nil
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for minter not found")
 	}
 
 	minterAddress, err := minterDidDoc.GetVerificationMethodBlockchainAddress(msg.MinterDid.String())
 	if err != nil {
-		return &types.MsgMintResponse{}, err
+		return nil, err
 	}
 
-	ownerDidDoc, found := s.iidKeeper().GetDidDocument(ctx, []byte(msg.OwnerDid.Did()))
+	ownerDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.OwnerDid.Did()))
 	if !found {
-		return &types.MsgMintResponse{}, nil
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for owner not found")
 	}
 
 	ownerAddress, err := ownerDidDoc.GetVerificationMethodBlockchainAddress(msg.OwnerDid.String())
 	if err != nil {
-		return &types.MsgMintResponse{}, err
+		return nil, err
 	}
 
 	var encodedMintMessage []byte
 
 	switch mintInfo := msg.MintContract.(type) {
-	case *types.MsgMint_Cw20:
+	case *types.MsgMintToken_Cw20:
 		if tokenMinter.ContractType != types.ContractType_CW20 {
-			return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw20 contract type")
+			return nil, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw20 contract type")
 		}
 		encodedMintMessage, err = cw20.Mint{
 			Recipient: ownerAddress.String(),
 			Amount:    uint(mintInfo.Cw20.Amount),
 		}.Marshal()
 
-	case *types.MsgMint_Cw721:
+	case *types.MsgMintToken_Cw721:
 		if tokenMinter.ContractType != types.ContractType_CW721 {
-			return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw721 contract type")
+			return nil, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw721 contract type")
 		}
 
 		uri := func() string {
@@ -191,9 +187,9 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMint) (*types.
 			},
 		}.Marshal()
 
-	case *types.MsgMint_Cw1155:
+	case *types.MsgMintToken_Cw1155:
 		if tokenMinter.ContractType != types.ContractType_IXO1155 {
-			return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw1155 contract type")
+			return nil, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw1155 contract type")
 		}
 		encodedMintMessage, err = ixo1155.Mint{
 			To:      ownerAddress.String(),
@@ -204,30 +200,32 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMint) (*types.
 
 	default:
 		// err := sdkerrors.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
-		return &types.MsgMintResponse{}, sdkerrors.ErrInvalidType.Wrap("invalid contract provided")
+		return nil, sdkerrors.ErrInvalidType.Wrap("invalid contract provided")
 	}
-
-	if err != nil {
-		return &types.MsgMintResponse{}, err
-	}
-
-	contractAddressBytes, err := sdk.AccAddressFromBech32(tokenMinter.ContractAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	s.wasmKeeper().Execute(
+	contractAddress, err := sdk.AccAddressFromBech32(tokenMinter.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.Keeper.WasmKeeper.Execute(
 		ctx,
-		contractAddressBytes,
+		contractAddress,
 		minterAddress,
 		encodedMintMessage,
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
+	if err != nil {
+		return nil, err
+	}
 
-	return &types.MsgMintResponse{}, nil
+	return &types.MsgMintTokenResponse{}, nil
 }
 
 func (s msgServer) TransferToken(goCtx context.Context, msg *types.MsgTransferToken) (*types.MsgTransferTokenResponse, error) {
-	return s.Keeper.TransferToken(sdk.UnwrapSDKContext(goCtx), msg)
+	return &types.MsgTransferTokenResponse{}, nil
 
 }

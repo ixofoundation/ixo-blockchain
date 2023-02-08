@@ -27,7 +27,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// UpdateProjectStatusDoc contains details required to update a project's status.
+// UpdateProjectStatusDoc contains details required to update a project's
+// status.
 type UpdateProjectStatusDoc struct {
 	Status          string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty" yaml:"status"`
 	EthFundingTxnId string `protobuf:"bytes,2,opt,name=eth_funding_txn_id,json=ethFundingTxnId,proto3" json:"ethFundingTxnID" yaml:"ethFundingTxnID"`
@@ -247,7 +248,8 @@ func (m *CreateClaimDoc) GetClaimTemplateId() string {
 	return ""
 }
 
-// CreateEvaluationDoc contains details required to create an evaluation for a specific claim on a project.
+// CreateEvaluationDoc contains details required to create an evaluation for a
+// specific claim on a project.
 type CreateEvaluationDoc struct {
 	ClaimId string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claimID" yaml:"claimID"`
 	Status  string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty" yaml:"status"`
@@ -300,7 +302,8 @@ func (m *CreateEvaluationDoc) GetStatus() string {
 	return ""
 }
 
-// WithdrawFundsDoc contains details required to withdraw funds from a specific project.
+// WithdrawFundsDoc contains details required to withdraw funds from a specific
+// project.
 type WithdrawFundsDoc struct {
 	ProjectDid   string                                                          `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"projectDid" yaml:"projectDid"`
 	RecipientDid github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"recipientDid" yaml:"recipientDid"`
@@ -447,7 +450,8 @@ func (m *ProjectDoc) GetData() encoding_json.RawMessage {
 	return nil
 }
 
-// WithdrawalInfoDoc contains details required to withdraw from a specific project.
+// WithdrawalInfoDoc contains details required to withdraw from a specific
+// project.
 type WithdrawalInfoDoc struct {
 	ProjectDid   string                                                          `protobuf:"bytes,1,opt,name=project_did,json=projectDid,proto3" json:"projectDid" yaml:"projectDid"`
 	RecipientDid github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"recipientDid" yaml:"recipientDid"`
@@ -632,7 +636,8 @@ func (m *Claim) GetStatus() string {
 	return ""
 }
 
-// GenesisAccountMap is a type used at genesis that maps a specific project's account names to the accounts' addresses.
+// GenesisAccountMap is a type used at genesis that maps a specific project's
+// account names to the accounts' addresses.
 type GenesisAccountMap struct {
 	Map map[string]string `protobuf:"bytes,1,rep,name=map,proto3" json:"map,omitempty" yaml:"map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
@@ -677,7 +682,8 @@ func (m *GenesisAccountMap) GetMap() map[string]string {
 	return nil
 }
 
-// AccountMap maps a specific project's account names to the accounts' addresses.
+// AccountMap maps a specific project's account names to the accounts'
+// addresses.
 type AccountMap struct {
 	Map map[string]string `protobuf:"bytes,1,rep,name=map,proto3" json:"map,omitempty" yaml:"map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }

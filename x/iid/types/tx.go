@@ -4,6 +4,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// --------------------------
+// CREATE DID
+// --------------------------
+
 // msg types
 const (
 	TypeMsgCreateDidDocument = "create-did"
@@ -68,16 +72,6 @@ func (msg MsgCreateIidDocument) GetSigners() []sdk.AccAddress {
 const (
 	TypeMsgUpdateDidDocument = "update-did"
 )
-
-func NewMsgUpdateDidDocument(
-	didDoc *IidDocument,
-	signerAccount string,
-) *MsgUpdateIidDocument {
-	return &MsgUpdateIidDocument{
-		Doc:    didDoc,
-		Signer: signerAccount,
-	}
-}
 
 // Route implements sdk.Msg
 func (MsgUpdateIidDocument) Route() string {
@@ -719,47 +713,13 @@ func (msg MsgDeleteIidContext) GetSigners() []sdk.AccAddress {
 }
 
 // --------------------------
-// ADD META
+// DEACTIVATE DID
 // --------------------------
 
 // msg types
 const (
-	TypeMsgAddDidMeta = "add-did-meta"
+	TypeMsgDeactivateDid = "deactivate-did"
 )
-
-var _ sdk.Msg = &MsgUpdateIidMeta{}
-
-// NewMsgAddService creates a new MsgAddService instance
-func NewMsgUpdateDidMetaData(
-	id string,
-	meta *IidMetadata,
-	signerAccount string,
-) *MsgUpdateIidMeta {
-	return &MsgUpdateIidMeta{
-		Id:     id,
-		Meta:   meta,
-		Signer: signerAccount,
-	}
-}
-
-// Type implements sdk.Msg
-func (MsgUpdateIidMeta) Type() string {
-	return TypeMsgAddDidMeta
-}
-
-func (msg MsgUpdateIidMeta) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgUpdateIidMeta) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{accAddr}
-}
 
 func NewMsgDeactivateIID(
 	id string,
@@ -779,11 +739,11 @@ func (MsgDeactivateIID) Route() string {
 }
 
 func (MsgDeactivateIID) Type() string {
-	return TypeMsgAddDidMeta
+	return TypeMsgDeactivateDid
 }
 
 func (msg MsgDeactivateIID) GetSignBytes() []byte {
-	panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 // GetSigners implements sdk.Msg

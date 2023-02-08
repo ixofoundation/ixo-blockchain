@@ -7,15 +7,20 @@ import (
 	fmt "fmt"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	_ "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -24,9 +29,9 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Params struct {
-	NftContractAddress string `protobuf:"bytes,1,opt,name=NftContractAddress,proto3" json:"NftContractAddress" yaml:"NftContractAddress"`
-	NftContractMinter  string `protobuf:"bytes,2,opt,name=NftContractMinter,proto3" json:"NftContractMinter" yaml:"NftContractMinter"`
-	CreateSequence     uint64 `protobuf:"varint,3,opt,name=CreateSequence,proto3" json:"CreateSequence" yaml:"CreateSequence"`
+	NftContractAddress string `protobuf:"bytes,1,opt,name=NftContractAddress,proto3" json:"NftContractAddress,omitempty"`
+	NftContractMinter  string `protobuf:"bytes,2,opt,name=NftContractMinter,proto3" json:"NftContractMinter,omitempty"`
+	CreateSequence     uint64 `protobuf:"varint,3,opt,name=CreateSequence,proto3" json:"CreateSequence,omitempty"`
 }
 
 func (m *Params) Reset()         { *m = Params{} }
@@ -83,22 +88,44 @@ func (m *Params) GetCreateSequence() uint64 {
 	return 0
 }
 
-// // ProjectDoc defines a project (or entity) type with all of its parameters.
-type EntityDoc struct {
+type Entity struct {
+	// id represents the id for the entity document.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Status of the Entity as defined by the implementer and interpreted by
+	// Client applications
+	Type string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	// Start Date of the Entity as defined by the implementer and interpreted by
+	// Client applications
+	StartDate *time.Time `protobuf:"bytes,3,opt,name=startDate,proto3,stdtime" json:"startDate,omitempty"`
+	// End Date of the Entity as defined by the implementer and interpreted by
+	// Client applications
+	EndDate *time.Time `protobuf:"bytes,4,opt,name=endDate,proto3,stdtime" json:"endDate,omitempty"`
+	// Status of the Entity as defined by the implementer and interpreted by
+	// Client applications
+	Status int32 `protobuf:"varint,5,opt,name=status,proto3" json:"status,omitempty"`
+	// DID of the operator through which the Entity was created
+	RelayerNode string `protobuf:"bytes,6,opt,name=relayerNode,proto3" json:"relayerNode,omitempty"`
+	// Credentials of the enitity to be verified
+	Credentials []string `protobuf:"bytes,7,rep,name=credentials,proto3" json:"credentials,omitempty"`
+	// Used as check whether the credentials of entity is verified
+	EntityVerified bool `protobuf:"varint,8,opt,name=entityVerified,proto3" json:"entityVerified,omitempty"`
+	// Metadata concerning the Entity such as versionId, created, updated and
+	// deactivated
+	Metadata *EntityMetadata `protobuf:"bytes,9,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
-func (m *EntityDoc) Reset()         { *m = EntityDoc{} }
-func (m *EntityDoc) String() string { return proto.CompactTextString(m) }
-func (*EntityDoc) ProtoMessage()    {}
-func (*EntityDoc) Descriptor() ([]byte, []int) {
+func (m *Entity) Reset()         { *m = Entity{} }
+func (m *Entity) String() string { return proto.CompactTextString(m) }
+func (*Entity) ProtoMessage()    {}
+func (*Entity) Descriptor() ([]byte, []int) {
 	return fileDescriptor_9631845bd4f69820, []int{1}
 }
-func (m *EntityDoc) XXX_Unmarshal(b []byte) error {
+func (m *Entity) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *EntityDoc) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Entity) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_EntityDoc.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Entity.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -108,49 +135,201 @@ func (m *EntityDoc) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *EntityDoc) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EntityDoc.Merge(m, src)
+func (m *Entity) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Entity.Merge(m, src)
 }
-func (m *EntityDoc) XXX_Size() int {
+func (m *Entity) XXX_Size() int {
 	return m.Size()
 }
-func (m *EntityDoc) XXX_DiscardUnknown() {
-	xxx_messageInfo_EntityDoc.DiscardUnknown(m)
+func (m *Entity) XXX_DiscardUnknown() {
+	xxx_messageInfo_Entity.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_EntityDoc proto.InternalMessageInfo
+var xxx_messageInfo_Entity proto.InternalMessageInfo
+
+// EntityMetadata defines metadata associated to a entity
+type EntityMetadata struct {
+	VersionId string     `protobuf:"bytes,1,opt,name=versionId,proto3" json:"versionId,omitempty"`
+	Created   *time.Time `protobuf:"bytes,2,opt,name=created,proto3,stdtime" json:"created,omitempty"`
+	Updated   *time.Time `protobuf:"bytes,3,opt,name=updated,proto3,stdtime" json:"updated,omitempty"`
+}
+
+func (m *EntityMetadata) Reset()         { *m = EntityMetadata{} }
+func (m *EntityMetadata) String() string { return proto.CompactTextString(m) }
+func (*EntityMetadata) ProtoMessage()    {}
+func (*EntityMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9631845bd4f69820, []int{2}
+}
+func (m *EntityMetadata) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EntityMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EntityMetadata.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EntityMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EntityMetadata.Merge(m, src)
+}
+func (m *EntityMetadata) XXX_Size() int {
+	return m.Size()
+}
+func (m *EntityMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_EntityMetadata.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EntityMetadata proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*Params)(nil), "ixo.entity.v1beta1.Params")
-	proto.RegisterType((*EntityDoc)(nil), "ixo.entity.v1beta1.EntityDoc")
+	proto.RegisterType((*Entity)(nil), "ixo.entity.v1beta1.Entity")
+	proto.RegisterType((*EntityMetadata)(nil), "ixo.entity.v1beta1.EntityMetadata")
 }
 
 func init() { proto.RegisterFile("ixo/entity/v1beta1/entity.proto", fileDescriptor_9631845bd4f69820) }
 
 var fileDescriptor_9631845bd4f69820 = []byte{
-	// 307 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0xc1, 0x4a, 0x02, 0x41,
-	0x18, 0xc7, 0x5d, 0x0b, 0xc1, 0x0d, 0x82, 0x86, 0x82, 0xad, 0xc3, 0x8c, 0xcc, 0x49, 0x88, 0x5c,
-	0x44, 0xe8, 0xd0, 0x2d, 0xad, 0x63, 0x21, 0x7a, 0xeb, 0x12, 0xb3, 0xe3, 0xa8, 0x43, 0x3a, 0x9f,
-	0xcd, 0x7e, 0xc6, 0xfa, 0x16, 0xbd, 0x43, 0x2f, 0xd3, 0xd1, 0x63, 0xa7, 0x21, 0xf4, 0xe6, 0xd1,
-	0x27, 0x08, 0xd7, 0x0d, 0xca, 0xf5, 0x36, 0xdf, 0xff, 0xf7, 0x9b, 0xf9, 0x60, 0xfe, 0x3e, 0xd3,
-	0x09, 0x84, 0xca, 0xa0, 0xc6, 0x59, 0xf8, 0x56, 0x8f, 0x14, 0x8a, 0x7a, 0x36, 0xd6, 0x26, 0x16,
-	0x10, 0x08, 0xd1, 0x09, 0xd4, 0xb2, 0x24, 0x13, 0x2e, 0x4e, 0x07, 0x30, 0x80, 0x14, 0x87, 0x9b,
-	0xd3, 0xd6, 0xe4, 0x1f, 0x45, 0xbf, 0xd4, 0x16, 0x56, 0x8c, 0x63, 0x22, 0x7d, 0xf2, 0xd8, 0xc7,
-	0x16, 0x18, 0xb4, 0x42, 0xe2, 0x6d, 0xaf, 0x67, 0x55, 0x1c, 0x07, 0x5e, 0xc5, 0xab, 0x96, 0x9b,
-	0x8d, 0x95, 0x63, 0x7b, 0xe8, 0xda, 0xb1, 0xf3, 0x99, 0x18, 0x8f, 0x6e, 0x78, 0x9e, 0xf1, 0xce,
-	0x9e, 0x0b, 0xe4, 0xd9, 0x3f, 0xf9, 0x93, 0x3e, 0x68, 0x83, 0xca, 0x06, 0xc5, 0x74, 0x47, 0x7d,
-	0xe5, 0x58, 0x1e, 0xae, 0x1d, 0x0b, 0x72, 0x2b, 0xb6, 0x88, 0x77, 0xf2, 0x3a, 0xe9, 0xfa, 0xc7,
-	0x2d, 0xab, 0x04, 0xaa, 0xae, 0x7a, 0x9d, 0x2a, 0x23, 0x55, 0x70, 0x50, 0xf1, 0xaa, 0x87, 0xcd,
-	0xcb, 0x95, 0x63, 0x3b, 0x64, 0xed, 0xd8, 0xd9, 0xf6, 0xe9, 0xff, 0x39, 0xef, 0xec, 0x88, 0xfc,
-	0xc8, 0x2f, 0xdf, 0xa7, 0xbf, 0x79, 0x07, 0xb2, 0xd9, 0xfe, 0x5c, 0x50, 0x6f, 0xbe, 0xa0, 0xde,
-	0xf7, 0x82, 0x7a, 0xef, 0x4b, 0x5a, 0x98, 0x2f, 0x69, 0xe1, 0x6b, 0x49, 0x0b, 0x4f, 0xd7, 0x03,
-	0x8d, 0xc3, 0x69, 0x54, 0x93, 0x30, 0x0e, 0x75, 0x02, 0x7d, 0x98, 0x9a, 0x9e, 0x40, 0x0d, 0x66,
-	0x33, 0x5d, 0x45, 0x23, 0x90, 0x2f, 0x72, 0x28, 0xb4, 0x09, 0x93, 0xdf, 0xf6, 0x70, 0x36, 0x51,
-	0x71, 0x54, 0x4a, 0xbb, 0x68, 0xfc, 0x04, 0x00, 0x00, 0xff, 0xff, 0x0d, 0x6a, 0x67, 0xb3, 0xd8,
-	0x01, 0x00, 0x00,
+	// 506 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xb1, 0x6e, 0x13, 0x4d,
+	0x10, 0xf6, 0x3a, 0x8e, 0x63, 0x6f, 0x24, 0x4b, 0xff, 0xea, 0x17, 0x3a, 0x2c, 0x74, 0x3e, 0xb9,
+	0x40, 0x2e, 0xe0, 0x4e, 0x01, 0x89, 0x22, 0x45, 0x24, 0x12, 0x28, 0x28, 0x12, 0x45, 0x07, 0xa2,
+	0xa0, 0x5b, 0xdf, 0x8e, 0x2f, 0x2b, 0x7c, 0xb7, 0x66, 0x77, 0x2e, 0xb2, 0xdf, 0x80, 0x0a, 0xe5,
+	0x11, 0xf2, 0x08, 0x3c, 0x06, 0x65, 0x4a, 0x3a, 0x90, 0xdd, 0xf0, 0x04, 0xd4, 0x68, 0xf7, 0xee,
+	0x62, 0x93, 0x50, 0xb8, 0xdb, 0xf9, 0xe6, 0xfb, 0x66, 0x67, 0xe6, 0xdb, 0xa5, 0x03, 0x39, 0x57,
+	0x11, 0xe4, 0x28, 0x71, 0x11, 0x5d, 0x1e, 0x8c, 0x01, 0xf9, 0x41, 0x15, 0x86, 0x33, 0xad, 0x50,
+	0x31, 0x26, 0xe7, 0x2a, 0xac, 0x90, 0x8a, 0xd0, 0xff, 0x3f, 0x55, 0xa9, 0x72, 0xe9, 0xc8, 0x9e,
+	0x4a, 0x66, 0xff, 0xa1, 0x2d, 0x25, 0xa5, 0xb8, 0xad, 0x23, 0xa5, 0xa8, 0x52, 0x83, 0x54, 0xa9,
+	0x74, 0x0a, 0x91, 0x8b, 0xc6, 0xc5, 0x24, 0x42, 0x99, 0x81, 0x41, 0x9e, 0xcd, 0x4a, 0xc2, 0xf0,
+	0x0b, 0xa1, 0xed, 0x73, 0xae, 0x79, 0x66, 0x58, 0x48, 0xd9, 0xd9, 0x04, 0x4f, 0x54, 0x8e, 0x9a,
+	0x27, 0xf8, 0x52, 0x08, 0x0d, 0xc6, 0x78, 0x24, 0x20, 0xa3, 0x6e, 0xfc, 0x8f, 0x0c, 0x7b, 0x42,
+	0xff, 0xdb, 0x40, 0x4f, 0x65, 0x8e, 0xa0, 0xbd, 0xa6, 0xa3, 0xdf, 0x4f, 0xb0, 0xc7, 0xb4, 0x77,
+	0xa2, 0x81, 0x23, 0xbc, 0x85, 0x4f, 0x05, 0xe4, 0x09, 0x78, 0x3b, 0x01, 0x19, 0xb5, 0xe2, 0x3b,
+	0xe8, 0xf0, 0x77, 0x93, 0xb6, 0x5f, 0xbb, 0xa9, 0x59, 0x8f, 0x36, 0xa5, 0xa8, 0x1a, 0x68, 0x4a,
+	0xc1, 0x18, 0x6d, 0xe1, 0x62, 0x06, 0xd5, 0x1d, 0xee, 0xcc, 0x8e, 0x68, 0xd7, 0x20, 0xd7, 0xf8,
+	0x8a, 0x63, 0x59, 0x71, 0xff, 0x59, 0x3f, 0x2c, 0x87, 0x0e, 0xeb, 0xa1, 0xc3, 0x77, 0xf5, 0xd0,
+	0xc7, 0xad, 0xab, 0x1f, 0x03, 0x12, 0xaf, 0x25, 0xec, 0x90, 0xee, 0x41, 0x2e, 0x9c, 0xba, 0xb5,
+	0xa5, 0xba, 0x16, 0xb0, 0x07, 0xb4, 0x6d, 0x90, 0x63, 0x61, 0xbc, 0xdd, 0x80, 0x8c, 0x76, 0xe3,
+	0x2a, 0x62, 0x01, 0xdd, 0xd7, 0x30, 0xe5, 0x0b, 0xd0, 0x67, 0x4a, 0x80, 0xd7, 0x76, 0xed, 0x6e,
+	0x42, 0x96, 0x91, 0x68, 0x10, 0xd6, 0x5d, 0x3e, 0x35, 0xde, 0x5e, 0xb0, 0x63, 0x19, 0x1b, 0x90,
+	0x5d, 0x57, 0xe9, 0xfd, 0x7b, 0xd0, 0x72, 0x22, 0x41, 0x78, 0x9d, 0x80, 0x8c, 0x3a, 0xf1, 0x1d,
+	0x94, 0x1d, 0xd1, 0x4e, 0x06, 0xc8, 0x05, 0x47, 0xee, 0x75, 0xdd, 0x00, 0xc3, 0xf0, 0xfe, 0xc3,
+	0x09, 0xcb, 0x8d, 0x9e, 0x56, 0xcc, 0xf8, 0x56, 0x73, 0xd8, 0xf9, 0x7c, 0x3d, 0x68, 0xfc, 0xba,
+	0x1e, 0x90, 0xe1, 0x57, 0x42, 0x7b, 0x7f, 0xd3, 0xd8, 0x23, 0xda, 0xbd, 0x04, 0x6d, 0xa4, 0xca,
+	0xdf, 0xd4, 0x3e, 0xac, 0x01, 0xbb, 0xba, 0xc4, 0x79, 0x27, 0x9c, 0x23, 0x5b, 0xad, 0xae, 0x12,
+	0x58, 0x6d, 0x31, 0x13, 0x4e, 0xbb, 0xad, 0x69, 0xb5, 0x60, 0xdd, 0xf2, 0xf1, 0xf9, 0xb7, 0xa5,
+	0x4f, 0x6e, 0x96, 0x3e, 0xf9, 0xb9, 0xf4, 0xc9, 0xd5, 0xca, 0x6f, 0xdc, 0xac, 0xfc, 0xc6, 0xf7,
+	0x95, 0xdf, 0xf8, 0xf0, 0x22, 0x95, 0x78, 0x51, 0x8c, 0xc3, 0x44, 0x65, 0x91, 0x9c, 0xab, 0x89,
+	0x2a, 0x72, 0xc1, 0x51, 0xaa, 0xdc, 0x46, 0x4f, 0xc7, 0x53, 0x95, 0x7c, 0x4c, 0x2e, 0xb8, 0xcc,
+	0xa3, 0x79, 0xfd, 0x07, 0xed, 0x6b, 0x32, 0xe3, 0xb6, 0xbb, 0xfe, 0xf9, 0x9f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x54, 0x12, 0x06, 0x2d, 0x9e, 0x03, 0x00, 0x00,
 }
 
+func (this *Entity) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Entity)
+	if !ok {
+		that2, ok := that.(Entity)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Id != that1.Id {
+		return false
+	}
+	if this.Type != that1.Type {
+		return false
+	}
+	if that1.StartDate == nil {
+		if this.StartDate != nil {
+			return false
+		}
+	} else if !this.StartDate.Equal(*that1.StartDate) {
+		return false
+	}
+	if that1.EndDate == nil {
+		if this.EndDate != nil {
+			return false
+		}
+	} else if !this.EndDate.Equal(*that1.EndDate) {
+		return false
+	}
+	if this.Status != that1.Status {
+		return false
+	}
+	if this.RelayerNode != that1.RelayerNode {
+		return false
+	}
+	if len(this.Credentials) != len(that1.Credentials) {
+		return false
+	}
+	for i := range this.Credentials {
+		if this.Credentials[i] != that1.Credentials[i] {
+			return false
+		}
+	}
+	if this.EntityVerified != that1.EntityVerified {
+		return false
+	}
+	if !this.Metadata.Equal(that1.Metadata) {
+		return false
+	}
+	return true
+}
+func (this *EntityMetadata) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*EntityMetadata)
+	if !ok {
+		that2, ok := that.(EntityMetadata)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.VersionId != that1.VersionId {
+		return false
+	}
+	if that1.Created == nil {
+		if this.Created != nil {
+			return false
+		}
+	} else if !this.Created.Equal(*that1.Created) {
+		return false
+	}
+	if that1.Updated == nil {
+		if this.Updated != nil {
+			return false
+		}
+	} else if !this.Updated.Equal(*that1.Updated) {
+		return false
+	}
+	return true
+}
 func (m *Params) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -193,7 +372,7 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *EntityDoc) Marshal() (dAtA []byte, err error) {
+func (m *Entity) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -203,16 +382,143 @@ func (m *EntityDoc) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *EntityDoc) MarshalTo(dAtA []byte) (int, error) {
+func (m *Entity) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *EntityDoc) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Entity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.Metadata != nil {
+		{
+			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEntity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.EntityVerified {
+		i--
+		if m.EntityVerified {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.Credentials) > 0 {
+		for iNdEx := len(m.Credentials) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Credentials[iNdEx])
+			copy(dAtA[i:], m.Credentials[iNdEx])
+			i = encodeVarintEntity(dAtA, i, uint64(len(m.Credentials[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if len(m.RelayerNode) > 0 {
+		i -= len(m.RelayerNode)
+		copy(dAtA[i:], m.RelayerNode)
+		i = encodeVarintEntity(dAtA, i, uint64(len(m.RelayerNode)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.Status != 0 {
+		i = encodeVarintEntity(dAtA, i, uint64(m.Status))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.EndDate != nil {
+		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
+		if err2 != nil {
+			return 0, err2
+		}
+		i -= n2
+		i = encodeVarintEntity(dAtA, i, uint64(n2))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.StartDate != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintEntity(dAtA, i, uint64(n3))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Type) > 0 {
+		i -= len(m.Type)
+		copy(dAtA[i:], m.Type)
+		i = encodeVarintEntity(dAtA, i, uint64(len(m.Type)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEntity(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EntityMetadata) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EntityMetadata) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EntityMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Updated != nil {
+		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Updated, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated):])
+		if err4 != nil {
+			return 0, err4
+		}
+		i -= n4
+		i = encodeVarintEntity(dAtA, i, uint64(n4))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Created != nil {
+		n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Created):])
+		if err5 != nil {
+			return 0, err5
+		}
+		i -= n5
+		i = encodeVarintEntity(dAtA, i, uint64(n5))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.VersionId) > 0 {
+		i -= len(m.VersionId)
+		copy(dAtA[i:], m.VersionId)
+		i = encodeVarintEntity(dAtA, i, uint64(len(m.VersionId)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -247,12 +553,69 @@ func (m *Params) Size() (n int) {
 	return n
 }
 
-func (m *EntityDoc) Size() (n int) {
+func (m *Entity) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	l = len(m.Type)
+	if l > 0 {
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.StartDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate)
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.EndDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate)
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.Status != 0 {
+		n += 1 + sovEntity(uint64(m.Status))
+	}
+	l = len(m.RelayerNode)
+	if l > 0 {
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if len(m.Credentials) > 0 {
+		for _, s := range m.Credentials {
+			l = len(s)
+			n += 1 + l + sovEntity(uint64(l))
+		}
+	}
+	if m.EntityVerified {
+		n += 2
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	return n
+}
+
+func (m *EntityMetadata) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.VersionId)
+	if l > 0 {
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.Created != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Created)
+		n += 1 + l + sovEntity(uint64(l))
+	}
+	if m.Updated != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated)
+		n += 1 + l + sovEntity(uint64(l))
+	}
 	return n
 }
 
@@ -395,7 +758,7 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *EntityDoc) Unmarshal(dAtA []byte) error {
+func (m *Entity) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -418,12 +781,441 @@ func (m *EntityDoc) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: EntityDoc: wiretype end group for non-group")
+			return fmt.Errorf("proto: Entity: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EntityDoc: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Entity: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Type = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.StartDate == nil {
+				m.StartDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDate == nil {
+				m.EndDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RelayerNode", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RelayerNode = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Credentials", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Credentials = append(m.Credentials, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityVerified", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.EntityVerified = bool(v != 0)
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &EntityMetadata{}
+			}
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEntity(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EntityMetadata) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEntity
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EntityMetadata: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EntityMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VersionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VersionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Created == nil {
+				m.Created = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Created, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Updated", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEntity
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEntity
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEntity
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Updated == nil {
+				m.Updated = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Updated, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEntity(dAtA[iNdEx:])
