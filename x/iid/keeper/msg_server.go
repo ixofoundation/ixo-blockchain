@@ -388,5 +388,4 @@ func ExecuteOnDidWithRelationships(ctx sdk.Context, k *Keeper, constraints Verif
 	// fire the event
 	err = ctx.EventManager().EmitTypedEvent(types.NewIidDocumentUpdatedEvent(did, signer))
 	return
-
 }

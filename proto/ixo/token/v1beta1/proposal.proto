@@ -6,8 +6,4 @@ import "ixo/token/v1beta1/token.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
-message SetTokenContractCodes {
-  uint64 cw20_contract_code = 1;
-  uint64 cw721_contract_code = 2;
-  uint64 ixo1155_contract_code = 3;
-}
+message SetTokenContractCodes { uint64 ixo1155_contract_code = 1; }

@@ -1,0 +1,52 @@
+syntax = "proto3";
+package ixo.token.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+
+import "gogoproto/gogo.proto";
+
+// TokenCreatedEvent is an event triggered on a Token creation
+message TokenCreatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // the contract address of token contract being initialized
+  string contract_address = 1;
+  // the token minter
+  string minter = 2;
+}
+
+// TokenUpdatedEvent is an event triggered on a Token update
+message TokenUpdatedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // contract_address of token updated
+  string contract_address = 1;
+  // the signer account of the change
+  string signer = 2;
+}
+
+// TokenMintedEvent is an event triggered on a Token mint execution
+message TokenMintedEvent {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // the contract address of token contract being initialized
+  string contract_address = 1;
+  // the token minter
+  string minter = 2;
+  // the new tokens owner
+  string owner = 3;
+  repeated TokenMintedBatch batches = 4;
+}
+
+message TokenMintedBatch {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // id of token(s) minted
+  string id = 1;
+  // amount of tokens minted
+  string amount = 2;
+}

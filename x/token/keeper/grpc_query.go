@@ -33,7 +33,7 @@ func (k Keeper) TokenList(c context.Context, req *types.QueryTokenListRequest) (
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	contracts := k.GetMinterContracts(ctx, req.MinterDid)
+	contracts := k.GetMinterTokens(ctx, req.MinterDid)
 
 	// wasmkeeper.Querier(&k.WasmKeeper).SmartContractState()
 	// k.WasmKeeper.Execute()

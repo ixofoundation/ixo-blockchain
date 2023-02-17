@@ -1350,21 +1350,21 @@
             <ul>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.Contract"><span class="badge">M</span>Contract</a>
-                </li>
-              
-                <li>
                   <a href="#ixo.token.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.TokenMinter"><span class="badge">M</span>TokenMinter</a>
+                  <a href="#ixo.token.v1beta1.Token"><span class="badge">M</span>Token</a>
                 </li>
-              
               
                 <li>
-                  <a href="#ixo.token.v1beta1.ContractType"><span class="badge">E</span>ContractType</a>
+                  <a href="#ixo.token.v1beta1.TokenData"><span class="badge">M</span>TokenData</a>
                 </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.TokenProperties"><span class="badge">M</span>TokenProperties</a>
+                </li>
+              
               
               
               
@@ -1377,23 +1377,38 @@
             <ul>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.Cw1155Constraints"><span class="badge">M</span>Cw1155Constraints</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.Cw20Constraints"><span class="badge">M</span>Cw20Constraints</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.Cw721Constraints"><span class="badge">M</span>Cw721Constraints</a>
-                </li>
-              
-                <li>
                   <a href="#ixo.token.v1beta1.MintAuthorization"><span class="badge">M</span>MintAuthorization</a>
                 </li>
               
                 <li>
                   <a href="#ixo.token.v1beta1.MintConstraints"><span class="badge">M</span>MintConstraints</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2ftoken%2fv1beta1%2fevent.proto">ixo/token/v1beta1/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.TokenCreatedEvent"><span class="badge">M</span>TokenCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.TokenMintedBatch"><span class="badge">M</span>TokenMintedBatch</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.TokenMintedEvent"><span class="badge">M</span>TokenMintedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.TokenUpdatedEvent"><span class="badge">M</span>TokenUpdatedEvent</a>
                 </li>
               
               
@@ -1481,19 +1496,15 @@
             <ul>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.Cw20Coin"><span class="badge">M</span>Cw20Coin</a>
+                  <a href="#ixo.token.v1beta1.MintBatch"><span class="badge">M</span>MintBatch</a>
                 </li>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.MintCw1155"><span class="badge">M</span>MintCw1155</a>
+                  <a href="#ixo.token.v1beta1.MsgCreateToken"><span class="badge">M</span>MsgCreateToken</a>
                 </li>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.MintCw20"><span class="badge">M</span>MintCw20</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.MintCw721"><span class="badge">M</span>MintCw721</a>
+                  <a href="#ixo.token.v1beta1.MsgCreateTokenResponse"><span class="badge">M</span>MsgCreateTokenResponse</a>
                 </li>
               
                 <li>
@@ -1505,31 +1516,11 @@
                 </li>
               
                 <li>
-                  <a href="#ixo.token.v1beta1.MsgSetupMinter"><span class="badge">M</span>MsgSetupMinter</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.MsgSetupMinterResponse"><span class="badge">M</span>MsgSetupMinterResponse</a>
-                </li>
-              
-                <li>
                   <a href="#ixo.token.v1beta1.MsgTransferToken"><span class="badge">M</span>MsgTransferToken</a>
                 </li>
               
                 <li>
                   <a href="#ixo.token.v1beta1.MsgTransferTokenResponse"><span class="badge">M</span>MsgTransferTokenResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.SetupCw1155"><span class="badge">M</span>SetupCw1155</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.SetupCw20"><span class="badge">M</span>SetupCw20</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.token.v1beta1.SetupCw721"><span class="badge">M</span>SetupCw721</a>
                 </li>
               
               
@@ -4498,8 +4489,7 @@ deactivated </p></td>
                   <td>type</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Status of the Entity as defined by the implementer and interpreted by
-Client applications </p></td>
+                  <td><p>Type of entity, eg protocol or asset </p></td>
                 </tr>
               
                 <tr>
@@ -9991,37 +9981,6 @@ from a project.</p></td>
       <p></p>
 
       
-        <h3 id="ixo.token.v1beta1.Contract">Contract</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
         <h3 id="ixo.token.v1beta1.Params">Params</h3>
         <p></p>
 
@@ -10031,20 +9990,6 @@ from a project.</p></td>
               <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
             </thead>
             <tbody>
-              
-                <tr>
-                  <td>cw20_contract_code</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw721_contract_code</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
               
                 <tr>
                   <td>ixo1155_contract_code</td>
@@ -10060,7 +10005,7 @@ from a project.</p></td>
 
         
       
-        <h3 id="ixo.token.v1beta1.TokenMinter">TokenMinter</h3>
+        <h3 id="ixo.token.v1beta1.Token">Token</h3>
         <p></p>
 
         
@@ -10088,25 +10033,115 @@ from a project.</p></td>
                   <td>contract_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Generated on token intiation through MsgSetupMinter </p></td>
                 </tr>
               
                 <tr>
-                  <td>contract_type</td>
-                  <td><a href="#ixo.token.v1beta1.ContractType">ContractType</a></td>
+                  <td>class</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>class is the token protocol entity DID (validated) </p></td>
                 </tr>
               
                 <tr>
                   <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>name is the token name, which must be unique (namespace) </p></td>
                 </tr>
               
                 <tr>
                   <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>description is any arbitrary description </p></td>
+                </tr>
+              
+                <tr>
+                  <td>image</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>image is the image url for the token </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>type is the token type (eg ixo1155) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cap</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>cap is the maximum number of tokens with this name that can be minted, 0 is
+unlimited </p></td>
+                </tr>
+              
+                <tr>
+                  <td>supply</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>how much has already been minted for this Token type, aka the supply </p></td>
+                </tr>
+              
+                <tr>
+                  <td>paused</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>stop allowance of token minter temporarily </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>stop allowance of token minter permanently </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.TokenData">TokenData</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>uri</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>media type value should always be &#34;application/json&#34;
+
+credential link ***.ipfs </p></td>
+                </tr>
+              
+                <tr>
+                  <td>encrypted</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>proof</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -10119,36 +10154,53 @@ from a project.</p></td>
 
         
       
-
-      
-        <h3 id="ixo.token.v1beta1.ContractType">ContractType</h3>
+        <h3 id="ixo.token.v1beta1.TokenProperties">TokenProperties</h3>
         <p></p>
-        <table class="enum-table">
-          <thead>
-            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
-          </thead>
-          <tbody>
-            
-              <tr>
-                <td>CW20</td>
-                <td>0</td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>CW721</td>
-                <td>1</td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>IXO1155</td>
-                <td>2</td>
-                <td><p></p></td>
-              </tr>
-            
-          </tbody>
-        </table>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>index</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>index is the unique identifier hexstring that identifies the token </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>did of collection (eg Supamoto Malawi) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokenData</td>
+                  <td><a href="#ixo.token.v1beta1.TokenData">TokenData</a></td>
+                  <td>repeated</td>
+                  <td><p>tokenData is the linkedResources added to tokenMetadata when queried eg
+(credential link ***.ipfs) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
       
 
       
@@ -10161,61 +10213,6 @@ from a project.</p></td>
       </div>
       <p></p>
 
-      
-        <h3 id="ixo.token.v1beta1.Cw1155Constraints">Cw1155Constraints</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>value</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.token.v1beta1.Cw20Constraints">Cw20Constraints</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>max_amount</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.token.v1beta1.Cw721Constraints">Cw721Constraints</h3>
-        <p></p>
-
-        
-
-        
       
         <h3 id="ixo.token.v1beta1.MintAuthorization">MintAuthorization</h3>
         <p></p>
@@ -10266,31 +10263,192 @@ from a project.</p></td>
                 </tr>
               
                 <tr>
-                  <td>limit</td>
-                  <td><a href="#int64">int64</a></td>
+                  <td>amount</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>cw20_constraints</td>
-                  <td><a href="#ixo.token.v1beta1.Cw20Constraints">Cw20Constraints</a></td>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>name is the token name, which must be unique (namespace), will be verified
+against Token name provided on msgCreateToken </p></td>
                 </tr>
               
                 <tr>
-                  <td>cw721_constraints</td>
-                  <td><a href="#ixo.token.v1beta1.Cw721Constraints">Cw721Constraints</a></td>
+                  <td>index</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>index is the unique identifier hexstring that identifies the token </p></td>
                 </tr>
               
                 <tr>
-                  <td>cw1155_constraints</td>
-                  <td><a href="#ixo.token.v1beta1.Cw1155Constraints">Cw1155Constraints</a></td>
+                  <td>collection</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
+                  <td><p>did of collection (eg Supamoto Malawi) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokenData</td>
+                  <td><a href="#ixo.token.v1beta1.TokenData">TokenData</a></td>
+                  <td>repeated</td>
+                  <td><p>tokenData is the linkedResources added to tokenMetadata when queried eg
+(credential link ***.ipfs) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/token/v1beta1/event.proto">ixo/token/v1beta1/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.token.v1beta1.TokenCreatedEvent">TokenCreatedEvent</h3>
+        <p>TokenCreatedEvent is an event triggered on a Token creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the contract address of token contract being initialized </p></td>
+                </tr>
+              
+                <tr>
+                  <td>minter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the token minter </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.TokenMintedBatch">TokenMintedBatch</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>id of token(s) minted </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>amount of tokens minted </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.TokenMintedEvent">TokenMintedEvent</h3>
+        <p>TokenMintedEvent is an event triggered on a Token mint execution</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the contract address of token contract being initialized </p></td>
+                </tr>
+              
+                <tr>
+                  <td>minter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the token minter </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the new tokens owner </p></td>
+                </tr>
+              
+                <tr>
+                  <td>batches</td>
+                  <td><a href="#ixo.token.v1beta1.TokenMintedBatch">TokenMintedBatch</a></td>
+                  <td>repeated</td>
                   <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.token.v1beta1.TokenUpdatedEvent">TokenUpdatedEvent</h3>
+        <p>TokenUpdatedEvent is an event triggered on a Token update</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>contract_address of token updated </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the signer account of the change </p></td>
                 </tr>
               
             </tbody>
@@ -10315,7 +10473,7 @@ from a project.</p></td>
 
       
         <h3 id="ixo.token.v1beta1.GenesisState">GenesisState</h3>
-        <p>GenesisState defines the project module's genesis state.</p>
+        <p>GenesisState defines the module's genesis state.</p>
 
         
           <table class="field-table">
@@ -10325,18 +10483,24 @@ from a project.</p></td>
             <tbody>
               
                 <tr>
-                  <td>token_minters</td>
-                  <td><a href="#ixo.token.v1beta1.TokenMinter">TokenMinter</a></td>
+                  <td>params</td>
+                  <td><a href="#ixo.token.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokens</td>
+                  <td><a href="#ixo.token.v1beta1.Token">Token</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>params</td>
-                  <td><a href="#ixo.token.v1beta1.Params">Params</a></td>
-                  <td></td>
-                  <td><p>repeated GenesisAccountMap account_maps       = 2 [(gogoproto.nullable) =
-false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td>
+                  <td>token_properties</td>
+                  <td><a href="#ixo.token.v1beta1.TokenProperties">TokenProperties</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -10369,20 +10533,6 @@ false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td
               <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
             </thead>
             <tbody>
-              
-                <tr>
-                  <td>cw20_contract_code</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw721_contract_code</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
               
                 <tr>
                   <td>ixo1155_contract_code</td>
@@ -10548,7 +10698,7 @@ false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td
               
                 <tr>
                   <td>contracts</td>
-                  <td><a href="#ixo.token.v1beta1.TokenMinter">TokenMinter</a></td>
+                  <td><a href="#ixo.token.v1beta1.Token">Token</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -10655,7 +10805,7 @@ false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td
       <p></p>
 
       
-        <h3 id="ixo.token.v1beta1.Cw20Coin">Cw20Coin</h3>
+        <h3 id="ixo.token.v1beta1.MintBatch">MintBatch</h3>
         <p></p>
 
         
@@ -10666,17 +10816,40 @@ false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td
             <tbody>
               
                 <tr>
-                  <td>address</td>
+                  <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>name is the token name, which must be unique (namespace), will be verified
+against Token name provided on msgCreateToken </p></td>
+                </tr>
+              
+                <tr>
+                  <td>index</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>index is the unique identifier hexstring that identifies the token </p></td>
                 </tr>
               
                 <tr>
                   <td>amount</td>
-                  <td><a href="#uint64">uint64</a></td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>amount is the number of tokens to mint </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>did of collection (eg Supamoto Malawi) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokenData</td>
+                  <td><a href="#ixo.token.v1beta1.TokenData">TokenData</a></td>
+                  <td>repeated</td>
+                  <td><p>tokenData is the linkedResources added to tokenMetadata when queried eg
+(credential link ***.ipfs) </p></td>
                 </tr>
               
             </tbody>
@@ -10686,7 +10859,7 @@ false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td
 
         
       
-        <h3 id="ixo.token.v1beta1.MintCw1155">MintCw1155</h3>
+        <h3 id="ixo.token.v1beta1.MsgCreateToken">MsgCreateToken</h3>
         <p></p>
 
         
@@ -10697,35 +10870,60 @@ false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; </p></td
             <tbody>
               
                 <tr>
-                  <td>id</td>
+                  <td>minter_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>An IID that identifies the asset that this token represents </p></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>minter_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>class</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>class is the token protocol entity DID (validated) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>name is the token name, which must be unique (namespace) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>description is any arbitrary description </p></td>
                 </tr>
               
                 <tr>
                   <td>image</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>A URI pointing to a resource with media type image/* representing </p></td>
+                  <td><p>image is the image url for the token </p></td>
                 </tr>
               
                 <tr>
-                  <td>uri</td>
+                  <td>token_type</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the asset to which this token represents. Consider making any
-images at a width between 320 and 1080 pixels and aspect ratio
-between 1.91:1 and 4:5 inclusive.
-
-Uri </p></td>
+                  <td><p>type is the token type (eg ixo1155) </p></td>
                 </tr>
               
                 <tr>
-                  <td>value</td>
-                  <td><a href="#uint64">uint64</a></td>
+                  <td>cap</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>cap is the maximum number of tokens with this name that can be minted, 0 is
+unlimited </p></td>
                 </tr>
               
             </tbody>
@@ -10735,76 +10933,10 @@ Uri </p></td>
 
         
       
-        <h3 id="ixo.token.v1beta1.MintCw20">MintCw20</h3>
+        <h3 id="ixo.token.v1beta1.MsgCreateTokenResponse">MsgCreateTokenResponse</h3>
         <p></p>
 
         
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>amount</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.token.v1beta1.MintCw721">MintCw721</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>An IID that identifies the asset that this token represents </p></td>
-                </tr>
-              
-                <tr>
-                  <td>image</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>A URI pointing to a resource with media type image/* representing </p></td>
-                </tr>
-              
-                <tr>
-                  <td>uri</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the asset to which this token represents. Consider making any
-images at a width between 320 and 1080 pixels and aspect ratio
-between 1.91:1 and 4:5 inclusive.
-
-Uri </p></td>
-                </tr>
-              
-                <tr>
-                  <td>properties</td>
-                  <td><a href="#bytes">bytes</a></td>
-                  <td></td>
-                  <td><p>&#34;Arbitrary properties. Values may be strings, numbers, object or </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
 
         
       
@@ -10847,23 +10979,9 @@ Uri </p></td>
                 </tr>
               
                 <tr>
-                  <td>cw20</td>
-                  <td><a href="#ixo.token.v1beta1.MintCw20">MintCw20</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw721</td>
-                  <td><a href="#ixo.token.v1beta1.MintCw721">MintCw721</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw1155</td>
-                  <td><a href="#ixo.token.v1beta1.MintCw1155">MintCw1155</a></td>
-                  <td></td>
+                  <td>mintBatch</td>
+                  <td><a href="#ixo.token.v1beta1.MintBatch">MintBatch</a></td>
+                  <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
@@ -10875,79 +10993,6 @@ Uri </p></td>
         
       
         <h3 id="ixo.token.v1beta1.MsgMintTokenResponse">MsgMintTokenResponse</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixo.token.v1beta1.MsgSetupMinter">MsgSetupMinter</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>minter_did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>minter_address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>name</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>description</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw20</td>
-                  <td><a href="#ixo.token.v1beta1.SetupCw20">SetupCw20</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw721</td>
-                  <td><a href="#ixo.token.v1beta1.SetupCw721">SetupCw721</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cw1155</td>
-                  <td><a href="#ixo.token.v1beta1.SetupCw1155">SetupCw1155</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.token.v1beta1.MsgSetupMinterResponse">MsgSetupMinterResponse</h3>
         <p></p>
 
         
@@ -11006,82 +11051,6 @@ Uri </p></td>
 
         
       
-        <h3 id="ixo.token.v1beta1.SetupCw1155">SetupCw1155</h3>
-        <p></p>
-
-        
-
-        
-      
-        <h3 id="ixo.token.v1beta1.SetupCw20">SetupCw20</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>symbol</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>decimals</td>
-                  <td><a href="#uint32">uint32</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cap</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>initialBalances</td>
-                  <td><a href="#ixo.token.v1beta1.Cw20Coin">Cw20Coin</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.token.v1beta1.SetupCw721">SetupCw721</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>symbol</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
 
       
 
@@ -11097,10 +11066,10 @@ Uri </p></td>
           <tbody>
             
               <tr>
-                <td>SetupMinter</td>
-                <td><a href="#ixo.token.v1beta1.MsgSetupMinter">MsgSetupMinter</a></td>
-                <td><a href="#ixo.token.v1beta1.MsgSetupMinterResponse">MsgSetupMinterResponse</a></td>
-                <td><p>SetupMinter defines a method for setting up a minter</p></td>
+                <td>CreateToken</td>
+                <td><a href="#ixo.token.v1beta1.MsgCreateToken">MsgCreateToken</a></td>
+                <td><a href="#ixo.token.v1beta1.MsgCreateTokenResponse">MsgCreateTokenResponse</a></td>
+                <td><p></p></td>
               </tr>
             
               <tr>
@@ -11114,7 +11083,7 @@ Uri </p></td>
                 <td>TransferToken</td>
                 <td><a href="#ixo.token.v1beta1.MsgTransferToken">MsgTransferToken</a></td>
                 <td><a href="#ixo.token.v1beta1.MsgTransferTokenResponse">MsgTransferTokenResponse</a></td>
-                <td><p>Transfers a token and its nft to the recipient</p></td>
+                <td><p></p></td>
               </tr>
             
           </tbody>

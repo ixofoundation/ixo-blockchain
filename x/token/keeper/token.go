@@ -4,54 +4,86 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
 )
 
-func (k Keeper) SetMinter(ctx sdk.Context, value types.TokenMinter) error {
-	minterBytes, err := value.Marshal()
-	if err != nil {
-		return err
-	}
-
+func (k Keeper) SetToken(ctx sdk.Context, value types.Token) {
 	key := fmt.Sprintf("%s#%s", value.MinterDid.Did(), value.ContractAddress)
-	ctx.KVStore(k.storeKey).Set([]byte(key), minterBytes)
-	return nil
+	k.Set(ctx, []byte(key), types.TokenKey, value, k.Marshal)
 }
 
-func (k Keeper) GetMinterContract(ctx sdk.Context, minterDid iidtypes.DIDFragment, contractAddress string) (types.TokenMinter, error) {
+func (k Keeper) GetToken(ctx sdk.Context, minterDid iidtypes.DIDFragment, contractAddress string) (types.Token, error) {
 	key := fmt.Sprintf("%s#%s", minterDid.Did(), contractAddress)
-	raw := ctx.KVStore(k.storeKey).Get([]byte(key))
-	var minterContract types.TokenMinter
-	err := k.cdc.Unmarshal(raw, &minterContract)
-	if err != nil {
-		return types.TokenMinter{}, err
+	val, found := k.Get(ctx, []byte(key), types.TokenKey, k.UnmarshalToken)
+	if !found {
+		return types.Token{}, sdkerrors.Wrapf(types.ErrTokenNotFound, "token not found for %s", minterDid)
 	}
-
-	return minterContract, nil
+	return val.(types.Token), nil
 }
 
-func (k Keeper) GetMinterContracts(ctx sdk.Context, minterDid string) []*types.TokenMinter {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(minterDid))
+func (k Keeper) UnmarshalToken(value []byte) (interface{}, bool) {
+	data := types.Token{}
+	k.Unmarshal(value, &data)
+	return data, types.IsValidToken(&data)
+}
 
-	minterContracts := []*types.TokenMinter{}
+func (k Keeper) SetTokenProperties(ctx sdk.Context, value types.TokenProperties) {
+	k.Set(ctx, []byte(value.Id), types.TokenPropertiesKey, value, k.Marshal)
+}
+
+func (k Keeper) GetTokenProperties(ctx sdk.Context, id string) (types.TokenProperties, error) {
+	val, found := k.Get(ctx, []byte(id), types.TokenKey, k.UnmarshalTokenProperties)
+	if !found {
+		return types.TokenProperties{}, sdkerrors.Wrapf(types.ErrTokenPropertiesNotFound, "token properties not found for %s", id)
+	}
+	return val.(types.TokenProperties), nil
+}
+
+func (k Keeper) UnmarshalTokenProperties(value []byte) (interface{}, bool) {
+	data := types.TokenProperties{}
+	k.Unmarshal(value, &data)
+	return data, types.IsValidTokenProperties(&data)
+}
+
+func (k Keeper) GetMinterTokens(ctx sdk.Context, minterDid string) []*types.Token {
+	iterator := k.GetAll(ctx, append([]byte(types.TokenKey), []byte(minterDid)...))
+	minterTokens := []*types.Token{}
 	for ; iterator.Valid(); iterator.Next() {
-		var minterContract types.TokenMinter
-		k.cdc.MustUnmarshal(iterator.Value(), &minterContract)
-		minterContracts = append(minterContracts, &minterContract)
+		var minterToken types.Token
+		k.cdc.MustUnmarshal(iterator.Value(), &minterToken)
+		minterTokens = append(minterTokens, &minterToken)
 	}
 
-	return minterContracts
+	return minterTokens
 }
 
-func (k Keeper) TokenExists(ctx sdk.Context, tokenDid string) bool {
-	// store := ctx.KVStore(k.storeKey)
-	_, exists := k.IidKeeper.GetDidDocument(ctx, []byte(tokenDid))
-	return exists
+// helper function to check if there are any tokens with provded name, return true if it is a duplicate name
+func (k Keeper) CheckTokensDuplicateName(ctx sdk.Context, name string) bool {
+	iterator := k.GetTokenIterator(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		var token types.Token
+		k.cdc.MustUnmarshal(iterator.Value(), &token)
+		if token.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
-func (k Keeper) GetTokenDocIterator(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types.TokenKey)
+func (k Keeper) GetTokens(ctx sdk.Context, minterDid string) []*types.Token {
+	iterator := k.GetTokenIterator(ctx)
+	tokens := []*types.Token{}
+	for ; iterator.Valid(); iterator.Next() {
+		var token types.Token
+		k.cdc.MustUnmarshal(iterator.Value(), &token)
+		tokens = append(tokens, &token)
+	}
+
+	return tokens
+}
+
+func (k Keeper) GetTokenIterator(ctx sdk.Context) sdk.Iterator {
+	return k.GetAll(ctx, append([]byte(types.TokenKey)))
 }

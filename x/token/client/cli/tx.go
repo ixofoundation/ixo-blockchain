@@ -34,8 +34,8 @@ func NewTxCmd() *cobra.Command {
 // NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-token-params [cw20-code-id] [cw721-code-id] [ixo1155-code-id] [flags]",
-		Args:  cobra.ExactArgs(3),
+		Use:   "update-token-params [ixo1155-code-id] [flags]",
+		Args:  cobra.ExactArgs(1),
 		Short: "Submit a proposal to update token params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -43,22 +43,12 @@ func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 				return err
 			}
 
-			cw20CodeId, err := strconv.ParseUint(args[0], 0, 64)
+			ixo1155CodeId, err := strconv.ParseUint(args[0], 0, 64)
 			if err != nil {
 				return err
 			}
 
-			cw721CodeId, err := strconv.ParseUint(args[1], 0, 64)
-			if err != nil {
-				return err
-			}
-
-			ixo1155CodeId, err := strconv.ParseUint(args[2], 0, 64)
-			if err != nil {
-				return err
-			}
-
-			content := types.NewSetTokenContract(cw20CodeId, cw721CodeId, ixo1155CodeId)
+			content := types.NewSetTokenContract(ixo1155CodeId)
 
 			from := clientCtx.GetFromAddress()
 

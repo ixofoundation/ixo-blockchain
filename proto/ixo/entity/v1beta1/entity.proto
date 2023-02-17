@@ -19,8 +19,7 @@ message Entity {
 
   // id represents the id for the entity document.
   string id = 1;
-  // Status of the Entity as defined by the implementer and interpreted by
-  // Client applications
+  // Type of entity, eg protocol or asset
   string type = 2;
   // Start Date of the Entity as defined by the implementer and interpreted by
   // Client applications

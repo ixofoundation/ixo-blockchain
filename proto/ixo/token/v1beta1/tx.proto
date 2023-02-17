@@ -3,7 +3,6 @@ package ixo.token.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
-import "ixo/iid/v1beta1/tx.proto";
 import "ixo/token/v1beta1/token.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -11,49 +10,14 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 // Msg defines the project Msg service.
 service Msg {
-
-  // SetupMinter defines a method for setting up a minter
-  rpc SetupMinter(MsgSetupMinter) returns (MsgSetupMinterResponse);
+  rpc CreateToken(MsgCreateToken) returns (MsgCreateTokenResponse);
 
   rpc MintToken(MsgMintToken) returns (MsgMintTokenResponse);
 
-  // Transfers a token and its nft to the recipient
   rpc TransferToken(MsgTransferToken) returns (MsgTransferTokenResponse);
 }
 
-// MsgCreateToken defines a message for creating a project.
-// message MsgSetupMinter {
-//   option (gogoproto.equal)            = false;
-//   option (gogoproto.goproto_getters)  = false;
-
-//   // An Token Type as defined by the implementer
-//   string minterDid        = 1 [(gogoproto.casttype) =
-//   "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment",
-//   (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) =
-//   "yaml:\"minter_did\""]; // Owner of the Token NFT | The ownersdid used to
-//   sign this transaction. string minterAddress    = 2 [(gogoproto.jsontag) =
-//   "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""]; //
-//   Owner of the Token NFT | The ownersdid used to sign this transaction.
-
-// }
-
-message Cw20Coin {
-  string address = 1;
-  uint64 amount = 2;
-}
-
-message SetupCw20 {
-  string symbol = 1;
-  uint32 decimals = 2;
-  uint64 cap = 3 [ (gogoproto.nullable) = true ];
-  repeated Cw20Coin initialBalances = 4 [ (gogoproto.nullable) = true ];
-}
-
-message SetupCw721 { string symbol = 1; }
-
-message SetupCw1155 {}
-
-message MsgSetupMinter {
+message MsgCreateToken {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
@@ -61,47 +25,27 @@ message MsgSetupMinter {
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
   string minter_address = 2;
-  string name = 3;
-  string description = 4;
-  oneof contract_info {
-    SetupCw20 cw20 = 5;
-    SetupCw721 cw721 = 6;
-    SetupCw1155 cw1155 = 7;
-  }
+  // class is the token protocol entity DID (validated)
+  string class = 3
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  // name is the token name, which must be unique (namespace)
+  string name = 4;
+  // description is any arbitrary description
+  string description = 5;
+  // image is the image url for the token
+  string image = 6;
+  // type is the token type (eg ixo1155)
+  string token_type = 7;
+  // cap is the maximum number of tokens with this name that can be minted, 0 is
+  // unlimited
+  string cap = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
 }
 
-message MsgSetupMinterResponse {}
-
-message MintCw20 { uint64 amount = 1; }
-
-message MintCw721 {
-  string id = 1; // An IID that identifies the asset that this token represents
-  oneof token_uri {
-    string image =
-        2; // A URI pointing to a resource with media type image/* representing
-           // the asset to which this token represents. Consider making any
-           // images at a width between 320 and 1080 pixels and aspect ratio
-           // between 1.91:1 and 4:5 inclusive.
-    string uri = 3; // Uri
-  }
-  bytes properties = 4 [
-    (gogoproto.casttype) = "encoding/json.RawMessage"
-  ]; //"Arbitrary properties. Values may be strings, numbers, object or
-     // arrays."];
-}
-
-message MintCw1155 {
-  string id = 1; // An IID that identifies the asset that this token represents
-  oneof token_uri {
-    string image =
-        2; // A URI pointing to a resource with media type image/* representing
-           // the asset to which this token represents. Consider making any
-           // images at a width between 320 and 1080 pixels and aspect ratio
-           // between 1.91:1 and 4:5 inclusive.
-    string uri = 3; // Uri
-  }
-  uint64 value = 4;
-}
+message MsgCreateTokenResponse {}
 
 message MsgMintToken {
   option (gogoproto.equal) = false;
@@ -115,12 +59,28 @@ message MsgMintToken {
   string owner_did = 4
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  repeated MintBatch mintBatch = 5;
+}
 
-  oneof mint_contract {
-    MintCw20 cw20 = 5;
-    MintCw721 cw721 = 6;
-    MintCw1155 cw1155 = 7;
-  }
+message MintBatch {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // name is the token name, which must be unique (namespace), will be verified
+  // against Token name provided on msgCreateToken
+  string name = 1;
+  // index is the unique identifier hexstring that identifies the token
+  string index = 2;
+  // amount is the number of tokens to mint
+  string amount = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // did of collection (eg Supamoto Malawi)
+  string collection = 4;
+  // tokenData is the linkedResources added to tokenMetadata when queried eg
+  // (credential link ***.ipfs)
+  repeated TokenData tokenData = 5;
 }
 
 message MsgMintTokenResponse {}

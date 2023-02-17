@@ -91,8 +91,7 @@ func (m *Params) GetCreateSequence() uint64 {
 type Entity struct {
 	// id represents the id for the entity document.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Status of the Entity as defined by the implementer and interpreted by
-	// Client applications
+	// Type of entity, eg protocol or asset
 	Type string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	// Start Date of the Entity as defined by the implementer and interpreted by
 	// Client applications

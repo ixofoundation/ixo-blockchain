@@ -2,14 +2,13 @@ package keeper
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
-	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/cw20"
-	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/cw721"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/ixo1155"
 )
 
@@ -27,9 +26,18 @@ func NewMsgServerImpl(k Keeper) types.MsgServer {
 	}
 }
 
-func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter) (*types.MsgSetupMinterResponse, error) {
+func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken) (*types.MsgCreateTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	params := s.Keeper.GetParams(ctx)
+
+	_, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.Class.Did()))
+	if !found {
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "class did document not found for %s", msg.Class.Did())
+	}
+
+	if s.Keeper.CheckTokensDuplicateName(ctx, msg.Name) {
+		return nil, sdkerrors.Wrapf(types.ErrTokenNameDuplicate, msg.Name)
+	}
 
 	minterDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
 	if !found {
@@ -41,99 +49,71 @@ func (s msgServer) SetupMinter(goCtx context.Context, msg *types.MsgSetupMinter)
 		return nil, err
 	}
 
-	var codeId uint64
-	var label string
-	var contractType types.ContractType
-	var encodedInitiateMessage []byte
-
-	switch contractInfo := msg.ContractInfo.(type) {
-	case *types.MsgSetupMinter_Cw20:
-		codeId = params.Cw20ContractCode
-		label = fmt.Sprintf("%s-cw20-contract", msg.MinterDid.String())
-		contractType = types.ContractType_CW20
-		// uint := uint(contractInfo.Cw20.Cap)
-		encodedInitiateMessage, err = cw20.InstantiateMsg{
-			Name:     msg.Name,
-			Symbol:   contractInfo.Cw20.Symbol,
-			Decimals: contractInfo.Cw20.Decimals,
-			InitialBalances: func() (coins []cw20.Cw20Coin) {
-				for _, bal := range contractInfo.Cw20.InitialBalances {
-					coins = append(coins, cw20.Cw20Coin{Address: bal.Address, Amount: bal.Amount})
-				}
-				return
-			}(),
-			Mint: cw20.MinterResponse{
-				Minter: msg.MinterAddress,
-				// Cap:    &contractInfo.Cw20.Cap,
-			},
-		}.Marshal()
-
-	case *types.MsgSetupMinter_Cw721:
-		codeId = params.Cw721ContractCode
-		label = fmt.Sprintf("%s-cw721-contract", msg.MinterDid.String())
-		contractType = types.ContractType_CW721
-		encodedInitiateMessage, err = cw721.InitiateNftContract{
-			Name:   msg.Name,
-			Symbol: contractInfo.Cw721.Symbol,
-			Minter: minterAddress.String(),
-		}.Marshal()
-
-	case *types.MsgSetupMinter_Cw1155:
-		codeId = params.Ixo1155ContractCode
-		label = fmt.Sprintf("%s-cw1155-contract", msg.MinterDid.String())
-		contractType = types.ContractType_IXO1155
-		encodedInitiateMessage, err = ixo1155.InstantiateMsg{
-			Minter: minterAddress.String(),
-		}.Marshal()
-
-	default:
-		return &types.MsgSetupMinterResponse{}, sdkerrors.ErrInvalidType.Wrap("invalid contract provided")
-	}
+	encodedInitiateMessage, err := ixo1155.Marshal(ixo1155.InstantiateMsg{
+		Minter: minterAddress.String(),
+	})
 	if err != nil {
-		return &types.MsgSetupMinterResponse{}, err
+		return nil, err
 	}
 
 	contractAddr, _, err := s.Keeper.WasmKeeper.Instantiate(
 		ctx,
-		codeId,
+		params.Ixo1155ContractCode,
 		minterAddress,
 		minterAddress,
 		encodedInitiateMessage,
-		label,
+		fmt.Sprintf("%s-ixo1155-contract", msg.MinterDid.String()),
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	tokenMinter := types.TokenMinter{
+	token := types.Token{
 		MinterDid:       msg.MinterDid,
 		MinterAddress:   minterAddress.String(),
 		ContractAddress: contractAddr.String(),
-		ContractType:    contractType,
+		Class:           msg.Class.Did(),
 		Name:            msg.Name,
 		Description:     msg.Description,
+		Image:           msg.Image,
+		Type:            msg.TokenType,
+		Cap:             msg.Cap,
+		Supply:          sdk.ZeroUint(),
+		Paused:          false,
+		Deactivated:     false,
 	}
-	s.Keeper.SetMinter(ctx, tokenMinter)
+	s.Keeper.SetToken(ctx, token)
 
-	if err := ctx.EventManager().EmitTypedEvent(&tokenMinter); err != nil {
-		s.Keeper.IidKeeper.Logger(ctx).Error("failed to emit TokerMinterEvent", err)
+	if err := ctx.EventManager().EmitTypedEvent(&types.TokenCreatedEvent{
+		ContractAddress: contractAddr.String(),
+		Minter:          msg.MinterDid.Did(),
+	}); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit createToken event")
 	}
 
-	return &types.MsgSetupMinterResponse{}, nil
+	return &types.MsgCreateTokenResponse{}, nil
 }
 
 func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*types.MsgMintTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	tokenMinter, err := s.Keeper.GetMinterContract(ctx, msg.MinterDid, msg.ContractAddress)
+	token, err := s.Keeper.GetToken(ctx, msg.MinterDid, msg.ContractAddress)
 	if err != nil {
 		return nil, err
 	}
 
+	if token.Paused {
+		return nil, types.ErrTokenPausedIncorrect
+	}
+
+	if token.Deactivated {
+		return nil, types.ErrTokenDeactivatedIncorrect
+	}
+
 	minterDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
 	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for minter not found")
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for minter not found %s", msg.MinterDid.Did())
 	}
 
 	minterAddress, err := minterDidDoc.GetVerificationMethodBlockchainAddress(msg.MinterDid.String())
@@ -143,7 +123,7 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 
 	ownerDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.OwnerDid.Did()))
 	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for owner not found")
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for owner not found %s", msg.OwnerDid.Did())
 	}
 
 	ownerAddress, err := ownerDidDoc.GetVerificationMethodBlockchainAddress(msg.OwnerDid.String())
@@ -151,62 +131,48 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 		return nil, err
 	}
 
-	var encodedMintMessage []byte
-
-	switch mintInfo := msg.MintContract.(type) {
-	case *types.MsgMintToken_Cw20:
-		if tokenMinter.ContractType != types.ContractType_CW20 {
-			return nil, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw20 contract type")
-		}
-		encodedMintMessage, err = cw20.Mint{
-			Recipient: ownerAddress.String(),
-			Amount:    uint(mintInfo.Cw20.Amount),
-		}.Marshal()
-
-	case *types.MsgMintToken_Cw721:
-		if tokenMinter.ContractType != types.ContractType_CW721 {
-			return nil, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw721 contract type")
-		}
-
-		uri := func() string {
-			switch uri := mintInfo.Cw721.TokenUri.(type) {
-			case *types.MintCw721_Uri:
-				return uri.Uri
-			case *types.MintCw721_Image:
-				return uri.Image
-			default:
-				return ""
-			}
-		}()
-
-		encodedMintMessage, err = cw721.WasmMsgMint{
-			Mint: cw721.Mint{
-				TokenId:  msg.OwnerDid.Did(),
-				Owner:    ownerAddress.String(),
-				TokenUri: uri,
-			},
-		}.Marshal()
-
-	case *types.MsgMintToken_Cw1155:
-		if tokenMinter.ContractType != types.ContractType_IXO1155 {
-			return nil, sdkerrors.ErrInvalidType.Wrap("selected contract is not a cw1155 contract type")
-		}
-		encodedMintMessage, err = ixo1155.Mint{
-			To:      ownerAddress.String(),
-			TokenId: ixo1155.TokenId(msg.OwnerDid.Did()),
-			Value:   mintInfo.Cw1155.Value,
-			Msg:     []byte{},
-		}.Marshal()
-
-	default:
-		// err := sdkerrors.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
-		return nil, sdkerrors.ErrInvalidType.Wrap("invalid contract provided")
-	}
+	contractAddress, err := sdk.AccAddressFromBech32(token.ContractAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	contractAddress, err := sdk.AccAddressFromBech32(tokenMinter.ContractAddress)
+	var amounts = sdk.NewUint(0)
+	var batches []types.MintBatchData
+
+	// valiodation checks, check name is same as token and amounts dont go more than toen cap
+	for _, batch := range msg.MintBatch {
+		amounts = amounts.Add(batch.Amount)
+
+		if token.Name != batch.Name {
+			return nil, sdkerrors.Wrapf(types.ErrTokenNameIncorrect, "token name is not same as class token name %s", batch.Name)
+		}
+
+		// generate token id and uri
+		tokenId := fmt.Sprintf("%x", md5.Sum([]byte(batch.Name+batch.Index)))
+		tokenUri := types.TokenUriBase + tokenId
+
+		batches = append(batches, types.MintBatchData{
+			Id:         tokenId,
+			Uri:        tokenUri,
+			Name:       batch.Name,
+			Index:      batch.Index,
+			Collection: batch.Collection,
+			TokenData:  batch.TokenData,
+			Amount:     batch.Amount,
+		})
+	}
+
+	// skip check if cap zero(unlimited), otherwise check if supply plus new amount is less than cap
+	if !token.Cap.IsZero() && token.Supply.Add(amounts).GT(token.Cap) {
+		return nil, sdkerrors.Wrapf(types.ErrTokenAmountIncorrect, "amounts %s plus current supply %s is greater than token cap %s", amounts.String(), token.Supply.String(), token.Cap.String())
+	}
+
+	encodedMintMessage, err := ixo1155.Marshal(ixo1155.WasmMsgBatchMint{
+		BatchMint: ixo1155.BatchMint{
+			To:    ownerAddress.String(),
+			Batch: types.Map(batches, func(b types.MintBatchData) ixo1155.Batch { return b.GetWasmMintBatch() }),
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -220,6 +186,37 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	// Add new minted tokens to token supply and persist
+	token.UpdateSupply(sdk.Int(amounts))
+	s.Keeper.SetToken(ctx, token)
+
+	// create and persist new token properties
+	for _, batch := range batches {
+		tokenProperties := types.TokenProperties{
+			Id:         batch.Id,
+			Index:      batch.Index,
+			Collection: batch.Collection,
+			TokenData:  batch.TokenData,
+		}
+		s.Keeper.SetTokenProperties(ctx, tokenProperties)
+	}
+
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.TokenMintedEvent{
+			ContractAddress: contractAddress.String(),
+			Minter:          msg.MinterDid.Did(),
+			Owner:           msg.OwnerDid.Did(),
+			Batches:         types.Map(batches, func(b types.MintBatchData) *types.TokenMintedBatch { return b.GetTokenMintedEventBatch() }),
+		},
+		// TokenUpdatedEvent event since token supply has been update
+		&types.TokenUpdatedEvent{
+			ContractAddress: token.ContractAddress,
+			Signer:          msg.MinterDid.Did(),
+		},
+	); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit mint token events")
 	}
 
 	return &types.MsgMintTokenResponse{}, nil

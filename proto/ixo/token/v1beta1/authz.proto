@@ -3,28 +3,10 @@ package ixo.token.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
-import "ixo/iid/v1beta1/tx.proto";
 import "ixo/token/v1beta1/token.proto";
-import "google/protobuf/timestamp.proto";
 import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
-
-message Cw20Constraints { uint64 max_amount = 1; }
-
-message Cw721Constraints {}
-
-message Cw1155Constraints { uint64 value = 1; }
-
-message MintConstraints {
-  string contract_address = 1;
-  int64 limit = 2;
-  oneof contract_constraints {
-    Cw20Constraints cw20_constraints = 3;
-    Cw721Constraints cw721_constraints = 4;
-    Cw1155Constraints cw1155_constraints = 5;
-  }
-}
 
 message MintAuthorization {
   option (cosmos_proto.implements_interface) = "Authorization";
@@ -33,4 +15,22 @@ message MintAuthorization {
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
   repeated MintConstraints constraints = 2;
+}
+
+message MintConstraints {
+  string contract_address = 1;
+  string amount = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // name is the token name, which must be unique (namespace), will be verified
+  // against Token name provided on msgCreateToken
+  string name = 3;
+  // index is the unique identifier hexstring that identifies the token
+  string index = 4;
+  // did of collection (eg Supamoto Malawi)
+  string collection = 5;
+  // tokenData is the linkedResources added to tokenMetadata when queried eg
+  // (credential link ***.ipfs)
+  repeated TokenData tokenData = 6;
 }

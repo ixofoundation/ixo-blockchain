@@ -29,8 +29,7 @@ message QueryTokenListRequest {
 // // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
 // method.
 message QueryTokenListResponse {
-  repeated TokenMinter contracts = 1
-      [ (gogoproto.moretags) = "yaml:\"contracts\"" ];
+  repeated Token contracts = 1 [ (gogoproto.moretags) = "yaml:\"contracts\"" ];
 }
 
 // QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC

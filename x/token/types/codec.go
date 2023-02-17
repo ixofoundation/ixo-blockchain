@@ -11,14 +11,14 @@ import (
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgSetupMinter{}, "token/SetupMinter", nil)
+	cdc.RegisterConcrete(&MsgCreateToken{}, "token/CreateToken", nil)
 	cdc.RegisterConcrete(&MsgMintToken{}, "token/MintToken", nil)
 	cdc.RegisterConcrete(&MsgTransferToken{}, "token/TransferToken", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgSetupMinter{},
+		&MsgCreateToken{},
 		&MsgMintToken{},
 		&MsgTransferToken{},
 	)

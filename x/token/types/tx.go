@@ -15,16 +15,16 @@ import (
 //	}
 
 // --------------------------
-// SETUP MINTER
+// CREATE TOKEN
 // --------------------------
-const TypeMsgSetupMinter = "setup_minter"
+const TypeMsgCreateToken = "create_token"
 
-var _ sdk.Msg = &MsgSetupMinter{}
+var _ sdk.Msg = &MsgCreateToken{}
 
-func (msg MsgSetupMinter) GetIidController() iidtypes.DIDFragment {
+func (msg MsgCreateToken) GetIidController() iidtypes.DIDFragment {
 	return msg.MinterDid
 }
-func (msg MsgSetupMinter) GetSigners() []sdk.AccAddress {
+func (msg MsgCreateToken) GetSigners() []sdk.AccAddress {
 	address, err := sdk.AccAddressFromBech32(msg.MinterAddress)
 	if err != nil {
 		return []sdk.AccAddress{}
@@ -32,17 +32,13 @@ func (msg MsgSetupMinter) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{address}
 }
 
-func (msg MsgSetupMinter) ValidateBasic() error {
-	return nil
-}
-
-func (msg MsgSetupMinter) GetSignBytes() []byte {
+func (msg MsgCreateToken) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgSetupMinter) Type() string { return TypeMsgSetupMinter }
+func (msg MsgCreateToken) Type() string { return TypeMsgCreateToken }
 
-func (msg MsgSetupMinter) Route() string { return RouterKey }
+func (msg MsgCreateToken) Route() string { return RouterKey }
 
 // --------------------------
 // MINT TOKEN
@@ -60,10 +56,6 @@ func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
 		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{address}
-}
-
-func (msg MsgMintToken) ValidateBasic() error {
-	return nil
 }
 
 func (msg MsgMintToken) GetSignBytes() []byte {

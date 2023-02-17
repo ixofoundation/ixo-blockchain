@@ -5,46 +5,66 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
-message Contract {
-  string id = 1;
-  string address = 2;
-}
+message Params { uint64 ixo1155_contract_code = 1; }
 
-message Params {
-  option (gogoproto.goproto_getters) = false;
-
-  uint64 cw20_contract_code = 1;
-  uint64 cw721_contract_code = 2;
-  uint64 ixo1155_contract_code = 3;
-}
-
-// message TokenDoc {
-//   string minterDid = 1 [(gogoproto.casttype) =
-//   "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment",
-//   (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) =
-//   "yaml:\"minter_did\""]; repeated Contract cw20Contracts = 2
-//   [(gogoproto.jsontag) = "cw20_contracts", (gogoproto.moretags) =
-//   "yaml:\"cw20_contracts\""]; Contract cw721Contract = 3 [(gogoproto.jsontag)
-//   = "cw721_contract", (gogoproto.moretags) = "yaml:\"cw721_contract\""];
-//   Contract ixo1155Contract = 4 [(gogoproto.jsontag) = "ixo1155_contract",
-//   (gogoproto.moretags) = "yaml:\"ixo1155_contract\""];
-// }
-
-enum ContractType {
-  CW20 = 0;
-  CW721 = 1;
-  IXO1155 = 2;
-}
-
-message TokenMinter {
+message Token {
+  option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
   string minter_did = 1
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
   string minter_address = 2;
+  // Generated on token intiation through MsgSetupMinter
   string contract_address = 3;
-  ContractType contract_type = 4;
+  // class is the token protocol entity DID (validated)
+  string class = 4;
+  // name is the token name, which must be unique (namespace)
   string name = 5;
+  // description is any arbitrary description
   string description = 6;
+  // image is the image url for the token
+  string image = 7;
+  // type is the token type (eg ixo1155)
+  string type = 8;
+  // cap is the maximum number of tokens with this name that can be minted, 0 is
+  // unlimited
+  string cap = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // how much has already been minted for this Token type, aka the supply
+  string supply = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // stop allowance of token minter temporarily
+  bool paused = 11;
+  // stop allowance of token minter permanently
+  bool deactivated = 12;
+}
+
+message TokenProperties {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string id = 1;
+  // index is the unique identifier hexstring that identifies the token
+  string index = 2;
+  // did of collection (eg Supamoto Malawi)
+  string collection = 3;
+  // tokenData is the linkedResources added to tokenMetadata when queried eg
+  // (credential link ***.ipfs)
+  repeated TokenData tokenData = 4;
+}
+
+message TokenData {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  // media type value should always be "application/json"
+  string uri = 1; // credential link ***.ipfs
+  bool encrypted = 2;
+  string proof = 3;
+  string type = 4;
 }

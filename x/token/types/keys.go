@@ -10,5 +10,10 @@ const (
 )
 
 var (
-	TokenKey = []byte{0x01}
+	TokenKey           = []byte{0x01}
+	TokenPropertiesKey = []byte{0x02}
+)
+
+const (
+	TokenUriBase = "https://w3id.org/token/" // https://w3id.org/token/{stringportionofthetokendid}
 )

@@ -288,18 +288,20 @@
     - [Msg](#ixo.project.v1.Msg)
   
 - [ixo/token/v1beta1/token.proto](#ixo/token/v1beta1/token.proto)
-    - [Contract](#ixo.token.v1beta1.Contract)
     - [Params](#ixo.token.v1beta1.Params)
-    - [TokenMinter](#ixo.token.v1beta1.TokenMinter)
-  
-    - [ContractType](#ixo.token.v1beta1.ContractType)
+    - [Token](#ixo.token.v1beta1.Token)
+    - [TokenData](#ixo.token.v1beta1.TokenData)
+    - [TokenProperties](#ixo.token.v1beta1.TokenProperties)
   
 - [ixo/token/v1beta1/authz.proto](#ixo/token/v1beta1/authz.proto)
-    - [Cw1155Constraints](#ixo.token.v1beta1.Cw1155Constraints)
-    - [Cw20Constraints](#ixo.token.v1beta1.Cw20Constraints)
-    - [Cw721Constraints](#ixo.token.v1beta1.Cw721Constraints)
     - [MintAuthorization](#ixo.token.v1beta1.MintAuthorization)
     - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
+  
+- [ixo/token/v1beta1/event.proto](#ixo/token/v1beta1/event.proto)
+    - [TokenCreatedEvent](#ixo.token.v1beta1.TokenCreatedEvent)
+    - [TokenMintedBatch](#ixo.token.v1beta1.TokenMintedBatch)
+    - [TokenMintedEvent](#ixo.token.v1beta1.TokenMintedEvent)
+    - [TokenUpdatedEvent](#ixo.token.v1beta1.TokenUpdatedEvent)
   
 - [ixo/token/v1beta1/genesis.proto](#ixo/token/v1beta1/genesis.proto)
     - [GenesisState](#ixo.token.v1beta1.GenesisState)
@@ -319,19 +321,13 @@
     - [Query](#ixo.token.v1beta1.Query)
   
 - [ixo/token/v1beta1/tx.proto](#ixo/token/v1beta1/tx.proto)
-    - [Cw20Coin](#ixo.token.v1beta1.Cw20Coin)
-    - [MintCw1155](#ixo.token.v1beta1.MintCw1155)
-    - [MintCw20](#ixo.token.v1beta1.MintCw20)
-    - [MintCw721](#ixo.token.v1beta1.MintCw721)
+    - [MintBatch](#ixo.token.v1beta1.MintBatch)
+    - [MsgCreateToken](#ixo.token.v1beta1.MsgCreateToken)
+    - [MsgCreateTokenResponse](#ixo.token.v1beta1.MsgCreateTokenResponse)
     - [MsgMintToken](#ixo.token.v1beta1.MsgMintToken)
     - [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse)
-    - [MsgSetupMinter](#ixo.token.v1beta1.MsgSetupMinter)
-    - [MsgSetupMinterResponse](#ixo.token.v1beta1.MsgSetupMinterResponse)
     - [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken)
     - [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse)
-    - [SetupCw1155](#ixo.token.v1beta1.SetupCw1155)
-    - [SetupCw20](#ixo.token.v1beta1.SetupCw20)
-    - [SetupCw721](#ixo.token.v1beta1.SetupCw721)
   
     - [Msg](#ixo.token.v1beta1.Msg)
   
@@ -1589,7 +1585,7 @@ Service defines how to find data associated with a identifer
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  | id represents the id for the entity document. |
-| type | [string](#string) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
+| type | [string](#string) |  | Type of entity, eg protocol or asset |
 | startDate | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
 | endDate | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
 | status | [int32](#int32) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
@@ -4332,22 +4328,6 @@ Msg defines the project Msg service.
 
 
 
-<a name="ixo.token.v1beta1.Contract"></a>
-
-### Contract
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  |  |
-| address | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="ixo.token.v1beta1.Params"></a>
 
 ### Params
@@ -4356,8 +4336,6 @@ Msg defines the project Msg service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| cw20_contract_code | [uint64](#uint64) |  |  |
-| cw721_contract_code | [uint64](#uint64) |  |  |
 | ixo1155_contract_code | [uint64](#uint64) |  |  |
 
 
@@ -4365,9 +4343,9 @@ Msg defines the project Msg service.
 
 
 
-<a name="ixo.token.v1beta1.TokenMinter"></a>
+<a name="ixo.token.v1beta1.Token"></a>
 
-### TokenMinter
+### Token
 
 
 
@@ -4375,29 +4353,60 @@ Msg defines the project Msg service.
 | ----- | ---- | ----- | ----------- |
 | minter_did | [string](#string) |  |  |
 | minter_address | [string](#string) |  |  |
-| contract_address | [string](#string) |  |  |
-| contract_type | [ContractType](#ixo.token.v1beta1.ContractType) |  |  |
-| name | [string](#string) |  |  |
-| description | [string](#string) |  |  |
+| contract_address | [string](#string) |  | Generated on token intiation through MsgSetupMinter |
+| class | [string](#string) |  | class is the token protocol entity DID (validated) |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace) |
+| description | [string](#string) |  | description is any arbitrary description |
+| image | [string](#string) |  | image is the image url for the token |
+| type | [string](#string) |  | type is the token type (eg ixo1155) |
+| cap | [string](#string) |  | cap is the maximum number of tokens with this name that can be minted, 0 is unlimited |
+| supply | [string](#string) |  | how much has already been minted for this Token type, aka the supply |
+| paused | [bool](#bool) |  | stop allowance of token minter temporarily |
+| deactivated | [bool](#bool) |  | stop allowance of token minter permanently |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenData"></a>
+
+### TokenData
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uri | [string](#string) |  | media type value should always be &#34;application/json&#34;
+
+credential link ***.ipfs |
+| encrypted | [bool](#bool) |  |  |
+| proof | [string](#string) |  |  |
+| type | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenProperties"></a>
+
+### TokenProperties
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
+| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
 
 
 
 
 
  
-
-
-<a name="ixo.token.v1beta1.ContractType"></a>
-
-### ContractType
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| CW20 | 0 |  |
-| CW721 | 1 |  |
-| IXO1155 | 2 |  |
-
 
  
 
@@ -4411,46 +4420,6 @@ Msg defines the project Msg service.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/token/v1beta1/authz.proto
-
-
-
-<a name="ixo.token.v1beta1.Cw1155Constraints"></a>
-
-### Cw1155Constraints
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| value | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.Cw20Constraints"></a>
-
-### Cw20Constraints
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| max_amount | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.Cw721Constraints"></a>
-
-### Cw721Constraints
-
-
-
-
 
 
 
@@ -4479,10 +4448,93 @@ Msg defines the project Msg service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | contract_address | [string](#string) |  |  |
-| limit | [int64](#int64) |  |  |
-| cw20_constraints | [Cw20Constraints](#ixo.token.v1beta1.Cw20Constraints) |  |  |
-| cw721_constraints | [Cw721Constraints](#ixo.token.v1beta1.Cw721Constraints) |  |  |
-| cw1155_constraints | [Cw1155Constraints](#ixo.token.v1beta1.Cw1155Constraints) |  |  |
+| amount | [string](#string) |  |  |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
+| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
+| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/token/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/token/v1beta1/event.proto
+
+
+
+<a name="ixo.token.v1beta1.TokenCreatedEvent"></a>
+
+### TokenCreatedEvent
+TokenCreatedEvent is an event triggered on a Token creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| contract_address | [string](#string) |  | the contract address of token contract being initialized |
+| minter | [string](#string) |  | the token minter |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenMintedBatch"></a>
+
+### TokenMintedBatch
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | id of token(s) minted |
+| amount | [string](#string) |  | amount of tokens minted |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenMintedEvent"></a>
+
+### TokenMintedEvent
+TokenMintedEvent is an event triggered on a Token mint execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| contract_address | [string](#string) |  | the contract address of token contract being initialized |
+| minter | [string](#string) |  | the token minter |
+| owner | [string](#string) |  | the new tokens owner |
+| batches | [TokenMintedBatch](#ixo.token.v1beta1.TokenMintedBatch) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenUpdatedEvent"></a>
+
+### TokenUpdatedEvent
+TokenUpdatedEvent is an event triggered on a Token update
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| contract_address | [string](#string) |  | contract_address of token updated |
+| signer | [string](#string) |  | the signer account of the change |
 
 
 
@@ -4508,13 +4560,14 @@ Msg defines the project Msg service.
 <a name="ixo.token.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the project module&#39;s genesis state.
+GenesisState defines the module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| token_minters | [TokenMinter](#ixo.token.v1beta1.TokenMinter) | repeated |  |
-| params | [Params](#ixo.token.v1beta1.Params) |  | repeated GenesisAccountMap account_maps = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = &#34;yaml:\&#34;account_maps\&#34;&#34;]; |
+| params | [Params](#ixo.token.v1beta1.Params) |  |  |
+| tokens | [Token](#ixo.token.v1beta1.Token) | repeated |  |
+| token_properties | [TokenProperties](#ixo.token.v1beta1.TokenProperties) | repeated |  |
 
 
 
@@ -4545,8 +4598,6 @@ GenesisState defines the project module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| cw20_contract_code | [uint64](#uint64) |  |  |
-| cw721_contract_code | [uint64](#uint64) |  |  |
 | ixo1155_contract_code | [uint64](#uint64) |  |  |
 
 
@@ -4664,7 +4715,7 @@ method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| contracts | [TokenMinter](#ixo.token.v1beta1.TokenMinter) | repeated |  |
+| contracts | [Token](#ixo.token.v1beta1.Token) | repeated |  |
 
 
 
@@ -4699,71 +4750,51 @@ Query defines the gRPC querier service.
 
 
 
-<a name="ixo.token.v1beta1.Cw20Coin"></a>
+<a name="ixo.token.v1beta1.MintBatch"></a>
 
-### Cw20Coin
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  |  |
-| amount | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MintCw1155"></a>
-
-### MintCw1155
+### MintBatch
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | An IID that identifies the asset that this token represents |
-| image | [string](#string) |  | A URI pointing to a resource with media type image/* representing |
-| uri | [string](#string) |  | the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.
-
-Uri |
-| value | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MintCw20"></a>
-
-### MintCw20
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| amount | [uint64](#uint64) |  |  |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
+| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| amount | [string](#string) |  | amount is the number of tokens to mint |
+| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
+| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
 
 
 
 
 
 
-<a name="ixo.token.v1beta1.MintCw721"></a>
+<a name="ixo.token.v1beta1.MsgCreateToken"></a>
 
-### MintCw721
+### MsgCreateToken
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | An IID that identifies the asset that this token represents |
-| image | [string](#string) |  | A URI pointing to a resource with media type image/* representing |
-| uri | [string](#string) |  | the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.
+| minter_did | [string](#string) |  |  |
+| minter_address | [string](#string) |  |  |
+| class | [string](#string) |  | class is the token protocol entity DID (validated) |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace) |
+| description | [string](#string) |  | description is any arbitrary description |
+| image | [string](#string) |  | image is the image url for the token |
+| token_type | [string](#string) |  | type is the token type (eg ixo1155) |
+| cap | [string](#string) |  | cap is the maximum number of tokens with this name that can be minted, 0 is unlimited |
 
-Uri |
-| properties | [bytes](#bytes) |  | &#34;Arbitrary properties. Values may be strings, numbers, object or |
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgCreateTokenResponse"></a>
+
+### MsgCreateTokenResponse
+
 
 
 
@@ -4782,9 +4813,7 @@ Uri |
 | minter_address | [string](#string) |  |  |
 | contract_address | [string](#string) |  |  |
 | owner_did | [string](#string) |  |  |
-| cw20 | [MintCw20](#ixo.token.v1beta1.MintCw20) |  |  |
-| cw721 | [MintCw721](#ixo.token.v1beta1.MintCw721) |  |  |
-| cw1155 | [MintCw1155](#ixo.token.v1beta1.MintCw1155) |  |  |
+| mintBatch | [MintBatch](#ixo.token.v1beta1.MintBatch) | repeated |  |
 
 
 
@@ -4794,37 +4823,6 @@ Uri |
 <a name="ixo.token.v1beta1.MsgMintTokenResponse"></a>
 
 ### MsgMintTokenResponse
-
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgSetupMinter"></a>
-
-### MsgSetupMinter
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
-| minter_address | [string](#string) |  |  |
-| name | [string](#string) |  |  |
-| description | [string](#string) |  |  |
-| cw20 | [SetupCw20](#ixo.token.v1beta1.SetupCw20) |  |  |
-| cw721 | [SetupCw721](#ixo.token.v1beta1.SetupCw721) |  |  |
-| cw1155 | [SetupCw1155](#ixo.token.v1beta1.SetupCw1155) |  |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgSetupMinterResponse"></a>
-
-### MsgSetupMinterResponse
 
 
 
@@ -4859,49 +4857,6 @@ Uri |
 
 
 
-
-<a name="ixo.token.v1beta1.SetupCw1155"></a>
-
-### SetupCw1155
-
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.SetupCw20"></a>
-
-### SetupCw20
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-| decimals | [uint32](#uint32) |  |  |
-| cap | [uint64](#uint64) |  |  |
-| initialBalances | [Cw20Coin](#ixo.token.v1beta1.Cw20Coin) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.SetupCw721"></a>
-
-### SetupCw721
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-
-
-
-
-
  
 
  
@@ -4916,9 +4871,9 @@ Msg defines the project Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| SetupMinter | [MsgSetupMinter](#ixo.token.v1beta1.MsgSetupMinter) | [MsgSetupMinterResponse](#ixo.token.v1beta1.MsgSetupMinterResponse) | SetupMinter defines a method for setting up a minter |
+| CreateToken | [MsgCreateToken](#ixo.token.v1beta1.MsgCreateToken) | [MsgCreateTokenResponse](#ixo.token.v1beta1.MsgCreateTokenResponse) |  |
 | MintToken | [MsgMintToken](#ixo.token.v1beta1.MsgMintToken) | [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse) |  |
-| TransferToken | [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken) | [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse) | Transfers a token and its nft to the recipient |
+| TransferToken | [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken) | [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse) |  |
 
  
 

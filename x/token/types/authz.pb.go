@@ -5,12 +5,12 @@ package types
 
 import (
 	fmt "fmt"
+	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	_ "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	github_com_ixofoundation_ixo_blockchain_x_iid_types "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	_ "github.com/regen-network/cosmos-proto"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
@@ -27,244 +27,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type Cw20Constraints struct {
-	MaxAmount uint64 `protobuf:"varint,1,opt,name=max_amount,json=maxAmount,proto3" json:"max_amount,omitempty"`
-}
-
-func (m *Cw20Constraints) Reset()         { *m = Cw20Constraints{} }
-func (m *Cw20Constraints) String() string { return proto.CompactTextString(m) }
-func (*Cw20Constraints) ProtoMessage()    {}
-func (*Cw20Constraints) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cca6ff8f08fc36db, []int{0}
-}
-func (m *Cw20Constraints) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Cw20Constraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Cw20Constraints.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Cw20Constraints) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cw20Constraints.Merge(m, src)
-}
-func (m *Cw20Constraints) XXX_Size() int {
-	return m.Size()
-}
-func (m *Cw20Constraints) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cw20Constraints.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cw20Constraints proto.InternalMessageInfo
-
-func (m *Cw20Constraints) GetMaxAmount() uint64 {
-	if m != nil {
-		return m.MaxAmount
-	}
-	return 0
-}
-
-type Cw721Constraints struct {
-}
-
-func (m *Cw721Constraints) Reset()         { *m = Cw721Constraints{} }
-func (m *Cw721Constraints) String() string { return proto.CompactTextString(m) }
-func (*Cw721Constraints) ProtoMessage()    {}
-func (*Cw721Constraints) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cca6ff8f08fc36db, []int{1}
-}
-func (m *Cw721Constraints) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Cw721Constraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Cw721Constraints.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Cw721Constraints) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cw721Constraints.Merge(m, src)
-}
-func (m *Cw721Constraints) XXX_Size() int {
-	return m.Size()
-}
-func (m *Cw721Constraints) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cw721Constraints.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cw721Constraints proto.InternalMessageInfo
-
-type Cw1155Constraints struct {
-	Value uint64 `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
-}
-
-func (m *Cw1155Constraints) Reset()         { *m = Cw1155Constraints{} }
-func (m *Cw1155Constraints) String() string { return proto.CompactTextString(m) }
-func (*Cw1155Constraints) ProtoMessage()    {}
-func (*Cw1155Constraints) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cca6ff8f08fc36db, []int{2}
-}
-func (m *Cw1155Constraints) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Cw1155Constraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Cw1155Constraints.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Cw1155Constraints) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cw1155Constraints.Merge(m, src)
-}
-func (m *Cw1155Constraints) XXX_Size() int {
-	return m.Size()
-}
-func (m *Cw1155Constraints) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cw1155Constraints.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cw1155Constraints proto.InternalMessageInfo
-
-func (m *Cw1155Constraints) GetValue() uint64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type MintConstraints struct {
-	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
-	Limit           int64  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	// Types that are valid to be assigned to ContractConstraints:
-	//	*MintConstraints_Cw20Constraints
-	//	*MintConstraints_Cw721Constraints
-	//	*MintConstraints_Cw1155Constraints
-	ContractConstraints isMintConstraints_ContractConstraints `protobuf_oneof:"contract_constraints"`
-}
-
-func (m *MintConstraints) Reset()         { *m = MintConstraints{} }
-func (m *MintConstraints) String() string { return proto.CompactTextString(m) }
-func (*MintConstraints) ProtoMessage()    {}
-func (*MintConstraints) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cca6ff8f08fc36db, []int{3}
-}
-func (m *MintConstraints) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MintConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MintConstraints.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MintConstraints) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MintConstraints.Merge(m, src)
-}
-func (m *MintConstraints) XXX_Size() int {
-	return m.Size()
-}
-func (m *MintConstraints) XXX_DiscardUnknown() {
-	xxx_messageInfo_MintConstraints.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MintConstraints proto.InternalMessageInfo
-
-type isMintConstraints_ContractConstraints interface {
-	isMintConstraints_ContractConstraints()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type MintConstraints_Cw20Constraints struct {
-	Cw20Constraints *Cw20Constraints `protobuf:"bytes,3,opt,name=cw20_constraints,json=cw20Constraints,proto3,oneof" json:"cw20_constraints,omitempty"`
-}
-type MintConstraints_Cw721Constraints struct {
-	Cw721Constraints *Cw721Constraints `protobuf:"bytes,4,opt,name=cw721_constraints,json=cw721Constraints,proto3,oneof" json:"cw721_constraints,omitempty"`
-}
-type MintConstraints_Cw1155Constraints struct {
-	Cw1155Constraints *Cw1155Constraints `protobuf:"bytes,5,opt,name=cw1155_constraints,json=cw1155Constraints,proto3,oneof" json:"cw1155_constraints,omitempty"`
-}
-
-func (*MintConstraints_Cw20Constraints) isMintConstraints_ContractConstraints()   {}
-func (*MintConstraints_Cw721Constraints) isMintConstraints_ContractConstraints()  {}
-func (*MintConstraints_Cw1155Constraints) isMintConstraints_ContractConstraints() {}
-
-func (m *MintConstraints) GetContractConstraints() isMintConstraints_ContractConstraints {
-	if m != nil {
-		return m.ContractConstraints
-	}
-	return nil
-}
-
-func (m *MintConstraints) GetContractAddress() string {
-	if m != nil {
-		return m.ContractAddress
-	}
-	return ""
-}
-
-func (m *MintConstraints) GetLimit() int64 {
-	if m != nil {
-		return m.Limit
-	}
-	return 0
-}
-
-func (m *MintConstraints) GetCw20Constraints() *Cw20Constraints {
-	if x, ok := m.GetContractConstraints().(*MintConstraints_Cw20Constraints); ok {
-		return x.Cw20Constraints
-	}
-	return nil
-}
-
-func (m *MintConstraints) GetCw721Constraints() *Cw721Constraints {
-	if x, ok := m.GetContractConstraints().(*MintConstraints_Cw721Constraints); ok {
-		return x.Cw721Constraints
-	}
-	return nil
-}
-
-func (m *MintConstraints) GetCw1155Constraints() *Cw1155Constraints {
-	if x, ok := m.GetContractConstraints().(*MintConstraints_Cw1155Constraints); ok {
-		return x.Cw1155Constraints
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*MintConstraints) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*MintConstraints_Cw20Constraints)(nil),
-		(*MintConstraints_Cw721Constraints)(nil),
-		(*MintConstraints_Cw1155Constraints)(nil),
-	}
-}
-
 type MintAuthorization struct {
 	MinterDid   github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=minter_did,json=minterDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"minter_did,omitempty"`
 	Constraints []*MintConstraints                                              `protobuf:"bytes,2,rep,name=constraints,proto3" json:"constraints,omitempty"`
@@ -274,7 +36,7 @@ func (m *MintAuthorization) Reset()         { *m = MintAuthorization{} }
 func (m *MintAuthorization) String() string { return proto.CompactTextString(m) }
 func (*MintAuthorization) ProtoMessage()    {}
 func (*MintAuthorization) Descriptor() ([]byte, []int) {
-	return fileDescriptor_cca6ff8f08fc36db, []int{4}
+	return fileDescriptor_cca6ff8f08fc36db, []int{0}
 }
 func (m *MintAuthorization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -317,239 +79,128 @@ func (m *MintAuthorization) GetConstraints() []*MintConstraints {
 	return nil
 }
 
+type MintConstraints struct {
+	ContractAddress string                                  `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+	Amount          github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"amount"`
+	// name is the token name, which must be unique (namespace), will be verified
+	// against Token name provided on msgCreateToken
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// index is the unique identifier hexstring that identifies the token
+	Index string `protobuf:"bytes,4,opt,name=index,proto3" json:"index,omitempty"`
+	// did of collection (eg Supamoto Malawi)
+	Collection string `protobuf:"bytes,5,opt,name=collection,proto3" json:"collection,omitempty"`
+	// tokenData is the linkedResources added to tokenMetadata when queried eg
+	// (credential link ***.ipfs)
+	TokenData []*TokenData `protobuf:"bytes,6,rep,name=tokenData,proto3" json:"tokenData,omitempty"`
+}
+
+func (m *MintConstraints) Reset()         { *m = MintConstraints{} }
+func (m *MintConstraints) String() string { return proto.CompactTextString(m) }
+func (*MintConstraints) ProtoMessage()    {}
+func (*MintConstraints) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cca6ff8f08fc36db, []int{1}
+}
+func (m *MintConstraints) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MintConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MintConstraints.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MintConstraints) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MintConstraints.Merge(m, src)
+}
+func (m *MintConstraints) XXX_Size() int {
+	return m.Size()
+}
+func (m *MintConstraints) XXX_DiscardUnknown() {
+	xxx_messageInfo_MintConstraints.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MintConstraints proto.InternalMessageInfo
+
+func (m *MintConstraints) GetContractAddress() string {
+	if m != nil {
+		return m.ContractAddress
+	}
+	return ""
+}
+
+func (m *MintConstraints) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *MintConstraints) GetIndex() string {
+	if m != nil {
+		return m.Index
+	}
+	return ""
+}
+
+func (m *MintConstraints) GetCollection() string {
+	if m != nil {
+		return m.Collection
+	}
+	return ""
+}
+
+func (m *MintConstraints) GetTokenData() []*TokenData {
+	if m != nil {
+		return m.TokenData
+	}
+	return nil
+}
+
 func init() {
-	proto.RegisterType((*Cw20Constraints)(nil), "ixo.token.v1beta1.Cw20Constraints")
-	proto.RegisterType((*Cw721Constraints)(nil), "ixo.token.v1beta1.Cw721Constraints")
-	proto.RegisterType((*Cw1155Constraints)(nil), "ixo.token.v1beta1.Cw1155Constraints")
-	proto.RegisterType((*MintConstraints)(nil), "ixo.token.v1beta1.MintConstraints")
 	proto.RegisterType((*MintAuthorization)(nil), "ixo.token.v1beta1.MintAuthorization")
+	proto.RegisterType((*MintConstraints)(nil), "ixo.token.v1beta1.MintConstraints")
 }
 
 func init() { proto.RegisterFile("ixo/token/v1beta1/authz.proto", fileDescriptor_cca6ff8f08fc36db) }
 
 var fileDescriptor_cca6ff8f08fc36db = []byte{
-	// 520 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x93, 0xcf, 0x6a, 0xdb, 0x40,
-	0x10, 0xc6, 0x25, 0x3b, 0x29, 0x78, 0x43, 0xb1, 0x25, 0x4c, 0x71, 0x03, 0x51, 0x8c, 0xda, 0x83,
-	0x73, 0x88, 0x64, 0xbb, 0x98, 0x42, 0x2f, 0xc5, 0x7f, 0x28, 0xee, 0xa1, 0x04, 0x04, 0xbd, 0xf4,
-	0x62, 0x56, 0x2b, 0x45, 0x5e, 0xe2, 0xdd, 0x35, 0xd2, 0x28, 0x56, 0xf3, 0x14, 0x7d, 0x98, 0x3e,
-	0x44, 0x8f, 0xa6, 0xa7, 0x9e, 0x4a, 0xb1, 0xa1, 0x0f, 0xd1, 0x53, 0xd1, 0xae, 0x93, 0xca, 0xaa,
-	0x0b, 0xbd, 0x69, 0xe6, 0xd3, 0xfc, 0x66, 0xe6, 0xdb, 0x5d, 0x74, 0x46, 0x33, 0xe1, 0x82, 0xb8,
-	0x09, 0xb9, 0x7b, 0xdb, 0xf3, 0x43, 0xc0, 0x3d, 0x17, 0xa7, 0x30, 0xbf, 0x73, 0x96, 0xb1, 0x00,
-	0x61, 0x1a, 0x34, 0x13, 0x8e, 0x94, 0x9d, 0x9d, 0x7c, 0xda, 0x8c, 0x44, 0x24, 0xa4, 0xea, 0xe6,
-	0x5f, 0xea, 0xc7, 0xd3, 0xa7, 0x39, 0x87, 0xd2, 0xe0, 0x81, 0x42, 0x69, 0xb0, 0x93, 0x5a, 0x65,
-	0x09, 0xb2, 0x9d, 0x72, 0xa0, 0xb9, 0xea, 0xa5, 0xe4, 0xf3, 0x48, 0x88, 0x68, 0x11, 0xba, 0x32,
-	0xf2, 0xd3, 0x6b, 0x17, 0x28, 0x0b, 0x13, 0xc0, 0x6c, 0x79, 0xdf, 0x94, 0x88, 0x84, 0x89, 0x64,
-	0xa6, 0xa6, 0x51, 0x81, 0x92, 0xec, 0x2e, 0xaa, 0x8f, 0x57, 0xfd, 0xee, 0x58, 0xf0, 0x04, 0x62,
-	0x4c, 0x39, 0x24, 0xe6, 0x19, 0x42, 0x0c, 0x67, 0x33, 0xcc, 0x44, 0xca, 0xa1, 0xa5, 0xb7, 0xf5,
-	0xce, 0x91, 0x57, 0x63, 0x38, 0x1b, 0xca, 0x84, 0x6d, 0xa2, 0xc6, 0x78, 0xf5, 0xb2, 0xdf, 0x2b,
-	0x94, 0xd8, 0x17, 0xc8, 0x18, 0xaf, 0x7a, 0xbd, 0xc1, 0xa0, 0xc8, 0x69, 0xa2, 0xe3, 0x5b, 0xbc,
-	0x48, 0xc3, 0x1d, 0x42, 0x05, 0xf6, 0xcf, 0x0a, 0xaa, 0xbf, 0xa3, 0x1c, 0x8a, 0x7f, 0x5e, 0xa0,
-	0x06, 0x11, 0x1c, 0x62, 0x4c, 0x60, 0x86, 0x83, 0x20, 0x0e, 0x93, 0x44, 0x16, 0xd5, 0xbc, 0xfa,
-	0x7d, 0x7e, 0xa8, 0xd2, 0x39, 0x74, 0x41, 0x19, 0x85, 0x56, 0xa5, 0xad, 0x77, 0xaa, 0x9e, 0x0a,
-	0xcc, 0x2b, 0xd4, 0x20, 0xab, 0x7e, 0x77, 0x46, 0xfe, 0x40, 0x5b, 0xd5, 0xb6, 0xde, 0x39, 0xe9,
-	0xdb, 0xce, 0x5f, 0x27, 0xe3, 0x94, 0x16, 0x9e, 0x6a, 0x5e, 0x9d, 0x94, 0x3c, 0xf0, 0x90, 0x41,
-	0xf2, 0x25, 0xf7, 0x88, 0x47, 0x92, 0xf8, 0xec, 0x20, 0x71, 0xdf, 0x90, 0xa9, 0xe6, 0x35, 0x48,
-	0x29, 0x67, 0xbe, 0x47, 0x26, 0x91, 0x26, 0xed, 0x41, 0x8f, 0x25, 0xf4, 0xf9, 0x41, 0x68, 0xc9,
-	0xd1, 0xa9, 0xe6, 0x19, 0xa4, 0x9c, 0x1c, 0x3d, 0x41, 0xcd, 0x07, 0xf3, 0x0a, 0x60, 0x7b, 0xad,
-	0x23, 0x23, 0x37, 0x7a, 0x98, 0xc2, 0x5c, 0xc4, 0xf4, 0x0e, 0x03, 0x15, 0xdc, 0xf4, 0x11, 0x62,
-	0x94, 0x43, 0x18, 0xcf, 0x02, 0x1a, 0x28, 0x93, 0x47, 0xe3, 0x5f, 0xdf, 0xcf, 0x5f, 0x47, 0x14,
-	0xe6, 0xa9, 0xef, 0x10, 0xc1, 0x5c, 0x9a, 0x89, 0x6b, 0x91, 0xf2, 0x40, 0x56, 0xe4, 0xd1, 0xa5,
-	0xbf, 0x10, 0xe4, 0x86, 0xcc, 0x31, 0xe5, 0x6e, 0x26, 0xaf, 0x28, 0x7c, 0x5c, 0x86, 0x89, 0x33,
-	0x79, 0x3b, 0x79, 0x13, 0xe3, 0x88, 0x85, 0x1c, 0xbc, 0x9a, 0xc2, 0x4e, 0x68, 0x60, 0x4e, 0xd0,
-	0x49, 0x71, 0xc3, 0x4a, 0xbb, 0xfa, 0x8f, 0x83, 0x28, 0xdd, 0x03, 0xaf, 0x58, 0xf6, 0xca, 0xf8,
-	0xfa, 0xf9, 0xf2, 0xf1, 0xde, 0xf0, 0xa3, 0xab, 0x2f, 0x1b, 0x4b, 0x5f, 0x6f, 0x2c, 0xfd, 0xc7,
-	0xc6, 0xd2, 0x3f, 0x6d, 0x2d, 0x6d, 0xbd, 0xb5, 0xb4, 0x6f, 0x5b, 0x4b, 0xfb, 0x30, 0xf8, 0xff,
-	0xf1, 0xd5, 0x3b, 0x92, 0x0b, 0xf8, 0x8f, 0xe4, 0x23, 0x78, 0xf1, 0x3b, 0x00, 0x00, 0xff, 0xff,
-	0x0b, 0x81, 0x03, 0xb8, 0xde, 0x03, 0x00, 0x00,
+	// 442 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0xc1, 0x6e, 0xd3, 0x40,
+	0x10, 0x8d, 0xd3, 0x36, 0x52, 0xb6, 0x42, 0x25, 0xab, 0x1e, 0x4c, 0x05, 0x4e, 0x95, 0x0b, 0xe5,
+	0x10, 0x5b, 0x05, 0x71, 0xe9, 0x05, 0xb5, 0xb5, 0x40, 0x1c, 0x10, 0x92, 0x05, 0x17, 0x2e, 0xd1,
+	0x7a, 0x77, 0x89, 0x47, 0x89, 0x77, 0x2a, 0x7b, 0x8c, 0x4c, 0x7f, 0x81, 0x0b, 0x1f, 0xc3, 0x47,
+	0xf4, 0x18, 0x71, 0x42, 0x1c, 0x22, 0x94, 0xfc, 0x05, 0x27, 0xe4, 0x5d, 0x97, 0x06, 0xe8, 0x81,
+	0x93, 0x77, 0xe6, 0xcd, 0x7b, 0x3b, 0xef, 0x79, 0xd9, 0x03, 0xa8, 0x31, 0x22, 0x9c, 0x69, 0x13,
+	0x7d, 0x38, 0x4e, 0x35, 0x89, 0xe3, 0x48, 0x54, 0x94, 0x5d, 0x86, 0x17, 0x05, 0x12, 0xf2, 0x01,
+	0xd4, 0x18, 0x5a, 0x38, 0x6c, 0xe1, 0x83, 0xfd, 0x29, 0x4e, 0xd1, 0xa2, 0x51, 0x73, 0x72, 0x83,
+	0x07, 0xf7, 0x1a, 0x1d, 0x00, 0xf5, 0x5b, 0x05, 0x40, 0xb5, 0xd0, 0x2d, 0x57, 0x38, 0xc5, 0x96,
+	0x29, 0xb1, 0xcc, 0xb1, 0x9c, 0x38, 0x49, 0x57, 0x38, 0x68, 0xb4, 0xf0, 0xd8, 0xe0, 0x15, 0x18,
+	0x3a, 0xad, 0x28, 0xc3, 0x02, 0x2e, 0x05, 0x01, 0x1a, 0x9e, 0x32, 0x96, 0x83, 0x21, 0x5d, 0x4c,
+	0x14, 0x28, 0xdf, 0x3b, 0xf4, 0x8e, 0xfa, 0x67, 0xe7, 0x3f, 0x97, 0xc3, 0x67, 0x53, 0xa0, 0xac,
+	0x4a, 0x43, 0x89, 0x79, 0x04, 0x35, 0xbe, 0xc7, 0xca, 0x28, 0xcb, 0x68, 0xaa, 0x71, 0x3a, 0x47,
+	0x39, 0x93, 0x99, 0x00, 0x13, 0xd5, 0x76, 0x51, 0xfa, 0x78, 0xa1, 0xcb, 0x30, 0x7e, 0x19, 0x3f,
+	0x2f, 0xc4, 0x34, 0xd7, 0x86, 0x92, 0xbe, 0x93, 0x8d, 0x41, 0xf1, 0x98, 0xed, 0x4a, 0x34, 0x25,
+	0x15, 0x02, 0x0c, 0x95, 0x7e, 0xf7, 0x70, 0xeb, 0x68, 0xf7, 0xf1, 0x28, 0xfc, 0x27, 0x8d, 0xb0,
+	0x59, 0xef, 0xfc, 0x66, 0x32, 0xd9, 0xa4, 0x9d, 0x0c, 0xbe, 0x7e, 0x19, 0xdf, 0xf9, 0x63, 0xf9,
+	0xd1, 0xa7, 0x2e, 0xdb, 0xfb, 0x8b, 0xc3, 0x1f, 0xb1, 0xbb, 0x12, 0x0d, 0x15, 0x42, 0xd2, 0x44,
+	0x28, 0x55, 0xe8, 0xb2, 0x74, 0xb6, 0x92, 0xbd, 0xeb, 0xfe, 0xa9, 0x6b, 0xf3, 0x17, 0xac, 0x27,
+	0x72, 0xac, 0x0c, 0xf9, 0x5d, 0xeb, 0x3b, 0xba, 0x5a, 0x0e, 0x3b, 0xdf, 0x97, 0xc3, 0x87, 0x1b,
+	0xde, 0x5d, 0x84, 0xed, 0x67, 0x5c, 0xaa, 0x59, 0x6b, 0xf5, 0x2d, 0x18, 0x4a, 0x5a, 0x3a, 0xe7,
+	0x6c, 0xdb, 0x88, 0x5c, 0xfb, 0x5b, 0xf6, 0x1e, 0x7b, 0xe6, 0xfb, 0x6c, 0x07, 0x8c, 0xd2, 0xb5,
+	0xbf, 0x6d, 0x9b, 0xae, 0xe0, 0x01, 0x63, 0x12, 0xe7, 0x73, 0x2d, 0x9b, 0xfd, 0xfd, 0x1d, 0x0b,
+	0x6d, 0x74, 0xf8, 0x09, 0xeb, 0xdb, 0x48, 0x62, 0x41, 0xc2, 0xef, 0xd9, 0xa0, 0xee, 0xdf, 0x12,
+	0xd4, 0x9b, 0xeb, 0x99, 0xe4, 0x66, 0xfc, 0xec, 0xf5, 0xd5, 0x2a, 0xf0, 0x16, 0xab, 0xc0, 0xfb,
+	0xb1, 0x0a, 0xbc, 0xcf, 0xeb, 0xa0, 0xb3, 0x58, 0x07, 0x9d, 0x6f, 0xeb, 0xa0, 0xf3, 0xee, 0xe9,
+	0xff, 0xff, 0x4c, 0xf7, 0xb4, 0xac, 0xc7, 0xb4, 0x67, 0x1f, 0xce, 0x93, 0x5f, 0x01, 0x00, 0x00,
+	0xff, 0xff, 0x4c, 0x45, 0x8a, 0x46, 0xd7, 0x02, 0x00, 0x00,
 }
 
-func (m *Cw20Constraints) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Cw20Constraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Cw20Constraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.MaxAmount != 0 {
-		i = encodeVarintAuthz(dAtA, i, uint64(m.MaxAmount))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Cw721Constraints) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Cw721Constraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Cw721Constraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *Cw1155Constraints) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Cw1155Constraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Cw1155Constraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Value != 0 {
-		i = encodeVarintAuthz(dAtA, i, uint64(m.Value))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MintConstraints) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MintConstraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MintConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.ContractConstraints != nil {
-		{
-			size := m.ContractConstraints.Size()
-			i -= size
-			if _, err := m.ContractConstraints.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	if m.Limit != 0 {
-		i = encodeVarintAuthz(dAtA, i, uint64(m.Limit))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.ContractAddress) > 0 {
-		i -= len(m.ContractAddress)
-		copy(dAtA[i:], m.ContractAddress)
-		i = encodeVarintAuthz(dAtA, i, uint64(len(m.ContractAddress)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MintConstraints_Cw20Constraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MintConstraints_Cw20Constraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Cw20Constraints != nil {
-		{
-			size, err := m.Cw20Constraints.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintAuthz(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *MintConstraints_Cw721Constraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MintConstraints_Cw721Constraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Cw721Constraints != nil {
-		{
-			size, err := m.Cw721Constraints.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintAuthz(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	return len(dAtA) - i, nil
-}
-func (m *MintConstraints_Cw1155Constraints) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MintConstraints_Cw1155Constraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.Cw1155Constraints != nil {
-		{
-			size, err := m.Cw1155Constraints.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintAuthz(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x2a
-	}
-	return len(dAtA) - i, nil
-}
 func (m *MintAuthorization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -594,6 +245,81 @@ func (m *MintAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *MintConstraints) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MintConstraints) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MintConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TokenData) > 0 {
+		for iNdEx := len(m.TokenData) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.TokenData[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintAuthz(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.Collection) > 0 {
+		i -= len(m.Collection)
+		copy(dAtA[i:], m.Collection)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.Collection)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Index) > 0 {
+		i -= len(m.Index)
+		copy(dAtA[i:], m.Index)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.Index)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size := m.Amount.Size()
+		i -= size
+		if _, err := m.Amount.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintAuthz(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.ContractAddress) > 0 {
+		i -= len(m.ContractAddress)
+		copy(dAtA[i:], m.ContractAddress)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.ContractAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintAuthz(dAtA []byte, offset int, v uint64) int {
 	offset -= sovAuthz(v)
 	base := offset
@@ -604,94 +330,6 @@ func encodeVarintAuthz(dAtA []byte, offset int, v uint64) int {
 	}
 	dAtA[offset] = uint8(v)
 	return base
-}
-func (m *Cw20Constraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.MaxAmount != 0 {
-		n += 1 + sovAuthz(uint64(m.MaxAmount))
-	}
-	return n
-}
-
-func (m *Cw721Constraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	return n
-}
-
-func (m *Cw1155Constraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Value != 0 {
-		n += 1 + sovAuthz(uint64(m.Value))
-	}
-	return n
-}
-
-func (m *MintConstraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.ContractAddress)
-	if l > 0 {
-		n += 1 + l + sovAuthz(uint64(l))
-	}
-	if m.Limit != 0 {
-		n += 1 + sovAuthz(uint64(m.Limit))
-	}
-	if m.ContractConstraints != nil {
-		n += m.ContractConstraints.Size()
-	}
-	return n
-}
-
-func (m *MintConstraints_Cw20Constraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Cw20Constraints != nil {
-		l = m.Cw20Constraints.Size()
-		n += 1 + l + sovAuthz(uint64(l))
-	}
-	return n
-}
-func (m *MintConstraints_Cw721Constraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Cw721Constraints != nil {
-		l = m.Cw721Constraints.Size()
-		n += 1 + l + sovAuthz(uint64(l))
-	}
-	return n
-}
-func (m *MintConstraints_Cw1155Constraints) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Cw1155Constraints != nil {
-		l = m.Cw1155Constraints.Size()
-		n += 1 + l + sovAuthz(uint64(l))
-	}
-	return n
 }
 func (m *MintAuthorization) Size() (n int) {
 	if m == nil {
@@ -712,405 +350,44 @@ func (m *MintAuthorization) Size() (n int) {
 	return n
 }
 
+func (m *MintConstraints) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ContractAddress)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	l = m.Amount.Size()
+	n += 1 + l + sovAuthz(uint64(l))
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	l = len(m.Index)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	l = len(m.Collection)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	if len(m.TokenData) > 0 {
+		for _, e := range m.TokenData {
+			l = e.Size()
+			n += 1 + l + sovAuthz(uint64(l))
+		}
+	}
+	return n
+}
+
 func sovAuthz(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozAuthz(x uint64) (n int) {
 	return sovAuthz(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Cw20Constraints) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowAuthz
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Cw20Constraints: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Cw20Constraints: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MaxAmount", wireType)
-			}
-			m.MaxAmount = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.MaxAmount |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipAuthz(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Cw721Constraints) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowAuthz
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Cw721Constraints: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Cw721Constraints: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipAuthz(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Cw1155Constraints) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowAuthz
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Cw1155Constraints: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Cw1155Constraints: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			m.Value = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Value |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipAuthz(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MintConstraints) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowAuthz
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MintConstraints: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MintConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ContractAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
-			}
-			m.Limit = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Limit |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cw20Constraints", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Cw20Constraints{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.ContractConstraints = &MintConstraints_Cw20Constraints{v}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cw721Constraints", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Cw721Constraints{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.ContractConstraints = &MintConstraints_Cw721Constraints{v}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cw1155Constraints", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuthz
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &Cw1155Constraints{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.ContractConstraints = &MintConstraints_Cw1155Constraints{v}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipAuthz(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthAuthz
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *MintAuthorization) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1204,6 +481,252 @@ func (m *MintAuthorization) Unmarshal(dAtA []byte) error {
 			}
 			m.Constraints = append(m.Constraints, &MintConstraints{})
 			if err := m.Constraints[len(m.Constraints)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipAuthz(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MintConstraints) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowAuthz
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MintConstraints: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MintConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ContractAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Index = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collection", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Collection = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenData", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenData = append(m.TokenData, &TokenData{})
+			if err := m.TokenData[len(m.TokenData)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -30,8 +30,6 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 	var xx types.Params
 	k.ParamSpace.GetParamSetIfExists(ctx, &xx)
 
-	xx.Cw20ContractCode = p.Cw20ContractCode
-	xx.Cw721ContractCode = p.Cw721ContractCode
 	xx.Ixo1155ContractCode = p.Ixo1155ContractCode
 
 	k.ParamSpace.SetParamSet(ctx, &xx)

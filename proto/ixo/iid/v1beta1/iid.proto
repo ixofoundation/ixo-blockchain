@@ -100,6 +100,7 @@ message LinkedResource {
   string encrypted = 7;
   string right = 8;
 }
+
 message LinkedEntity {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
