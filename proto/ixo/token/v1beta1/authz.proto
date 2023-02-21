@@ -11,9 +11,8 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 message MintAuthorization {
   option (cosmos_proto.implements_interface) = "Authorization";
 
-  string minter_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  // address of minter
+  string minter = 1;
   repeated MintConstraints constraints = 2;
 }
 

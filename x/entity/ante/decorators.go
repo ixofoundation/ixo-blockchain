@@ -18,7 +18,7 @@ func NewBlockNftContractTransferForEntityDecorator(entityKeeper entitykeeper.Kee
 	}
 }
 
-func (sud BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
+func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 
 	for _, msg := range tx.GetMsgs() {
 		wasmMsg, ok := msg.(*wasmtypes.MsgExecuteContract)
@@ -27,7 +27,7 @@ func (sud BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context
 		}
 
 		var params entitytypes.Params
-		sud.entityKeeper.ParamSpace.GetParamSetIfExists(ctx, &params)
+		dec.entityKeeper.ParamSpace.GetParamSetIfExists(ctx, &params)
 
 		if wasmMsg.Contract == params.NftContractAddress {
 			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Cant execute contract set as the nft contract address")

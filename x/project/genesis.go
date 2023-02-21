@@ -45,6 +45,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var claims []types.Claims
 
 	iterator := k.GetProjectDocIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		projectDoc := k.MustGetProjectDocByKey(ctx, iterator.Key())
 		accountMap := k.GetAccountMap(ctx, projectDoc.ProjectDid)
@@ -56,6 +57,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 			claim := k.MustGetClaimByKey(ctx, claimIter.Key())
 			subClaims = types.AppendClaims(subClaims, claim)
 		}
+		claimIter.Close()
 
 		projectDocs = append(projectDocs, projectDoc)
 		accountMaps = append(accountMaps, accountMap)

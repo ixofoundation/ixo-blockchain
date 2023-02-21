@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
 //	func didToAddressSplitter(did string) (sdk.AccAddress, error) {
@@ -21,11 +20,8 @@ const TypeMsgCreateToken = "create_token"
 
 var _ sdk.Msg = &MsgCreateToken{}
 
-func (msg MsgCreateToken) GetIidController() iidtypes.DIDFragment {
-	return msg.MinterDid
-}
 func (msg MsgCreateToken) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.MinterAddress)
+	address, err := sdk.AccAddressFromBech32(msg.Minter)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}
@@ -47,11 +43,8 @@ const TypeMsgMintToken = "mint_token"
 
 var _ sdk.Msg = &MsgMintToken{}
 
-func (msg MsgMintToken) GetIidController() iidtypes.DIDFragment {
-	return msg.MinterDid
-}
 func (msg MsgMintToken) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.MinterAddress)
+	address, err := sdk.AccAddressFromBech32(msg.Minter)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}
@@ -73,19 +66,12 @@ const TypeMsgTransferToken = "transfer_token"
 
 var _ sdk.Msg = &MsgTransferToken{}
 
-func (msg MsgTransferToken) GetIidController() iidtypes.DIDFragment {
-	return iidtypes.DIDFragment(msg.OwnerDid)
-}
 func (msg MsgTransferToken) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	address, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{address}
-}
-
-func (msg MsgTransferToken) ValidateBasic() error {
-	return nil
 }
 
 func (msg MsgTransferToken) GetSignBytes() []byte {
@@ -95,3 +81,95 @@ func (msg MsgTransferToken) GetSignBytes() []byte {
 func (msg MsgTransferToken) Type() string { return TypeMsgTransferToken }
 
 func (msg MsgTransferToken) Route() string { return RouterKey }
+
+// --------------------------
+// RETIRE TOKEN
+// --------------------------
+const TypeMsgRetireToken = "retire_token"
+
+var _ sdk.Msg = &MsgRetireToken{}
+
+func (msg MsgRetireToken) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgRetireToken) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgRetireToken) Type() string { return TypeMsgRetireToken }
+
+func (msg MsgRetireToken) Route() string { return RouterKey }
+
+// --------------------------
+// CANCEL TOKEN
+// --------------------------
+const TypeMsgCancelToken = "cancel_token"
+
+var _ sdk.Msg = &MsgCancelToken{}
+
+func (msg MsgCancelToken) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgCancelToken) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgCancelToken) Type() string { return TypeMsgCancelToken }
+
+func (msg MsgCancelToken) Route() string { return RouterKey }
+
+// --------------------------
+// PAUSE TOKEN
+// --------------------------
+const TypeMsgPauseToken = "pause_token"
+
+var _ sdk.Msg = &MsgPauseToken{}
+
+func (msg MsgPauseToken) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.Minter)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgPauseToken) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgPauseToken) Type() string { return TypeMsgPauseToken }
+
+func (msg MsgPauseToken) Route() string { return RouterKey }
+
+// --------------------------
+// STOP TOKEN
+// --------------------------
+const TypeMsgStopToken = "stop_token"
+
+var _ sdk.Msg = &MsgStopToken{}
+
+func (msg MsgStopToken) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.Minter)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgStopToken) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgStopToken) Type() string { return TypeMsgStopToken }
+
+func (msg MsgStopToken) Route() string { return RouterKey }

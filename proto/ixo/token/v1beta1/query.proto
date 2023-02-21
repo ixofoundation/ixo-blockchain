@@ -4,52 +4,63 @@ package ixo.token.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "ixo/token/v1beta1/token.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 // Query defines the gRPC querier service.
 service Query {
   rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse) {
-    option (google.api.http).get = "/ixo/token/{minter_did}";
+    option (google.api.http).get = "/ixo/token/{minter}";
   }
 
   rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse) {
-    option (google.api.http).get = "/ixo/token/{minter_did}/{contract_address}";
+    option (google.api.http).get = "/ixo/token/{minter}/{contract_address}";
   }
 
-  rpc TokenConfig(QueryTokenConfigRequest) returns (QueryTokenConfigResponse) {
-    option (google.api.http).get = "/ixo/token/config";
+  rpc TokenMetadata(QueryTokenMetadataRequest)
+      returns (QueryTokenMetadataResponse) {
+    option (google.api.http).get = "/ixo/token/metadata/{id}";
   }
 }
 
 message QueryTokenListRequest {
-  string minter_did = 1 [ (gogoproto.moretags) = "yaml:\"minter_did\"" ];
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  // minter address to get list for
+  string minter = 2;
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
-// method.
 message QueryTokenListResponse {
-  repeated Token contracts = 1 [ (gogoproto.moretags) = "yaml:\"contracts\"" ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 1;
+  repeated Token tokenDocs = 2 [ (gogoproto.nullable) = false ];
 }
 
-// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC
-// method.
 message QueryTokenDocRequest {
-  string minter_did = 1 [ (gogoproto.moretags) = "yaml:\"minter_did\"" ];
-  string contract_address = 2
-      [ (gogoproto.moretags) = "yaml:\"contract_address\"" ];
+  // minter address to get Token Doc for
+  string minter = 1;
+  string contract_address = 2;
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
-// method.
 message QueryTokenDocResponse {
-  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
+  Token tokenDoc = 1 [ (gogoproto.nullable) = false ];
 }
 
-message QueryTokenConfigRequest {}
+message QueryTokenMetadataRequest { string id = 1; }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
-// method.
-message QueryTokenConfigResponse {
-  map<string, string> map = 1 [ (gogoproto.moretags) = "yaml:\"config\"" ];
+message QueryTokenMetadataResponse {
+  string name = 1;
+  string description = 2;
+  string decimals = 3;
+  string image = 4;
+  string index = 5;
+  TokenMetadataProperties properties = 6;
+}
+
+message TokenMetadataProperties {
+  option (gogoproto.equal) = true;
+
+  string class = 1;
+  string collection = 2;
+  string cap = 3;
+  repeated TokenData linkedResources = 4;
 }

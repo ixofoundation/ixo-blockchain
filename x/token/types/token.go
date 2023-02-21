@@ -61,16 +61,6 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	}
 }
 
-// UpdateSupply updates token suply by subtracting or adding amount
-func (token *Token) UpdateSupply(amount sdk.Int) error {
-	if amount.IsNegative() {
-		token.Supply = token.Supply.Sub(sdk.NewUint(amount.Abs().Uint64()))
-	} else {
-		token.Supply = token.Supply.Add(sdk.NewUint(amount.Abs().Uint64()))
-	}
-	return nil
-}
-
 type MintBatchData struct {
 	Id         string
 	Uri        string
@@ -85,13 +75,16 @@ func (batch *MintBatchData) GetWasmMintBatch() ixo1155.Batch {
 	return []string{batch.Id, batch.Amount.String(), batch.Uri}
 }
 
-func (batch *MintBatchData) GetTokenMintedEventBatch() *TokenMintedBatch {
-	return &TokenMintedBatch{
+func (batch *MintBatchData) GetTokenMintedEventBatch() *TokenBatch {
+	return &TokenBatch{
 		Id:     batch.Id,
-		Amount: batch.Amount.String(),
+		Amount: batch.Amount,
 	}
 }
 
+func (batch *TokenBatch) GetWasmTransferBatch() ixo1155.Batch {
+	return []string{batch.Id, batch.Amount.String(), ""}
+}
 func Map[T, V any](ts []T, fn func(T) V) []V {
 	result := make([]V, len(ts))
 	for i, t := range ts {

@@ -39,18 +39,13 @@ func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken)
 		return nil, sdkerrors.Wrapf(types.ErrTokenNameDuplicate, msg.Name)
 	}
 
-	minterDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
-	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for minter not found")
-	}
-
-	minterAddress, err := minterDidDoc.GetVerificationMethodBlockchainAddress(msg.MinterDid.String())
+	minter, err := sdk.AccAddressFromBech32(msg.Minter)
 	if err != nil {
 		return nil, err
 	}
 
 	encodedInitiateMessage, err := ixo1155.Marshal(ixo1155.InstantiateMsg{
-		Minter: minterAddress.String(),
+		Minter: minter.String(),
 	})
 	if err != nil {
 		return nil, err
@@ -59,10 +54,10 @@ func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken)
 	contractAddr, _, err := s.Keeper.WasmKeeper.Instantiate(
 		ctx,
 		params.Ixo1155ContractCode,
-		minterAddress,
-		minterAddress,
+		minter,
+		minter,
 		encodedInitiateMessage,
-		fmt.Sprintf("%s-ixo1155-contract", msg.MinterDid.String()),
+		fmt.Sprintf("%s-ixo1155-contract", msg.Minter),
 		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
 	)
 	if err != nil {
@@ -70,8 +65,7 @@ func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken)
 	}
 
 	token := types.Token{
-		MinterDid:       msg.MinterDid,
-		MinterAddress:   minterAddress.String(),
+		Minter:          msg.Minter,
 		ContractAddress: contractAddr.String(),
 		Class:           msg.Class.Did(),
 		Name:            msg.Name,
@@ -81,15 +75,15 @@ func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken)
 		Cap:             msg.Cap,
 		Supply:          sdk.ZeroUint(),
 		Paused:          false,
-		Deactivated:     false,
+		Stopped:         false,
 	}
 	s.Keeper.SetToken(ctx, token)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.TokenCreatedEvent{
 		ContractAddress: contractAddr.String(),
-		Minter:          msg.MinterDid.Did(),
+		Minter:          minter.String(),
 	}); err != nil {
-		return nil, sdkerrors.Wrapf(err, "failed to emit createToken event")
+		return nil, sdkerrors.Wrapf(err, "failed to emit create Token event")
 	}
 
 	return &types.MsgCreateTokenResponse{}, nil
@@ -98,35 +92,25 @@ func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken)
 func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*types.MsgMintTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token, err := s.Keeper.GetToken(ctx, msg.MinterDid, msg.ContractAddress)
+	token, err := s.Keeper.GetToken(ctx, msg.Minter, msg.ContractAddress)
 	if err != nil {
 		return nil, err
 	}
 
 	if token.Paused {
-		return nil, types.ErrTokenPausedIncorrect
+		return nil, types.ErrTokenPaused
 	}
 
-	if token.Deactivated {
-		return nil, types.ErrTokenDeactivatedIncorrect
+	if token.Stopped {
+		return nil, types.ErrTokenStopped
 	}
 
-	minterDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.MinterDid.Did()))
-	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for minter not found %s", msg.MinterDid.Did())
-	}
-
-	minterAddress, err := minterDidDoc.GetVerificationMethodBlockchainAddress(msg.MinterDid.String())
+	minterAddress, err := sdk.AccAddressFromBech32(msg.Minter)
 	if err != nil {
 		return nil, err
 	}
 
-	ownerDidDoc, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.OwnerDid.Did()))
-	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "did document for owner not found %s", msg.OwnerDid.Did())
-	}
-
-	ownerAddress, err := ownerDidDoc.GetVerificationMethodBlockchainAddress(msg.OwnerDid.String())
+	ownerAddress, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
 		return nil, err
 	}
@@ -136,10 +120,10 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 		return nil, err
 	}
 
-	var amounts = sdk.NewUint(0)
+	amounts := sdk.NewUint(0)
 	var batches []types.MintBatchData
 
-	// valiodation checks, check name is same as token and amounts dont go more than toen cap
+	// validation checks, check name is same as token and amounts dont go more than then cap
 	for _, batch := range msg.MintBatch {
 		amounts = amounts.Add(batch.Amount)
 
@@ -189,7 +173,7 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 	}
 
 	// Add new minted tokens to token supply and persist
-	token.UpdateSupply(sdk.Int(amounts))
+	token.Supply = token.Supply.Add(amounts)
 	s.Keeper.SetToken(ctx, token)
 
 	// create and persist new token properties
@@ -199,6 +183,7 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 			Index:      batch.Index,
 			Collection: batch.Collection,
 			TokenData:  batch.TokenData,
+			Name:       batch.Name,
 		}
 		s.Keeper.SetTokenProperties(ctx, tokenProperties)
 	}
@@ -206,14 +191,14 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.TokenMintedEvent{
 			ContractAddress: contractAddress.String(),
-			Minter:          msg.MinterDid.Did(),
-			Owner:           msg.OwnerDid.Did(),
-			Batches:         types.Map(batches, func(b types.MintBatchData) *types.TokenMintedBatch { return b.GetTokenMintedEventBatch() }),
+			Minter:          minterAddress.String(),
+			Owner:           ownerAddress.String(),
+			Batches:         types.Map(batches, func(b types.MintBatchData) *types.TokenBatch { return b.GetTokenMintedEventBatch() }),
 		},
 		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
 			ContractAddress: token.ContractAddress,
-			Signer:          msg.MinterDid.Did(),
+			Owner:           minterAddress.String(),
 		},
 	); err != nil {
 		return nil, sdkerrors.Wrapf(err, "failed to emit mint token events")
@@ -223,6 +208,263 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 }
 
 func (s msgServer) TransferToken(goCtx context.Context, msg *types.MsgTransferToken) (*types.MsgTransferTokenResponse, error) {
-	return &types.MsgTransferTokenResponse{}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	recipientAddress, err := sdk.AccAddressFromBech32(msg.Recipient)
+	if err != nil {
+		return nil, err
+	}
+
+	ownerAddress, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get Token for the first token in tokens field
+	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
+	if err != nil {
+		return nil, err
+	}
+
+	contractAddress, err := sdk.AccAddressFromBech32(token.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	encodedTransferMessage, err := ixo1155.Marshal(ixo1155.WasmBatchSendFrom{
+		BatchSendFrom: ixo1155.BatchSendFrom{
+			From:  ownerAddress.String(),
+			To:    recipientAddress.String(),
+			Batch: types.Map(msg.Tokens, func(b *types.TokenBatch) ixo1155.Batch { return b.GetWasmTransferBatch() }),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.Keeper.WasmKeeper.Execute(
+		ctx,
+		contractAddress,
+		ownerAddress,
+		encodedTransferMessage,
+		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := ctx.EventManager().EmitTypedEvent(
+		&types.TokenTransferredEvent{
+			Recipient: recipientAddress.String(),
+			Owner:     ownerAddress.String(),
+			Tokens:    msg.Tokens,
+		},
+	); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit transfer token event")
+	}
+
+	return &types.MsgTransferTokenResponse{}, nil
+}
+
+func (s msgServer) RetireToken(goCtx context.Context, msg *types.MsgRetireToken) (*types.MsgRetireTokenResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Token for the first token in tokens field
+	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
+	if err != nil {
+		return nil, err
+	}
+
+	ownerAddress, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, err
+	}
+
+	contractAddress, err := sdk.AccAddressFromBech32(token.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	encodedBurnMessage, err := ixo1155.Marshal(ixo1155.WasmMsgBatchBurn{
+		BatchBurn: ixo1155.BatchBurn{
+			From:  ownerAddress.String(),
+			Batch: types.Map(msg.Tokens, func(b *types.TokenBatch) ixo1155.Batch { return b.GetWasmTransferBatch() }),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.Keeper.WasmKeeper.Execute(
+		ctx,
+		contractAddress,
+		ownerAddress,
+		encodedBurnMessage,
+		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update Token retired tokens and persist
+	var retiredTokens []*types.TokensRetired
+	for _, batch := range msg.Tokens {
+		retiredTokens = append(retiredTokens, &types.TokensRetired{
+			Id:           batch.Id,
+			Amount:       batch.Amount,
+			Reason:       msg.Reason,
+			Jurisdiction: msg.Jurisdiction,
+			Owner:        msg.Owner,
+		})
+	}
+	token.Retired = append(token.Retired, retiredTokens...)
+	s.Keeper.SetToken(ctx, *token)
+
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.TokenRetiredEvent{
+			Owner:  ownerAddress.String(),
+			Tokens: msg.Tokens,
+		},
+		// TokenUpdatedEvent event since token supply has been update
+		&types.TokenUpdatedEvent{
+			ContractAddress: token.ContractAddress,
+			Owner:           token.Minter,
+		},
+	); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit retire token event")
+	}
+
+	return &types.MsgRetireTokenResponse{}, nil
+}
+
+func (s msgServer) CancelToken(goCtx context.Context, msg *types.MsgCancelToken) (*types.MsgCancelTokenResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Token for the first token in tokens field
+	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
+	if err != nil {
+		return nil, err
+	}
+
+	ownerAddress, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, err
+	}
+
+	contractAddress, err := sdk.AccAddressFromBech32(token.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	encodedBurnMessage, err := ixo1155.Marshal(ixo1155.WasmMsgBatchBurn{
+		BatchBurn: ixo1155.BatchBurn{
+			From:  ownerAddress.String(),
+			Batch: types.Map(msg.Tokens, func(b *types.TokenBatch) ixo1155.Batch { return b.GetWasmTransferBatch() }),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.Keeper.WasmKeeper.Execute(
+		ctx,
+		contractAddress,
+		ownerAddress,
+		encodedBurnMessage,
+		sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update Token cancelled and remove amount from supply tokens and persist
+	var cancelledTokens []*types.TokensCancelled
+	amount := sdk.NewUint(0)
+
+	for _, batch := range msg.Tokens {
+		amount = amount.Add(batch.Amount)
+		cancelledTokens = append(cancelledTokens, &types.TokensCancelled{
+			Id:     batch.Id,
+			Amount: batch.Amount,
+			Reason: msg.Reason,
+			Owner:  msg.Owner,
+		})
+	}
+
+	token.Supply = token.Supply.Sub(amount)
+	token.Cancelled = append(token.Cancelled, cancelledTokens...)
+	s.Keeper.SetToken(ctx, *token)
+
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.TokenRetiredEvent{
+			Owner:  ownerAddress.String(),
+			Tokens: msg.Tokens,
+		},
+		// TokenUpdatedEvent event since token supply has been update
+		&types.TokenUpdatedEvent{
+			ContractAddress: token.ContractAddress,
+			Owner:           token.Minter,
+		},
+	); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit retire token event")
+	}
+	return &types.MsgCancelTokenResponse{}, nil
+}
+
+func (s msgServer) PauseToken(goCtx context.Context, msg *types.MsgPauseToken) (*types.MsgPauseTokenResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	token, err := s.Keeper.GetToken(ctx, msg.Minter, msg.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update Token paused and persist
+	token.Paused = msg.Paused
+	s.Keeper.SetToken(ctx, token)
+
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.TokenPausedEvent{
+			ContractAddress: token.ContractAddress,
+			Minter:          token.Minter,
+			Paused:          msg.Paused,
+		},
+		// TokenUpdatedEvent event since token supply has been update
+		&types.TokenUpdatedEvent{
+			ContractAddress: token.ContractAddress,
+			Owner:           token.Minter,
+		},
+	); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit pause token event")
+	}
+	return &types.MsgPauseTokenResponse{}, nil
+}
+
+func (s msgServer) StopToken(goCtx context.Context, msg *types.MsgStopToken) (*types.MsgStopTokenResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	token, err := s.Keeper.GetToken(ctx, msg.Minter, msg.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update Token stopped and persist
+	token.Stopped = true
+	s.Keeper.SetToken(ctx, token)
+
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.TokenStoppedEvent{
+			ContractAddress: token.ContractAddress,
+			Minter:          token.Minter,
+			Stopped:         true,
+		},
+		// TokenUpdatedEvent event since token supply has been update
+		&types.TokenUpdatedEvent{
+			ContractAddress: token.ContractAddress,
+			Owner:           token.Minter,
+		},
+	); err != nil {
+		return nil, sdkerrors.Wrapf(err, "failed to emit stop token event")
+	}
+	return &types.MsgStopTokenResponse{}, nil
 }

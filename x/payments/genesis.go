@@ -33,6 +33,7 @@ func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 		template := keeper.MustGetPaymentTemplateByKey(ctx, iterator.Key())
 		templates = append(templates, template)
 	}
+	iterator.Close()
 
 	// Export payment contracts
 	var contracts []types.PaymentContract
@@ -41,6 +42,7 @@ func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 		contract := keeper.MustGetPaymentContractByKey(ctx, iterator.Key())
 		contracts = append(contracts, contract)
 	}
+	iterator.Close()
 
 	// Export subscriptions
 	var subscriptions []types.Subscription
@@ -49,6 +51,7 @@ func ExportGenesis(ctx sdk.Context, keeper keeper.Keeper) *types.GenesisState {
 		subscription := keeper.MustGetSubscriptionByKey(ctx, iterator.Key())
 		subscriptions = append(subscriptions, subscription)
 	}
+	iterator.Close()
 
 	return types.NewGenesisState(templates, contracts, subscriptions)
 }

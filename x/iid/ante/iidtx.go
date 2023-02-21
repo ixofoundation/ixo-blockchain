@@ -23,7 +23,6 @@ func GetIidControllers(tx signing.SigVerifiableTx) []IidTxMsg {
 }
 
 func VerifyIidControllersAgainstSigniture(tx signing.SigVerifiableTx, ctx sdk.Context, iidKeeper iidkeeper.Keeper) error {
-
 	pubKeys, err := tx.GetPubKeys()
 	if err != nil {
 		return sdkerrors.Wrap(err, "TX must be signed with pubkey")

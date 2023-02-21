@@ -23,6 +23,18 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgTransferToken:
 			res, err := msgServer.TransferToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgCancelToken:
+			res, err := msgServer.CancelToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgRetireToken:
+			res, err := msgServer.RetireToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgPauseToken:
+			res, err := msgServer.PauseToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgStopToken:
+			res, err := msgServer.StopToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized token Msg")
 			return nil, err

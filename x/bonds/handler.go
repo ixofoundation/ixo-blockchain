@@ -54,6 +54,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 
 	iterator := keeper.GetBondIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		bond := keeper.MustGetBondByKey(ctx, iterator.Key())
 		batch := keeper.MustGetBatch(ctx, bond.BondDid)

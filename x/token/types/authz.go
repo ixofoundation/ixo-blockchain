@@ -12,9 +12,9 @@ var (
 )
 
 // NewMintAuthorization creates a new MintAuthorization object.
-func NewMintAuthorization(minterDid iidtypes.DIDFragment, constraints []*MintConstraints) *MintAuthorization {
+func NewMintAuthorization(minter string, constraints []*MintConstraints) *MintAuthorization {
 	return &MintAuthorization{
-		MinterDid:   minterDid,
+		Minter:      minter,
 		Constraints: constraints,
 	}
 }
@@ -31,8 +31,8 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("type mismatch")
 	}
 
-	if a.MinterDid.Did() != mMint.MinterDid.Did() {
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("authorized minter (%s) did not match the minter in the msg %s", a.MinterDid.Did(), mMint.MinterDid.Did())
+	if a.Minter != mMint.Minter {
+		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("authorized minter (%s) did not match the minter in the msg %s", a.Minter, mMint.Minter)
 	}
 
 	// state indicating if there was a mismatch for one of the msgMint batches in relation to authz constraints
@@ -107,6 +107,11 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 
 // ValidateBasic implements Authorization.ValidateBasic.
 func (a MintAuthorization) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(a.Minter)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid minter address (%s)", err)
+	}
+
 	if len(a.Constraints) == 0 {
 		return sdkerrors.ErrInvalidRequest.Wrap("mint authorization must contain atleast 1 constraint")
 	}

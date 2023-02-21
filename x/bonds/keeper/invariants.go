@@ -4,6 +4,7 @@ package keeper
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 )
@@ -46,6 +47,7 @@ func SupplyInvariant(k Keeper) sdk.Invariant {
 		})
 
 		iterator := k.GetBondIterator(ctx)
+		defer iterator.Close()
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
 			denom := bond.Token
@@ -88,6 +90,7 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 		var count int
 
 		iterator := k.GetBondIterator(ctx)
+		defer iterator.Close()
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
 			denom := bond.Token
@@ -140,6 +143,7 @@ func AvailableReserveInvariant(k Keeper) sdk.Invariant {
 		// outcome payment reserve, since this has already reached the reserve
 		// but is not considered a part of the available reserve
 		availableReserveSum := sdk.NewCoins()
+		defer iterator.Close()
 		for ; iterator.Valid(); iterator.Next() {
 			bond := k.MustGetBondByKey(ctx, iterator.Key())
 			availableReserveSum = availableReserveSum.Add(bond.AvailableReserve...)

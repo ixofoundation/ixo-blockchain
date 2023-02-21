@@ -292,15 +292,41 @@
     - [Token](#ixo.token.v1beta1.Token)
     - [TokenData](#ixo.token.v1beta1.TokenData)
     - [TokenProperties](#ixo.token.v1beta1.TokenProperties)
+    - [TokensCancelled](#ixo.token.v1beta1.TokensCancelled)
+    - [TokensRetired](#ixo.token.v1beta1.TokensRetired)
   
 - [ixo/token/v1beta1/authz.proto](#ixo/token/v1beta1/authz.proto)
     - [MintAuthorization](#ixo.token.v1beta1.MintAuthorization)
     - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
   
+- [ixo/token/v1beta1/tx.proto](#ixo/token/v1beta1/tx.proto)
+    - [MintBatch](#ixo.token.v1beta1.MintBatch)
+    - [MsgCancelToken](#ixo.token.v1beta1.MsgCancelToken)
+    - [MsgCancelTokenResponse](#ixo.token.v1beta1.MsgCancelTokenResponse)
+    - [MsgCreateToken](#ixo.token.v1beta1.MsgCreateToken)
+    - [MsgCreateTokenResponse](#ixo.token.v1beta1.MsgCreateTokenResponse)
+    - [MsgMintToken](#ixo.token.v1beta1.MsgMintToken)
+    - [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse)
+    - [MsgPauseToken](#ixo.token.v1beta1.MsgPauseToken)
+    - [MsgPauseTokenResponse](#ixo.token.v1beta1.MsgPauseTokenResponse)
+    - [MsgRetireToken](#ixo.token.v1beta1.MsgRetireToken)
+    - [MsgRetireTokenResponse](#ixo.token.v1beta1.MsgRetireTokenResponse)
+    - [MsgStopToken](#ixo.token.v1beta1.MsgStopToken)
+    - [MsgStopTokenResponse](#ixo.token.v1beta1.MsgStopTokenResponse)
+    - [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken)
+    - [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse)
+    - [TokenBatch](#ixo.token.v1beta1.TokenBatch)
+  
+    - [Msg](#ixo.token.v1beta1.Msg)
+  
 - [ixo/token/v1beta1/event.proto](#ixo/token/v1beta1/event.proto)
+    - [TokenCancelledEvent](#ixo.token.v1beta1.TokenCancelledEvent)
     - [TokenCreatedEvent](#ixo.token.v1beta1.TokenCreatedEvent)
-    - [TokenMintedBatch](#ixo.token.v1beta1.TokenMintedBatch)
     - [TokenMintedEvent](#ixo.token.v1beta1.TokenMintedEvent)
+    - [TokenPausedEvent](#ixo.token.v1beta1.TokenPausedEvent)
+    - [TokenRetiredEvent](#ixo.token.v1beta1.TokenRetiredEvent)
+    - [TokenStoppedEvent](#ixo.token.v1beta1.TokenStoppedEvent)
+    - [TokenTransferredEvent](#ixo.token.v1beta1.TokenTransferredEvent)
     - [TokenUpdatedEvent](#ixo.token.v1beta1.TokenUpdatedEvent)
   
 - [ixo/token/v1beta1/genesis.proto](#ixo/token/v1beta1/genesis.proto)
@@ -310,26 +336,15 @@
     - [SetTokenContractCodes](#ixo.token.v1beta1.SetTokenContractCodes)
   
 - [ixo/token/v1beta1/query.proto](#ixo/token/v1beta1/query.proto)
-    - [QueryTokenConfigRequest](#ixo.token.v1beta1.QueryTokenConfigRequest)
-    - [QueryTokenConfigResponse](#ixo.token.v1beta1.QueryTokenConfigResponse)
-    - [QueryTokenConfigResponse.MapEntry](#ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry)
     - [QueryTokenDocRequest](#ixo.token.v1beta1.QueryTokenDocRequest)
     - [QueryTokenDocResponse](#ixo.token.v1beta1.QueryTokenDocResponse)
     - [QueryTokenListRequest](#ixo.token.v1beta1.QueryTokenListRequest)
     - [QueryTokenListResponse](#ixo.token.v1beta1.QueryTokenListResponse)
+    - [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest)
+    - [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse)
+    - [TokenMetadataProperties](#ixo.token.v1beta1.TokenMetadataProperties)
   
     - [Query](#ixo.token.v1beta1.Query)
-  
-- [ixo/token/v1beta1/tx.proto](#ixo/token/v1beta1/tx.proto)
-    - [MintBatch](#ixo.token.v1beta1.MintBatch)
-    - [MsgCreateToken](#ixo.token.v1beta1.MsgCreateToken)
-    - [MsgCreateTokenResponse](#ixo.token.v1beta1.MsgCreateTokenResponse)
-    - [MsgMintToken](#ixo.token.v1beta1.MsgMintToken)
-    - [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse)
-    - [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken)
-    - [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse)
-  
-    - [Msg](#ixo.token.v1beta1.Msg)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -4351,9 +4366,8 @@ Msg defines the project Msg service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
-| minter_address | [string](#string) |  |  |
-| contract_address | [string](#string) |  | Generated on token intiation through MsgSetupMinter |
+| minter | [string](#string) |  | address of minter |
+| contract_address | [string](#string) |  | generated on token intiation through MsgSetupMinter |
 | class | [string](#string) |  | class is the token protocol entity DID (validated) |
 | name | [string](#string) |  | name is the token name, which must be unique (namespace) |
 | description | [string](#string) |  | description is any arbitrary description |
@@ -4362,7 +4376,9 @@ Msg defines the project Msg service.
 | cap | [string](#string) |  | cap is the maximum number of tokens with this name that can be minted, 0 is unlimited |
 | supply | [string](#string) |  | how much has already been minted for this Token type, aka the supply |
 | paused | [bool](#bool) |  | stop allowance of token minter temporarily |
-| deactivated | [bool](#bool) |  | stop allowance of token minter permanently |
+| stopped | [bool](#bool) |  | stop allowance of token minter permanently |
+| retired | [TokensRetired](#ixo.token.v1beta1.TokensRetired) | repeated | tokens that has been retired for this Token with specific name and contract address |
+| cancelled | [TokensCancelled](#ixo.token.v1beta1.TokensCancelled) | repeated | tokens that has been cancelled for this Token with specific name and contract address |
 
 
 
@@ -4399,8 +4415,46 @@ credential link ***.ipfs |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  |  |
 | index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| name | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
 | collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
 | tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokensCancelled"></a>
+
+### TokensCancelled
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| reason | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| owner | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokensRetired"></a>
+
+### TokensRetired
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| reason | [string](#string) |  |  |
+| jurisdiction | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| owner | [string](#string) |  |  |
 
 
 
@@ -4431,7 +4485,7 @@ credential link ***.ipfs |
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
+| minter | [string](#string) |  | address of minter |
 | constraints | [MintConstraints](#ixo.token.v1beta1.MintConstraints) | repeated |  |
 
 
@@ -4468,10 +4522,287 @@ credential link ***.ipfs |
 
 
 
+<a name="ixo/token/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/token/v1beta1/tx.proto
+
+
+
+<a name="ixo.token.v1beta1.MintBatch"></a>
+
+### MintBatch
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
+| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| amount | [string](#string) |  | amount is the number of tokens to mint |
+| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
+| token_data | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgCancelToken"></a>
+
+### MsgCancelToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | address of owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated | tokens to retire, all tokens must be in same smart contract |
+| reason | [string](#string) |  | reason is any arbitrary string that specifies the reason for retiring tokens. |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgCancelTokenResponse"></a>
+
+### MsgCancelTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgCreateToken"></a>
+
+### MsgCreateToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| class | [string](#string) |  | class is the token protocol entity DID (validated) |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace) |
+| description | [string](#string) |  | description is any arbitrary description |
+| image | [string](#string) |  | image is the image url for the token |
+| token_type | [string](#string) |  | type is the token type (eg ixo1155) |
+| cap | [string](#string) |  | cap is the maximum number of tokens with this name that can be minted, 0 is unlimited |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgCreateTokenResponse"></a>
+
+### MsgCreateTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgMintToken"></a>
+
+### MsgMintToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| contract_address | [string](#string) |  |  |
+| owner | [string](#string) |  | address of owner to mint for |
+| mint_batch | [MintBatch](#ixo.token.v1beta1.MintBatch) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgMintTokenResponse"></a>
+
+### MsgMintTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgPauseToken"></a>
+
+### MsgPauseToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| contract_address | [string](#string) |  |  |
+| paused | [bool](#bool) |  | pause or unpause Token Minting allowance |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgPauseTokenResponse"></a>
+
+### MsgPauseTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgRetireToken"></a>
+
+### MsgRetireToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | address of owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated | tokens to retire, all tokens must be in same smart contract |
+| jurisdiction | [string](#string) |  | jurisdiction is the jurisdiction of the token owner. A jurisdiction has the format: &lt;country-code&gt;[-&lt;sub-national-code&gt;[ &lt;postal-code&gt;]] The country-code must be 2 alphabetic characters, the sub-national-code can be 1-3 alphanumeric characters, and the postal-code can be up to 64 alphanumeric characters. Only the country-code is required, while the sub-national-code and postal-code are optional and can be added for increased precision. See the valid format for this below. |
+| reason | [string](#string) |  | reason is any arbitrary string that specifies the reason for retiring tokens. |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgRetireTokenResponse"></a>
+
+### MsgRetireTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgStopToken"></a>
+
+### MsgStopToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| contract_address | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgStopTokenResponse"></a>
+
+### MsgStopTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgTransferToken"></a>
+
+### MsgTransferToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | address of owner |
+| recipient | [string](#string) |  | address of receiver |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated | all tokens must be in same smart contract |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgTransferTokenResponse"></a>
+
+### MsgTransferTokenResponse
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenBatch"></a>
+
+### TokenBatch
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | id that identifies the token |
+| amount | [string](#string) |  | amount is the number of tokens to transfer |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.token.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the project Msg service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| CreateToken | [MsgCreateToken](#ixo.token.v1beta1.MsgCreateToken) | [MsgCreateTokenResponse](#ixo.token.v1beta1.MsgCreateTokenResponse) |  |
+| MintToken | [MsgMintToken](#ixo.token.v1beta1.MsgMintToken) | [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse) |  |
+| TransferToken | [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken) | [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse) |  |
+| RetireToken | [MsgRetireToken](#ixo.token.v1beta1.MsgRetireToken) | [MsgRetireTokenResponse](#ixo.token.v1beta1.MsgRetireTokenResponse) |  |
+| CancelToken | [MsgCancelToken](#ixo.token.v1beta1.MsgCancelToken) | [MsgCancelTokenResponse](#ixo.token.v1beta1.MsgCancelTokenResponse) |  |
+| PauseToken | [MsgPauseToken](#ixo.token.v1beta1.MsgPauseToken) | [MsgPauseTokenResponse](#ixo.token.v1beta1.MsgPauseTokenResponse) |  |
+| StopToken | [MsgStopToken](#ixo.token.v1beta1.MsgStopToken) | [MsgStopTokenResponse](#ixo.token.v1beta1.MsgStopTokenResponse) |  |
+
+ 
+
+
+
 <a name="ixo/token/v1beta1/event.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/token/v1beta1/event.proto
+
+
+
+<a name="ixo.token.v1beta1.TokenCancelledEvent"></a>
+
+### TokenCancelledEvent
+TokenCancelledEvent is an event triggered on a Token cancel execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | the token owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
+
+
+
 
 
 
@@ -4491,22 +4822,6 @@ TokenCreatedEvent is an event triggered on a Token creation
 
 
 
-<a name="ixo.token.v1beta1.TokenMintedBatch"></a>
-
-### TokenMintedBatch
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | id of token(s) minted |
-| amount | [string](#string) |  | amount of tokens minted |
-
-
-
-
-
-
 <a name="ixo.token.v1beta1.TokenMintedEvent"></a>
 
 ### TokenMintedEvent
@@ -4518,7 +4833,74 @@ TokenMintedEvent is an event triggered on a Token mint execution
 | contract_address | [string](#string) |  | the contract address of token contract being initialized |
 | minter | [string](#string) |  | the token minter |
 | owner | [string](#string) |  | the new tokens owner |
-| batches | [TokenMintedBatch](#ixo.token.v1beta1.TokenMintedBatch) | repeated |  |
+| batches | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenPausedEvent"></a>
+
+### TokenPausedEvent
+TokenPausedEvent is an event triggered on a Token pause/unpause execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | the minter address |
+| contract_address | [string](#string) |  |  |
+| paused | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenRetiredEvent"></a>
+
+### TokenRetiredEvent
+TokenRetiredEvent is an event triggered on a Token retire execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | the token owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenStoppedEvent"></a>
+
+### TokenStoppedEvent
+TokenStoppedEvent is an event triggered on a Token stopped execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | the minter address |
+| contract_address | [string](#string) |  |  |
+| stopped | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenTransferredEvent"></a>
+
+### TokenTransferredEvent
+TokenTransferedEvent is an event triggered on a Token transfer execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | the old token owner |
+| recipient | [string](#string) |  | the new tokens owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
 
 
 
@@ -4534,7 +4916,7 @@ TokenUpdatedEvent is an event triggered on a Token update
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | contract_address | [string](#string) |  | contract_address of token updated |
-| signer | [string](#string) |  | the signer account of the change |
+| owner | [string](#string) |  | the owner account of the change |
 
 
 
@@ -4621,58 +5003,15 @@ GenesisState defines the module&#39;s genesis state.
 
 
 
-<a name="ixo.token.v1beta1.QueryTokenConfigRequest"></a>
-
-### QueryTokenConfigRequest
-
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.QueryTokenConfigResponse"></a>
-
-### QueryTokenConfigResponse
-QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
-method.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| map | [QueryTokenConfigResponse.MapEntry](#ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry"></a>
-
-### QueryTokenConfigResponse.MapEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="ixo.token.v1beta1.QueryTokenDocRequest"></a>
 
 ### QueryTokenDocRequest
-QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC
-method.
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
+| minter | [string](#string) |  | minter address to get Token Doc for |
 | contract_address | [string](#string) |  |  |
 
 
@@ -4683,8 +5022,12 @@ method.
 <a name="ixo.token.v1beta1.QueryTokenDocResponse"></a>
 
 ### QueryTokenDocResponse
-QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
-method.
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tokenDoc | [Token](#ixo.token.v1beta1.Token) |  |  |
 
 
 
@@ -4699,7 +5042,8 @@ method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+| minter | [string](#string) |  | minter address to get list for |
 
 
 
@@ -4709,13 +5053,66 @@ method.
 <a name="ixo.token.v1beta1.QueryTokenListResponse"></a>
 
 ### QueryTokenListResponse
-QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC
-method.
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| contracts | [Token](#ixo.token.v1beta1.Token) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+| tokenDocs | [Token](#ixo.token.v1beta1.Token) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.QueryTokenMetadataRequest"></a>
+
+### QueryTokenMetadataRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.QueryTokenMetadataResponse"></a>
+
+### QueryTokenMetadataResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| decimals | [string](#string) |  |  |
+| image | [string](#string) |  |  |
+| index | [string](#string) |  |  |
+| properties | [TokenMetadataProperties](#ixo.token.v1beta1.TokenMetadataProperties) |  |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.TokenMetadataProperties"></a>
+
+### TokenMetadataProperties
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| class | [string](#string) |  |  |
+| collection | [string](#string) |  |  |
+| cap | [string](#string) |  |  |
+| linkedResources | [TokenData](#ixo.token.v1beta1.TokenData) | repeated |  |
 
 
 
@@ -4737,143 +5134,7 @@ Query defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------|
 | TokenList | [QueryTokenListRequest](#ixo.token.v1beta1.QueryTokenListRequest) | [QueryTokenListResponse](#ixo.token.v1beta1.QueryTokenListResponse) |  |
 | TokenDoc | [QueryTokenDocRequest](#ixo.token.v1beta1.QueryTokenDocRequest) | [QueryTokenDocResponse](#ixo.token.v1beta1.QueryTokenDocResponse) |  |
-| TokenConfig | [QueryTokenConfigRequest](#ixo.token.v1beta1.QueryTokenConfigRequest) | [QueryTokenConfigResponse](#ixo.token.v1beta1.QueryTokenConfigResponse) |  |
-
- 
-
-
-
-<a name="ixo/token/v1beta1/tx.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/token/v1beta1/tx.proto
-
-
-
-<a name="ixo.token.v1beta1.MintBatch"></a>
-
-### MintBatch
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
-| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
-| amount | [string](#string) |  | amount is the number of tokens to mint |
-| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
-| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgCreateToken"></a>
-
-### MsgCreateToken
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
-| minter_address | [string](#string) |  |  |
-| class | [string](#string) |  | class is the token protocol entity DID (validated) |
-| name | [string](#string) |  | name is the token name, which must be unique (namespace) |
-| description | [string](#string) |  | description is any arbitrary description |
-| image | [string](#string) |  | image is the image url for the token |
-| token_type | [string](#string) |  | type is the token type (eg ixo1155) |
-| cap | [string](#string) |  | cap is the maximum number of tokens with this name that can be minted, 0 is unlimited |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgCreateTokenResponse"></a>
-
-### MsgCreateTokenResponse
-
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgMintToken"></a>
-
-### MsgMintToken
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| minter_did | [string](#string) |  |  |
-| minter_address | [string](#string) |  |  |
-| contract_address | [string](#string) |  |  |
-| owner_did | [string](#string) |  |  |
-| mintBatch | [MintBatch](#ixo.token.v1beta1.MintBatch) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgMintTokenResponse"></a>
-
-### MsgMintTokenResponse
-
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgTransferToken"></a>
-
-### MsgTransferToken
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| token_did | [string](#string) |  |  |
-| owner_did | [string](#string) |  | The ownersdid used to sign this transaction. |
-| owner_address | [string](#string) |  | The owners address used to sign this transaction. |
-| recipient_did | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MsgTransferTokenResponse"></a>
-
-### MsgTransferTokenResponse
-
-
-
-
-
-
- 
-
- 
-
- 
-
-
-<a name="ixo.token.v1beta1.Msg"></a>
-
-### Msg
-Msg defines the project Msg service.
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| CreateToken | [MsgCreateToken](#ixo.token.v1beta1.MsgCreateToken) | [MsgCreateTokenResponse](#ixo.token.v1beta1.MsgCreateTokenResponse) |  |
-| MintToken | [MsgMintToken](#ixo.token.v1beta1.MsgMintToken) | [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse) |  |
-| TransferToken | [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken) | [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse) |  |
+| TokenMetadata | [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest) | [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse) |  |
 
  
 

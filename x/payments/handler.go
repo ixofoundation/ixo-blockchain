@@ -12,6 +12,7 @@ import (
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 
 	iterator := keeper.GetSubscriptionIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		subscription := keeper.MustGetSubscriptionByKey(ctx, iterator.Key())
 

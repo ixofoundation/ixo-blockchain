@@ -134,6 +134,7 @@ func (k Keeper) GetPaymentContractsByPrefix(ctx sdk.Context, contractIdPrefix st
 	iterator := sdk.KVStorePrefixIterator(store, key)
 
 	var contracts []types.PaymentContract
+	iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		contract := k.MustGetPaymentContractByKey(ctx, iterator.Key())
 		contracts = append(contracts, contract)

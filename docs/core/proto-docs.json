@@ -10830,20 +10830,8 @@
           "extensions": [],
           "fields": [
             {
-              "name": "minter_did",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "minter_address",
-              "description": "",
+              "name": "minter",
+              "description": "address of minter",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -10855,7 +10843,7 @@
             },
             {
               "name": "contract_address",
-              "description": "Generated on token intiation through MsgSetupMinter",
+              "description": "generated on token intiation through MsgSetupMinter",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -10962,12 +10950,36 @@
               "defaultValue": ""
             },
             {
-              "name": "deactivated",
+              "name": "stopped",
               "description": "stop allowance of token minter permanently",
               "label": "",
               "type": "bool",
               "longType": "bool",
               "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "retired",
+              "description": "tokens that has been retired for this Token with specific name and contract\naddress",
+              "label": "repeated",
+              "type": "TokensRetired",
+              "longType": "TokensRetired",
+              "fullType": "ixo.token.v1beta1.TokensRetired",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cancelled",
+              "description": "tokens that has been cancelled for this Token with specific name and\ncontract address",
+              "label": "repeated",
+              "type": "TokensCancelled",
+              "longType": "TokensCancelled",
+              "fullType": "ixo.token.v1beta1.TokensCancelled",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -11070,6 +11082,18 @@
               "defaultValue": ""
             },
             {
+              "name": "name",
+              "description": "index is the unique identifier hexstring that identifies the token",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "collection",
               "description": "did of collection (eg Supamoto Malawi)",
               "label": "",
@@ -11088,6 +11112,138 @@
               "type": "TokenData",
               "longType": "TokenData",
               "fullType": "ixo.token.v1beta1.TokenData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokensCancelled",
+          "longName": "TokensCancelled",
+          "fullName": "ixo.token.v1beta1.TokensCancelled",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokensRetired",
+          "longName": "TokensRetired",
+          "fullName": "ixo.token.v1beta1.TokensRetired",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "jurisdiction",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -11120,8 +11276,8 @@
           "extensions": [],
           "fields": [
             {
-              "name": "minter_did",
-              "description": "",
+              "name": "minter",
+              "description": "address of minter",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -11233,6 +11389,694 @@
       "services": []
     },
     {
+      "name": "ixo/token/v1beta1/tx.proto",
+      "description": "",
+      "package": "ixo.token.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MintBatch",
+          "longName": "MintBatch",
+          "fullName": "ixo.token.v1beta1.MintBatch",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "name is the token name, which must be unique (namespace), will be verified\nagainst Token name provided on msgCreateToken",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "index",
+              "description": "index is the unique identifier hexstring that identifies the token",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "amount is the number of tokens to mint",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection",
+              "description": "did of collection (eg Supamoto Malawi)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token_data",
+              "description": "tokenData is the linkedResources added to tokenMetadata when queried eg\n(credential link ***.ipfs)",
+              "label": "repeated",
+              "type": "TokenData",
+              "longType": "TokenData",
+              "fullType": "ixo.token.v1beta1.TokenData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCancelToken",
+          "longName": "MsgCancelToken",
+          "fullName": "ixo.token.v1beta1.MsgCancelToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "address of owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "tokens to retire, all tokens must be in same smart contract",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "reason is any arbitrary string that specifies the reason for retiring\ntokens.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCancelTokenResponse",
+          "longName": "MsgCancelTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgCancelTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgCreateToken",
+          "longName": "MsgCreateToken",
+          "fullName": "ixo.token.v1beta1.MsgCreateToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "class",
+              "description": "class is the token protocol entity DID (validated)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "name is the token name, which must be unique (namespace)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "description",
+              "description": "description is any arbitrary description",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "image",
+              "description": "image is the image url for the token",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token_type",
+              "description": "type is the token type (eg ixo1155)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cap",
+              "description": "cap is the maximum number of tokens with this name that can be minted, 0 is\nunlimited",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreateTokenResponse",
+          "longName": "MsgCreateTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgCreateTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgMintToken",
+          "longName": "MsgMintToken",
+          "fullName": "ixo.token.v1beta1.MsgMintToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner",
+              "description": "address of owner to mint for",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "mint_batch",
+              "description": "",
+              "label": "repeated",
+              "type": "MintBatch",
+              "longType": "MintBatch",
+              "fullType": "ixo.token.v1beta1.MintBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgMintTokenResponse",
+          "longName": "MsgMintTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgMintTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgPauseToken",
+          "longName": "MsgPauseToken",
+          "fullName": "ixo.token.v1beta1.MsgPauseToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "paused",
+              "description": "pause or unpause Token Minting allowance",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgPauseTokenResponse",
+          "longName": "MsgPauseTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgPauseTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgRetireToken",
+          "longName": "MsgRetireToken",
+          "fullName": "ixo.token.v1beta1.MsgRetireToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "address of owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "tokens to retire, all tokens must be in same smart contract",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "jurisdiction",
+              "description": "jurisdiction is the jurisdiction of the token owner. A jurisdiction has\nthe format: \u003ccountry-code\u003e[-\u003csub-national-code\u003e[ \u003cpostal-code\u003e]]\nThe country-code must be 2 alphabetic characters, the sub-national-code\ncan be 1-3 alphanumeric characters, and the postal-code can be up to 64\nalphanumeric characters. Only the country-code is required, while the\nsub-national-code and postal-code are optional and can be added for\nincreased precision. See the valid format for this below.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "reason is any arbitrary string that specifies the reason for retiring\ntokens.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRetireTokenResponse",
+          "longName": "MsgRetireTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgRetireTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgStopToken",
+          "longName": "MsgStopToken",
+          "fullName": "ixo.token.v1beta1.MsgStopToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgStopTokenResponse",
+          "longName": "MsgStopTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgStopTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgTransferToken",
+          "longName": "MsgTransferToken",
+          "fullName": "ixo.token.v1beta1.MsgTransferToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "address of owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "recipient",
+              "description": "address of receiver",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "all tokens must be in same smart contract",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgTransferTokenResponse",
+          "longName": "MsgTransferTokenResponse",
+          "fullName": "ixo.token.v1beta1.MsgTransferTokenResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "TokenBatch",
+          "longName": "TokenBatch",
+          "fullName": "ixo.token.v1beta1.TokenBatch",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "id that identifies the token",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "amount is the number of tokens to transfer",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Msg",
+          "longName": "Msg",
+          "fullName": "ixo.token.v1beta1.Msg",
+          "description": "Msg defines the project Msg service.",
+          "methods": [
+            {
+              "name": "CreateToken",
+              "description": "",
+              "requestType": "MsgCreateToken",
+              "requestLongType": "MsgCreateToken",
+              "requestFullType": "ixo.token.v1beta1.MsgCreateToken",
+              "requestStreaming": false,
+              "responseType": "MsgCreateTokenResponse",
+              "responseLongType": "MsgCreateTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgCreateTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "MintToken",
+              "description": "",
+              "requestType": "MsgMintToken",
+              "requestLongType": "MsgMintToken",
+              "requestFullType": "ixo.token.v1beta1.MsgMintToken",
+              "requestStreaming": false,
+              "responseType": "MsgMintTokenResponse",
+              "responseLongType": "MsgMintTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgMintTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "TransferToken",
+              "description": "",
+              "requestType": "MsgTransferToken",
+              "requestLongType": "MsgTransferToken",
+              "requestFullType": "ixo.token.v1beta1.MsgTransferToken",
+              "requestStreaming": false,
+              "responseType": "MsgTransferTokenResponse",
+              "responseLongType": "MsgTransferTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgTransferTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "RetireToken",
+              "description": "",
+              "requestType": "MsgRetireToken",
+              "requestLongType": "MsgRetireToken",
+              "requestFullType": "ixo.token.v1beta1.MsgRetireToken",
+              "requestStreaming": false,
+              "responseType": "MsgRetireTokenResponse",
+              "responseLongType": "MsgRetireTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgRetireTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "CancelToken",
+              "description": "",
+              "requestType": "MsgCancelToken",
+              "requestLongType": "MsgCancelToken",
+              "requestFullType": "ixo.token.v1beta1.MsgCancelToken",
+              "requestStreaming": false,
+              "responseType": "MsgCancelTokenResponse",
+              "responseLongType": "MsgCancelTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgCancelTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "PauseToken",
+              "description": "",
+              "requestType": "MsgPauseToken",
+              "requestLongType": "MsgPauseToken",
+              "requestFullType": "ixo.token.v1beta1.MsgPauseToken",
+              "requestStreaming": false,
+              "responseType": "MsgPauseTokenResponse",
+              "responseLongType": "MsgPauseTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgPauseTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "StopToken",
+              "description": "",
+              "requestType": "MsgStopToken",
+              "requestLongType": "MsgStopToken",
+              "requestFullType": "ixo.token.v1beta1.MsgStopToken",
+              "requestStreaming": false,
+              "responseType": "MsgStopTokenResponse",
+              "responseLongType": "MsgStopTokenResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgStopTokenResponse",
+              "responseStreaming": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "ixo/token/v1beta1/event.proto",
       "description": "",
       "package": "ixo.token.v1beta1",
@@ -11243,6 +12087,42 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "TokenCancelledEvent",
+          "longName": "TokenCancelledEvent",
+          "fullName": "ixo.token.v1beta1.TokenCancelledEvent",
+          "description": "TokenCancelledEvent is an event triggered on a Token cancel execution",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "the token owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "TokenCreatedEvent",
           "longName": "TokenCreatedEvent",
@@ -11268,42 +12148,6 @@
             {
               "name": "minter",
               "description": "the token minter",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "TokenMintedBatch",
-          "longName": "TokenMintedBatch",
-          "fullName": "ixo.token.v1beta1.TokenMintedBatch",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "id",
-              "description": "id of token(s) minted",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "amount",
-              "description": "amount of tokens minted",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -11365,9 +12209,189 @@
               "name": "batches",
               "description": "",
               "label": "repeated",
-              "type": "TokenMintedBatch",
-              "longType": "TokenMintedBatch",
-              "fullType": "ixo.token.v1beta1.TokenMintedBatch",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokenPausedEvent",
+          "longName": "TokenPausedEvent",
+          "fullName": "ixo.token.v1beta1.TokenPausedEvent",
+          "description": "TokenPausedEvent is an event triggered on a Token pause/unpause execution",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "the minter address",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "paused",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokenRetiredEvent",
+          "longName": "TokenRetiredEvent",
+          "fullName": "ixo.token.v1beta1.TokenRetiredEvent",
+          "description": "TokenRetiredEvent is an event triggered on a Token retire execution",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "the token owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokenStoppedEvent",
+          "longName": "TokenStoppedEvent",
+          "fullName": "ixo.token.v1beta1.TokenStoppedEvent",
+          "description": "TokenStoppedEvent is an event triggered on a Token stopped execution",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "the minter address",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "stopped",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokenTransferredEvent",
+          "longName": "TokenTransferredEvent",
+          "fullName": "ixo.token.v1beta1.TokenTransferredEvent",
+          "description": "TokenTransferedEvent is an event triggered on a Token transfer execution",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "the old token owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "recipient",
+              "description": "the new tokens owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -11398,8 +12422,8 @@
               "defaultValue": ""
             },
             {
-              "name": "signer",
-              "description": "the signer account of the change",
+              "name": "owner",
+              "description": "the owner account of the change",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -11526,89 +12550,18 @@
       "extensions": [],
       "messages": [
         {
-          "name": "QueryTokenConfigRequest",
-          "longName": "QueryTokenConfigRequest",
-          "fullName": "ixo.token.v1beta1.QueryTokenConfigRequest",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": false,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": []
-        },
-        {
-          "name": "QueryTokenConfigResponse",
-          "longName": "QueryTokenConfigResponse",
-          "fullName": "ixo.token.v1beta1.QueryTokenConfigResponse",
-          "description": "QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC\nmethod.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "map",
-              "description": "",
-              "label": "repeated",
-              "type": "MapEntry",
-              "longType": "QueryTokenConfigResponse.MapEntry",
-              "fullType": "ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry",
-              "ismap": true,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MapEntry",
-          "longName": "QueryTokenConfigResponse.MapEntry",
-          "fullName": "ixo.token.v1beta1.QueryTokenConfigResponse.MapEntry",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "key",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "value",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "QueryTokenDocRequest",
           "longName": "QueryTokenDocRequest",
           "fullName": "ixo.token.v1beta1.QueryTokenDocRequest",
-          "description": "QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC\nmethod.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
             {
-              "name": "minter_did",
-              "description": "",
+              "name": "minter",
+              "description": "minter address to get Token Doc for",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -11636,12 +12589,25 @@
           "name": "QueryTokenDocResponse",
           "longName": "QueryTokenDocResponse",
           "fullName": "ixo.token.v1beta1.QueryTokenDocResponse",
-          "description": "QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC\nmethod.",
+          "description": "",
           "hasExtensions": false,
-          "hasFields": false,
+          "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
-          "fields": []
+          "fields": [
+            {
+              "name": "tokenDoc",
+              "description": "",
+              "label": "",
+              "type": "Token",
+              "longType": "Token",
+              "fullType": "ixo.token.v1beta1.Token",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         },
         {
           "name": "QueryTokenListRequest",
@@ -11654,8 +12620,20 @@
           "extensions": [],
           "fields": [
             {
-              "name": "minter_did",
+              "name": "pagination",
               "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "minter",
+              "description": "minter address to get list for",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -11671,19 +12649,199 @@
           "name": "QueryTokenListResponse",
           "longName": "QueryTokenListResponse",
           "fullName": "ixo.token.v1beta1.QueryTokenListResponse",
-          "description": "QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC\nmethod.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
             {
-              "name": "contracts",
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokenDocs",
               "description": "",
               "label": "repeated",
               "type": "Token",
               "longType": "Token",
               "fullType": "ixo.token.v1beta1.Token",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryTokenMetadataRequest",
+          "longName": "QueryTokenMetadataRequest",
+          "fullName": "ixo.token.v1beta1.QueryTokenMetadataRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryTokenMetadataResponse",
+          "longName": "QueryTokenMetadataResponse",
+          "fullName": "ixo.token.v1beta1.QueryTokenMetadataResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "decimals",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "image",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "index",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "properties",
+              "description": "",
+              "label": "",
+              "type": "TokenMetadataProperties",
+              "longType": "TokenMetadataProperties",
+              "fullType": "ixo.token.v1beta1.TokenMetadataProperties",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TokenMetadataProperties",
+          "longName": "TokenMetadataProperties",
+          "fullName": "ixo.token.v1beta1.TokenMetadataProperties",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "class",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cap",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "linkedResources",
+              "description": "",
+              "label": "repeated",
+              "type": "TokenData",
+              "longType": "TokenData",
+              "fullType": "ixo.token.v1beta1.TokenData",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -11715,7 +12873,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/{minter_did}"
+                      "pattern": "/ixo/token/{minter}"
                     }
                   ]
                 }
@@ -11737,437 +12895,33 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/{minter_did}/{contract_address}"
+                      "pattern": "/ixo/token/{minter}/{contract_address}"
                     }
                   ]
                 }
               }
             },
             {
-              "name": "TokenConfig",
+              "name": "TokenMetadata",
               "description": "",
-              "requestType": "QueryTokenConfigRequest",
-              "requestLongType": "QueryTokenConfigRequest",
-              "requestFullType": "ixo.token.v1beta1.QueryTokenConfigRequest",
+              "requestType": "QueryTokenMetadataRequest",
+              "requestLongType": "QueryTokenMetadataRequest",
+              "requestFullType": "ixo.token.v1beta1.QueryTokenMetadataRequest",
               "requestStreaming": false,
-              "responseType": "QueryTokenConfigResponse",
-              "responseLongType": "QueryTokenConfigResponse",
-              "responseFullType": "ixo.token.v1beta1.QueryTokenConfigResponse",
+              "responseType": "QueryTokenMetadataResponse",
+              "responseLongType": "QueryTokenMetadataResponse",
+              "responseFullType": "ixo.token.v1beta1.QueryTokenMetadataResponse",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/config"
+                      "pattern": "/ixo/token/metadata/{id}"
                     }
                   ]
                 }
               }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ixo/token/v1beta1/tx.proto",
-      "description": "",
-      "package": "ixo.token.v1beta1",
-      "hasEnums": false,
-      "hasExtensions": false,
-      "hasMessages": true,
-      "hasServices": true,
-      "enums": [],
-      "extensions": [],
-      "messages": [
-        {
-          "name": "MintBatch",
-          "longName": "MintBatch",
-          "fullName": "ixo.token.v1beta1.MintBatch",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "name",
-              "description": "name is the token name, which must be unique (namespace), will be verified\nagainst Token name provided on msgCreateToken",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "index",
-              "description": "index is the unique identifier hexstring that identifies the token",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "amount",
-              "description": "amount is the number of tokens to mint",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "collection",
-              "description": "did of collection (eg Supamoto Malawi)",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "tokenData",
-              "description": "tokenData is the linkedResources added to tokenMetadata when queried eg\n(credential link ***.ipfs)",
-              "label": "repeated",
-              "type": "TokenData",
-              "longType": "TokenData",
-              "fullType": "ixo.token.v1beta1.TokenData",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MsgCreateToken",
-          "longName": "MsgCreateToken",
-          "fullName": "ixo.token.v1beta1.MsgCreateToken",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "minter_did",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "minter_address",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "class",
-              "description": "class is the token protocol entity DID (validated)",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "name",
-              "description": "name is the token name, which must be unique (namespace)",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "description",
-              "description": "description is any arbitrary description",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "image",
-              "description": "image is the image url for the token",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "token_type",
-              "description": "type is the token type (eg ixo1155)",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "cap",
-              "description": "cap is the maximum number of tokens with this name that can be minted, 0 is\nunlimited",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MsgCreateTokenResponse",
-          "longName": "MsgCreateTokenResponse",
-          "fullName": "ixo.token.v1beta1.MsgCreateTokenResponse",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": false,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": []
-        },
-        {
-          "name": "MsgMintToken",
-          "longName": "MsgMintToken",
-          "fullName": "ixo.token.v1beta1.MsgMintToken",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "minter_did",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "minter_address",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "contract_address",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "owner_did",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "mintBatch",
-              "description": "",
-              "label": "repeated",
-              "type": "MintBatch",
-              "longType": "MintBatch",
-              "fullType": "ixo.token.v1beta1.MintBatch",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MsgMintTokenResponse",
-          "longName": "MsgMintTokenResponse",
-          "fullName": "ixo.token.v1beta1.MsgMintTokenResponse",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": false,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": []
-        },
-        {
-          "name": "MsgTransferToken",
-          "longName": "MsgTransferToken",
-          "fullName": "ixo.token.v1beta1.MsgTransferToken",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "token_did",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "owner_did",
-              "description": "The ownersdid used to sign this transaction.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "owner_address",
-              "description": "The owners address used to sign this transaction.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "recipient_did",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MsgTransferTokenResponse",
-          "longName": "MsgTransferTokenResponse",
-          "fullName": "ixo.token.v1beta1.MsgTransferTokenResponse",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": false,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": []
-        }
-      ],
-      "services": [
-        {
-          "name": "Msg",
-          "longName": "Msg",
-          "fullName": "ixo.token.v1beta1.Msg",
-          "description": "Msg defines the project Msg service.",
-          "methods": [
-            {
-              "name": "CreateToken",
-              "description": "",
-              "requestType": "MsgCreateToken",
-              "requestLongType": "MsgCreateToken",
-              "requestFullType": "ixo.token.v1beta1.MsgCreateToken",
-              "requestStreaming": false,
-              "responseType": "MsgCreateTokenResponse",
-              "responseLongType": "MsgCreateTokenResponse",
-              "responseFullType": "ixo.token.v1beta1.MsgCreateTokenResponse",
-              "responseStreaming": false
-            },
-            {
-              "name": "MintToken",
-              "description": "",
-              "requestType": "MsgMintToken",
-              "requestLongType": "MsgMintToken",
-              "requestFullType": "ixo.token.v1beta1.MsgMintToken",
-              "requestStreaming": false,
-              "responseType": "MsgMintTokenResponse",
-              "responseLongType": "MsgMintTokenResponse",
-              "responseFullType": "ixo.token.v1beta1.MsgMintTokenResponse",
-              "responseStreaming": false
-            },
-            {
-              "name": "TransferToken",
-              "description": "",
-              "requestType": "MsgTransferToken",
-              "requestLongType": "MsgTransferToken",
-              "requestFullType": "ixo.token.v1beta1.MsgTransferToken",
-              "requestStreaming": false,
-              "responseType": "MsgTransferTokenResponse",
-              "responseLongType": "MsgTransferTokenResponse",
-              "responseFullType": "ixo.token.v1beta1.MsgTransferTokenResponse",
-              "responseStreaming": false
             }
           ]
         }

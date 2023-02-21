@@ -16,9 +16,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	dds := k.GetAllDidDocuments(ctx)
+	iidDocs := k.GetAllDidDocuments(ctx)
 
 	return &types.GenesisState{
-		IidDocs: dds,
+		IidDocs: iidDocs,
 	}
 }

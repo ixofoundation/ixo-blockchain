@@ -43,7 +43,7 @@ type WasmBatchSendFrom struct {
 // BatchSendFrom / BatchSendFrom is a base message to move multiple types of tokens in batch
 // / if `env.sender` is the owner or has sufficient pre-approval.
 type BatchSendFrom struct {
-	From string `json:"minter"`
+	From string `json:"from"`
 	/// if `to` is not contract `msg` should be `None`
 	To    string  `json:"to"`
 	Batch []Batch `json:"batch"`

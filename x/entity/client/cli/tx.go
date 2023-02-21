@@ -83,7 +83,7 @@ func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 
 func NewCmdCreateEntity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-entity [create-entity-doc]",
+		Use:   "create [create-entity-doc]",
 		Short: "Create a new Entity - flag is raw json with struct of MsgCreateEntity",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -122,7 +122,7 @@ func NewCmdCreateEntity() *cobra.Command {
 // When using this function it updates all fields, even if dopnt provide fields it will use the proto defaults
 func NewCmdUpdateEntity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-entity [update-entity-doc]",
+		Use:   "update [update-entity-doc]",
 		Short: "Update an Entity - flag is raw json with struct of MsgUpdateEntity",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -181,7 +181,7 @@ func NewCmdUpdateEntityVerified() *cobra.Command {
 
 func NewCmdTransferEntity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "transfer-entity [id] [owner-did] [recipient-did]",
+		Use:   "transfer [id] [owner-did] [recipient-did]",
 		Short: "Transfer an Entity",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
