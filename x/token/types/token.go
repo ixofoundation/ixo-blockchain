@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/ixo1155"
 )
 
@@ -26,12 +27,32 @@ func IsValidToken(token *Token) bool {
 	if token == nil {
 		return false
 	}
+	if iidtypes.IsEmpty(token.Name) {
+		return false
+	}
+	_, err := sdk.AccAddressFromBech32(token.ContractAddress)
+	if err != nil {
+		return false
+	}
+	_, err = sdk.AccAddressFromBech32(token.Minter)
+	if err != nil {
+		return false
+	}
+	if !iidtypes.IsValidDID(token.Class) {
+		return false
+	}
 	return true
 }
 
 // IsValidTokenProperties tells if a TokenProperties is valid,
 func IsValidTokenProperties(tokenProperties *TokenProperties) bool {
 	if tokenProperties == nil {
+		return false
+	}
+	if iidtypes.IsEmpty(tokenProperties.Id) {
+		return false
+	}
+	if iidtypes.IsEmpty(tokenProperties.Name) {
 		return false
 	}
 	return true
