@@ -95,4 +95,6 @@ message TokenData {
   bool encrypted = 2;
   string proof = 3;
   string type = 4;
+  // did of entity to map token to
+  string id = 5;
 }
