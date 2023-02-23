@@ -160,8 +160,6 @@
 - [ixo/entity/v1beta1/tx.proto](#ixo/entity/v1beta1/tx.proto)
     - [MsgCreateEntity](#ixo.entity.v1beta1.MsgCreateEntity)
     - [MsgCreateEntityResponse](#ixo.entity.v1beta1.MsgCreateEntityResponse)
-    - [MsgDeleteEntity](#ixo.entity.v1beta1.MsgDeleteEntity)
-    - [MsgDeleteEntityResponse](#ixo.entity.v1beta1.MsgDeleteEntityResponse)
     - [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity)
     - [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse)
     - [MsgUpdateEntity](#ixo.entity.v1beta1.MsgUpdateEntity)
@@ -2619,33 +2617,6 @@ Msg defines the identity Msg service.
 | entity_id | [string](#string) |  |  |
 | entity_type | [string](#string) |  |  |
 | entity_status | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="ixo.entity.v1beta1.MsgDeleteEntity"></a>
-
-### MsgDeleteEntity
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | Entity ID to be deleted. |
-| owner_did | [string](#string) |  | The owner_did used to sign this transaction. |
-| owner_address | [string](#string) |  | The owner&#39;s address |
-
-
-
-
-
-
-<a name="ixo.entity.v1beta1.MsgDeleteEntityResponse"></a>
-
-### MsgDeleteEntityResponse
-
 
 
 

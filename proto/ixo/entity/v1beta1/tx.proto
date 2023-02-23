@@ -141,19 +141,3 @@ message MsgTransferEntity {
 }
 
 message MsgTransferEntityResponse {}
-
-message MsgDeleteEntity {
-  option (gogoproto.goproto_getters) = false;
-  option (gogoproto.equal) = false;
-
-  // Entity ID to be deleted.
-  string id = 1;
-  // The owner_did used to sign this transaction.
-  string owner_did = 2
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
-  // The owner's address
-  string owner_address = 3;
-}
-
-message MsgDeleteEntityResponse {}

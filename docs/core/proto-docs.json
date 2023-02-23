@@ -6555,65 +6555,6 @@
           ]
         },
         {
-          "name": "MsgDeleteEntity",
-          "longName": "MsgDeleteEntity",
-          "fullName": "ixo.entity.v1beta1.MsgDeleteEntity",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "id",
-              "description": "Entity ID to be deleted.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "owner_did",
-              "description": "The owner_did used to sign this transaction.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "owner_address",
-              "description": "The owner's address",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MsgDeleteEntityResponse",
-          "longName": "MsgDeleteEntityResponse",
-          "fullName": "ixo.entity.v1beta1.MsgDeleteEntityResponse",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": false,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": []
-        },
-        {
           "name": "MsgTransferEntity",
           "longName": "MsgTransferEntity",
           "fullName": "ixo.entity.v1beta1.MsgTransferEntity",
