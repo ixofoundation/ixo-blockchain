@@ -73,15 +73,17 @@
   
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
-- [ixo/iid/v1beta1/iid.proto](#ixo/iid/v1beta1/iid.proto)
+- [ixo/iid/v1beta1/types.proto](#ixo/iid/v1beta1/types.proto)
     - [AccordedRight](#ixo.iid.v1beta1.AccordedRight)
-    - [Context](#ixo.iid.v1beta1.Context)
-    - [IidDocument](#ixo.iid.v1beta1.IidDocument)
     - [IidMetadata](#ixo.iid.v1beta1.IidMetadata)
     - [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity)
     - [LinkedResource](#ixo.iid.v1beta1.LinkedResource)
     - [Service](#ixo.iid.v1beta1.Service)
     - [VerificationMethod](#ixo.iid.v1beta1.VerificationMethod)
+  
+- [ixo/iid/v1beta1/iid.proto](#ixo/iid/v1beta1/iid.proto)
+    - [Context](#ixo.iid.v1beta1.Context)
+    - [IidDocument](#ixo.iid.v1beta1.IidDocument)
   
 - [ixo/entity/v1beta1/entity.proto](#ixo/entity/v1beta1/entity.proto)
     - [Entity](#ixo.entity.v1beta1.Entity)
@@ -158,6 +160,8 @@
 - [ixo/entity/v1beta1/tx.proto](#ixo/entity/v1beta1/tx.proto)
     - [MsgCreateEntity](#ixo.entity.v1beta1.MsgCreateEntity)
     - [MsgCreateEntityResponse](#ixo.entity.v1beta1.MsgCreateEntityResponse)
+    - [MsgDeleteEntity](#ixo.entity.v1beta1.MsgDeleteEntity)
+    - [MsgDeleteEntityResponse](#ixo.entity.v1beta1.MsgDeleteEntityResponse)
     - [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity)
     - [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse)
     - [MsgUpdateEntity](#ixo.entity.v1beta1.MsgUpdateEntity)
@@ -1408,10 +1412,10 @@ Msg defines the bonds Msg service.
 
 
 
-<a name="ixo/iid/v1beta1/iid.proto"></a>
+<a name="ixo/iid/v1beta1/types.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## ixo/iid/v1beta1/iid.proto
+## ixo/iid/v1beta1/types.proto
 
 
 
@@ -1434,55 +1438,10 @@ Msg defines the bonds Msg service.
 
 
 
-<a name="ixo.iid.v1beta1.Context"></a>
-
-### Context
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| val | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="ixo.iid.v1beta1.IidDocument"></a>
-
-### IidDocument
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| context | [Context](#ixo.iid.v1beta1.Context) | repeated | @context is spec for did document. |
-| id | [string](#string) |  | id represents the id for the did document. |
-| controller | [string](#string) | repeated | A DID controller is an entity that is authorized to make changes to a DID document. cfr. https://www.w3.org/TR/did-core/#did-controller |
-| verificationMethod | [VerificationMethod](#ixo.iid.v1beta1.VerificationMethod) | repeated | A DID document can express verification methods, such as cryptographic public keys, which can be used to authenticate or authorize interactions with the DID subject or associated parties. https://www.w3.org/TR/did-core/#verification-methods |
-| service | [Service](#ixo.iid.v1beta1.Service) | repeated | Services are used in DID documents to express ways of communicating with the DID subject or associated entities. https://www.w3.org/TR/did-core/#services |
-| authentication | [string](#string) | repeated | NOTE: below this line there are the relationships Authentication represents public key associated with the did document. cfr. https://www.w3.org/TR/did-core/#authentication |
-| assertionMethod | [string](#string) | repeated | Used to specify how the DID subject is expected to express claims, such as for the purposes of issuing a Verifiable Credential. cfr. https://www.w3.org/TR/did-core/#assertion |
-| keyAgreement | [string](#string) | repeated | used to specify how an entity can generate encryption material in order to transmit confidential information intended for the DID subject. https://www.w3.org/TR/did-core/#key-agreement |
-| capabilityInvocation | [string](#string) | repeated | Used to specify a verification method that might be used by the DID subject to invoke a cryptographic capability, such as the authorization to update the DID Document. https://www.w3.org/TR/did-core/#capability-invocation |
-| capabilityDelegation | [string](#string) | repeated | Used to specify a mechanism that might be used by the DID subject to delegate a cryptographic capability to another party. https://www.w3.org/TR/did-core/#capability-delegation |
-| linkedResource | [LinkedResource](#ixo.iid.v1beta1.LinkedResource) | repeated |  |
-| accordedRight | [AccordedRight](#ixo.iid.v1beta1.AccordedRight) | repeated |  |
-| linkedEntity | [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated |  |
-| alsoKnownAs | [string](#string) |  |  |
-| metadata | [IidMetadata](#ixo.iid.v1beta1.IidMetadata) |  | Metadata concerning the IidDocument such as versionId, created, updated and deactivated |
-
-
-
-
-
-
 <a name="ixo.iid.v1beta1.IidMetadata"></a>
 
 ### IidMetadata
-IidMetadata defines metadata associated to a Iid document
+
 
 
 | Field | Type | Label | Description |
@@ -1540,7 +1499,7 @@ IidMetadata defines metadata associated to a Iid document
 <a name="ixo.iid.v1beta1.Service"></a>
 
 ### Service
-Service defines how to find data associated with a identifer
+
 
 
 | Field | Type | Label | Description |
@@ -1569,6 +1528,67 @@ Service defines how to find data associated with a identifer
 | publicKeyHex | [string](#string) |  |  |
 | publicKeyMultibase | [string](#string) |  |  |
 | publicKeyBase58 | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/iid/v1beta1/iid.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/iid/v1beta1/iid.proto
+
+
+
+<a name="ixo.iid.v1beta1.Context"></a>
+
+### Context
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| val | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.iid.v1beta1.IidDocument"></a>
+
+### IidDocument
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| context | [Context](#ixo.iid.v1beta1.Context) | repeated | @context is spec for did document. |
+| id | [string](#string) |  | id represents the id for the did document. |
+| controller | [string](#string) | repeated | A DID controller is an entity that is authorized to make changes to a DID document. cfr. https://www.w3.org/TR/did-core/#did-controller |
+| verificationMethod | [VerificationMethod](#ixo.iid.v1beta1.VerificationMethod) | repeated | A DID document can express verification methods, such as cryptographic public keys, which can be used to authenticate or authorize interactions with the DID subject or associated parties. https://www.w3.org/TR/did-core/#verification-methods |
+| service | [Service](#ixo.iid.v1beta1.Service) | repeated | Services are used in DID documents to express ways of communicating with the DID subject or associated entities. https://www.w3.org/TR/did-core/#services |
+| authentication | [string](#string) | repeated | NOTE: below this line there are the relationships Authentication represents public key associated with the did document. cfr. https://www.w3.org/TR/did-core/#authentication |
+| assertionMethod | [string](#string) | repeated | Used to specify how the DID subject is expected to express claims, such as for the purposes of issuing a Verifiable Credential. cfr. https://www.w3.org/TR/did-core/#assertion |
+| keyAgreement | [string](#string) | repeated | used to specify how an entity can generate encryption material in order to transmit confidential information intended for the DID subject. https://www.w3.org/TR/did-core/#key-agreement |
+| capabilityInvocation | [string](#string) | repeated | Used to specify a verification method that might be used by the DID subject to invoke a cryptographic capability, such as the authorization to update the DID Document. https://www.w3.org/TR/did-core/#capability-invocation |
+| capabilityDelegation | [string](#string) | repeated | Used to specify a mechanism that might be used by the DID subject to delegate a cryptographic capability to another party. https://www.w3.org/TR/did-core/#capability-delegation |
+| linkedResource | [LinkedResource](#ixo.iid.v1beta1.LinkedResource) | repeated |  |
+| accordedRight | [AccordedRight](#ixo.iid.v1beta1.AccordedRight) | repeated |  |
+| linkedEntity | [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated |  |
+| alsoKnownAs | [string](#string) |  |  |
+| metadata | [IidMetadata](#ixo.iid.v1beta1.IidMetadata) |  | Metadata concerning the IidDocument such as versionId, created, updated and deactivated |
 
 
 
@@ -1672,8 +1692,8 @@ EntityCreatedEvent is an event triggered on a Entity creation
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | the id of entity being created |
-| owner | [string](#string) |  | the entity owner |
+| entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
+| owner | [string](#string) |  |  |
 
 
 
@@ -1688,8 +1708,8 @@ EntityTransferredEvent is an event triggered on a entity transfer
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | the id if entity being transferred |
-| owner | [string](#string) |  | the new owner of the entity |
+| entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
+| owner | [string](#string) |  |  |
 
 
 
@@ -1704,8 +1724,8 @@ EntityUpdatedEvent is an event triggered on a entity document update
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | the id being updated |
-| signer | [string](#string) |  | the signer account of the change |
+| entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
+| owner | [string](#string) |  |  |
 
 
 
@@ -1721,9 +1741,9 @@ document update
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | the id being updated |
-| signer | [string](#string) |  | the signer account of the change |
-| entity_verified | [bool](#bool) |  | whether entity is verified or not |
+| entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
+| owner | [string](#string) |  |  |
+| entity_verified | [bool](#bool) |  |  |
 
 
 
@@ -2605,6 +2625,33 @@ Msg defines the identity Msg service.
 
 
 
+<a name="ixo.entity.v1beta1.MsgDeleteEntity"></a>
+
+### MsgDeleteEntity
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | Entity ID to be deleted. |
+| owner_did | [string](#string) |  | The owner_did used to sign this transaction. |
+| owner_address | [string](#string) |  | The owner&#39;s address |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgDeleteEntityResponse"></a>
+
+### MsgDeleteEntityResponse
+
+
+
+
+
+
+
 <a name="ixo.entity.v1beta1.MsgTransferEntity"></a>
 
 ### MsgTransferEntity
@@ -2725,13 +2772,12 @@ Msg defines the project Msg service.
 <a name="ixo.iid.v1beta1.IidDocumentCreatedEvent"></a>
 
 ### IidDocumentCreatedEvent
-DidDocumentCreatedEvent is an event triggered on a DID document creation
+IidDocumentCreatedEvent is triggered when a new IidDocument is created.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  | the did being created |
-| signer | [string](#string) |  | the signer account creating the did |
+| iidDocument | [IidDocument](#ixo.iid.v1beta1.IidDocument) |  |  |
 
 
 
@@ -4399,6 +4445,7 @@ credential link ***.ipfs |
 | encrypted | [bool](#bool) |  |  |
 | proof | [string](#string) |  |  |
 | type | [string](#string) |  |  |
+| id | [string](#string) |  | did of entity to map token to |
 
 
 

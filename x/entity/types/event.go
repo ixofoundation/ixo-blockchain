@@ -1,34 +1,34 @@
 package types
 
 // Constructs a new entity_created sdk.Event
-func NewEntityCreatedEvent(id string, owner string) *EntityCreatedEvent {
+func NewEntityCreatedEvent(entity *Entity, owner string) *EntityCreatedEvent {
 	return &EntityCreatedEvent{
-		Id:    id,
-		Owner: owner,
+		Entity: entity,
+		Owner:  owner,
 	}
 }
 
 // Constructs a new entity_updated sdk.Event
-func NewEntityUpdatedEvent(id string, signer string) *EntityUpdatedEvent {
+func NewEntityUpdatedEvent(entity *Entity, owner string) *EntityUpdatedEvent {
 	return &EntityUpdatedEvent{
-		Id:    id,
-		Signer: signer,
+		Entity: entity,
+		Owner:  owner,
 	}
 }
 
 // Constructs a new entity_updated_verified sdk.Event
-func NewEntityVerifiedUpdatedEvent(id string, signer string, entity_verified bool) *EntityVerifiedUpdatedEvent {
+func NewEntityVerifiedUpdatedEvent(entity *Entity, owner string, entity_verified bool) *EntityVerifiedUpdatedEvent {
 	return &EntityVerifiedUpdatedEvent{
-		Id:    id,
-		Signer: signer,
+		Entity:         entity,
+		Owner:          owner,
 		EntityVerified: entity_verified,
 	}
 }
 
 // Constructs a new entity_transferred sdk.Event
-func NewEntityTransferredEvent(id string, owner string) *EntityTransferredEvent {
+func NewEntityTransferredEvent(entity *Entity, owner string) *EntityTransferredEvent {
 	return &EntityTransferredEvent{
-		Id:    id,
-		Owner: owner,
+		Entity: entity,
+		Owner:  owner,
 	}
 }

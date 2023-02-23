@@ -4,17 +4,15 @@ package ixo.iid.v1beta1;
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
 
 import "gogoproto/gogo.proto";
+import "ixo/iid/v1beta1/types.proto";
+import "ixo/iid/v1beta1/iid.proto";
 
-// DidDocumentCreatedEvent is an event triggered on a DID document creation
+// IidDocumentCreatedEvent is triggered when a new IidDocument is created.
 message IidDocumentCreatedEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  // the did being created
-  string did = 1;
-
-  // the signer account creating the did
-  string signer = 2;
+  IidDocument iidDocument = 1;
 }
 
 // DidDocumentUpdatedEvent is an event triggered on a DID document update

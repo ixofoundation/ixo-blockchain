@@ -50,7 +50,7 @@ func (k msgServer) CreateIidDocument(goCtx context.Context, msg *types.MsgCreate
 	k.Keeper.SetDidDocument(ctx, []byte(msg.Id), did)
 
 	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
+	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(&did)); err != nil {
 		return nil, err
 	}
 

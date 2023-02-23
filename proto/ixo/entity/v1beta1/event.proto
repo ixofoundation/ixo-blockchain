@@ -4,15 +4,14 @@ package ixo.entity.v1beta1;
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 import "gogoproto/gogo.proto";
+import "ixo/entity/v1beta1/entity.proto";
 
 // EntityCreatedEvent is an event triggered on a Entity creation
 message EntityCreatedEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  // the id of entity being created
-  string id = 1;
-  // the entity owner
+  Entity entity = 1;
   string owner = 2;
 }
 
@@ -21,10 +20,8 @@ message EntityUpdatedEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  // the id being updated
-  string id = 1;
-  // the signer account of the change
-  string signer = 2;
+  Entity entity = 1;
+  string owner = 2;
 }
 
 // EntityVerifiedUpdatedEvent is an event triggered on a entity verified
@@ -33,11 +30,8 @@ message EntityVerifiedUpdatedEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  // the id being updated
-  string id = 1;
-  // the signer account of the change
-  string signer = 2;
-  // whether entity is verified or not
+  Entity entity = 1;
+  string owner = 2;
   bool entity_verified = 3;
 }
 
@@ -46,8 +40,6 @@ message EntityTransferredEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  // the id if entity being transferred
-  string id = 1;
-  // the new owner of the entity
+  Entity entity = 1;
   string owner = 2;
 }

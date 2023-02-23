@@ -1,10 +1,9 @@
 package types
 
 // NewIidDocumentCreatedEvent constructs a new did_created sdk.Event
-func NewIidDocumentCreatedEvent(did, owner string) *IidDocumentCreatedEvent {
+func NewIidDocumentCreatedEvent(iidDocument *IidDocument) *IidDocumentCreatedEvent {
 	return &IidDocumentCreatedEvent{
-		Did:    did,
-		Signer: owner,
+		IidDocument: iidDocument,
 	}
 }
 

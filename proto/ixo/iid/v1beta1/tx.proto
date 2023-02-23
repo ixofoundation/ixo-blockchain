@@ -2,8 +2,9 @@ syntax = "proto3";
 package ixo.iid.v1beta1;
 
 import "gogoproto/gogo.proto";
-import "ixo/iid/v1beta1/iid.proto";
 import "google/api/annotations.proto";
+import "ixo/iid/v1beta1/iid.proto";
+import "ixo/iid/v1beta1/types.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
 

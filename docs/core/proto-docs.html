@@ -459,19 +459,11 @@
         
           
           <li>
-            <a href="#ixo%2fiid%2fv1beta1%2fiid.proto">ixo/iid/v1beta1/iid.proto</a>
+            <a href="#ixo%2fiid%2fv1beta1%2ftypes.proto">ixo/iid/v1beta1/types.proto</a>
             <ul>
               
                 <li>
                   <a href="#ixo.iid.v1beta1.AccordedRight"><span class="badge">M</span>AccordedRight</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.iid.v1beta1.Context"><span class="badge">M</span>Context</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.iid.v1beta1.IidDocument"><span class="badge">M</span>IidDocument</a>
                 </li>
               
                 <li>
@@ -492,6 +484,25 @@
               
                 <li>
                   <a href="#ixo.iid.v1beta1.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fiid%2fv1beta1%2fiid.proto">ixo/iid/v1beta1/iid.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.Context"><span class="badge">M</span>Context</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.IidDocument"><span class="badge">M</span>IidDocument</a>
                 </li>
               
               
@@ -809,6 +820,14 @@
               
                 <li>
                   <a href="#ixo.entity.v1beta1.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgDeleteEntity"><span class="badge">M</span>MsgDeleteEntity</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgDeleteEntityResponse"><span class="badge">M</span>MsgDeleteEntityResponse</a>
                 </li>
               
                 <li>
@@ -4019,7 +4038,7 @@ in the SETTLE stage.</p></td>
     
       
       <div class="file-heading">
-        <h2 id="ixo/iid/v1beta1/iid.proto">ixo/iid/v1beta1/iid.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/types.proto">ixo/iid/v1beta1/types.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -4075,6 +4094,287 @@ in the SETTLE stage.</p></td>
           
 
         
+      
+        <h3 id="ixo.iid.v1beta1.IidMetadata">IidMetadata</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>versionId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>created</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>updated</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>deactivated</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.iid.v1beta1.LinkedEntity">LinkedEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>relationship</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.iid.v1beta1.LinkedResource">LinkedResource</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>description</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>mediaType</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>proof</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>encrypted</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>right</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.iid.v1beta1.Service">Service</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serviceEndpoint</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.iid.v1beta1.VerificationMethod">VerificationMethod</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>blockchainAccountID</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyHex</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyMultibase</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>publicKeyBase58</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/iid/v1beta1/iid.proto">ixo/iid/v1beta1/iid.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
       
         <h3 id="ixo.iid.v1beta1.Context">Context</h3>
         <p></p>
@@ -4238,273 +4538,6 @@ https://www.w3.org/TR/did-core/#capability-delegation </p></td>
                   <td></td>
                   <td><p>Metadata concerning the IidDocument such as versionId, created, updated and
 deactivated </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.iid.v1beta1.IidMetadata">IidMetadata</h3>
-        <p>IidMetadata defines metadata associated to a Iid document</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>versionId</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>created</td>
-                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>updated</td>
-                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>deactivated</td>
-                  <td><a href="#bool">bool</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.iid.v1beta1.LinkedEntity">LinkedEntity</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>type</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>relationship</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>service</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.iid.v1beta1.LinkedResource">LinkedResource</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>type</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>description</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>mediaType</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>serviceEndpoint</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>proof</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>encrypted</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>right</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.iid.v1beta1.Service">Service</h3>
-        <p>Service defines how to find data associated with a identifer</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>type</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>serviceEndpoint</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.iid.v1beta1.VerificationMethod">VerificationMethod</h3>
-        <p></p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>type</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>controller</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>blockchainAccountID</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>publicKeyHex</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>publicKeyMultibase</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>publicKeyBase58</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -4713,17 +4746,17 @@ deactivated </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity</td>
+                  <td><a href="#ixo.entity.v1beta1.Entity">Entity</a></td>
                   <td></td>
-                  <td><p>the id of entity being created </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the entity owner </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -4744,17 +4777,17 @@ deactivated </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity</td>
+                  <td><a href="#ixo.entity.v1beta1.Entity">Entity</a></td>
                   <td></td>
-                  <td><p>the id if entity being transferred </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the new owner of the entity </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -4775,17 +4808,17 @@ deactivated </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity</td>
+                  <td><a href="#ixo.entity.v1beta1.Entity">Entity</a></td>
                   <td></td>
-                  <td><p>the id being updated </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
+                  <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the signer account of the change </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -4806,24 +4839,24 @@ deactivated </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity</td>
+                  <td><a href="#ixo.entity.v1beta1.Entity">Entity</a></td>
                   <td></td>
-                  <td><p>the id being updated </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
+                  <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the signer account of the change </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>entity_verified</td>
                   <td><a href="#bool">bool</a></td>
                   <td></td>
-                  <td><p>whether entity is verified or not </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -6608,6 +6641,51 @@ subject </p></td>
 
         
       
+        <h3 id="ixo.entity.v1beta1.MsgDeleteEntity">MsgDeleteEntity</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Entity ID to be deleted. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The owner_did used to sign this transaction. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The owner&#39;s address </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.MsgDeleteEntityResponse">MsgDeleteEntityResponse</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="ixo.entity.v1beta1.MsgTransferEntity">MsgTransferEntity</h3>
         <p></p>
 
@@ -6844,7 +6922,7 @@ subject </p></td>
 
       
         <h3 id="ixo.iid.v1beta1.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
-        <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
+        <p>IidDocumentCreatedEvent is triggered when a new IidDocument is created.</p>
 
         
           <table class="field-table">
@@ -6854,17 +6932,10 @@ subject </p></td>
             <tbody>
               
                 <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
+                  <td>iidDocument</td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td></td>
-                  <td><p>the did being created </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the signer account creating the did </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -10214,6 +10285,13 @@ credential link ***.ipfs </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>did of entity to map token to </p></td>
                 </tr>
               
             </tbody>
