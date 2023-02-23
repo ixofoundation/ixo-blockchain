@@ -1,0 +1,9 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+import "gogoproto/gogo.proto";
+
+// ClaimCreatedEvent is an event triggered on a Claim creation
+message ClaimCreatedEvent { string owner = 2; }

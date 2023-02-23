@@ -15,5 +15,4 @@ func KeyPrefix(p string) []byte {
 
 var (
 	EntityKey = []byte{0x01}
-	// DocKey         = []byte{0x02}
 )

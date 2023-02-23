@@ -96,7 +96,6 @@ import (
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 
-	// this line is used by starport scaffolding # stargate/app/moduleImport
 	entitymodule "github.com/ixofoundation/ixo-blockchain/x/entity"
 	entityclient "github.com/ixofoundation/ixo-blockchain/x/entity/client"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
@@ -107,15 +106,22 @@ import (
 	tokenkeeper "github.com/ixofoundation/ixo-blockchain/x/token/keeper"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/x/token/types"
 
+	claimsmodule "github.com/ixofoundation/ixo-blockchain/x/claims"
+	claimsmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/claims/keeper"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/x/claims/types"
+
 	iidmodule "github.com/ixofoundation/ixo-blockchain/x/iid"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/x/payments"
+
 	paymentskeeper "github.com/ixofoundation/ixo-blockchain/x/payments/keeper"
 	paymentstypes "github.com/ixofoundation/ixo-blockchain/x/payments/types"
 	"github.com/ixofoundation/ixo-blockchain/x/project"
+
 	projectkeeper "github.com/ixofoundation/ixo-blockchain/x/project/keeper"
 	projecttypes "github.com/ixofoundation/ixo-blockchain/x/project/types"
+
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -161,7 +167,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		iidmodule.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 
@@ -185,6 +190,7 @@ var (
 		project.AppModuleBasic{},
 		entitymodule.AppModuleBasic{},
 		tokenmodule.AppModuleBasic{},
+		claimsmodule.AppModuleBasic{},
 	)
 
 	// Module account permissions
@@ -296,6 +302,7 @@ type IxoApp struct {
 	BondsKeeper    bondskeeper.Keeper     `json:"bonds_keeper"`
 	PaymentsKeeper paymentskeeper.Keeper  `json:"payments_keeper,omitempty"`
 	ProjectKeeper  projectkeeper.Keeper   `json:"project_keeper"`
+	ClaimsKeeper   claimsmodulekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager `json:"mm,omitempty"`
@@ -335,6 +342,7 @@ func NewIxoApp(
 		paymentstypes.StoreKey, projecttypes.StoreKey,
 		entitytypes.StoreKey,
 		tokentypes.StoreKey,
+		claimsmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -508,6 +516,15 @@ func NewIxoApp(
 		app.GetSubspace(tokentypes.ModuleName),
 	)
 
+	app.ClaimsKeeper = *claimsmodulekeeper.NewKeeper(
+		appCodec,
+		keys[claimsmoduletypes.StoreKey],
+		keys[claimsmoduletypes.MemStoreKey],
+		app.GetSubspace(claimsmoduletypes.ModuleName),
+		app.IidKeeper,
+		app.AccountKeeper,
+		app.AuthzKeeper,
+	)
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -568,6 +585,7 @@ func NewIxoApp(
 		project.NewAppModule(app.ProjectKeeper, app.PaymentsKeeper, app.BankKeeper),
 		entitymodule.NewAppModule(app.EntityKeeper),
 		tokenmodule.NewAppModule(app.TokenKeeper),
+		claimsmodule.NewAppModule(app.ClaimsKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -589,6 +607,7 @@ func NewIxoApp(
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
 		tokentypes.ModuleName,
+		claimsmoduletypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		// Custom ixo modules
@@ -603,6 +622,7 @@ func NewIxoApp(
 
 		entitytypes.ModuleName, tokentypes.ModuleName,
 		bondstypes.ModuleName, paymentstypes.ModuleName,
+		claimsmoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -622,6 +642,7 @@ func NewIxoApp(
 		iidtypes.ModuleName, bondstypes.ModuleName,
 		paymentstypes.ModuleName, projecttypes.ModuleName,
 		tokentypes.ModuleName, entitytypes.ModuleName,
+		claimsmoduletypes.ModuleName,
 	)
 
 	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
@@ -1015,6 +1036,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(projecttypes.ModuleName)
 	paramsKeeper.Subspace(entitytypes.ModuleName)
 	paramsKeeper.Subspace(tokentypes.ModuleName)
+	paramsKeeper.Subspace(claimsmoduletypes.ModuleName)
 
 	return paramsKeeper
 }

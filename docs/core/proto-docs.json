@@ -3154,6 +3154,331 @@
       ]
     },
     {
+      "name": "ixo/claims/v1beta1/authz.proto",
+      "description": "",
+      "package": "ixo.claims.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "EvaluateAuthorization",
+          "longName": "EvaluateAuthorization",
+          "fullName": "ixo.claims.v1beta1.EvaluateAuthorization",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "constraints",
+              "description": "",
+              "label": "repeated",
+              "type": "MintConstraints",
+              "longType": "MintConstraints",
+              "fullType": "ixo.claims.v1beta1.MintConstraints",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MintConstraints",
+          "longName": "MintConstraints",
+          "fullName": "ixo.claims.v1beta1.MintConstraints",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/claims/v1beta1/claims.proto",
+      "description": "",
+      "package": "ixo.claims.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "Params",
+          "longName": "Params",
+          "fullName": "ixo.claims.v1beta1.Params",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/claims/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.claims.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "ClaimCreatedEvent",
+          "longName": "ClaimCreatedEvent",
+          "fullName": "ixo.claims.v1beta1.ClaimCreatedEvent",
+          "description": "ClaimCreatedEvent is an event triggered on a Claim creation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/claims/v1beta1/genesis.proto",
+      "description": "",
+      "package": "ixo.claims.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GenesisState",
+          "longName": "GenesisState",
+          "fullName": "ixo.claims.v1beta1.GenesisState",
+          "description": "GenesisState defines the claims module's genesis state.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.claims.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/claims/v1beta1/query.proto",
+      "description": "",
+      "package": "ixo.claims.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "QueryParamsRequest",
+          "longName": "QueryParamsRequest",
+          "fullName": "ixo.claims.v1beta1.QueryParamsRequest",
+          "description": "QueryParamsRequest is request type for the Query/Params RPC method.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryParamsResponse",
+          "longName": "QueryParamsResponse",
+          "fullName": "ixo.claims.v1beta1.QueryParamsResponse",
+          "description": "QueryParamsResponse is response type for the Query/Params RPC method.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "params holds all the parameters of this module.",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.claims.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Query",
+          "longName": "Query",
+          "fullName": "ixo.claims.v1beta1.Query",
+          "description": "Query defines the gRPC querier service.",
+          "methods": [
+            {
+              "name": "Params",
+              "description": "Parameters queries the parameters of the module.",
+              "requestType": "QueryParamsRequest",
+              "requestLongType": "QueryParamsRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryParamsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryParamsResponse",
+              "responseLongType": "QueryParamsResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryParamsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixofoundation/ixo-blockchain/claims/params"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/claims/v1beta1/tx.proto",
+      "description": "",
+      "package": "ixo.claims.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MsgCreateClaim",
+          "longName": "MsgCreateClaim",
+          "fullName": "ixo.claims.v1beta1.MsgCreateClaim",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreateClaimResponse",
+          "longName": "MsgCreateClaimResponse",
+          "fullName": "ixo.claims.v1beta1.MsgCreateClaimResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        }
+      ],
+      "services": [
+        {
+          "name": "Msg",
+          "longName": "Msg",
+          "fullName": "ixo.claims.v1beta1.Msg",
+          "description": "Msg defines the Msg service.",
+          "methods": [
+            {
+              "name": "CreateClaim",
+              "description": "",
+              "requestType": "MsgCreateClaim",
+              "requestLongType": "MsgCreateClaim",
+              "requestFullType": "ixo.claims.v1beta1.MsgCreateClaim",
+              "requestStreaming": false,
+              "responseType": "MsgCreateClaimResponse",
+              "responseLongType": "MsgCreateClaimResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgCreateClaimResponse",
+              "responseStreaming": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "ixo/iid/v1beta1/iid.proto",
       "description": "",
       "package": "ixo.iid.v1beta1",
@@ -11036,6 +11361,18 @@
             {
               "name": "type",
               "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "id",
+              "description": "did of entity to map token to",
               "label": "",
               "type": "string",
               "longType": "string",

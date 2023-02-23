@@ -1,0 +1,8 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+message Params {}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc CreateClaim(MsgCreateClaim) returns (MsgCreateClaimResponse);
+}
+
+message MsgCreateClaim {
+  // address of minter
+  string minter = 1;
+}
+
+message MsgCreateClaimResponse {}

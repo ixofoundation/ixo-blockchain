@@ -459,6 +459,116 @@
         
           
           <li>
+            <a href="#ixo%2fclaims%2fv1beta1%2fauthz.proto">ixo/claims/v1beta1/authz.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.EvaluateAuthorization"><span class="badge">M</span>EvaluateAuthorization</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MintConstraints"><span class="badge">M</span>MintConstraints</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fclaims%2fv1beta1%2fclaims.proto">ixo/claims/v1beta1/claims.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.Params"><span class="badge">M</span>Params</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fclaims%2fv1beta1%2fevent.proto">ixo/claims/v1beta1/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.ClaimCreatedEvent"><span class="badge">M</span>ClaimCreatedEvent</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fclaims%2fv1beta1%2fgenesis.proto">ixo/claims/v1beta1/genesis.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.GenesisState"><span class="badge">M</span>GenesisState</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fclaims%2fv1beta1%2fquery.proto">ixo/claims/v1beta1/query.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.Query"><span class="badge">S</span>Query</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fclaims%2fv1beta1%2ftx.proto">ixo/claims/v1beta1/tx.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgCreateClaim"><span class="badge">M</span>MsgCreateClaim</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgCreateClaimResponse"><span class="badge">M</span>MsgCreateClaimResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.Msg"><span class="badge">S</span>Msg</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#ixo%2fiid%2fv1beta1%2fiid.proto">ixo/iid/v1beta1/iid.proto</a>
             <ul>
               
@@ -4010,6 +4120,328 @@ in the SETTLE stage.</p></td>
                 <td><a href="#ixo.bonds.v1beta1.MsgWithdrawReserve">MsgWithdrawReserve</a></td>
                 <td><a href="#ixo.bonds.v1beta1.MsgWithdrawReserveResponse">MsgWithdrawReserveResponse</a></td>
                 <td><p>WithdrawReserve defines a method for withdrawing reserve from a bond.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/claims/v1beta1/authz.proto">ixo/claims/v1beta1/authz.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.claims.v1beta1.EvaluateAuthorization">EvaluateAuthorization</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>minter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of minter </p></td>
+                </tr>
+              
+                <tr>
+                  <td>constraints</td>
+                  <td><a href="#ixo.claims.v1beta1.MintConstraints">MintConstraints</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MintConstraints">MintConstraints</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/claims/v1beta1/claims.proto">ixo/claims/v1beta1/claims.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.claims.v1beta1.Params">Params</h3>
+        <p></p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/claims/v1beta1/event.proto">ixo/claims/v1beta1/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.claims.v1beta1.ClaimCreatedEvent">ClaimCreatedEvent</h3>
+        <p>ClaimCreatedEvent is an event triggered on a Claim creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>owner</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/claims/v1beta1/genesis.proto">ixo/claims/v1beta1/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.claims.v1beta1.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the claims module's genesis state.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#ixo.claims.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/claims/v1beta1/query.proto">ixo/claims/v1beta1/query.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.claims.v1beta1.QueryParamsRequest">QueryParamsRequest</h3>
+        <p>QueryParamsRequest is request type for the Query/Params RPC method.</p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryParamsResponse">QueryParamsResponse</h3>
+        <p>QueryParamsResponse is response type for the Query/Params RPC method.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#ixo.claims.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p>params holds all the parameters of this module. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixo.claims.v1beta1.Query">Query</h3>
+        <p>Query defines the gRPC querier service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>Params</td>
+                <td><a href="#ixo.claims.v1beta1.QueryParamsRequest">QueryParamsRequest</a></td>
+                <td><a href="#ixo.claims.v1beta1.QueryParamsResponse">QueryParamsResponse</a></td>
+                <td><p>Parameters queries the parameters of the module.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>Params</td>
+                <td>GET</td>
+                <td>/ixofoundation/ixo-blockchain/claims/params</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/claims/v1beta1/tx.proto">ixo/claims/v1beta1/tx.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.claims.v1beta1.MsgCreateClaim">MsgCreateClaim</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>minter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of minter </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgCreateClaimResponse">MsgCreateClaimResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixo.claims.v1beta1.Msg">Msg</h3>
+        <p>Msg defines the Msg service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateClaim</td>
+                <td><a href="#ixo.claims.v1beta1.MsgCreateClaim">MsgCreateClaim</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgCreateClaimResponse">MsgCreateClaimResponse</a></td>
+                <td><p></p></td>
               </tr>
             
           </tbody>
@@ -10214,6 +10646,13 @@ credential link ***.ipfs </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>did of entity to map token to </p></td>
                 </tr>
               
             </tbody>

@@ -73,6 +73,31 @@
   
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
+- [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
+    - [EvaluateAuthorization](#ixo.claims.v1beta1.EvaluateAuthorization)
+    - [MintConstraints](#ixo.claims.v1beta1.MintConstraints)
+  
+- [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
+    - [Params](#ixo.claims.v1beta1.Params)
+  
+- [ixo/claims/v1beta1/event.proto](#ixo/claims/v1beta1/event.proto)
+    - [ClaimCreatedEvent](#ixo.claims.v1beta1.ClaimCreatedEvent)
+  
+- [ixo/claims/v1beta1/genesis.proto](#ixo/claims/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.claims.v1beta1.GenesisState)
+  
+- [ixo/claims/v1beta1/query.proto](#ixo/claims/v1beta1/query.proto)
+    - [QueryParamsRequest](#ixo.claims.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.claims.v1beta1.QueryParamsResponse)
+  
+    - [Query](#ixo.claims.v1beta1.Query)
+  
+- [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
+    - [MsgCreateClaim](#ixo.claims.v1beta1.MsgCreateClaim)
+    - [MsgCreateClaimResponse](#ixo.claims.v1beta1.MsgCreateClaimResponse)
+  
+    - [Msg](#ixo.claims.v1beta1.Msg)
+  
 - [ixo/iid/v1beta1/iid.proto](#ixo/iid/v1beta1/iid.proto)
     - [AccordedRight](#ixo.iid.v1beta1.AccordedRight)
     - [Context](#ixo.iid.v1beta1.Context)
@@ -1403,6 +1428,243 @@ Msg defines the bonds Msg service.
 | MakeOutcomePayment | [MsgMakeOutcomePayment](#ixo.bonds.v1beta1.MsgMakeOutcomePayment) | [MsgMakeOutcomePaymentResponse](#ixo.bonds.v1beta1.MsgMakeOutcomePaymentResponse) | MakeOutcomePayment defines a method for making an outcome payment to a bond. |
 | WithdrawShare | [MsgWithdrawShare](#ixo.bonds.v1beta1.MsgWithdrawShare) | [MsgWithdrawShareResponse](#ixo.bonds.v1beta1.MsgWithdrawShareResponse) | WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage. |
 | WithdrawReserve | [MsgWithdrawReserve](#ixo.bonds.v1beta1.MsgWithdrawReserve) | [MsgWithdrawReserveResponse](#ixo.bonds.v1beta1.MsgWithdrawReserveResponse) | WithdrawReserve defines a method for withdrawing reserve from a bond. |
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/authz.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/authz.proto
+
+
+
+<a name="ixo.claims.v1beta1.EvaluateAuthorization"></a>
+
+### EvaluateAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| constraints | [MintConstraints](#ixo.claims.v1beta1.MintConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MintConstraints"></a>
+
+### MintConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| contract_address | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/claims.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/claims.proto
+
+
+
+<a name="ixo.claims.v1beta1.Params"></a>
+
+### Params
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/event.proto
+
+
+
+<a name="ixo.claims.v1beta1.ClaimCreatedEvent"></a>
+
+### ClaimCreatedEvent
+ClaimCreatedEvent is an event triggered on a Claim creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/genesis.proto
+
+
+
+<a name="ixo.claims.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the claims module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.claims.v1beta1.Params) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/query.proto
+
+
+
+<a name="ixo.claims.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.claims.v1beta1.Params) |  | params holds all the parameters of this module. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.claims.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.claims.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.claims.v1beta1.QueryParamsResponse) | Parameters queries the parameters of the module. |
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/tx.proto
+
+
+
+<a name="ixo.claims.v1beta1.MsgCreateClaim"></a>
+
+### MsgCreateClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgCreateClaimResponse"></a>
+
+### MsgCreateClaimResponse
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.claims.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the Msg service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| CreateClaim | [MsgCreateClaim](#ixo.claims.v1beta1.MsgCreateClaim) | [MsgCreateClaimResponse](#ixo.claims.v1beta1.MsgCreateClaimResponse) |  |
 
  
 
@@ -4399,6 +4661,7 @@ credential link ***.ipfs |
 | encrypted | [bool](#bool) |  |  |
 | proof | [string](#string) |  |  |
 | type | [string](#string) |  |  |
+| id | [string](#string) |  | did of entity to map token to |
 
 
 

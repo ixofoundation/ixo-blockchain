@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+message EvaluateAuthorization {
+  option (cosmos_proto.implements_interface) = "Authorization";
+
+  // address of minter
+  string minter = 1;
+  repeated MintConstraints constraints = 2;
+}
+
+message MintConstraints { string contract_address = 1; }
