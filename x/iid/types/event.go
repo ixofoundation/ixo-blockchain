@@ -8,9 +8,8 @@ func NewIidDocumentCreatedEvent(iidDocument *IidDocument) *IidDocumentCreatedEve
 }
 
 // NewIidDocumentUpdatedEvent constructs a new did_updated sdk.Event
-func NewIidDocumentUpdatedEvent(did, signer string) *IidDocumentUpdatedEvent {
+func NewIidDocumentUpdatedEvent(iidDocument *IidDocument) *IidDocumentUpdatedEvent {
 	return &IidDocumentUpdatedEvent{
-		Did:    did,
-		Signer: signer,
+		IidDocument: iidDocument,
 	}
 }

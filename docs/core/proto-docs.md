@@ -2763,8 +2763,7 @@ DidDocumentUpdatedEvent is an event triggered on a DID document update
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| did | [string](#string) |  | the did being updated |
-| signer | [string](#string) |  | the signer account of the change |
+| iidDocument | [IidDocument](#ixo.iid.v1beta1.IidDocument) |  |  |
 
 
 

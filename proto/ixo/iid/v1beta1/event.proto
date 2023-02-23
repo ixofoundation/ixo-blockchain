@@ -20,9 +20,5 @@ message IidDocumentUpdatedEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  // the did being updated
-  string did = 1;
-
-  // the signer account of the change
-  string signer = 2;
+  IidDocument iidDocument = 1;
 }
