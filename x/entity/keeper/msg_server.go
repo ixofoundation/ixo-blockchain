@@ -170,11 +170,6 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 	params := s.Keeper.GetParams(ctx)
 	nftContractAddressParam := params.NftContractAddress
 
-	_, entity, err := s.ResolveEntity(ctx, msg.Id)
-	if err != nil {
-		return nil, err
-	}
-
 	if len(nftContractAddressParam) == 0 {
 		return nil, errors.New("nftContractAddress not set")
 	}
@@ -251,7 +246,7 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityTransferredEvent(&entity, msg.RecipientDid.Did()),
+		types.NewEntityTransferredEvent(msg.Id, msg.OwnerDid.Did(), msg.RecipientDid.Did()),
 	); err != nil {
 		return nil, err
 	}
@@ -292,7 +287,7 @@ func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpd
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
 		types.NewEntityUpdatedEvent(&entity, msg.RelayerNodeDid.String()),
-		types.NewEntityVerifiedUpdatedEvent(&entity, msg.RelayerNodeDid.String(), msg.EntityVerified),
+		types.NewEntityVerifiedUpdatedEvent(msg.Id, msg.RelayerNodeDid.String(), msg.EntityVerified),
 	); err != nil {
 		return nil, err
 	}

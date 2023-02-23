@@ -1706,8 +1706,9 @@ EntityTransferredEvent is an event triggered on a entity transfer
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
-| owner | [string](#string) |  |  |
+| id | [string](#string) |  |  |
+| from | [string](#string) |  |  |
+| to | [string](#string) |  |  |
 
 
 
@@ -1739,7 +1740,7 @@ document update
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
+| id | [string](#string) |  |  |
 | owner | [string](#string) |  |  |
 | entity_verified | [bool](#bool) |  |  |
 

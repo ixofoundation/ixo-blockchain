@@ -30,7 +30,7 @@ message EntityVerifiedUpdatedEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  Entity entity = 1;
+  string id = 1;
   string owner = 2;
   bool entity_verified = 3;
 }
@@ -40,6 +40,7 @@ message EntityTransferredEvent {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
-  Entity entity = 1;
-  string owner = 2;
+  string id = 1;
+  string from = 2;
+  string to = 3;
 }

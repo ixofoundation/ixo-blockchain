@@ -4141,19 +4141,31 @@
           "extensions": [],
           "fields": [
             {
-              "name": "entity",
+              "name": "id",
               "description": "",
               "label": "",
-              "type": "Entity",
-              "longType": "Entity",
-              "fullType": "ixo.entity.v1beta1.Entity",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
             },
             {
-              "name": "owner",
+              "name": "from",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "to",
               "description": "",
               "label": "",
               "type": "string",
@@ -4213,12 +4225,12 @@
           "extensions": [],
           "fields": [
             {
-              "name": "entity",
+              "name": "id",
               "description": "",
               "label": "",
-              "type": "Entity",
-              "longType": "Entity",
-              "fullType": "ixo.entity.v1beta1.Entity",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
