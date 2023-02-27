@@ -4832,8 +4832,7 @@ TokenCreatedEvent is an event triggered on a Token creation
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| contract_address | [string](#string) |  | the contract address of token contract being initialized |
-| minter | [string](#string) |  | the token minter |
+| token | [Token](#ixo.token.v1beta1.Token) |  |  |
 
 
 
@@ -4933,8 +4932,7 @@ TokenUpdatedEvent is an event triggered on a Token update
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| contract_address | [string](#string) |  | contract_address of token updated |
-| owner | [string](#string) |  | the owner account of the change |
+| token | [Token](#ixo.token.v1beta1.Token) |  |  |
 
 
 
