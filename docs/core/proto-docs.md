@@ -4851,6 +4851,7 @@ TokenMintedEvent is an event triggered on a Token mint execution
 | minter | [string](#string) |  | the token minter |
 | owner | [string](#string) |  | the new tokens owner |
 | batches | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
+| tokenProperties | [TokenProperties](#ixo.token.v1beta1.TokenProperties) |  |  |
 
 
 

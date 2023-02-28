@@ -185,21 +185,25 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 			Name:       batch.Name,
 		}
 		s.Keeper.SetTokenProperties(ctx, tokenProperties)
+		if err := ctx.EventManager().EmitTypedEvents(
+			&types.TokenMintedEvent{
+				ContractAddress: contractAddress.String(),
+				Minter:          minterAddress.String(),
+				Owner:           ownerAddress.String(),
+				Batches:         types.Map(batches, func(b types.MintBatchData) *types.TokenBatch { return b.GetTokenMintedEventBatch() }),
+				TokenProperties: &tokenProperties,
+			},
+		); err != nil {
+			return nil, sdkerrors.Wrapf(err, "Failed to emit TokenMintEvent")
+		}
 	}
 
 	if err := ctx.EventManager().EmitTypedEvents(
-		&types.TokenMintedEvent{
-			ContractAddress: contractAddress.String(),
-			Minter:          minterAddress.String(),
-			Owner:           ownerAddress.String(),
-			Batches:         types.Map(batches, func(b types.MintBatchData) *types.TokenBatch { return b.GetTokenMintedEventBatch() }),
-		},
-		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
 			Token: &token,
 		},
 	); err != nil {
-		return nil, sdkerrors.Wrapf(err, "failed to emit mint token events")
+		return nil, sdkerrors.Wrapf(err, "Failed to emit TokenUpdatedEvent")
 	}
 
 	return &types.MsgMintTokenResponse{}, nil

@@ -22,6 +22,7 @@ message TokenMintedEvent {
   // the new tokens owner
   string owner = 3;
   repeated TokenBatch batches = 4;
+  TokenProperties tokenProperties = 5;
 }
 
 // TokenTransferedEvent is an event triggered on a Token transfer execution

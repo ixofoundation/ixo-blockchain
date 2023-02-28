@@ -12218,6 +12218,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "tokenProperties",
+              "description": "",
+              "label": "",
+              "type": "TokenProperties",
+              "longType": "TokenProperties",
+              "fullType": "ixo.token.v1beta1.TokenProperties",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
