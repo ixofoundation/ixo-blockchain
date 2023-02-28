@@ -2,27 +2,110 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+)
+
+var (
+	_ iidante.IidTxMsg = &MsgSubmitClaim{}
+	_ iidante.IidTxMsg = &MsgEvaluateClaim{}
+	_ iidante.IidTxMsg = &MsgDisputeClaim{}
 )
 
 // --------------------------
-// CREATE CLAIM
+// CREATE COLLECTION
 // --------------------------
-const TypeMsgCreateClaim = "create_claim"
+const TypeMsgCreateCollection = "create_collection"
 
-var _ sdk.Msg = &MsgCreateClaim{}
+var _ sdk.Msg = &MsgCreateCollection{}
 
-func (msg MsgCreateClaim) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.Minter)
+func (msg MsgCreateCollection) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.Admin)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{address}
 }
 
-func (msg MsgCreateClaim) GetSignBytes() []byte {
+func (msg MsgCreateCollection) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
-func (msg MsgCreateClaim) Type() string { return TypeMsgCreateClaim }
+func (msg MsgCreateCollection) Type() string { return TypeMsgCreateCollection }
 
-func (msg MsgCreateClaim) Route() string { return RouterKey }
+func (msg MsgCreateCollection) Route() string { return RouterKey }
+
+// --------------------------
+// SUBMIT CLAIM
+// --------------------------
+const TypeMsgSubmitClaim = "submit_claim"
+
+var _ sdk.Msg = &MsgSubmitClaim{}
+
+func (msg MsgSubmitClaim) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgSubmitClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+
+func (msg MsgSubmitClaim) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgSubmitClaim) Type() string { return TypeMsgSubmitClaim }
+
+func (msg MsgSubmitClaim) Route() string { return RouterKey }
+
+// --------------------------
+// EVALUATE CLAIM
+// --------------------------
+const TypeMsgEvaluateClaim = "evaluate_claim"
+
+var _ sdk.Msg = &MsgEvaluateClaim{}
+
+func (msg MsgEvaluateClaim) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgEvaluateClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+
+func (msg MsgEvaluateClaim) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgEvaluateClaim) Type() string { return TypeMsgEvaluateClaim }
+
+func (msg MsgEvaluateClaim) Route() string { return RouterKey }
+
+// --------------------------
+// DISPUTE CLAIM
+// --------------------------
+const TypeMsgDisputeClaim = "dispute_claim"
+
+var _ sdk.Msg = &MsgDisputeClaim{}
+
+func (msg MsgDisputeClaim) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgDisputeClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+
+func (msg MsgDisputeClaim) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgDisputeClaim) Type() string { return TypeMsgDisputeClaim }
+
+func (msg MsgDisputeClaim) Route() string { return RouterKey }

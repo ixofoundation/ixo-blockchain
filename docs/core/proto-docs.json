@@ -3165,9 +3165,9 @@
       "extensions": [],
       "messages": [
         {
-          "name": "EvaluateAuthorization",
-          "longName": "EvaluateAuthorization",
-          "fullName": "ixo.claims.v1beta1.EvaluateAuthorization",
+          "name": "EvaluateClaimAuthorization",
+          "longName": "EvaluateClaimAuthorization",
+          "fullName": "ixo.claims.v1beta1.EvaluateClaimAuthorization",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -3175,8 +3175,8 @@
           "extensions": [],
           "fields": [
             {
-              "name": "minter",
-              "description": "address of minter",
+              "name": "admin",
+              "description": "address of admin",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -3190,9 +3190,9 @@
               "name": "constraints",
               "description": "",
               "label": "repeated",
-              "type": "MintConstraints",
-              "longType": "MintConstraints",
-              "fullType": "ixo.claims.v1beta1.MintConstraints",
+              "type": "EvaluateClaimConstraints",
+              "longType": "EvaluateClaimConstraints",
+              "fullType": "ixo.claims.v1beta1.EvaluateClaimConstraints",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -3201,9 +3201,9 @@
           ]
         },
         {
-          "name": "MintConstraints",
-          "longName": "MintConstraints",
-          "fullName": "ixo.claims.v1beta1.MintConstraints",
+          "name": "EvaluateClaimConstraints",
+          "longName": "EvaluateClaimConstraints",
+          "fullName": "ixo.claims.v1beta1.EvaluateClaimConstraints",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -3211,12 +3211,120 @@
           "extensions": [],
           "fields": [
             {
-              "name": "contract_address",
-              "description": "",
+              "name": "collection_id",
+              "description": "collection_id indicates to which Collection this claim belongs",
               "label": "",
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "claim_id",
+              "description": "either collection_id or claim_id is needed",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_quota",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "before_date",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SubmitClaimAuthorization",
+          "longName": "SubmitClaimAuthorization",
+          "fullName": "ixo.claims.v1beta1.SubmitClaimAuthorization",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "admin",
+              "description": "address of admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "constraints",
+              "description": "string collection_id = 1;",
+              "label": "repeated",
+              "type": "SubmitClaimConstraints",
+              "longType": "SubmitClaimConstraints",
+              "fullType": "ixo.claims.v1beta1.SubmitClaimConstraints",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SubmitClaimConstraints",
+          "longName": "SubmitClaimConstraints",
+          "fullName": "ixo.claims.v1beta1.SubmitClaimConstraints",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates to which Collection this claim belongs",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_quota",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -3231,23 +3339,736 @@
       "name": "ixo/claims/v1beta1/claims.proto",
       "description": "",
       "package": "ixo.claims.v1beta1",
-      "hasEnums": false,
+      "hasEnums": true,
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": false,
-      "enums": [],
+      "enums": [
+        {
+          "name": "CollectionState",
+          "longName": "CollectionState",
+          "fullName": "ixo.claims.v1beta1.CollectionState",
+          "description": "",
+          "values": [
+            {
+              "name": "OPEN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "PAUSED",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "CLOSED",
+              "number": "2",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "EvaluationStatus",
+          "longName": "EvaluationStatus",
+          "fullName": "ixo.claims.v1beta1.EvaluationStatus",
+          "description": "",
+          "values": [
+            {
+              "name": "PENDING",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "APPROVED",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "REJECTED",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "DISPUTED",
+              "number": "3",
+              "description": ""
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
+        {
+          "name": "Claim",
+          "longName": "Claim",
+          "fullName": "ixo.claims.v1beta1.Claim",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates to which Collection this claim belongs",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "agent is the DID of the agent submitting the claim",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "submission_date",
+              "description": "submissionDate is the date and time that the claim was submitted on-chain",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "claim_id",
+              "description": "claimID is the unique identifier of the claim in the cid hash format",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluation",
+              "description": "evaluation is the result of one or more claim evaluations",
+              "label": "",
+              "type": "Evaluation",
+              "longType": "Evaluation",
+              "fullType": "ixo.claims.v1beta1.Evaluation",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Collection",
+          "longName": "Collection",
+          "fullName": "ixo.claims.v1beta1.Collection",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "collection id is the incremented internal id for the collection of claims",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "entity",
+              "description": "entity is the DID of the entity for which the claims are being created",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin",
+              "description": "admin is the account address that will authorize or revoke agents and\npayments (the grantor)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "protocol",
+              "description": "protocol is the DID of the claim protocol",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "start_date",
+              "description": "startDate is the date after which claims may be submitted",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_date",
+              "description": "endDate is the date after which no more claims may be submitted (no endDate\nis allowed)",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "quota",
+              "description": "quota is the maximum number of claims that may be submitted, 0 is unlimited",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "count",
+              "description": "count is the number of claims already submitted (internally calculated)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluated",
+              "description": "evaluated is the number of claims that have been evaluated (internally\ncalculated)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "approved",
+              "description": "approved is the number of claims that have been evaluated and approved\n(internally calculated)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rejected",
+              "description": "rejected is the number of claims that have been evaluated and rejected\n(internally calculated)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "disputed",
+              "description": "disputed is the number of claims that have disputed status (internally\ncalculated)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "state",
+              "description": "state is the current state of this Collection (open, paused, closed)",
+              "label": "",
+              "type": "CollectionState",
+              "longType": "CollectionState",
+              "fullType": "ixo.claims.v1beta1.CollectionState",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "payments",
+              "description": "payments is the amount paid for claim submission, evaluation, approval, or\nrejection",
+              "label": "",
+              "type": "Payments",
+              "longType": "Payments",
+              "fullType": "ixo.claims.v1beta1.Payments",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Dispute",
+          "longName": "Dispute",
+          "fullName": "ixo.claims.v1beta1.Dispute",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claim_id",
+              "description": "claimID for which this dispute is against",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "agent is the DID of the agent submitting the dispute",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "type",
+              "description": "type is expressed as an integer, interpreted by the client",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "DisputeData",
+              "longType": "DisputeData",
+              "fullType": "ixo.claims.v1beta1.DisputeData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DisputeData",
+          "longName": "DisputeData",
+          "fullName": "ixo.claims.v1beta1.DisputeData",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "uri",
+              "description": "dispute link ***.ipfs",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "encrypted",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "proof",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Evaluation",
+          "longName": "Evaluation",
+          "fullName": "ixo.claims.v1beta1.Evaluation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "oracle",
+              "description": "oracle is the DID of the Oracle entity that evaluates the claim",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "agent is the DID of the agent that submits the evaluation",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "status is the evaluation status expressed as an integer (2=approved,\n3=rejected, ...)",
+              "label": "",
+              "type": "EvaluationStatus",
+              "longType": "EvaluationStatus",
+              "fullType": "ixo.claims.v1beta1.EvaluationStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "reason is the code expressed as an integer, for why the evaluation result\nwas given (codes defined by evaluator)",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "verification_proof",
+              "description": "verificationProof is the cid of the evaluation Verfiable Credential",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluation_date",
+              "description": "evaluationDate is the date and time that the claim evaluation was submitted\non-chain",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "custom amount specified by evaluator for claim approval, if empty list then\nuse default by Collection",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "Params",
           "longName": "Params",
           "fullName": "ixo.claims.v1beta1.Params",
           "description": "",
           "hasExtensions": false,
-          "hasFields": false,
+          "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
-          "fields": []
+          "fields": [
+            {
+              "name": "collection_sequence",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "ixo_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "oracle_fee_percentage",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "node_fee_percentage",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Payment",
+          "longName": "Payment",
+          "fullName": "ixo.claims.v1beta1.Payment",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account",
+              "description": "account is the entity account address from which the payment will be made",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "timeout_ns",
+              "description": "timeout after claim/evaluation to create authZ for payment, if 0 then\nimmidiate direct payment",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Payments",
+          "longName": "Payments",
+          "fullName": "ixo.claims.v1beta1.Payments",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "submission",
+              "description": "",
+              "label": "",
+              "type": "Payment",
+              "longType": "Payment",
+              "fullType": "ixo.claims.v1beta1.Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluation",
+              "description": "",
+              "label": "",
+              "type": "Payment",
+              "longType": "Payment",
+              "fullType": "ixo.claims.v1beta1.Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "approval",
+              "description": "",
+              "label": "",
+              "type": "Payment",
+              "longType": "Payment",
+              "fullType": "ixo.claims.v1beta1.Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rejection",
+              "description": "Payment penalty = 5;",
+              "label": "",
+              "type": "Payment",
+              "longType": "Payment",
+              "fullType": "ixo.claims.v1beta1.Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": []
@@ -3264,22 +4085,142 @@
       "extensions": [],
       "messages": [
         {
-          "name": "ClaimCreatedEvent",
-          "longName": "ClaimCreatedEvent",
-          "fullName": "ixo.claims.v1beta1.ClaimCreatedEvent",
-          "description": "ClaimCreatedEvent is an event triggered on a Claim creation",
+          "name": "ClaimDisputedEvent",
+          "longName": "ClaimDisputedEvent",
+          "fullName": "ixo.claims.v1beta1.ClaimDisputedEvent",
+          "description": "ClaimDisputedEvent is an event triggered on a Claim dispute",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
             {
-              "name": "owner",
+              "name": "dispute",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ClaimEvaluatedEvent",
+          "longName": "ClaimEvaluatedEvent",
+          "fullName": "ixo.claims.v1beta1.ClaimEvaluatedEvent",
+          "description": "ClaimEvaluatedEvent is an event triggered on a Claim evaluation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "evaluation",
+              "description": "",
+              "label": "",
+              "type": "Evaluation",
+              "longType": "Evaluation",
+              "fullType": "ixo.claims.v1beta1.Evaluation",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ClaimSubmittedEvent",
+          "longName": "ClaimSubmittedEvent",
+          "fullName": "ixo.claims.v1beta1.ClaimSubmittedEvent",
+          "description": "CollectionCreatedEvent is an event triggered on a Claim submission",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claim",
+              "description": "",
+              "label": "",
+              "type": "Claim",
+              "longType": "Claim",
+              "fullType": "ixo.claims.v1beta1.Claim",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ClaimUpdatedEvent",
+          "longName": "ClaimUpdatedEvent",
+          "fullName": "ixo.claims.v1beta1.ClaimUpdatedEvent",
+          "description": "ClaimUpdatedEvent is an event triggered on a Claim update",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claim",
+              "description": "",
+              "label": "",
+              "type": "Claim",
+              "longType": "Claim",
+              "fullType": "ixo.claims.v1beta1.Claim",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CollectionCreatedEvent",
+          "longName": "CollectionCreatedEvent",
+          "fullName": "ixo.claims.v1beta1.CollectionCreatedEvent",
+          "description": "CollectionCreatedEvent is an event triggered on a Collection creation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection",
+              "description": "",
+              "label": "",
+              "type": "Collection",
+              "longType": "Collection",
+              "fullType": "ixo.claims.v1beta1.Collection",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CollectionUpdatedEvent",
+          "longName": "CollectionUpdatedEvent",
+          "fullName": "ixo.claims.v1beta1.CollectionUpdatedEvent",
+          "description": "CollectionUpdatedEvent is an event triggered on a Collection update",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection",
+              "description": "",
+              "label": "",
+              "type": "Collection",
+              "longType": "Collection",
+              "fullType": "ixo.claims.v1beta1.Collection",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -3322,6 +4263,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "collections",
+              "description": "",
+              "label": "repeated",
+              "type": "Collection",
+              "longType": "Collection",
+              "fullType": "ixo.claims.v1beta1.Collection",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "claims",
+              "description": "",
+              "label": "repeated",
+              "type": "Claim",
+              "longType": "Claim",
+              "fullType": "ixo.claims.v1beta1.Claim",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }
@@ -3339,6 +4304,330 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "QueryClaimListRequest",
+          "longName": "QueryClaimListRequest",
+          "fullName": "ixo.claims.v1beta1.QueryClaimListRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryClaimListResponse",
+          "longName": "QueryClaimListResponse",
+          "fullName": "ixo.claims.v1beta1.QueryClaimListResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claims",
+              "description": "",
+              "label": "repeated",
+              "type": "Claim",
+              "longType": "Claim",
+              "fullType": "ixo.claims.v1beta1.Claim",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryClaimRequest",
+          "longName": "QueryClaimRequest",
+          "fullName": "ixo.claims.v1beta1.QueryClaimRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryClaimResponse",
+          "longName": "QueryClaimResponse",
+          "fullName": "ixo.claims.v1beta1.QueryClaimResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claim",
+              "description": "",
+              "label": "",
+              "type": "Claim",
+              "longType": "Claim",
+              "fullType": "ixo.claims.v1beta1.Claim",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionListRequest",
+          "longName": "QueryCollectionListRequest",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionListRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionListResponse",
+          "longName": "QueryCollectionListResponse",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionListResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collections",
+              "description": "",
+              "label": "repeated",
+              "type": "Collection",
+              "longType": "Collection",
+              "fullType": "ixo.claims.v1beta1.Collection",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionRequest",
+          "longName": "QueryCollectionRequest",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionResponse",
+          "longName": "QueryCollectionResponse",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection",
+              "description": "",
+              "label": "",
+              "type": "Collection",
+              "longType": "Collection",
+              "fullType": "ixo.claims.v1beta1.Collection",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeListRequest",
+          "longName": "QueryDisputeListRequest",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeListRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeListResponse",
+          "longName": "QueryDisputeListResponse",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeListResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disputes",
+              "description": "",
+              "label": "repeated",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeRequest",
+          "longName": "QueryDisputeRequest",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "proof",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeResponse",
+          "longName": "QueryDisputeResponse",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dispute",
+              "description": "",
+              "label": "",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "QueryParamsRequest",
           "longName": "QueryParamsRequest",
@@ -3398,7 +4687,139 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixofoundation/ixo-blockchain/claims/params"
+                      "pattern": "/ixo/claims/params"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Collection",
+              "description": "",
+              "requestType": "QueryCollectionRequest",
+              "requestLongType": "QueryCollectionRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryCollectionRequest",
+              "requestStreaming": false,
+              "responseType": "QueryCollectionResponse",
+              "responseLongType": "QueryCollectionResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryCollectionResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/collection/{id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CollectionList",
+              "description": "",
+              "requestType": "QueryCollectionListRequest",
+              "requestLongType": "QueryCollectionListRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryCollectionListRequest",
+              "requestStreaming": false,
+              "responseType": "QueryCollectionListResponse",
+              "responseLongType": "QueryCollectionListResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryCollectionListResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/collection"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Claim",
+              "description": "",
+              "requestType": "QueryClaimRequest",
+              "requestLongType": "QueryClaimRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryClaimRequest",
+              "requestStreaming": false,
+              "responseType": "QueryClaimResponse",
+              "responseLongType": "QueryClaimResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryClaimResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claim/{id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ClaimList",
+              "description": "",
+              "requestType": "QueryClaimListRequest",
+              "requestLongType": "QueryClaimListRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryClaimListRequest",
+              "requestStreaming": false,
+              "responseType": "QueryClaimListResponse",
+              "responseLongType": "QueryClaimListResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryClaimListResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claim"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Dispute",
+              "description": "",
+              "requestType": "QueryDisputeRequest",
+              "requestLongType": "QueryDisputeRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryDisputeRequest",
+              "requestStreaming": false,
+              "responseType": "QueryDisputeResponse",
+              "responseLongType": "QueryDisputeResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryDisputeResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/dispute/{proof}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DisputeList",
+              "description": "",
+              "requestType": "QueryDisputeListRequest",
+              "requestLongType": "QueryDisputeListRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryDisputeListRequest",
+              "requestStreaming": false,
+              "responseType": "QueryDisputeListResponse",
+              "responseLongType": "QueryDisputeListResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryDisputeListResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/dispute"
                     }
                   ]
                 }
@@ -3420,9 +4841,9 @@
       "extensions": [],
       "messages": [
         {
-          "name": "MsgCreateClaim",
-          "longName": "MsgCreateClaim",
-          "fullName": "ixo.claims.v1beta1.MsgCreateClaim",
+          "name": "MsgCreateCollection",
+          "longName": "MsgCreateCollection",
+          "fullName": "ixo.claims.v1beta1.MsgCreateCollection",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -3430,8 +4851,389 @@
           "extensions": [],
           "fields": [
             {
-              "name": "minter",
-              "description": "address of minter",
+              "name": "entity",
+              "description": "entity is the DID of the entity for which the claims are being created",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin",
+              "description": "admin is the account address that will authorize or revoke agents and\npayments (the grantor)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "protocol",
+              "description": "protocol is the DID of the claim protocol",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "start_date",
+              "description": "startDate is the date after which claims may be submitted",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_date",
+              "description": "endDate is the date after which no more claims may be submitted (no endDate\nis allowed)",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "quota",
+              "description": "quota is the maximum number of claims that may be submitted, 0 is unlimited",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "state",
+              "description": "state is the current state of this Collection (open, paused, closed)",
+              "label": "",
+              "type": "CollectionState",
+              "longType": "CollectionState",
+              "fullType": "ixo.claims.v1beta1.CollectionState",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "payments",
+              "description": "payments is the amount paid for claim submission, evaluation, approval, or\nrejection",
+              "label": "",
+              "type": "Payments",
+              "longType": "Payments",
+              "fullType": "ixo.claims.v1beta1.Payments",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreateCollectionResponse",
+          "longName": "MsgCreateCollectionResponse",
+          "fullName": "ixo.claims.v1beta1.MsgCreateCollectionResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgDisputeClaim",
+          "longName": "MsgDisputeClaim",
+          "fullName": "ixo.claims.v1beta1.MsgDisputeClaim",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claim_id",
+              "description": "claimID for which this dispute is against",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "agent is the DID of the agent disputing the claim",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dispute_type",
+              "description": "type is expressed as an integer, interpreted by the client",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "DisputeData",
+              "longType": "DisputeData",
+              "fullType": "ixo.claims.v1beta1.DisputeData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgDisputeClaimResponse",
+          "longName": "MsgDisputeClaimResponse",
+          "fullName": "ixo.claims.v1beta1.MsgDisputeClaimResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgEvaluateClaim",
+          "longName": "MsgEvaluateClaim",
+          "fullName": "ixo.claims.v1beta1.MsgEvaluateClaim",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "claim_id",
+              "description": "claimID is the unique identifier of the claim to make evaluation against",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "oracle",
+              "description": "oracle is the DID of the Oracle entity that evaluates the claim",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "agent is the DID of the agent that submits the evaluation",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "status is the evaluation status expressed as an integer (2=approved,\n3=rejected, ...)",
+              "label": "",
+              "type": "EvaluationStatus",
+              "longType": "EvaluationStatus",
+              "fullType": "ixo.claims.v1beta1.EvaluationStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "reason is the code expressed as an integer, for why the evaluation result\nwas given (codes defined by evaluator)",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "verification_proof",
+              "description": "verificationProof is the cid of the evaluation Verfiable Credential",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "custom amount specified by evaluator for claim approval, if empty list then\nuse default by Collection",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgEvaluateClaimResponse",
+          "longName": "MsgEvaluateClaimResponse",
+          "fullName": "ixo.claims.v1beta1.MsgEvaluateClaimResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgSubmitClaim",
+          "longName": "MsgSubmitClaim",
+          "fullName": "ixo.claims.v1beta1.MsgSubmitClaim",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates to which Collection this claim belongs",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "claim_id",
+              "description": "claimID is the unique identifier of the claim in the cid hash format",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "agent is the DID of the agent submitting the claim",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -3444,9 +5246,9 @@
           ]
         },
         {
-          "name": "MsgCreateClaimResponse",
-          "longName": "MsgCreateClaimResponse",
-          "fullName": "ixo.claims.v1beta1.MsgCreateClaimResponse",
+          "name": "MsgSubmitClaimResponse",
+          "longName": "MsgSubmitClaimResponse",
+          "fullName": "ixo.claims.v1beta1.MsgSubmitClaimResponse",
           "description": "",
           "hasExtensions": false,
           "hasFields": false,
@@ -3463,15 +5265,51 @@
           "description": "Msg defines the Msg service.",
           "methods": [
             {
-              "name": "CreateClaim",
+              "name": "CreateCollection",
               "description": "",
-              "requestType": "MsgCreateClaim",
-              "requestLongType": "MsgCreateClaim",
-              "requestFullType": "ixo.claims.v1beta1.MsgCreateClaim",
+              "requestType": "MsgCreateCollection",
+              "requestLongType": "MsgCreateCollection",
+              "requestFullType": "ixo.claims.v1beta1.MsgCreateCollection",
               "requestStreaming": false,
-              "responseType": "MsgCreateClaimResponse",
-              "responseLongType": "MsgCreateClaimResponse",
-              "responseFullType": "ixo.claims.v1beta1.MsgCreateClaimResponse",
+              "responseType": "MsgCreateCollectionResponse",
+              "responseLongType": "MsgCreateCollectionResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgCreateCollectionResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "SubmitClaim",
+              "description": "",
+              "requestType": "MsgSubmitClaim",
+              "requestLongType": "MsgSubmitClaim",
+              "requestFullType": "ixo.claims.v1beta1.MsgSubmitClaim",
+              "requestStreaming": false,
+              "responseType": "MsgSubmitClaimResponse",
+              "responseLongType": "MsgSubmitClaimResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgSubmitClaimResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "EvaluateClaim",
+              "description": "",
+              "requestType": "MsgEvaluateClaim",
+              "requestLongType": "MsgEvaluateClaim",
+              "requestFullType": "ixo.claims.v1beta1.MsgEvaluateClaim",
+              "requestStreaming": false,
+              "responseType": "MsgEvaluateClaimResponse",
+              "responseLongType": "MsgEvaluateClaimResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgEvaluateClaimResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "DisputeClaim",
+              "description": "",
+              "requestType": "MsgDisputeClaim",
+              "requestLongType": "MsgDisputeClaim",
+              "requestFullType": "ixo.claims.v1beta1.MsgDisputeClaim",
+              "requestStreaming": false,
+              "responseType": "MsgDisputeClaimResponse",
+              "responseLongType": "MsgDisputeClaimResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgDisputeClaimResponse",
               "responseStreaming": false
             }
           ]

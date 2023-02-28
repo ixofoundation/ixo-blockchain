@@ -7,16 +7,20 @@ import (
 	fmt "fmt"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	_ "github.com/regen-network/cosmos-proto"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -24,24 +28,25 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type EvaluateAuthorization struct {
-	// address of minter
-	Minter      string             `protobuf:"bytes,1,opt,name=minter,proto3" json:"minter,omitempty"`
-	Constraints []*MintConstraints `protobuf:"bytes,2,rep,name=constraints,proto3" json:"constraints,omitempty"`
+type SubmitClaimAuthorization struct {
+	// address of admin
+	Admin string `protobuf:"bytes,1,opt,name=admin,proto3" json:"admin,omitempty"`
+	// string collection_id = 1;
+	Constraints []*SubmitClaimConstraints `protobuf:"bytes,2,rep,name=constraints,proto3" json:"constraints,omitempty"`
 }
 
-func (m *EvaluateAuthorization) Reset()         { *m = EvaluateAuthorization{} }
-func (m *EvaluateAuthorization) String() string { return proto.CompactTextString(m) }
-func (*EvaluateAuthorization) ProtoMessage()    {}
-func (*EvaluateAuthorization) Descriptor() ([]byte, []int) {
+func (m *SubmitClaimAuthorization) Reset()         { *m = SubmitClaimAuthorization{} }
+func (m *SubmitClaimAuthorization) String() string { return proto.CompactTextString(m) }
+func (*SubmitClaimAuthorization) ProtoMessage()    {}
+func (*SubmitClaimAuthorization) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f4b7f6c531e101a6, []int{0}
 }
-func (m *EvaluateAuthorization) XXX_Unmarshal(b []byte) error {
+func (m *SubmitClaimAuthorization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *EvaluateAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SubmitClaimAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_EvaluateAuthorization.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SubmitClaimAuthorization.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -51,48 +56,50 @@ func (m *EvaluateAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *EvaluateAuthorization) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EvaluateAuthorization.Merge(m, src)
+func (m *SubmitClaimAuthorization) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubmitClaimAuthorization.Merge(m, src)
 }
-func (m *EvaluateAuthorization) XXX_Size() int {
+func (m *SubmitClaimAuthorization) XXX_Size() int {
 	return m.Size()
 }
-func (m *EvaluateAuthorization) XXX_DiscardUnknown() {
-	xxx_messageInfo_EvaluateAuthorization.DiscardUnknown(m)
+func (m *SubmitClaimAuthorization) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubmitClaimAuthorization.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_EvaluateAuthorization proto.InternalMessageInfo
+var xxx_messageInfo_SubmitClaimAuthorization proto.InternalMessageInfo
 
-func (m *EvaluateAuthorization) GetMinter() string {
+func (m *SubmitClaimAuthorization) GetAdmin() string {
 	if m != nil {
-		return m.Minter
+		return m.Admin
 	}
 	return ""
 }
 
-func (m *EvaluateAuthorization) GetConstraints() []*MintConstraints {
+func (m *SubmitClaimAuthorization) GetConstraints() []*SubmitClaimConstraints {
 	if m != nil {
 		return m.Constraints
 	}
 	return nil
 }
 
-type MintConstraints struct {
-	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
+type SubmitClaimConstraints struct {
+	// collection_id indicates to which Collection this claim belongs
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	AgentQuota   uint64 `protobuf:"varint,2,opt,name=agent_quota,json=agentQuota,proto3" json:"agent_quota,omitempty"`
 }
 
-func (m *MintConstraints) Reset()         { *m = MintConstraints{} }
-func (m *MintConstraints) String() string { return proto.CompactTextString(m) }
-func (*MintConstraints) ProtoMessage()    {}
-func (*MintConstraints) Descriptor() ([]byte, []int) {
+func (m *SubmitClaimConstraints) Reset()         { *m = SubmitClaimConstraints{} }
+func (m *SubmitClaimConstraints) String() string { return proto.CompactTextString(m) }
+func (*SubmitClaimConstraints) ProtoMessage()    {}
+func (*SubmitClaimConstraints) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f4b7f6c531e101a6, []int{1}
 }
-func (m *MintConstraints) XXX_Unmarshal(b []byte) error {
+func (m *SubmitClaimConstraints) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MintConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SubmitClaimConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MintConstraints.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SubmitClaimConstraints.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -102,56 +109,197 @@ func (m *MintConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *MintConstraints) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MintConstraints.Merge(m, src)
+func (m *SubmitClaimConstraints) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubmitClaimConstraints.Merge(m, src)
 }
-func (m *MintConstraints) XXX_Size() int {
+func (m *SubmitClaimConstraints) XXX_Size() int {
 	return m.Size()
 }
-func (m *MintConstraints) XXX_DiscardUnknown() {
-	xxx_messageInfo_MintConstraints.DiscardUnknown(m)
+func (m *SubmitClaimConstraints) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubmitClaimConstraints.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MintConstraints proto.InternalMessageInfo
+var xxx_messageInfo_SubmitClaimConstraints proto.InternalMessageInfo
 
-func (m *MintConstraints) GetContractAddress() string {
+func (m *SubmitClaimConstraints) GetCollectionId() string {
 	if m != nil {
-		return m.ContractAddress
+		return m.CollectionId
 	}
 	return ""
 }
 
+func (m *SubmitClaimConstraints) GetAgentQuota() uint64 {
+	if m != nil {
+		return m.AgentQuota
+	}
+	return 0
+}
+
+type EvaluateClaimAuthorization struct {
+	// address of admin
+	Admin       string                      `protobuf:"bytes,1,opt,name=admin,proto3" json:"admin,omitempty"`
+	Constraints []*EvaluateClaimConstraints `protobuf:"bytes,2,rep,name=constraints,proto3" json:"constraints,omitempty"`
+}
+
+func (m *EvaluateClaimAuthorization) Reset()         { *m = EvaluateClaimAuthorization{} }
+func (m *EvaluateClaimAuthorization) String() string { return proto.CompactTextString(m) }
+func (*EvaluateClaimAuthorization) ProtoMessage()    {}
+func (*EvaluateClaimAuthorization) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f4b7f6c531e101a6, []int{2}
+}
+func (m *EvaluateClaimAuthorization) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EvaluateClaimAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EvaluateClaimAuthorization.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EvaluateClaimAuthorization) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EvaluateClaimAuthorization.Merge(m, src)
+}
+func (m *EvaluateClaimAuthorization) XXX_Size() int {
+	return m.Size()
+}
+func (m *EvaluateClaimAuthorization) XXX_DiscardUnknown() {
+	xxx_messageInfo_EvaluateClaimAuthorization.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EvaluateClaimAuthorization proto.InternalMessageInfo
+
+func (m *EvaluateClaimAuthorization) GetAdmin() string {
+	if m != nil {
+		return m.Admin
+	}
+	return ""
+}
+
+func (m *EvaluateClaimAuthorization) GetConstraints() []*EvaluateClaimConstraints {
+	if m != nil {
+		return m.Constraints
+	}
+	return nil
+}
+
+type EvaluateClaimConstraints struct {
+	// collection_id indicates to which Collection this claim belongs
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// either collection_id or claim_id is needed
+	ClaimId    string     `protobuf:"bytes,2,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
+	AgentQuota uint64     `protobuf:"varint,3,opt,name=agent_quota,json=agentQuota,proto3" json:"agent_quota,omitempty"`
+	BeforeDate *time.Time `protobuf:"bytes,4,opt,name=before_date,json=beforeDate,proto3,stdtime" json:"before_date,omitempty"`
+}
+
+func (m *EvaluateClaimConstraints) Reset()         { *m = EvaluateClaimConstraints{} }
+func (m *EvaluateClaimConstraints) String() string { return proto.CompactTextString(m) }
+func (*EvaluateClaimConstraints) ProtoMessage()    {}
+func (*EvaluateClaimConstraints) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f4b7f6c531e101a6, []int{3}
+}
+func (m *EvaluateClaimConstraints) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EvaluateClaimConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EvaluateClaimConstraints.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EvaluateClaimConstraints) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EvaluateClaimConstraints.Merge(m, src)
+}
+func (m *EvaluateClaimConstraints) XXX_Size() int {
+	return m.Size()
+}
+func (m *EvaluateClaimConstraints) XXX_DiscardUnknown() {
+	xxx_messageInfo_EvaluateClaimConstraints.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EvaluateClaimConstraints proto.InternalMessageInfo
+
+func (m *EvaluateClaimConstraints) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *EvaluateClaimConstraints) GetClaimId() string {
+	if m != nil {
+		return m.ClaimId
+	}
+	return ""
+}
+
+func (m *EvaluateClaimConstraints) GetAgentQuota() uint64 {
+	if m != nil {
+		return m.AgentQuota
+	}
+	return 0
+}
+
+func (m *EvaluateClaimConstraints) GetBeforeDate() *time.Time {
+	if m != nil {
+		return m.BeforeDate
+	}
+	return nil
+}
+
 func init() {
-	proto.RegisterType((*EvaluateAuthorization)(nil), "ixo.claims.v1beta1.EvaluateAuthorization")
-	proto.RegisterType((*MintConstraints)(nil), "ixo.claims.v1beta1.MintConstraints")
+	proto.RegisterType((*SubmitClaimAuthorization)(nil), "ixo.claims.v1beta1.SubmitClaimAuthorization")
+	proto.RegisterType((*SubmitClaimConstraints)(nil), "ixo.claims.v1beta1.SubmitClaimConstraints")
+	proto.RegisterType((*EvaluateClaimAuthorization)(nil), "ixo.claims.v1beta1.EvaluateClaimAuthorization")
+	proto.RegisterType((*EvaluateClaimConstraints)(nil), "ixo.claims.v1beta1.EvaluateClaimConstraints")
 }
 
 func init() { proto.RegisterFile("ixo/claims/v1beta1/authz.proto", fileDescriptor_f4b7f6c531e101a6) }
 
 var fileDescriptor_f4b7f6c531e101a6 = []byte{
-	// 295 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x90, 0xbf, 0x4a, 0x03, 0x41,
-	0x10, 0xc6, 0xb3, 0x0a, 0x01, 0x37, 0x48, 0xf4, 0x50, 0x89, 0x29, 0x96, 0x10, 0x9b, 0x58, 0x64,
-	0x97, 0x28, 0x58, 0x88, 0x4d, 0x94, 0x94, 0x82, 0xa4, 0xb4, 0x09, 0x7b, 0x9b, 0x33, 0xb7, 0x98,
-	0xdb, 0x09, 0xbb, 0x73, 0xe1, 0xcc, 0x1b, 0xd8, 0xf9, 0x30, 0x3e, 0x84, 0x65, 0xb0, 0xb2, 0x94,
-	0xdc, 0x8b, 0x48, 0x6e, 0x2f, 0xf8, 0xaf, 0x9b, 0x6f, 0x7e, 0x33, 0x7c, 0x1f, 0x1f, 0x65, 0x3a,
-	0x03, 0xa1, 0xa6, 0x52, 0x27, 0x4e, 0xcc, 0x7b, 0x61, 0x84, 0xb2, 0x27, 0x64, 0x8a, 0xf1, 0x82,
-	0xcf, 0x2c, 0x20, 0x04, 0x81, 0xce, 0x80, 0x7b, 0xce, 0x4b, 0xde, 0x3c, 0x98, 0xc0, 0x04, 0x0a,
-	0x2c, 0xd6, 0x93, 0xbf, 0x6c, 0x1e, 0x2b, 0x70, 0x09, 0xb8, 0x91, 0x07, 0x5e, 0x78, 0xd4, 0x7e,
-	0x26, 0xf4, 0x70, 0x30, 0x97, 0xd3, 0x54, 0x62, 0xd4, 0x4f, 0x31, 0x06, 0xab, 0x17, 0x12, 0x35,
-	0x98, 0xe0, 0x88, 0x56, 0x13, 0x6d, 0x30, 0xb2, 0x0d, 0xd2, 0x22, 0x9d, 0x9d, 0x61, 0xa9, 0x82,
-	0x01, 0xad, 0x29, 0x30, 0x0e, 0xad, 0xd4, 0x06, 0x5d, 0x63, 0xab, 0xb5, 0xdd, 0xa9, 0x9d, 0x9d,
-	0xf0, 0xff, 0x61, 0xf8, 0xad, 0x36, 0x78, 0xf3, 0x7d, 0x3a, 0xfc, 0xf9, 0x77, 0xb9, 0xff, 0xfe,
-	0xda, 0xdd, 0xfd, 0xe5, 0xd8, 0xbe, 0xa2, 0xf5, 0x3f, 0x2f, 0xc1, 0x29, 0xdd, 0x53, 0x60, 0xd0,
-	0x4a, 0x85, 0x23, 0x39, 0x1e, 0xdb, 0xc8, 0xb9, 0x32, 0x4e, 0x7d, 0xb3, 0xef, 0xfb, 0xf5, 0xf5,
-	0xdd, 0xdb, 0x8a, 0x91, 0xe5, 0x8a, 0x91, 0xcf, 0x15, 0x23, 0x2f, 0x39, 0xab, 0x2c, 0x73, 0x56,
-	0xf9, 0xc8, 0x59, 0xe5, 0xfe, 0x62, 0xa2, 0x31, 0x4e, 0x43, 0xae, 0x20, 0x11, 0x3a, 0x83, 0x07,
-	0x48, 0xcd, 0xb8, 0x70, 0x5c, 0xab, 0x6e, 0x38, 0x05, 0xf5, 0xa8, 0x62, 0xa9, 0x8d, 0xc8, 0x36,
-	0x75, 0xe3, 0xd3, 0x2c, 0x72, 0x61, 0xb5, 0xa8, 0xe8, 0xfc, 0x2b, 0x00, 0x00, 0xff, 0xff, 0xf5,
-	0x6a, 0x2b, 0x72, 0x89, 0x01, 0x00, 0x00,
+	// 433 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4d, 0x6f, 0xd3, 0x40,
+	0x10, 0xcd, 0xa6, 0xe1, 0x6b, 0x4d, 0x0f, 0x58, 0x15, 0x72, 0x73, 0x70, 0xa2, 0x70, 0x89, 0x10,
+	0xdd, 0x55, 0x8b, 0xc4, 0x81, 0x5b, 0x5b, 0x38, 0x20, 0x21, 0x04, 0x81, 0x13, 0x07, 0xac, 0xf5,
+	0x7a, 0x63, 0xaf, 0xb0, 0x3d, 0xc1, 0x9e, 0xad, 0x4c, 0x7f, 0x45, 0x39, 0xf0, 0x4f, 0x38, 0x73,
+	0xe6, 0x58, 0x71, 0xe2, 0x06, 0x4a, 0xfe, 0x08, 0xf2, 0x6e, 0xa2, 0xb6, 0x34, 0x48, 0xed, 0x6d,
+	0xdf, 0xbc, 0x79, 0x33, 0xf3, 0x46, 0xb3, 0x34, 0xd4, 0x0d, 0x70, 0x99, 0x0b, 0x5d, 0xd4, 0xfc,
+	0x68, 0x37, 0x56, 0x28, 0x76, 0xb9, 0x30, 0x98, 0x1d, 0xb3, 0x59, 0x05, 0x08, 0xbe, 0xaf, 0x1b,
+	0x60, 0x8e, 0x67, 0x4b, 0xbe, 0xbf, 0x95, 0x42, 0x0a, 0x96, 0xe6, 0xed, 0xcb, 0x65, 0xf6, 0xb7,
+	0x25, 0xd4, 0x05, 0xd4, 0x91, 0x23, 0x1c, 0x58, 0x52, 0x83, 0x14, 0x20, 0xcd, 0x15, 0xb7, 0x28,
+	0x36, 0x53, 0x8e, 0xba, 0x50, 0x35, 0x8a, 0x62, 0xe6, 0x12, 0x46, 0x5f, 0x08, 0x0d, 0xde, 0x9a,
+	0xb8, 0xd0, 0x78, 0xd8, 0xb6, 0xda, 0x37, 0x98, 0x41, 0xa5, 0x8f, 0x05, 0x6a, 0x28, 0xfd, 0x2d,
+	0x7a, 0x43, 0x24, 0x85, 0x2e, 0x03, 0x32, 0x24, 0xe3, 0x3b, 0x13, 0x07, 0xfc, 0x97, 0xd4, 0x93,
+	0x50, 0xd6, 0x58, 0x09, 0x5d, 0x62, 0x1d, 0x74, 0x87, 0x1b, 0x63, 0x6f, 0xef, 0x21, 0xbb, 0x3c,
+	0x2e, 0x3b, 0x57, 0xf8, 0xf0, 0x4c, 0x31, 0x39, 0x2f, 0x7f, 0x7a, 0xef, 0xe7, 0xb7, 0x9d, 0xcd,
+	0x0b, 0x6d, 0x47, 0x1f, 0xe8, 0xfd, 0xf5, 0x4a, 0xff, 0x01, 0xdd, 0x94, 0x90, 0xe7, 0x4a, 0xb6,
+	0x79, 0x91, 0x4e, 0x96, 0x83, 0xdd, 0x3d, 0x0b, 0xbe, 0x48, 0xfc, 0x01, 0xf5, 0x44, 0xaa, 0x4a,
+	0x8c, 0x3e, 0x19, 0x40, 0x11, 0x74, 0x87, 0x64, 0xdc, 0x9b, 0x50, 0x1b, 0x7a, 0xd3, 0x46, 0x46,
+	0x5f, 0x09, 0xed, 0x3f, 0x3f, 0x12, 0xb9, 0x11, 0xa8, 0xae, 0xec, 0xfa, 0xd5, 0x3a, 0xd7, 0x8f,
+	0xd6, 0xb9, 0xbe, 0x50, 0xfa, 0x3a, 0xbe, 0xbf, 0x13, 0x1a, 0xfc, 0x4f, 0x7c, 0x35, 0xeb, 0xdb,
+	0xf4, 0xb6, 0x1d, 0xa6, 0xe5, 0xbb, 0x96, 0xbf, 0x65, 0xf1, 0xe5, 0xad, 0x6c, 0xfc, 0xbb, 0x15,
+	0x7f, 0x9f, 0x7a, 0xb1, 0x9a, 0x42, 0xa5, 0xa2, 0x44, 0xa0, 0x0a, 0x7a, 0x43, 0x32, 0xf6, 0xf6,
+	0xfa, 0xcc, 0x1d, 0x10, 0x5b, 0x1d, 0x10, 0x7b, 0xb7, 0x3a, 0xa0, 0x83, 0xde, 0xc9, 0xef, 0x01,
+	0x99, 0x50, 0x27, 0x7a, 0x26, 0x50, 0x1d, 0xbc, 0xfe, 0x31, 0x0f, 0xc9, 0xe9, 0x3c, 0x24, 0x7f,
+	0xe6, 0x21, 0x39, 0x59, 0x84, 0x9d, 0xd3, 0x45, 0xd8, 0xf9, 0xb5, 0x08, 0x3b, 0xef, 0x9f, 0xa4,
+	0x1a, 0x33, 0x13, 0x33, 0x09, 0x05, 0xd7, 0x0d, 0x4c, 0xc1, 0x94, 0x89, 0x35, 0xdd, 0xa2, 0x9d,
+	0x38, 0x07, 0xf9, 0x51, 0x66, 0x42, 0x97, 0xbc, 0x59, 0x7d, 0x09, 0xfc, 0x3c, 0x53, 0x75, 0x7c,
+	0xd3, 0xf6, 0x7d, 0xfc, 0x37, 0x00, 0x00, 0xff, 0xff, 0xa2, 0x49, 0x12, 0x50, 0x2d, 0x03, 0x00,
+	0x00,
 }
 
-func (m *EvaluateAuthorization) Marshal() (dAtA []byte, err error) {
+func (m *SubmitClaimAuthorization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -161,12 +309,12 @@ func (m *EvaluateAuthorization) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *EvaluateAuthorization) MarshalTo(dAtA []byte) (int, error) {
+func (m *SubmitClaimAuthorization) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *EvaluateAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SubmitClaimAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -185,17 +333,17 @@ func (m *EvaluateAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.Minter) > 0 {
-		i -= len(m.Minter)
-		copy(dAtA[i:], m.Minter)
-		i = encodeVarintAuthz(dAtA, i, uint64(len(m.Minter)))
+	if len(m.Admin) > 0 {
+		i -= len(m.Admin)
+		copy(dAtA[i:], m.Admin)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.Admin)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *MintConstraints) Marshal() (dAtA []byte, err error) {
+func (m *SubmitClaimConstraints) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -205,20 +353,121 @@ func (m *MintConstraints) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MintConstraints) MarshalTo(dAtA []byte) (int, error) {
+func (m *SubmitClaimConstraints) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MintConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SubmitClaimConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContractAddress) > 0 {
-		i -= len(m.ContractAddress)
-		copy(dAtA[i:], m.ContractAddress)
-		i = encodeVarintAuthz(dAtA, i, uint64(len(m.ContractAddress)))
+	if m.AgentQuota != 0 {
+		i = encodeVarintAuthz(dAtA, i, uint64(m.AgentQuota))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EvaluateClaimAuthorization) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EvaluateClaimAuthorization) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EvaluateClaimAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Constraints) > 0 {
+		for iNdEx := len(m.Constraints) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Constraints[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintAuthz(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Admin) > 0 {
+		i -= len(m.Admin)
+		copy(dAtA[i:], m.Admin)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.Admin)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EvaluateClaimConstraints) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EvaluateClaimConstraints) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EvaluateClaimConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.BeforeDate != nil {
+		n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.BeforeDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.BeforeDate):])
+		if err1 != nil {
+			return 0, err1
+		}
+		i -= n1
+		i = encodeVarintAuthz(dAtA, i, uint64(n1))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.AgentQuota != 0 {
+		i = encodeVarintAuthz(dAtA, i, uint64(m.AgentQuota))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.ClaimId) > 0 {
+		i -= len(m.ClaimId)
+		copy(dAtA[i:], m.ClaimId)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.ClaimId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.CollectionId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -236,13 +485,13 @@ func encodeVarintAuthz(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *EvaluateAuthorization) Size() (n int) {
+func (m *SubmitClaimAuthorization) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Minter)
+	l = len(m.Admin)
 	if l > 0 {
 		n += 1 + l + sovAuthz(uint64(l))
 	}
@@ -255,14 +504,60 @@ func (m *EvaluateAuthorization) Size() (n int) {
 	return n
 }
 
-func (m *MintConstraints) Size() (n int) {
+func (m *SubmitClaimConstraints) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.ContractAddress)
+	l = len(m.CollectionId)
 	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	if m.AgentQuota != 0 {
+		n += 1 + sovAuthz(uint64(m.AgentQuota))
+	}
+	return n
+}
+
+func (m *EvaluateClaimAuthorization) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Admin)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	if len(m.Constraints) > 0 {
+		for _, e := range m.Constraints {
+			l = e.Size()
+			n += 1 + l + sovAuthz(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *EvaluateClaimConstraints) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	l = len(m.ClaimId)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	if m.AgentQuota != 0 {
+		n += 1 + sovAuthz(uint64(m.AgentQuota))
+	}
+	if m.BeforeDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.BeforeDate)
 		n += 1 + l + sovAuthz(uint64(l))
 	}
 	return n
@@ -274,7 +569,7 @@ func sovAuthz(x uint64) (n int) {
 func sozAuthz(x uint64) (n int) {
 	return sovAuthz(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *EvaluateAuthorization) Unmarshal(dAtA []byte) error {
+func (m *SubmitClaimAuthorization) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -297,15 +592,15 @@ func (m *EvaluateAuthorization) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: EvaluateAuthorization: wiretype end group for non-group")
+			return fmt.Errorf("proto: SubmitClaimAuthorization: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EvaluateAuthorization: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SubmitClaimAuthorization: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Minter", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Admin", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -333,7 +628,7 @@ func (m *EvaluateAuthorization) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Minter = string(dAtA[iNdEx:postIndex])
+			m.Admin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -364,7 +659,7 @@ func (m *EvaluateAuthorization) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Constraints = append(m.Constraints, &MintConstraints{})
+			m.Constraints = append(m.Constraints, &SubmitClaimConstraints{})
 			if err := m.Constraints[len(m.Constraints)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -390,7 +685,7 @@ func (m *EvaluateAuthorization) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MintConstraints) Unmarshal(dAtA []byte) error {
+func (m *SubmitClaimConstraints) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -413,15 +708,15 @@ func (m *MintConstraints) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MintConstraints: wiretype end group for non-group")
+			return fmt.Errorf("proto: SubmitClaimConstraints: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MintConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SubmitClaimConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddress", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -449,7 +744,311 @@ func (m *MintConstraints) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ContractAddress = string(dAtA[iNdEx:postIndex])
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AgentQuota", wireType)
+			}
+			m.AgentQuota = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AgentQuota |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipAuthz(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EvaluateClaimAuthorization) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowAuthz
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EvaluateClaimAuthorization: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EvaluateClaimAuthorization: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Admin", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Admin = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Constraints", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Constraints = append(m.Constraints, &EvaluateClaimConstraints{})
+			if err := m.Constraints[len(m.Constraints)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipAuthz(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EvaluateClaimConstraints) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowAuthz
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EvaluateClaimConstraints: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EvaluateClaimConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClaimId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClaimId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AgentQuota", wireType)
+			}
+			m.AgentQuota = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AgentQuota |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BeforeDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.BeforeDate == nil {
+				m.BeforeDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.BeforeDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

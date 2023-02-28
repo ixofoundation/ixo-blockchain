@@ -23,23 +23,23 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// ClaimCreatedEvent is an event triggered on a Claim creation
-type ClaimCreatedEvent struct {
-	Owner string `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
+// CollectionCreatedEvent is an event triggered on a Collection creation
+type CollectionCreatedEvent struct {
+	Collection *Collection `protobuf:"bytes,1,opt,name=collection,proto3" json:"collection,omitempty"`
 }
 
-func (m *ClaimCreatedEvent) Reset()         { *m = ClaimCreatedEvent{} }
-func (m *ClaimCreatedEvent) String() string { return proto.CompactTextString(m) }
-func (*ClaimCreatedEvent) ProtoMessage()    {}
-func (*ClaimCreatedEvent) Descriptor() ([]byte, []int) {
+func (m *CollectionCreatedEvent) Reset()         { *m = CollectionCreatedEvent{} }
+func (m *CollectionCreatedEvent) String() string { return proto.CompactTextString(m) }
+func (*CollectionCreatedEvent) ProtoMessage()    {}
+func (*CollectionCreatedEvent) Descriptor() ([]byte, []int) {
 	return fileDescriptor_26b125bce36ddb45, []int{0}
 }
-func (m *ClaimCreatedEvent) XXX_Unmarshal(b []byte) error {
+func (m *CollectionCreatedEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ClaimCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CollectionCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ClaimCreatedEvent.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CollectionCreatedEvent.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -49,49 +49,286 @@ func (m *ClaimCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *ClaimCreatedEvent) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClaimCreatedEvent.Merge(m, src)
+func (m *CollectionCreatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CollectionCreatedEvent.Merge(m, src)
 }
-func (m *ClaimCreatedEvent) XXX_Size() int {
+func (m *CollectionCreatedEvent) XXX_Size() int {
 	return m.Size()
 }
-func (m *ClaimCreatedEvent) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClaimCreatedEvent.DiscardUnknown(m)
+func (m *CollectionCreatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_CollectionCreatedEvent.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ClaimCreatedEvent proto.InternalMessageInfo
+var xxx_messageInfo_CollectionCreatedEvent proto.InternalMessageInfo
 
-func (m *ClaimCreatedEvent) GetOwner() string {
+func (m *CollectionCreatedEvent) GetCollection() *Collection {
 	if m != nil {
-		return m.Owner
+		return m.Collection
 	}
-	return ""
+	return nil
+}
+
+// CollectionUpdatedEvent is an event triggered on a Collection update
+type CollectionUpdatedEvent struct {
+	Collection *Collection `protobuf:"bytes,1,opt,name=collection,proto3" json:"collection,omitempty"`
+}
+
+func (m *CollectionUpdatedEvent) Reset()         { *m = CollectionUpdatedEvent{} }
+func (m *CollectionUpdatedEvent) String() string { return proto.CompactTextString(m) }
+func (*CollectionUpdatedEvent) ProtoMessage()    {}
+func (*CollectionUpdatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{1}
+}
+func (m *CollectionUpdatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CollectionUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CollectionUpdatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CollectionUpdatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CollectionUpdatedEvent.Merge(m, src)
+}
+func (m *CollectionUpdatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *CollectionUpdatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_CollectionUpdatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CollectionUpdatedEvent proto.InternalMessageInfo
+
+func (m *CollectionUpdatedEvent) GetCollection() *Collection {
+	if m != nil {
+		return m.Collection
+	}
+	return nil
+}
+
+// CollectionCreatedEvent is an event triggered on a Claim submission
+type ClaimSubmittedEvent struct {
+	Claim *Claim `protobuf:"bytes,1,opt,name=claim,proto3" json:"claim,omitempty"`
+}
+
+func (m *ClaimSubmittedEvent) Reset()         { *m = ClaimSubmittedEvent{} }
+func (m *ClaimSubmittedEvent) String() string { return proto.CompactTextString(m) }
+func (*ClaimSubmittedEvent) ProtoMessage()    {}
+func (*ClaimSubmittedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{2}
+}
+func (m *ClaimSubmittedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClaimSubmittedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClaimSubmittedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ClaimSubmittedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimSubmittedEvent.Merge(m, src)
+}
+func (m *ClaimSubmittedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClaimSubmittedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimSubmittedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClaimSubmittedEvent proto.InternalMessageInfo
+
+func (m *ClaimSubmittedEvent) GetClaim() *Claim {
+	if m != nil {
+		return m.Claim
+	}
+	return nil
+}
+
+// ClaimUpdatedEvent is an event triggered on a Claim update
+type ClaimUpdatedEvent struct {
+	Claim *Claim `protobuf:"bytes,1,opt,name=claim,proto3" json:"claim,omitempty"`
+}
+
+func (m *ClaimUpdatedEvent) Reset()         { *m = ClaimUpdatedEvent{} }
+func (m *ClaimUpdatedEvent) String() string { return proto.CompactTextString(m) }
+func (*ClaimUpdatedEvent) ProtoMessage()    {}
+func (*ClaimUpdatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{3}
+}
+func (m *ClaimUpdatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClaimUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClaimUpdatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ClaimUpdatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimUpdatedEvent.Merge(m, src)
+}
+func (m *ClaimUpdatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClaimUpdatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimUpdatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClaimUpdatedEvent proto.InternalMessageInfo
+
+func (m *ClaimUpdatedEvent) GetClaim() *Claim {
+	if m != nil {
+		return m.Claim
+	}
+	return nil
+}
+
+// ClaimEvaluatedEvent is an event triggered on a Claim evaluation
+type ClaimEvaluatedEvent struct {
+	Evaluation *Evaluation `protobuf:"bytes,1,opt,name=evaluation,proto3" json:"evaluation,omitempty"`
+}
+
+func (m *ClaimEvaluatedEvent) Reset()         { *m = ClaimEvaluatedEvent{} }
+func (m *ClaimEvaluatedEvent) String() string { return proto.CompactTextString(m) }
+func (*ClaimEvaluatedEvent) ProtoMessage()    {}
+func (*ClaimEvaluatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{4}
+}
+func (m *ClaimEvaluatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClaimEvaluatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClaimEvaluatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ClaimEvaluatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimEvaluatedEvent.Merge(m, src)
+}
+func (m *ClaimEvaluatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClaimEvaluatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimEvaluatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClaimEvaluatedEvent proto.InternalMessageInfo
+
+func (m *ClaimEvaluatedEvent) GetEvaluation() *Evaluation {
+	if m != nil {
+		return m.Evaluation
+	}
+	return nil
+}
+
+// ClaimDisputedEvent is an event triggered on a Claim dispute
+type ClaimDisputedEvent struct {
+	Dispute *Dispute `protobuf:"bytes,1,opt,name=dispute,proto3" json:"dispute,omitempty"`
+}
+
+func (m *ClaimDisputedEvent) Reset()         { *m = ClaimDisputedEvent{} }
+func (m *ClaimDisputedEvent) String() string { return proto.CompactTextString(m) }
+func (*ClaimDisputedEvent) ProtoMessage()    {}
+func (*ClaimDisputedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{5}
+}
+func (m *ClaimDisputedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ClaimDisputedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ClaimDisputedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ClaimDisputedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ClaimDisputedEvent.Merge(m, src)
+}
+func (m *ClaimDisputedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *ClaimDisputedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_ClaimDisputedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ClaimDisputedEvent proto.InternalMessageInfo
+
+func (m *ClaimDisputedEvent) GetDispute() *Dispute {
+	if m != nil {
+		return m.Dispute
+	}
+	return nil
 }
 
 func init() {
-	proto.RegisterType((*ClaimCreatedEvent)(nil), "ixo.claims.v1beta1.ClaimCreatedEvent")
+	proto.RegisterType((*CollectionCreatedEvent)(nil), "ixo.claims.v1beta1.CollectionCreatedEvent")
+	proto.RegisterType((*CollectionUpdatedEvent)(nil), "ixo.claims.v1beta1.CollectionUpdatedEvent")
+	proto.RegisterType((*ClaimSubmittedEvent)(nil), "ixo.claims.v1beta1.ClaimSubmittedEvent")
+	proto.RegisterType((*ClaimUpdatedEvent)(nil), "ixo.claims.v1beta1.ClaimUpdatedEvent")
+	proto.RegisterType((*ClaimEvaluatedEvent)(nil), "ixo.claims.v1beta1.ClaimEvaluatedEvent")
+	proto.RegisterType((*ClaimDisputedEvent)(nil), "ixo.claims.v1beta1.ClaimDisputedEvent")
 }
 
 func init() { proto.RegisterFile("ixo/claims/v1beta1/event.proto", fileDescriptor_26b125bce36ddb45) }
 
 var fileDescriptor_26b125bce36ddb45 = []byte{
-	// 195 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0xcb, 0xac, 0xc8, 0xd7,
-	0x4f, 0xce, 0x49, 0xcc, 0xcc, 0x2d, 0xd6, 0x2f, 0x33, 0x4c, 0x4a, 0x2d, 0x49, 0x34, 0xd4, 0x4f,
-	0x2d, 0x4b, 0xcd, 0x2b, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0xca, 0xac, 0xc8, 0xd7,
-	0x83, 0xc8, 0xeb, 0x41, 0xe5, 0xa5, 0x44, 0xd2, 0xf3, 0xd3, 0xf3, 0xc1, 0xd2, 0xfa, 0x20, 0x16,
-	0x44, 0xa5, 0x92, 0x26, 0x97, 0xa0, 0x33, 0x48, 0x9d, 0x73, 0x51, 0x6a, 0x62, 0x49, 0x6a, 0x8a,
-	0x2b, 0xc8, 0x10, 0x21, 0x11, 0x2e, 0xd6, 0xfc, 0xf2, 0xbc, 0xd4, 0x22, 0x09, 0x26, 0x05, 0x46,
-	0x0d, 0xce, 0x20, 0x08, 0xc7, 0x29, 0xe0, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f,
-	0x3c, 0x92, 0x63, 0x9c, 0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18,
-	0xa2, 0xcc, 0xd2, 0x33, 0x4b, 0x32, 0x4a, 0x93, 0xf4, 0x92, 0xf3, 0x73, 0xf5, 0x33, 0x2b, 0xf2,
-	0xd3, 0xf2, 0x4b, 0xf3, 0x52, 0x12, 0x4b, 0x32, 0xf3, 0xf3, 0x40, 0x3c, 0xdd, 0xa4, 0x9c, 0xfc,
-	0xe4, 0xec, 0xe4, 0x8c, 0xc4, 0xcc, 0x3c, 0xfd, 0x0a, 0x98, 0xa3, 0x4b, 0x2a, 0x0b, 0x52, 0x8b,
-	0x93, 0xd8, 0xc0, 0x6e, 0x30, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0xb6, 0x44, 0x74, 0xf9, 0xcf,
-	0x00, 0x00, 0x00,
+	// 313 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x92, 0xb1, 0x4a, 0xc4, 0x40,
+	0x10, 0x86, 0x2f, 0x85, 0x0a, 0x6b, 0x65, 0x14, 0xd1, 0x13, 0x56, 0x49, 0x65, 0xe3, 0x2e, 0xa7,
+	0x68, 0x69, 0x61, 0x2e, 0x36, 0x36, 0x12, 0x39, 0x10, 0xbb, 0x64, 0xb3, 0xe6, 0x16, 0x93, 0x4c,
+	0xb8, 0x6c, 0x42, 0x7c, 0x0b, 0x1f, 0xcb, 0xf2, 0x4a, 0x4b, 0x49, 0x5e, 0x44, 0xb2, 0xd9, 0x8b,
+	0x17, 0x0c, 0x88, 0x60, 0xb7, 0xb3, 0xff, 0xff, 0x7f, 0x33, 0x03, 0x83, 0xb0, 0x28, 0x81, 0xb2,
+	0xc8, 0x13, 0x71, 0x46, 0x8b, 0x89, 0xcf, 0xa5, 0x37, 0xa1, 0xbc, 0xe0, 0x89, 0x24, 0xe9, 0x02,
+	0x24, 0x98, 0xa6, 0x28, 0x81, 0xb4, 0x3a, 0xd1, 0xfa, 0x78, 0x2f, 0x84, 0x10, 0x94, 0x4c, 0x9b,
+	0x57, 0xeb, 0x1c, 0x1f, 0x0f, 0x90, 0x74, 0x50, 0x19, 0xac, 0x47, 0xb4, 0x6f, 0x43, 0x14, 0x71,
+	0x26, 0x05, 0x24, 0xf6, 0x82, 0x7b, 0x92, 0x07, 0x4e, 0xd3, 0xca, 0xbc, 0x46, 0x88, 0x75, 0xca,
+	0x81, 0x71, 0x62, 0x9c, 0x6e, 0x9f, 0x63, 0xf2, 0xb3, 0x33, 0xf9, 0xce, 0xbb, 0x6b, 0x89, 0x3e,
+	0x79, 0x96, 0x06, 0xff, 0x47, 0xbe, 0x45, 0xbb, 0x76, 0x63, 0x7c, 0xc8, 0xfd, 0x58, 0xc8, 0x0e,
+	0x4b, 0xd1, 0x86, 0xca, 0x6b, 0xe2, 0xe1, 0x20, 0xb1, 0x29, 0xdd, 0xd6, 0x67, 0x4d, 0xd1, 0x8e,
+	0xaa, 0x7b, 0xc3, 0xfd, 0x99, 0x32, 0xd3, 0xd3, 0x38, 0x85, 0x17, 0xe5, 0xbd, 0x25, 0x79, 0xfb,
+	0xf3, 0xcb, 0x92, 0x4e, 0xe7, 0x72, 0xd7, 0x12, 0xd6, 0x1d, 0x32, 0x15, 0x76, 0x2a, 0xb2, 0x34,
+	0xef, 0xa8, 0x97, 0x68, 0x2b, 0x68, 0x3f, 0x34, 0xf2, 0x68, 0x08, 0xa9, 0x33, 0xee, 0xca, 0x7b,
+	0x73, 0xff, 0x5e, 0x61, 0x63, 0x59, 0x61, 0xe3, 0xb3, 0xc2, 0xc6, 0x5b, 0x8d, 0x47, 0xcb, 0x1a,
+	0x8f, 0x3e, 0x6a, 0x3c, 0x7a, 0xba, 0x0a, 0x85, 0x9c, 0xe7, 0x3e, 0x61, 0x10, 0x53, 0x51, 0xc2,
+	0x33, 0xe4, 0x49, 0xa0, 0x06, 0x68, 0xaa, 0x33, 0x3f, 0x02, 0xf6, 0xc2, 0xe6, 0x9e, 0x48, 0x68,
+	0xb9, 0x3a, 0x23, 0xf9, 0x9a, 0xf2, 0xcc, 0xdf, 0x54, 0xe7, 0x73, 0xf1, 0x15, 0x00, 0x00, 0xff,
+	0xff, 0x39, 0x66, 0x2a, 0x00, 0xab, 0x02, 0x00, 0x00,
 }
 
-func (m *ClaimCreatedEvent) Marshal() (dAtA []byte, err error) {
+func (m *CollectionCreatedEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -101,22 +338,202 @@ func (m *ClaimCreatedEvent) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ClaimCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
+func (m *CollectionCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ClaimCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CollectionCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Owner) > 0 {
-		i -= len(m.Owner)
-		copy(dAtA[i:], m.Owner)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.Owner)))
+	if m.Collection != nil {
+		{
+			size, err := m.Collection.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CollectionUpdatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CollectionUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CollectionUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Collection != nil {
+		{
+			size, err := m.Collection.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ClaimSubmittedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClaimSubmittedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimSubmittedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Claim != nil {
+		{
+			size, err := m.Claim.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ClaimUpdatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClaimUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Claim != nil {
+		{
+			size, err := m.Claim.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ClaimEvaluatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClaimEvaluatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimEvaluatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Evaluation != nil {
+		{
+			size, err := m.Evaluation.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ClaimDisputedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ClaimDisputedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ClaimDisputedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Dispute != nil {
+		{
+			size, err := m.Dispute.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -132,14 +549,79 @@ func encodeVarintEvent(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *ClaimCreatedEvent) Size() (n int) {
+func (m *CollectionCreatedEvent) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Owner)
-	if l > 0 {
+	if m.Collection != nil {
+		l = m.Collection.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *CollectionUpdatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Collection != nil {
+		l = m.Collection.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *ClaimSubmittedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Claim != nil {
+		l = m.Claim.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *ClaimUpdatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Claim != nil {
+		l = m.Claim.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *ClaimEvaluatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Evaluation != nil {
+		l = m.Evaluation.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *ClaimDisputedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Dispute != nil {
+		l = m.Dispute.Size()
 		n += 1 + l + sovEvent(uint64(l))
 	}
 	return n
@@ -151,7 +633,7 @@ func sovEvent(x uint64) (n int) {
 func sozEvent(x uint64) (n int) {
 	return sovEvent(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *ClaimCreatedEvent) Unmarshal(dAtA []byte) error {
+func (m *CollectionCreatedEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -174,17 +656,17 @@ func (m *ClaimCreatedEvent) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ClaimCreatedEvent: wiretype end group for non-group")
+			return fmt.Errorf("proto: CollectionCreatedEvent: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ClaimCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CollectionCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 2:
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Owner", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Collection", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -194,23 +676,457 @@ func (m *ClaimCreatedEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Owner = string(dAtA[iNdEx:postIndex])
+			if m.Collection == nil {
+				m.Collection = &Collection{}
+			}
+			if err := m.Collection.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CollectionUpdatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CollectionUpdatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CollectionUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collection", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Collection == nil {
+				m.Collection = &Collection{}
+			}
+			if err := m.Collection.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClaimSubmittedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ClaimSubmittedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ClaimSubmittedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Claim", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Claim == nil {
+				m.Claim = &Claim{}
+			}
+			if err := m.Claim.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClaimUpdatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ClaimUpdatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ClaimUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Claim", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Claim == nil {
+				m.Claim = &Claim{}
+			}
+			if err := m.Claim.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClaimEvaluatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ClaimEvaluatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ClaimEvaluatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Evaluation", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Evaluation == nil {
+				m.Evaluation = &Evaluation{}
+			}
+			if err := m.Evaluation.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ClaimDisputedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ClaimDisputedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ClaimDisputedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dispute", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Dispute == nil {
+				m.Dispute = &Dispute{}
+			}
+			if err := m.Dispute.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

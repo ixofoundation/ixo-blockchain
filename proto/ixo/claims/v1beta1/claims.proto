@@ -2,7 +2,151 @@ syntax = "proto3";
 package ixo.claims.v1beta1;
 
 import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
-message Params {}
+message Params {
+  uint64 collection_sequence = 1;
+  string ixo_did = 2;
+  string oracle_fee_percentage = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string node_fee_percentage = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+enum CollectionState {
+  OPEN = 0 [ (gogoproto.enumvalue_customname) = "open" ];
+  PAUSED = 1 [ (gogoproto.enumvalue_customname) = "paused" ];
+  CLOSED = 2 [ (gogoproto.enumvalue_customname) = "closed" ];
+}
+
+enum EvaluationStatus {
+  PENDING = 0 [ (gogoproto.enumvalue_customname) = "pending" ];
+  APPROVED = 1 [ (gogoproto.enumvalue_customname) = "approved" ];
+  REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
+  DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
+}
+
+message Collection {
+  // collection id is the incremented internal id for the collection of claims
+  string id = 1;
+  // entity is the DID of the entity for which the claims are being created
+  string entity = 2;
+  // admin is the account address that will authorize or revoke agents and
+  // payments (the grantor)
+  string admin = 3;
+  // protocol is the DID of the claim protocol
+  string protocol = 4;
+  // startDate is the date after which claims may be submitted
+  google.protobuf.Timestamp start_date = 5 [ (gogoproto.stdtime) = true ];
+  // endDate is the date after which no more claims may be submitted (no endDate
+  // is allowed)
+  google.protobuf.Timestamp end_date = 6 [ (gogoproto.stdtime) = true ];
+  // quota is the maximum number of claims that may be submitted, 0 is unlimited
+  uint64 quota = 7;
+  // count is the number of claims already submitted (internally calculated)
+  uint64 count = 8;
+  // evaluated is the number of claims that have been evaluated (internally
+  // calculated)
+  uint64 evaluated = 9;
+  // approved is the number of claims that have been evaluated and approved
+  // (internally calculated)
+  uint64 approved = 10;
+  // rejected is the number of claims that have been evaluated and rejected
+  // (internally calculated)
+  uint64 rejected = 11;
+  // disputed is the number of claims that have disputed status (internally
+  // calculated)
+  uint64 disputed = 12;
+  // state is the current state of this Collection (open, paused, closed)
+  CollectionState state = 13;
+  // payments is the amount paid for claim submission, evaluation, approval, or
+  // rejection
+  Payments payments = 14;
+}
+
+message Payments {
+  Payment submission = 1;
+  Payment evaluation = 2;
+  Payment approval = 3;
+  Payment rejection = 4;
+  // Payment penalty = 5;
+}
+
+message Payment {
+  // account is the entity account address from which the payment will be made
+  string account = 1;
+  repeated cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // timeout after claim/evaluation to create authZ for payment, if 0 then
+  // immidiate direct payment
+  google.protobuf.Duration timeout_ns = 8
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+}
+
+message Claim {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  // agent is the DID of the agent submitting the claim
+  string agent_did = 2;
+  string agent_address = 3;
+  // submissionDate is the date and time that the claim was submitted on-chain
+  google.protobuf.Timestamp submission_date = 4 [ (gogoproto.stdtime) = true ];
+  // claimID is the unique identifier of the claim in the cid hash format
+  string claim_id = 5;
+  // evaluation is the result of one or more claim evaluations
+  Evaluation evaluation = 6;
+  // payment_status
+}
+
+message Evaluation {
+  // oracle is the DID of the Oracle entity that evaluates the claim
+  string oracle = 1;
+  // agent is the DID of the agent that submits the evaluation
+  string agent_did = 2;
+  string agent_address = 3;
+  // status is the evaluation status expressed as an integer (2=approved,
+  // 3=rejected, ...)
+  EvaluationStatus status = 4;
+  // reason is the code expressed as an integer, for why the evaluation result
+  // was given (codes defined by evaluator)
+  uint32 reason = 5;
+  // verificationProof is the cid of the evaluation Verfiable Credential
+  string verification_proof = 6;
+  // evaluationDate is the date and time that the claim evaluation was submitted
+  // on-chain
+  google.protobuf.Timestamp evaluation_date = 7 [ (gogoproto.stdtime) = true ];
+  // custom amount specified by evaluator for claim approval, if empty list then
+  // use default by Collection
+  repeated cosmos.base.v1beta1.Coin amount = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message Dispute {
+  string subject_id = 1;
+  // agent is the DID of the agent submitting the dispute
+  string agent_did = 2;
+  string agent_address = 3;
+  // type is expressed as an integer, interpreted by the client
+  int32 type = 4;
+  DisputeData data = 5;
+}
+
+message DisputeData {
+  string uri = 1; // dispute link ***.ipfs
+  string type = 2;
+  string proof = 3;
+  bool encrypted = 4;
+}
+// controller on entity, agent authz cap for the entity, or is admin

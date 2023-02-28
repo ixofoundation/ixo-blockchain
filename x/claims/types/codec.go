@@ -10,17 +10,24 @@ import (
 )
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgCreateClaim{}, "claims/CreateClaim", nil)
+	cdc.RegisterConcrete(&MsgCreateCollection{}, "claims/CreateCollection", nil)
+	cdc.RegisterConcrete(&MsgSubmitClaim{}, "claims/SubmitClaim", nil)
+	cdc.RegisterConcrete(&MsgEvaluateClaim{}, "claims/EvaluateClaim", nil)
+	cdc.RegisterConcrete(&MsgDisputeClaim{}, "claims/DisputeClaim", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgCreateClaim{},
+		&MsgCreateCollection{},
+		&MsgSubmitClaim{},
+		&MsgEvaluateClaim{},
+		&MsgDisputeClaim{},
 	)
 
 	registry.RegisterImplementations(
 		(*authz.Authorization)(nil),
-		&EvaluateAuthorization{},
+		&SubmitClaimAuthorization{},
+		&EvaluateClaimAuthorization{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

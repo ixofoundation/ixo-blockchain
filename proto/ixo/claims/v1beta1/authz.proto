@@ -3,15 +3,38 @@ package ixo.claims.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
-message EvaluateAuthorization {
+message SubmitClaimAuthorization {
   option (cosmos_proto.implements_interface) = "Authorization";
 
-  // address of minter
-  string minter = 1;
-  repeated MintConstraints constraints = 2;
+  // address of admin
+  string admin = 1;
+  // string collection_id = 1;
+  repeated SubmitClaimConstraints constraints = 2;
 }
 
-message MintConstraints { string contract_address = 1; }
+message SubmitClaimConstraints {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  uint64 agent_quota = 2;
+}
+
+message EvaluateClaimAuthorization {
+  option (cosmos_proto.implements_interface) = "Authorization";
+
+  // address of admin
+  string admin = 1;
+  repeated EvaluateClaimConstraints constraints = 2;
+}
+
+message EvaluateClaimConstraints {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  // either collection_id or claim_id is needed
+  repeated string claim_id = 2;
+  uint64 agent_quota = 3;
+  google.protobuf.Timestamp before_date = 4 [ (gogoproto.stdtime) = true ];
+}

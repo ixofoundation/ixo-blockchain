@@ -74,27 +74,62 @@
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
 - [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
-    - [EvaluateAuthorization](#ixo.claims.v1beta1.EvaluateAuthorization)
-    - [MintConstraints](#ixo.claims.v1beta1.MintConstraints)
+    - [EvaluateClaimAuthorization](#ixo.claims.v1beta1.EvaluateClaimAuthorization)
+    - [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints)
+    - [SubmitClaimAuthorization](#ixo.claims.v1beta1.SubmitClaimAuthorization)
+    - [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints)
   
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
+    - [Claim](#ixo.claims.v1beta1.Claim)
+    - [Collection](#ixo.claims.v1beta1.Collection)
+    - [Dispute](#ixo.claims.v1beta1.Dispute)
+    - [DisputeData](#ixo.claims.v1beta1.DisputeData)
+    - [Evaluation](#ixo.claims.v1beta1.Evaluation)
     - [Params](#ixo.claims.v1beta1.Params)
+    - [Payment](#ixo.claims.v1beta1.Payment)
+    - [Payments](#ixo.claims.v1beta1.Payments)
+  
+    - [CollectionState](#ixo.claims.v1beta1.CollectionState)
+    - [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus)
   
 - [ixo/claims/v1beta1/event.proto](#ixo/claims/v1beta1/event.proto)
-    - [ClaimCreatedEvent](#ixo.claims.v1beta1.ClaimCreatedEvent)
+    - [ClaimDisputedEvent](#ixo.claims.v1beta1.ClaimDisputedEvent)
+    - [ClaimEvaluatedEvent](#ixo.claims.v1beta1.ClaimEvaluatedEvent)
+    - [ClaimSubmittedEvent](#ixo.claims.v1beta1.ClaimSubmittedEvent)
+    - [ClaimUpdatedEvent](#ixo.claims.v1beta1.ClaimUpdatedEvent)
+    - [CollectionCreatedEvent](#ixo.claims.v1beta1.CollectionCreatedEvent)
+    - [CollectionUpdatedEvent](#ixo.claims.v1beta1.CollectionUpdatedEvent)
   
 - [ixo/claims/v1beta1/genesis.proto](#ixo/claims/v1beta1/genesis.proto)
     - [GenesisState](#ixo.claims.v1beta1.GenesisState)
   
 - [ixo/claims/v1beta1/query.proto](#ixo/claims/v1beta1/query.proto)
+    - [QueryClaimListRequest](#ixo.claims.v1beta1.QueryClaimListRequest)
+    - [QueryClaimListResponse](#ixo.claims.v1beta1.QueryClaimListResponse)
+    - [QueryClaimRequest](#ixo.claims.v1beta1.QueryClaimRequest)
+    - [QueryClaimResponse](#ixo.claims.v1beta1.QueryClaimResponse)
+    - [QueryCollectionListRequest](#ixo.claims.v1beta1.QueryCollectionListRequest)
+    - [QueryCollectionListResponse](#ixo.claims.v1beta1.QueryCollectionListResponse)
+    - [QueryCollectionRequest](#ixo.claims.v1beta1.QueryCollectionRequest)
+    - [QueryCollectionResponse](#ixo.claims.v1beta1.QueryCollectionResponse)
+    - [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest)
+    - [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse)
+    - [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest)
+    - [QueryDisputeResponse](#ixo.claims.v1beta1.QueryDisputeResponse)
     - [QueryParamsRequest](#ixo.claims.v1beta1.QueryParamsRequest)
     - [QueryParamsResponse](#ixo.claims.v1beta1.QueryParamsResponse)
   
     - [Query](#ixo.claims.v1beta1.Query)
   
 - [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
-    - [MsgCreateClaim](#ixo.claims.v1beta1.MsgCreateClaim)
-    - [MsgCreateClaimResponse](#ixo.claims.v1beta1.MsgCreateClaimResponse)
+    - [MsgCreateCollection](#ixo.claims.v1beta1.MsgCreateCollection)
+    - [MsgCreateCollectionResponse](#ixo.claims.v1beta1.MsgCreateCollectionResponse)
+    - [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim)
+    - [MsgDisputeClaimResponse](#ixo.claims.v1beta1.MsgDisputeClaimResponse)
+    - [MsgEvaluateClaim](#ixo.claims.v1beta1.MsgEvaluateClaim)
+    - [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse)
+    - [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim)
+    - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
   
     - [Msg](#ixo.claims.v1beta1.Msg)
   
@@ -1440,31 +1475,66 @@ Msg defines the bonds Msg service.
 
 
 
-<a name="ixo.claims.v1beta1.EvaluateAuthorization"></a>
+<a name="ixo.claims.v1beta1.EvaluateClaimAuthorization"></a>
 
-### EvaluateAuthorization
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| minter | [string](#string) |  | address of minter |
-| constraints | [MintConstraints](#ixo.claims.v1beta1.MintConstraints) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.MintConstraints"></a>
-
-### MintConstraints
+### EvaluateClaimAuthorization
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| contract_address | [string](#string) |  |  |
+| admin | [string](#string) |  | address of admin |
+| constraints | [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.EvaluateClaimConstraints"></a>
+
+### EvaluateClaimConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
+| claim_id | [string](#string) |  | either collection_id or claim_id is needed |
+| agent_quota | [uint64](#uint64) |  |  |
+| before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.SubmitClaimAuthorization"></a>
+
+### SubmitClaimAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| admin | [string](#string) |  | address of admin |
+| constraints | [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints) | repeated | string collection_id = 1; |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.SubmitClaimConstraints"></a>
+
+### SubmitClaimConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
+| agent_quota | [uint64](#uint64) |  |  |
 
 
 
@@ -1487,16 +1557,193 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.Claim"></a>
+
+### Claim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
+| agent_did | [string](#string) |  | agent is the DID of the agent submitting the claim |
+| agent_address | [string](#string) |  |  |
+| submission_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submissionDate is the date and time that the claim was submitted on-chain |
+| claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
+| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Collection"></a>
+
+### Collection
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | collection id is the incremented internal id for the collection of claims |
+| entity | [string](#string) |  | entity is the DID of the entity for which the claims are being created |
+| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor) |
+| protocol | [string](#string) |  | protocol is the DID of the claim protocol |
+| start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
+| end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
+| quota | [uint64](#uint64) |  | quota is the maximum number of claims that may be submitted, 0 is unlimited |
+| count | [uint64](#uint64) |  | count is the number of claims already submitted (internally calculated) |
+| evaluated | [uint64](#uint64) |  | evaluated is the number of claims that have been evaluated (internally calculated) |
+| approved | [uint64](#uint64) |  | approved is the number of claims that have been evaluated and approved (internally calculated) |
+| rejected | [uint64](#uint64) |  | rejected is the number of claims that have been evaluated and rejected (internally calculated) |
+| disputed | [uint64](#uint64) |  | disputed is the number of claims that have disputed status (internally calculated) |
+| state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
+| payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Dispute"></a>
+
+### Dispute
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  | claimID for which this dispute is against |
+| agent_did | [string](#string) |  | agent is the DID of the agent submitting the dispute |
+| agent_address | [string](#string) |  |  |
+| type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
+| data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.DisputeData"></a>
+
+### DisputeData
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uri | [string](#string) |  | dispute link ***.ipfs |
+| encrypted | [bool](#bool) |  |  |
+| proof | [string](#string) |  |  |
+| type | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Evaluation"></a>
+
+### Evaluation
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| oracle | [string](#string) |  | oracle is the DID of the Oracle entity that evaluates the claim |
+| agent_did | [string](#string) |  | agent is the DID of the agent that submits the evaluation |
+| agent_address | [string](#string) |  |  |
+| status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
+| reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
+| verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
+| evaluation_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | evaluationDate is the date and time that the claim evaluation was submitted on-chain |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.Params"></a>
 
 ### Params
 
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_sequence | [uint64](#uint64) |  |  |
+| ixo_did | [string](#string) |  |  |
+| oracle_fee_percentage | [string](#string) |  |  |
+| node_fee_percentage | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Payment"></a>
+
+### Payment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [string](#string) |  | account is the entity account address from which the payment will be made |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immidiate direct payment |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Payments"></a>
+
+### Payments
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| submission | [Payment](#ixo.claims.v1beta1.Payment) |  |  |
+| evaluation | [Payment](#ixo.claims.v1beta1.Payment) |  |  |
+| approval | [Payment](#ixo.claims.v1beta1.Payment) |  |  |
+| rejection | [Payment](#ixo.claims.v1beta1.Payment) |  | Payment penalty = 5; |
+
+
 
 
 
  
+
+
+<a name="ixo.claims.v1beta1.CollectionState"></a>
+
+### CollectionState
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| OPEN | 0 |  |
+| PAUSED | 1 |  |
+| CLOSED | 2 |  |
+
+
+
+<a name="ixo.claims.v1beta1.EvaluationStatus"></a>
+
+### EvaluationStatus
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PENDING | 0 |  |
+| APPROVED | 1 |  |
+| REJECTED | 2 |  |
+| DISPUTED | 3 |  |
+
 
  
 
@@ -1513,15 +1760,90 @@ Msg defines the bonds Msg service.
 
 
 
-<a name="ixo.claims.v1beta1.ClaimCreatedEvent"></a>
+<a name="ixo.claims.v1beta1.ClaimDisputedEvent"></a>
 
-### ClaimCreatedEvent
-ClaimCreatedEvent is an event triggered on a Claim creation
+### ClaimDisputedEvent
+ClaimDisputedEvent is an event triggered on a Claim dispute
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| owner | [string](#string) |  |  |
+| dispute | [Dispute](#ixo.claims.v1beta1.Dispute) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.ClaimEvaluatedEvent"></a>
+
+### ClaimEvaluatedEvent
+ClaimEvaluatedEvent is an event triggered on a Claim evaluation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.ClaimSubmittedEvent"></a>
+
+### ClaimSubmittedEvent
+CollectionCreatedEvent is an event triggered on a Claim submission
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim | [Claim](#ixo.claims.v1beta1.Claim) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.ClaimUpdatedEvent"></a>
+
+### ClaimUpdatedEvent
+ClaimUpdatedEvent is an event triggered on a Claim update
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim | [Claim](#ixo.claims.v1beta1.Claim) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.CollectionCreatedEvent"></a>
+
+### CollectionCreatedEvent
+CollectionCreatedEvent is an event triggered on a Collection creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection | [Collection](#ixo.claims.v1beta1.Collection) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.CollectionUpdatedEvent"></a>
+
+### CollectionUpdatedEvent
+CollectionUpdatedEvent is an event triggered on a Collection update
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection | [Collection](#ixo.claims.v1beta1.Collection) |  |  |
 
 
 
@@ -1553,6 +1875,8 @@ GenesisState defines the claims module&#39;s genesis state.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | params | [Params](#ixo.claims.v1beta1.Params) |  |  |
+| collections | [Collection](#ixo.claims.v1beta1.Collection) | repeated |  |
+| claims | [Claim](#ixo.claims.v1beta1.Claim) | repeated |  |
 
 
 
@@ -1572,6 +1896,189 @@ GenesisState defines the claims module&#39;s genesis state.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/claims/v1beta1/query.proto
+
+
+
+<a name="ixo.claims.v1beta1.QueryClaimListRequest"></a>
+
+### QueryClaimListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryClaimListResponse"></a>
+
+### QueryClaimListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claims | [Claim](#ixo.claims.v1beta1.Claim) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryClaimRequest"></a>
+
+### QueryClaimRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryClaimResponse"></a>
+
+### QueryClaimResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim | [Claim](#ixo.claims.v1beta1.Claim) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionListRequest"></a>
+
+### QueryCollectionListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionListResponse"></a>
+
+### QueryCollectionListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collections | [Collection](#ixo.claims.v1beta1.Collection) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionRequest"></a>
+
+### QueryCollectionRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionResponse"></a>
+
+### QueryCollectionResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection | [Collection](#ixo.claims.v1beta1.Collection) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeListRequest"></a>
+
+### QueryDisputeListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeListResponse"></a>
+
+### QueryDisputeListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeRequest"></a>
+
+### QueryDisputeRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| proof | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeResponse"></a>
+
+### QueryDisputeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| dispute | [Dispute](#ixo.claims.v1beta1.Dispute) |  |  |
+
+
+
 
 
 
@@ -1614,6 +2121,12 @@ Query defines the gRPC querier service.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Params | [QueryParamsRequest](#ixo.claims.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.claims.v1beta1.QueryParamsResponse) | Parameters queries the parameters of the module. |
+| Collection | [QueryCollectionRequest](#ixo.claims.v1beta1.QueryCollectionRequest) | [QueryCollectionResponse](#ixo.claims.v1beta1.QueryCollectionResponse) |  |
+| CollectionList | [QueryCollectionListRequest](#ixo.claims.v1beta1.QueryCollectionListRequest) | [QueryCollectionListResponse](#ixo.claims.v1beta1.QueryCollectionListResponse) |  |
+| Claim | [QueryClaimRequest](#ixo.claims.v1beta1.QueryClaimRequest) | [QueryClaimResponse](#ixo.claims.v1beta1.QueryClaimResponse) |  |
+| ClaimList | [QueryClaimListRequest](#ixo.claims.v1beta1.QueryClaimListRequest) | [QueryClaimListResponse](#ixo.claims.v1beta1.QueryClaimListResponse) |  |
+| Dispute | [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest) | [QueryDisputeResponse](#ixo.claims.v1beta1.QueryDisputeResponse) |  |
+| DisputeList | [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest) | [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse) |  |
 
  
 
@@ -1626,24 +2139,122 @@ Query defines the gRPC querier service.
 
 
 
-<a name="ixo.claims.v1beta1.MsgCreateClaim"></a>
+<a name="ixo.claims.v1beta1.MsgCreateCollection"></a>
 
-### MsgCreateClaim
+### MsgCreateCollection
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| minter | [string](#string) |  | address of minter |
+| entity | [string](#string) |  | entity is the DID of the entity for which the claims are being created |
+| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor) |
+| protocol | [string](#string) |  | protocol is the DID of the claim protocol |
+| start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
+| end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
+| quota | [uint64](#uint64) |  | quota is the maximum number of claims that may be submitted, 0 is unlimited |
+| state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
+| payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
 
 
 
 
 
 
-<a name="ixo.claims.v1beta1.MsgCreateClaimResponse"></a>
+<a name="ixo.claims.v1beta1.MsgCreateCollectionResponse"></a>
 
-### MsgCreateClaimResponse
+### MsgCreateCollectionResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgDisputeClaim"></a>
+
+### MsgDisputeClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  | claimID for which this dispute is against |
+| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim |
+| agent_address | [string](#string) |  |  |
+| dispute_type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
+| data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgDisputeClaimResponse"></a>
+
+### MsgDisputeClaimResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgEvaluateClaim"></a>
+
+### MsgEvaluateClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
+| oracle | [string](#string) |  | oracle is the DID of the Oracle entity that evaluates the claim |
+| agent_did | [string](#string) |  | agent is the DID of the agent that submits the evaluation |
+| agent_address | [string](#string) |  |  |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+| status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
+| reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
+| verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgEvaluateClaimResponse"></a>
+
+### MsgEvaluateClaimResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgSubmitClaim"></a>
+
+### MsgSubmitClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
+| claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
+| agent_did | [string](#string) |  | agent is the DID of the agent submitting the claim |
+| agent_address | [string](#string) |  |  |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgSubmitClaimResponse"></a>
+
+### MsgSubmitClaimResponse
 
 
 
@@ -1664,7 +2275,10 @@ Msg defines the Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateClaim | [MsgCreateClaim](#ixo.claims.v1beta1.MsgCreateClaim) | [MsgCreateClaimResponse](#ixo.claims.v1beta1.MsgCreateClaimResponse) |  |
+| CreateCollection | [MsgCreateCollection](#ixo.claims.v1beta1.MsgCreateCollection) | [MsgCreateCollectionResponse](#ixo.claims.v1beta1.MsgCreateCollectionResponse) |  |
+| SubmitClaim | [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim) | [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse) |  |
+| EvaluateClaim | [MsgEvaluateClaim](#ixo.claims.v1beta1.MsgEvaluateClaim) | [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse) |  |
+| DisputeClaim | [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim) | [MsgDisputeClaimResponse](#ixo.claims.v1beta1.MsgDisputeClaimResponse) |  |
 
  
 

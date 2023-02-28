@@ -91,7 +91,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 
 	// update and persist createSequence
 	params.CreateSequence++
-	s.Keeper.ParamSpace.SetParamSet(ctx, &params)
+	s.Keeper.SetParams(ctx, &params)
 
 	// create the nft cw721
 	nftMint := entitycontracts.WasmMsgMint{

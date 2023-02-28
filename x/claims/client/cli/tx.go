@@ -23,19 +23,19 @@ func NewTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		NewCmdCreateClaim(),
+		NewCmdCreateCollection(),
 	)
 
 	return cmd
 }
 
-func NewCmdCreateClaim() *cobra.Command {
+func NewCmdCreateCollection() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create [create-claim-doc]",
 		Short: "Create a new Claim - flag is raw json with struct of MsgCreateClaim",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			var msg types.MsgCreateClaim
+			var msg types.MsgCreateCollection
 			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
 				return err
 			}

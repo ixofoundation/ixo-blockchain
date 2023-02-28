@@ -18,5 +18,7 @@ func KeyPrefix(p string) []byte {
 }
 
 var (
-// EntityKey = []byte{0x01}
+	CollectionKey = []byte{0x01}
+	ClaimKey      = []byte{0x02}
+	DisputeKey    = []byte{0x03}
 )

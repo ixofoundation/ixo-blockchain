@@ -3,14 +3,103 @@ package ixo.claims.v1beta1;
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "ixo/claims/v1beta1/claims.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
 // Msg defines the Msg service.
 service Msg {
-  rpc CreateClaim(MsgCreateClaim) returns (MsgCreateClaimResponse);
+  rpc CreateCollection(MsgCreateCollection)
+      returns (MsgCreateCollectionResponse);
+  rpc SubmitClaim(MsgSubmitClaim) returns (MsgSubmitClaimResponse);
+  rpc EvaluateClaim(MsgEvaluateClaim) returns (MsgEvaluateClaimResponse);
+  rpc DisputeClaim(MsgDisputeClaim) returns (MsgDisputeClaimResponse);
 }
 
-message MsgCreateClaim {
-  // address of minter
-  string minter = 1;
+message MsgCreateCollection {
+  // entity is the DID of the entity for which the claims are being created
+  string entity = 1;
+  // admin is the account address that will authorize or revoke agents and
+  // payments (the grantor)
+  string admin = 2;
+  // protocol is the DID of the claim protocol
+  string protocol = 3;
+  // startDate is the date after which claims may be submitted
+  google.protobuf.Timestamp start_date = 4 [ (gogoproto.stdtime) = true ];
+  // endDate is the date after which no more claims may be submitted (no endDate
+  // is allowed)
+  google.protobuf.Timestamp end_date = 5 [ (gogoproto.stdtime) = true ];
+  // quota is the maximum number of claims that may be submitted, 0 is unlimited
+  uint64 quota = 6;
+  // state is the current state of this Collection (open, paused, closed)
+  CollectionState state = 7;
+  // payments is the amount paid for claim submission, evaluation, approval, or
+  // rejection
+  Payments payments = 8;
 }
 
-message MsgCreateClaimResponse {}
+message MsgCreateCollectionResponse {}
+
+message MsgSubmitClaim {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  // claimID is the unique identifier of the claim in the cid hash format
+  string claim_id = 2;
+  // agent is the DID of the agent submitting the claim
+  string agent_did = 3
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_address = 4;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 5;
+}
+
+message MsgSubmitClaimResponse {}
+
+message MsgEvaluateClaim {
+  // claimID is the unique identifier of the claim to make evaluation against
+  string claim_id = 1;
+  // claimID is the unique identifier of the claim to make evaluation against
+  string collection_id = 1;
+  // oracle is the DID of the Oracle entity that evaluates the claim
+  string oracle = 2;
+  // agent is the DID of the agent that submits the evaluation
+  string agent_did = 3
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_address = 4;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 5;
+  // status is the evaluation status expressed as an integer (2=approved,
+  // 3=rejected, ...)
+  EvaluationStatus status = 6;
+  // reason is the code expressed as an integer, for why the evaluation result
+  // was given (codes defined by evaluator)
+  uint32 reason = 7;
+  // verificationProof is the cid of the evaluation Verfiable Credential
+  string verification_proof = 8;
+  // custom amount specified by evaluator for claim approval, if empty list then
+  // use default by Collection
+  repeated cosmos.base.v1beta1.Coin amount = 9 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message MsgEvaluateClaimResponse {}
+
+message MsgDisputeClaim {
+  // claimID for which this dispute is against
+  string claim_id = 1;
+  // agent is the DID of the agent disputing the claim
+  string agent_did = 2
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_address = 3;
+  // type is expressed as an integer, interpreted by the client
+  int32 dispute_type = 4;
+  DisputeData data = 5;
+}
+
+message MsgDisputeClaimResponse {}

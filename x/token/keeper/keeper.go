@@ -109,16 +109,6 @@ func (k Keeper) GetAll(
 	return sdk.KVStorePrefixIterator(store, prefix)
 }
 
-func (k Keeper) Marshal(value interface{}) (bytes []byte) {
-	switch value := value.(type) {
-	case types.Token:
-		bytes = k.cdc.MustMarshal(&value)
-	case types.TokenProperties:
-		bytes = k.cdc.MustMarshal(&value)
-	}
-	return
-}
-
 // Unmarshal unmarshal a byte slice to a struct, return false in case of errors
 func (k Keeper) Unmarshal(data []byte, val codec.ProtoMarshaler) bool {
 	if len(data) == 0 {

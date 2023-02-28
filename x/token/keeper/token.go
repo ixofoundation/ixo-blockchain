@@ -32,6 +32,16 @@ func (k Keeper) UnmarshalToken(value []byte) (interface{}, bool) {
 	return data, types.IsValidToken(&data)
 }
 
+func (k Keeper) Marshal(value interface{}) (bytes []byte) {
+	switch value := value.(type) {
+	case types.Token:
+		bytes = k.cdc.MustMarshal(&value)
+	case types.TokenProperties:
+		bytes = k.cdc.MustMarshal(&value)
+	}
+	return
+}
+
 func (k Keeper) SetTokenProperties(ctx sdk.Context, value types.TokenProperties) {
 	k.Set(ctx, []byte(value.Id), types.TokenPropertiesKey, value, k.Marshal)
 }
