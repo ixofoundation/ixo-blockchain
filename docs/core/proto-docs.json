@@ -12208,12 +12208,12 @@
               "defaultValue": ""
             },
             {
-              "name": "batches",
+              "name": "amount",
               "description": "",
-              "label": "repeated",
-              "type": "TokenBatch",
-              "longType": "TokenBatch",
-              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

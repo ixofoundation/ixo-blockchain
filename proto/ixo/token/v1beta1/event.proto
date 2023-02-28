@@ -21,7 +21,10 @@ message TokenMintedEvent {
   string minter = 2;
   // the new tokens owner
   string owner = 3;
-  repeated TokenBatch batches = 4;
+  string amount = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
   TokenProperties tokenProperties = 5;
 }
 

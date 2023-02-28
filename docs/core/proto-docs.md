@@ -4850,7 +4850,7 @@ TokenMintedEvent is an event triggered on a Token mint execution
 | contract_address | [string](#string) |  | the contract address of token contract being initialized |
 | minter | [string](#string) |  | the token minter |
 | owner | [string](#string) |  | the new tokens owner |
-| batches | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
+| amount | [string](#string) |  |  |
 | tokenProperties | [TokenProperties](#ixo.token.v1beta1.TokenProperties) |  |  |
 
 
