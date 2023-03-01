@@ -61,27 +61,27 @@ message MsgEvaluateClaim {
   // claimID is the unique identifier of the claim to make evaluation against
   string claim_id = 1;
   // claimID is the unique identifier of the claim to make evaluation against
-  string collection_id = 1;
+  string collection_id = 2;
   // oracle is the DID of the Oracle entity that evaluates the claim
-  string oracle = 2;
+  string oracle = 3;
   // agent is the DID of the agent that submits the evaluation
-  string agent_did = 3
+  string agent_did = 4
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
-  string agent_address = 4;
+  string agent_address = 5;
   // admin address used to sign this message, validated against Collection Admin
-  string admin_address = 5;
+  string admin_address = 6;
   // status is the evaluation status expressed as an integer (2=approved,
   // 3=rejected, ...)
-  EvaluationStatus status = 6;
+  EvaluationStatus status = 7;
   // reason is the code expressed as an integer, for why the evaluation result
   // was given (codes defined by evaluator)
-  uint32 reason = 7;
+  uint32 reason = 8;
   // verificationProof is the cid of the evaluation Verfiable Credential
-  string verification_proof = 8;
+  string verification_proof = 9;
   // custom amount specified by evaluator for claim approval, if empty list then
   // use default by Collection
-  repeated cosmos.base.v1beta1.Coin amount = 9 [
+  repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -90,9 +90,10 @@ message MsgEvaluateClaim {
 message MsgEvaluateClaimResponse {}
 
 message MsgDisputeClaim {
-  // claimID for which this dispute is against
-  string claim_id = 1;
-  // agent is the DID of the agent disputing the claim
+  // subject_id for which this dispute is against
+  string subject_id = 1;
+  // agent is the DID of the agent disputing the claim, agent detials wont be
+  // saved in kvStore
   string agent_did = 2
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];

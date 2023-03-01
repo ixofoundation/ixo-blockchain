@@ -15,8 +15,10 @@ var (
 	ErrClaimCollectionEnded        = sdkerrors.Register(ModuleName, 1103, "collection for claim has ended")
 	ErrClaimCollectionQuotaReached = sdkerrors.Register(ModuleName, 1104, "collection for claim's quato has been reached")
 	ErrClaimDuplicate              = sdkerrors.Register(ModuleName, 1105, "claim with id already exists")
-	ErrClaimDuplicateEvaluation    = sdkerrors.Register(ModuleName, 1105, "claim with id already evaluated")
+	ErrClaimDuplicateEvaluation    = sdkerrors.Register(ModuleName, 1106, "claim with id already evaluated")
 
 	ErrDisputeNotFound  = sdkerrors.Register(ModuleName, 1200, "dispute not found")
 	ErrDisputeDuplicate = sdkerrors.Register(ModuleName, 1201, "dispute with proof already exists")
+
+	ErrEvaluateWrongCollection = sdkerrors.Register(ModuleName, 1300, "evaluation claim and collection does not match")
 )

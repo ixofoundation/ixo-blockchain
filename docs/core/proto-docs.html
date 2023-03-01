@@ -478,6 +478,14 @@
                   <a href="#ixo.claims.v1beta1.SubmitClaimConstraints"><span class="badge">M</span>SubmitClaimConstraints</a>
                 </li>
               
+                <li>
+                  <a href="#ixo.claims.v1beta1.WithdrawAuthorization"><span class="badge">M</span>WithdrawAuthorization</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.WithdrawConstraints"><span class="badge">M</span>WithdrawConstraints</a>
+                </li>
+              
               
               
               
@@ -4319,10 +4327,10 @@ in the SETTLE stage.</p></td>
                 </tr>
               
                 <tr>
-                  <td>claim_id</td>
+                  <td>claim_ids</td>
                   <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>either collection_id or claim_id is needed </p></td>
+                  <td>repeated</td>
+                  <td><p>either collection_id or claim_ids is needed </p></td>
                 </tr>
               
                 <tr>
@@ -4337,6 +4345,14 @@ in the SETTLE stage.</p></td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
                   <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_custom_amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>max custom amount evaluator can change, of empty list must use amount
+defined in Token payments </p></td>
                 </tr>
               
             </tbody>
@@ -4367,7 +4383,7 @@ in the SETTLE stage.</p></td>
                   <td>constraints</td>
                   <td><a href="#ixo.claims.v1beta1.SubmitClaimConstraints">SubmitClaimConstraints</a></td>
                   <td>repeated</td>
-                  <td><p>string collection_id = 1; </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -4405,6 +4421,44 @@ in the SETTLE stage.</p></td>
           </table>
 
           
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.WithdrawAuthorization">WithdrawAuthorization</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>admin</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of admin </p></td>
+                </tr>
+              
+                <tr>
+                  <td>constraints</td>
+                  <td><a href="#ixo.claims.v1beta1.WithdrawConstraints">WithdrawConstraints</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.WithdrawConstraints">WithdrawConstraints</h3>
+        <p></p>
+
+        
 
         
       
@@ -4471,7 +4525,9 @@ in the SETTLE stage.</p></td>
                   <td>evaluation</td>
                   <td><a href="#ixo.claims.v1beta1.Evaluation">Evaluation</a></td>
                   <td></td>
-                  <td><p>evaluation is the result of one or more claim evaluations </p></td>
+                  <td><p>evaluation is the result of one or more claim evaluations
+
+payment_status </p></td>
                 </tr>
               
             </tbody>
@@ -4614,21 +4670,7 @@ rejection </p></td>
             <tbody>
               
                 <tr>
-                  <td>claim_id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>claimID for which this dispute is against </p></td>
-                </tr>
-              
-                <tr>
-                  <td>agent_did</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>agent is the DID of the agent submitting the dispute </p></td>
-                </tr>
-              
-                <tr>
-                  <td>agent_address</td>
+                  <td>subject_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
@@ -4656,7 +4698,7 @@ rejection </p></td>
         
       
         <h3 id="ixo.claims.v1beta1.DisputeData">DisputeData</h3>
-        <p></p>
+        <p>controller on entity, agent authz cap for the entity, or is admin</p>
 
         
           <table class="field-table">
@@ -4673,8 +4715,8 @@ rejection </p></td>
                 </tr>
               
                 <tr>
-                  <td>encrypted</td>
-                  <td><a href="#bool">bool</a></td>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -4687,8 +4729,8 @@ rejection </p></td>
                 </tr>
               
                 <tr>
-                  <td>type</td>
-                  <td><a href="#string">string</a></td>
+                  <td>encrypted</td>
+                  <td><a href="#bool">bool</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -4709,6 +4751,21 @@ rejection </p></td>
               <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
             </thead>
             <tbody>
+              
+                <tr>
+                  <td>claim_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>claim_id indicates which Claim this evaluation is for </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates to which Collection the claim being evaluated
+belongs to </p></td>
+                </tr>
               
                 <tr>
                   <td>oracle</td>
@@ -5791,17 +5848,18 @@ rejection </p></td>
             <tbody>
               
                 <tr>
-                  <td>claim_id</td>
+                  <td>subject_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>claimID for which this dispute is against </p></td>
+                  <td><p>subject_id for which this dispute is against </p></td>
                 </tr>
               
                 <tr>
                   <td>agent_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>agent is the DID of the agent disputing the claim </p></td>
+                  <td><p>agent is the DID of the agent disputing the claim, agent detials wont be
+saved in kvStore </p></td>
                 </tr>
               
                 <tr>
@@ -5851,6 +5909,13 @@ rejection </p></td>
               
                 <tr>
                   <td>claim_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>claimID is the unique identifier of the claim to make evaluation against </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>claimID is the unique identifier of the claim to make evaluation against </p></td>

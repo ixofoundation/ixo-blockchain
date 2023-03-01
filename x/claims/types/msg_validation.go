@@ -108,10 +108,6 @@ func (msg MsgDisputeClaim) ValidateBasic() error {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
 
-	if iidtypes.IsEmpty(msg.ClaimId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
-	}
-
 	if iidtypes.IsEmpty(msg.Data.Proof) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data proof cannot be empty")
 	}

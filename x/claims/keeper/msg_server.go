@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/claims/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -95,7 +96,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "Collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// check that collection is in open state
@@ -159,6 +160,11 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		return nil, err
 	}
 
+	// check that collectionId in message corresponds to claims collection
+	if claim.CollectionId != msg.CollectionId {
+		return nil, sdkerrors.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
+	}
+
 	// check that claim was not evaluated already
 	if claim.Evaluation != nil {
 		return nil, sdkerrors.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
@@ -172,7 +178,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "Collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// create and persist the Evaluation
@@ -224,25 +230,17 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClaim) (*types.MsgDisputeClaimResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// check that claim exists
-	_, err := s.Keeper.GetClaim(ctx, msg.ClaimId)
-	if err != nil {
-		return nil, err
-	}
-
 	// Make sure dispute with proof does not exist already
-	_, err = s.Keeper.GetDispute(ctx, msg.Data.Proof)
+	_, err := s.Keeper.GetDispute(ctx, msg.Data.Proof)
 	if err == nil {
 		return nil, sdkerrors.Wrapf(types.ErrDisputeDuplicate, "proof %s", msg.Data.Proof)
 	}
 
 	// create and persist the dispute
 	dispute := types.Dispute{
-		AgentDid:     msg.AgentDid.Did(),
-		AgentAddress: msg.AgentAddress,
-		ClaimId:      msg.ClaimId,
-		Type:         msg.DisputeType,
-		Data:         msg.Data,
+		SubjectId: msg.SubjectId,
+		Type:      msg.DisputeType,
+		Data:      msg.Data,
 	}
 	s.Keeper.SetDispute(ctx, dispute)
 
@@ -255,4 +253,54 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 		return nil, err
 	}
 	return &types.MsgDisputeClaimResponse{}, nil
+}
+
+// --------------------------
+// PAYMENT HELPER
+// --------------------------
+
+func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, senderAddr, receiver sdk.AccAddress, payment types.Payments, split bool) error {
+	// // Get project address
+	// projectAddr, err := getProjectAccount(ctx, k, projectDid)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// // Get payment template
+	// template := pk.MustGetPaymentTemplate(ctx, paymentTemplateId)
+
+	// // Create or get payment contract
+	// contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
+	// 	types.ModuleName, projectDid, senderAddr.String(), feeType)
+	// var contract paymentstypes.PaymentContract
+	// if !pk.PaymentContractExists(ctx, contractId) {
+	// 	contract = paymentstypes.NewPaymentContract(contractId, paymentTemplateId,
+	// 		projectAddr, projectAddr, recipients, false, true, sdk.ZeroUint())
+	// 	pk.SetPaymentContract(ctx, contract)
+	// } else {
+	// 	contract = pk.MustGetPaymentContract(ctx, contractId)
+	// }
+
+	// // Effect payment if can effect
+	// if contract.CanEffectPayment(template) {
+	// 	// Check that project has enough tokens to effect contract payment
+	// 	// (assume no effect from PaymentMin, PaymentMax, Discounts)
+	// 	for _, coin := range template.PaymentAmount {
+	// 		if !bk.HasBalance(ctx, projectAddr, coin) {
+	// 			return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
+	// 		}
+	// 	}
+
+	// 	// Effect payment
+	// 	effected, err := pk.EffectPayment(ctx, bk, contractId)
+	// 	if err != nil {
+	// 		return err
+	// 	} else if !effected {
+	// 		panic("expected to be able to effect contract payment")
+	// 	}
+	// } else {
+	// 	return fmt.Errorf("cannot effect contract payment (max reached?)")
+	// }
+
+	return nil
 }

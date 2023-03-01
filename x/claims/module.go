@@ -154,7 +154,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 
 // EndBlock returns the end blocker for the module. It returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return EndBlocker(ctx, am.keeper)
+	return []abci.ValidatorUpdate{}
 }
 
 // ConsensusVersion is a sequence number for state-breaking change of the

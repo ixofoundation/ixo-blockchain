@@ -78,6 +78,8 @@
     - [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints)
     - [SubmitClaimAuthorization](#ixo.claims.v1beta1.SubmitClaimAuthorization)
     - [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints)
+    - [WithdrawAuthorization](#ixo.claims.v1beta1.WithdrawAuthorization)
+    - [WithdrawConstraints](#ixo.claims.v1beta1.WithdrawConstraints)
   
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
     - [Claim](#ixo.claims.v1beta1.Claim)
@@ -1500,9 +1502,10 @@ Msg defines the bonds Msg service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
-| claim_id | [string](#string) |  | either collection_id or claim_id is needed |
+| claim_ids | [string](#string) | repeated | either collection_id or claim_ids is needed |
 | agent_quota | [uint64](#uint64) |  |  |
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, of empty list must use amount defined in Token payments |
 
 
 
@@ -1518,7 +1521,7 @@ Msg defines the bonds Msg service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | admin | [string](#string) |  | address of admin |
-| constraints | [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints) | repeated | string collection_id = 1; |
+| constraints | [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints) | repeated |  |
 
 
 
@@ -1535,6 +1538,32 @@ Msg defines the bonds Msg service.
 | ----- | ---- | ----- | ----------- |
 | collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | agent_quota | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.WithdrawAuthorization"></a>
+
+### WithdrawAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| admin | [string](#string) |  | address of admin |
+| constraints | [WithdrawConstraints](#ixo.claims.v1beta1.WithdrawConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.WithdrawConstraints"></a>
+
+### WithdrawConstraints
+
 
 
 
@@ -1570,7 +1599,9 @@ Msg defines the bonds Msg service.
 | agent_address | [string](#string) |  |  |
 | submission_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submissionDate is the date and time that the claim was submitted on-chain |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
-| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations |
+| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations
+
+payment_status |
 
 
 
@@ -1613,9 +1644,7 @@ Msg defines the bonds Msg service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| claim_id | [string](#string) |  | claimID for which this dispute is against |
-| agent_did | [string](#string) |  | agent is the DID of the agent submitting the dispute |
-| agent_address | [string](#string) |  |  |
+| subject_id | [string](#string) |  |  |
 | type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
 | data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
 
@@ -1627,15 +1656,15 @@ Msg defines the bonds Msg service.
 <a name="ixo.claims.v1beta1.DisputeData"></a>
 
 ### DisputeData
-
+controller on entity, agent authz cap for the entity, or is admin
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | uri | [string](#string) |  | dispute link ***.ipfs |
-| encrypted | [bool](#bool) |  |  |
-| proof | [string](#string) |  |  |
 | type | [string](#string) |  |  |
+| proof | [string](#string) |  |  |
+| encrypted | [bool](#bool) |  |  |
 
 
 
@@ -1650,6 +1679,8 @@ Msg defines the bonds Msg service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  | claim_id indicates which Claim this evaluation is for |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection the claim being evaluated belongs to |
 | oracle | [string](#string) |  | oracle is the DID of the Oracle entity that evaluates the claim |
 | agent_did | [string](#string) |  | agent is the DID of the agent that submits the evaluation |
 | agent_address | [string](#string) |  |  |
@@ -2179,8 +2210,8 @@ Query defines the gRPC querier service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| claim_id | [string](#string) |  | claimID for which this dispute is against |
-| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim |
+| subject_id | [string](#string) |  | subject_id for which this dispute is against |
+| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim, agent detials wont be saved in kvStore |
 | agent_address | [string](#string) |  |  |
 | dispute_type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
 | data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
@@ -2209,6 +2240,7 @@ Query defines the gRPC querier service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
+| collection_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
 | oracle | [string](#string) |  | oracle is the DID of the Oracle entity that evaluates the claim |
 | agent_did | [string](#string) |  | agent is the DID of the agent that submits the evaluation |
 | agent_address | [string](#string) |  |  |

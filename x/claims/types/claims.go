@@ -45,14 +45,7 @@ func IsValidDispute(dispute *Dispute) bool {
 	if dispute == nil {
 		return false
 	}
-	if iidtypes.IsEmpty(dispute.ClaimId) {
-		return false
-	}
-	if !iidtypes.IsValidDID(dispute.AgentDid) {
-		return false
-	}
-	_, err := sdk.AccAddressFromBech32(dispute.AgentAddress)
-	if err != nil {
+	if iidtypes.IsEmpty(dispute.SubjectId) {
 		return false
 	}
 	if iidtypes.IsEmpty(dispute.Data.Proof) {

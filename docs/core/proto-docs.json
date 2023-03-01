@@ -3223,9 +3223,9 @@
               "defaultValue": ""
             },
             {
-              "name": "claim_id",
-              "description": "either collection_id or claim_id is needed",
-              "label": "",
+              "name": "claim_ids",
+              "description": "either collection_id or claim_ids is needed",
+              "label": "repeated",
               "type": "string",
               "longType": "string",
               "fullType": "string",
@@ -3257,6 +3257,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "max_custom_amount",
+              "description": "max custom amount evaluator can change, of empty list must use amount\ndefined in Token payments",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -3284,7 +3296,7 @@
             },
             {
               "name": "constraints",
-              "description": "string collection_id = 1;",
+              "description": "",
               "label": "repeated",
               "type": "SubmitClaimConstraints",
               "longType": "SubmitClaimConstraints",
@@ -3331,6 +3343,53 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "WithdrawAuthorization",
+          "longName": "WithdrawAuthorization",
+          "fullName": "ixo.claims.v1beta1.WithdrawAuthorization",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "admin",
+              "description": "address of admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "constraints",
+              "description": "",
+              "label": "repeated",
+              "type": "WithdrawConstraints",
+              "longType": "WithdrawConstraints",
+              "fullType": "ixo.claims.v1beta1.WithdrawConstraints",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "WithdrawConstraints",
+          "longName": "WithdrawConstraints",
+          "fullName": "ixo.claims.v1beta1.WithdrawConstraints",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
         }
       ],
       "services": []
@@ -3470,7 +3529,7 @@
             },
             {
               "name": "evaluation",
-              "description": "evaluation is the result of one or more claim evaluations",
+              "description": "evaluation is the result of one or more claim evaluations\n\npayment_status",
               "label": "",
               "type": "Evaluation",
               "longType": "Evaluation",
@@ -3673,31 +3732,7 @@
           "extensions": [],
           "fields": [
             {
-              "name": "claim_id",
-              "description": "claimID for which this dispute is against",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "agent_did",
-              "description": "agent is the DID of the agent submitting the dispute",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "agent_address",
+              "name": "subject_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -3738,7 +3773,7 @@
           "name": "DisputeData",
           "longName": "DisputeData",
           "fullName": "ixo.claims.v1beta1.DisputeData",
-          "description": "",
+          "description": "controller on entity, agent authz cap for the entity, or is admin",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -3747,30 +3782,6 @@
             {
               "name": "uri",
               "description": "dispute link ***.ipfs",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "encrypted",
-              "description": "",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "proof",
-              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -3791,6 +3802,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "proof",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "encrypted",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -3804,6 +3839,30 @@
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "claim_id",
+              "description": "claim_id indicates which Claim this evaluation is for",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates to which Collection the claim being evaluated\nbelongs to",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
             {
               "name": "oracle",
               "description": "oracle is the DID of the Oracle entity that evaluates the claim",
@@ -4970,8 +5029,8 @@
           "extensions": [],
           "fields": [
             {
-              "name": "claim_id",
-              "description": "claimID for which this dispute is against",
+              "name": "subject_id",
+              "description": "subject_id for which this dispute is against",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -4983,7 +5042,7 @@
             },
             {
               "name": "agent_did",
-              "description": "agent is the DID of the agent disputing the claim",
+              "description": "agent is the DID of the agent disputing the claim, agent detials wont be\nsaved in kvStore",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -5054,6 +5113,18 @@
           "fields": [
             {
               "name": "claim_id",
+              "description": "claimID is the unique identifier of the claim to make evaluation against",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_id",
               "description": "claimID is the unique identifier of the claim to make evaluation against",
               "label": "",
               "type": "string",
