@@ -122,8 +122,8 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		iidtypes.NewIidDocumentCreatedEvent(entityId, msg.OwnerDid.Did()),
-		types.NewEntityCreatedEvent(entityId, msg.OwnerDid.Did()),
+		iidtypes.NewIidDocumentCreatedEvent(&did),
+		types.NewEntityCreatedEvent(&entity, msg.OwnerDid.Did()),
 	); err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntit
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityUpdatedEvent(entity.Id, msg.ControllerDid.String()),
+		types.NewEntityUpdatedEvent(&entity, msg.ControllerDid.String()),
 	); err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityTransferredEvent(msg.Id, msg.RecipientDid.Did()),
+		types.NewEntityTransferredEvent(msg.Id, msg.OwnerDid.Did(), msg.RecipientDid.Did()),
 	); err != nil {
 		return nil, err
 	}
@@ -293,8 +293,8 @@ func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpd
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityUpdatedEvent(entity.Id, msg.RelayerNodeDid.String()),
-		types.NewEntityVerifiedUpdatedEvent(entity.Id, msg.RelayerNodeDid.String(), msg.EntityVerified),
+		types.NewEntityUpdatedEvent(&entity, msg.RelayerNodeDid.String()),
+		types.NewEntityVerifiedUpdatedEvent(msg.Id, msg.RelayerNodeDid.String(), msg.EntityVerified),
 	); err != nil {
 		return nil, err
 	}

@@ -3,24 +3,15 @@ package ixo.token.v1beta1;
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
+import "ixo/token/v1beta1/token.proto";
 import "ixo/token/v1beta1/tx.proto";
 import "gogoproto/gogo.proto";
 
 // TokenCreatedEvent is an event triggered on a Token creation
-message TokenCreatedEvent {
-  // the contract address of token contract being initialized
-  string contract_address = 1;
-  // the token minter
-  string minter = 2;
-}
+message TokenCreatedEvent { Token token = 1; }
 
 // TokenUpdatedEvent is an event triggered on a Token update
-message TokenUpdatedEvent {
-  // contract_address of token updated
-  string contract_address = 1;
-  // the owner account of the change
-  string owner = 2;
-}
+message TokenUpdatedEvent { Token token = 1; }
 
 // TokenMintedEvent is an event triggered on a Token mint execution
 message TokenMintedEvent {
@@ -30,7 +21,11 @@ message TokenMintedEvent {
   string minter = 2;
   // the new tokens owner
   string owner = 3;
-  repeated TokenBatch batches = 4;
+  string amount = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  TokenProperties tokenProperties = 5;
 }
 
 // TokenTransferedEvent is an event triggered on a Token transfer execution

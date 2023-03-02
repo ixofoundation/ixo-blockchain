@@ -51,7 +51,7 @@ func (k msgServer) CreateIidDocument(goCtx context.Context, msg *types.MsgCreate
 	k.Keeper.SetDidDocument(ctx, []byte(msg.Id), did)
 
 	// emit the event
-	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(msg.Id, msg.Signer)); err != nil {
+	if err := ctx.EventManager().EmitTypedEvents(types.NewIidDocumentCreatedEvent(&did)); err != nil {
 		return nil, err
 	}
 
@@ -422,6 +422,6 @@ func ExecuteOnDidWithRelationships(ctx sdk.Context, k *Keeper, constraints Verif
 	k.SetDidDocument(ctx, []byte(did), didDoc)
 
 	// fire the event
-	err = ctx.EventManager().EmitTypedEvent(types.NewIidDocumentUpdatedEvent(did, signer))
+	err = ctx.EventManager().EmitTypedEvent(types.NewIidDocumentUpdatedEvent(&didDoc))
 	return
 }

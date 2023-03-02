@@ -760,7 +760,7 @@
         
           
           <li>
-            <a href="#ixo%2fiid%2fv1beta1%2fiid.proto">ixo/iid/v1beta1/iid.proto</a>
+            <a href="#ixo%2fiid%2fv1beta1%2ftypes.proto">ixo/iid/v1beta1/types.proto</a>
             <ul>
               
                 <li>
@@ -769,10 +769,6 @@
               
                 <li>
                   <a href="#ixo.iid.v1beta1.Context"><span class="badge">M</span>Context</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.iid.v1beta1.IidDocument"><span class="badge">M</span>IidDocument</a>
                 </li>
               
                 <li>
@@ -797,6 +793,21 @@
               
                 <li>
                   <a href="#ixo.iid.v1beta1.VerificationMethod"><span class="badge">M</span>VerificationMethod</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fiid%2fv1beta1%2fiid.proto">ixo/iid/v1beta1/iid.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.iid.v1beta1.IidDocument"><span class="badge">M</span>IidDocument</a>
                 </li>
               
               
@@ -6554,7 +6565,7 @@ plus the timeout on Collection payments </p></td>
     
       
       <div class="file-heading">
-        <h2 id="ixo/iid/v1beta1/iid.proto">ixo/iid/v1beta1/iid.proto</h2><a href="#title">Top</a>
+        <h2 id="ixo/iid/v1beta1/types.proto">ixo/iid/v1beta1/types.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
@@ -6642,155 +6653,8 @@ plus the timeout on Collection payments </p></td>
 
         
       
-        <h3 id="ixo.iid.v1beta1.IidDocument">IidDocument</h3>
-        <p>type entity account</p><p>relationship entity account</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>context</td>
-                  <td><a href="#ixo.iid.v1beta1.Context">Context</a></td>
-                  <td>repeated</td>
-                  <td><p>@context is spec for did document. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>id represents the id for the did document. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>controller</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>A DID controller is an entity that is authorized to make changes to a DID
-document. cfr. https://www.w3.org/TR/did-core/#did-controller </p></td>
-                </tr>
-              
-                <tr>
-                  <td>verificationMethod</td>
-                  <td><a href="#ixo.iid.v1beta1.VerificationMethod">VerificationMethod</a></td>
-                  <td>repeated</td>
-                  <td><p>A DID document can express verification methods,
-such as cryptographic public keys, which can be used
-to authenticate or authorize interactions with the DID subject or
-associated parties. https://www.w3.org/TR/did-core/#verification-methods </p></td>
-                </tr>
-              
-                <tr>
-                  <td>service</td>
-                  <td><a href="#ixo.iid.v1beta1.Service">Service</a></td>
-                  <td>repeated</td>
-                  <td><p>Services are used in DID documents to express ways of communicating
-with the DID subject or associated entities.
-https://www.w3.org/TR/did-core/#services </p></td>
-                </tr>
-              
-                <tr>
-                  <td>authentication</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>NOTE: below this line there are the relationships
-Authentication represents public key associated with the did document.
-cfr. https://www.w3.org/TR/did-core/#authentication </p></td>
-                </tr>
-              
-                <tr>
-                  <td>assertionMethod</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>Used to specify how the DID subject is expected to express claims,
-such as for the purposes of issuing a Verifiable Credential.
-cfr. https://www.w3.org/TR/did-core/#assertion </p></td>
-                </tr>
-              
-                <tr>
-                  <td>keyAgreement</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>used to specify how an entity can generate encryption material
-in order to transmit confidential information intended for the DID subject.
-https://www.w3.org/TR/did-core/#key-agreement </p></td>
-                </tr>
-              
-                <tr>
-                  <td>capabilityInvocation</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>Used to specify a verification method that might be used by the DID subject
-to invoke a cryptographic capability, such as the authorization
-to update the DID Document.
-https://www.w3.org/TR/did-core/#capability-invocation </p></td>
-                </tr>
-              
-                <tr>
-                  <td>capabilityDelegation</td>
-                  <td><a href="#string">string</a></td>
-                  <td>repeated</td>
-                  <td><p>Used to specify a mechanism that might be used by the DID subject
-to delegate a cryptographic capability to another party.
-https://www.w3.org/TR/did-core/#capability-delegation </p></td>
-                </tr>
-              
-                <tr>
-                  <td>linkedResource</td>
-                  <td><a href="#ixo.iid.v1beta1.LinkedResource">LinkedResource</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>linkedClaim</td>
-                  <td><a href="#ixo.iid.v1beta1.LinkedClaim">LinkedClaim</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>accordedRight</td>
-                  <td><a href="#ixo.iid.v1beta1.AccordedRight">AccordedRight</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>linkedEntity</td>
-                  <td><a href="#ixo.iid.v1beta1.LinkedEntity">LinkedEntity</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>alsoKnownAs</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>metadata</td>
-                  <td><a href="#ixo.iid.v1beta1.IidMetadata">IidMetadata</a></td>
-                  <td></td>
-                  <td><p>Metadata concerning the IidDocument such as versionId, created, updated and
-deactivated </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
         <h3 id="ixo.iid.v1beta1.IidMetadata">IidMetadata</h3>
-        <p>IidMetadata defines metadata associated to a Iid document</p>
+        <p></p>
 
         
           <table class="field-table">
@@ -7026,7 +6890,7 @@ deactivated </p></td>
         
       
         <h3 id="ixo.iid.v1beta1.Service">Service</h3>
-        <p>Service defines how to find data associated with a identifer</p>
+        <p></p>
 
         
           <table class="field-table">
@@ -7120,6 +6984,167 @@ deactivated </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/iid/v1beta1/iid.proto">ixo/iid/v1beta1/iid.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.iid.v1beta1.IidDocument">IidDocument</h3>
+        <p>type entity account</p><p>relationship entity account</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>context</td>
+                  <td><a href="#ixo.iid.v1beta1.Context">Context</a></td>
+                  <td>repeated</td>
+                  <td><p>@context is spec for did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>id represents the id for the did document. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>controller</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>A DID controller is an entity that is authorized to make changes to a DID
+document. cfr. https://www.w3.org/TR/did-core/#did-controller </p></td>
+                </tr>
+              
+                <tr>
+                  <td>verificationMethod</td>
+                  <td><a href="#ixo.iid.v1beta1.VerificationMethod">VerificationMethod</a></td>
+                  <td>repeated</td>
+                  <td><p>A DID document can express verification methods,
+such as cryptographic public keys, which can be used
+to authenticate or authorize interactions with the DID subject or
+associated parties. https://www.w3.org/TR/did-core/#verification-methods </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service</td>
+                  <td><a href="#ixo.iid.v1beta1.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p>Services are used in DID documents to express ways of communicating
+with the DID subject or associated entities.
+https://www.w3.org/TR/did-core/#services </p></td>
+                </tr>
+              
+                <tr>
+                  <td>authentication</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: below this line there are the relationships
+Authentication represents public key associated with the did document.
+cfr. https://www.w3.org/TR/did-core/#authentication </p></td>
+                </tr>
+              
+                <tr>
+                  <td>assertionMethod</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify how the DID subject is expected to express claims,
+such as for the purposes of issuing a Verifiable Credential.
+cfr. https://www.w3.org/TR/did-core/#assertion </p></td>
+                </tr>
+              
+                <tr>
+                  <td>keyAgreement</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>used to specify how an entity can generate encryption material
+in order to transmit confidential information intended for the DID subject.
+https://www.w3.org/TR/did-core/#key-agreement </p></td>
+                </tr>
+              
+                <tr>
+                  <td>capabilityInvocation</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify a verification method that might be used by the DID subject
+to invoke a cryptographic capability, such as the authorization
+to update the DID Document.
+https://www.w3.org/TR/did-core/#capability-invocation </p></td>
+                </tr>
+              
+                <tr>
+                  <td>capabilityDelegation</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Used to specify a mechanism that might be used by the DID subject
+to delegate a cryptographic capability to another party.
+https://www.w3.org/TR/did-core/#capability-delegation </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedResource</td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedResource">LinkedResource</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedClaim</td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedClaim">LinkedClaim</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>accordedRight</td>
+                  <td><a href="#ixo.iid.v1beta1.AccordedRight">AccordedRight</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>linkedEntity</td>
+                  <td><a href="#ixo.iid.v1beta1.LinkedEntity">LinkedEntity</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>alsoKnownAs</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#ixo.iid.v1beta1.IidMetadata">IidMetadata</a></td>
+                  <td></td>
+                  <td><p>Metadata concerning the IidDocument such as versionId, created, updated and
+deactivated </p></td>
                 </tr>
               
             </tbody>
@@ -7328,17 +7353,17 @@ deactivated </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity</td>
+                  <td><a href="#ixo.entity.v1beta1.Entity">Entity</a></td>
                   <td></td>
-                  <td><p>the id of entity being created </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the entity owner </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -7362,14 +7387,21 @@ deactivated </p></td>
                   <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the id if entity being transferred </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>owner</td>
+                  <td>from</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the new owner of the entity </p></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>to</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -7390,17 +7422,17 @@ deactivated </p></td>
             <tbody>
               
                 <tr>
-                  <td>id</td>
-                  <td><a href="#string">string</a></td>
+                  <td>entity</td>
+                  <td><a href="#ixo.entity.v1beta1.Entity">Entity</a></td>
                   <td></td>
-                  <td><p>the id being updated </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
+                  <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the signer account of the change </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -7424,21 +7456,21 @@ deactivated </p></td>
                   <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the id being updated </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
-                  <td>signer</td>
+                  <td>owner</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>the signer account of the change </p></td>
+                  <td><p> </p></td>
                 </tr>
               
                 <tr>
                   <td>entity_verified</td>
                   <td><a href="#bool">bool</a></td>
                   <td></td>
-                  <td><p>whether entity is verified or not </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -9257,7 +9289,7 @@ Client applications </p></td>
                   <td>relayer_node</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>DID of the operator through which the Entity was created </p></td>
+                  <td><p>Address of the operator through which the Entity was created </p></td>
                 </tr>
               
                 <tr>
@@ -9584,7 +9616,7 @@ subject </p></td>
 
       
         <h3 id="ixo.iid.v1beta1.IidDocumentCreatedEvent">IidDocumentCreatedEvent</h3>
-        <p>DidDocumentCreatedEvent is an event triggered on a DID document creation</p>
+        <p>IidDocumentCreatedEvent is triggered when a new IidDocument is created.</p>
 
         
           <table class="field-table">
@@ -9594,17 +9626,10 @@ subject </p></td>
             <tbody>
               
                 <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
+                  <td>iidDocument</td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td></td>
-                  <td><p>the did being created </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the signer account creating the did </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -9625,17 +9650,10 @@ subject </p></td>
             <tbody>
               
                 <tr>
-                  <td>did</td>
-                  <td><a href="#string">string</a></td>
+                  <td>iidDocument</td>
+                  <td><a href="#ixo.iid.v1beta1.IidDocument">IidDocument</a></td>
                   <td></td>
-                  <td><p>the did being updated </p></td>
-                </tr>
-              
-                <tr>
-                  <td>signer</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the signer account of the change </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -13801,17 +13819,10 @@ tokens. </p></td>
             <tbody>
               
                 <tr>
-                  <td>contract_address</td>
-                  <td><a href="#string">string</a></td>
+                  <td>token</td>
+                  <td><a href="#ixo.token.v1beta1.Token">Token</a></td>
                   <td></td>
-                  <td><p>the contract address of token contract being initialized </p></td>
-                </tr>
-              
-                <tr>
-                  <td>minter</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the token minter </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -13853,9 +13864,16 @@ tokens. </p></td>
                 </tr>
               
                 <tr>
-                  <td>batches</td>
-                  <td><a href="#ixo.token.v1beta1.TokenBatch">TokenBatch</a></td>
-                  <td>repeated</td>
+                  <td>amount</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokenProperties</td>
+                  <td><a href="#ixo.token.v1beta1.TokenProperties">TokenProperties</a></td>
+                  <td></td>
                   <td><p> </p></td>
                 </tr>
               
@@ -14022,17 +14040,10 @@ tokens. </p></td>
             <tbody>
               
                 <tr>
-                  <td>contract_address</td>
-                  <td><a href="#string">string</a></td>
+                  <td>token</td>
+                  <td><a href="#ixo.token.v1beta1.Token">Token</a></td>
                   <td></td>
-                  <td><p>contract_address of token updated </p></td>
-                </tr>
-              
-                <tr>
-                  <td>owner</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>the owner account of the change </p></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>

@@ -4,6 +4,7 @@ package ixo.entity.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/tx.proto";
+import "ixo/iid/v1beta1/types.proto";
 import "ixo/entity/v1beta1/entity.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -11,6 +12,7 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 // Msg defines the project Msg service.
 service Msg {
+
   // CreateEntity defines a method for creating a entity.
   rpc CreateEntity(MsgCreateEntity) returns (MsgCreateEntityResponse);
 

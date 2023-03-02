@@ -80,8 +80,7 @@ func (s msgServer) CreateToken(goCtx context.Context, msg *types.MsgCreateToken)
 	s.Keeper.SetToken(ctx, token)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.TokenCreatedEvent{
-		ContractAddress: contractAddr.String(),
-		Minter:          minter.String(),
+		Token: &token,
 	}); err != nil {
 		return nil, sdkerrors.Wrapf(err, "failed to emit create Token event")
 	}
@@ -186,22 +185,25 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 			Name:       batch.Name,
 		}
 		s.Keeper.SetTokenProperties(ctx, tokenProperties)
+		if err := ctx.EventManager().EmitTypedEvents(
+			&types.TokenMintedEvent{
+				ContractAddress: contractAddress.String(),
+				Minter:          minterAddress.String(),
+				Owner:           ownerAddress.String(),
+				Amount:          batch.Amount,
+				TokenProperties: &tokenProperties,
+			},
+		); err != nil {
+			return nil, sdkerrors.Wrapf(err, "failed to emit tokenMintEvent")
+		}
 	}
 
 	if err := ctx.EventManager().EmitTypedEvents(
-		&types.TokenMintedEvent{
-			ContractAddress: contractAddress.String(),
-			Minter:          minterAddress.String(),
-			Owner:           ownerAddress.String(),
-			Batches:         types.Map(batches, func(b types.MintBatchData) *types.TokenBatch { return b.GetTokenMintedEventBatch() }),
-		},
-		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
-			ContractAddress: token.ContractAddress,
-			Owner:           minterAddress.String(),
+			Token: &token,
 		},
 	); err != nil {
-		return nil, sdkerrors.Wrapf(err, "failed to emit mint token events")
+		return nil, sdkerrors.Wrapf(err, "failed to emit tokenUpdatedEvent")
 	}
 
 	return &types.MsgMintTokenResponse{}, nil
@@ -327,8 +329,7 @@ func (s msgServer) RetireToken(goCtx context.Context, msg *types.MsgRetireToken)
 		},
 		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
-			ContractAddress: token.ContractAddress,
-			Owner:           token.Minter,
+			Token: token,
 		},
 	); err != nil {
 		return nil, sdkerrors.Wrapf(err, "failed to emit retire token event")
@@ -402,8 +403,7 @@ func (s msgServer) CancelToken(goCtx context.Context, msg *types.MsgCancelToken)
 		},
 		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
-			ContractAddress: token.ContractAddress,
-			Owner:           token.Minter,
+			Token: token,
 		},
 	); err != nil {
 		return nil, sdkerrors.Wrapf(err, "failed to emit retire token event")
@@ -431,8 +431,7 @@ func (s msgServer) PauseToken(goCtx context.Context, msg *types.MsgPauseToken) (
 		},
 		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
-			ContractAddress: token.ContractAddress,
-			Owner:           token.Minter,
+			Token: &token,
 		},
 	); err != nil {
 		return nil, sdkerrors.Wrapf(err, "failed to emit pause token event")
@@ -460,8 +459,7 @@ func (s msgServer) StopToken(goCtx context.Context, msg *types.MsgStopToken) (*t
 		},
 		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
-			ContractAddress: token.ContractAddress,
-			Owner:           token.Minter,
+			Token: &token,
 		},
 	); err != nil {
 		return nil, sdkerrors.Wrapf(err, "failed to emit stop token event")

@@ -1,0 +1,98 @@
+syntax = "proto3";
+package ixo.iid.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+message Context {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string key = 1;
+  string val = 2;
+}
+
+message AccordedRight {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string type = 1;
+  string id = 2;
+  string mechanism = 3;
+  string message = 4;
+  string service = 5;
+}
+
+message LinkedResource {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string type = 1;
+  string id = 2;
+  string description = 3;
+  string mediaType = 4;
+  string serviceEndpoint = 5;
+  string proof = 6;
+  string encrypted = 7;
+  string right = 8;
+}
+
+message LinkedClaim {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string type = 1;
+  string id = 2;
+  string description = 3;
+  string mediaType = 4;
+  string serviceEndpoint = 5;
+  string proof = 6;
+  string encrypted = 7;
+  string right = 8;
+}
+
+message LinkedEntity {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string type = 1;
+  string id = 2;
+  string relationship = 3;
+  string service = 4;
+}
+
+message VerificationMethod {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string id = 1;
+  string type = 2;
+  string controller = 3;
+  oneof verificationMaterial {
+    string blockchainAccountID = 4;
+    string publicKeyHex = 5;
+    string publicKeyMultibase = 6;
+    string publicKeyBase58 = 7;
+  }
+}
+
+message Service {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string id = 1;
+  string type = 2;
+  string serviceEndpoint = 3;
+}
+
+message IidMetadata {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string versionId = 1;
+  google.protobuf.Timestamp created = 2 [ (gogoproto.stdtime) = true ];
+  google.protobuf.Timestamp updated = 3 [ (gogoproto.stdtime) = true ];
+  bool deactivated = 4;
+}
