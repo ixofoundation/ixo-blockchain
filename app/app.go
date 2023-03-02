@@ -525,6 +525,7 @@ func NewIxoApp(
 		app.AccountKeeper,
 		app.AuthzKeeper,
 		app.BankKeeper,
+		app.EntityKeeper,
 	)
 	// register the proposal types
 	govRouter := govtypes.NewRouter()

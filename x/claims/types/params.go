@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	KeyCollectionSequence  = []byte("CollectionSequence")
-	KeyIxoDid              = []byte("IxoDid")
-	KeyOracleFeePercentage = []byte("OracleFeePercentage")
-	KeyNodeFeePercentage   = []byte("NodeFeePercentage")
+	KeyCollectionSequence   = []byte("CollectionSequence")
+	KeyIxoAccount           = []byte("KeyIxoAccount")
+	KeyNetworkFeePercentage = []byte("NetworkFeePercentage")
+	KeyNodeFeePercentage    = []byte("NodeFeePercentage")
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -24,12 +24,12 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 // NewParams creates a new Params instance
 func NewParams(collectionSequence uint64, ixoDid didexported.Did,
-	oracleFeePercentage, nodeFeePercentage sdk.Dec) Params {
+	networkFeePercentage, nodeFeePercentage sdk.Dec) Params {
 	return Params{
-		CollectionSequence:  collectionSequence,
-		IxoDid:              ixoDid,
-		OracleFeePercentage: oracleFeePercentage,
-		NodeFeePercentage:   nodeFeePercentage,
+		CollectionSequence:   collectionSequence,
+		IxoAccount:           ixoDid,
+		NetworkFeePercentage: networkFeePercentage,
+		NodeFeePercentage:    nodeFeePercentage,
 	}
 }
 
@@ -45,20 +45,21 @@ func DefaultParams() Params {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.ParamSetPair{Key: KeyCollectionSequence, Value: &p.CollectionSequence, ValidatorFn: validateCollectionSequence},
-		paramtypes.ParamSetPair{Key: KeyIxoDid, Value: &p.IxoDid, ValidatorFn: validateIxoDid},
-		paramtypes.ParamSetPair{Key: KeyOracleFeePercentage, Value: &p.OracleFeePercentage, ValidatorFn: validateFeePercentage},
+		paramtypes.ParamSetPair{Key: KeyIxoAccount, Value: &p.IxoAccount, ValidatorFn: validateIxoAccount},
+		paramtypes.ParamSetPair{Key: KeyNetworkFeePercentage, Value: &p.NetworkFeePercentage, ValidatorFn: validateFeePercentage},
 		paramtypes.ParamSetPair{Key: KeyNodeFeePercentage, Value: &p.NodeFeePercentage, ValidatorFn: validateFeePercentage},
 	}
 }
 
-func validateIxoDid(i interface{}) error {
-	v, ok := i.(didexported.Did)
+func validateIxoAccount(i interface{}) error {
+	v, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if len(v) == 0 {
-		return fmt.Errorf("ixo did cannot be empty")
+	_, err := sdk.AccAddressFromBech32(v)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -94,11 +95,11 @@ func (p Params) Validate() error {
 	if err != nil {
 		return err
 	}
-	err = validateIxoDid(p.IxoDid)
+	err = validateIxoAccount(p.IxoAccount)
 	if err != nil {
 		return err
 	}
-	err = validateFeePercentage(p.OracleFeePercentage)
+	err = validateFeePercentage(p.NetworkFeePercentage)
 	if err != nil {
 		return err
 	}

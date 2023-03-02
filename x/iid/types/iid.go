@@ -352,6 +352,13 @@ func WithResources(resources ...*LinkedResource) DidDocumentOption {
 	}
 }
 
+// WithClaims add optional claims
+func WithClaims(claims ...*LinkedClaim) DidDocumentOption {
+	return func(did *IidDocument) error {
+		return did.AddLinkedClaim(claims...)
+	}
+}
+
 func WithEntities(entities ...*LinkedEntity) DidDocumentOption {
 	return func(did *IidDocument) error {
 		return did.AddLinkedEntity(entities...)
@@ -790,6 +797,37 @@ func (didDoc *IidDocument) AddLinkedResource(linkedResources ...*LinkedResource)
 	return
 }
 
+func (didDoc *IidDocument) AddLinkedClaim(linkedClaims ...*LinkedClaim) (err error) {
+	if didDoc.LinkedClaim == nil {
+		didDoc.LinkedClaim = []*LinkedClaim{}
+	}
+
+	// used to check duplicates
+	index := make(map[string]struct{}, len(didDoc.LinkedClaim))
+
+	// load existing Claims
+	for _, s := range didDoc.LinkedClaim {
+		index[s.Id] = struct{}{}
+	}
+
+	// Claims must be unique
+	for _, s := range linkedClaims {
+		//if err = ValidateService(s); err != nil {
+		//	return
+		//}
+
+		// verify that there are no duplicates in method ids
+		if _, found := index[s.Id]; found {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated Claim id %s", s.Id)
+			return
+		}
+		index[s.Id] = struct{}{}
+
+		didDoc.LinkedClaim = append(didDoc.LinkedClaim, s)
+	}
+	return
+}
+
 func (didDoc *IidDocument) DeleteLinkedResource(resourceID string) {
 	del := func(x int) {
 		lastIdx := len(didDoc.LinkedResource) - 1
@@ -806,6 +844,28 @@ func (didDoc *IidDocument) DeleteLinkedResource(resourceID string) {
 
 	for i, s := range didDoc.LinkedResource {
 		if s.Id == resourceID {
+			del(i)
+			break
+		}
+	}
+}
+
+func (didDoc *IidDocument) DeleteLinkedClaim(claimID string) {
+	del := func(x int) {
+		lastIdx := len(didDoc.LinkedClaim) - 1
+		switch lastIdx {
+		case 0: // remove the item since there is no elements left
+			didDoc.LinkedClaim = nil
+		case x: // if it's at the last position, just drop the last position
+			didDoc.LinkedClaim = didDoc.LinkedClaim[:lastIdx]
+		default: // swap and drop last position
+			didDoc.LinkedClaim[x] = didDoc.LinkedClaim[lastIdx]
+			didDoc.LinkedClaim = didDoc.LinkedClaim[:lastIdx]
+		}
+	}
+
+	for i, s := range didDoc.LinkedClaim {
+		if s.Id == claimID {
 			del(i)
 			break
 		}
@@ -1075,6 +1135,19 @@ func NewService(id string, serviceType string, serviceEndpoint string) *Service 
 func NewLinkedResource(id string, resourceType string, description string, mediaType string, serviceEndpoint string, proof string, encrypted string, privacy string) *LinkedResource {
 	return &LinkedResource{
 		Type:            resourceType,
+		Id:              id,
+		Description:     description,
+		MediaType:       mediaType,
+		ServiceEndpoint: serviceEndpoint,
+		Proof:           proof,
+		Encrypted:       encrypted,
+		Right:           privacy,
+	}
+}
+
+func NewLinkedClaim(id string, claimType string, description string, mediaType string, serviceEndpoint string, proof string, encrypted string, privacy string) *LinkedClaim {
+	return &LinkedClaim{
+		Type:            claimType,
 		Id:              id,
 		Description:     description,
 		MediaType:       mediaType,

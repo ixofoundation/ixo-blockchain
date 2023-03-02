@@ -109,3 +109,26 @@ func (msg MsgDisputeClaim) GetSignBytes() []byte {
 func (msg MsgDisputeClaim) Type() string { return TypeMsgDisputeClaim }
 
 func (msg MsgDisputeClaim) Route() string { return RouterKey }
+
+// --------------------------
+// WITHDRAW PAYMENT
+// --------------------------
+const TypeMsgWithdrawPayment = "withdraw_payment"
+
+var _ sdk.Msg = &MsgWithdrawPayment{}
+
+func (msg MsgWithdrawPayment) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgWithdrawPayment) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgWithdrawPayment) Type() string { return TypeMsgWithdrawPayment }
+
+func (msg MsgWithdrawPayment) Route() string { return RouterKey }

@@ -62,13 +62,16 @@ message IidDocument {
   // https://www.w3.org/TR/did-core/#capability-delegation
   repeated string capabilityDelegation = 10;
   repeated LinkedResource linkedResource = 11;
-  repeated AccordedRight accordedRight = 12;
-  repeated LinkedEntity linkedEntity = 13;
-  string alsoKnownAs = 14;
+  repeated LinkedClaim linkedClaim = 12;
+  repeated AccordedRight accordedRight = 13;
+  repeated LinkedEntity linkedEntity = 14;
+  string alsoKnownAs = 15;
   // Metadata concerning the IidDocument such as versionId, created, updated and
   // deactivated
-  IidMetadata metadata = 15;
+  IidMetadata metadata = 16;
 }
+// type entity account
+// relationship entity account
 
 // A DID document can express verification methods,
 // such as cryptographic public keys, which can be used
@@ -88,6 +91,20 @@ message AccordedRight {
 }
 
 message LinkedResource {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+
+  string type = 1;
+  string id = 2;
+  string description = 3;
+  string mediaType = 4;
+  string serviceEndpoint = 5;
+  string proof = 6;
+  string encrypted = 7;
+  string right = 8;
+}
+
+message LinkedClaim {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 

@@ -41,6 +41,10 @@ service Msg {
       returns (MsgAddLinkedResourceResponse);
   rpc DeleteLinkedResource(MsgDeleteLinkedResource)
       returns (MsgDeleteLinkedResourceResponse);
+  // Add / Delete Linked Claims
+  rpc AddLinkedClaim(MsgAddLinkedClaim) returns (MsgAddLinkedClaimResponse);
+  rpc DeleteLinkedClaim(MsgDeleteLinkedClaim)
+      returns (MsgDeleteLinkedClaimResponse);
   // Add / Delete Linked Entity
   rpc AddLinkedEntity(MsgAddLinkedEntity) returns (MsgAddLinkedEntityResponse);
   rpc DeleteLinkedEntity(MsgDeleteLinkedEntity)
@@ -88,6 +92,7 @@ message MsgCreateIidDocument {
   repeated LinkedEntity linkedEntity = 8;
   string alsoKnownAs = 9;
   string signer = 10; // address of the account signing the message
+  repeated LinkedClaim linkedClaim = 11;
 }
 
 message MsgCreateIidDocumentResponse {}
@@ -109,6 +114,7 @@ message MsgUpdateIidDocument {
   repeated LinkedEntity linkedEntity = 8;
   string alsoKnownAs = 9;
   string signer = 10; // address of the account signing the message
+  repeated LinkedClaim linkedClaim = 11;
 }
 
 message MsgUpdateIidDocumentResponse {}
@@ -227,6 +233,24 @@ message MsgDeleteLinkedResource {
   string signer = 3;      // address of the account signing the message
 }
 
+message MsgAddLinkedClaim {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string id = 1;               // the did
+  LinkedClaim linkedClaim = 2; // the claim to add
+  string signer = 3;           // address of the account signing the message
+}
+
+message MsgDeleteLinkedClaim {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string id = 1;       // the did
+  string claim_id = 2; // the claim id
+  string signer = 3;   // address of the account signing the message
+}
+
 message MsgAddLinkedEntity {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
@@ -292,6 +316,8 @@ message MsgDeleteIidContext {
 
 message MsgAddLinkedResourceResponse {}
 message MsgDeleteLinkedResourceResponse {}
+message MsgAddLinkedClaimResponse {}
+message MsgDeleteLinkedClaimResponse {}
 message MsgAddLinkedEntityResponse {}
 message MsgDeleteLinkedEntityResponse {}
 message MsgAddAccordedRightResponse {}

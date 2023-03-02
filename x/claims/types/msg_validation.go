@@ -101,7 +101,7 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 func (msg MsgDisputeClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
@@ -113,6 +113,32 @@ func (msg MsgDisputeClaim) ValidateBasic() error {
 	}
 	if iidtypes.IsEmpty(msg.Data.Uri) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data uri cannot be empty")
+	}
+
+	return nil
+}
+
+// --------------------------
+// WITHDRAW PAYMENT
+// --------------------------
+func (msg MsgWithdrawPayment) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+
+	if len(msg.Inputs) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "inputs cannot be empty")
+	}
+	if len(msg.Outputs) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "inputs cannot be empty")
+	}
+
+	if iidtypes.IsEmpty(msg.PaymentType.String()) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "payment type cannot be empty")
+	}
+	if iidtypes.IsEmpty(msg.ClaimId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
 	}
 
 	return nil

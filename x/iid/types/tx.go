@@ -4,16 +4,31 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// --------------------------
-// CREATE DID
-// --------------------------
-
-// msg types
-const (
-	TypeMsgCreateDidDocument = "create-did"
-)
-
 var _ sdk.Msg = &MsgCreateIidDocument{}
+var _ sdk.Msg = &MsgUpdateIidDocument{}
+var _ sdk.Msg = &MsgAddVerification{}
+var _ sdk.Msg = &MsgRevokeVerification{}
+var _ sdk.Msg = &MsgSetVerificationRelationships{}
+var _ sdk.Msg = &MsgAddService{}
+var _ sdk.Msg = &MsgDeleteService{}
+var _ sdk.Msg = &MsgAddController{}
+var _ sdk.Msg = &MsgDeleteController{}
+var _ sdk.Msg = &MsgAddLinkedResource{}
+var _ sdk.Msg = &MsgDeleteLinkedResource{}
+var _ sdk.Msg = &MsgAddLinkedClaim{}
+var _ sdk.Msg = &MsgDeleteLinkedClaim{}
+var _ sdk.Msg = &MsgAddLinkedEntity{}
+var _ sdk.Msg = &MsgDeleteLinkedEntity{}
+var _ sdk.Msg = &MsgAddAccordedRight{}
+var _ sdk.Msg = &MsgDeleteAccordedRight{}
+var _ sdk.Msg = &MsgAddIidContext{}
+var _ sdk.Msg = &MsgDeactivateIID{}
+var _ sdk.Msg = &MsgDeleteIidContext{}
+
+// --------------------------
+// CREATE IDENTIFIER
+// --------------------------
+const TypeMsgCreateDidDocument = "create-did"
 
 // NewMsgCreateDidDocument creates a new MsgCreateDidDocument instance
 func NewMsgCreateIidDocument(
@@ -67,11 +82,7 @@ func (msg MsgCreateIidDocument) GetSigners() []sdk.AccAddress {
 // --------------------------
 // UPDATE IDENTIFIER
 // --------------------------
-
-// msg types
-const (
-	TypeMsgUpdateDidDocument = "update-did"
-)
+const TypeMsgUpdateDidDocument = "update-did"
 
 // Route implements sdk.Msg
 func (MsgUpdateIidDocument) Route() string {
@@ -100,12 +111,7 @@ func (msg MsgUpdateIidDocument) GetSigners() []sdk.AccAddress {
 // --------------------------
 // ADD VERIFICATION
 // --------------------------
-// msg types
-const (
-	TypeMsgAddVerification = "add-verification"
-)
-
-var _ sdk.Msg = &MsgAddVerification{}
+const TypeMsgAddVerification = "add-verification"
 
 // NewMsgAddVerification creates a new MsgAddVerification instance
 func NewMsgAddVerification(
@@ -147,13 +153,7 @@ func (msg MsgAddVerification) GetSigners() []sdk.AccAddress {
 // --------------------------
 // REVOKE VERIFICATION
 // --------------------------
-
-// msg types
-const (
-	TypeMsgRevokeVerification = "revoke-verification"
-)
-
-var _ sdk.Msg = &MsgRevokeVerification{}
+const TypeMsgRevokeVerification = "revoke-verification"
 
 // NewMsgRevokeVerification creates a new MsgRevokeVerification instance
 func NewMsgRevokeVerification(
@@ -195,10 +195,7 @@ func (msg MsgRevokeVerification) GetSigners() []sdk.AccAddress {
 // --------------------------
 // SET VERIFICATION RELATIONSHIPS
 // --------------------------
-// msg types
-const (
-	TypeMsgSetVerificationRelationships = "set-verification-relationships"
-)
+const TypeMsgSetVerificationRelationships = "set-verification-relationships"
 
 func NewMsgSetVerificationRelationships(
 	id string,
@@ -241,13 +238,7 @@ func (msg MsgSetVerificationRelationships) GetSigners() []sdk.AccAddress {
 // --------------------------
 // ADD SERVICE
 // --------------------------
-
-// msg types
-const (
-	TypeMsgAddService = "add-service"
-)
-
-var _ sdk.Msg = &MsgAddService{}
+const TypeMsgAddService = "add-service"
 
 // NewMsgAddService creates a new MsgAddService instance
 func NewMsgAddService(
@@ -259,28 +250,6 @@ func NewMsgAddService(
 		Id:          id,
 		ServiceData: service,
 		Signer:      signerAccount,
-	}
-}
-func NewMsgAddLinkedResource(
-	id string,
-	linkedResource *LinkedResource,
-	signerAccount string,
-) *MsgAddLinkedResource {
-	return &MsgAddLinkedResource{
-		Id:             id,
-		LinkedResource: linkedResource,
-		Signer:         signerAccount,
-	}
-}
-func NewMsgAddLinkedEntity(
-	id string,
-	linkedResource *LinkedEntity,
-	signerAccount string,
-) *MsgAddLinkedEntity {
-	return &MsgAddLinkedEntity{
-		Id:           id,
-		LinkedEntity: linkedResource,
-		Signer:       signerAccount,
 	}
 }
 
@@ -308,6 +277,23 @@ func (msg MsgAddService) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{accAddr}
 }
 
+// --------------------------
+// ADD LINKED RESOURCE
+// --------------------------
+const TypeMsgAddLinkedResource = "add-linked-resource"
+
+func NewMsgAddLinkedResource(
+	id string,
+	linkedResource *LinkedResource,
+	signerAccount string,
+) *MsgAddLinkedResource {
+	return &MsgAddLinkedResource{
+		Id:             id,
+		LinkedResource: linkedResource,
+		Signer:         signerAccount,
+	}
+}
+
 // Route implements sdk.Msg
 func (MsgAddLinkedResource) Route() string {
 	return RouterKey
@@ -315,7 +301,7 @@ func (MsgAddLinkedResource) Route() string {
 
 // Type implements sdk.Msg
 func (MsgAddLinkedResource) Type() string {
-	return TypeMsgAddService
+	return TypeMsgAddLinkedResource
 }
 
 func (msg MsgAddLinkedResource) GetSignBytes() []byte {
@@ -331,6 +317,80 @@ func (msg MsgAddLinkedResource) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{accAddr}
 }
+
+// --------------------------
+// ADD LINKED CLAIM
+// --------------------------
+const TypeMsgAddLinkedClaim = "add-linked-claim"
+
+func NewMsgAddLinkedClaim(
+	id string,
+	linkedClaim *LinkedClaim,
+	signerAccount string,
+) *MsgAddLinkedClaim {
+	return &MsgAddLinkedClaim{
+		Id:          id,
+		LinkedClaim: linkedClaim,
+		Signer:      signerAccount,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgAddLinkedClaim) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgAddLinkedClaim) Type() string {
+	return TypeMsgAddLinkedClaim
+}
+
+func (msg MsgAddLinkedClaim) GetSignBytes() []byte {
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgAddLinkedClaim) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+
+// --------------------------
+// ADD LINKED ENTITY
+// --------------------------
+const TypeMsgAddLinkedEntity = "add-linked-entity"
+
+func NewMsgAddLinkedEntity(
+	id string,
+	linkedResource *LinkedEntity,
+	signerAccount string,
+) *MsgAddLinkedEntity {
+	return &MsgAddLinkedEntity{
+		Id:           id,
+		LinkedEntity: linkedResource,
+		Signer:       signerAccount,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgAddLinkedEntity) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgAddLinkedEntity) Type() string {
+	return TypeMsgAddLinkedEntity
+}
+
+func (msg MsgAddLinkedEntity) GetSignBytes() []byte {
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
+}
+
 func (msg MsgAddLinkedEntity) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
@@ -342,11 +402,7 @@ func (msg MsgAddLinkedEntity) GetSigners() []sdk.AccAddress {
 // --------------------------
 // DELETE SERVICE
 // --------------------------
-
-// msg types
-const (
-	TypeMsgDeleteService = "delete-service"
-)
+const TypeMsgDeleteService = "delete-service"
 
 func NewMsgDeleteService(
 	id string,
@@ -357,28 +413,6 @@ func NewMsgDeleteService(
 		Id:        id,
 		ServiceId: serviceID,
 		Signer:    signerAccount,
-	}
-}
-func NewMsgDeleteLinkedResource(
-	id string,
-	resourceID string,
-	signerAccount string,
-) *MsgDeleteLinkedResource {
-	return &MsgDeleteLinkedResource{
-		Id:         id,
-		ResourceId: resourceID,
-		Signer:     signerAccount,
-	}
-}
-func NewMsgDeleteLinkedEntity(
-	id string,
-	entityID string,
-	signerAccount string,
-) *MsgDeleteLinkedEntity {
-	return &MsgDeleteLinkedEntity{
-		Id:       id,
-		EntityId: entityID,
-		Signer:   signerAccount,
 	}
 }
 
@@ -406,13 +440,30 @@ func (msg MsgDeleteService) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{accAddr}
 }
 
+// --------------------------
+// DELETE LINKED RESOURCE
+// --------------------------
+const TypeMsgDeleteLinkedResource = "delete-linked-resource"
+
+func NewMsgDeleteLinkedResource(
+	id string,
+	resourceID string,
+	signerAccount string,
+) *MsgDeleteLinkedResource {
+	return &MsgDeleteLinkedResource{
+		Id:         id,
+		ResourceId: resourceID,
+		Signer:     signerAccount,
+	}
+}
+
 func (MsgDeleteLinkedResource) Route() string {
 	return RouterKey
 }
 
 // Type implements sdk.Msg
 func (MsgDeleteLinkedResource) Type() string {
-	return TypeMsgDeleteService
+	return TypeMsgDeleteLinkedResource
 }
 
 func (msg MsgDeleteLinkedResource) GetSignBytes() []byte {
@@ -428,6 +479,78 @@ func (msg MsgDeleteLinkedResource) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{accAddr}
 }
+
+// --------------------------
+// DELETE LINKED CLAIM
+// --------------------------
+const TypeMsgDeleteLinkedClaim = "delete-linked-claim"
+
+func NewMsgDeleteLinkedClaim(
+	id string,
+	claimID string,
+	signerAccount string,
+) *MsgDeleteLinkedClaim {
+	return &MsgDeleteLinkedClaim{
+		Id:      id,
+		ClaimId: claimID,
+		Signer:  signerAccount,
+	}
+}
+
+func (MsgDeleteLinkedClaim) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgDeleteLinkedClaim) Type() string {
+	return TypeMsgDeleteLinkedClaim
+}
+
+func (msg MsgDeleteLinkedClaim) GetSignBytes() []byte {
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgDeleteLinkedClaim) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+
+// --------------------------
+// DELETE LINKED ENTITY
+// --------------------------
+const TypeMsgDeleteLinkedEntity = "delete-linked-entity"
+
+func NewMsgDeleteLinkedEntity(
+	id string,
+	entityID string,
+	signerAccount string,
+) *MsgDeleteLinkedEntity {
+	return &MsgDeleteLinkedEntity{
+		Id:       id,
+		EntityId: entityID,
+		Signer:   signerAccount,
+	}
+}
+
+func (MsgDeleteLinkedEntity) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgDeleteLinkedEntity) Type() string {
+	return TypeMsgDeleteLinkedEntity
+}
+
+func (msg MsgDeleteLinkedEntity) GetSignBytes() []byte {
+	// panic("IBC messages do not support amino")
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
+}
+
 func (msg MsgDeleteLinkedEntity) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
@@ -439,13 +562,7 @@ func (msg MsgDeleteLinkedEntity) GetSigners() []sdk.AccAddress {
 // --------------------------
 // ADD RIGHT
 // --------------------------
-
-// msg types
-const (
-	TypeMsgAddRight = "add-right"
-)
-
-var _ sdk.Msg = &MsgAddAccordedRight{}
+const TypeMsgAddRight = "add-right"
 
 // NewMsgAddAccordedRight creates a new MsgAddAccordedright instance
 func NewMsgAddAccordedRight(
@@ -467,7 +584,7 @@ func (MsgAddAccordedRight) Route() string {
 
 // Type implements sdk.Msg
 func (MsgAddAccordedRight) Type() string {
-	return TypeMsgAddService
+	return TypeMsgAddRight
 }
 
 func (msg MsgAddAccordedRight) GetSignBytes() []byte {
@@ -487,11 +604,7 @@ func (msg MsgAddAccordedRight) GetSigners() []sdk.AccAddress {
 // --------------------------
 // DELETE RIGHT
 // --------------------------
-
-// msg types
-const (
-	TypeMsgDeleteAccordedRight = "delete-right"
-)
+const TypeMsgDeleteAccordedRight = "delete-right"
 
 func NewMsgDeleteAccordedRight(
 	id string,
@@ -512,7 +625,7 @@ func (MsgDeleteAccordedRight) Route() string {
 
 // Type implements sdk.Msg
 func (MsgDeleteAccordedRight) Type() string {
-	return TypeMsgDeleteService
+	return TypeMsgDeleteAccordedRight
 }
 
 func (msg MsgDeleteAccordedRight) GetSignBytes() []byte {
@@ -532,11 +645,7 @@ func (msg MsgDeleteAccordedRight) GetSigners() []sdk.AccAddress {
 // --------------------------
 // ADD CONTROLLER
 // --------------------------
-
-// msg types
-const (
-	TypeMsgAddController = "add-controller"
-)
+const TypeMsgAddController = "add-controller"
 
 func NewMsgAddController(
 	id string,
@@ -577,11 +686,7 @@ func (msg MsgAddController) GetSigners() []sdk.AccAddress {
 // --------------------------
 // DELETE CONTROLLER
 // --------------------------
-
-// msg types
-const (
-	TypeMsgDeleteController = "delete-controller"
-)
+const TypeMsgDeleteController = "delete-controller"
 
 func NewMsgDeleteController(
 	id string,
@@ -622,13 +727,7 @@ func (msg MsgDeleteController) GetSigners() []sdk.AccAddress {
 // --------------------------
 // ADD CONTEXT
 // --------------------------
-
-// msg types
-const (
-	TypeMsgAddContext = "add-did-context"
-)
-
-var _ sdk.Msg = &MsgAddIidContext{}
+const TypeMsgAddContext = "add-did-context"
 
 // NewMsgAddService creates a new MsgAddService instance
 func NewMsgAddDidContext(
@@ -650,7 +749,7 @@ func (MsgAddIidContext) Route() string {
 
 // Type implements sdk.Msg
 func (MsgAddIidContext) Type() string {
-	return TypeMsgAddService
+	return TypeMsgAddContext
 }
 
 func (msg MsgAddIidContext) GetSignBytes() []byte {
@@ -670,11 +769,7 @@ func (msg MsgAddIidContext) GetSigners() []sdk.AccAddress {
 // --------------------------
 // DELETE CONTEXT
 // --------------------------
-
-// msg types
-const (
-	TypeMsgDeleteDidContext = "delete-context"
-)
+const TypeMsgDeleteDidContext = "delete-context"
 
 func NewMsgDeleteDidContext(
 	id string,
@@ -695,7 +790,7 @@ func (MsgDeleteIidContext) Route() string {
 
 // Type implements sdk.Msg
 func (MsgDeleteIidContext) Type() string {
-	return TypeMsgDeleteService
+	return TypeMsgDeleteDidContext
 }
 
 func (msg MsgDeleteIidContext) GetSignBytes() []byte {
@@ -715,11 +810,7 @@ func (msg MsgDeleteIidContext) GetSigners() []sdk.AccAddress {
 // --------------------------
 // DEACTIVATE DID
 // --------------------------
-
-// msg types
-const (
-	TypeMsgDeactivateDid = "deactivate-did"
-)
+const TypeMsgDeactivateDid = "deactivate-did"
 
 func NewMsgDeactivateIID(
 	id string,

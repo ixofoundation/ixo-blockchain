@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -54,5 +55,16 @@ func IsValidDispute(dispute *Dispute) bool {
 	if iidtypes.IsEmpty(dispute.Data.Uri) {
 		return false
 	}
+	return true
+}
+
+func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.AccAddress,
+	requiredFunds sdk.Coins) bool {
+	for _, reqCoin := range requiredFunds {
+		if !bankKeeper.HasBalance(ctx, payerAddr, reqCoin) {
+			return false
+		}
+	}
+
 	return true
 }

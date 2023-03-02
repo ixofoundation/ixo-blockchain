@@ -7,7 +7,6 @@ import (
 // --------------------------
 // CREATE IDENTIFIER
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgCreateDidDocument fields.
 func (msg MsgCreateIidDocument) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -45,7 +44,6 @@ func (msg MsgCreateIidDocument) ValidateBasic() error {
 // --------------------------
 // UPDATE IDENTIFIER
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgUpdateDidDocument fields.
 func (msg MsgUpdateIidDocument) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -83,7 +81,6 @@ func (msg MsgUpdateIidDocument) ValidateBasic() error {
 // --------------------------
 // ADD VERIFICATION METHOD
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgAddVerification fields.
 func (msg MsgAddVerification) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -96,7 +93,6 @@ func (msg MsgAddVerification) ValidateBasic() error {
 // --------------------------
 // REVOKE VERIFICATION METHOD
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgRevokeVerification fields.
 func (msg MsgRevokeVerification) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -112,7 +108,6 @@ func (msg MsgRevokeVerification) ValidateBasic() error {
 // --------------------------
 // SET VERIFICATION RELATIONSHIPS
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgSetVerificationRelationships fields.
 func (msg MsgSetVerificationRelationships) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -134,7 +129,6 @@ func (msg MsgSetVerificationRelationships) ValidateBasic() error {
 // --------------------------
 // ADD SERVICE
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddService) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -153,7 +147,6 @@ func (msg MsgAddAccordedRight) ValidateBasic() error {
 // --------------------------
 // DELETE SERVICE
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteService) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -173,7 +166,6 @@ func (msg MsgDeleteService) ValidateBasic() error {
 // --------------------------
 // ADD CONTROLLERS
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddController) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -190,7 +182,6 @@ func (msg MsgAddController) ValidateBasic() error {
 // --------------------------
 // DELETE CONTROLLERS
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteController) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -205,9 +196,8 @@ func (msg MsgDeleteController) ValidateBasic() error {
 }
 
 // --------------------------
-// ADD Resource
+// ADD LINKED RESOURCE
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddLinkedResource) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -217,9 +207,8 @@ func (msg MsgAddLinkedResource) ValidateBasic() error {
 }
 
 // --------------------------
-// DELETE Resource
+// DELETE LINKED RESOURCE
 // --------------------------
-
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteLinkedResource) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
@@ -227,15 +216,40 @@ func (msg MsgDeleteLinkedResource) ValidateBasic() error {
 	}
 
 	if IsEmpty(msg.ResourceId) {
-		return sdkerrors.Wrap(ErrInvalidInput, "resource id cannot be empty;")
+		return sdkerrors.Wrap(ErrInvalidInput, "resource id cannot be empty")
 	}
-
-	//if !IsValidRFC3986Uri(msg.ServiceId) {
-	//	return sdkerrors.Wrap(ErrInvalidRFC3986UriFormat, "service id validation error")
-	//}
 	return nil
 }
 
+// --------------------------
+// ADD LINKED CLAIM
+// --------------------------
+// ValidateBasic performs a basic check of the MsgAddService fields.
+func (msg MsgAddLinkedClaim) ValidateBasic() error {
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
+	return nil
+}
+
+// --------------------------
+// DELETE LINKED CLAIM
+// --------------------------
+// ValidateBasic performs a basic check of the MsgDeleteService fields.
+func (msg MsgDeleteLinkedClaim) ValidateBasic() error {
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
+
+	if IsEmpty(msg.ClaimId) {
+		return sdkerrors.Wrap(ErrInvalidInput, "claim id cannot be empty")
+	}
+	return nil
+}
+
+// --------------------------
+// ADD LINKED ENTITY
+// --------------------------
 func (msg MsgAddLinkedEntity) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
@@ -244,9 +258,8 @@ func (msg MsgAddLinkedEntity) ValidateBasic() error {
 }
 
 // --------------------------
-// DELETE Resource
+// DELETE LINKED ENTITY
 // --------------------------
-
 func (msg MsgDeleteLinkedEntity) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
@@ -258,6 +271,9 @@ func (msg MsgDeleteLinkedEntity) ValidateBasic() error {
 	return nil
 }
 
+// --------------------------
+// DELETE RIGHT
+// --------------------------
 func (msg MsgDeleteAccordedRight) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
@@ -268,12 +284,20 @@ func (msg MsgDeleteAccordedRight) ValidateBasic() error {
 	}
 	return nil
 }
+
+// --------------------------
+// ADD CONTEXT
+// --------------------------
 func (msg MsgAddIidContext) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
 	return nil
 }
+
+// --------------------------
+// DELETE CONTEXT
+// --------------------------
 func (msg MsgDeleteIidContext) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
@@ -285,6 +309,9 @@ func (msg MsgDeleteIidContext) ValidateBasic() error {
 	return nil
 }
 
+// --------------------------
+// DEACTIVATE IID
+// --------------------------
 func (msg MsgDeactivateIID) ValidateBasic() error {
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)

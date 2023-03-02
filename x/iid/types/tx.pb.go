@@ -105,6 +105,7 @@ type MsgCreateIidDocument struct {
 	LinkedEntity   []*LinkedEntity   `protobuf:"bytes,8,rep,name=linkedEntity,proto3" json:"linkedEntity,omitempty"`
 	AlsoKnownAs    string            `protobuf:"bytes,9,opt,name=alsoKnownAs,proto3" json:"alsoKnownAs,omitempty"`
 	Signer         string            `protobuf:"bytes,10,opt,name=signer,proto3" json:"signer,omitempty"`
+	LinkedClaim    []*LinkedClaim    `protobuf:"bytes,11,rep,name=linkedClaim,proto3" json:"linkedClaim,omitempty"`
 }
 
 func (m *MsgCreateIidDocument) Reset()         { *m = MsgCreateIidDocument{} }
@@ -189,6 +190,7 @@ type MsgUpdateIidDocument struct {
 	LinkedEntity   []*LinkedEntity   `protobuf:"bytes,8,rep,name=linkedEntity,proto3" json:"linkedEntity,omitempty"`
 	AlsoKnownAs    string            `protobuf:"bytes,9,opt,name=alsoKnownAs,proto3" json:"alsoKnownAs,omitempty"`
 	Signer         string            `protobuf:"bytes,10,opt,name=signer,proto3" json:"signer,omitempty"`
+	LinkedClaim    []*LinkedClaim    `protobuf:"bytes,11,rep,name=linkedClaim,proto3" json:"linkedClaim,omitempty"`
 }
 
 func (m *MsgUpdateIidDocument) Reset()         { *m = MsgUpdateIidDocument{} }
@@ -866,6 +868,84 @@ func (m *MsgDeleteLinkedResource) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteLinkedResource proto.InternalMessageInfo
 
+type MsgAddLinkedClaim struct {
+	Id          string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	LinkedClaim *LinkedClaim `protobuf:"bytes,2,opt,name=linkedClaim,proto3" json:"linkedClaim,omitempty"`
+	Signer      string       `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+func (m *MsgAddLinkedClaim) Reset()         { *m = MsgAddLinkedClaim{} }
+func (m *MsgAddLinkedClaim) String() string { return proto.CompactTextString(m) }
+func (*MsgAddLinkedClaim) ProtoMessage()    {}
+func (*MsgAddLinkedClaim) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5d148d8ca0e87464, []int{21}
+}
+func (m *MsgAddLinkedClaim) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddLinkedClaim) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddLinkedClaim.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddLinkedClaim) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddLinkedClaim.Merge(m, src)
+}
+func (m *MsgAddLinkedClaim) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddLinkedClaim) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddLinkedClaim.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddLinkedClaim proto.InternalMessageInfo
+
+type MsgDeleteLinkedClaim struct {
+	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ClaimId string `protobuf:"bytes,2,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
+	Signer  string `protobuf:"bytes,3,opt,name=signer,proto3" json:"signer,omitempty"`
+}
+
+func (m *MsgDeleteLinkedClaim) Reset()         { *m = MsgDeleteLinkedClaim{} }
+func (m *MsgDeleteLinkedClaim) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLinkedClaim) ProtoMessage()    {}
+func (*MsgDeleteLinkedClaim) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5d148d8ca0e87464, []int{22}
+}
+func (m *MsgDeleteLinkedClaim) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLinkedClaim) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLinkedClaim.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLinkedClaim) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLinkedClaim.Merge(m, src)
+}
+func (m *MsgDeleteLinkedClaim) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLinkedClaim) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLinkedClaim.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLinkedClaim proto.InternalMessageInfo
+
 type MsgAddLinkedEntity struct {
 	Id           string        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	LinkedEntity *LinkedEntity `protobuf:"bytes,2,opt,name=linkedEntity,proto3" json:"linkedEntity,omitempty"`
@@ -876,7 +956,7 @@ func (m *MsgAddLinkedEntity) Reset()         { *m = MsgAddLinkedEntity{} }
 func (m *MsgAddLinkedEntity) String() string { return proto.CompactTextString(m) }
 func (*MsgAddLinkedEntity) ProtoMessage()    {}
 func (*MsgAddLinkedEntity) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{21}
+	return fileDescriptor_5d148d8ca0e87464, []int{23}
 }
 func (m *MsgAddLinkedEntity) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -915,7 +995,7 @@ func (m *MsgDeleteLinkedEntity) Reset()         { *m = MsgDeleteLinkedEntity{} }
 func (m *MsgDeleteLinkedEntity) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteLinkedEntity) ProtoMessage()    {}
 func (*MsgDeleteLinkedEntity) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{22}
+	return fileDescriptor_5d148d8ca0e87464, []int{24}
 }
 func (m *MsgDeleteLinkedEntity) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -954,7 +1034,7 @@ func (m *MsgAddAccordedRight) Reset()         { *m = MsgAddAccordedRight{} }
 func (m *MsgAddAccordedRight) String() string { return proto.CompactTextString(m) }
 func (*MsgAddAccordedRight) ProtoMessage()    {}
 func (*MsgAddAccordedRight) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{23}
+	return fileDescriptor_5d148d8ca0e87464, []int{25}
 }
 func (m *MsgAddAccordedRight) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -993,7 +1073,7 @@ func (m *MsgDeleteAccordedRight) Reset()         { *m = MsgDeleteAccordedRight{}
 func (m *MsgDeleteAccordedRight) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteAccordedRight) ProtoMessage()    {}
 func (*MsgDeleteAccordedRight) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{24}
+	return fileDescriptor_5d148d8ca0e87464, []int{26}
 }
 func (m *MsgDeleteAccordedRight) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1032,7 +1112,7 @@ func (m *MsgAddIidContext) Reset()         { *m = MsgAddIidContext{} }
 func (m *MsgAddIidContext) String() string { return proto.CompactTextString(m) }
 func (*MsgAddIidContext) ProtoMessage()    {}
 func (*MsgAddIidContext) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{25}
+	return fileDescriptor_5d148d8ca0e87464, []int{27}
 }
 func (m *MsgAddIidContext) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1071,7 +1151,7 @@ func (m *MsgDeactivateIID) Reset()         { *m = MsgDeactivateIID{} }
 func (m *MsgDeactivateIID) String() string { return proto.CompactTextString(m) }
 func (*MsgDeactivateIID) ProtoMessage()    {}
 func (*MsgDeactivateIID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{26}
+	return fileDescriptor_5d148d8ca0e87464, []int{28}
 }
 func (m *MsgDeactivateIID) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1110,7 +1190,7 @@ func (m *MsgDeleteIidContext) Reset()         { *m = MsgDeleteIidContext{} }
 func (m *MsgDeleteIidContext) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteIidContext) ProtoMessage()    {}
 func (*MsgDeleteIidContext) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{27}
+	return fileDescriptor_5d148d8ca0e87464, []int{29}
 }
 func (m *MsgDeleteIidContext) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1146,7 +1226,7 @@ func (m *MsgAddLinkedResourceResponse) Reset()         { *m = MsgAddLinkedResour
 func (m *MsgAddLinkedResourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddLinkedResourceResponse) ProtoMessage()    {}
 func (*MsgAddLinkedResourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{28}
+	return fileDescriptor_5d148d8ca0e87464, []int{30}
 }
 func (m *MsgAddLinkedResourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1182,7 +1262,7 @@ func (m *MsgDeleteLinkedResourceResponse) Reset()         { *m = MsgDeleteLinked
 func (m *MsgDeleteLinkedResourceResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteLinkedResourceResponse) ProtoMessage()    {}
 func (*MsgDeleteLinkedResourceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{29}
+	return fileDescriptor_5d148d8ca0e87464, []int{31}
 }
 func (m *MsgDeleteLinkedResourceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1211,6 +1291,78 @@ func (m *MsgDeleteLinkedResourceResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDeleteLinkedResourceResponse proto.InternalMessageInfo
 
+type MsgAddLinkedClaimResponse struct {
+}
+
+func (m *MsgAddLinkedClaimResponse) Reset()         { *m = MsgAddLinkedClaimResponse{} }
+func (m *MsgAddLinkedClaimResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddLinkedClaimResponse) ProtoMessage()    {}
+func (*MsgAddLinkedClaimResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5d148d8ca0e87464, []int{32}
+}
+func (m *MsgAddLinkedClaimResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddLinkedClaimResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddLinkedClaimResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddLinkedClaimResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddLinkedClaimResponse.Merge(m, src)
+}
+func (m *MsgAddLinkedClaimResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddLinkedClaimResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddLinkedClaimResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddLinkedClaimResponse proto.InternalMessageInfo
+
+type MsgDeleteLinkedClaimResponse struct {
+}
+
+func (m *MsgDeleteLinkedClaimResponse) Reset()         { *m = MsgDeleteLinkedClaimResponse{} }
+func (m *MsgDeleteLinkedClaimResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLinkedClaimResponse) ProtoMessage()    {}
+func (*MsgDeleteLinkedClaimResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5d148d8ca0e87464, []int{33}
+}
+func (m *MsgDeleteLinkedClaimResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLinkedClaimResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLinkedClaimResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLinkedClaimResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLinkedClaimResponse.Merge(m, src)
+}
+func (m *MsgDeleteLinkedClaimResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLinkedClaimResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLinkedClaimResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLinkedClaimResponse proto.InternalMessageInfo
+
 type MsgAddLinkedEntityResponse struct {
 }
 
@@ -1218,7 +1370,7 @@ func (m *MsgAddLinkedEntityResponse) Reset()         { *m = MsgAddLinkedEntityRe
 func (m *MsgAddLinkedEntityResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddLinkedEntityResponse) ProtoMessage()    {}
 func (*MsgAddLinkedEntityResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{30}
+	return fileDescriptor_5d148d8ca0e87464, []int{34}
 }
 func (m *MsgAddLinkedEntityResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1254,7 +1406,7 @@ func (m *MsgDeleteLinkedEntityResponse) Reset()         { *m = MsgDeleteLinkedEn
 func (m *MsgDeleteLinkedEntityResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteLinkedEntityResponse) ProtoMessage()    {}
 func (*MsgDeleteLinkedEntityResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{31}
+	return fileDescriptor_5d148d8ca0e87464, []int{35}
 }
 func (m *MsgDeleteLinkedEntityResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1290,7 +1442,7 @@ func (m *MsgAddAccordedRightResponse) Reset()         { *m = MsgAddAccordedRight
 func (m *MsgAddAccordedRightResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddAccordedRightResponse) ProtoMessage()    {}
 func (*MsgAddAccordedRightResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{32}
+	return fileDescriptor_5d148d8ca0e87464, []int{36}
 }
 func (m *MsgAddAccordedRightResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1326,7 +1478,7 @@ func (m *MsgDeleteAccordedRightResponse) Reset()         { *m = MsgDeleteAccorde
 func (m *MsgDeleteAccordedRightResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteAccordedRightResponse) ProtoMessage()    {}
 func (*MsgDeleteAccordedRightResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{33}
+	return fileDescriptor_5d148d8ca0e87464, []int{37}
 }
 func (m *MsgDeleteAccordedRightResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1362,7 +1514,7 @@ func (m *MsgAddIidContextResponse) Reset()         { *m = MsgAddIidContextRespon
 func (m *MsgAddIidContextResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgAddIidContextResponse) ProtoMessage()    {}
 func (*MsgAddIidContextResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{34}
+	return fileDescriptor_5d148d8ca0e87464, []int{38}
 }
 func (m *MsgAddIidContextResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1398,7 +1550,7 @@ func (m *MsgDeleteIidContextResponse) Reset()         { *m = MsgDeleteIidContext
 func (m *MsgDeleteIidContextResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeleteIidContextResponse) ProtoMessage()    {}
 func (*MsgDeleteIidContextResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{35}
+	return fileDescriptor_5d148d8ca0e87464, []int{39}
 }
 func (m *MsgDeleteIidContextResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1434,7 +1586,7 @@ func (m *MsgDeactivateIIDResponse) Reset()         { *m = MsgDeactivateIIDRespon
 func (m *MsgDeactivateIIDResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgDeactivateIIDResponse) ProtoMessage()    {}
 func (*MsgDeactivateIIDResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_5d148d8ca0e87464, []int{36}
+	return fileDescriptor_5d148d8ca0e87464, []int{40}
 }
 func (m *MsgDeactivateIIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1485,6 +1637,8 @@ func init() {
 	proto.RegisterType((*MsgDeleteControllerResponse)(nil), "ixo.iid.v1beta1.MsgDeleteControllerResponse")
 	proto.RegisterType((*MsgAddLinkedResource)(nil), "ixo.iid.v1beta1.MsgAddLinkedResource")
 	proto.RegisterType((*MsgDeleteLinkedResource)(nil), "ixo.iid.v1beta1.MsgDeleteLinkedResource")
+	proto.RegisterType((*MsgAddLinkedClaim)(nil), "ixo.iid.v1beta1.MsgAddLinkedClaim")
+	proto.RegisterType((*MsgDeleteLinkedClaim)(nil), "ixo.iid.v1beta1.MsgDeleteLinkedClaim")
 	proto.RegisterType((*MsgAddLinkedEntity)(nil), "ixo.iid.v1beta1.MsgAddLinkedEntity")
 	proto.RegisterType((*MsgDeleteLinkedEntity)(nil), "ixo.iid.v1beta1.MsgDeleteLinkedEntity")
 	proto.RegisterType((*MsgAddAccordedRight)(nil), "ixo.iid.v1beta1.MsgAddAccordedRight")
@@ -1494,6 +1648,8 @@ func init() {
 	proto.RegisterType((*MsgDeleteIidContext)(nil), "ixo.iid.v1beta1.MsgDeleteIidContext")
 	proto.RegisterType((*MsgAddLinkedResourceResponse)(nil), "ixo.iid.v1beta1.MsgAddLinkedResourceResponse")
 	proto.RegisterType((*MsgDeleteLinkedResourceResponse)(nil), "ixo.iid.v1beta1.MsgDeleteLinkedResourceResponse")
+	proto.RegisterType((*MsgAddLinkedClaimResponse)(nil), "ixo.iid.v1beta1.MsgAddLinkedClaimResponse")
+	proto.RegisterType((*MsgDeleteLinkedClaimResponse)(nil), "ixo.iid.v1beta1.MsgDeleteLinkedClaimResponse")
 	proto.RegisterType((*MsgAddLinkedEntityResponse)(nil), "ixo.iid.v1beta1.MsgAddLinkedEntityResponse")
 	proto.RegisterType((*MsgDeleteLinkedEntityResponse)(nil), "ixo.iid.v1beta1.MsgDeleteLinkedEntityResponse")
 	proto.RegisterType((*MsgAddAccordedRightResponse)(nil), "ixo.iid.v1beta1.MsgAddAccordedRightResponse")
@@ -1506,87 +1662,94 @@ func init() {
 func init() { proto.RegisterFile("ixo/iid/v1beta1/tx.proto", fileDescriptor_5d148d8ca0e87464) }
 
 var fileDescriptor_5d148d8ca0e87464 = []byte{
-	// 1265 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x4d, 0x6f, 0xdb, 0x46,
-	0x13, 0x36, 0xed, 0xc4, 0x96, 0xc6, 0x96, 0x93, 0x97, 0xf1, 0x9b, 0x30, 0xb2, 0x2d, 0xf9, 0x3b,
-	0x0e, 0x9a, 0x48, 0x89, 0xd3, 0x43, 0xd1, 0x9c, 0x54, 0xab, 0x28, 0x8c, 0x44, 0x17, 0xa6, 0xed,
-	0x21, 0x40, 0x61, 0xd0, 0xdc, 0x35, 0xbd, 0xb0, 0xcc, 0x15, 0x48, 0xda, 0x95, 0x2f, 0x3d, 0xf7,
-	0x03, 0x01, 0xda, 0x4b, 0xcf, 0xf9, 0x39, 0x3d, 0xe6, 0xd8, 0x63, 0x61, 0x5f, 0xf2, 0x33, 0x0a,
-	0x91, 0xd4, 0x72, 0x97, 0xbb, 0x4b, 0xd1, 0x97, 0x9e, 0x72, 0x33, 0x77, 0x9e, 0x99, 0x79, 0x76,
-	0x77, 0xe6, 0xd9, 0xb1, 0xc0, 0x22, 0x43, 0xda, 0x26, 0x04, 0xb5, 0x2f, 0x9e, 0x1f, 0xe1, 0xc8,
-	0x79, 0xde, 0x8e, 0x86, 0xad, 0x41, 0x40, 0x23, 0x6a, 0xde, 0x21, 0x43, 0xda, 0x22, 0x04, 0xb5,
-	0x52, 0x4b, 0x7d, 0xc9, 0xa3, 0x1e, 0x8d, 0x6d, 0xed, 0xd1, 0x5f, 0x09, 0xac, 0xfe, 0x30, 0x1f,
-	0x60, 0xe4, 0x92, 0x98, 0x56, 0x3c, 0x4a, 0xbd, 0x3e, 0x6e, 0x3b, 0x03, 0xd2, 0x76, 0x7c, 0x9f,
-	0x46, 0x4e, 0x44, 0xa8, 0x1f, 0x26, 0xd6, 0x8d, 0xdf, 0x0c, 0x58, 0xf8, 0x1e, 0x07, 0xe4, 0x98,
-	0xb8, 0xf1, 0xba, 0xb9, 0x05, 0xb5, 0x00, 0xf7, 0x13, 0xcc, 0x09, 0x19, 0x84, 0x96, 0xb1, 0x36,
-	0xb3, 0x5b, 0xb5, 0xc5, 0x45, 0xf3, 0x25, 0xcc, 0x9e, 0xe1, 0xe8, 0x84, 0x22, 0x6b, 0x7a, 0xcd,
-	0xd8, 0x9d, 0xdf, 0xdb, 0x6c, 0xe5, 0x78, 0xb6, 0xf8, 0xa0, 0xbd, 0x18, 0x6a, 0xa7, 0x2e, 0xa6,
-	0x05, 0x73, 0x2e, 0xf5, 0x23, 0x3c, 0x8c, 0xac, 0x99, 0x38, 0xf8, 0xf8, 0x73, 0xe3, 0xdd, 0x2d,
-	0x58, 0xea, 0x85, 0xde, 0x7e, 0x80, 0x9d, 0x08, 0x1f, 0x10, 0xd4, 0xa5, 0xee, 0xf9, 0x19, 0xf6,
-	0x23, 0x73, 0x11, 0xa6, 0x09, 0xb2, 0x8c, 0x35, 0x63, 0xb7, 0x6a, 0x4f, 0x13, 0x64, 0xae, 0xc1,
-	0xfc, 0xc8, 0x27, 0xa0, 0xfd, 0x3e, 0x0e, 0x42, 0x6b, 0x3a, 0x0e, 0xc3, 0x2f, 0x99, 0x7b, 0x62,
-	0x92, 0xf9, 0x3d, 0x4b, 0xa2, 0xb8, 0x9f, 0xd8, 0x59, 0x7a, 0x73, 0x1f, 0x6a, 0x17, 0x1c, 0xed,
-	0xd0, 0xba, 0x15, 0x7b, 0xae, 0x16, 0x6e, 0xce, 0x16, 0x7d, 0xcc, 0xcf, 0xa1, 0x12, 0xe2, 0xe0,
-	0x82, 0xb8, 0x38, 0xb4, 0x6e, 0x6b, 0x32, 0xbf, 0x49, 0x00, 0x36, 0x43, 0x9a, 0x5d, 0xa8, 0x39,
-	0xae, 0x4b, 0x03, 0x84, 0x91, 0x4d, 0xbc, 0x93, 0xc8, 0x9a, 0x8d, 0x5d, 0x1b, 0x92, 0x6b, 0x87,
-	0x47, 0xd9, 0xa2, 0x93, 0xf9, 0x0d, 0x2c, 0xf6, 0x89, 0x7f, 0x8a, 0x91, 0x8d, 0x43, 0x7a, 0x1e,
-	0xb8, 0xd8, 0x9a, 0x8b, 0xc3, 0x34, 0xa5, 0x30, 0xaf, 0x05, 0x98, 0x9d, 0x73, 0x33, 0x3b, 0xb0,
-	0x90, 0xac, 0x7c, 0xed, 0x47, 0x24, 0xba, 0xb4, 0x2a, 0x9a, 0x83, 0x78, 0xcd, 0x81, 0x6c, 0xc1,
-	0x65, 0x74, 0x45, 0x4e, 0x3f, 0xa4, 0xaf, 0x7c, 0xfa, 0xa3, 0xdf, 0x09, 0xad, 0x6a, 0x7c, 0x77,
-	0xfc, 0x92, 0x79, 0x1f, 0x66, 0x43, 0xe2, 0xf9, 0x38, 0xb0, 0x20, 0x36, 0xa6, 0x5f, 0x5f, 0x56,
-	0x7e, 0x7e, 0xdf, 0x9c, 0xfa, 0xf8, 0xbe, 0x39, 0xb5, 0xd1, 0x80, 0x15, 0x55, 0x39, 0xd8, 0x38,
-	0x1c, 0x50, 0x3f, 0xc4, 0xe3, 0x7a, 0xf9, 0x6e, 0x80, 0x3e, 0xd5, 0xcb, 0xa7, 0x7a, 0x19, 0xd7,
-	0x8b, 0x54, 0x0e, 0xac, 0x5e, 0x7e, 0x31, 0xc0, 0xec, 0x85, 0x5e, 0x07, 0x21, 0x41, 0xf3, 0xf2,
-	0xd5, 0xd2, 0x81, 0x05, 0xfe, 0x8e, 0x52, 0x8d, 0x9b, 0x70, 0xad, 0x82, 0x0b, 0xc7, 0x75, 0x46,
-	0xc3, 0x75, 0x05, 0xea, 0x32, 0x15, 0xc6, 0xf4, 0x4f, 0x03, 0x9a, 0xbd, 0xd0, 0x7b, 0x83, 0x23,
-	0xd1, 0xcc, 0x8b, 0x70, 0x9e, 0xf6, 0x32, 0x54, 0x13, 0x85, 0x3d, 0x24, 0x89, 0x2e, 0x57, 0xed,
-	0x4a, 0xb2, 0x70, 0x80, 0x64, 0x5d, 0x9f, 0x51, 0xe9, 0x7a, 0x46, 0xfb, 0x96, 0x86, 0xf6, 0x63,
-	0x78, 0x34, 0x81, 0x17, 0xdb, 0xc3, 0x31, 0xfc, 0xbf, 0x17, 0x7a, 0x36, 0xbe, 0xa0, 0xa7, 0xb8,
-	0xf0, 0xbc, 0x0b, 0x89, 0x4f, 0x3e, 0xc9, 0x26, 0xac, 0x2a, 0xf3, 0x30, 0x22, 0x3f, 0x41, 0x2d,
-	0x39, 0xea, 0xb4, 0x8f, 0x24, 0x02, 0x2f, 0x61, 0x21, 0xed, 0xac, 0x43, 0xe4, 0x44, 0x4e, 0x7a,
-	0xe1, 0xfa, 0x3e, 0x9c, 0x4f, 0xd1, 0x5d, 0x27, 0x72, 0x4a, 0x10, 0x7c, 0x10, 0x1f, 0x44, 0x96,
-	0x9f, 0x11, 0x73, 0xe1, 0x6e, 0x2f, 0xf4, 0xba, 0xb8, 0x8f, 0x23, 0xac, 0xe3, 0xb6, 0x0a, 0x30,
-	0xe6, 0xc6, 0x4e, 0xa7, 0x9a, 0xae, 0x94, 0x3a, 0x9e, 0x3a, 0x58, 0xf9, 0x24, 0x8c, 0xc0, 0x69,
-	0x4c, 0xa0, 0x83, 0xd0, 0x3e, 0x93, 0x42, 0x89, 0xc0, 0x36, 0x2c, 0x66, 0x42, 0x79, 0x88, 0x18,
-	0x89, 0x5a, 0xb6, 0xda, 0x25, 0xe5, 0x89, 0x08, 0xc9, 0x18, 0x11, 0x1f, 0xee, 0x31, 0x92, 0xff,
-	0x05, 0x97, 0x55, 0x58, 0x56, 0xe4, 0x63, 0x74, 0xfe, 0x30, 0xe2, 0x87, 0xa5, 0x83, 0x90, 0x28,
-	0x7c, 0x12, 0x21, 0x59, 0x41, 0x93, 0xda, 0xb9, 0xb1, 0x82, 0x4e, 0xa6, 0xdc, 0x87, 0x07, 0x8c,
-	0xf2, 0x04, 0x56, 0x4d, 0x98, 0x0f, 0x52, 0x5b, 0x56, 0x34, 0x30, 0x5e, 0x2a, 0x55, 0x35, 0x99,
-	0x54, 0xf2, 0x9a, 0xad, 0x92, 0x4a, 0x41, 0xf8, 0x75, 0x52, 0x59, 0x20, 0xfc, 0x93, 0xb9, 0x24,
-	0x42, 0xc2, 0xef, 0x5c, 0xc3, 0x66, 0x19, 0xaa, 0x38, 0xb6, 0x70, 0x42, 0x92, 0x2c, 0x94, 0xda,
-	0xf3, 0x3b, 0x23, 0xae, 0xc2, 0x0e, 0x42, 0xc2, 0xab, 0x29, 0xa5, 0x91, 0x1e, 0xdf, 0x64, 0xd7,
-	0x37, 0x7c, 0x7c, 0x27, 0xf3, 0xc1, 0x70, 0x9f, 0xed, 0xbb, 0x98, 0xd1, 0x43, 0xa8, 0x04, 0x23,
-	0x43, 0xb6, 0xef, 0xb9, 0xf8, 0xbb, 0xd4, 0xb6, 0x87, 0x63, 0x11, 0x38, 0x20, 0x28, 0x9d, 0x71,
-	0xa4, 0x04, 0xdc, 0x78, 0xa4, 0x13, 0x47, 0x69, 0x3c, 0x9a, 0x9c, 0xf9, 0x6d, 0xaa, 0x7f, 0x8e,
-	0x1b, 0x91, 0x8b, 0xd1, 0x9b, 0x7d, 0xd0, 0x95, 0x32, 0x2f, 0xc1, 0xed, 0x30, 0x72, 0xa2, 0xa4,
-	0xb1, 0x2a, 0x76, 0xf2, 0x51, 0x22, 0xb6, 0xc7, 0x29, 0x4a, 0xc1, 0xc6, 0x1a, 0x00, 0x29, 0xdf,
-	0x57, 0xf8, 0x72, 0xdc, 0x29, 0xd9, 0x4a, 0x89, 0x44, 0xc9, 0xd0, 0x21, 0x49, 0x05, 0xd3, 0x92,
-	0xf5, 0xf8, 0x25, 0x57, 0xf5, 0x2d, 0x83, 0xb0, 0x59, 0x40, 0x68, 0x93, 0xb1, 0x35, 0x79, 0xdf,
-	0xe4, 0xf2, 0x67, 0x80, 0x44, 0xcc, 0xf2, 0x65, 0xcb, 0xcc, 0x6b, 0xd0, 0x50, 0x97, 0x11, 0x43,
-	0x30, 0x65, 0xce, 0x0e, 0x2a, 0x17, 0x3c, 0x7f, 0x8e, 0x39, 0x57, 0xe1, 0x0a, 0xc7, 0xb6, 0xbd,
-	0x8f, 0x8b, 0x30, 0xd3, 0x0b, 0x3d, 0x93, 0xc0, 0xff, 0xe4, 0x7f, 0xe9, 0xb6, 0xa5, 0x02, 0x52,
-	0x8d, 0xfa, 0xf5, 0xa7, 0xa5, 0x60, 0xe3, 0x94, 0xa3, 0x54, 0xf2, 0x7f, 0x03, 0xca, 0x54, 0x12,
-	0x4c, 0x9d, 0x4a, 0x3b, 0x4c, 0x9a, 0x2e, 0xdc, 0xc9, 0x0f, 0x92, 0x9b, 0xaa, 0x08, 0x39, 0x50,
-	0xfd, 0xb3, 0x12, 0x20, 0x96, 0xa4, 0x0f, 0xa6, 0x62, 0x80, 0xda, 0x51, 0x85, 0x90, 0x71, 0xf5,
-	0x56, 0x39, 0x1c, 0xcb, 0xf6, 0xab, 0x01, 0x2b, 0x85, 0x23, 0xe7, 0x33, 0x55, 0xc0, 0x22, 0x8f,
-	0xfa, 0x17, 0x37, 0xf5, 0x60, 0x64, 0xbe, 0x05, 0xe0, 0x46, 0xb6, 0x86, 0xe6, 0xd4, 0x52, 0x7b,
-	0x7d, 0xa7, 0xd8, 0xce, 0xa2, 0xfe, 0x00, 0x35, 0x71, 0xde, 0x5a, 0x57, 0x39, 0x0a, 0x90, 0xfa,
-	0xe3, 0x89, 0x10, 0x3e, 0xbc, 0x38, 0x4d, 0xad, 0x6b, 0x78, 0x65, 0x10, 0x75, 0x78, 0xe5, 0x98,
-	0x64, 0x1e, 0xc3, 0x5d, 0x69, 0x46, 0xda, 0xd2, 0xb3, 0xe3, 0x92, 0x3c, 0x29, 0x83, 0xe2, 0xdb,
-	0x48, 0x9e, 0x7d, 0xb6, 0x35, 0x3c, 0x45, 0x98, 0xba, 0x8d, 0xb4, 0xf2, 0x68, 0x06, 0xb0, 0xa4,
-	0x9c, 0x69, 0x76, 0xf5, 0x84, 0x73, 0x09, 0x9f, 0x95, 0x45, 0xe6, 0x5a, 0x57, 0x18, 0x25, 0x36,
-	0x0b, 0x59, 0x27, 0x20, 0x6d, 0xeb, 0xaa, 0x54, 0x79, 0xd4, 0xba, 0x8a, 0x91, 0x65, 0x67, 0x12,
-	0xd9, 0x34, 0x55, 0xab, 0x1c, 0x8e, 0xaf, 0x0c, 0x69, 0x6e, 0xd9, 0xd2, 0xd0, 0x15, 0x50, 0xea,
-	0xca, 0xd0, 0x3d, 0x26, 0x26, 0x85, 0x7b, 0xaa, 0x81, 0xe4, 0x91, 0x9e, 0xae, 0x98, 0xad, 0x5d,
-	0x12, 0x98, 0xeb, 0x28, 0xee, 0x05, 0xd7, 0x75, 0x54, 0x06, 0xd1, 0x76, 0x94, 0xfc, 0x7e, 0x25,
-	0x7a, 0xc0, 0xcf, 0x1f, 0x1a, 0x3d, 0xe0, 0x20, 0x3a, 0x3d, 0x50, 0x3c, 0x81, 0x59, 0xc3, 0x72,
-	0x1b, 0x28, 0x68, 0x58, 0x6e, 0x0f, 0x4f, 0xca, 0xa0, 0xc6, 0x79, 0xbe, 0xea, 0xfd, 0x75, 0xd5,
-	0x30, 0x3e, 0x5c, 0x35, 0x8c, 0x7f, 0xae, 0x1a, 0xc6, 0xef, 0xd7, 0x8d, 0xa9, 0x0f, 0xd7, 0x8d,
-	0xa9, 0xbf, 0xaf, 0x1b, 0x53, 0x6f, 0x5f, 0x78, 0x24, 0x3a, 0x39, 0x3f, 0x6a, 0xb9, 0xf4, 0xac,
-	0x4d, 0x86, 0xf4, 0x98, 0x9e, 0xfb, 0x28, 0x56, 0xdb, 0xd1, 0xd7, 0xd3, 0xa3, 0x3e, 0x75, 0x4f,
-	0xdd, 0x13, 0x87, 0xf8, 0xed, 0x61, 0xfc, 0x03, 0x72, 0x74, 0x39, 0xc0, 0xe1, 0xd1, 0x6c, 0xfc,
-	0xeb, 0xf0, 0x8b, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x5c, 0xf6, 0x5e, 0x61, 0x99, 0x16, 0x00,
-	0x00,
+	// 1378 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x59, 0xcf, 0x6e, 0xdb, 0xc6,
+	0x13, 0x36, 0xed, 0xc4, 0x91, 0x46, 0x96, 0x93, 0x30, 0xfe, 0x25, 0xb4, 0x6c, 0x4b, 0x8e, 0x13,
+	0x27, 0xce, 0xaf, 0x89, 0x94, 0x38, 0x3d, 0x14, 0x0d, 0x50, 0x40, 0xb5, 0x8a, 0xc2, 0x48, 0x74,
+	0x61, 0xda, 0x1e, 0x02, 0x14, 0x29, 0x4d, 0xae, 0xe9, 0x85, 0x65, 0xae, 0x40, 0xd2, 0xae, 0x72,
+	0xe9, 0xad, 0x40, 0xff, 0xa0, 0x40, 0x7b, 0xe9, 0x39, 0x2f, 0xd1, 0x77, 0xe8, 0xa5, 0x40, 0x8e,
+	0x3d, 0x16, 0xc9, 0xa5, 0x8f, 0x51, 0x68, 0x97, 0x5a, 0x2e, 0xb9, 0xbb, 0x24, 0x03, 0x14, 0x3d,
+	0xe5, 0x66, 0xee, 0x7c, 0x3b, 0xf3, 0xcd, 0xee, 0xec, 0x37, 0x23, 0x18, 0x2c, 0x3c, 0x21, 0x3d,
+	0x8c, 0xbd, 0xde, 0xd9, 0x83, 0x03, 0x14, 0x3b, 0x0f, 0x7a, 0xf1, 0xa4, 0x3b, 0x0e, 0x49, 0x4c,
+	0xcc, 0x8b, 0x78, 0x42, 0xba, 0x18, 0x7b, 0xdd, 0xc4, 0xd2, 0x5a, 0xf1, 0x89, 0x4f, 0xa8, 0xad,
+	0x37, 0xfd, 0x8b, 0xc1, 0x5a, 0xab, 0x79, 0x07, 0xd3, 0x2d, 0xcc, 0xb4, 0xee, 0x13, 0xe2, 0x8f,
+	0x50, 0xcf, 0x19, 0xe3, 0x9e, 0x13, 0x04, 0x24, 0x76, 0x62, 0x4c, 0x82, 0x88, 0x59, 0xb7, 0x7e,
+	0x34, 0x60, 0xe9, 0x0b, 0x14, 0xe2, 0x43, 0xec, 0xd2, 0x75, 0xf3, 0x26, 0x34, 0x43, 0x34, 0x62,
+	0x98, 0x23, 0x3c, 0x8e, 0x2c, 0x63, 0x73, 0x61, 0xa7, 0x6e, 0x67, 0x17, 0xcd, 0x47, 0xb0, 0x78,
+	0x82, 0xe2, 0x23, 0xe2, 0x59, 0xf3, 0x9b, 0xc6, 0x4e, 0x63, 0xf7, 0x46, 0x37, 0xc7, 0xb3, 0x2b,
+	0x3a, 0x1d, 0x52, 0xa8, 0x9d, 0x6c, 0x31, 0x2d, 0xb8, 0xe0, 0x92, 0x20, 0x46, 0x93, 0xd8, 0x5a,
+	0xa0, 0xce, 0x67, 0x9f, 0x5b, 0x7f, 0x9c, 0x83, 0x95, 0x61, 0xe4, 0xef, 0x85, 0xc8, 0x89, 0xd1,
+	0x3e, 0xf6, 0x06, 0xc4, 0x3d, 0x3d, 0x41, 0x41, 0x6c, 0x2e, 0xc3, 0x3c, 0xf6, 0x2c, 0x63, 0xd3,
+	0xd8, 0xa9, 0xdb, 0xf3, 0xd8, 0x33, 0x37, 0xa1, 0x31, 0xdd, 0x13, 0x92, 0xd1, 0x08, 0x85, 0x91,
+	0x35, 0x4f, 0xdd, 0x88, 0x4b, 0xe6, 0x6e, 0x36, 0x48, 0x63, 0xd7, 0x92, 0x28, 0xee, 0x31, 0x3b,
+	0x0f, 0x6f, 0xee, 0x41, 0xf3, 0x4c, 0xa0, 0x1d, 0x59, 0xe7, 0xe8, 0xce, 0x8d, 0xc2, 0xe4, 0xec,
+	0xec, 0x1e, 0xf3, 0x7d, 0xa8, 0x45, 0x28, 0x3c, 0xc3, 0x2e, 0x8a, 0xac, 0xf3, 0x9a, 0xc8, 0x4f,
+	0x19, 0xc0, 0xe6, 0x48, 0x73, 0x00, 0x4d, 0xc7, 0x75, 0x49, 0xe8, 0x21, 0xcf, 0xc6, 0xfe, 0x51,
+	0x6c, 0x2d, 0xd2, 0xad, 0x6d, 0x69, 0x6b, 0x5f, 0x44, 0xd9, 0xd9, 0x4d, 0xe6, 0xa7, 0xb0, 0x3c,
+	0xc2, 0xc1, 0x31, 0xf2, 0x6c, 0x14, 0x91, 0xd3, 0xd0, 0x45, 0xd6, 0x05, 0xea, 0xa6, 0x23, 0xb9,
+	0x79, 0x92, 0x81, 0xd9, 0xb9, 0x6d, 0x66, 0x1f, 0x96, 0xd8, 0xca, 0x27, 0x41, 0x8c, 0xe3, 0x17,
+	0x56, 0x4d, 0x73, 0x10, 0x4f, 0x04, 0x90, 0x9d, 0xd9, 0x32, 0xbd, 0x22, 0x67, 0x14, 0x91, 0xc7,
+	0x01, 0xf9, 0x3a, 0xe8, 0x47, 0x56, 0x9d, 0xde, 0x9d, 0xb8, 0x64, 0x5e, 0x85, 0xc5, 0x08, 0xfb,
+	0x01, 0x0a, 0x2d, 0xa0, 0xc6, 0xe4, 0xcb, 0xfc, 0x08, 0x1a, 0xcc, 0xd3, 0xde, 0xc8, 0xc1, 0x27,
+	0x56, 0x83, 0xc6, 0x5e, 0xd7, 0xc4, 0xa6, 0x18, 0x5b, 0xdc, 0xf0, 0x61, 0xed, 0xbb, 0x97, 0x9d,
+	0xb9, 0xbf, 0x5f, 0x76, 0xe6, 0xb6, 0xda, 0xb0, 0xae, 0x2a, 0x27, 0x1b, 0x45, 0x63, 0x12, 0x44,
+	0x68, 0x56, 0x6f, 0x9f, 0x8f, 0xbd, 0x77, 0xf5, 0xf6, 0xae, 0xde, 0xfe, 0xad, 0x7a, 0x93, 0xca,
+	0x89, 0xd7, 0xdb, 0xf7, 0x06, 0x98, 0xc3, 0xc8, 0xef, 0x7b, 0x5e, 0x46, 0x73, 0xf3, 0xd5, 0xd6,
+	0x87, 0x25, 0xf1, 0x8e, 0x13, 0x8d, 0x2d, 0x29, 0x8b, 0xcc, 0x16, 0x21, 0xd7, 0x05, 0x31, 0x57,
+	0x81, 0xeb, 0x3a, 0xb4, 0x64, 0x2a, 0x9c, 0xe9, 0xaf, 0x06, 0x74, 0x86, 0x91, 0xff, 0x14, 0xc5,
+	0x59, 0xb3, 0xd8, 0x04, 0xf2, 0xb4, 0xd7, 0xa0, 0xce, 0x14, 0xfe, 0x39, 0x66, 0x7d, 0xa1, 0x6e,
+	0xd7, 0xd8, 0xc2, 0xbe, 0x27, 0xf7, 0x95, 0x05, 0x55, 0x5f, 0x49, 0x69, 0x9f, 0xd3, 0xd0, 0xbe,
+	0x03, 0xb7, 0x4b, 0x78, 0xf1, 0x1c, 0x0e, 0xe1, 0x7f, 0xc3, 0xc8, 0xb7, 0xd1, 0x19, 0x39, 0x46,
+	0x85, 0xe7, 0x5d, 0x48, 0xbc, 0xfc, 0x24, 0x3b, 0xb0, 0xa1, 0x8c, 0xc3, 0x89, 0x7c, 0x03, 0x4d,
+	0x76, 0xd4, 0xc9, 0x3b, 0x94, 0x08, 0x3c, 0x82, 0xa5, 0xe4, 0x65, 0x3e, 0xf7, 0x9c, 0xd8, 0x49,
+	0x2e, 0x5c, 0xff, 0x8e, 0x1b, 0x09, 0x7a, 0xe0, 0xc4, 0x4e, 0x05, 0x82, 0xd7, 0xe8, 0x41, 0xa4,
+	0xf1, 0x39, 0x31, 0x17, 0x2e, 0x0d, 0x23, 0x7f, 0x80, 0x46, 0x28, 0x46, 0x3a, 0x6e, 0x1b, 0x00,
+	0x33, 0x6e, 0xfc, 0x74, 0xea, 0xc9, 0x4a, 0xa5, 0xe3, 0x69, 0x81, 0x95, 0x0f, 0xc2, 0x09, 0x1c,
+	0x53, 0x02, 0x7d, 0xcf, 0xdb, 0xe3, 0x52, 0x2a, 0x11, 0xd8, 0x86, 0xe5, 0x54, 0x68, 0x9f, 0x7b,
+	0x9c, 0x44, 0x33, 0x5d, 0x1d, 0xe0, 0xea, 0x44, 0x32, 0xc1, 0x38, 0x91, 0x00, 0xae, 0x70, 0x92,
+	0xff, 0x05, 0x97, 0x0d, 0x58, 0x53, 0xc4, 0xe3, 0x74, 0x7e, 0x31, 0x68, 0x63, 0xea, 0x7b, 0x5e,
+	0x56, 0x38, 0x25, 0x42, 0xb2, 0x02, 0xb3, 0xda, 0x79, 0x6b, 0x05, 0x2e, 0xa7, 0x3c, 0x82, 0x6b,
+	0x9c, 0x72, 0x09, 0xab, 0x0e, 0x34, 0xc2, 0xc4, 0x96, 0x16, 0x0d, 0xcc, 0x96, 0x2a, 0x55, 0xcd,
+	0xb7, 0x06, 0x5c, 0x16, 0x4f, 0x80, 0x4a, 0xad, 0x14, 0x28, 0x27, 0xdd, 0x2c, 0xf7, 0xea, 0xd2,
+	0x5d, 0x81, 0x87, 0x4b, 0x2f, 0x42, 0xcc, 0x5a, 0xcd, 0x64, 0x15, 0x6a, 0xee, 0xd4, 0x90, 0xe6,
+	0x7b, 0x81, 0x7e, 0x57, 0x4a, 0x36, 0xed, 0x0b, 0x62, 0x83, 0x53, 0xf5, 0x85, 0x4c, 0x97, 0xd4,
+	0xf5, 0x85, 0x82, 0x2e, 0x59, 0xce, 0x85, 0xa9, 0xa6, 0x98, 0xb0, 0x86, 0xcd, 0x1a, 0xd4, 0x11,
+	0xb5, 0x08, 0xaa, 0xc9, 0x16, 0x2a, 0xe5, 0xfc, 0x93, 0x41, 0x9f, 0x5c, 0xdf, 0xf3, 0x32, 0x23,
+	0x86, 0x14, 0x46, 0x9a, 0x54, 0x58, 0xd6, 0x6f, 0x39, 0xa9, 0x94, 0xf3, 0x41, 0x70, 0x95, 0xe7,
+	0x5d, 0xcc, 0x68, 0x15, 0x6a, 0xe1, 0xd4, 0x20, 0x5c, 0x35, 0xfd, 0xae, 0x94, 0xf6, 0x64, 0xa6,
+	0x78, 0xfb, 0xd8, 0x4b, 0x06, 0x42, 0x29, 0x80, 0x30, 0x4b, 0xea, 0x3a, 0x81, 0x34, 0x4b, 0x96,
+	0x47, 0x7e, 0x96, 0x88, 0xbd, 0xe3, 0xc6, 0xf8, 0x6c, 0x3a, 0xa0, 0xec, 0x0f, 0xa4, 0xc8, 0x2b,
+	0x70, 0x3e, 0x8a, 0x9d, 0x98, 0xa9, 0x48, 0xcd, 0x66, 0x1f, 0x15, 0x7c, 0xfb, 0x82, 0x7c, 0x16,
+	0x24, 0xd6, 0x06, 0x48, 0xf8, 0x3e, 0x46, 0x2f, 0x66, 0xb2, 0x90, 0xae, 0x54, 0x08, 0xc4, 0x26,
+	0x2c, 0x49, 0x17, 0xb9, 0x70, 0x5e, 0xa7, 0x63, 0x8b, 0x4a, 0xa4, 0x38, 0x64, 0x0d, 0x56, 0x25,
+	0x61, 0xe1, 0x46, 0xe6, 0x5f, 0x7a, 0xee, 0xdc, 0xce, 0xa7, 0xa6, 0xcc, 0x1b, 0x9b, 0x59, 0xd9,
+	0x24, 0x20, 0xbf, 0x1d, 0x0e, 0x60, 0xb2, 0x9f, 0xaf, 0x79, 0x6e, 0xde, 0x84, 0xb6, 0xba, 0x06,
+	0x39, 0x82, 0xf7, 0xb0, 0xf4, 0x94, 0x73, 0xce, 0xf3, 0x97, 0x90, 0xdb, 0x9a, 0xb9, 0xff, 0x99,
+	0x6d, 0xf7, 0xb7, 0x4b, 0xb0, 0x30, 0x8c, 0x7c, 0x13, 0xc3, 0x65, 0xf9, 0xc7, 0xf7, 0xb6, 0x54,
+	0x7d, 0xaa, 0x1f, 0x55, 0xad, 0x7b, 0x95, 0x60, 0xb3, 0x90, 0xd3, 0x50, 0xf2, 0xef, 0x2e, 0x65,
+	0x28, 0x09, 0xa6, 0x0e, 0xa5, 0x1d, 0xbb, 0x4d, 0x17, 0x2e, 0xe6, 0x47, 0xee, 0x1b, 0x2a, 0x0f,
+	0x39, 0x50, 0xeb, 0xbd, 0x0a, 0x20, 0x1e, 0x64, 0x04, 0xa6, 0x62, 0xd4, 0xbc, 0xa5, 0x72, 0x21,
+	0xe3, 0x5a, 0xdd, 0x6a, 0x38, 0x1e, 0xed, 0x07, 0x03, 0xd6, 0x0b, 0x87, 0xf3, 0xfb, 0x2a, 0x87,
+	0x45, 0x3b, 0x5a, 0x1f, 0xbc, 0xed, 0x0e, 0x4e, 0xe6, 0x33, 0x00, 0x61, 0xb8, 0x6d, 0x6b, 0x4e,
+	0x2d, 0xb1, 0xb7, 0x6e, 0x15, 0xdb, 0xb9, 0xd7, 0x2f, 0xa1, 0x99, 0x9d, 0x4c, 0xaf, 0xab, 0x36,
+	0x66, 0x20, 0xad, 0x3b, 0xa5, 0x10, 0xd1, 0x7d, 0x76, 0xee, 0xbc, 0xae, 0xe1, 0x95, 0x42, 0xd4,
+	0xee, 0x95, 0x03, 0xa5, 0x79, 0x08, 0x97, 0xa4, 0x69, 0xf2, 0xa6, 0x9e, 0x9d, 0x10, 0xe4, 0x6e,
+	0x15, 0x94, 0xf8, 0x8c, 0xe4, 0x29, 0x71, 0x5b, 0xc3, 0x33, 0x0b, 0x53, 0x3f, 0x23, 0xad, 0xb6,
+	0x9a, 0x21, 0xac, 0x28, 0xa7, 0xbf, 0x1d, 0x3d, 0xe1, 0x5c, 0xc0, 0xfb, 0x55, 0x91, 0x3c, 0xe6,
+	0x57, 0xb0, 0x9c, 0x1b, 0x01, 0xb7, 0x0a, 0x49, 0x53, 0x4c, 0xeb, 0xff, 0xe5, 0x18, 0xf1, 0x00,
+	0xe5, 0xe9, 0x6e, 0xbb, 0x8c, 0x28, 0x8b, 0x73, 0xaf, 0x12, 0x2c, 0xa7, 0x43, 0x99, 0xa1, 0xea,
+	0x46, 0x21, 0x53, 0x06, 0xd2, 0xea, 0x90, 0xaa, 0xc5, 0x4c, 0x75, 0x48, 0x31, 0xbc, 0xdd, 0x2a,
+	0x63, 0x9a, 0x84, 0xea, 0x56, 0xc3, 0x89, 0x65, 0x2e, 0x4d, 0x70, 0x37, 0x35, 0x74, 0x33, 0x28,
+	0x75, 0x99, 0xeb, 0x3a, 0xa3, 0x49, 0xe0, 0x8a, 0x6a, 0x34, 0xbb, 0xad, 0xa7, 0x9b, 0x8d, 0xd6,
+	0xab, 0x08, 0xcc, 0xc9, 0x83, 0x30, 0xcb, 0xe8, 0xe4, 0x21, 0x85, 0x68, 0xe5, 0x41, 0x6e, 0xc6,
+	0x4c, 0xdc, 0xc4, 0x49, 0x4c, 0x23, 0x6e, 0x02, 0x44, 0x27, 0x6e, 0x8a, 0x7e, 0x9e, 0xaa, 0x8f,
+	0x90, 0x40, 0x81, 0xfa, 0x08, 0x39, 0xdc, 0xad, 0x82, 0x9a, 0xc5, 0xf9, 0x78, 0xf8, 0xfb, 0xeb,
+	0xb6, 0xf1, 0xea, 0x75, 0xdb, 0xf8, 0xeb, 0x75, 0xdb, 0xf8, 0xf9, 0x4d, 0x7b, 0xee, 0xd5, 0x9b,
+	0xf6, 0xdc, 0x9f, 0x6f, 0xda, 0x73, 0xcf, 0x1e, 0xfa, 0x38, 0x3e, 0x3a, 0x3d, 0xe8, 0xba, 0xe4,
+	0xa4, 0x87, 0x27, 0xe4, 0x90, 0x9c, 0x06, 0x1e, 0x6d, 0x1d, 0xd3, 0xaf, 0x7b, 0x07, 0x23, 0xe2,
+	0x1e, 0xbb, 0x47, 0x0e, 0x0e, 0x7a, 0x13, 0xfa, 0x7f, 0x8b, 0xf8, 0xc5, 0x18, 0x45, 0x07, 0x8b,
+	0xf4, 0x9f, 0x12, 0x0f, 0xff, 0x09, 0x00, 0x00, 0xff, 0xff, 0x3e, 0x75, 0x2d, 0xc9, 0x10, 0x19,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1623,6 +1786,9 @@ type MsgClient interface {
 	// Add / Delete Linked Resource
 	AddLinkedResource(ctx context.Context, in *MsgAddLinkedResource, opts ...grpc.CallOption) (*MsgAddLinkedResourceResponse, error)
 	DeleteLinkedResource(ctx context.Context, in *MsgDeleteLinkedResource, opts ...grpc.CallOption) (*MsgDeleteLinkedResourceResponse, error)
+	// Add / Delete Linked Claims
+	AddLinkedClaim(ctx context.Context, in *MsgAddLinkedClaim, opts ...grpc.CallOption) (*MsgAddLinkedClaimResponse, error)
+	DeleteLinkedClaim(ctx context.Context, in *MsgDeleteLinkedClaim, opts ...grpc.CallOption) (*MsgDeleteLinkedClaimResponse, error)
 	// Add / Delete Linked Entity
 	AddLinkedEntity(ctx context.Context, in *MsgAddLinkedEntity, opts ...grpc.CallOption) (*MsgAddLinkedEntityResponse, error)
 	DeleteLinkedEntity(ctx context.Context, in *MsgDeleteLinkedEntity, opts ...grpc.CallOption) (*MsgDeleteLinkedEntityResponse, error)
@@ -1742,6 +1908,24 @@ func (c *msgClient) DeleteLinkedResource(ctx context.Context, in *MsgDeleteLinke
 	return out, nil
 }
 
+func (c *msgClient) AddLinkedClaim(ctx context.Context, in *MsgAddLinkedClaim, opts ...grpc.CallOption) (*MsgAddLinkedClaimResponse, error) {
+	out := new(MsgAddLinkedClaimResponse)
+	err := c.cc.Invoke(ctx, "/ixo.iid.v1beta1.Msg/AddLinkedClaim", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteLinkedClaim(ctx context.Context, in *MsgDeleteLinkedClaim, opts ...grpc.CallOption) (*MsgDeleteLinkedClaimResponse, error) {
+	out := new(MsgDeleteLinkedClaimResponse)
+	err := c.cc.Invoke(ctx, "/ixo.iid.v1beta1.Msg/DeleteLinkedClaim", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *msgClient) AddLinkedEntity(ctx context.Context, in *MsgAddLinkedEntity, opts ...grpc.CallOption) (*MsgAddLinkedEntityResponse, error) {
 	out := new(MsgAddLinkedEntityResponse)
 	err := c.cc.Invoke(ctx, "/ixo.iid.v1beta1.Msg/AddLinkedEntity", in, out, opts...)
@@ -1829,6 +2013,9 @@ type MsgServer interface {
 	// Add / Delete Linked Resource
 	AddLinkedResource(context.Context, *MsgAddLinkedResource) (*MsgAddLinkedResourceResponse, error)
 	DeleteLinkedResource(context.Context, *MsgDeleteLinkedResource) (*MsgDeleteLinkedResourceResponse, error)
+	// Add / Delete Linked Claims
+	AddLinkedClaim(context.Context, *MsgAddLinkedClaim) (*MsgAddLinkedClaimResponse, error)
+	DeleteLinkedClaim(context.Context, *MsgDeleteLinkedClaim) (*MsgDeleteLinkedClaimResponse, error)
 	// Add / Delete Linked Entity
 	AddLinkedEntity(context.Context, *MsgAddLinkedEntity) (*MsgAddLinkedEntityResponse, error)
 	DeleteLinkedEntity(context.Context, *MsgDeleteLinkedEntity) (*MsgDeleteLinkedEntityResponse, error)
@@ -1877,6 +2064,12 @@ func (*UnimplementedMsgServer) AddLinkedResource(ctx context.Context, req *MsgAd
 }
 func (*UnimplementedMsgServer) DeleteLinkedResource(ctx context.Context, req *MsgDeleteLinkedResource) (*MsgDeleteLinkedResourceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteLinkedResource not implemented")
+}
+func (*UnimplementedMsgServer) AddLinkedClaim(ctx context.Context, req *MsgAddLinkedClaim) (*MsgAddLinkedClaimResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddLinkedClaim not implemented")
+}
+func (*UnimplementedMsgServer) DeleteLinkedClaim(ctx context.Context, req *MsgDeleteLinkedClaim) (*MsgDeleteLinkedClaimResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLinkedClaim not implemented")
 }
 func (*UnimplementedMsgServer) AddLinkedEntity(ctx context.Context, req *MsgAddLinkedEntity) (*MsgAddLinkedEntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddLinkedEntity not implemented")
@@ -2102,6 +2295,42 @@ func _Msg_DeleteLinkedResource_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_AddLinkedClaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddLinkedClaim)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddLinkedClaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.iid.v1beta1.Msg/AddLinkedClaim",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddLinkedClaim(ctx, req.(*MsgAddLinkedClaim))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteLinkedClaim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteLinkedClaim)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteLinkedClaim(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.iid.v1beta1.Msg/DeleteLinkedClaim",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteLinkedClaim(ctx, req.(*MsgDeleteLinkedClaim))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Msg_AddLinkedEntity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgAddLinkedEntity)
 	if err := dec(in); err != nil {
@@ -2277,6 +2506,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_DeleteLinkedResource_Handler,
 		},
 		{
+			MethodName: "AddLinkedClaim",
+			Handler:    _Msg_AddLinkedClaim_Handler,
+		},
+		{
+			MethodName: "DeleteLinkedClaim",
+			Handler:    _Msg_DeleteLinkedClaim_Handler,
+		},
+		{
 			MethodName: "AddLinkedEntity",
 			Handler:    _Msg_AddLinkedEntity_Handler,
 		},
@@ -2382,6 +2619,20 @@ func (m *MsgCreateIidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.LinkedClaim) > 0 {
+		for iNdEx := len(m.LinkedClaim) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.LinkedClaim[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if len(m.Signer) > 0 {
 		i -= len(m.Signer)
 		copy(dAtA[i:], m.Signer)
@@ -2542,6 +2793,20 @@ func (m *MsgUpdateIidDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.LinkedClaim) > 0 {
+		for iNdEx := len(m.LinkedClaim) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.LinkedClaim[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if len(m.Signer) > 0 {
 		i -= len(m.Signer)
 		copy(dAtA[i:], m.Signer)
@@ -3263,6 +3528,99 @@ func (m *MsgDeleteLinkedResource) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgAddLinkedClaim) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddLinkedClaim) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddLinkedClaim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.LinkedClaim != nil {
+		{
+			size, err := m.LinkedClaim.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLinkedClaim) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLinkedClaim) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLinkedClaim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ClaimId) > 0 {
+		i -= len(m.ClaimId)
+		copy(dAtA[i:], m.ClaimId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ClaimId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgAddLinkedEntity) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3635,6 +3993,52 @@ func (m *MsgDeleteLinkedResourceResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgAddLinkedClaimResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddLinkedClaimResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddLinkedClaimResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLinkedClaimResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLinkedClaimResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLinkedClaimResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgAddLinkedEntityResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3892,6 +4296,12 @@ func (m *MsgCreateIidDocument) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
+	if len(m.LinkedClaim) > 0 {
+		for _, e := range m.LinkedClaim {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -3963,6 +4373,12 @@ func (m *MsgUpdateIidDocument) Size() (n int) {
 	l = len(m.Signer)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.LinkedClaim) > 0 {
+		for _, e := range m.LinkedClaim {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
 	return n
 }
@@ -4234,6 +4650,48 @@ func (m *MsgDeleteLinkedResource) Size() (n int) {
 	return n
 }
 
+func (m *MsgAddLinkedClaim) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.LinkedClaim != nil {
+		l = m.LinkedClaim.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgDeleteLinkedClaim) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ClaimId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
 func (m *MsgAddLinkedEntity) Size() (n int) {
 	if m == nil {
 		return 0
@@ -4390,6 +4848,24 @@ func (m *MsgAddLinkedResourceResponse) Size() (n int) {
 }
 
 func (m *MsgDeleteLinkedResourceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgAddLinkedClaimResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgDeleteLinkedClaimResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4978,6 +5454,40 @@ func (m *MsgCreateIidDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.Signer = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LinkedClaim", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LinkedClaim = append(m.LinkedClaim, &LinkedClaim{})
+			if err := m.LinkedClaim[len(m.LinkedClaim)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -5409,6 +5919,40 @@ func (m *MsgUpdateIidDocument) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LinkedClaim", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LinkedClaim = append(m.LinkedClaim, &LinkedClaim{})
+			if err := m.LinkedClaim[len(m.LinkedClaim)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7189,6 +7733,302 @@ func (m *MsgDeleteLinkedResource) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *MsgAddLinkedClaim) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddLinkedClaim: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddLinkedClaim: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LinkedClaim", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LinkedClaim == nil {
+				m.LinkedClaim = &LinkedClaim{}
+			}
+			if err := m.LinkedClaim.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLinkedClaim) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLinkedClaim: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLinkedClaim: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClaimId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClaimId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *MsgAddLinkedEntity) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -8288,6 +9128,106 @@ func (m *MsgDeleteLinkedResourceResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgDeleteLinkedResourceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddLinkedClaimResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddLinkedClaimResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddLinkedClaimResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLinkedClaimResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLinkedClaimResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLinkedClaimResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

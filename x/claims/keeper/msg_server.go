@@ -6,8 +6,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	ixo "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/claims/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -41,23 +42,35 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	}
 
 	// create and persist the Collection
-	collectionId := fmt.Sprint(params.CollectionSequence)
-	collection := types.Collection{
-		Id:        collectionId,
-		Entity:    msg.Entity,
-		Admin:     msg.Admin,
-		Protocol:  msg.Protocol,
-		StartDate: msg.StartDate,
-		EndDate:   msg.EndDate,
-		Quota:     msg.Quota,
-		Count:     0,
-		Evaluated: 0,
-		Approved:  0,
-		Rejected:  0,
-		Disputed:  0,
-		State:     msg.State,
-		Payments:  msg.Payments,
+	var collection types.Collection
+	// only create colelction if admin/signer has auth on entity iid doc
+	if err := iidkeeper.ExecuteOnDidWithRelationships(
+		ctx, &s.IidKeeper,
+		[]string{iidtypes.Authentication},
+		msg.Entity, msg.Admin,
+		func(didDoc *iidtypes.IidDocument) error {
+			collectionId := fmt.Sprint(params.CollectionSequence)
+			collection = types.Collection{
+				Id:        collectionId,
+				Entity:    msg.Entity,
+				Admin:     msg.Admin,
+				Protocol:  msg.Protocol,
+				StartDate: msg.StartDate,
+				EndDate:   msg.EndDate,
+				Quota:     msg.Quota,
+				Count:     0,
+				Evaluated: 0,
+				Approved:  0,
+				Rejected:  0,
+				Disputed:  0,
+				State:     msg.State,
+				Payments:  msg.Payments,
+			}
+			return nil
+		}); err != nil {
+		return nil, err
 	}
+
 	s.Keeper.SetCollection(ctx, collection)
 
 	// update and persist createSequence
@@ -126,6 +139,12 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 		AgentAddress:   msg.AgentAddress,
 		ClaimId:        msg.ClaimId,
 		SubmissionDate: &claimSubmissionDate,
+		PaymentsStatus: &types.ClaimPayments{
+			Submission: types.PaymentStatus_no_payment,
+			Approval:   types.PaymentStatus_no_payment,
+			Evaluation: types.PaymentStatus_no_payment,
+			Rejection:  types.PaymentStatus_no_payment,
+		},
 	}
 	s.Keeper.SetClaim(ctx, claim)
 
@@ -142,6 +161,11 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			Collection: &collection,
 		},
 	); err != nil {
+		return nil, err
+	}
+
+	// start payout process for claim submission
+	if err = processPayment(ctx, s.Keeper, s.bankKeeper, s.AuthzKeeper, sdk.AccAddress(msg.AgentAddress), collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId); err != nil {
 		return nil, err
 	}
 
@@ -184,6 +208,8 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	// create and persist the Evaluation
 	evaluationDate := ctx.BlockTime()
 	evaluation := types.Evaluation{
+		ClaimId:           msg.ClaimId,
+		CollectionId:      msg.CollectionId,
 		Oracle:            msg.Oracle,
 		AgentDid:          msg.AgentDid.Did(),
 		AgentAddress:      msg.AgentAddress,
@@ -196,14 +222,32 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	claim.Evaluation = &evaluation
 	s.Keeper.SetClaim(ctx, claim)
 
-	// update amounts for collection and persist
+	// start payout process for evaluation submission
+	if err = processPayment(ctx, s.Keeper, s.bankKeeper, s.AuthzKeeper, sdk.AccAddress(msg.AgentAddress), collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
+		return nil, err
+	}
+
+	// update amounts for collection, make payouts and persist
 	collection.Evaluated++
 	if msg.Status == types.EvaluationStatus_approved {
 		collection.Approved++
+		// payout process for evaluation approval to claim agent
+		// if msg amount is not zero, it means agent set custo amount that was authenticated through authZ constraints to be valid.
+		approvedPayment := collection.Payments.Approval
+		if !msg.Amount.IsZero() {
+			approvedPayment.Amount = msg.Amount
+		}
+		if err = processPayment(ctx, s.Keeper, s.bankKeeper, s.AuthzKeeper, sdk.AccAddress(claim.AgentAddress), approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
+			return nil, err
+		}
 	} else if msg.Status == types.EvaluationStatus_rejected {
+		// no payment for rejected
 		collection.Rejected++
 	} else if msg.Status == types.EvaluationStatus_disputed {
+		// no payment for disputed
 		collection.Disputed++
+		// update payment status to disputed
+		updatePaymentStatus(ctx, s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
 	}
 	s.Keeper.SetCollection(ctx, collection)
 
@@ -236,6 +280,52 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 		return nil, sdkerrors.Wrapf(types.ErrDisputeDuplicate, "proof %s", msg.Data.Proof)
 	}
 
+	// get Claim for dispute
+	claim, err := s.Keeper.GetClaim(ctx, msg.SubjectId)
+	if err != nil {
+		return nil, err
+	}
+
+	// get Collection for claim
+	collection, err := s.Keeper.GetCollection(ctx, claim.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	entity, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(collection.Entity))
+	if !found {
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+	}
+
+	// check if user authorized to lay claim,
+	// check if user is admin on Collection or if user is a controller on Collections entity
+	if msg.AgentAddress != collection.Admin && !entity.HasController(iidtypes.DID(msg.AgentDid.Did())) {
+		// check if user has authz cap, aka is agent
+		isAuthorized := false
+		authorizations := s.AuthzKeeper.GetAuthorizations(ctx, sdk.AccAddress(msg.AgentAddress), sdk.AccAddress(collection.Admin))
+		for _, auth := range authorizations {
+			switch k := auth.(type) {
+			case *types.SubmitClaimAuthorization:
+				// check if there a constraint that has collectionId of disputed subjectId(claim)
+				for _, con := range k.Constraints {
+					if con.CollectionId == collection.Id {
+						isAuthorized = true
+					}
+				}
+			case *types.EvaluateClaimAuthorization:
+				// check if there a constraint that has collectionId or claimId of disputed subjectId(claim)
+				for _, con := range k.Constraints {
+					if con.CollectionId == collection.Id || ixo.Contains(con.ClaimIds, claim.ClaimId) {
+						isAuthorized = true
+					}
+				}
+			}
+		}
+		if !isAuthorized {
+			return nil, types.ErrDisputeUnauthorized
+		}
+	}
+
 	// create and persist the dispute
 	dispute := types.Dispute{
 		SubjectId: msg.SubjectId,
@@ -256,51 +346,31 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 }
 
 // --------------------------
-// PAYMENT HELPER
+// WITHDRAW PAYMENT
 // --------------------------
+func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdrawPayment) (*types.MsgWithdrawPaymentResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-func processPay(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, senderAddr, receiver sdk.AccAddress, payment types.Payments, split bool) error {
-	// // Get project address
-	// projectAddr, err := getProjectAccount(ctx, k, projectDid)
-	// if err != nil {
-	// 	return err
-	// }
+	// get Claim for dispute
+	claim, err := s.Keeper.GetClaim(ctx, msg.ClaimId)
+	if err != nil {
+		return nil, err
+	}
 
-	// // Get payment template
-	// template := pk.MustGetPaymentTemplate(ctx, paymentTemplateId)
+	// get Collection for claim
+	collection, err := s.Keeper.GetCollection(ctx, claim.CollectionId)
+	if err != nil {
+		return nil, err
+	}
 
-	// // Create or get payment contract
-	// contractId := fmt.Sprintf("payment:contract:%s:%s:%s:%s",
-	// 	types.ModuleName, projectDid, senderAddr.String(), feeType)
-	// var contract paymentstypes.PaymentContract
-	// if !pk.PaymentContractExists(ctx, contractId) {
-	// 	contract = paymentstypes.NewPaymentContract(contractId, paymentTemplateId,
-	// 		projectAddr, projectAddr, recipients, false, true, sdk.ZeroUint())
-	// 	pk.SetPaymentContract(ctx, contract)
-	// } else {
-	// 	contract = pk.MustGetPaymentContract(ctx, contractId)
-	// }
+	// check that user is authorized, aka signer is admin for Collection
+	if collection.Admin != msg.AdminAddress {
+		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
 
-	// // Effect payment if can effect
-	// if contract.CanEffectPayment(template) {
-	// 	// Check that project has enough tokens to effect contract payment
-	// 	// (assume no effect from PaymentMin, PaymentMax, Discounts)
-	// 	for _, coin := range template.PaymentAmount {
-	// 		if !bk.HasBalance(ctx, projectAddr, coin) {
-	// 			return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "project has insufficient funds")
-	// 		}
-	// 	}
-
-	// 	// Effect payment
-	// 	effected, err := pk.EffectPayment(ctx, bk, contractId)
-	// 	if err != nil {
-	// 		return err
-	// 	} else if !effected {
-	// 		panic("expected to be able to effect contract payment")
-	// 	}
-	// } else {
-	// 	return fmt.Errorf("cannot effect contract payment (max reached?)")
-	// }
-
-	return nil
+	err = payout(ctx, s.Keeper, s.bankKeeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate)
+	if err != nil {
+		return nil, err
+	}
+	return &types.MsgWithdrawPaymentResponse{}, nil
 }

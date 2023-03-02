@@ -35,7 +35,9 @@ func GetTxCmd() *cobra.Command {
 		NewAddControllerCmd(),
 		NewDeleteControllerCmd(),
 		NewAddLinkedResourceCmd(),
-		NewDeleteLinkedresourceCmd(),
+		NewDeleteLinkedResourceCmd(),
+		NewAddLinkedClaimCmd(),
+		NewDeleteLinkedClaimCmd(),
 		NewAddLinkedEntityCmd(),
 		NewDeleteLinkedEntityCmd(),
 		NewAddAccordedRightCmd(),
@@ -395,7 +397,7 @@ func NewAddLinkedResourceCmd() *cobra.Command {
 	return cmd
 }
 
-func NewDeleteLinkedresourceCmd() *cobra.Command {
+func NewDeleteLinkedResourceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-resource [id] [resource-id]",
 		Short: "deletes a resource from an iid document",
@@ -407,6 +409,69 @@ func NewDeleteLinkedresourceCmd() *cobra.Command {
 			}
 
 			msg := types.NewMsgDeleteLinkedResource(
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
+			)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewAddLinkedClaimCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "add-linked-claim [id] [claim-id] [type] [description] [media-type] [service-endpoint] [proof] [encrypted] [privacy]",
+		Short: "add a linked claim to an iid document",
+		Args:  cobra.ExactArgs(9),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			id, claimId, serviceType, desc, mediaType, endpoint, proof, encrypted, privacy := args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
+
+			claim := types.NewLinkedClaim(
+				claimId,
+				serviceType,
+				desc,
+				mediaType,
+				endpoint,
+				proof,
+				encrypted,
+				privacy,
+			)
+
+			msg := types.NewMsgAddLinkedClaim(
+				id,
+				claim,
+				clientCtx.GetFromAddress().String(),
+			)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewDeleteLinkedClaimCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete-claim [id] [claim-id]",
+		Short: "deletes a claim from an iid document",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDeleteLinkedClaim(
 				args[0],
 				args[1],
 				clientCtx.GetFromAddress().String(),

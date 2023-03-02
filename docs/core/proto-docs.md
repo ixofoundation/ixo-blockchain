@@ -73,16 +73,9 @@
   
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
-- [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
-    - [EvaluateClaimAuthorization](#ixo.claims.v1beta1.EvaluateClaimAuthorization)
-    - [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints)
-    - [SubmitClaimAuthorization](#ixo.claims.v1beta1.SubmitClaimAuthorization)
-    - [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints)
-    - [WithdrawAuthorization](#ixo.claims.v1beta1.WithdrawAuthorization)
-    - [WithdrawConstraints](#ixo.claims.v1beta1.WithdrawConstraints)
-  
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
     - [Claim](#ixo.claims.v1beta1.Claim)
+    - [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments)
     - [Collection](#ixo.claims.v1beta1.Collection)
     - [Dispute](#ixo.claims.v1beta1.Dispute)
     - [DisputeData](#ixo.claims.v1beta1.DisputeData)
@@ -93,6 +86,20 @@
   
     - [CollectionState](#ixo.claims.v1beta1.CollectionState)
     - [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus)
+    - [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus)
+    - [PaymentType](#ixo.claims.v1beta1.PaymentType)
+  
+- [ixo/claims/v1beta1/cosmos.proto](#ixo/claims/v1beta1/cosmos.proto)
+    - [Input](#ixo.claims.v1beta1.Input)
+    - [Output](#ixo.claims.v1beta1.Output)
+  
+- [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
+    - [EvaluateClaimAuthorization](#ixo.claims.v1beta1.EvaluateClaimAuthorization)
+    - [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints)
+    - [SubmitClaimAuthorization](#ixo.claims.v1beta1.SubmitClaimAuthorization)
+    - [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints)
+    - [WithdrawPaymentAuthorization](#ixo.claims.v1beta1.WithdrawPaymentAuthorization)
+    - [WithdrawPaymentConstraints](#ixo.claims.v1beta1.WithdrawPaymentConstraints)
   
 - [ixo/claims/v1beta1/event.proto](#ixo/claims/v1beta1/event.proto)
     - [ClaimDisputedEvent](#ixo.claims.v1beta1.ClaimDisputedEvent)
@@ -101,6 +108,8 @@
     - [ClaimUpdatedEvent](#ixo.claims.v1beta1.ClaimUpdatedEvent)
     - [CollectionCreatedEvent](#ixo.claims.v1beta1.CollectionCreatedEvent)
     - [CollectionUpdatedEvent](#ixo.claims.v1beta1.CollectionUpdatedEvent)
+    - [PaymentWithdrawCreatedEvent](#ixo.claims.v1beta1.PaymentWithdrawCreatedEvent)
+    - [PaymentWithdrawnEvent](#ixo.claims.v1beta1.PaymentWithdrawnEvent)
   
 - [ixo/claims/v1beta1/genesis.proto](#ixo/claims/v1beta1/genesis.proto)
     - [GenesisState](#ixo.claims.v1beta1.GenesisState)
@@ -132,6 +141,8 @@
     - [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse)
     - [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim)
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
+    - [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment)
+    - [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse)
   
     - [Msg](#ixo.claims.v1beta1.Msg)
   
@@ -140,6 +151,7 @@
     - [Context](#ixo.iid.v1beta1.Context)
     - [IidDocument](#ixo.iid.v1beta1.IidDocument)
     - [IidMetadata](#ixo.iid.v1beta1.IidMetadata)
+    - [LinkedClaim](#ixo.iid.v1beta1.LinkedClaim)
     - [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity)
     - [LinkedResource](#ixo.iid.v1beta1.LinkedResource)
     - [Service](#ixo.iid.v1beta1.Service)
@@ -183,6 +195,8 @@
     - [MsgAddControllerResponse](#ixo.iid.v1beta1.MsgAddControllerResponse)
     - [MsgAddIidContext](#ixo.iid.v1beta1.MsgAddIidContext)
     - [MsgAddIidContextResponse](#ixo.iid.v1beta1.MsgAddIidContextResponse)
+    - [MsgAddLinkedClaim](#ixo.iid.v1beta1.MsgAddLinkedClaim)
+    - [MsgAddLinkedClaimResponse](#ixo.iid.v1beta1.MsgAddLinkedClaimResponse)
     - [MsgAddLinkedEntity](#ixo.iid.v1beta1.MsgAddLinkedEntity)
     - [MsgAddLinkedEntityResponse](#ixo.iid.v1beta1.MsgAddLinkedEntityResponse)
     - [MsgAddLinkedResource](#ixo.iid.v1beta1.MsgAddLinkedResource)
@@ -201,6 +215,8 @@
     - [MsgDeleteControllerResponse](#ixo.iid.v1beta1.MsgDeleteControllerResponse)
     - [MsgDeleteIidContext](#ixo.iid.v1beta1.MsgDeleteIidContext)
     - [MsgDeleteIidContextResponse](#ixo.iid.v1beta1.MsgDeleteIidContextResponse)
+    - [MsgDeleteLinkedClaim](#ixo.iid.v1beta1.MsgDeleteLinkedClaim)
+    - [MsgDeleteLinkedClaimResponse](#ixo.iid.v1beta1.MsgDeleteLinkedClaimResponse)
     - [MsgDeleteLinkedEntity](#ixo.iid.v1beta1.MsgDeleteLinkedEntity)
     - [MsgDeleteLinkedEntityResponse](#ixo.iid.v1beta1.MsgDeleteLinkedEntityResponse)
     - [MsgDeleteLinkedResource](#ixo.iid.v1beta1.MsgDeleteLinkedResource)
@@ -1470,115 +1486,6 @@ Msg defines the bonds Msg service.
 
 
 
-<a name="ixo/claims/v1beta1/authz.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/claims/v1beta1/authz.proto
-
-
-
-<a name="ixo.claims.v1beta1.EvaluateClaimAuthorization"></a>
-
-### EvaluateClaimAuthorization
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| admin | [string](#string) |  | address of admin |
-| constraints | [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.EvaluateClaimConstraints"></a>
-
-### EvaluateClaimConstraints
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
-| claim_ids | [string](#string) | repeated | either collection_id or claim_ids is needed |
-| agent_quota | [uint64](#uint64) |  |  |
-| before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-| max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, of empty list must use amount defined in Token payments |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.SubmitClaimAuthorization"></a>
-
-### SubmitClaimAuthorization
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| admin | [string](#string) |  | address of admin |
-| constraints | [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.SubmitClaimConstraints"></a>
-
-### SubmitClaimConstraints
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
-| agent_quota | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.WithdrawAuthorization"></a>
-
-### WithdrawAuthorization
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| admin | [string](#string) |  | address of admin |
-| constraints | [WithdrawConstraints](#ixo.claims.v1beta1.WithdrawConstraints) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.WithdrawConstraints"></a>
-
-### WithdrawConstraints
-
-
-
-
-
-
- 
-
- 
-
- 
-
- 
-
-
-
 <a name="ixo/claims/v1beta1/claims.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1599,9 +1506,26 @@ Msg defines the bonds Msg service.
 | agent_address | [string](#string) |  |  |
 | submission_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submissionDate is the date and time that the claim was submitted on-chain |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
-| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations
+| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations |
+| payments_status | [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments) |  |  |
 
-payment_status |
+
+
+
+
+
+<a name="ixo.claims.v1beta1.ClaimPayments"></a>
+
+### ClaimPayments
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| submission | [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus) |  |  |
+| evaluation | [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus) |  |  |
+| approval | [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus) |  |  |
+| rejection | [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus) |  | PaymentStatus penalty = 5; |
 
 
 
@@ -1656,7 +1580,7 @@ payment_status |
 <a name="ixo.claims.v1beta1.DisputeData"></a>
 
 ### DisputeData
-controller on entity, agent authz cap for the entity, or is admin
+
 
 
 | Field | Type | Label | Description |
@@ -1704,8 +1628,8 @@ controller on entity, agent authz cap for the entity, or is admin
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | collection_sequence | [uint64](#uint64) |  |  |
-| ixo_did | [string](#string) |  |  |
-| oracle_fee_percentage | [string](#string) |  |  |
+| ixo_account | [string](#string) |  |  |
+| network_fee_percentage | [string](#string) |  |  |
 | node_fee_percentage | [string](#string) |  |  |
 
 
@@ -1775,6 +1699,203 @@ controller on entity, agent authz cap for the entity, or is admin
 | REJECTED | 2 |  |
 | DISPUTED | 3 |  |
 
+
+
+<a name="ixo.claims.v1beta1.PaymentStatus"></a>
+
+### PaymentStatus
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| NO_PAYMENT | 0 |  |
+| PROMISED | 1 | agent is contracted to receive payment |
+| AUTHORIZED | 2 | authz set up, no guarantee |
+| GAURANTEED | 3 | escrow set up with funds blocked |
+| PAID | 4 |  |
+| FAILED | 5 |  |
+| DISPUTED | 6 |  |
+
+
+
+<a name="ixo.claims.v1beta1.PaymentType"></a>
+
+### PaymentType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| SUBMISSION | 0 |  |
+| APPROVAL | 1 |  |
+| EVALUATION | 2 |  |
+| REJECTION | 3 |  |
+
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/cosmos.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/cosmos.proto
+
+
+
+<a name="ixo.claims.v1beta1.Input"></a>
+
+### Input
+Input models transaction input.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Output"></a>
+
+### Output
+Output models transaction outputs.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/claims/v1beta1/authz.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/claims/v1beta1/authz.proto
+
+
+
+<a name="ixo.claims.v1beta1.EvaluateClaimAuthorization"></a>
+
+### EvaluateClaimAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| admin | [string](#string) |  | address of admin |
+| constraints | [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.EvaluateClaimConstraints"></a>
+
+### EvaluateClaimConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
+| claim_ids | [string](#string) | repeated | either collection_id or claim_ids is needed |
+| agent_quota | [uint64](#uint64) |  |  |
+| before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if zero then no before_date validation done |
+| max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty list must use amount defined in Token payments |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.SubmitClaimAuthorization"></a>
+
+### SubmitClaimAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| admin | [string](#string) |  | address of admin |
+| constraints | [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.SubmitClaimConstraints"></a>
+
+### SubmitClaimConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
+| agent_quota | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.WithdrawPaymentAuthorization"></a>
+
+### WithdrawPaymentAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| admin | [string](#string) |  | address of admin |
+| constraints | [WithdrawPaymentConstraints](#ixo.claims.v1beta1.WithdrawPaymentConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.WithdrawPaymentConstraints"></a>
+
+### WithdrawPaymentConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  | claim_id the withdrawal is for |
+| inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
+| outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
+| payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
+| release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
+
+
+
+
+
+ 
 
  
 
@@ -1875,6 +1996,36 @@ CollectionUpdatedEvent is an event triggered on a Collection update
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | collection | [Collection](#ixo.claims.v1beta1.Collection) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.PaymentWithdrawCreatedEvent"></a>
+
+### PaymentWithdrawCreatedEvent
+ClaimDisputedEvent is an event triggered on a Claim dispute
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| withdraw | [WithdrawPaymentConstraints](#ixo.claims.v1beta1.WithdrawPaymentConstraints) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.PaymentWithdrawnEvent"></a>
+
+### PaymentWithdrawnEvent
+ClaimDisputedEvent is an event triggered on a Claim dispute
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| withdraw | [WithdrawPaymentConstraints](#ixo.claims.v1beta1.WithdrawPaymentConstraints) |  |  |
 
 
 
@@ -2179,7 +2330,7 @@ Query defines the gRPC querier service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | entity | [string](#string) |  | entity is the DID of the entity for which the claims are being created |
-| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor) |
+| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor), signer for tx |
 | protocol | [string](#string) |  | protocol is the DID of the claim protocol |
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
@@ -2205,12 +2356,13 @@ Query defines the gRPC querier service.
 <a name="ixo.claims.v1beta1.MsgDisputeClaim"></a>
 
 ### MsgDisputeClaim
-
+Agent laying dispute must be admin for Collection, or controller on
+Collection entity, or have authz cap, aka is agent
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| subject_id | [string](#string) |  | subject_id for which this dispute is against |
+| subject_id | [string](#string) |  | subject_id for which this dispute is against, for now can only lay disputes against claims |
 | agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim, agent detials wont be saved in kvStore |
 | agent_address | [string](#string) |  |  |
 | dispute_type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
@@ -2293,6 +2445,36 @@ Query defines the gRPC querier service.
 
 
 
+
+<a name="ixo.claims.v1beta1.MsgWithdrawPayment"></a>
+
+### MsgWithdrawPayment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| claim_id | [string](#string) |  | claim_id the withdrawal is for |
+| inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
+| outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
+| payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
+| release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgWithdrawPaymentResponse"></a>
+
+### MsgWithdrawPaymentResponse
+
+
+
+
+
+
  
 
  
@@ -2311,6 +2493,7 @@ Msg defines the Msg service.
 | SubmitClaim | [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim) | [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse) |  |
 | EvaluateClaim | [MsgEvaluateClaim](#ixo.claims.v1beta1.MsgEvaluateClaim) | [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse) |  |
 | DisputeClaim | [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim) | [MsgDisputeClaimResponse](#ixo.claims.v1beta1.MsgDisputeClaimResponse) |  |
+| WithdrawPayment | [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment) | [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse) |  |
 
  
 
@@ -2361,7 +2544,8 @@ Msg defines the Msg service.
 <a name="ixo.iid.v1beta1.IidDocument"></a>
 
 ### IidDocument
-
+type entity account
+relationship entity account
 
 
 | Field | Type | Label | Description |
@@ -2377,6 +2561,7 @@ Msg defines the Msg service.
 | capabilityInvocation | [string](#string) | repeated | Used to specify a verification method that might be used by the DID subject to invoke a cryptographic capability, such as the authorization to update the DID Document. https://www.w3.org/TR/did-core/#capability-invocation |
 | capabilityDelegation | [string](#string) | repeated | Used to specify a mechanism that might be used by the DID subject to delegate a cryptographic capability to another party. https://www.w3.org/TR/did-core/#capability-delegation |
 | linkedResource | [LinkedResource](#ixo.iid.v1beta1.LinkedResource) | repeated |  |
+| linkedClaim | [LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) | repeated |  |
 | accordedRight | [AccordedRight](#ixo.iid.v1beta1.AccordedRight) | repeated |  |
 | linkedEntity | [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated |  |
 | alsoKnownAs | [string](#string) |  |  |
@@ -2399,6 +2584,28 @@ IidMetadata defines metadata associated to a Iid document
 | created | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | updated | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | deactivated | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.iid.v1beta1.LinkedClaim"></a>
+
+### LinkedClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| type | [string](#string) |  |  |
+| id | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| mediaType | [string](#string) |  |  |
+| serviceEndpoint | [string](#string) |  |  |
+| proof | [string](#string) |  |  |
+| encrypted | [string](#string) |  |  |
+| right | [string](#string) |  |  |
 
 
 
@@ -2509,12 +2716,12 @@ Service defines how to find data associated with a identifer
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  | id represents the id for the entity document. |
 | type | [string](#string) |  | Type of entity, eg protocol or asset |
-| startDate | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
-| endDate | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
+| start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
+| end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
 | status | [int32](#int32) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
-| relayerNode | [string](#string) |  | DID of the operator through which the Entity was created |
+| relayer_node | [string](#string) |  | Address of the operator through which the Entity was created |
 | credentials | [string](#string) | repeated | Credentials of the enitity to be verified |
-| entityVerified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
+| entity_verified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
 | metadata | [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata) |  | Metadata concerning the Entity such as versionId, created, updated and deactivated |
 
 
@@ -2530,7 +2737,7 @@ EntityMetadata defines metadata associated to a entity
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| versionId | [string](#string) |  |  |
+| version_id | [string](#string) |  |  |
 | created | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 | updated | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
 
@@ -2547,9 +2754,9 @@ EntityMetadata defines metadata associated to a entity
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| NftContractAddress | [string](#string) |  |  |
-| NftContractMinter | [string](#string) |  |  |
-| CreateSequence | [uint64](#uint64) |  |  |
+| nftContractAddress | [string](#string) |  |  |
+| nftContractMinter | [string](#string) |  |  |
+| createSequence | [uint64](#uint64) |  |  |
 
 
 
@@ -2981,6 +3188,33 @@ Query defines the gRPC querier service.
 
 
 
+<a name="ixo.iid.v1beta1.MsgAddLinkedClaim"></a>
+
+### MsgAddLinkedClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | the did |
+| linkedClaim | [LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) |  | the claim to add |
+| signer | [string](#string) |  | address of the account signing the message |
+
+
+
+
+
+
+<a name="ixo.iid.v1beta1.MsgAddLinkedClaimResponse"></a>
+
+### MsgAddLinkedClaimResponse
+
+
+
+
+
+
+
 <a name="ixo.iid.v1beta1.MsgAddLinkedEntity"></a>
 
 ### MsgAddLinkedEntity
@@ -3107,6 +3341,7 @@ MsgCreateDidDocument defines a SDK message for creating a new did.
 | linkedEntity | [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated |  |
 | alsoKnownAs | [string](#string) |  |  |
 | signer | [string](#string) |  | address of the account signing the message |
+| linkedClaim | [LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) | repeated |  |
 
 
 
@@ -3224,6 +3459,33 @@ MsgCreateDidDocument defines a SDK message for creating a new did.
 <a name="ixo.iid.v1beta1.MsgDeleteIidContextResponse"></a>
 
 ### MsgDeleteIidContextResponse
+
+
+
+
+
+
+
+<a name="ixo.iid.v1beta1.MsgDeleteLinkedClaim"></a>
+
+### MsgDeleteLinkedClaim
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | the did |
+| claim_id | [string](#string) |  | the claim id |
+| signer | [string](#string) |  | address of the account signing the message |
+
+
+
+
+
+
+<a name="ixo.iid.v1beta1.MsgDeleteLinkedClaimResponse"></a>
+
+### MsgDeleteLinkedClaimResponse
 
 
 
@@ -3386,6 +3648,7 @@ with default go type, aka never null
 | linkedEntity | [LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated |  |
 | alsoKnownAs | [string](#string) |  |  |
 | signer | [string](#string) |  | address of the account signing the message |
+| linkedClaim | [LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) | repeated |  |
 
 
 
@@ -3446,6 +3709,8 @@ Msg defines the identity Msg service.
 | DeleteController | [MsgDeleteController](#ixo.iid.v1beta1.MsgDeleteController) | [MsgDeleteControllerResponse](#ixo.iid.v1beta1.MsgDeleteControllerResponse) | DeleteService delete an existing service |
 | AddLinkedResource | [MsgAddLinkedResource](#ixo.iid.v1beta1.MsgAddLinkedResource) | [MsgAddLinkedResourceResponse](#ixo.iid.v1beta1.MsgAddLinkedResourceResponse) | Add / Delete Linked Resource |
 | DeleteLinkedResource | [MsgDeleteLinkedResource](#ixo.iid.v1beta1.MsgDeleteLinkedResource) | [MsgDeleteLinkedResourceResponse](#ixo.iid.v1beta1.MsgDeleteLinkedResourceResponse) |  |
+| AddLinkedClaim | [MsgAddLinkedClaim](#ixo.iid.v1beta1.MsgAddLinkedClaim) | [MsgAddLinkedClaimResponse](#ixo.iid.v1beta1.MsgAddLinkedClaimResponse) | Add / Delete Linked Claims |
+| DeleteLinkedClaim | [MsgDeleteLinkedClaim](#ixo.iid.v1beta1.MsgDeleteLinkedClaim) | [MsgDeleteLinkedClaimResponse](#ixo.iid.v1beta1.MsgDeleteLinkedClaimResponse) |  |
 | AddLinkedEntity | [MsgAddLinkedEntity](#ixo.iid.v1beta1.MsgAddLinkedEntity) | [MsgAddLinkedEntityResponse](#ixo.iid.v1beta1.MsgAddLinkedEntityResponse) | Add / Delete Linked Entity |
 | DeleteLinkedEntity | [MsgDeleteLinkedEntity](#ixo.iid.v1beta1.MsgDeleteLinkedEntity) | [MsgDeleteLinkedEntityResponse](#ixo.iid.v1beta1.MsgDeleteLinkedEntityResponse) |  |
 | AddAccordedRight | [MsgAddAccordedRight](#ixo.iid.v1beta1.MsgAddAccordedRight) | [MsgAddAccordedRightResponse](#ixo.iid.v1beta1.MsgAddAccordedRightResponse) | Add / Delete Accorded Right |
@@ -3490,6 +3755,7 @@ Msg defines the identity Msg service.
 | owner_address | [string](#string) |  | The ownersdid address used to sign this transaction. |
 | data | [bytes](#bytes) |  | Extention data |
 | alsoKnownAs | [string](#string) |  |  |
+| linked_claim | [ixo.iid.v1beta1.LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) | repeated | Digital claims associated with the Subject |
 
 
 

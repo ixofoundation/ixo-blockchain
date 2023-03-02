@@ -7,6 +7,7 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "ixo/claims/v1beta1/claims.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "ixo/claims/v1beta1/cosmos.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -15,13 +16,14 @@ service Msg {
   rpc SubmitClaim(MsgSubmitClaim) returns (MsgSubmitClaimResponse);
   rpc EvaluateClaim(MsgEvaluateClaim) returns (MsgEvaluateClaimResponse);
   rpc DisputeClaim(MsgDisputeClaim) returns (MsgDisputeClaimResponse);
+  rpc WithdrawPayment(MsgWithdrawPayment) returns (MsgWithdrawPaymentResponse);
 }
 
 message MsgCreateCollection {
   // entity is the DID of the entity for which the claims are being created
   string entity = 1;
   // admin is the account address that will authorize or revoke agents and
-  // payments (the grantor)
+  // payments (the grantor), signer for tx
   string admin = 2;
   // protocol is the DID of the claim protocol
   string protocol = 3;
@@ -89,8 +91,11 @@ message MsgEvaluateClaim {
 
 message MsgEvaluateClaimResponse {}
 
+// Agent laying dispute must be admin for Collection, or controller on
+// Collection entity, or have authz cap, aka is agent
 message MsgDisputeClaim {
-  // subject_id for which this dispute is against
+  // subject_id for which this dispute is against, for now can only lay disputes
+  // against claims
   string subject_id = 1;
   // agent is the DID of the agent disputing the claim, agent detials wont be
   // saved in kvStore
@@ -104,3 +109,28 @@ message MsgDisputeClaim {
 }
 
 message MsgDisputeClaimResponse {}
+
+message MsgWithdrawPayment {
+  // claim_id the withdrawal is for
+  string claim_id = 1;
+  // Inputs to the multisend tx to run to withdraw payment
+  repeated Input inputs = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Input"
+  ];
+  // Outputs for the multisend tx to run to withdraw payment
+  repeated Output outputs = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Output"
+  ];
+  // payment type to keep track what payment is for and mark claim payment
+  // accordingly
+  PaymentType payment_type = 4;
+  // date that grantee can execute authorization, calculated from created date
+  // plus the timeout on Collection payments
+  google.protobuf.Timestamp release_date = 5 [ (gogoproto.stdtime) = true ];
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 6;
+}
+
+message MsgWithdrawPaymentResponse {}

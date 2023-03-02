@@ -5,6 +5,7 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
 import "gogoproto/gogo.proto";
 import "ixo/claims/v1beta1/claims.proto";
+import "ixo/claims/v1beta1/authz.proto";
 
 // CollectionCreatedEvent is an event triggered on a Collection creation
 message CollectionCreatedEvent { Collection collection = 1; }
@@ -23,3 +24,9 @@ message ClaimEvaluatedEvent { Evaluation evaluation = 1; }
 
 // ClaimDisputedEvent is an event triggered on a Claim dispute
 message ClaimDisputedEvent { Dispute dispute = 1; }
+
+// ClaimDisputedEvent is an event triggered on a Claim dispute
+message PaymentWithdrawnEvent { WithdrawPaymentConstraints withdraw = 1; }
+
+// ClaimDisputedEvent is an event triggered on a Claim dispute
+message PaymentWithdrawCreatedEvent { WithdrawPaymentConstraints withdraw = 1; }

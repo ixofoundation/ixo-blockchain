@@ -5,6 +5,8 @@ import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "ixo/claims/v1beta1/claims.proto";
+import "ixo/claims/v1beta1/cosmos.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
@@ -46,12 +48,31 @@ message EvaluateClaimConstraints {
   ];
 }
 
-message WithdrawAuthorization {
+message WithdrawPaymentAuthorization {
   option (cosmos_proto.implements_interface) = "Authorization";
 
   // address of admin
   string admin = 1;
-  repeated WithdrawConstraints constraints = 2;
+  repeated WithdrawPaymentConstraints constraints = 2;
 }
 
-message WithdrawConstraints {}
+message WithdrawPaymentConstraints {
+  // claim_id the withdrawal is for
+  string claim_id = 1;
+  // Inputs to the multisend tx to run to withdraw payment
+  repeated Input inputs = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Input"
+  ];
+  // Outputs for the multisend tx to run to withdraw payment
+  repeated Output outputs = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Output"
+  ];
+  // payment type to keep track what payment is for and mark claim payment
+  // accordingly
+  PaymentType payment_type = 4;
+  // date that grantee can execute authorization, calculated from created date
+  // plus the timeout on Collection payments
+  google.protobuf.Timestamp release_date = 5 [ (gogoproto.stdtime) = true ];
+}

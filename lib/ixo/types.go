@@ -13,3 +13,14 @@ func Contains(s []string, str string) bool {
 
 	return false
 }
+
+// removes an element at index i from a slice, will change order of slice (fast)
+func RemoveUnordered[T any](s []T, i int) []T {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+// removes an element at index i from a slice, will not change order of slice (slow)
+func RemoveOrdered[T any](slice []T, s int) []T {
+	return append(slice[:s], slice[s+1:]...)
+}

@@ -10,8 +10,8 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
 message Params {
   uint64 collection_sequence = 1;
-  string ixo_did = 2;
-  string oracle_fee_percentage = 3 [
+  string ixo_account = 2;
+  string network_fee_percentage = 3 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
@@ -32,6 +32,26 @@ enum EvaluationStatus {
   APPROVED = 1 [ (gogoproto.enumvalue_customname) = "approved" ];
   REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
   DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
+}
+
+enum PaymentType {
+  SUBMISSION = 0 [ (gogoproto.enumvalue_customname) = "submission" ];
+  APPROVAL = 1 [ (gogoproto.enumvalue_customname) = "approval" ];
+  EVALUATION = 2 [ (gogoproto.enumvalue_customname) = "evaluation" ];
+  REJECTION = 3 [ (gogoproto.enumvalue_customname) = "rejection" ];
+}
+
+enum PaymentStatus {
+  NO_PAYMENT = 0 [ (gogoproto.enumvalue_customname) = "no_payment" ];
+  PROMISED = 1 [ (gogoproto.enumvalue_customname) =
+                     "promised" ]; // agent is contracted to receive payment
+  AUTHORIZED = 2 [ (gogoproto.enumvalue_customname) =
+                       "authorized" ]; // authz set up, no guarantee
+  GAURANTEED = 3 [ (gogoproto.enumvalue_customname) =
+                       "gauranteed" ]; // escrow set up with funds blocked
+  PAID = 4 [ (gogoproto.enumvalue_customname) = "paid" ];
+  FAILED = 5 [ (gogoproto.enumvalue_customname) = "failed" ];
+  DISPUTED = 6 [ (gogoproto.enumvalue_customname) = "disputed" ];
 }
 
 message Collection {
@@ -89,7 +109,7 @@ message Payment {
   ];
   // timeout after claim/evaluation to create authZ for payment, if 0 then
   // immidiate direct payment
-  google.protobuf.Duration timeout_ns = 8
+  google.protobuf.Duration timeout_ns = 3
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
 }
 
@@ -105,7 +125,15 @@ message Claim {
   string claim_id = 5;
   // evaluation is the result of one or more claim evaluations
   Evaluation evaluation = 6;
-  // payment_status
+  ClaimPayments payments_status = 7;
+}
+
+message ClaimPayments {
+  PaymentStatus submission = 1;
+  PaymentStatus evaluation = 2;
+  PaymentStatus approval = 3;
+  PaymentStatus rejection = 4;
+  // PaymentStatus penalty = 5;
 }
 
 message Evaluation {
@@ -151,4 +179,3 @@ message DisputeData {
   string proof = 3;
   bool encrypted = 4;
 }
-// controller on entity, agent authz cap for the entity, or is admin

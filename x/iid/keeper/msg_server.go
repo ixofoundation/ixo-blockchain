@@ -37,6 +37,7 @@ func (k msgServer) CreateIidDocument(goCtx context.Context, msg *types.MsgCreate
 		types.WithServices(msg.Services...),
 		types.WithRights(msg.AccordedRight...),
 		types.WithResources(msg.LinkedResource...),
+		types.WithClaims(msg.LinkedClaim...),
 		types.WithEntities(msg.LinkedEntity...),
 		types.WithVerifications(msg.Verifications...),
 		types.WithControllers(msg.Controllers...),
@@ -70,6 +71,7 @@ func (k msgServer) UpdateIidDocument(goCtx context.Context, msg *types.MsgUpdate
 				types.WithServices(msg.Services...),
 				types.WithRights(msg.AccordedRight...),
 				types.WithResources(msg.LinkedResource...),
+				types.WithClaims(msg.LinkedClaim...),
 				types.WithEntities(msg.LinkedEntity...),
 				types.WithVerifications(msg.Verifications...),
 				types.WithControllers(msg.Controllers...),
@@ -149,6 +151,40 @@ func (k msgServer) DeleteLinkedResource(goCtx context.Context, msg *types.MsgDel
 	}
 
 	return &types.MsgDeleteLinkedResourceResponse{}, nil
+}
+
+func (k msgServer) AddLinkedClaim(goCtx context.Context, msg *types.MsgAddLinkedClaim,
+) (*types.MsgAddLinkedClaimResponse, error) {
+	if err := ExecuteOnDidWithRelationships(
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.IidDocument) error {
+			return didDoc.AddLinkedClaim(msg.LinkedClaim)
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAddLinkedClaimResponse{}, nil
+}
+
+func (k msgServer) DeleteLinkedClaim(goCtx context.Context, msg *types.MsgDeleteLinkedClaim,
+) (*types.MsgDeleteLinkedClaimResponse, error) {
+	if err := ExecuteOnDidWithRelationships(
+		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
+		newConstraints(types.Authentication),
+		msg.Id, msg.Signer,
+		func(didDoc *types.IidDocument) error {
+			if len(didDoc.LinkedClaim) == 0 {
+				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have Claims associated")
+			}
+			didDoc.DeleteLinkedClaim(msg.ClaimId)
+			return nil
+		}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDeleteLinkedClaimResponse{}, nil
 }
 
 func (k msgServer) AddLinkedEntity(goCtx context.Context, msg *types.MsgAddLinkedEntity,

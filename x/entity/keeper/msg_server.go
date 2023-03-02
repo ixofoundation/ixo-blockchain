@@ -38,6 +38,12 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 		return nil, errors.New("nftContractAddress not set")
 	}
 
+	// check that relayerNode did exists
+	_, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.RelayerNode))
+	if !found {
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "relayer node did document not found for %s", msg.RelayerNode)
+	}
+
 	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
 	if err != nil {
 		return nil, err
@@ -52,7 +58,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	entityId := fmt.Sprintf("did:ixo:entity:%x", generatedId)
 
 	// check that the did is not already taken
-	_, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(entityId))
+	_, found = s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(entityId))
 	if found {
 		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", entityId)
 		return nil, err
@@ -64,6 +70,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 		iidtypes.WithServices(msg.Service...),
 		iidtypes.WithRights(msg.AccordedRight...),
 		iidtypes.WithResources(msg.LinkedResource...),
+		iidtypes.WithClaims(msg.LinkedClaim...),
 		iidtypes.WithEntities(msg.LinkedEntity...),
 		iidtypes.WithVerifications(msg.Verification...),
 		iidtypes.WithContexts(msg.Context...),

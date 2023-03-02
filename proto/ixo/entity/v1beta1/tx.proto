@@ -52,7 +52,7 @@ message MsgCreateEntity {
   // End Date of the Entity as defined by the implementer and interpreted by
   // Client applications
   google.protobuf.Timestamp end_date = 11 [ (gogoproto.stdtime) = true ];
-  // DID of the operator through which the Entity was created
+  // Address of the operator through which the Entity was created
   string relayer_node = 12;
   // Content ID or Hash of public Verifiable Credentials associated with the
   // subject
@@ -66,6 +66,8 @@ message MsgCreateEntity {
   bytes data = 16
       [ (gogoproto.casttype) = "encoding/json.RawMessage" ]; // Extention data
   string alsoKnownAs = 17;
+  repeated ixo.iid.v1beta1.LinkedClaim linked_claim =
+      18; // Digital claims associated with the Subject
 }
 
 message MsgCreateEntityResponse {

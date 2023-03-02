@@ -7,6 +7,7 @@ import (
 	fmt "fmt"
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
+	github_com_cosmos_cosmos_sdk_x_bank_types "github.com/cosmos/cosmos-sdk/x/bank/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
@@ -193,10 +194,11 @@ type EvaluateClaimConstraints struct {
 	// collection_id indicates to which Collection this claim belongs
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	// either collection_id or claim_ids is needed
-	ClaimIds   []string   `protobuf:"bytes,2,rep,name=claim_ids,json=claimIds,proto3" json:"claim_ids,omitempty"`
-	AgentQuota uint64     `protobuf:"varint,3,opt,name=agent_quota,json=agentQuota,proto3" json:"agent_quota,omitempty"`
+	ClaimIds   []string `protobuf:"bytes,2,rep,name=claim_ids,json=claimIds,proto3" json:"claim_ids,omitempty"`
+	AgentQuota uint64   `protobuf:"varint,3,opt,name=agent_quota,json=agentQuota,proto3" json:"agent_quota,omitempty"`
+	// if zero then no before_date validation done
 	BeforeDate *time.Time `protobuf:"bytes,4,opt,name=before_date,json=beforeDate,proto3,stdtime" json:"before_date,omitempty"`
-	// max custom amount evaluator can change, of empty list must use amount
+	// max custom amount evaluator can change, if empty list must use amount
 	// defined in Token payments
 	MaxCustomAmount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,10,rep,name=max_custom_amount,json=maxCustomAmount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"max_custom_amount"`
 }
@@ -269,24 +271,24 @@ func (m *EvaluateClaimConstraints) GetMaxCustomAmount() github_com_cosmos_cosmos
 	return nil
 }
 
-type WithdrawAuthorization struct {
+type WithdrawPaymentAuthorization struct {
 	// address of admin
-	Admin       string                 `protobuf:"bytes,1,opt,name=admin,proto3" json:"admin,omitempty"`
-	Constraints []*WithdrawConstraints `protobuf:"bytes,2,rep,name=constraints,proto3" json:"constraints,omitempty"`
+	Admin       string                        `protobuf:"bytes,1,opt,name=admin,proto3" json:"admin,omitempty"`
+	Constraints []*WithdrawPaymentConstraints `protobuf:"bytes,2,rep,name=constraints,proto3" json:"constraints,omitempty"`
 }
 
-func (m *WithdrawAuthorization) Reset()         { *m = WithdrawAuthorization{} }
-func (m *WithdrawAuthorization) String() string { return proto.CompactTextString(m) }
-func (*WithdrawAuthorization) ProtoMessage()    {}
-func (*WithdrawAuthorization) Descriptor() ([]byte, []int) {
+func (m *WithdrawPaymentAuthorization) Reset()         { *m = WithdrawPaymentAuthorization{} }
+func (m *WithdrawPaymentAuthorization) String() string { return proto.CompactTextString(m) }
+func (*WithdrawPaymentAuthorization) ProtoMessage()    {}
+func (*WithdrawPaymentAuthorization) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f4b7f6c531e101a6, []int{4}
 }
-func (m *WithdrawAuthorization) XXX_Unmarshal(b []byte) error {
+func (m *WithdrawPaymentAuthorization) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WithdrawAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *WithdrawPaymentAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WithdrawAuthorization.Marshal(b, m, deterministic)
+		return xxx_messageInfo_WithdrawPaymentAuthorization.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -296,47 +298,59 @@ func (m *WithdrawAuthorization) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *WithdrawAuthorization) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WithdrawAuthorization.Merge(m, src)
+func (m *WithdrawPaymentAuthorization) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WithdrawPaymentAuthorization.Merge(m, src)
 }
-func (m *WithdrawAuthorization) XXX_Size() int {
+func (m *WithdrawPaymentAuthorization) XXX_Size() int {
 	return m.Size()
 }
-func (m *WithdrawAuthorization) XXX_DiscardUnknown() {
-	xxx_messageInfo_WithdrawAuthorization.DiscardUnknown(m)
+func (m *WithdrawPaymentAuthorization) XXX_DiscardUnknown() {
+	xxx_messageInfo_WithdrawPaymentAuthorization.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WithdrawAuthorization proto.InternalMessageInfo
+var xxx_messageInfo_WithdrawPaymentAuthorization proto.InternalMessageInfo
 
-func (m *WithdrawAuthorization) GetAdmin() string {
+func (m *WithdrawPaymentAuthorization) GetAdmin() string {
 	if m != nil {
 		return m.Admin
 	}
 	return ""
 }
 
-func (m *WithdrawAuthorization) GetConstraints() []*WithdrawConstraints {
+func (m *WithdrawPaymentAuthorization) GetConstraints() []*WithdrawPaymentConstraints {
 	if m != nil {
 		return m.Constraints
 	}
 	return nil
 }
 
-type WithdrawConstraints struct {
+type WithdrawPaymentConstraints struct {
+	// claim_id the withdrawal is for
+	ClaimId string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
+	// Inputs to the multisend tx to run to withdraw payment
+	Inputs []github_com_cosmos_cosmos_sdk_x_bank_types.Input `protobuf:"bytes,2,rep,name=inputs,proto3,casttype=github.com/cosmos/cosmos-sdk/x/bank/types.Input" json:"inputs"`
+	// Outputs for the multisend tx to run to withdraw payment
+	Outputs []github_com_cosmos_cosmos_sdk_x_bank_types.Output `protobuf:"bytes,3,rep,name=outputs,proto3,casttype=github.com/cosmos/cosmos-sdk/x/bank/types.Output" json:"outputs"`
+	// payment type to keep track what payment is for and mark claim payment
+	// accordingly
+	PaymentType PaymentType `protobuf:"varint,4,opt,name=payment_type,json=paymentType,proto3,enum=ixo.claims.v1beta1.PaymentType" json:"payment_type,omitempty"`
+	// date that grantee can execute authorization, calculated from created date
+	// plus the timeout on Collection payments
+	ReleaseDate *time.Time `protobuf:"bytes,5,opt,name=release_date,json=releaseDate,proto3,stdtime" json:"release_date,omitempty"`
 }
 
-func (m *WithdrawConstraints) Reset()         { *m = WithdrawConstraints{} }
-func (m *WithdrawConstraints) String() string { return proto.CompactTextString(m) }
-func (*WithdrawConstraints) ProtoMessage()    {}
-func (*WithdrawConstraints) Descriptor() ([]byte, []int) {
+func (m *WithdrawPaymentConstraints) Reset()         { *m = WithdrawPaymentConstraints{} }
+func (m *WithdrawPaymentConstraints) String() string { return proto.CompactTextString(m) }
+func (*WithdrawPaymentConstraints) ProtoMessage()    {}
+func (*WithdrawPaymentConstraints) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f4b7f6c531e101a6, []int{5}
 }
-func (m *WithdrawConstraints) XXX_Unmarshal(b []byte) error {
+func (m *WithdrawPaymentConstraints) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WithdrawConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *WithdrawPaymentConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WithdrawConstraints.Marshal(b, m, deterministic)
+		return xxx_messageInfo_WithdrawPaymentConstraints.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -346,66 +360,109 @@ func (m *WithdrawConstraints) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *WithdrawConstraints) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WithdrawConstraints.Merge(m, src)
+func (m *WithdrawPaymentConstraints) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WithdrawPaymentConstraints.Merge(m, src)
 }
-func (m *WithdrawConstraints) XXX_Size() int {
+func (m *WithdrawPaymentConstraints) XXX_Size() int {
 	return m.Size()
 }
-func (m *WithdrawConstraints) XXX_DiscardUnknown() {
-	xxx_messageInfo_WithdrawConstraints.DiscardUnknown(m)
+func (m *WithdrawPaymentConstraints) XXX_DiscardUnknown() {
+	xxx_messageInfo_WithdrawPaymentConstraints.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WithdrawConstraints proto.InternalMessageInfo
+var xxx_messageInfo_WithdrawPaymentConstraints proto.InternalMessageInfo
+
+func (m *WithdrawPaymentConstraints) GetClaimId() string {
+	if m != nil {
+		return m.ClaimId
+	}
+	return ""
+}
+
+func (m *WithdrawPaymentConstraints) GetInputs() []github_com_cosmos_cosmos_sdk_x_bank_types.Input {
+	if m != nil {
+		return m.Inputs
+	}
+	return nil
+}
+
+func (m *WithdrawPaymentConstraints) GetOutputs() []github_com_cosmos_cosmos_sdk_x_bank_types.Output {
+	if m != nil {
+		return m.Outputs
+	}
+	return nil
+}
+
+func (m *WithdrawPaymentConstraints) GetPaymentType() PaymentType {
+	if m != nil {
+		return m.PaymentType
+	}
+	return PaymentType_submission
+}
+
+func (m *WithdrawPaymentConstraints) GetReleaseDate() *time.Time {
+	if m != nil {
+		return m.ReleaseDate
+	}
+	return nil
+}
 
 func init() {
 	proto.RegisterType((*SubmitClaimAuthorization)(nil), "ixo.claims.v1beta1.SubmitClaimAuthorization")
 	proto.RegisterType((*SubmitClaimConstraints)(nil), "ixo.claims.v1beta1.SubmitClaimConstraints")
 	proto.RegisterType((*EvaluateClaimAuthorization)(nil), "ixo.claims.v1beta1.EvaluateClaimAuthorization")
 	proto.RegisterType((*EvaluateClaimConstraints)(nil), "ixo.claims.v1beta1.EvaluateClaimConstraints")
-	proto.RegisterType((*WithdrawAuthorization)(nil), "ixo.claims.v1beta1.WithdrawAuthorization")
-	proto.RegisterType((*WithdrawConstraints)(nil), "ixo.claims.v1beta1.WithdrawConstraints")
+	proto.RegisterType((*WithdrawPaymentAuthorization)(nil), "ixo.claims.v1beta1.WithdrawPaymentAuthorization")
+	proto.RegisterType((*WithdrawPaymentConstraints)(nil), "ixo.claims.v1beta1.WithdrawPaymentConstraints")
 }
 
 func init() { proto.RegisterFile("ixo/claims/v1beta1/authz.proto", fileDescriptor_f4b7f6c531e101a6) }
 
 var fileDescriptor_f4b7f6c531e101a6 = []byte{
-	// 550 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xc1, 0x6e, 0xd3, 0x40,
-	0x10, 0xcd, 0xa6, 0x01, 0x91, 0x0d, 0x15, 0xaa, 0x69, 0x91, 0x1b, 0x24, 0x27, 0x0a, 0x07, 0x22,
-	0x44, 0x6c, 0x5a, 0x24, 0x0e, 0xdc, 0x92, 0xc0, 0x21, 0x12, 0x42, 0x60, 0x90, 0x90, 0x38, 0x60,
-	0xad, 0xed, 0x8d, 0xb3, 0xaa, 0xd7, 0x13, 0xbc, 0xeb, 0xd6, 0xf4, 0x17, 0xb8, 0x94, 0x03, 0x3f,
-	0xc1, 0x99, 0x0b, 0x7f, 0xd0, 0x63, 0xc5, 0x89, 0x13, 0x45, 0xc9, 0x8f, 0x20, 0xaf, 0x9d, 0x36,
-	0x2d, 0x46, 0x4a, 0x4f, 0xc9, 0xcc, 0x9b, 0x37, 0x3b, 0x6f, 0xe6, 0xc9, 0xd8, 0x60, 0x29, 0x58,
-	0x5e, 0x48, 0x18, 0x17, 0xd6, 0xfe, 0x8e, 0x4b, 0x25, 0xd9, 0xb1, 0x48, 0x22, 0x27, 0x87, 0xe6,
-	0x34, 0x06, 0x09, 0x9a, 0xc6, 0x52, 0x30, 0x73, 0xdc, 0x2c, 0xf0, 0xe6, 0x66, 0x00, 0x01, 0x28,
-	0xd8, 0xca, 0xfe, 0xe5, 0x95, 0xcd, 0x6d, 0x0f, 0x04, 0x07, 0xe1, 0xe4, 0x40, 0x1e, 0x14, 0x50,
-	0x2b, 0x00, 0x08, 0x42, 0x6a, 0xa9, 0xc8, 0x4d, 0xc6, 0x96, 0x64, 0x9c, 0x0a, 0x49, 0xf8, 0xb4,
-	0x28, 0x30, 0xf2, 0x72, 0xcb, 0x25, 0x82, 0x9e, 0x8d, 0xe1, 0x01, 0x8b, 0x72, 0xbc, 0xf3, 0x05,
-	0x61, 0xfd, 0x4d, 0xe2, 0x72, 0x26, 0x87, 0xd9, 0x28, 0xfd, 0x44, 0x4e, 0x20, 0x66, 0x87, 0x44,
-	0x32, 0x88, 0xb4, 0x4d, 0x7c, 0x8d, 0xf8, 0x9c, 0x45, 0x3a, 0x6a, 0xa3, 0x6e, 0xdd, 0xce, 0x03,
-	0xed, 0x05, 0x6e, 0x78, 0x10, 0x09, 0x19, 0x13, 0x16, 0x49, 0xa1, 0x57, 0xdb, 0x6b, 0xdd, 0xc6,
-	0xee, 0x03, 0xf3, 0x5f, 0x39, 0xe6, 0x52, 0xe3, 0xe1, 0x39, 0xc3, 0x5e, 0xa6, 0x3f, 0xdd, 0xf8,
-	0xf9, 0xbd, 0xb7, 0x7e, 0xe1, 0xd9, 0xce, 0x07, 0x7c, 0xa7, 0x9c, 0xa9, 0xdd, 0xc3, 0xeb, 0x1e,
-	0x84, 0x21, 0xf5, 0xb2, 0x3a, 0x87, 0xf9, 0xc5, 0x60, 0x37, 0xcf, 0x93, 0x23, 0x5f, 0x6b, 0xe1,
-	0x06, 0x09, 0x68, 0x24, 0x9d, 0x8f, 0x09, 0x48, 0xa2, 0x57, 0xdb, 0xa8, 0x5b, 0xb3, 0xb1, 0x4a,
-	0xbd, 0xce, 0x32, 0x9d, 0xaf, 0x08, 0x37, 0x9f, 0xef, 0x93, 0x30, 0x21, 0x92, 0xae, 0xac, 0xfa,
-	0x65, 0x99, 0xea, 0x87, 0x65, 0xaa, 0x2f, 0xb4, 0xbe, 0x8a, 0xee, 0x1f, 0x55, 0xac, 0xff, 0x8f,
-	0xbc, 0x9a, 0xf4, 0xbb, 0xb8, 0xae, 0x86, 0x71, 0x98, 0x9f, 0x8f, 0x58, 0xb7, 0x6f, 0xa8, 0xc4,
-	0xc8, 0x17, 0x97, 0xf7, 0xb2, 0x76, 0x79, 0x2f, 0x5a, 0x1f, 0x37, 0x5c, 0x3a, 0x86, 0x98, 0x3a,
-	0x3e, 0x91, 0x54, 0xaf, 0xb5, 0x51, 0xb7, 0xb1, 0xdb, 0x34, 0x73, 0x8b, 0x99, 0x0b, 0x8b, 0x99,
-	0x6f, 0x17, 0x16, 0x1b, 0xd4, 0x8e, 0x4e, 0x5b, 0xc8, 0xc6, 0x39, 0xe9, 0x19, 0x91, 0x54, 0x3b,
-	0xc0, 0x1b, 0x9c, 0xa4, 0x8e, 0x97, 0x08, 0x09, 0xdc, 0x21, 0x1c, 0x92, 0x48, 0xea, 0x58, 0xed,
-	0x6a, 0xdb, 0x2c, 0x9c, 0x9b, 0x59, 0xf1, 0x6c, 0x59, 0x43, 0x60, 0xd1, 0xe0, 0xd1, 0xf1, 0xef,
-	0x56, 0xe5, 0xdb, 0x69, 0xab, 0x1b, 0x30, 0x39, 0x49, 0x5c, 0xd3, 0x03, 0x5e, 0xd8, 0xbc, 0xf8,
-	0xe9, 0x09, 0x7f, 0xcf, 0x92, 0x9f, 0xa6, 0x54, 0x28, 0x82, 0xb0, 0x6f, 0x71, 0x92, 0x0e, 0xd5,
-	0x23, 0x7d, 0xf5, 0x46, 0xe7, 0x33, 0xc2, 0x5b, 0xef, 0x98, 0x9c, 0xf8, 0x31, 0x39, 0x58, 0xe5,
-	0x9c, 0xa3, 0xb2, 0x73, 0xde, 0x2f, 0x3b, 0xe7, 0xa2, 0xeb, 0x55, 0x2e, 0xb9, 0x85, 0x6f, 0x97,
-	0xd0, 0x06, 0xaf, 0x8e, 0x67, 0x06, 0x3a, 0x99, 0x19, 0xe8, 0xcf, 0xcc, 0x40, 0x47, 0x73, 0xa3,
-	0x72, 0x32, 0x37, 0x2a, 0xbf, 0xe6, 0x46, 0xe5, 0xfd, 0x93, 0x25, 0xe5, 0x2c, 0x85, 0x31, 0x24,
-	0x91, 0xaf, 0x5a, 0x65, 0x51, 0xcf, 0x0d, 0xc1, 0xdb, 0xf3, 0x26, 0x84, 0x45, 0x56, 0xba, 0xf8,
-	0xa4, 0xa8, 0x6d, 0xb8, 0xd7, 0xd5, 0x55, 0x1e, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x4f, 0xae,
-	0x1f, 0x61, 0x6d, 0x04, 0x00, 0x00,
+	// 683 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x4f, 0x4f, 0xd4, 0x40,
+	0x1c, 0xdd, 0xb2, 0xfc, 0x9d, 0x05, 0x0d, 0x13, 0x62, 0xba, 0xab, 0x69, 0x37, 0xeb, 0x65, 0x63,
+	0xa4, 0x05, 0x4c, 0xd4, 0x78, 0x63, 0x57, 0x0f, 0x24, 0x46, 0xb1, 0x92, 0x98, 0x78, 0xb0, 0x99,
+	0xb6, 0xc3, 0xee, 0x48, 0x3b, 0x53, 0x77, 0xa6, 0x50, 0xf8, 0x14, 0x78, 0xf0, 0x60, 0xe2, 0x27,
+	0xf0, 0xec, 0xc5, 0x6f, 0xc0, 0x91, 0x78, 0xf2, 0x04, 0x06, 0xbe, 0x85, 0x27, 0xd3, 0xe9, 0x14,
+	0x16, 0x2c, 0x64, 0x39, 0xed, 0xce, 0xfc, 0x7e, 0x6f, 0xde, 0xfb, 0xbd, 0xdf, 0x4b, 0x81, 0x41,
+	0x52, 0x66, 0xfb, 0x21, 0x22, 0x11, 0xb7, 0xb7, 0x97, 0x3d, 0x2c, 0xd0, 0xb2, 0x8d, 0x12, 0xd1,
+	0xdf, 0xb3, 0xe2, 0x01, 0x13, 0x0c, 0x42, 0x92, 0x32, 0x2b, 0xaf, 0x5b, 0xaa, 0xde, 0x58, 0xe8,
+	0xb1, 0x1e, 0x93, 0x65, 0x3b, 0xfb, 0x97, 0x77, 0x36, 0xea, 0x3e, 0xe3, 0x11, 0xe3, 0x6e, 0x5e,
+	0xc8, 0x0f, 0xaa, 0x64, 0xf6, 0x18, 0xeb, 0x85, 0xd8, 0x96, 0x27, 0x2f, 0xd9, 0xb4, 0x05, 0x89,
+	0x30, 0x17, 0x28, 0x8a, 0x55, 0x83, 0x91, 0xb7, 0xdb, 0x1e, 0xe2, 0xf8, 0x4c, 0x86, 0xcf, 0x08,
+	0x2d, 0x1e, 0x28, 0x51, 0xa9, 0x44, 0x5d, 0xd3, 0x30, 0x24, 0xa1, 0xf5, 0x59, 0x03, 0xfa, 0xdb,
+	0xc4, 0x8b, 0x88, 0xe8, 0x66, 0x5d, 0xab, 0x89, 0xe8, 0xb3, 0x01, 0xd9, 0x43, 0x82, 0x30, 0x0a,
+	0x17, 0xc0, 0x04, 0x0a, 0x22, 0x42, 0x75, 0xad, 0xa9, 0xb5, 0x67, 0x9c, 0xfc, 0x00, 0x5f, 0x82,
+	0x9a, 0xcf, 0x28, 0x17, 0x03, 0x44, 0xa8, 0xe0, 0xfa, 0x58, 0xb3, 0xda, 0xae, 0xad, 0x3c, 0xb0,
+	0xfe, 0x37, 0xc4, 0x1a, 0x7a, 0xb8, 0x7b, 0x8e, 0x70, 0x86, 0xe1, 0xcf, 0xe6, 0x7f, 0xfd, 0x58,
+	0x9c, 0xbb, 0x40, 0xdb, 0xfa, 0x00, 0xee, 0x94, 0x23, 0xe1, 0x7d, 0x30, 0xe7, 0xb3, 0x30, 0xc4,
+	0x7e, 0xd6, 0xe7, 0x92, 0x40, 0x09, 0x9b, 0x3d, 0xbf, 0x5c, 0x0b, 0xa0, 0x09, 0x6a, 0xa8, 0x87,
+	0xa9, 0x70, 0x3f, 0x25, 0x4c, 0x20, 0x7d, 0xac, 0xa9, 0xb5, 0xc7, 0x1d, 0x20, 0xaf, 0xde, 0x64,
+	0x37, 0xad, 0x2f, 0x1a, 0x68, 0xbc, 0xd8, 0x46, 0x61, 0x82, 0x04, 0x1e, 0x79, 0xea, 0x57, 0x65,
+	0x53, 0x3f, 0x2c, 0x9b, 0xfa, 0xc2, 0xd3, 0x37, 0x99, 0xfb, 0xe7, 0x18, 0xd0, 0xaf, 0x02, 0x8f,
+	0x36, 0xfa, 0x5d, 0x30, 0x23, 0xc5, 0xb8, 0x24, 0xc8, 0x25, 0xce, 0x38, 0xd3, 0xf2, 0x62, 0x2d,
+	0xe0, 0x97, 0x7d, 0xa9, 0x5e, 0xf6, 0x05, 0xae, 0x82, 0x9a, 0x87, 0x37, 0xd9, 0x00, 0xbb, 0x01,
+	0x12, 0x58, 0x1f, 0x6f, 0x6a, 0xed, 0xda, 0x4a, 0xc3, 0xca, 0x43, 0x6a, 0x15, 0x21, 0xb5, 0x36,
+	0x8a, 0x90, 0x76, 0xc6, 0xf7, 0x8f, 0x4d, 0xcd, 0x01, 0x39, 0xe8, 0x39, 0x12, 0x18, 0xee, 0x80,
+	0xf9, 0x08, 0xa5, 0xae, 0x9f, 0x70, 0xc1, 0x22, 0x17, 0x45, 0x2c, 0xa1, 0x42, 0x07, 0xd2, 0xab,
+	0xba, 0xa5, 0x82, 0x97, 0x85, 0xf9, 0xcc, 0xac, 0x2e, 0x23, 0xb4, 0xb3, 0x74, 0x70, 0x64, 0x56,
+	0xbe, 0x1f, 0x9b, 0xed, 0x1e, 0x11, 0xfd, 0xc4, 0xb3, 0x7c, 0x16, 0xa9, 0x94, 0xaa, 0x9f, 0x45,
+	0x1e, 0x6c, 0xd9, 0x62, 0x37, 0xc6, 0x5c, 0x02, 0xb8, 0x73, 0x3b, 0x42, 0x69, 0x57, 0x92, 0xac,
+	0x4a, 0x8e, 0xd6, 0x57, 0x0d, 0xdc, 0x7b, 0x47, 0x44, 0x3f, 0x18, 0xa0, 0x9d, 0x75, 0xb4, 0x1b,
+	0x61, 0x2a, 0x46, 0xd9, 0xea, 0x7a, 0xd9, 0x56, 0xad, 0xb2, 0xad, 0x5e, 0x7a, 0xfc, 0x26, 0x7b,
+	0xfd, 0x56, 0x05, 0x8d, 0xab, 0xe1, 0xb0, 0x0e, 0xa6, 0x8b, 0xa5, 0x29, 0x71, 0x53, 0x6a, 0x67,
+	0xf0, 0x23, 0x98, 0x24, 0x34, 0x4e, 0xce, 0x94, 0xd5, 0xcb, 0x94, 0xad, 0x65, 0x1d, 0x9d, 0x27,
+	0x99, 0x87, 0x7f, 0x8f, 0x4c, 0xfb, 0x5a, 0x0f, 0x53, 0xdb, 0x43, 0xb4, 0xb0, 0x52, 0x02, 0x1d,
+	0xc5, 0x00, 0x29, 0x98, 0x62, 0x89, 0x90, 0x64, 0x55, 0x49, 0xd6, 0x28, 0x23, 0x7b, 0x2d, 0x5b,
+	0x3a, 0x4f, 0x15, 0xdb, 0xd2, 0xe8, 0x6c, 0x39, 0xd2, 0x29, 0x48, 0x60, 0x07, 0xcc, 0xc6, 0xb9,
+	0x19, 0x6e, 0xd6, 0x20, 0xe3, 0x76, 0x6b, 0xc5, 0x2c, 0x23, 0x55, 0xa6, 0x6d, 0xec, 0xc6, 0xd8,
+	0xa9, 0xc5, 0xe7, 0x07, 0xd8, 0x05, 0xb3, 0x03, 0x1c, 0x62, 0xc4, 0x55, 0x64, 0x27, 0x46, 0x8c,
+	0x6c, 0x4d, 0xa1, 0xb2, 0xcc, 0x76, 0xd6, 0x0f, 0x4e, 0x0c, 0xed, 0xf0, 0xc4, 0xd0, 0xfe, 0x9c,
+	0x18, 0xda, 0xfe, 0xa9, 0x51, 0x39, 0x3c, 0x35, 0x2a, 0xbf, 0x4f, 0x8d, 0xca, 0xfb, 0xc7, 0x43,
+	0xd3, 0x91, 0x94, 0x6d, 0xb2, 0x84, 0x06, 0x72, 0xa5, 0xd9, 0x69, 0xd1, 0x0b, 0x99, 0xbf, 0xe5,
+	0xf7, 0x11, 0xa1, 0x76, 0x5a, 0x7c, 0x63, 0xe5, 0xa8, 0xde, 0xa4, 0x24, 0x7e, 0xf4, 0x2f, 0x00,
+	0x00, 0xff, 0xff, 0xf0, 0x98, 0x7e, 0xb2, 0x45, 0x06, 0x00, 0x00,
 }
 
 func (m *SubmitClaimAuthorization) Marshal() (dAtA []byte, err error) {
@@ -599,7 +656,7 @@ func (m *EvaluateClaimConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *WithdrawAuthorization) Marshal() (dAtA []byte, err error) {
+func (m *WithdrawPaymentAuthorization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -609,12 +666,12 @@ func (m *WithdrawAuthorization) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WithdrawAuthorization) MarshalTo(dAtA []byte) (int, error) {
+func (m *WithdrawPaymentAuthorization) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WithdrawAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *WithdrawPaymentAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -643,7 +700,7 @@ func (m *WithdrawAuthorization) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *WithdrawConstraints) Marshal() (dAtA []byte, err error) {
+func (m *WithdrawPaymentConstraints) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -653,16 +710,66 @@ func (m *WithdrawConstraints) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WithdrawConstraints) MarshalTo(dAtA []byte) (int, error) {
+func (m *WithdrawPaymentConstraints) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WithdrawConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *WithdrawPaymentConstraints) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if m.ReleaseDate != nil {
+		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ReleaseDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ReleaseDate):])
+		if err2 != nil {
+			return 0, err2
+		}
+		i -= n2
+		i = encodeVarintAuthz(dAtA, i, uint64(n2))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.PaymentType != 0 {
+		i = encodeVarintAuthz(dAtA, i, uint64(m.PaymentType))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Outputs) > 0 {
+		for iNdEx := len(m.Outputs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Outputs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintAuthz(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.Inputs) > 0 {
+		for iNdEx := len(m.Inputs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Inputs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintAuthz(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.ClaimId) > 0 {
+		i -= len(m.ClaimId)
+		copy(dAtA[i:], m.ClaimId)
+		i = encodeVarintAuthz(dAtA, i, uint64(len(m.ClaimId)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -763,7 +870,7 @@ func (m *EvaluateClaimConstraints) Size() (n int) {
 	return n
 }
 
-func (m *WithdrawAuthorization) Size() (n int) {
+func (m *WithdrawPaymentAuthorization) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -782,12 +889,35 @@ func (m *WithdrawAuthorization) Size() (n int) {
 	return n
 }
 
-func (m *WithdrawConstraints) Size() (n int) {
+func (m *WithdrawPaymentConstraints) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.ClaimId)
+	if l > 0 {
+		n += 1 + l + sovAuthz(uint64(l))
+	}
+	if len(m.Inputs) > 0 {
+		for _, e := range m.Inputs {
+			l = e.Size()
+			n += 1 + l + sovAuthz(uint64(l))
+		}
+	}
+	if len(m.Outputs) > 0 {
+		for _, e := range m.Outputs {
+			l = e.Size()
+			n += 1 + l + sovAuthz(uint64(l))
+		}
+	}
+	if m.PaymentType != 0 {
+		n += 1 + sovAuthz(uint64(m.PaymentType))
+	}
+	if m.ReleaseDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.ReleaseDate)
+		n += 1 + l + sovAuthz(uint64(l))
+	}
 	return n
 }
 
@@ -1333,7 +1463,7 @@ func (m *EvaluateClaimConstraints) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WithdrawAuthorization) Unmarshal(dAtA []byte) error {
+func (m *WithdrawPaymentAuthorization) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1356,10 +1486,10 @@ func (m *WithdrawAuthorization) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WithdrawAuthorization: wiretype end group for non-group")
+			return fmt.Errorf("proto: WithdrawPaymentAuthorization: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WithdrawAuthorization: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: WithdrawPaymentAuthorization: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1423,7 +1553,7 @@ func (m *WithdrawAuthorization) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Constraints = append(m.Constraints, &WithdrawConstraints{})
+			m.Constraints = append(m.Constraints, &WithdrawPaymentConstraints{})
 			if err := m.Constraints[len(m.Constraints)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1449,7 +1579,7 @@ func (m *WithdrawAuthorization) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WithdrawConstraints) Unmarshal(dAtA []byte) error {
+func (m *WithdrawPaymentConstraints) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1472,12 +1602,167 @@ func (m *WithdrawConstraints) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WithdrawConstraints: wiretype end group for non-group")
+			return fmt.Errorf("proto: WithdrawPaymentConstraints: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WithdrawConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: WithdrawPaymentConstraints: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClaimId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClaimId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Inputs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Inputs = append(m.Inputs, github_com_cosmos_cosmos_sdk_x_bank_types.Input{})
+			if err := m.Inputs[len(m.Inputs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Outputs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Outputs = append(m.Outputs, github_com_cosmos_cosmos_sdk_x_bank_types.Output{})
+			if err := m.Outputs[len(m.Outputs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PaymentType", wireType)
+			}
+			m.PaymentType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PaymentType |= PaymentType(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ReleaseDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAuthz
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ReleaseDate == nil {
+				m.ReleaseDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.ReleaseDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipAuthz(dAtA[iNdEx:])
