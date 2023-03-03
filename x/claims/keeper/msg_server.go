@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ixo "github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/claims/types"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
@@ -303,25 +303,53 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 	if msg.AgentAddress != collection.Admin && !entity.HasController(iidtypes.DID(msg.AgentDid.Did())) {
 		// check if user has authz cap, aka is agent
 		isAuthorized := false
+		grantee := sdk.AccAddress(msg.AgentAddress)
+		granter := sdk.AccAddress(collection.Admin)
+
+		// get users current SubmitClaimAuthorization authorization
+		authSC, _ := s.AuthzKeeper.GetCleanAuthorization(ctx, grantee, granter, sdk.MsgTypeURL(&types.MsgSubmitClaim{}))
+		// get users current EvaluateClaimAuthorization authorization
+		authEC, _ := s.AuthzKeeper.GetCleanAuthorization(ctx, grantee, granter, sdk.MsgTypeURL(&types.MsgEvaluateClaim{}))
+
 		authorizations := s.AuthzKeeper.GetAuthorizations(ctx, sdk.AccAddress(msg.AgentAddress), sdk.AccAddress(collection.Admin))
-		for _, auth := range authorizations {
-			switch k := auth.(type) {
+		// return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "test test %s; %s; %s", authorizations, authSC, authEC)
+
+		if authSC != nil {
+			// return nil, fmt.Errorf("existing Authorizations for route is not of type SubmitClaimAuthorization")
+			switch k := authSC.(type) {
 			case *types.SubmitClaimAuthorization:
-				// check if there a constraint that has collectionId of disputed subjectId(claim)
 				for _, con := range k.Constraints {
+					if isAuthorized {
+						break
+					}
 					if con.CollectionId == collection.Id {
 						isAuthorized = true
+						break
 					}
 				}
-			case *types.EvaluateClaimAuthorization:
-				// check if there a constraint that has collectionId or claimId of disputed subjectId(claim)
-				for _, con := range k.Constraints {
-					if con.CollectionId == collection.Id || ixo.Contains(con.ClaimIds, claim.ClaimId) {
-						isAuthorized = true
-					}
-				}
+			default:
+				return nil, fmt.Errorf("existing Authorizations for route is not of type SubmitClaimAuthorization")
 			}
 		}
+
+		if authEC != nil {
+			// return nil, fmt.Errorf("existing Authorizations for route is not of type EvaluateClaimAuthorization")
+			switch k := authEC.(type) {
+			case *types.EvaluateClaimAuthorization:
+				for _, con := range k.Constraints {
+					if isAuthorized {
+						break
+					}
+					if con.CollectionId == collection.Id || ixo.Contains(con.ClaimIds, claim.ClaimId) {
+						isAuthorized = true
+						break
+					}
+				}
+			default:
+				return nil, fmt.Errorf("existing Authorizations for route is not of type EvaluateClaimAuthorization")
+			}
+		}
+
 		if !isAuthorized {
 			return nil, types.ErrDisputeUnauthorized
 		}

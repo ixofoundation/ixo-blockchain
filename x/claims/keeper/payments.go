@@ -29,7 +29,7 @@ func processPayment(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, azk authzke
 		return nil
 	}
 
-	// TODO not sure of needed as authz can still be created even if sender has no fees
+	// TODO not sure if needed as authz can still be created even if sender has no fees
 	// check that sender has enough tokens to make the payment
 	// if !types.HasBalances(ctx, bk, sdk.AccAddress(payment.Account), payment.Amount) {
 	// 	return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "sender has insufficient funds")
@@ -60,14 +60,14 @@ func processPayment(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, azk authzke
 		if !exists {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "relayer node did doesn't exist for did %s", entity.RelayerNode)
 		}
-		relayerAddr, err := relayerDidDoc.GetVerificationMethodBlockchainAddress(relayerDidDoc.String())
+		relayerAddr, err := relayerDidDoc.GetVerificationMethodBlockchainAddress(entity.RelayerNode)
 		if err != nil {
 			return sdkerrors.Wrapf(err, "address not found in iid doc for %s", entity.RelayerNode)
 		}
 
 		// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
-		nodeFeePercentage := k.GetParams(ctx).NodeFeePercentage
-		ixoFeePercentage := k.GetParams(ctx).NetworkFeePercentage
+		nodeFeePercentage := params.NodeFeePercentage
+		ixoFeePercentage := params.NetworkFeePercentage
 		// check that the 2 preset percentages dont go over 100%
 		if nodeFeePercentage.Add(ixoFeePercentage).GT(types.OneHundred) {
 			return types.ErrPaymentPresetPercentagesOverflow
