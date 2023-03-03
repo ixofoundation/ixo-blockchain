@@ -2572,7 +2572,6 @@ Msg defines the Msg service.
 | type | [string](#string) |  |  |
 | id | [string](#string) |  |  |
 | description | [string](#string) |  |  |
-| mediaType | [string](#string) |  |  |
 | serviceEndpoint | [string](#string) |  |  |
 | proof | [string](#string) |  |  |
 | encrypted | [string](#string) |  |  |
@@ -2806,7 +2805,7 @@ EntityCreatedEvent is an event triggered on a Entity creation
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
-| owner | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
 
 
 
@@ -2839,7 +2838,7 @@ EntityUpdatedEvent is an event triggered on a entity document update
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | entity | [Entity](#ixo.entity.v1beta1.Entity) |  |  |
-| owner | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
 
 
 
@@ -2856,7 +2855,7 @@ document update
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  |  |
-| owner | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
 | entity_verified | [bool](#bool) |  |  |
 
 

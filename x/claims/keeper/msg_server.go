@@ -146,6 +146,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			Rejection:  types.PaymentStatus_no_payment,
 		},
 	}
+
 	s.Keeper.SetClaim(ctx, claim)
 
 	// update count for collection and persist

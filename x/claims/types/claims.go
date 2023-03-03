@@ -60,8 +60,8 @@ func IsValidDispute(dispute *Dispute) bool {
 
 func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.AccAddress,
 	requiredFunds sdk.Coins) bool {
-	for _, reqCoin := range requiredFunds {
-		if !bankKeeper.HasBalance(ctx, payerAddr, reqCoin) {
+	for _, coin := range requiredFunds {
+		if !bankKeeper.HasBalance(ctx, payerAddr, coin) {
 			return false
 		}
 	}

@@ -29,10 +29,11 @@ func processPayment(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, azk authzke
 		return nil
 	}
 
+	// TODO not sure of needed as authz can still be created even if sender has no fees
 	// check that sender has enough tokens to make the payment
-	if !types.HasBalances(ctx, bk, sdk.AccAddress(payment.Account), payment.Amount) {
-		return sdkerrors.Wrap(sdkerrors.ErrInsufficientFunds, "sender has insufficient funds")
-	}
+	// if !types.HasBalances(ctx, bk, sdk.AccAddress(payment.Account), payment.Amount) {
+	// 	return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "sender has insufficient funds")
+	// }
 
 	// get claim and collection payment is for
 	claim, err := k.GetClaim(ctx, claimId)
@@ -109,7 +110,7 @@ func processPayment(ctx sdk.Context, k Keeper, bk bankkeeper.Keeper, azk authzke
 	} else {
 		// else create authz WithdrawPaymentAuthorization for receiver to execute to receive payout once timout has passed
 		if err := createAuthz(ctx, k, azk, receiver, sdk.AccAddress(collection.Admin), inputs, outputs, paymentType, claimId, payment.TimeoutNs); err != nil {
-			return nil
+			return err
 		}
 	}
 

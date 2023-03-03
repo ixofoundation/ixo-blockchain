@@ -424,22 +424,21 @@ func NewDeleteLinkedResourceCmd() *cobra.Command {
 
 func NewAddLinkedClaimCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add-linked-claim [id] [claim-id] [type] [description] [media-type] [service-endpoint] [proof] [encrypted] [privacy]",
+		Use:   "add-linked-claim [id] [claim-id] [type] [description] [service-endpoint] [proof] [encrypted] [privacy]",
 		Short: "add a linked claim to an iid document",
-		Args:  cobra.ExactArgs(9),
+		Args:  cobra.ExactArgs(8),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			id, claimId, serviceType, desc, mediaType, endpoint, proof, encrypted, privacy := args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
+			id, claimId, serviceType, desc, endpoint, proof, encrypted, privacy := args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]
 
 			claim := types.NewLinkedClaim(
 				claimId,
 				serviceType,
 				desc,
-				mediaType,
 				endpoint,
 				proof,
 				encrypted,

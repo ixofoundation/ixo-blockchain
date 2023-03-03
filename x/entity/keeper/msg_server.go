@@ -123,7 +123,10 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
 		iidtypes.NewIidDocumentCreatedEvent(&did),
-		types.NewEntityCreatedEvent(&entity, msg.OwnerDid.Did()),
+		&types.EntityCreatedEvent{
+			Entity: &entity,
+			Signer: msg.OwnerDid.Did(),
+		},
 	); err != nil {
 		return nil, err
 	}
@@ -164,7 +167,10 @@ func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntit
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityUpdatedEvent(&entity, msg.ControllerDid.String()),
+		&types.EntityUpdatedEvent{
+			Entity: &entity,
+			Signer: msg.ControllerDid.Did(),
+		},
 	); err != nil {
 		return nil, err
 	}
@@ -253,7 +259,11 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityTransferredEvent(msg.Id, msg.OwnerDid.Did(), msg.RecipientDid.Did()),
+		&types.EntityTransferredEvent{
+			Id:   msg.Id,
+			To:   msg.OwnerDid.Did(),
+			From: msg.RecipientDid.Did(),
+		},
 	); err != nil {
 		return nil, err
 	}
@@ -269,32 +279,26 @@ func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpd
 		return nil, err
 	}
 
-	if msg.RelayerNodeDid.String() != entity.RelayerNode {
+	if msg.RelayerNodeDid.Did() != entity.RelayerNode {
 		return nil, sdkerrors.Wrapf(types.ErrUpdateVerifiedFailed, "invalid relayer node did (%s)", msg.RelayerNodeDid.String())
 	}
 
 	entity.EntityVerified = msg.EntityVerified
-
-	// if err := iidkeeper.ExecuteOnDidWithRelationships(
-	// 	ctx,
-	// 	&s.Keeper.IidKeeper,
-	// 	[]string{iidtypes.Authentication},
-	// 	msg.Id,
-	// 	msg.RelayerNodeDid.Did(),
-	// 	func(didDoc *iidtypes.IidDocument) error {
-	// 		entity.EntityVerified = msg.EntityVerified
-	// 		return nil
-	// 	}); err != nil {
-	// 	return nil, err
-	// }
 
 	types.UpdateEntityMetadata(entity.Metadata, ctx.TxBytes(), ctx.BlockTime())
 	s.Keeper.SetEntity(ctx, []byte(entity.Id), entity)
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
-		types.NewEntityUpdatedEvent(&entity, msg.RelayerNodeDid.String()),
-		types.NewEntityVerifiedUpdatedEvent(msg.Id, msg.RelayerNodeDid.String(), msg.EntityVerified),
+		&types.EntityUpdatedEvent{
+			Entity: &entity,
+			Signer: msg.RelayerNodeDid.Did(),
+		},
+		&types.EntityVerifiedUpdatedEvent{
+			Id:             msg.Id,
+			Signer:         msg.RelayerNodeDid.Did(),
+			EntityVerified: msg.EntityVerified,
+		},
 	); err != nil {
 		return nil, err
 	}

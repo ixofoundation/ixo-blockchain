@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 )
 
 var (
@@ -23,11 +22,11 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(collectionSequence uint64, ixoDid didexported.Did,
+func NewParams(collectionSequence uint64, ixoAccount string,
 	networkFeePercentage, nodeFeePercentage sdk.Dec) Params {
 	return Params{
 		CollectionSequence:   collectionSequence,
-		IxoAccount:           ixoDid,
+		IxoAccount:           ixoAccount,
 		NetworkFeePercentage: networkFeePercentage,
 		NodeFeePercentage:    nodeFeePercentage,
 	}
@@ -35,10 +34,10 @@ func NewParams(collectionSequence uint64, ixoDid didexported.Did,
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	defaultIxoDid := didexported.Did("did:ixo:U4tSpzzv91HHqWW1YmFkHJ")
+	defaultIxoAccount := "ixo1y0d7w5xfj9a0p7ygpx0uwvyrnmmqj3fd4sva7t"
 	tenPercentFee := sdk.NewDec(10)
 
-	return NewParams(0, defaultIxoDid, tenPercentFee, tenPercentFee)
+	return NewParams(1, defaultIxoAccount, tenPercentFee, tenPercentFee)
 }
 
 // ParamSetPairs get the params.ParamSet

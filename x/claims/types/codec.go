@@ -14,6 +14,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSubmitClaim{}, "claims/SubmitClaim", nil)
 	cdc.RegisterConcrete(&MsgEvaluateClaim{}, "claims/EvaluateClaim", nil)
 	cdc.RegisterConcrete(&MsgDisputeClaim{}, "claims/DisputeClaim", nil)
+	cdc.RegisterConcrete(&MsgWithdrawPayment{}, "claims/WithdrawPayment", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -22,12 +23,14 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgSubmitClaim{},
 		&MsgEvaluateClaim{},
 		&MsgDisputeClaim{},
+		&MsgWithdrawPayment{},
 	)
 
 	registry.RegisterImplementations(
 		(*authz.Authorization)(nil),
 		&SubmitClaimAuthorization{},
 		&EvaluateClaimAuthorization{},
+		&WithdrawPaymentAuthorization{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

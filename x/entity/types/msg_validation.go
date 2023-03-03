@@ -68,10 +68,13 @@ func (msg MsgUpdateEntity) ValidateBasic() error {
 func (msg MsgUpdateEntityVerified) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.RelayerNodeAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid relayer node address %s", msg.RelayerNodeAddress)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+	}
+	if !iidtypes.IsValidDID(string(msg.RelayerNodeDid)) {
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNodeDid.String())
 	}
 	return nil
 }

@@ -584,7 +584,6 @@ func (didDoc *IidDocument) setRelationships(methodID string, relationships ...Ve
 // GetVerificationMethodBlockchainAddress returns the verification method cosmos blockchain address of a verification method.
 // it fails if the verification method is not supported or if the verification method is not found
 func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string) (sdk.AccAddress, error) {
-
 	// switch m := verificationMethod.GetVerificationMaterial().(type) {
 	// case *iidtypes.VerificationMethod_PublicKeyHex:
 
@@ -1145,12 +1144,11 @@ func NewLinkedResource(id string, resourceType string, description string, media
 	}
 }
 
-func NewLinkedClaim(id string, claimType string, description string, mediaType string, serviceEndpoint string, proof string, encrypted string, privacy string) *LinkedClaim {
+func NewLinkedClaim(id string, claimType string, description string, serviceEndpoint string, proof string, encrypted string, privacy string) *LinkedClaim {
 	return &LinkedClaim{
 		Type:            claimType,
 		Id:              id,
 		Description:     description,
-		MediaType:       mediaType,
 		ServiceEndpoint: serviceEndpoint,
 		Proof:           proof,
 		Encrypted:       encrypted,

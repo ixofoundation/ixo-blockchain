@@ -46,11 +46,10 @@ message LinkedClaim {
   string type = 1;
   string id = 2;
   string description = 3;
-  string mediaType = 4;
-  string serviceEndpoint = 5;
-  string proof = 6;
-  string encrypted = 7;
-  string right = 8;
+  string serviceEndpoint = 4;
+  string proof = 5;
+  string encrypted = 6;
+  string right = 7;
 }
 
 message LinkedEntity {

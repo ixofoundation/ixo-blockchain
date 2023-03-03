@@ -12,7 +12,7 @@ message EntityCreatedEvent {
   option (gogoproto.goproto_getters) = false;
 
   Entity entity = 1;
-  string owner = 2;
+  string signer = 2;
 }
 
 // EntityUpdatedEvent is an event triggered on a entity document update
@@ -21,7 +21,7 @@ message EntityUpdatedEvent {
   option (gogoproto.goproto_getters) = false;
 
   Entity entity = 1;
-  string owner = 2;
+  string signer = 2;
 }
 
 // EntityVerifiedUpdatedEvent is an event triggered on a entity verified
@@ -31,7 +31,7 @@ message EntityVerifiedUpdatedEvent {
   option (gogoproto.goproto_getters) = false;
 
   string id = 1;
-  string owner = 2;
+  string signer = 2;
   bool entity_verified = 3;
 }
 

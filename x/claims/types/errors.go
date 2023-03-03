@@ -19,7 +19,7 @@ var (
 
 	ErrDisputeNotFound     = sdkerrors.Register(ModuleName, 1200, "dispute not found")
 	ErrDisputeDuplicate    = sdkerrors.Register(ModuleName, 1201, "dispute with proof already exists")
-	ErrDisputeUnauthorized = sdkerrors.Register(ModuleName, 1200, "unauthorized, not part of collection/entity/authz agent")
+	ErrDisputeUnauthorized = sdkerrors.Register(ModuleName, 1202, "unauthorized, not part of collection/entity/authz agent")
 
 	ErrEvaluateWrongCollection = sdkerrors.Register(ModuleName, 1300, "evaluation claim and collection does not match")
 

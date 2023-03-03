@@ -148,7 +148,7 @@ func NewCmdUpdateEntity() *cobra.Command {
 
 func NewCmdUpdateEntityVerified() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-entity-verified [id] [verified] [relayer-did]",
+		Use:   "update-entity-verified [id] [relayer-did] [verified]",
 		Short: "Update if an Entity is verified, only the relayer-node can verify",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
