@@ -45,7 +45,7 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	var collection types.Collection
 	// only create colelction if admin/signer has auth on entity iid doc
 	if err := iidkeeper.ExecuteOnDidWithRelationships(
-		ctx, &s.IidKeeper,
+		ctx, &s.Keeper.IidKeeper,
 		[]string{iidtypes.Authentication},
 		msg.Entity, msg.Admin,
 		func(didDoc *iidtypes.IidDocument) error {
@@ -103,6 +103,12 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 
 	// Get Collection for claim
 	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get agent address
+	agent, err := sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +172,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 	}
 
 	// start payout process for claim submission
-	if err = processPayment(ctx, s.Keeper, s.bankKeeper, s.AuthzKeeper, sdk.AccAddress(msg.AgentAddress), collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId); err != nil {
+	if err = processPayment(ctx, s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId); err != nil {
 		return nil, err
 	}
 
@@ -206,6 +212,18 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
+	// Get evaluation agent address
+	evalAgent, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get claim agent address
+	claimAgent, err := sdk.AccAddressFromBech32(claim.AgentAddress)
+	if err != nil {
+		return nil, err
+	}
+
 	// create and persist the Evaluation
 	evaluationDate := ctx.BlockTime()
 	evaluation := types.Evaluation{
@@ -224,7 +242,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	s.Keeper.SetClaim(ctx, claim)
 
 	// start payout process for evaluation submission
-	if err = processPayment(ctx, s.Keeper, s.bankKeeper, s.AuthzKeeper, sdk.AccAddress(msg.AgentAddress), collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
+	if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
 		return nil, err
 	}
 
@@ -238,7 +256,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		if !msg.Amount.IsZero() {
 			approvedPayment.Amount = msg.Amount
 		}
-		if err = processPayment(ctx, s.Keeper, s.bankKeeper, s.AuthzKeeper, sdk.AccAddress(claim.AgentAddress), approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
+		if err = processPayment(ctx, s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_rejected {
@@ -303,50 +321,37 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 	if msg.AgentAddress != collection.Admin && !entity.HasController(iidtypes.DID(msg.AgentDid.Did())) {
 		// check if user has authz cap, aka is agent
 		isAuthorized := false
-		grantee := sdk.AccAddress(msg.AgentAddress)
-		granter := sdk.AccAddress(collection.Admin)
-
-		// get users current SubmitClaimAuthorization authorization
-		authSC, _ := s.AuthzKeeper.GetCleanAuthorization(ctx, grantee, granter, sdk.MsgTypeURL(&types.MsgSubmitClaim{}))
-		// get users current EvaluateClaimAuthorization authorization
-		authEC, _ := s.AuthzKeeper.GetCleanAuthorization(ctx, grantee, granter, sdk.MsgTypeURL(&types.MsgEvaluateClaim{}))
-
-		authorizations := s.AuthzKeeper.GetAuthorizations(ctx, sdk.AccAddress(msg.AgentAddress), sdk.AccAddress(collection.Admin))
-		// return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "test test %s; %s; %s", authorizations, authSC, authEC)
-
-		if authSC != nil {
-			// return nil, fmt.Errorf("existing Authorizations for route is not of type SubmitClaimAuthorization")
-			switch k := authSC.(type) {
-			case *types.SubmitClaimAuthorization:
-				for _, con := range k.Constraints {
-					if isAuthorized {
-						break
-					}
-					if con.CollectionId == collection.Id {
-						isAuthorized = true
-						break
-					}
-				}
-			default:
-				return nil, fmt.Errorf("existing Authorizations for route is not of type SubmitClaimAuthorization")
-			}
+		grantee, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+		if err != nil {
+			return nil, err
+		}
+		granter, err := sdk.AccAddressFromBech32(collection.Admin)
+		if err != nil {
+			return nil, err
 		}
 
-		if authEC != nil {
-			// return nil, fmt.Errorf("existing Authorizations for route is not of type EvaluateClaimAuthorization")
-			switch k := authEC.(type) {
-			case *types.EvaluateClaimAuthorization:
+		// get users current authorization to see if user is agent for claim/collection
+		authorizations := s.Keeper.AuthzKeeper.GetAuthorizations(ctx, grantee, granter)
+
+		for _, auth := range authorizations {
+			if isAuthorized {
+				break
+			}
+			switch k := auth.(type) {
+			case *types.SubmitClaimAuthorization:
+				// check if there a constraint that has collectionId of disputed subjectId(claim)
 				for _, con := range k.Constraints {
-					if isAuthorized {
-						break
-					}
-					if con.CollectionId == collection.Id || ixo.Contains(con.ClaimIds, claim.ClaimId) {
+					if con.CollectionId == collection.Id {
 						isAuthorized = true
-						break
 					}
 				}
-			default:
-				return nil, fmt.Errorf("existing Authorizations for route is not of type EvaluateClaimAuthorization")
+			case *types.EvaluateClaimAuthorization:
+				// check if there a constraint that has collectionId or claimId of disputed subjectId(claim)
+				for _, con := range k.Constraints {
+					if con.CollectionId == collection.Id || ixo.Contains(con.ClaimIds, claim.ClaimId) {
+						isAuthorized = true
+					}
+				}
 			}
 		}
 
@@ -397,7 +402,7 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
-	err = payout(ctx, s.Keeper, s.bankKeeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate)
+	err = payout(ctx, s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate)
 	if err != nil {
 		return nil, err
 	}

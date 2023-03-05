@@ -5201,7 +5201,7 @@ immidiate direct payment </p></td>
                   <td>before_date</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>if zero then no before_date validation done </p></td>
+                  <td><p>if null then no before_date validation done </p></td>
                 </tr>
               
                 <tr>
@@ -5356,7 +5356,7 @@ accordingly </p></td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
                   <td><p>date that grantee can execute authorization, calculated from created date
-plus the timeout on Collection payments </p></td>
+plus the timeout on Collection payments, if null then none </p></td>
                 </tr>
               
             </tbody>

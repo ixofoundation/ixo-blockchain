@@ -66,7 +66,7 @@ func (a SubmitClaimAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.Ac
 
 	// state indicating if there was a auth constraint that matched msgSubmitClaim fields
 	var matched bool
-	unhandledConstraints := []*SubmitClaimConstraints{}
+	var unhandledConstraints []*SubmitClaimConstraints
 
 	// check all constraints if the msg fields correlates to a granted constraint
 	for _, constraint := range a.Constraints {
@@ -156,13 +156,13 @@ func (a EvaluateClaimAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.
 
 	// state indicating if there was an auth constraint that matched msgEvaluateClaim fields
 	var matched bool
-	unhandledConstraints := []*EvaluateClaimConstraints{}
+	var unhandledConstraints []*EvaluateClaimConstraints
 
 	// check all constraints if the msg fields correlates to a granted constraint
 	for _, constraint := range a.Constraints {
 		// if before_date is not zero(no validation) and is in the past then remove authZ constraint by not adding into unhandledConstraints,
 		// same for when quota is 0, which should not get in constraints but adding extra check
-		if (!constraint.BeforeDate.IsZero() && constraint.BeforeDate.Before(ctx.BlockTime())) || constraint.AgentQuota == 0 {
+		if (constraint.BeforeDate != nil && constraint.BeforeDate.Before(ctx.BlockTime())) || constraint.AgentQuota == 0 {
 			continue
 		}
 		// If the msg fields dont correlate to granted constraint, add constraint back into list
@@ -295,7 +295,7 @@ func (a WithdrawPaymentAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (auth
 
 	// state indicating if there was an auth constraint that matched msgWithdrawPayment fields
 	var matched bool
-	unhandledConstraints := []*WithdrawPaymentConstraints{}
+	var unhandledConstraints []*WithdrawPaymentConstraints
 
 	// check all constraints if the msg fields correlates to a granted constraint
 	for _, constraint := range a.Constraints {
@@ -305,8 +305,8 @@ func (a WithdrawPaymentAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (auth
 			continue
 		}
 
-		// check that withdraw has reached release date yet
-		if constraint.ReleaseDate.After(ctx.BlockTime()) {
+		// check that withdraw has reached release date yet if it exists
+		if constraint.ReleaseDate != nil && constraint.ReleaseDate.After(ctx.BlockTime()) {
 			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("constraint release date not reached")
 		}
 
@@ -345,7 +345,7 @@ func (a WithdrawPaymentAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (auth
 				}
 			}
 			if !valid {
-				return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("msg outputs does not match constraint outputs")
+				return authz.AcceptResponse{Accept: false}, sdkerrors.ErrInvalidRequest.Wrapf("msg outputs does not match constraint outputs")
 			}
 		}
 

@@ -38,7 +38,7 @@ message EvaluateClaimConstraints {
   // either collection_id or claim_ids is needed
   repeated string claim_ids = 2;
   uint64 agent_quota = 3;
-  // if zero then no before_date validation done
+  // if null then no before_date validation done
   google.protobuf.Timestamp before_date = 4 [ (gogoproto.stdtime) = true ];
   // max custom amount evaluator can change, if empty list must use amount
   // defined in Token payments
@@ -73,6 +73,6 @@ message WithdrawPaymentConstraints {
   // accordingly
   PaymentType payment_type = 4;
   // date that grantee can execute authorization, calculated from created date
-  // plus the timeout on Collection payments
+  // plus the timeout on Collection payments, if null then none
   google.protobuf.Timestamp release_date = 5 [ (gogoproto.stdtime) = true ];
 }

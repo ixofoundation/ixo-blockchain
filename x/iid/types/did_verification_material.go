@@ -92,9 +92,9 @@ func (baID BlockchainAccountID) MatchAddress(address string) bool {
 // TODO: this function shall return an error for invalid addresses
 func (baID BlockchainAccountID) GetAddress() string {
 	addrStart := strings.LastIndex(string(baID), ":")
-	if addrStart < 0 {
-		return ""
-	}
+	// if addrStart < 0 {
+	// 	return ""
+	// }
 	return string(baID)[addrStart+1:]
 }
 

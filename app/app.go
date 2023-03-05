@@ -296,13 +296,13 @@ type IxoApp struct {
 	// Custom ixo keepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	IidKeeper      iidmodulekeeper.Keeper `json:"iid_keeper"`
-	EntityKeeper   entitykeeper.Keeper    `json:"entity_keeper"`
-	TokenKeeper    tokenkeeper.Keeper     `json:"token_keeper"`
-	BondsKeeper    bondskeeper.Keeper     `json:"bonds_keeper"`
-	PaymentsKeeper paymentskeeper.Keeper  `json:"payments_keeper,omitempty"`
-	ProjectKeeper  projectkeeper.Keeper   `json:"project_keeper"`
-	ClaimsKeeper   claimsmodulekeeper.Keeper
+	IidKeeper      iidmodulekeeper.Keeper    `json:"iid_keeper"`
+	EntityKeeper   entitykeeper.Keeper       `json:"entity_keeper"`
+	TokenKeeper    tokenkeeper.Keeper        `json:"token_keeper"`
+	BondsKeeper    bondskeeper.Keeper        `json:"bonds_keeper"`
+	PaymentsKeeper paymentskeeper.Keeper     `json:"payments_keeper,omitempty"`
+	ProjectKeeper  projectkeeper.Keeper      `json:"project_keeper"`
+	ClaimsKeeper   claimsmodulekeeper.Keeper `json:"claims_keeper"`
 
 	// the module manager
 	mm *module.Manager `json:"mm,omitempty"`
@@ -501,7 +501,6 @@ func NewIxoApp(
 		keys[entitytypes.MemStoreKey],
 		app.IidKeeper,
 		app.WasmKeeper,
-		app.AccountKeeper,
 		app.GetSubspace(entitytypes.ModuleName),
 	)
 
@@ -511,18 +510,15 @@ func NewIxoApp(
 		keys[tokentypes.MemStoreKey],
 		app.IidKeeper,
 		app.WasmKeeper,
-		app.AccountKeeper,
-		app.AuthzKeeper,
 		app.GetSubspace(tokentypes.ModuleName),
 	)
 
-	app.ClaimsKeeper = *claimsmodulekeeper.NewKeeper(
+	app.ClaimsKeeper = claimsmodulekeeper.NewKeeper(
 		appCodec,
 		keys[claimsmoduletypes.StoreKey],
 		keys[claimsmoduletypes.MemStoreKey],
 		app.GetSubspace(claimsmoduletypes.ModuleName),
 		app.IidKeeper,
-		app.AccountKeeper,
 		app.AuthzKeeper,
 		app.BankKeeper,
 		app.EntityKeeper,

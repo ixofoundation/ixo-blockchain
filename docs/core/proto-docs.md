@@ -1823,7 +1823,7 @@ Output models transaction outputs.
 | collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | claim_ids | [string](#string) | repeated | either collection_id or claim_ids is needed |
 | agent_quota | [uint64](#uint64) |  |  |
-| before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if zero then no before_date validation done |
+| before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done |
 | max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty list must use amount defined in Token payments |
 
 
@@ -1891,7 +1891,7 @@ Output models transaction outputs.
 | inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
 | outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
-| release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
+| release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments, if null then none |
 
 
 

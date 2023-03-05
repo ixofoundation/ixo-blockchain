@@ -196,7 +196,7 @@ type EvaluateClaimConstraints struct {
 	// either collection_id or claim_ids is needed
 	ClaimIds   []string `protobuf:"bytes,2,rep,name=claim_ids,json=claimIds,proto3" json:"claim_ids,omitempty"`
 	AgentQuota uint64   `protobuf:"varint,3,opt,name=agent_quota,json=agentQuota,proto3" json:"agent_quota,omitempty"`
-	// if zero then no before_date validation done
+	// if null then no before_date validation done
 	BeforeDate *time.Time `protobuf:"bytes,4,opt,name=before_date,json=beforeDate,proto3,stdtime" json:"before_date,omitempty"`
 	// max custom amount evaluator can change, if empty list must use amount
 	// defined in Token payments
@@ -335,7 +335,7 @@ type WithdrawPaymentConstraints struct {
 	// accordingly
 	PaymentType PaymentType `protobuf:"varint,4,opt,name=payment_type,json=paymentType,proto3,enum=ixo.claims.v1beta1.PaymentType" json:"payment_type,omitempty"`
 	// date that grantee can execute authorization, calculated from created date
-	// plus the timeout on Collection payments
+	// plus the timeout on Collection payments, if null then none
 	ReleaseDate *time.Time `protobuf:"bytes,5,opt,name=release_date,json=releaseDate,proto3,stdtime" json:"release_date,omitempty"`
 }
 

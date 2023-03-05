@@ -5,7 +5,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -23,15 +22,14 @@ type MarshalFn func(value interface{}) []byte
 
 type (
 	Keeper struct {
-		cdc           codec.BinaryCodec
-		storeKey      sdk.StoreKey
-		memKey        sdk.StoreKey
-		paramstore    paramtypes.Subspace
-		AccountKeeper authkeeper.AccountKeeper
-		AuthzKeeper   authzkeeper.Keeper
-		IidKeeper     iidkeeper.Keeper
-		bankKeeper    bankkeeper.Keeper
-		entityKeeper  entitykeeper.Keeper
+		cdc          codec.BinaryCodec
+		storeKey     sdk.StoreKey
+		memKey       sdk.StoreKey
+		paramstore   paramtypes.Subspace
+		AuthzKeeper  authzkeeper.Keeper
+		IidKeeper    iidkeeper.Keeper
+		BankKeeper   bankkeeper.Keeper
+		EntityKeeper entitykeeper.Keeper
 	}
 )
 
@@ -41,26 +39,24 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	ps paramtypes.Subspace,
 	iidKeeper iidkeeper.Keeper,
-	accountKeeper authkeeper.AccountKeeper,
 	authzKeeper authzkeeper.Keeper,
 	bankKeeper bankkeeper.Keeper,
 	entityKeeper entitykeeper.Keeper,
-) *Keeper {
+) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
-	return &Keeper{
-		cdc:           cdc,
-		storeKey:      storeKey,
-		memKey:        memKey,
-		paramstore:    ps,
-		IidKeeper:     iidKeeper,
-		AccountKeeper: accountKeeper,
-		AuthzKeeper:   authzKeeper,
-		bankKeeper:    bankKeeper,
-		entityKeeper:  entityKeeper,
+	return Keeper{
+		cdc:          cdc,
+		storeKey:     storeKey,
+		memKey:       memKey,
+		paramstore:   ps,
+		IidKeeper:    iidKeeper,
+		AuthzKeeper:  authzKeeper,
+		BankKeeper:   bankKeeper,
+		EntityKeeper: entityKeeper,
 	}
 }
 

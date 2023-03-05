@@ -7,8 +7,6 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/token/types"
@@ -16,32 +14,28 @@ import (
 )
 
 type Keeper struct {
-	cdc           codec.BinaryCodec
-	storeKey      sdk.StoreKey
-	memKey        sdk.StoreKey
-	IidKeeper     iidkeeper.Keeper
-	WasmKeeper    wasmtypes.ContractOpsKeeper
-	AccountKeeper authkeeper.AccountKeeper
-	AuthzKeeper   authzkeeper.Keeper
-	ParamSpace    paramstypes.Subspace
+	cdc        codec.BinaryCodec
+	storeKey   sdk.StoreKey
+	memKey     sdk.StoreKey
+	IidKeeper  iidkeeper.Keeper
+	WasmKeeper wasmtypes.ContractOpsKeeper
+	ParamSpace paramstypes.Subspace
 }
 
 func NewKeeper(cdc codec.BinaryCodec, key, memKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
-	accountKeeper authkeeper.AccountKeeper, authzKeeper authzkeeper.Keeper, paramSpace paramstypes.Subspace) Keeper {
+	paramSpace paramstypes.Subspace) Keeper {
 
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
-		cdc:           cdc,
-		storeKey:      key,
-		memKey:        memKey,
-		IidKeeper:     iidKeeper,
-		WasmKeeper:    wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
-		AccountKeeper: accountKeeper,
-		AuthzKeeper:   authzKeeper,
-		ParamSpace:    paramSpace,
+		cdc:        cdc,
+		storeKey:   key,
+		memKey:     memKey,
+		IidKeeper:  iidKeeper,
+		WasmKeeper: wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		ParamSpace: paramSpace,
 	}
 }
 

@@ -4215,7 +4215,7 @@
             },
             {
               "name": "before_date",
-              "description": "if zero then no before_date validation done",
+              "description": "if null then no before_date validation done",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -4407,7 +4407,7 @@
             },
             {
               "name": "release_date",
-              "description": "date that grantee can execute authorization, calculated from created date\nplus the timeout on Collection payments",
+              "description": "date that grantee can execute authorization, calculated from created date\nplus the timeout on Collection payments, if null then none",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
