@@ -19,7 +19,8 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	entityQueryCmd.AddCommand(
-		GetCmdListEntity(),
+		CmdQueryParams(),
+		CmdListEntity(),
 		CmdShowEntity(),
 		CmdShowEntityMetadata(),
 		CmdShowEntityIidDocument(),
@@ -29,7 +30,31 @@ func GetQueryCmd() *cobra.Command {
 	return entityQueryCmd
 }
 
-func GetCmdListEntity() *cobra.Command {
+func CmdQueryParams() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "params",
+		Short: "shows the parameters of the module",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdListEntity() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-entity",
 		Short: "list all entity",
@@ -39,27 +64,27 @@ func GetCmdListEntity() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
-			
+
 			queryClient := types.NewQueryClient(clientCtx)
-			
+
 			params := &types.QueryEntityListRequest{
 				Pagination: pageReq,
 			}
-			
+
 			res, err := queryClient.EntityList(context.Background(), params)
 			if err != nil {
 				return err
 			}
-			
+
 			return clientCtx.PrintProto(res)
 		},
 	}
-	
+
 	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd

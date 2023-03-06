@@ -11,28 +11,34 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/ixo/entity/params";
+  }
   rpc Entity(QueryEntityRequest) returns (QueryEntityResponse) {
     option (google.api.http).get = "/ixo/entity/{id}";
   }
-
   rpc EntityMetaData(QueryEntityMetadataRequest)
       returns (QueryEntityMetadataResponse) {
     option (google.api.http).get = "/ixo/entity/{id}/metadata";
   }
-
   rpc EntityIidDocument(QueryEntityIidDocumentRequest)
       returns (QueryEntityIidDocumentResponse) {
     option (google.api.http).get = "/ixo/entity/{id}/iiddocument";
   }
-
   rpc EntityVerified(QueryEntityVerifiedRequest)
       returns (QueryEntityVerifiedResponse) {
     option (google.api.http).get = "/ixo/entity/{id}/verified";
   }
-
   rpc EntityList(QueryEntityListRequest) returns (QueryEntityListResponse) {
     option (google.api.http).get = "/ixo/entity";
   }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
 }
 
 message QueryEntityRequest { string id = 1; }

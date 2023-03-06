@@ -5029,7 +5029,7 @@
           "name": "QueryParamsRequest",
           "longName": "QueryParamsRequest",
           "fullName": "ixo.claims.v1beta1.QueryParamsRequest",
-          "description": "QueryParamsRequest is request type for the Query/Params RPC method.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,
@@ -5040,7 +5040,7 @@
           "name": "QueryParamsResponse",
           "longName": "QueryParamsResponse",
           "fullName": "ixo.claims.v1beta1.QueryParamsResponse",
-          "description": "QueryParamsResponse is response type for the Query/Params RPC method.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -7426,6 +7426,41 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "QueryParamsRequest",
+          "longName": "QueryParamsRequest",
+          "fullName": "ixo.entity.v1beta1.QueryParamsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryParamsResponse",
+          "longName": "QueryParamsResponse",
+          "fullName": "ixo.entity.v1beta1.QueryParamsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "params holds all the parameters of this module.",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.entity.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -7435,6 +7470,28 @@
           "fullName": "ixo.entity.v1beta1.Query",
           "description": "Query defines the gRPC querier service.",
           "methods": [
+            {
+              "name": "Params",
+              "description": "",
+              "requestType": "QueryParamsRequest",
+              "requestLongType": "QueryParamsRequest",
+              "requestFullType": "ixo.entity.v1beta1.QueryParamsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryParamsResponse",
+              "responseLongType": "QueryParamsResponse",
+              "responseFullType": "ixo.entity.v1beta1.QueryParamsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/entity/params"
+                    }
+                  ]
+                }
+              }
+            },
             {
               "name": "Entity",
               "description": "",
@@ -15517,6 +15574,41 @@
       "extensions": [],
       "messages": [
         {
+          "name": "QueryParamsRequest",
+          "longName": "QueryParamsRequest",
+          "fullName": "ixo.token.v1beta1.QueryParamsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryParamsResponse",
+          "longName": "QueryParamsResponse",
+          "fullName": "ixo.token.v1beta1.QueryParamsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "params holds all the parameters of this module.",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.token.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "QueryTokenDocRequest",
           "longName": "QueryTokenDocRequest",
           "fullName": "ixo.token.v1beta1.QueryTokenDocRequest",
@@ -15824,6 +15916,28 @@
           "fullName": "ixo.token.v1beta1.Query",
           "description": "Query defines the gRPC querier service.",
           "methods": [
+            {
+              "name": "Params",
+              "description": "",
+              "requestType": "QueryParamsRequest",
+              "requestLongType": "QueryParamsRequest",
+              "requestFullType": "ixo.token.v1beta1.QueryParamsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryParamsResponse",
+              "responseLongType": "QueryParamsResponse",
+              "responseFullType": "ixo.token.v1beta1.QueryParamsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/token/params"
+                    }
+                  ]
+                }
+              }
+            },
             {
               "name": "TokenList",
               "description": "",

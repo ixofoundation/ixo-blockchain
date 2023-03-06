@@ -10,18 +10,26 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/ixo/token/params";
+  }
   rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse) {
     option (google.api.http).get = "/ixo/token/{minter}";
   }
-
   rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse) {
     option (google.api.http).get = "/ixo/token/{minter}/{contract_address}";
   }
-
   rpc TokenMetadata(QueryTokenMetadataRequest)
       returns (QueryTokenMetadataResponse) {
     option (google.api.http).get = "/ixo/token/metadata/{id}";
   }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
 }
 
 message QueryTokenListRequest {

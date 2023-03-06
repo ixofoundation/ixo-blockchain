@@ -941,6 +941,14 @@
                   <a href="#ixo.entity.v1beta1.QueryEntityVerifiedResponse"><span class="badge">M</span>QueryEntityVerifiedResponse</a>
                 </li>
               
+                <li>
+                  <a href="#ixo.entity.v1beta1.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
+                </li>
+              
               
               
               
@@ -1886,6 +1894,14 @@
           <li>
             <a href="#ixo%2ftoken%2fv1beta1%2fquery.proto">ixo/token/v1beta1/query.proto</a>
             <ul>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.token.v1beta1.QueryParamsResponse"><span class="badge">M</span>QueryParamsResponse</a>
+                </li>
               
                 <li>
                   <a href="#ixo.token.v1beta1.QueryTokenDocRequest"><span class="badge">M</span>QueryTokenDocRequest</a>
@@ -5948,14 +5964,14 @@ plus the timeout on Collection payments, if null then none </p></td>
         
       
         <h3 id="ixo.claims.v1beta1.QueryParamsRequest">QueryParamsRequest</h3>
-        <p>QueryParamsRequest is request type for the Query/Params RPC method.</p>
+        <p></p>
 
         
 
         
       
         <h3 id="ixo.claims.v1beta1.QueryParamsResponse">QueryParamsResponse</h3>
-        <p>QueryParamsResponse is response type for the Query/Params RPC method.</p>
+        <p></p>
 
         
           <table class="field-table">
@@ -7832,6 +7848,37 @@ string status = 3; </p></td>
 
         
       
+        <h3 id="ixo.entity.v1beta1.QueryParamsRequest">QueryParamsRequest</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.QueryParamsResponse">QueryParamsResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#ixo.entity.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p>params holds all the parameters of this module. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
 
       
 
@@ -7845,6 +7892,13 @@ string status = 3; </p></td>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
           </thead>
           <tbody>
+            
+              <tr>
+                <td>Params</td>
+                <td><a href="#ixo.entity.v1beta1.QueryParamsRequest">QueryParamsRequest</a></td>
+                <td><a href="#ixo.entity.v1beta1.QueryParamsResponse">QueryParamsResponse</a></td>
+                <td><p></p></td>
+              </tr>
             
               <tr>
                 <td>Entity</td>
@@ -7898,6 +7952,16 @@ string status = 3; </p></td>
               </tr>
             </thead>
             <tbody>
+            
+              
+              
+              <tr>
+                <td>Params</td>
+                <td>GET</td>
+                <td>/ixo/entity/params</td>
+                <td></td>
+              </tr>
+              
             
               
               
@@ -14150,6 +14214,37 @@ tokens. </p></td>
       <p></p>
 
       
+        <h3 id="ixo.token.v1beta1.QueryParamsRequest">QueryParamsRequest</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.token.v1beta1.QueryParamsResponse">QueryParamsResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#ixo.token.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p>params holds all the parameters of this module. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.token.v1beta1.QueryTokenDocRequest">QueryTokenDocRequest</h3>
         <p></p>
 
@@ -14410,6 +14505,13 @@ tokens. </p></td>
           <tbody>
             
               <tr>
+                <td>Params</td>
+                <td><a href="#ixo.token.v1beta1.QueryParamsRequest">QueryParamsRequest</a></td>
+                <td><a href="#ixo.token.v1beta1.QueryParamsResponse">QueryParamsResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
                 <td>TokenList</td>
                 <td><a href="#ixo.token.v1beta1.QueryTokenListRequest">QueryTokenListRequest</a></td>
                 <td><a href="#ixo.token.v1beta1.QueryTokenListResponse">QueryTokenListResponse</a></td>
@@ -14447,6 +14549,16 @@ tokens. </p></td>
               </tr>
             </thead>
             <tbody>
+            
+              
+              
+              <tr>
+                <td>Params</td>
+                <td>GET</td>
+                <td>/ixo/token/params</td>
+                <td></td>
+              </tr>
+              
             
               
               

@@ -187,6 +187,8 @@
     - [QueryEntityResponse](#ixo.entity.v1beta1.QueryEntityResponse)
     - [QueryEntityVerifiedRequest](#ixo.entity.v1beta1.QueryEntityVerifiedRequest)
     - [QueryEntityVerifiedResponse](#ixo.entity.v1beta1.QueryEntityVerifiedResponse)
+    - [QueryParamsRequest](#ixo.entity.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.entity.v1beta1.QueryParamsResponse)
   
     - [Query](#ixo.entity.v1beta1.Query)
   
@@ -416,6 +418,8 @@
     - [SetTokenContractCodes](#ixo.token.v1beta1.SetTokenContractCodes)
   
 - [ixo/token/v1beta1/query.proto](#ixo/token/v1beta1/query.proto)
+    - [QueryParamsRequest](#ixo.token.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.token.v1beta1.QueryParamsResponse)
     - [QueryTokenDocRequest](#ixo.token.v1beta1.QueryTokenDocRequest)
     - [QueryTokenDocResponse](#ixo.token.v1beta1.QueryTokenDocResponse)
     - [QueryTokenListRequest](#ixo.token.v1beta1.QueryTokenListRequest)
@@ -2269,7 +2273,7 @@ GenesisState defines the claims module&#39;s genesis state.
 <a name="ixo.claims.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is request type for the Query/Params RPC method.
+
 
 
 
@@ -2279,7 +2283,7 @@ QueryParamsRequest is request type for the Query/Params RPC method.
 <a name="ixo.claims.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is response type for the Query/Params RPC method.
+
 
 
 | Field | Type | Label | Description |
@@ -3094,6 +3098,31 @@ GenesisState defines the project module&#39;s genesis state.
 
 
 
+
+<a name="ixo.entity.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.entity.v1beta1.Params) |  | params holds all the parameters of this module. |
+
+
+
+
+
  
 
  
@@ -3108,6 +3137,7 @@ Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.entity.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.entity.v1beta1.QueryParamsResponse) |  |
 | Entity | [QueryEntityRequest](#ixo.entity.v1beta1.QueryEntityRequest) | [QueryEntityResponse](#ixo.entity.v1beta1.QueryEntityResponse) |  |
 | EntityMetaData | [QueryEntityMetadataRequest](#ixo.entity.v1beta1.QueryEntityMetadataRequest) | [QueryEntityMetadataResponse](#ixo.entity.v1beta1.QueryEntityMetadataResponse) |  |
 | EntityIidDocument | [QueryEntityIidDocumentRequest](#ixo.entity.v1beta1.QueryEntityIidDocumentRequest) | [QueryEntityIidDocumentResponse](#ixo.entity.v1beta1.QueryEntityIidDocumentResponse) |  |
@@ -6193,6 +6223,31 @@ GenesisState defines the module&#39;s genesis state.
 
 
 
+<a name="ixo.token.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.token.v1beta1.Params) |  | params holds all the parameters of this module. |
+
+
+
+
+
+
 <a name="ixo.token.v1beta1.QueryTokenDocRequest"></a>
 
 ### QueryTokenDocRequest
@@ -6322,6 +6377,7 @@ Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.token.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.token.v1beta1.QueryParamsResponse) |  |
 | TokenList | [QueryTokenListRequest](#ixo.token.v1beta1.QueryTokenListRequest) | [QueryTokenListResponse](#ixo.token.v1beta1.QueryTokenListResponse) |  |
 | TokenDoc | [QueryTokenDocRequest](#ixo.token.v1beta1.QueryTokenDocRequest) | [QueryTokenDocResponse](#ixo.token.v1beta1.QueryTokenDocResponse) |  |
 | TokenMetadata | [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest) | [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse) |  |
