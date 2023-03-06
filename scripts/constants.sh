@@ -110,13 +110,3 @@ END
 
   echo $DID_FULL
 }
-# {
-#   "method": {
-#     "id": "${DID}#${ADDRESS}",
-#     "type": "tendermint/PubKeySecp256k1",
-#     "controller": "${DID}",
-#     "blockchainAccountID": "${ADDRESS}"
-#   },
-#   "relationships": ["authentication"],
-#   "contexts": []
-# }

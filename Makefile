@@ -94,6 +94,9 @@ run_with_all_data:
 	./scripts/clean_build.sh
 	./scripts/run_with_all_data.sh
 
+run_with_genesis:
+	./scripts/run_with_genesis.sh
+
 ###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################
