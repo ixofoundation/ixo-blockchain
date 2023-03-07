@@ -4,6 +4,7 @@ import (
 	time "time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -217,3 +218,77 @@ func (msg MsgTransferEntity) GetSignBytes() []byte {
 }
 
 func (msg MsgTransferEntity) Route() string { return RouterKey }
+
+// --------------------------
+// CREATE ENTITY ACCOUNT
+// --------------------------
+const TypeMsgCreateEntityAccount = "create_entity_account"
+
+var _ sdk.Msg = &MsgCreateEntityAccount{}
+
+func NewMsgCreateEntityAccount(
+	id, name string,
+	ownerAddress string,
+) *MsgCreateEntityAccount {
+	return &MsgCreateEntityAccount{
+		Id:           id,
+		Name:         name,
+		OwnerAddress: ownerAddress,
+	}
+}
+
+func (msg MsgCreateEntityAccount) Type() string {
+	return TypeMsgCreateEntityAccount
+}
+
+func (msg MsgCreateEntityAccount) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgCreateEntityAccount) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgCreateEntityAccount) Route() string { return RouterKey }
+
+// --------------------------
+// GRANT ENTITY ACCOUNT AUTHZ
+// --------------------------
+const TypeMsgGrantEntityAccountAuthz = "grant_entity_account_authz"
+
+var _ sdk.Msg = &MsgGrantEntityAccountAuthz{}
+
+func NewMsgGrantEntityAccountAuthz(
+	id, name, ownerAddress, granteeAddress string,
+	grant Grant,
+) *MsgGrantEntityAccountAuthz {
+	return &MsgGrantEntityAccountAuthz{
+		Id:             id,
+		Name:           name,
+		OwnerAddress:   ownerAddress,
+		GranteeAddress: granteeAddress,
+		Grant:          authz.Grant(grant),
+	}
+}
+
+func (msg MsgGrantEntityAccountAuthz) Type() string {
+	return TypeMsgGrantEntityAccountAuthz
+}
+
+func (msg MsgGrantEntityAccountAuthz) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgGrantEntityAccountAuthz) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgGrantEntityAccountAuthz) Route() string { return RouterKey }

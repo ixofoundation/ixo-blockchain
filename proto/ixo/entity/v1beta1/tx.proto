@@ -6,13 +6,13 @@ import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/tx.proto";
 import "ixo/iid/v1beta1/types.proto";
 import "ixo/entity/v1beta1/entity.proto";
+import "ixo/entity/v1beta1/cosmos.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 // Msg defines the project Msg service.
 service Msg {
-
   // CreateEntity defines a method for creating a entity.
   rpc CreateEntity(MsgCreateEntity) returns (MsgCreateEntityResponse);
 
@@ -25,12 +25,17 @@ service Msg {
 
   // Transfers an entity and its nft to the recipient
   rpc TransferEntity(MsgTransferEntity) returns (MsgTransferEntityResponse);
+
+  // Create a module account for an entity,
+  rpc CreateEntityAccount(MsgCreateEntityAccount)
+      returns (MsgCreateEntityAccountResponse);
+
+  // Create a authz grant from entity account
+  rpc GrantEntityAccountAuthz(MsgGrantEntityAccountAuthz)
+      returns (MsgGrantEntityAccountAuthzResponse);
 }
 
 message MsgCreateEntity {
-  option (gogoproto.equal) = false;
-  option (gogoproto.goproto_getters) = false;
-
   // An Entity Type as defined by the implementer
   string entity_type = 1;
   // Status of the Entity as defined by the implementer and interpreted by
@@ -81,9 +86,6 @@ message MsgCreateEntityResponse {
 // Updates the entity with all the fields, so if field empty will be updated
 // with default go type, aka never null
 message MsgUpdateEntity {
-  option (gogoproto.equal) = false;
-  option (gogoproto.goproto_getters) = false;
-
   // Id of entity to be updated
   string id = 1;
   // Status of the Entity as defined by the implementer and interpreted by
@@ -110,9 +112,6 @@ message MsgUpdateEntityResponse {}
 
 // Only relayer nodes can update entity field 'entityVerified'
 message MsgUpdateEntityVerified {
-  option (gogoproto.equal) = false;
-  option (gogoproto.goproto_getters) = false;
-
   // Id of entity to be updated
   string id = 1;
   // Whether entity is verified or not based on credentials
@@ -128,18 +127,52 @@ message MsgUpdateEntityVerified {
 message MsgUpdateEntityVerifiedResponse {}
 
 message MsgTransferEntity {
-  option (gogoproto.goproto_getters) = false;
-  option (gogoproto.equal) = false;
-
   string id = 1;
-  string owner_did = 2 [
-    (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment"
-  ];                        // The owner_did used to sign this transaction.
-  string owner_address = 3; // The owner_address used to sign this transaction.
+  // The owner_did used to sign this transaction.
+  string owner_did = 2
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  // The owner_address used to sign this transaction.
+  string owner_address = 3;
   string recipient_did = 4
       [ (gogoproto.casttype) =
             "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
 }
 
 message MsgTransferEntityResponse {}
+
+// create a module account for an entity, account details will be added as a
+// linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+message MsgCreateEntityAccount {
+  // entity id (did) to create account for
+  string id = 1;
+  // name of account
+  string name = 2;
+  // The owner_address used to sign this transaction.
+  string owner_address = 3;
+}
+
+message MsgCreateEntityAccountResponse {
+  // account address that was created for specific entity and account name
+  string account = 1;
+}
+
+// Create a authz grant from entity account (as grantor) to recipient in msg as
+// grantee for the specific authorization
+message MsgGrantEntityAccountAuthz {
+  // entity id (did) to create account for
+  string id = 1;
+  // name of account
+  string name = 2;
+  // the grantee address that will be able to execute the authz authorization
+  string grantee_address = 3;
+  // grant to be Authorized in authz grant
+  Grant grant = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/authz.Grant"
+  ];
+  // the owner_address used to sign this transaction.
+  string owner_address = 5;
+}
+
+message MsgGrantEntityAccountAuthzResponse {}

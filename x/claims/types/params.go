@@ -9,7 +9,7 @@ import (
 
 var (
 	KeyCollectionSequence   = []byte("CollectionSequence")
-	KeyIxoAccount           = []byte("KeyIxoAccount")
+	KeyIxoAccount           = []byte("IxoAccount")
 	KeyNetworkFeePercentage = []byte("NetworkFeePercentage")
 	KeyNodeFeePercentage    = []byte("NodeFeePercentage")
 )

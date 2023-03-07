@@ -603,21 +603,22 @@ func NewDeleteIidContextCmd() *cobra.Command {
 
 func NewAddLinkedEntityCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add-linked-entity [id] [entity-id] [type] [relationship]",
+		Use:   "add-linked-entity [id] [entity-id] [type] [relationship] [service]",
 		Short: "add a linked entity to an iid document",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			id, entityId, entityType, relationship := args[0], args[1], args[2], args[3]
+			id, entityId, entityType, relationship, service := args[0], args[1], args[2], args[3], args[4]
 
 			entity := types.NewLinkedEntity(
 				entityId,
 				entityType,
 				relationship,
+				service,
 			)
 
 			msg := types.NewMsgAddLinkedEntity(

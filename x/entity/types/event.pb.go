@@ -62,6 +62,20 @@ func (m *EntityCreatedEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EntityCreatedEvent proto.InternalMessageInfo
 
+func (m *EntityCreatedEvent) GetEntity() *Entity {
+	if m != nil {
+		return m.Entity
+	}
+	return nil
+}
+
+func (m *EntityCreatedEvent) GetSigner() string {
+	if m != nil {
+		return m.Signer
+	}
+	return ""
+}
+
 // EntityUpdatedEvent is an event triggered on a entity document update
 type EntityUpdatedEvent struct {
 	Entity *Entity `protobuf:"bytes,1,opt,name=entity,proto3" json:"entity,omitempty"`
@@ -100,6 +114,20 @@ func (m *EntityUpdatedEvent) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_EntityUpdatedEvent proto.InternalMessageInfo
+
+func (m *EntityUpdatedEvent) GetEntity() *Entity {
+	if m != nil {
+		return m.Entity
+	}
+	return nil
+}
+
+func (m *EntityUpdatedEvent) GetSigner() string {
+	if m != nil {
+		return m.Signer
+	}
+	return ""
+}
 
 // EntityVerifiedUpdatedEvent is an event triggered on a entity verified
 // document update
@@ -142,6 +170,27 @@ func (m *EntityVerifiedUpdatedEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EntityVerifiedUpdatedEvent proto.InternalMessageInfo
 
+func (m *EntityVerifiedUpdatedEvent) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *EntityVerifiedUpdatedEvent) GetSigner() string {
+	if m != nil {
+		return m.Signer
+	}
+	return ""
+}
+
+func (m *EntityVerifiedUpdatedEvent) GetEntityVerified() bool {
+	if m != nil {
+		return m.EntityVerified
+	}
+	return false
+}
+
 // EntityTransferredEvent is an event triggered on a entity transfer
 type EntityTransferredEvent struct {
 	Id   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -182,154 +231,223 @@ func (m *EntityTransferredEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EntityTransferredEvent proto.InternalMessageInfo
 
+func (m *EntityTransferredEvent) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *EntityTransferredEvent) GetFrom() string {
+	if m != nil {
+		return m.From
+	}
+	return ""
+}
+
+func (m *EntityTransferredEvent) GetTo() string {
+	if m != nil {
+		return m.To
+	}
+	return ""
+}
+
+// EntityAccountCreatedEvent is an event triggered on a entity account creation
+type EntityAccountCreatedEvent struct {
+	Id             string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Signer         string `protobuf:"bytes,2,opt,name=signer,proto3" json:"signer,omitempty"`
+	AccountName    string `protobuf:"bytes,3,opt,name=account_name,json=accountName,proto3" json:"account_name,omitempty"`
+	AccountAddress string `protobuf:"bytes,4,opt,name=account_address,json=accountAddress,proto3" json:"account_address,omitempty"`
+}
+
+func (m *EntityAccountCreatedEvent) Reset()         { *m = EntityAccountCreatedEvent{} }
+func (m *EntityAccountCreatedEvent) String() string { return proto.CompactTextString(m) }
+func (*EntityAccountCreatedEvent) ProtoMessage()    {}
+func (*EntityAccountCreatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3a73923d9783a1ef, []int{4}
+}
+func (m *EntityAccountCreatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EntityAccountCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EntityAccountCreatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EntityAccountCreatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EntityAccountCreatedEvent.Merge(m, src)
+}
+func (m *EntityAccountCreatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *EntityAccountCreatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_EntityAccountCreatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EntityAccountCreatedEvent proto.InternalMessageInfo
+
+func (m *EntityAccountCreatedEvent) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *EntityAccountCreatedEvent) GetSigner() string {
+	if m != nil {
+		return m.Signer
+	}
+	return ""
+}
+
+func (m *EntityAccountCreatedEvent) GetAccountName() string {
+	if m != nil {
+		return m.AccountName
+	}
+	return ""
+}
+
+func (m *EntityAccountCreatedEvent) GetAccountAddress() string {
+	if m != nil {
+		return m.AccountAddress
+	}
+	return ""
+}
+
+// EntityAccountCreatedEvent is an event triggered on a entity account creation
+type EntityAccountAuthzCreatedEvent struct {
+	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Signer      string `protobuf:"bytes,2,opt,name=signer,proto3" json:"signer,omitempty"`
+	AccountName string `protobuf:"bytes,3,opt,name=account_name,json=accountName,proto3" json:"account_name,omitempty"`
+	Granter     string `protobuf:"bytes,4,opt,name=granter,proto3" json:"granter,omitempty"`
+	Grantee     string `protobuf:"bytes,5,opt,name=grantee,proto3" json:"grantee,omitempty"`
+	Grant       *Grant `protobuf:"bytes,6,opt,name=grant,proto3" json:"grant,omitempty"`
+}
+
+func (m *EntityAccountAuthzCreatedEvent) Reset()         { *m = EntityAccountAuthzCreatedEvent{} }
+func (m *EntityAccountAuthzCreatedEvent) String() string { return proto.CompactTextString(m) }
+func (*EntityAccountAuthzCreatedEvent) ProtoMessage()    {}
+func (*EntityAccountAuthzCreatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3a73923d9783a1ef, []int{5}
+}
+func (m *EntityAccountAuthzCreatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EntityAccountAuthzCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EntityAccountAuthzCreatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EntityAccountAuthzCreatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EntityAccountAuthzCreatedEvent.Merge(m, src)
+}
+func (m *EntityAccountAuthzCreatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *EntityAccountAuthzCreatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_EntityAccountAuthzCreatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EntityAccountAuthzCreatedEvent proto.InternalMessageInfo
+
+func (m *EntityAccountAuthzCreatedEvent) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *EntityAccountAuthzCreatedEvent) GetSigner() string {
+	if m != nil {
+		return m.Signer
+	}
+	return ""
+}
+
+func (m *EntityAccountAuthzCreatedEvent) GetAccountName() string {
+	if m != nil {
+		return m.AccountName
+	}
+	return ""
+}
+
+func (m *EntityAccountAuthzCreatedEvent) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *EntityAccountAuthzCreatedEvent) GetGrantee() string {
+	if m != nil {
+		return m.Grantee
+	}
+	return ""
+}
+
+func (m *EntityAccountAuthzCreatedEvent) GetGrant() *Grant {
+	if m != nil {
+		return m.Grant
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*EntityCreatedEvent)(nil), "ixo.entity.v1beta1.EntityCreatedEvent")
 	proto.RegisterType((*EntityUpdatedEvent)(nil), "ixo.entity.v1beta1.EntityUpdatedEvent")
 	proto.RegisterType((*EntityVerifiedUpdatedEvent)(nil), "ixo.entity.v1beta1.EntityVerifiedUpdatedEvent")
 	proto.RegisterType((*EntityTransferredEvent)(nil), "ixo.entity.v1beta1.EntityTransferredEvent")
+	proto.RegisterType((*EntityAccountCreatedEvent)(nil), "ixo.entity.v1beta1.EntityAccountCreatedEvent")
+	proto.RegisterType((*EntityAccountAuthzCreatedEvent)(nil), "ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent")
 }
 
 func init() { proto.RegisterFile("ixo/entity/v1beta1/event.proto", fileDescriptor_3a73923d9783a1ef) }
 
 var fileDescriptor_3a73923d9783a1ef = []byte{
-	// 332 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x92, 0x3f, 0x4f, 0xc2, 0x40,
-	0x18, 0xc6, 0x7b, 0xd5, 0x10, 0x38, 0x13, 0x4c, 0x2e, 0x86, 0x90, 0x0e, 0x07, 0x71, 0x91, 0xc5,
-	0x36, 0x60, 0xe2, 0xe0, 0xa8, 0x61, 0x37, 0x8d, 0x32, 0xb8, 0x98, 0x96, 0xbb, 0x96, 0x53, 0xb9,
-	0x97, 0x1c, 0x07, 0x96, 0x6f, 0xe0, 0xe8, 0x47, 0xe0, 0xe3, 0x38, 0x32, 0x3a, 0x1a, 0xba, 0xf8,
-	0x31, 0x4c, 0xef, 0x6a, 0x90, 0x28, 0xa3, 0xdb, 0xfb, 0xe4, 0xf9, 0xf3, 0x5b, 0x5e, 0x4c, 0x45,
-	0x06, 0x01, 0x97, 0x5a, 0xe8, 0x45, 0x30, 0xef, 0xc6, 0x5c, 0x47, 0xdd, 0x80, 0xcf, 0xb9, 0xd4,
-	0xfe, 0x44, 0x81, 0x06, 0x42, 0x44, 0x06, 0xbe, 0xf5, 0xfd, 0xd2, 0xf7, 0x8e, 0x52, 0x48, 0xc1,
-	0xd8, 0x41, 0x71, 0xd9, 0xa4, 0xd7, 0xfa, 0x6b, 0xc9, 0x16, 0x4d, 0xe0, 0xf8, 0x01, 0x93, 0xbe,
-	0xd1, 0x57, 0x8a, 0x47, 0x9a, 0xb3, 0x7e, 0x81, 0x21, 0x3d, 0x5c, 0xb1, 0xa9, 0x26, 0x6a, 0xa3,
-	0xce, 0x41, 0xcf, 0xf3, 0x7f, 0x13, 0x7d, 0xdb, 0x0b, 0xcb, 0x24, 0x69, 0xe0, 0xca, 0x54, 0xa4,
-	0x92, 0xab, 0xa6, 0xdb, 0x46, 0x9d, 0x5a, 0x58, 0xaa, 0x8b, 0xea, 0xcb, 0xb2, 0xe5, 0x7c, 0x2e,
-	0x5b, 0x68, 0xc3, 0xba, 0x9d, 0xb0, 0xff, 0x66, 0x3d, 0x63, 0xcf, 0x76, 0x06, 0x5c, 0x89, 0x44,
-	0x70, 0xb6, 0xc5, 0xac, 0x63, 0x57, 0x30, 0xc3, 0xab, 0x85, 0xae, 0x60, 0xbb, 0xf6, 0xc8, 0x09,
-	0x3e, 0xb4, 0xc4, 0xfb, 0x79, 0x39, 0xd3, 0xdc, 0x6b, 0xa3, 0x4e, 0x35, 0xac, 0xf3, 0xad, 0xf1,
-	0x1f, 0xe0, 0x01, 0x6e, 0x58, 0xf0, 0x8d, 0x8a, 0xe4, 0x34, 0xe1, 0x4a, 0xed, 0x82, 0x12, 0xbc,
-	0x9f, 0x28, 0x18, 0x97, 0x48, 0x73, 0x17, 0x19, 0x0d, 0x86, 0x51, 0x0b, 0x5d, 0x0d, 0x9b, 0xdd,
-	0xcb, 0xeb, 0xb7, 0x35, 0x45, 0xab, 0x35, 0x45, 0x1f, 0x6b, 0x8a, 0x5e, 0x73, 0xea, 0xac, 0x72,
-	0xea, 0xbc, 0xe7, 0xd4, 0xb9, 0x3b, 0x4f, 0x85, 0x1e, 0xcd, 0x62, 0x7f, 0x08, 0xe3, 0x40, 0x64,
-	0x90, 0xc0, 0x4c, 0xb2, 0x48, 0x0b, 0x90, 0x85, 0x3a, 0x8d, 0x9f, 0x60, 0xf8, 0x38, 0x1c, 0x45,
-	0x42, 0x06, 0xd9, 0xf7, 0x27, 0xe8, 0xc5, 0x84, 0x4f, 0xe3, 0x8a, 0xf9, 0x80, 0xb3, 0xaf, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0x1f, 0xf2, 0x44, 0xec, 0x6e, 0x02, 0x00, 0x00,
+	// 429 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x53, 0xc1, 0x8e, 0xd3, 0x30,
+	0x10, 0xad, 0xcb, 0x6e, 0xa1, 0x5e, 0x54, 0x24, 0x0b, 0xad, 0xb2, 0x3d, 0x98, 0xd2, 0x0b, 0xbd,
+	0x90, 0x68, 0x17, 0x89, 0x7b, 0x41, 0x2b, 0x2e, 0x08, 0xa1, 0x08, 0x38, 0x70, 0x59, 0xdc, 0x78,
+	0x9a, 0x5a, 0x10, 0x4f, 0xe5, 0x38, 0x55, 0x96, 0x9f, 0x80, 0xcf, 0xe2, 0xd8, 0x23, 0x47, 0xd4,
+	0xfe, 0x08, 0x8a, 0xed, 0x6a, 0x89, 0xd8, 0x4a, 0x7b, 0xe9, 0x6d, 0x66, 0xde, 0x9b, 0xf7, 0x5e,
+	0x14, 0x0f, 0xe5, 0xaa, 0xc6, 0x04, 0xb4, 0x55, 0xf6, 0x3a, 0x59, 0x9d, 0xcf, 0xc0, 0x8a, 0xf3,
+	0x04, 0x56, 0xa0, 0x6d, 0xbc, 0x34, 0x68, 0x91, 0x31, 0x55, 0x63, 0xec, 0xf1, 0x38, 0xe0, 0xc3,
+	0xc7, 0x39, 0xe6, 0xe8, 0xe0, 0xa4, 0xa9, 0x3c, 0x73, 0xf8, 0xe4, 0x36, 0x25, 0xbf, 0xb8, 0x9f,
+	0x90, 0x61, 0x59, 0x60, 0xe9, 0x09, 0xe3, 0x2f, 0x94, 0x5d, 0x3a, 0xf8, 0xb5, 0x01, 0x61, 0x41,
+	0x5e, 0x36, 0x39, 0xd8, 0x05, 0xed, 0xf9, 0xa5, 0x88, 0x8c, 0xc8, 0xe4, 0xe4, 0x62, 0x18, 0xff,
+	0x1f, 0x29, 0xf6, 0x7b, 0x69, 0x60, 0xb2, 0x53, 0xda, 0x2b, 0x55, 0xae, 0xc1, 0x44, 0xdd, 0x11,
+	0x99, 0xf4, 0xd3, 0xd0, 0xdd, 0x38, 0x7c, 0x5c, 0xca, 0xc3, 0x38, 0x14, 0x74, 0xe8, 0x99, 0x9f,
+	0xc0, 0xa8, 0xb9, 0x02, 0xd9, 0x72, 0x1a, 0xd0, 0xae, 0x92, 0xce, 0xa5, 0x9f, 0x76, 0x95, 0xdc,
+	0xa7, 0xc2, 0x9e, 0xd1, 0x47, 0xde, 0xe7, 0x6a, 0x15, 0x64, 0xa2, 0x7b, 0x23, 0x32, 0x79, 0x90,
+	0x0e, 0xa0, 0x25, 0x3e, 0x7e, 0x4b, 0x4f, 0xbd, 0xdd, 0x07, 0x23, 0x74, 0x39, 0x07, 0x63, 0xf6,
+	0x59, 0x31, 0x7a, 0x34, 0x37, 0x58, 0x04, 0x23, 0x57, 0x37, 0x1c, 0x8b, 0x4e, 0xb9, 0x9f, 0x76,
+	0x2d, 0x8e, 0x7f, 0x10, 0x7a, 0xe6, 0xe5, 0xa6, 0x59, 0x86, 0x95, 0xb6, 0xad, 0x1f, 0x71, 0xd7,
+	0xf0, 0x4f, 0xe9, 0x43, 0xe1, 0xd7, 0xaf, 0xb4, 0x28, 0x20, 0xe8, 0x9f, 0x84, 0xd9, 0x3b, 0x51,
+	0x40, 0xf3, 0x7d, 0x3b, 0x8a, 0x90, 0xd2, 0x40, 0x59, 0x46, 0x47, 0x8e, 0x35, 0x08, 0xe3, 0xa9,
+	0x9f, 0x8e, 0xd7, 0x84, 0xf2, 0x56, 0xa2, 0x69, 0x65, 0x17, 0xdf, 0x0f, 0x15, 0x2b, 0xa2, 0xf7,
+	0x73, 0x23, 0xb4, 0x05, 0x13, 0xe2, 0xec, 0xda, 0x1b, 0x04, 0xa2, 0xe3, 0x7f, 0x11, 0x60, 0x09,
+	0x3d, 0x76, 0x65, 0xd4, 0x73, 0x6f, 0xe7, 0xec, 0xb6, 0xb7, 0xf3, 0xa6, 0x21, 0xa4, 0x9e, 0xf7,
+	0xea, 0xfd, 0xaf, 0x0d, 0x27, 0xeb, 0x0d, 0x27, 0x7f, 0x36, 0x9c, 0xfc, 0xdc, 0xf2, 0xce, 0x7a,
+	0xcb, 0x3b, 0xbf, 0xb7, 0xbc, 0xf3, 0xf9, 0x65, 0xae, 0xec, 0xa2, 0x9a, 0xc5, 0x19, 0x16, 0x89,
+	0xaa, 0x71, 0x8e, 0x95, 0x96, 0xc2, 0x2a, 0xd4, 0x4d, 0xf7, 0x7c, 0xf6, 0x0d, 0xb3, 0xaf, 0xd9,
+	0x42, 0x28, 0x9d, 0xd4, 0xbb, 0x33, 0xb2, 0xd7, 0x4b, 0x28, 0x67, 0x3d, 0x77, 0x3e, 0x2f, 0xfe,
+	0x06, 0x00, 0x00, 0xff, 0xff, 0x65, 0xaa, 0x8d, 0xa2, 0xcc, 0x03, 0x00, 0x00,
 }
 
-func (this *EntityCreatedEvent) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*EntityCreatedEvent)
-	if !ok {
-		that2, ok := that.(EntityCreatedEvent)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.Entity.Equal(that1.Entity) {
-		return false
-	}
-	if this.Signer != that1.Signer {
-		return false
-	}
-	return true
-}
-func (this *EntityUpdatedEvent) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*EntityUpdatedEvent)
-	if !ok {
-		that2, ok := that.(EntityUpdatedEvent)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if !this.Entity.Equal(that1.Entity) {
-		return false
-	}
-	if this.Signer != that1.Signer {
-		return false
-	}
-	return true
-}
-func (this *EntityVerifiedUpdatedEvent) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*EntityVerifiedUpdatedEvent)
-	if !ok {
-		that2, ok := that.(EntityVerifiedUpdatedEvent)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.Id != that1.Id {
-		return false
-	}
-	if this.Signer != that1.Signer {
-		return false
-	}
-	if this.EntityVerified != that1.EntityVerified {
-		return false
-	}
-	return true
-}
-func (this *EntityTransferredEvent) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*EntityTransferredEvent)
-	if !ok {
-		that2, ok := that.(EntityTransferredEvent)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.Id != that1.Id {
-		return false
-	}
-	if this.From != that1.From {
-		return false
-	}
-	if this.To != that1.To {
-		return false
-	}
-	return true
-}
 func (m *EntityCreatedEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -505,6 +623,127 @@ func (m *EntityTransferredEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
+func (m *EntityAccountCreatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EntityAccountCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EntityAccountCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.AccountAddress) > 0 {
+		i -= len(m.AccountAddress)
+		copy(dAtA[i:], m.AccountAddress)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.AccountAddress)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.AccountName) > 0 {
+		i -= len(m.AccountName)
+		copy(dAtA[i:], m.AccountName)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.AccountName)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EntityAccountAuthzCreatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EntityAccountAuthzCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EntityAccountAuthzCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Grant != nil {
+		{
+			size, err := m.Grant.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Grantee) > 0 {
+		i -= len(m.Grantee)
+		copy(dAtA[i:], m.Grantee)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Grantee)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.AccountName) > 0 {
+		i -= len(m.AccountName)
+		copy(dAtA[i:], m.AccountName)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.AccountName)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Signer) > 0 {
+		i -= len(m.Signer)
+		copy(dAtA[i:], m.Signer)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Signer)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintEvent(dAtA []byte, offset int, v uint64) int {
 	offset -= sovEvent(v)
 	base := offset
@@ -586,6 +825,64 @@ func (m *EntityTransferredEvent) Size() (n int) {
 	}
 	l = len(m.To)
 	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *EntityAccountCreatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.AccountName)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.AccountAddress)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *EntityAccountAuthzCreatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.Signer)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.AccountName)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.Grantee)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	if m.Grant != nil {
+		l = m.Grant.Size()
 		n += 1 + l + sovEvent(uint64(l))
 	}
 	return n
@@ -1091,6 +1388,430 @@ func (m *EntityTransferredEvent) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.To = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EntityAccountCreatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EntityAccountCreatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EntityAccountCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccountName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AccountName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccountAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AccountAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EntityAccountAuthzCreatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EntityAccountAuthzCreatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EntityAccountAuthzCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AccountName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AccountName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Grantee", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Grantee = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Grant", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Grant == nil {
+				m.Grant = &Grant{}
+			}
+			if err := m.Grant.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

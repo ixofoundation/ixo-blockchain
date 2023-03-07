@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	ixo "github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -56,7 +57,7 @@ func (msg MsgSubmitClaim) ValidateBasic() error {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
 
-	if iidtypes.IsEmpty(msg.ClaimId) {
+	if ixo.IsEmpty(msg.ClaimId) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
 	}
 

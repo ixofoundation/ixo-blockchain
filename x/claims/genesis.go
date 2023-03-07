@@ -9,16 +9,42 @@ import (
 
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState *types.GenesisState) []abci.ValidatorUpdate {
-	k.SetParams(ctx, &genState.Params)
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abci.ValidatorUpdate {
+	// Initialise params
+	k.SetParams(ctx, &gs.Params)
+
+	// save collections to the store
+	for _, c := range gs.Collections {
+		k.SetCollection(ctx, c)
+	}
+
+	// save claims to the store
+	for _, c := range gs.Claims {
+		k.SetClaim(ctx, c)
+	}
+
+	// save disputes to the store
+	for _, d := range gs.Disputes {
+		k.SetDispute(ctx, d)
+	}
 
 	return []abci.ValidatorUpdate{}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesisState()
-	genesis.Params = k.GetParams(ctx)
+	params := k.GetParams(ctx)
 
-	return genesis
+	collections := k.GetCollections(ctx)
+
+	claims := k.GetClaims(ctx)
+
+	disputes := k.GetDisputes(ctx)
+
+	return &types.GenesisState{
+		Params:      params,
+		Collections: collections,
+		Disputes:    disputes,
+		Claims:      claims,
+	}
 }

@@ -760,6 +760,21 @@
         
           
           <li>
+            <a href="#ixo%2fentity%2fv1beta1%2fcosmos.proto">ixo/entity/v1beta1/cosmos.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.Grant"><span class="badge">M</span>Grant</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#ixo%2fiid%2fv1beta1%2ftypes.proto">ixo/iid/v1beta1/types.proto</a>
             <ul>
               
@@ -826,6 +841,10 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.entity.v1beta1.EntityAccount"><span class="badge">M</span>EntityAccount</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.entity.v1beta1.EntityMetadata"><span class="badge">M</span>EntityMetadata</a>
                 </li>
               
@@ -843,6 +862,14 @@
           <li>
             <a href="#ixo%2fentity%2fv1beta1%2fevent.proto">ixo/entity/v1beta1/event.proto</a>
             <ul>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent"><span class="badge">M</span>EntityAccountAuthzCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.EntityAccountCreatedEvent"><span class="badge">M</span>EntityAccountCreatedEvent</a>
+                </li>
               
                 <li>
                   <a href="#ixo.entity.v1beta1.EntityCreatedEvent"><span class="badge">M</span>EntityCreatedEvent</a>
@@ -1148,7 +1175,23 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.entity.v1beta1.MsgCreateEntityAccount"><span class="badge">M</span>MsgCreateEntityAccount</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgCreateEntityAccountResponse"><span class="badge">M</span>MsgCreateEntityAccountResponse</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.entity.v1beta1.MsgCreateEntityResponse"><span class="badge">M</span>MsgCreateEntityResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz"><span class="badge">M</span>MsgGrantEntityAccountAuthz</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse"><span class="badge">M</span>MsgGrantEntityAccountAuthzResponse</a>
                 </li>
               
                 <li>
@@ -5633,6 +5676,13 @@ plus the timeout on Collection payments, if null then none </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>disputes</td>
+                  <td><a href="#ixo.claims.v1beta1.Dispute">Dispute</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6581,6 +6631,51 @@ plus the timeout on Collection payments </p></td>
     
       
       <div class="file-heading">
+        <h2 id="ixo/entity/v1beta1/cosmos.proto">ixo/entity/v1beta1/cosmos.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.entity.v1beta1.Grant">Grant</h3>
+        <p>Grant gives permissions to execute</p><p>the provide method with expiration time.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>authorization</td>
+                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>expiration</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
         <h2 id="ixo/iid/v1beta1/types.proto">ixo/iid/v1beta1/types.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
@@ -7254,6 +7349,44 @@ Client applications </p></td>
 deactivated </p></td>
                 </tr>
               
+                <tr>
+                  <td>accounts</td>
+                  <td><a href="#ixo.entity.v1beta1.EntityAccount">EntityAccount</a></td>
+                  <td>repeated</td>
+                  <td><p>module accounts created for entity </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.EntityAccount">EntityAccount</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7350,6 +7483,110 @@ deactivated </p></td>
       </div>
       <p></p>
 
+      
+        <h3 id="ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent">EntityAccountAuthzCreatedEvent</h3>
+        <p>EntityAccountCreatedEvent is an event triggered on a entity account creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>granter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grantee</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grant</td>
+                  <td><a href="#ixo.entity.v1beta1.Grant">Grant</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.EntityAccountCreatedEvent">EntityAccountCreatedEvent</h3>
+        <p>EntityAccountCreatedEvent is an event triggered on a entity account creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
       
         <h3 id="ixo.entity.v1beta1.EntityCreatedEvent">EntityCreatedEvent</h3>
         <p>EntityCreatedEvent is an event triggered on a Entity creation</p>
@@ -9399,6 +9636,68 @@ subject </p></td>
 
         
       
+        <h3 id="ixo.entity.v1beta1.MsgCreateEntityAccount">MsgCreateEntityAccount</h3>
+        <p>create a module account for an entity, account details will be added as a</p><p>linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>entity id (did) to create account for </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>name of account </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The owner_address used to sign this transaction. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.MsgCreateEntityAccountResponse">MsgCreateEntityAccountResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>account</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>account address that was created for specific entity and account name </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.entity.v1beta1.MsgCreateEntityResponse">MsgCreateEntityResponse</h3>
         <p></p>
 
@@ -9434,6 +9733,65 @@ subject </p></td>
           </table>
 
           
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.MsgGrantEntityAccountAuthz">MsgGrantEntityAccountAuthz</h3>
+        <p>Create a authz grant from entity account (as grantor) to recipient in msg as</p><p>grantee for the specific authorization</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>entity id (did) to create account for </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>name of account </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grantee_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the grantee address that will be able to execute the authz authorization </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grant</td>
+                  <td><a href="#ixo.entity.v1beta1.Grant">Grant</a></td>
+                  <td></td>
+                  <td><p>grant to be Authorized in authz grant </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the owner_address used to sign this transaction. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse">MsgGrantEntityAccountAuthzResponse</h3>
+        <p></p>
+
+        
 
         
       
@@ -9658,6 +10016,20 @@ subject </p></td>
                 <td><a href="#ixo.entity.v1beta1.MsgTransferEntity">MsgTransferEntity</a></td>
                 <td><a href="#ixo.entity.v1beta1.MsgTransferEntityResponse">MsgTransferEntityResponse</a></td>
                 <td><p>Transfers an entity and its nft to the recipient</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreateEntityAccount</td>
+                <td><a href="#ixo.entity.v1beta1.MsgCreateEntityAccount">MsgCreateEntityAccount</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgCreateEntityAccountResponse">MsgCreateEntityAccountResponse</a></td>
+                <td><p>Create a module account for an entity,</p></td>
+              </tr>
+            
+              <tr>
+                <td>GrantEntityAccountAuthz</td>
+                <td><a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz">MsgGrantEntityAccountAuthz</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse">MsgGrantEntityAccountAuthzResponse</a></td>
+                <td><p>Create a authz grant from entity account</p></td>
               </tr>
             
           </tbody>

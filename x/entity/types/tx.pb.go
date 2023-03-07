@@ -7,6 +7,7 @@ import (
 	context "context"
 	encoding_json "encoding/json"
 	fmt "fmt"
+	github_com_cosmos_cosmos_sdk_x_authz "github.com/cosmos/cosmos-sdk/x/authz"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
@@ -99,6 +100,132 @@ func (m *MsgCreateEntity) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_MsgCreateEntity proto.InternalMessageInfo
+
+func (m *MsgCreateEntity) GetEntityType() string {
+	if m != nil {
+		return m.EntityType
+	}
+	return ""
+}
+
+func (m *MsgCreateEntity) GetEntityStatus() int32 {
+	if m != nil {
+		return m.EntityStatus
+	}
+	return 0
+}
+
+func (m *MsgCreateEntity) GetController() []string {
+	if m != nil {
+		return m.Controller
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetContext() []*types.Context {
+	if m != nil {
+		return m.Context
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetVerification() []*types.Verification {
+	if m != nil {
+		return m.Verification
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetService() []*types.Service {
+	if m != nil {
+		return m.Service
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetAccordedRight() []*types.AccordedRight {
+	if m != nil {
+		return m.AccordedRight
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetLinkedResource() []*types.LinkedResource {
+	if m != nil {
+		return m.LinkedResource
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetLinkedEntity() []*types.LinkedEntity {
+	if m != nil {
+		return m.LinkedEntity
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetStartDate() *time.Time {
+	if m != nil {
+		return m.StartDate
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetEndDate() *time.Time {
+	if m != nil {
+		return m.EndDate
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetRelayerNode() string {
+	if m != nil {
+		return m.RelayerNode
+	}
+	return ""
+}
+
+func (m *MsgCreateEntity) GetCredentials() []string {
+	if m != nil {
+		return m.Credentials
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetOwnerDid() github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment {
+	if m != nil {
+		return m.OwnerDid
+	}
+	return ""
+}
+
+func (m *MsgCreateEntity) GetOwnerAddress() string {
+	if m != nil {
+		return m.OwnerAddress
+	}
+	return ""
+}
+
+func (m *MsgCreateEntity) GetData() encoding_json.RawMessage {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+func (m *MsgCreateEntity) GetAlsoKnownAs() string {
+	if m != nil {
+		return m.AlsoKnownAs
+	}
+	return ""
+}
+
+func (m *MsgCreateEntity) GetLinkedClaim() []*types.LinkedClaim {
+	if m != nil {
+		return m.LinkedClaim
+	}
+	return nil
+}
 
 type MsgCreateEntityResponse struct {
 	EntityId     string `protobuf:"bytes,1,opt,name=entity_id,json=entityId,proto3" json:"entity_id,omitempty"`
@@ -214,6 +341,55 @@ func (m *MsgUpdateEntity) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateEntity proto.InternalMessageInfo
 
+func (m *MsgUpdateEntity) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *MsgUpdateEntity) GetEntityStatus() int32 {
+	if m != nil {
+		return m.EntityStatus
+	}
+	return 0
+}
+
+func (m *MsgUpdateEntity) GetStartDate() *time.Time {
+	if m != nil {
+		return m.StartDate
+	}
+	return nil
+}
+
+func (m *MsgUpdateEntity) GetEndDate() *time.Time {
+	if m != nil {
+		return m.EndDate
+	}
+	return nil
+}
+
+func (m *MsgUpdateEntity) GetCredentials() []string {
+	if m != nil {
+		return m.Credentials
+	}
+	return nil
+}
+
+func (m *MsgUpdateEntity) GetControllerDid() github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment {
+	if m != nil {
+		return m.ControllerDid
+	}
+	return ""
+}
+
+func (m *MsgUpdateEntity) GetControllerAddress() string {
+	if m != nil {
+		return m.ControllerAddress
+	}
+	return ""
+}
+
 type MsgUpdateEntityResponse struct {
 }
 
@@ -293,6 +469,34 @@ func (m *MsgUpdateEntityVerified) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateEntityVerified proto.InternalMessageInfo
 
+func (m *MsgUpdateEntityVerified) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *MsgUpdateEntityVerified) GetEntityVerified() bool {
+	if m != nil {
+		return m.EntityVerified
+	}
+	return false
+}
+
+func (m *MsgUpdateEntityVerified) GetRelayerNodeDid() github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment {
+	if m != nil {
+		return m.RelayerNodeDid
+	}
+	return ""
+}
+
+func (m *MsgUpdateEntityVerified) GetRelayerNodeAddress() string {
+	if m != nil {
+		return m.RelayerNodeAddress
+	}
+	return ""
+}
+
 type MsgUpdateEntityVerifiedResponse struct {
 }
 
@@ -330,8 +534,10 @@ func (m *MsgUpdateEntityVerifiedResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgUpdateEntityVerifiedResponse proto.InternalMessageInfo
 
 type MsgTransferEntity struct {
-	Id           string                                                          `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	OwnerDid     github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The owner_did used to sign this transaction.
+	OwnerDid github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
+	// The owner_address used to sign this transaction.
 	OwnerAddress string                                                          `protobuf:"bytes,3,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 	RecipientDid github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
 }
@@ -369,6 +575,34 @@ func (m *MsgTransferEntity) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferEntity proto.InternalMessageInfo
 
+func (m *MsgTransferEntity) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *MsgTransferEntity) GetOwnerDid() github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment {
+	if m != nil {
+		return m.OwnerDid
+	}
+	return ""
+}
+
+func (m *MsgTransferEntity) GetOwnerAddress() string {
+	if m != nil {
+		return m.OwnerAddress
+	}
+	return ""
+}
+
+func (m *MsgTransferEntity) GetRecipientDid() github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment {
+	if m != nil {
+		return m.RecipientDid
+	}
+	return ""
+}
+
 type MsgTransferEntityResponse struct {
 }
 
@@ -405,6 +639,235 @@ func (m *MsgTransferEntityResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferEntityResponse proto.InternalMessageInfo
 
+// create a module account for an entity, account details will be added as a
+// linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+type MsgCreateEntityAccount struct {
+	// entity id (did) to create account for
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// name of account
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The owner_address used to sign this transaction.
+	OwnerAddress string `protobuf:"bytes,3,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+}
+
+func (m *MsgCreateEntityAccount) Reset()         { *m = MsgCreateEntityAccount{} }
+func (m *MsgCreateEntityAccount) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateEntityAccount) ProtoMessage()    {}
+func (*MsgCreateEntityAccount) Descriptor() ([]byte, []int) {
+	return fileDescriptor_60859df4ac9fa053, []int{8}
+}
+func (m *MsgCreateEntityAccount) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateEntityAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateEntityAccount.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateEntityAccount) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateEntityAccount.Merge(m, src)
+}
+func (m *MsgCreateEntityAccount) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateEntityAccount) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateEntityAccount.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateEntityAccount proto.InternalMessageInfo
+
+func (m *MsgCreateEntityAccount) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *MsgCreateEntityAccount) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *MsgCreateEntityAccount) GetOwnerAddress() string {
+	if m != nil {
+		return m.OwnerAddress
+	}
+	return ""
+}
+
+type MsgCreateEntityAccountResponse struct {
+	// account address that was created for specific entity and account name
+	Account string `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
+}
+
+func (m *MsgCreateEntityAccountResponse) Reset()         { *m = MsgCreateEntityAccountResponse{} }
+func (m *MsgCreateEntityAccountResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateEntityAccountResponse) ProtoMessage()    {}
+func (*MsgCreateEntityAccountResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_60859df4ac9fa053, []int{9}
+}
+func (m *MsgCreateEntityAccountResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateEntityAccountResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateEntityAccountResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateEntityAccountResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateEntityAccountResponse.Merge(m, src)
+}
+func (m *MsgCreateEntityAccountResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateEntityAccountResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateEntityAccountResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateEntityAccountResponse proto.InternalMessageInfo
+
+func (m *MsgCreateEntityAccountResponse) GetAccount() string {
+	if m != nil {
+		return m.Account
+	}
+	return ""
+}
+
+// Create a authz grant from entity account (as grantor) to recipient in msg as
+// grantee for the specific authorization
+type MsgGrantEntityAccountAuthz struct {
+	// entity id (did) to create account for
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// name of account
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// the grantee address that will be able to execute the authz authorization
+	GranteeAddress string `protobuf:"bytes,3,opt,name=grantee_address,json=granteeAddress,proto3" json:"grantee_address,omitempty"`
+	// grant to be Authorized in authz grant
+	Grant github_com_cosmos_cosmos_sdk_x_authz.Grant `protobuf:"bytes,4,opt,name=grant,proto3,casttype=github.com/cosmos/cosmos-sdk/x/authz.Grant" json:"grant"`
+	// the owner_address used to sign this transaction.
+	OwnerAddress string `protobuf:"bytes,5,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
+}
+
+func (m *MsgGrantEntityAccountAuthz) Reset()         { *m = MsgGrantEntityAccountAuthz{} }
+func (m *MsgGrantEntityAccountAuthz) String() string { return proto.CompactTextString(m) }
+func (*MsgGrantEntityAccountAuthz) ProtoMessage()    {}
+func (*MsgGrantEntityAccountAuthz) Descriptor() ([]byte, []int) {
+	return fileDescriptor_60859df4ac9fa053, []int{10}
+}
+func (m *MsgGrantEntityAccountAuthz) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgGrantEntityAccountAuthz) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgGrantEntityAccountAuthz.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgGrantEntityAccountAuthz) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgGrantEntityAccountAuthz.Merge(m, src)
+}
+func (m *MsgGrantEntityAccountAuthz) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgGrantEntityAccountAuthz) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgGrantEntityAccountAuthz.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgGrantEntityAccountAuthz proto.InternalMessageInfo
+
+func (m *MsgGrantEntityAccountAuthz) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *MsgGrantEntityAccountAuthz) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *MsgGrantEntityAccountAuthz) GetGranteeAddress() string {
+	if m != nil {
+		return m.GranteeAddress
+	}
+	return ""
+}
+
+func (m *MsgGrantEntityAccountAuthz) GetGrant() github_com_cosmos_cosmos_sdk_x_authz.Grant {
+	if m != nil {
+		return m.Grant
+	}
+	return github_com_cosmos_cosmos_sdk_x_authz.Grant{}
+}
+
+func (m *MsgGrantEntityAccountAuthz) GetOwnerAddress() string {
+	if m != nil {
+		return m.OwnerAddress
+	}
+	return ""
+}
+
+type MsgGrantEntityAccountAuthzResponse struct {
+}
+
+func (m *MsgGrantEntityAccountAuthzResponse) Reset()         { *m = MsgGrantEntityAccountAuthzResponse{} }
+func (m *MsgGrantEntityAccountAuthzResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgGrantEntityAccountAuthzResponse) ProtoMessage()    {}
+func (*MsgGrantEntityAccountAuthzResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_60859df4ac9fa053, []int{11}
+}
+func (m *MsgGrantEntityAccountAuthzResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgGrantEntityAccountAuthzResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgGrantEntityAccountAuthzResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgGrantEntityAccountAuthzResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgGrantEntityAccountAuthzResponse.Merge(m, src)
+}
+func (m *MsgGrantEntityAccountAuthzResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgGrantEntityAccountAuthzResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgGrantEntityAccountAuthzResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgGrantEntityAccountAuthzResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgCreateEntity)(nil), "ixo.entity.v1beta1.MsgCreateEntity")
 	proto.RegisterType((*MsgCreateEntityResponse)(nil), "ixo.entity.v1beta1.MsgCreateEntityResponse")
@@ -414,76 +877,89 @@ func init() {
 	proto.RegisterType((*MsgUpdateEntityVerifiedResponse)(nil), "ixo.entity.v1beta1.MsgUpdateEntityVerifiedResponse")
 	proto.RegisterType((*MsgTransferEntity)(nil), "ixo.entity.v1beta1.MsgTransferEntity")
 	proto.RegisterType((*MsgTransferEntityResponse)(nil), "ixo.entity.v1beta1.MsgTransferEntityResponse")
+	proto.RegisterType((*MsgCreateEntityAccount)(nil), "ixo.entity.v1beta1.MsgCreateEntityAccount")
+	proto.RegisterType((*MsgCreateEntityAccountResponse)(nil), "ixo.entity.v1beta1.MsgCreateEntityAccountResponse")
+	proto.RegisterType((*MsgGrantEntityAccountAuthz)(nil), "ixo.entity.v1beta1.MsgGrantEntityAccountAuthz")
+	proto.RegisterType((*MsgGrantEntityAccountAuthzResponse)(nil), "ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse")
 }
 
 func init() { proto.RegisterFile("ixo/entity/v1beta1/tx.proto", fileDescriptor_60859df4ac9fa053) }
 
 var fileDescriptor_60859df4ac9fa053 = []byte{
-	// 1014 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x41, 0x6f, 0xdb, 0x36,
-	0x14, 0x8e, 0x2c, 0x37, 0xb6, 0x69, 0xd9, 0x69, 0x88, 0x00, 0x63, 0x9c, 0xce, 0x76, 0x53, 0x0c,
-	0x33, 0x30, 0x44, 0x6e, 0x53, 0x60, 0x87, 0xed, 0x10, 0xc4, 0x71, 0x87, 0x15, 0x5b, 0x86, 0x41,
-	0xcd, 0x76, 0xd8, 0xc5, 0xa1, 0x45, 0x5a, 0x61, 0x2b, 0x8b, 0x86, 0x48, 0x27, 0x0e, 0xb0, 0x1f,
-	0x30, 0x60, 0x97, 0xfe, 0x82, 0xa1, 0xf7, 0xfd, 0x91, 0x1d, 0x7b, 0xdc, 0xa9, 0x2b, 0x92, 0xcb,
-	0x7e, 0x43, 0x81, 0x01, 0x83, 0x48, 0xc9, 0x96, 0xad, 0x18, 0x75, 0xb1, 0x60, 0x37, 0xf1, 0xbd,
-	0xef, 0xbd, 0x47, 0xbe, 0xf7, 0xbd, 0x0f, 0x02, 0x3b, 0x6c, 0xc2, 0xdb, 0x34, 0x90, 0x4c, 0x5e,
-	0xb6, 0xcf, 0x1f, 0xf5, 0xa9, 0xc4, 0x8f, 0xda, 0x72, 0x62, 0x8f, 0x42, 0x2e, 0x39, 0x84, 0x6c,
-	0xc2, 0x6d, 0xed, 0xb4, 0x63, 0x67, 0x6d, 0xcb, 0xe3, 0x1e, 0x57, 0xee, 0x76, 0xf4, 0xa5, 0x91,
-	0xb5, 0xed, 0x28, 0x0d, 0x63, 0x64, 0x9a, 0x83, 0x31, 0x12, 0xbb, 0xd0, 0xa2, 0x2b, 0x49, 0x5f,
-	0xdb, 0xc9, 0x78, 0x2e, 0x47, 0x54, 0xc4, 0xce, 0xc6, 0x0d, 0x17, 0x8b, 0xaf, 0x12, 0x03, 0x3c,
-	0xce, 0x3d, 0x9f, 0xb6, 0xd5, 0xa9, 0x3f, 0x1e, 0xb4, 0x25, 0x1b, 0x52, 0x21, 0xf1, 0x70, 0xa4,
-	0x01, 0xbb, 0x6f, 0x0b, 0x60, 0xe3, 0x58, 0x78, 0x47, 0x21, 0xc5, 0x92, 0x3e, 0x51, 0xa1, 0xb0,
-	0x01, 0xca, 0x3a, 0x49, 0x2f, 0xaa, 0x85, 0x8c, 0xa6, 0xd1, 0x2a, 0x39, 0x40, 0x9b, 0x4e, 0x2e,
-	0x47, 0x14, 0x3e, 0x00, 0x95, 0x18, 0x20, 0x24, 0x96, 0x63, 0x81, 0x72, 0x4d, 0xa3, 0x75, 0xc7,
-	0xb1, 0xb4, 0xf1, 0x99, 0xb2, 0xc1, 0x3a, 0x00, 0x2e, 0x0f, 0x64, 0xc8, 0x7d, 0x9f, 0x86, 0xc8,
-	0x6c, 0x9a, 0x51, 0x92, 0x99, 0x05, 0xee, 0x83, 0x42, 0x74, 0xa2, 0x13, 0x89, 0xf2, 0x4d, 0xb3,
-	0x55, 0xde, 0x47, 0x76, 0xd4, 0xc9, 0xa8, 0x27, 0xf1, 0x53, 0xec, 0x23, 0xed, 0x77, 0x12, 0x20,
-	0x3c, 0x04, 0xd6, 0x39, 0x0d, 0xd9, 0x80, 0xb9, 0x58, 0x32, 0x1e, 0xa0, 0x3b, 0x2a, 0xf0, 0xe3,
-	0x4c, 0xe0, 0x8f, 0x29, 0x90, 0x33, 0x17, 0x12, 0x95, 0x15, 0x34, 0x3c, 0x67, 0x2e, 0x45, 0xeb,
-	0x4b, 0xca, 0x3e, 0xd3, 0x7e, 0x27, 0x01, 0xc2, 0x27, 0xa0, 0x8a, 0x5d, 0x97, 0x87, 0x84, 0x92,
-	0x5e, 0xc8, 0xbc, 0x33, 0x89, 0x0a, 0x2a, 0xb4, 0x9e, 0x09, 0x3d, 0x8c, 0x61, 0x4e, 0x84, 0x72,
-	0x2a, 0x38, 0x7d, 0x84, 0x5f, 0x83, 0x0d, 0x9f, 0x05, 0x2f, 0xa2, 0x24, 0x54, 0xf0, 0x71, 0xe8,
-	0x52, 0x54, 0x54, 0x79, 0x1a, 0x99, 0x3c, 0xdf, 0x2a, 0x9c, 0x13, 0xc3, 0x9c, 0xaa, 0x3f, 0x77,
-	0x86, 0x1d, 0x50, 0x89, 0x33, 0xe9, 0x96, 0xa3, 0xd2, 0x92, 0x46, 0xe8, 0x3c, 0x7a, 0xae, 0x8e,
-	0xe5, 0xa7, 0x4e, 0xf0, 0x00, 0x00, 0x21, 0x71, 0x28, 0x7b, 0x04, 0x4b, 0x8a, 0x40, 0xd3, 0x68,
-	0x95, 0xf7, 0x6b, 0xb6, 0xe6, 0x8b, 0x9d, 0xf0, 0xc5, 0x3e, 0x49, 0xf8, 0xd2, 0xc9, 0xbf, 0xfc,
-	0xab, 0x61, 0x38, 0x25, 0x15, 0xd3, 0xc5, 0x92, 0xc2, 0x2f, 0x41, 0x91, 0x06, 0x44, 0x87, 0x97,
-	0x57, 0x0c, 0x2f, 0xd0, 0x80, 0xa8, 0xe0, 0xfb, 0xc0, 0x0a, 0xa9, 0x8f, 0x2f, 0x69, 0xd8, 0x0b,
-	0x38, 0xa1, 0xc8, 0x52, 0x24, 0x2b, 0xc7, 0xb6, 0xef, 0x38, 0xa1, 0xb0, 0x09, 0xca, 0x6e, 0x48,
-	0x49, 0xf4, 0x42, 0xec, 0x0b, 0x54, 0x51, 0x0c, 0x4a, 0x9b, 0xe0, 0x29, 0x28, 0xf1, 0x8b, 0x80,
-	0x86, 0x3d, 0xc2, 0x08, 0xaa, 0x46, 0x19, 0x3a, 0x47, 0xef, 0xde, 0x34, 0x0e, 0x3c, 0x26, 0xcf,
-	0xc6, 0x7d, 0xdb, 0xe5, 0xc3, 0x36, 0x9b, 0xf0, 0x01, 0x1f, 0x07, 0x44, 0x0d, 0x3f, 0x3a, 0xed,
-	0xf5, 0x7d, 0xee, 0xbe, 0x70, 0xcf, 0x30, 0x0b, 0xda, 0x13, 0xb5, 0x58, 0x7a, 0xa1, 0xba, 0x4f,
-	0xbb, 0x5f, 0x85, 0xd8, 0x1b, 0xd2, 0x40, 0x3a, 0x45, 0x95, 0xb5, 0xcb, 0x48, 0xc4, 0x74, 0x5d,
-	0x01, 0x13, 0x12, 0x52, 0x21, 0xd0, 0x86, 0xba, 0xa7, 0xa5, 0x8c, 0x87, 0xda, 0x06, 0x1f, 0x82,
-	0x3c, 0xc1, 0x12, 0xa3, 0xbb, 0x4d, 0xa3, 0x65, 0x75, 0xee, 0xbd, 0x7b, 0xd3, 0x40, 0x34, 0x70,
-	0x39, 0x61, 0x81, 0xd7, 0x7e, 0x2e, 0x78, 0x60, 0x3b, 0xf8, 0xe2, 0x98, 0x0a, 0x81, 0x3d, 0xea,
-	0x28, 0x64, 0xf4, 0x34, 0xec, 0x0b, 0xfe, 0x4d, 0xc0, 0x2f, 0x82, 0x43, 0x81, 0x36, 0xf5, 0xe3,
-	0x53, 0x26, 0x78, 0x00, 0xe2, 0x69, 0xf5, 0x5c, 0x1f, 0xb3, 0x21, 0x82, 0x6a, 0xc0, 0xf7, 0x96,
-	0x0c, 0xf8, 0x28, 0xc2, 0x38, 0x65, 0x7f, 0x76, 0xf8, 0xa2, 0xf8, 0xcb, 0xab, 0xc6, 0xda, 0xdf,
-	0xaf, 0x1a, 0x6b, 0xbb, 0x3f, 0x83, 0x8f, 0x16, 0x36, 0xdc, 0xa1, 0x62, 0xc4, 0x03, 0x41, 0xe1,
-	0x0e, 0x28, 0xc5, 0x8b, 0xcc, 0x48, 0xbc, 0xe7, 0x45, 0x6d, 0x78, 0x4a, 0x16, 0x65, 0x20, 0xf7,
-	0x7e, 0x19, 0x30, 0xb3, 0x32, 0xb0, 0xfb, 0xab, 0xa9, 0x04, 0xe6, 0x87, 0x11, 0x99, 0x09, 0x4c,
-	0x15, 0xe4, 0xa6, 0xf5, 0x72, 0xba, 0xcb, 0xef, 0xd7, 0x93, 0x79, 0xbe, 0x9a, 0xff, 0x8d, 0xaf,
-	0xf9, 0x0f, 0xe5, 0xeb, 0x02, 0x19, 0xef, 0x64, 0xc9, 0xf8, 0x1c, 0x54, 0x67, 0xea, 0xa6, 0x18,
-	0xb9, 0x7e, 0x7b, 0x8c, 0xac, 0xcc, 0x52, 0x47, 0xb4, 0xdc, 0x03, 0x30, 0x55, 0x2b, 0xe1, 0x66,
-	0x41, 0x35, 0x74, 0x73, 0xe6, 0x89, 0x09, 0x9a, 0xe2, 0xc2, 0xb6, 0xe2, 0x42, 0x7a, 0x18, 0x09,
-	0x17, 0x76, 0xff, 0x31, 0x32, 0x3e, 0x2d, 0xa3, 0x94, 0x64, 0x06, 0xf6, 0x29, 0xd8, 0x88, 0x07,
-	0x76, 0x1e, 0x43, 0xd4, 0xc8, 0x8a, 0x4e, 0x95, 0xce, 0x07, 0x0e, 0xc1, 0xdd, 0xf4, 0x9a, 0xab,
-	0xb6, 0x98, 0xb7, 0xd7, 0x96, 0x6a, 0x4a, 0x2f, 0xa2, 0xbe, 0x3c, 0x04, 0x5b, 0x73, 0xe5, 0x92,
-	0xce, 0xe4, 0xd5, 0xcd, 0x61, 0x0a, 0x9d, 0x6d, 0xcd, 0x7d, 0xd0, 0x58, 0xf2, 0xfc, 0x69, 0x8b,
-	0x7e, 0xcb, 0x81, 0xcd, 0x63, 0xe1, 0x9d, 0x84, 0x38, 0x10, 0x03, 0x1a, 0x2e, 0x61, 0xf3, 0x9c,
-	0x2a, 0xe5, 0xfe, 0x17, 0x55, 0x32, 0x6f, 0x50, 0xa5, 0x33, 0x50, 0x09, 0xa9, 0xcb, 0x46, 0x8c,
-	0x06, 0x52, 0x5d, 0x25, 0x7f, 0x7b, 0x57, 0xb1, 0xa6, 0x99, 0xbb, 0x8c, 0xa4, 0x7a, 0xb8, 0x03,
-	0xb6, 0x33, 0xfd, 0x49, 0xba, 0xb7, 0xff, 0xbb, 0x09, 0xcc, 0x63, 0xe1, 0xc1, 0x53, 0x60, 0xcd,
-	0xfd, 0x6e, 0x3c, 0xb0, 0xb3, 0x7f, 0x50, 0xf6, 0x82, 0x62, 0xd5, 0x3e, 0x5b, 0x01, 0x34, 0x95,
-	0xb5, 0x53, 0x60, 0xcd, 0xe9, 0xcd, 0xb2, 0x0a, 0x69, 0xd0, 0xd2, 0x0a, 0x37, 0x2d, 0x0b, 0x9c,
-	0x80, 0xad, 0x1b, 0x17, 0x65, 0x95, 0x24, 0x09, 0xb8, 0xf6, 0xf8, 0x03, 0xc0, 0xd3, 0xca, 0x03,
-	0x50, 0x5d, 0xe0, 0xdf, 0x27, 0x4b, 0xd2, 0xcc, 0xc3, 0x6a, 0x7b, 0x2b, 0xc1, 0x92, 0x3a, 0x9d,
-	0xef, 0xff, 0xb8, 0xaa, 0x1b, 0xaf, 0xaf, 0xea, 0xc6, 0xdb, 0xab, 0xba, 0xf1, 0xf2, 0xba, 0xbe,
-	0xf6, 0xfa, 0xba, 0xbe, 0xf6, 0xe7, 0x75, 0x7d, 0xed, 0xa7, 0xcf, 0x57, 0x67, 0x4f, 0xfc, 0x6b,
-	0xaa, 0x08, 0xd4, 0x5f, 0x57, 0x2a, 0xfb, 0xf8, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x76, 0x1e,
-	0xb4, 0xd9, 0x4e, 0x0b, 0x00, 0x00,
+	// 1166 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0xcd, 0x6e, 0xdb, 0x46,
+	0x10, 0xb6, 0xfe, 0x22, 0x7b, 0xf4, 0xe3, 0x64, 0x1b, 0x34, 0xb4, 0x9c, 0x4a, 0x8a, 0xd2, 0x22,
+	0x46, 0x0a, 0x53, 0x89, 0x02, 0xe4, 0xd0, 0x1e, 0x02, 0xcb, 0x4e, 0xdb, 0xa0, 0x75, 0x51, 0x30,
+	0x69, 0x0f, 0xbd, 0xc8, 0x6b, 0xee, 0x9a, 0xde, 0x98, 0xe2, 0x0a, 0xdc, 0x95, 0x2d, 0x17, 0xbd,
+	0xe4, 0x0d, 0x72, 0xe8, 0x33, 0xf4, 0x59, 0x72, 0xcc, 0xa9, 0xe8, 0xc9, 0x2d, 0xec, 0x47, 0xe8,
+	0xcd, 0xa7, 0x82, 0xbb, 0xa4, 0x44, 0x89, 0x22, 0x22, 0xa3, 0x46, 0x4f, 0xe2, 0xce, 0x7c, 0xf3,
+	0xb3, 0x33, 0xdf, 0x0c, 0x29, 0x58, 0x67, 0x23, 0xde, 0xa6, 0x9e, 0x64, 0xf2, 0xb4, 0x7d, 0xfc,
+	0x78, 0x9f, 0x4a, 0xfc, 0xb8, 0x2d, 0x47, 0xe6, 0xc0, 0xe7, 0x92, 0x23, 0xc4, 0x46, 0xdc, 0xd4,
+	0x4a, 0x33, 0x54, 0xd6, 0x6e, 0x3b, 0xdc, 0xe1, 0x4a, 0xdd, 0x0e, 0x9e, 0x34, 0xb2, 0xb6, 0x16,
+	0xb8, 0x61, 0x8c, 0x8c, 0x7d, 0x30, 0x46, 0x42, 0x95, 0x31, 0xab, 0x8a, 0xdc, 0xd7, 0xd6, 0x13,
+	0x9a, 0xd3, 0x01, 0x15, 0xa1, 0xb2, 0x31, 0x27, 0xb1, 0x30, 0x95, 0x74, 0x80, 0xcd, 0x45, 0x9f,
+	0x8f, 0x3d, 0x38, 0x9c, 0x3b, 0x2e, 0x6d, 0xab, 0xd3, 0xfe, 0xf0, 0xa0, 0x2d, 0x59, 0x9f, 0x0a,
+	0x89, 0xfb, 0x03, 0x0d, 0x68, 0xfd, 0x51, 0x84, 0xd5, 0x5d, 0xe1, 0x6c, 0xfb, 0x14, 0x4b, 0xfa,
+	0x5c, 0x79, 0x42, 0x0d, 0x28, 0x69, 0x9f, 0xbd, 0x20, 0x19, 0x23, 0xd3, 0xcc, 0x6c, 0xac, 0x58,
+	0xa0, 0x45, 0xaf, 0x4e, 0x07, 0x14, 0xdd, 0x87, 0x4a, 0x08, 0x10, 0x12, 0xcb, 0xa1, 0x30, 0xb2,
+	0xcd, 0xcc, 0x46, 0xc1, 0x2a, 0x6b, 0xe1, 0x4b, 0x25, 0x43, 0x75, 0x00, 0x9b, 0x7b, 0xd2, 0xe7,
+	0xae, 0x4b, 0x7d, 0x23, 0xd7, 0xcc, 0x05, 0x4e, 0x26, 0x12, 0xd4, 0x81, 0x62, 0x70, 0xa2, 0x23,
+	0x69, 0xe4, 0x9b, 0xb9, 0x8d, 0x52, 0xc7, 0x30, 0x83, 0x52, 0x07, 0x45, 0x0b, 0xaf, 0x62, 0x6e,
+	0x6b, 0xbd, 0x15, 0x01, 0xd1, 0x16, 0x94, 0x8f, 0xa9, 0xcf, 0x0e, 0x98, 0x8d, 0x25, 0xe3, 0x9e,
+	0x51, 0x50, 0x86, 0x9f, 0x24, 0x0c, 0x7f, 0x8a, 0x81, 0xac, 0x29, 0x93, 0x20, 0xac, 0xa0, 0xfe,
+	0x31, 0xb3, 0xa9, 0x71, 0x23, 0x25, 0xec, 0x4b, 0xad, 0xb7, 0x22, 0x20, 0x7a, 0x0e, 0x55, 0x6c,
+	0xdb, 0xdc, 0x27, 0x94, 0xf4, 0x7c, 0xe6, 0x1c, 0x4a, 0xa3, 0xa8, 0x4c, 0xeb, 0x09, 0xd3, 0xad,
+	0x10, 0x66, 0x05, 0x28, 0xab, 0x82, 0xe3, 0x47, 0xf4, 0x0d, 0xac, 0xba, 0xcc, 0x3b, 0x0a, 0x9c,
+	0x50, 0xc1, 0x87, 0xbe, 0x4d, 0x8d, 0x65, 0xe5, 0xa7, 0x91, 0xf0, 0xf3, 0x9d, 0xc2, 0x59, 0x21,
+	0xcc, 0xaa, 0xba, 0x53, 0x67, 0xd4, 0x85, 0x4a, 0xe8, 0x49, 0x97, 0xdc, 0x58, 0x49, 0x29, 0x84,
+	0xf6, 0xa3, 0xfb, 0x6a, 0x95, 0xdd, 0xd8, 0x09, 0x3d, 0x03, 0x10, 0x12, 0xfb, 0xb2, 0x47, 0xb0,
+	0xa4, 0x06, 0x34, 0x33, 0x1b, 0xa5, 0x4e, 0xcd, 0xd4, 0x7c, 0x31, 0x23, 0xbe, 0x98, 0xaf, 0x22,
+	0xbe, 0x74, 0xf3, 0x6f, 0xff, 0x6a, 0x64, 0xac, 0x15, 0x65, 0xb3, 0x83, 0x25, 0x45, 0x5f, 0xc2,
+	0x32, 0xf5, 0x88, 0x36, 0x2f, 0x2d, 0x68, 0x5e, 0xa4, 0x1e, 0x51, 0xc6, 0xf7, 0xa0, 0xec, 0x53,
+	0x17, 0x9f, 0x52, 0xbf, 0xe7, 0x71, 0x42, 0x8d, 0xb2, 0x22, 0x59, 0x29, 0x94, 0x7d, 0xcf, 0x09,
+	0x45, 0x4d, 0x28, 0xd9, 0x3e, 0x25, 0xc1, 0x0d, 0xb1, 0x2b, 0x8c, 0x8a, 0x62, 0x50, 0x5c, 0x84,
+	0xf6, 0x60, 0x85, 0x9f, 0x78, 0xd4, 0xef, 0x11, 0x46, 0x8c, 0x6a, 0xe0, 0xa1, 0xbb, 0x7d, 0x79,
+	0xd6, 0x78, 0xe6, 0x30, 0x79, 0x38, 0xdc, 0x37, 0x6d, 0xde, 0x6f, 0xb3, 0x11, 0x3f, 0xe0, 0x43,
+	0x8f, 0xa8, 0xe6, 0x07, 0xa7, 0xcd, 0x7d, 0x97, 0xdb, 0x47, 0xf6, 0x21, 0x66, 0x5e, 0x7b, 0xa4,
+	0x26, 0x4f, 0x4f, 0xdc, 0xce, 0x8b, 0x9d, 0xaf, 0x7c, 0xec, 0xf4, 0xa9, 0x27, 0xad, 0x65, 0xe5,
+	0x75, 0x87, 0x91, 0x80, 0xe9, 0x3a, 0x02, 0x26, 0xc4, 0xa7, 0x42, 0x18, 0xab, 0x2a, 0xcf, 0xb2,
+	0x12, 0x6e, 0x69, 0x19, 0x7a, 0x04, 0x79, 0x82, 0x25, 0x36, 0x6e, 0x36, 0x33, 0x1b, 0xe5, 0xee,
+	0xdd, 0xcb, 0xb3, 0x86, 0x41, 0x3d, 0x9b, 0x13, 0xe6, 0x39, 0xed, 0xd7, 0x82, 0x7b, 0xa6, 0x85,
+	0x4f, 0x76, 0xa9, 0x10, 0xd8, 0xa1, 0x96, 0x42, 0x06, 0x57, 0xc3, 0xae, 0xe0, 0xdf, 0x7a, 0xfc,
+	0xc4, 0xdb, 0x12, 0xc6, 0x2d, 0x7d, 0xf9, 0x98, 0x08, 0x3d, 0x83, 0xb0, 0x5b, 0x3d, 0xdb, 0xc5,
+	0xac, 0x6f, 0x20, 0xd5, 0xe0, 0xbb, 0x29, 0x0d, 0xde, 0x0e, 0x30, 0x56, 0xc9, 0x9d, 0x1c, 0x5a,
+	0xbf, 0xc2, 0x9d, 0x99, 0xb9, 0xb6, 0xa8, 0x18, 0x70, 0x4f, 0x50, 0xb4, 0x0e, 0x2b, 0xe1, 0xf8,
+	0x32, 0x12, 0x4e, 0xf7, 0xb2, 0x16, 0xbc, 0x20, 0xb3, 0xc3, 0x9f, 0xfd, 0xf0, 0xf0, 0xe7, 0x92,
+	0xc3, 0xdf, 0x7a, 0x93, 0x53, 0x6b, 0xe5, 0xc7, 0x01, 0x99, 0xac, 0x95, 0x2a, 0x64, 0xc7, 0xf1,
+	0xb2, 0xba, 0xb6, 0x1f, 0xde, 0x22, 0xd3, 0x2c, 0xcd, 0xfd, 0x37, 0x96, 0xe6, 0xaf, 0xca, 0xd2,
+	0x19, 0x0a, 0x16, 0x92, 0x14, 0x7c, 0x0d, 0xd5, 0xc9, 0x4e, 0x53, 0x3c, 0xbc, 0x71, 0x7d, 0x3c,
+	0xac, 0x4c, 0x5c, 0x07, 0x64, 0xdc, 0x04, 0x14, 0x8b, 0x15, 0x31, 0xb2, 0xa8, 0x0a, 0x7a, 0x6b,
+	0xa2, 0x09, 0x69, 0xd9, 0x5a, 0x53, 0x0c, 0x88, 0xb7, 0x20, 0x62, 0x40, 0xeb, 0x9f, 0x4c, 0x42,
+	0xa7, 0x57, 0x26, 0x25, 0x89, 0x36, 0x3d, 0x80, 0xd5, 0xb0, 0x4d, 0xc7, 0x21, 0x44, 0x35, 0x6a,
+	0xd9, 0xaa, 0xd2, 0x69, 0xc3, 0x3e, 0xdc, 0x8c, 0x8f, 0xb4, 0x2a, 0x46, 0xee, 0xfa, 0x8a, 0x51,
+	0x8d, 0xed, 0x86, 0xa0, 0x1a, 0x8f, 0xe0, 0xf6, 0x54, 0xb8, 0xa8, 0x1e, 0x79, 0x95, 0x39, 0x8a,
+	0xa1, 0xa3, 0x82, 0xdc, 0x83, 0x46, 0xca, 0xa5, 0xc7, 0x85, 0xf9, 0x2d, 0x0b, 0xb7, 0x76, 0x85,
+	0xf3, 0xca, 0xc7, 0x9e, 0x38, 0xa0, 0x7e, 0x0a, 0x73, 0xa7, 0xf6, 0x4e, 0xf6, 0x7f, 0xd9, 0x3b,
+	0xb9, 0x39, 0x7b, 0xe7, 0x10, 0x2a, 0x3e, 0xb5, 0xd9, 0x80, 0x51, 0x4f, 0xaa, 0x54, 0xf2, 0xd7,
+	0x97, 0x4a, 0x79, 0xec, 0x79, 0x87, 0x91, 0xd6, 0x3a, 0xac, 0x25, 0xaa, 0x32, 0xae, 0x19, 0x86,
+	0x8f, 0x67, 0x36, 0x4d, 0xf0, 0x16, 0x1c, 0x7a, 0x32, 0x51, 0x37, 0x04, 0x79, 0x0f, 0xf7, 0xa3,
+	0xa5, 0xa2, 0x9e, 0x17, 0xba, 0x69, 0xeb, 0x0b, 0xa8, 0xcf, 0x0f, 0x31, 0xde, 0x69, 0x06, 0x14,
+	0xb1, 0x16, 0x85, 0xf1, 0xa2, 0x63, 0xc0, 0xf5, 0xda, 0xae, 0x70, 0xbe, 0xf6, 0xb1, 0x27, 0xa7,
+	0x6c, 0xb7, 0x86, 0xf2, 0xf0, 0x97, 0x85, 0x72, 0x7c, 0x00, 0xab, 0x4e, 0x60, 0x4e, 0xe9, 0x4c,
+	0x96, 0xd5, 0x50, 0x1c, 0x75, 0xc4, 0x86, 0x82, 0x92, 0x84, 0x9b, 0x66, 0xcd, 0x4c, 0x7e, 0x3c,
+	0x9a, 0x2a, 0x91, 0x6e, 0xe7, 0xdd, 0x59, 0x63, 0xe9, 0xf2, 0xac, 0xf1, 0x30, 0xd6, 0x28, 0xfd,
+	0xe5, 0x16, 0xfe, 0x6c, 0x0a, 0x72, 0xd4, 0x1e, 0xb5, 0x71, 0x90, 0xa4, 0xb6, 0xb1, 0xb4, 0xef,
+	0x64, 0xc5, 0x0a, 0x73, 0x2a, 0xf6, 0x29, 0xb4, 0xd2, 0x2f, 0x1d, 0x55, 0xad, 0xf3, 0x7b, 0x01,
+	0x72, 0xbb, 0xc2, 0x41, 0x7b, 0x50, 0x9e, 0xfa, 0x02, 0xbc, 0x3f, 0x2f, 0xf1, 0x99, 0x0e, 0xd4,
+	0x3e, 0x5f, 0x00, 0x34, 0xee, 0xcf, 0x1e, 0x94, 0xa7, 0x5e, 0x06, 0x69, 0x11, 0xe2, 0xa0, 0xd4,
+	0x08, 0xf3, 0x76, 0x1a, 0x1a, 0xc1, 0xed, 0xb9, 0xfb, 0x6c, 0x11, 0x27, 0x11, 0xb8, 0xf6, 0xe4,
+	0x0a, 0xe0, 0x71, 0xe4, 0x03, 0xa8, 0xce, 0x2c, 0x8c, 0xcf, 0x52, 0xdc, 0x4c, 0xc3, 0x6a, 0x9b,
+	0x0b, 0xc1, 0xc6, 0x71, 0x86, 0xf0, 0xd1, 0xbc, 0x29, 0x7b, 0xb8, 0x40, 0x1f, 0x42, 0x6c, 0xad,
+	0xb3, 0x38, 0x76, 0x1c, 0xf6, 0x4d, 0x06, 0xee, 0xa4, 0x4d, 0x8f, 0x99, 0xe2, 0x2f, 0x05, 0x5f,
+	0x7b, 0x7a, 0x35, 0x7c, 0x94, 0x43, 0xf7, 0x87, 0x77, 0xe7, 0xf5, 0xcc, 0xfb, 0xf3, 0x7a, 0xe6,
+	0xef, 0xf3, 0x7a, 0xe6, 0xed, 0x45, 0x7d, 0xe9, 0xfd, 0x45, 0x7d, 0xe9, 0xcf, 0x8b, 0xfa, 0xd2,
+	0xcf, 0x4f, 0x17, 0xdf, 0x74, 0xe1, 0x1f, 0x25, 0xb5, 0xec, 0xf6, 0x6f, 0xa8, 0xb7, 0xff, 0x93,
+	0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x53, 0x7a, 0x4e, 0x9a, 0xfd, 0x0d, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -506,6 +982,10 @@ type MsgClient interface {
 	UpdateEntityVerified(ctx context.Context, in *MsgUpdateEntityVerified, opts ...grpc.CallOption) (*MsgUpdateEntityVerifiedResponse, error)
 	// Transfers an entity and its nft to the recipient
 	TransferEntity(ctx context.Context, in *MsgTransferEntity, opts ...grpc.CallOption) (*MsgTransferEntityResponse, error)
+	// Create a module account for an entity,
+	CreateEntityAccount(ctx context.Context, in *MsgCreateEntityAccount, opts ...grpc.CallOption) (*MsgCreateEntityAccountResponse, error)
+	// Create a authz grant from entity account
+	GrantEntityAccountAuthz(ctx context.Context, in *MsgGrantEntityAccountAuthz, opts ...grpc.CallOption) (*MsgGrantEntityAccountAuthzResponse, error)
 }
 
 type msgClient struct {
@@ -552,6 +1032,24 @@ func (c *msgClient) TransferEntity(ctx context.Context, in *MsgTransferEntity, o
 	return out, nil
 }
 
+func (c *msgClient) CreateEntityAccount(ctx context.Context, in *MsgCreateEntityAccount, opts ...grpc.CallOption) (*MsgCreateEntityAccountResponse, error) {
+	out := new(MsgCreateEntityAccountResponse)
+	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Msg/CreateEntityAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) GrantEntityAccountAuthz(ctx context.Context, in *MsgGrantEntityAccountAuthz, opts ...grpc.CallOption) (*MsgGrantEntityAccountAuthzResponse, error) {
+	out := new(MsgGrantEntityAccountAuthzResponse)
+	err := c.cc.Invoke(ctx, "/ixo.entity.v1beta1.Msg/GrantEntityAccountAuthz", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// CreateEntity defines a method for creating a entity.
@@ -562,6 +1060,10 @@ type MsgServer interface {
 	UpdateEntityVerified(context.Context, *MsgUpdateEntityVerified) (*MsgUpdateEntityVerifiedResponse, error)
 	// Transfers an entity and its nft to the recipient
 	TransferEntity(context.Context, *MsgTransferEntity) (*MsgTransferEntityResponse, error)
+	// Create a module account for an entity,
+	CreateEntityAccount(context.Context, *MsgCreateEntityAccount) (*MsgCreateEntityAccountResponse, error)
+	// Create a authz grant from entity account
+	GrantEntityAccountAuthz(context.Context, *MsgGrantEntityAccountAuthz) (*MsgGrantEntityAccountAuthzResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -579,6 +1081,12 @@ func (*UnimplementedMsgServer) UpdateEntityVerified(ctx context.Context, req *Ms
 }
 func (*UnimplementedMsgServer) TransferEntity(ctx context.Context, req *MsgTransferEntity) (*MsgTransferEntityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferEntity not implemented")
+}
+func (*UnimplementedMsgServer) CreateEntityAccount(ctx context.Context, req *MsgCreateEntityAccount) (*MsgCreateEntityAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateEntityAccount not implemented")
+}
+func (*UnimplementedMsgServer) GrantEntityAccountAuthz(ctx context.Context, req *MsgGrantEntityAccountAuthz) (*MsgGrantEntityAccountAuthzResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GrantEntityAccountAuthz not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -657,6 +1165,42 @@ func _Msg_TransferEntity_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateEntityAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateEntityAccount)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateEntityAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.entity.v1beta1.Msg/CreateEntityAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateEntityAccount(ctx, req.(*MsgCreateEntityAccount))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_GrantEntityAccountAuthz_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgGrantEntityAccountAuthz)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).GrantEntityAccountAuthz(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.entity.v1beta1.Msg/GrantEntityAccountAuthz",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).GrantEntityAccountAuthz(ctx, req.(*MsgGrantEntityAccountAuthz))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ixo.entity.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -676,6 +1220,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TransferEntity",
 			Handler:    _Msg_TransferEntity_Handler,
+		},
+		{
+			MethodName: "CreateEntityAccount",
+			Handler:    _Msg_CreateEntityAccount_Handler,
+		},
+		{
+			MethodName: "GrantEntityAccountAuthz",
+			Handler:    _Msg_GrantEntityAccountAuthz_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1188,6 +1740,164 @@ func (m *MsgTransferEntityResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateEntityAccount) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateEntityAccount) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateEntityAccount) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.OwnerAddress) > 0 {
+		i -= len(m.OwnerAddress)
+		copy(dAtA[i:], m.OwnerAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.OwnerAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateEntityAccountResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateEntityAccountResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateEntityAccountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Account) > 0 {
+		i -= len(m.Account)
+		copy(dAtA[i:], m.Account)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Account)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgGrantEntityAccountAuthz) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgGrantEntityAccountAuthz) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgGrantEntityAccountAuthz) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.OwnerAddress) > 0 {
+		i -= len(m.OwnerAddress)
+		copy(dAtA[i:], m.OwnerAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.OwnerAddress)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	{
+		size, err := m.Grant.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	if len(m.GranteeAddress) > 0 {
+		i -= len(m.GranteeAddress)
+		copy(dAtA[i:], m.GranteeAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.GranteeAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Id) > 0 {
+		i -= len(m.Id)
+		copy(dAtA[i:], m.Id)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Id)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgGrantEntityAccountAuthzResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgGrantEntityAccountAuthzResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgGrantEntityAccountAuthzResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1423,6 +2133,76 @@ func (m *MsgTransferEntity) Size() (n int) {
 }
 
 func (m *MsgTransferEntityResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCreateEntityAccount) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.OwnerAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgCreateEntityAccountResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Account)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgGrantEntityAccountAuthz) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.GranteeAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.Grant.Size()
+	n += 1 + l + sovTx(uint64(l))
+	l = len(m.OwnerAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgGrantEntityAccountAuthzResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2947,6 +3727,495 @@ func (m *MsgTransferEntityResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgTransferEntityResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateEntityAccount) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateEntityAccount: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateEntityAccount: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateEntityAccountResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateEntityAccountResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateEntityAccountResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Account", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Account = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgGrantEntityAccountAuthz) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgGrantEntityAccountAuthz: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgGrantEntityAccountAuthz: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Grant", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Grant.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgGrantEntityAccountAuthzResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgGrantEntityAccountAuthzResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgGrantEntityAccountAuthzResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

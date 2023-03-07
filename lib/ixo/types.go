@@ -1,5 +1,7 @@
 package ixo
 
+import "strings"
+
 const IxoNativeToken = "uixo"
 
 // https://play.golang.org/p/Qg_uv_inCek
@@ -23,4 +25,9 @@ func RemoveUnordered[T any](s []T, i int) []T {
 // removes an element at index i from a slice, will not change order of slice (slow)
 func RemoveOrdered[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
+}
+
+// check if trimmed string is empty (return true)
+func IsEmpty(input string) bool {
+	return strings.TrimSpace(input) == ""
 }

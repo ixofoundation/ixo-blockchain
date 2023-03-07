@@ -7,7 +7,10 @@ import (
 	"strings"
 	time "time"
 
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -107,4 +110,21 @@ func UpdateEntityMetadata(meta *EntityMetadata, versionData []byte, updated time
 	txH := sha256.Sum256(versionData)
 	meta.VersionId = hex.EncodeToString(txH[:])
 	meta.Updated = &updated
+}
+
+// Helper to get module account key in form of id#name
+func GetModuleAccountKey(id, name string) string {
+	return id + "#" + name
+}
+
+// Helper to get module account address
+func GetModuleAccountAddress(id, name string) sdk.AccAddress {
+	return authtypes.NewModuleAddress(GetModuleAccountKey(id, name))
+}
+
+// UnpackInterfaces implements UnpackInterfacesMessage.UnpackInterfaces
+// Require to run this to add the Any for Authorization to cache
+func (g Grant) UnpackInterfaces(unpacker cdctypes.AnyUnpacker) error {
+	var a authz.Authorization
+	return unpacker.UnpackAny(g.Authorization, &a)
 }

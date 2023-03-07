@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
+	nft "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -28,6 +28,9 @@ func NewMsgServerImpl(k Keeper) types.MsgServer {
 	}
 }
 
+// --------------------------
+// CREATE ENTITY
+// --------------------------
 func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntity) (*types.MsgCreateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -83,6 +86,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	s.Keeper.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 
 	// create and persist the entity
+	var enityAccounts []*types.EntityAccount
 	entityMeta := types.NewEntityMetadata(ctx.TxBytes(), ctx.BlockTime())
 	entity := types.Entity{
 		Id:          entityId,
@@ -93,6 +97,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 		RelayerNode: msg.RelayerNode,
 		Credentials: msg.Credentials,
 		Metadata:    &entityMeta,
+		Accounts:    enityAccounts,
 	}
 	s.Keeper.SetEntity(ctx, []byte(entityId), entity)
 
@@ -101,16 +106,14 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	s.Keeper.SetParams(ctx, &params)
 
 	// create the nft cw721
-	nftMint := entitycontracts.WasmMsgMint{
-		Mint: entitycontracts.Mint{
+	finalMessage, err := nft.Marshal(nft.WasmMsgMint{
+		Mint: nft.Mint{
 			TokenId:   did.Id,
 			Owner:     msg.OwnerAddress,
 			TokenUri:  did.Id,
 			Extension: msg.Data,
 		},
-	}
-
-	finalMessage, err := nftMint.Marshal()
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +141,9 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	}, nil
 }
 
+// --------------------------
+// UPDATE ENTITY
+// --------------------------
 func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntity) (*types.MsgUpdateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -178,6 +184,9 @@ func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntit
 	return &types.MsgUpdateEntityResponse{}, nil
 }
 
+// --------------------------
+// TRANSFER ENTITY
+// --------------------------
 func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferEntity) (*types.MsgTransferEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	params := s.Keeper.GetParams(ctx)
@@ -240,14 +249,12 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 		return nil, err
 	}
 
-	nftTranferMsg := entitycontracts.WasmMsgTransferNft{
-		TransferNft: entitycontracts.TransferNft{
+	finalMessage, err := nft.Marshal(nft.WasmMsgTransferNft{
+		TransferNft: nft.TransferNft{
 			TokenId:   msg.Id,
 			Recipient: recipientAddress.String(),
 		},
-	}
-
-	finalMessage, err := nftTranferMsg.Marshal()
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -271,6 +278,9 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 	return &types.MsgTransferEntityResponse{}, nil
 }
 
+// --------------------------
+// UPDATE ENTITY VERIFIED
+// --------------------------
 func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpdateEntityVerified) (*types.MsgUpdateEntityVerifiedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -304,4 +314,142 @@ func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpd
 	}
 
 	return &types.MsgUpdateEntityVerifiedResponse{}, nil
+}
+
+// --------------------------
+// CREATE ENTITY ACCOUNT
+// --------------------------
+func (s msgServer) CreateEntityAccount(goCtx context.Context, msg *types.MsgCreateEntityAccount) (*types.MsgCreateEntityAccountResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// get entity doc
+	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// check if entity account with name already exists
+	for _, acc := range entity.Accounts {
+		if acc.Name == msg.Name {
+			return nil, sdkerrors.Wrapf(types.ErrAccountDuplicate, "name %s", msg.Name)
+		}
+	}
+
+	// check that owner is admin
+	isOwner, err := s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
+	if !isOwner {
+		return nil, sdkerrors.Wrapf(err, "unauthorized")
+	}
+
+	// create module account
+	address, err := s.Keeper.CreateNewAccount(ctx, msg.Id, msg.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	// update entity and persist
+	entity.Accounts = append(entity.Accounts, &types.EntityAccount{Name: msg.Name, Address: address.String()})
+	types.UpdateEntityMetadata(entity.Metadata, ctx.TxBytes(), ctx.BlockTime())
+	s.Keeper.SetEntity(ctx, []byte(entity.Id), entity)
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.EntityUpdatedEvent{
+			Entity: &entity,
+			Signer: msg.OwnerAddress,
+		},
+		&types.EntityAccountCreatedEvent{
+			Id:             entity.Id,
+			Signer:         msg.OwnerAddress,
+			AccountName:    msg.Name,
+			AccountAddress: address.String(),
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateEntityAccountResponse{Account: address.String()}, nil
+}
+
+// --------------------------
+// GRANT ENTITY ACCOUNT AUTHZ
+// --------------------------
+func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.MsgGrantEntityAccountAuthz) (*types.MsgGrantEntityAccountAuthzResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// get entity doc
+	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that owner is admin
+	isOwner, err := s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
+	if !isOwner {
+		return nil, sdkerrors.Wrapf(err, "unauthorized")
+	}
+
+	// get entity account with same name
+	var account *types.EntityAccount
+	for _, acc := range entity.Accounts {
+		if account != nil {
+			break
+		}
+		if acc.Name == msg.Name {
+			account = acc
+		}
+	}
+
+	// if no account with name throw
+	if account == nil {
+		return nil, sdkerrors.Wrapf(types.ErrAccountNotFound, "name %s", msg.Name)
+	}
+
+	// get addresses
+	grantee, err := sdk.AccAddressFromBech32(msg.GranteeAddress)
+	if err != nil {
+		return nil, err
+	}
+	granter, err := sdk.AccAddressFromBech32(account.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unpack interface to both have concrete type and add to cache for validation method
+	err = msg.Grant.UnpackInterfaces(s.cdc)
+	if err != nil {
+		return nil, err
+	}
+
+	err = msg.Grant.ValidateBasic()
+	if err != nil {
+		return nil, err
+	}
+
+	// get authorization
+	authorization := msg.Grant.GetAuthorization()
+	if authorization == nil {
+		return nil, sdkerrors.ErrUnpackAny.Wrap("Authorization is not present in the msg")
+	}
+
+	// persist new grant
+	if err := s.Keeper.AuthzKeeper.SaveGrant(ctx, grantee, granter, authorization, msg.Grant.Expiration); err != nil {
+		return nil, err
+	}
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.EntityAccountAuthzCreatedEvent{
+			Id:          entity.Id,
+			Signer:      msg.OwnerAddress,
+			AccountName: msg.Name,
+			Granter:     granter.String(),
+			Grantee:     grantee.String(),
+			Grant:       (*types.Grant)(&msg.Grant),
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgGrantEntityAccountAuthzResponse{}, nil
 }

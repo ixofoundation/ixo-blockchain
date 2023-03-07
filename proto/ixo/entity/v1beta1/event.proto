@@ -5,21 +5,16 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 import "gogoproto/gogo.proto";
 import "ixo/entity/v1beta1/entity.proto";
+import "ixo/entity/v1beta1/cosmos.proto";
 
 // EntityCreatedEvent is an event triggered on a Entity creation
 message EntityCreatedEvent {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-
   Entity entity = 1;
   string signer = 2;
 }
 
 // EntityUpdatedEvent is an event triggered on a entity document update
 message EntityUpdatedEvent {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-
   Entity entity = 1;
   string signer = 2;
 }
@@ -27,9 +22,6 @@ message EntityUpdatedEvent {
 // EntityVerifiedUpdatedEvent is an event triggered on a entity verified
 // document update
 message EntityVerifiedUpdatedEvent {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-
   string id = 1;
   string signer = 2;
   bool entity_verified = 3;
@@ -37,10 +29,25 @@ message EntityVerifiedUpdatedEvent {
 
 // EntityTransferredEvent is an event triggered on a entity transfer
 message EntityTransferredEvent {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-
   string id = 1;
   string from = 2;
   string to = 3;
+}
+
+// EntityAccountCreatedEvent is an event triggered on a entity account creation
+message EntityAccountCreatedEvent {
+  string id = 1;
+  string signer = 2;
+  string account_name = 3;
+  string account_address = 4;
+}
+
+// EntityAccountCreatedEvent is an event triggered on a entity account creation
+message EntityAccountAuthzCreatedEvent {
+  string id = 1;
+  string signer = 2;
+  string account_name = 3;
+  string granter = 4;
+  string grantee = 5;
+  Grant grant = 6;
 }

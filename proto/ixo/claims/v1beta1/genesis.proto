@@ -11,4 +11,5 @@ message GenesisState {
   Params params = 1 [ (gogoproto.nullable) = false ];
   repeated Collection collections = 2 [ (gogoproto.nullable) = false ];
   repeated Claim claims = 3 [ (gogoproto.nullable) = false ];
+  repeated Dispute disputes = 4 [ (gogoproto.nullable) = false ];
 }

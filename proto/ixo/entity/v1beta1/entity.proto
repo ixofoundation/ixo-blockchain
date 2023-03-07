@@ -15,7 +15,6 @@ message Params {
 
 message Entity {
   option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
 
   // id represents the id for the entity document.
   string id = 1;
@@ -39,12 +38,20 @@ message Entity {
   // Metadata concerning the Entity such as versionId, created, updated and
   // deactivated
   EntityMetadata metadata = 9;
+  // module accounts created for entity
+  repeated EntityAccount accounts = 10;
+}
+
+message EntityAccount {
+  option (gogoproto.equal) = true;
+
+  string name = 1;
+  string address = 2;
 }
 
 // EntityMetadata defines metadata associated to a entity
 message EntityMetadata {
   option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
 
   string version_id = 1;
   google.protobuf.Timestamp created = 2 [ (gogoproto.stdtime) = true ];

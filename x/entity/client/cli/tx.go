@@ -208,3 +208,31 @@ func NewCmdTransferEntity() *cobra.Command {
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
+
+func NewCmdCreateEntityAccount() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-entity-account [id] [name]",
+		Short: "Create an Entity Account for a given name",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			argId := args[0]
+			argName := args[1]
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.MsgCreateEntityAccount{
+				Id:           argId,
+				Name:         argName,
+				OwnerAddress: clientCtx.GetFromAddress().String(),
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}

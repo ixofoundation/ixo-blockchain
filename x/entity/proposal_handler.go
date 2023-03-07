@@ -7,7 +7,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
+	nft "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 )
 
 const (
@@ -38,13 +38,13 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 		return err
 	}
 
-	initiateNftContractMsg := entitycontracts.InitiateNftContract{
+	initiateNftContractMsg := nft.InitiateNftContract{
 		Name:   EntityNftContractName,
 		Symbol: EntityNftContractSymbol,
 		Minter: adminAddr.String(),
 	}
 
-	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
+	encodedInitiateNftContractMsg, err := nft.Marshal(initiateNftContractMsg)
 	if err != nil {
 		return err
 	}

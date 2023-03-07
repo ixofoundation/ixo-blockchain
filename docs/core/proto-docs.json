@@ -4684,6 +4684,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "disputes",
+              "description": "",
+              "label": "repeated",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }
@@ -5833,6 +5845,56 @@
       ]
     },
     {
+      "name": "ixo/entity/v1beta1/cosmos.proto",
+      "description": "",
+      "package": "ixo.entity.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "Grant",
+          "longName": "Grant",
+          "fullName": "ixo.entity.v1beta1.Grant",
+          "description": "Grant gives permissions to execute\nthe provide method with expiration time.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authorization",
+              "description": "",
+              "label": "",
+              "type": "Any",
+              "longType": "google.protobuf.Any",
+              "fullType": "google.protobuf.Any",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "expiration",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "ixo/iid/v1beta1/types.proto",
       "description": "",
       "package": "ixo.iid.v1beta1",
@@ -6768,6 +6830,54 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "accounts",
+              "description": "module accounts created for entity",
+              "label": "repeated",
+              "type": "EntityAccount",
+              "longType": "EntityAccount",
+              "fullType": "ixo.entity.v1beta1.EntityAccount",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EntityAccount",
+          "longName": "EntityAccount",
+          "fullName": "ixo.entity.v1beta1.EntityAccount",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -6881,6 +6991,150 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "EntityAccountAuthzCreatedEvent",
+          "longName": "EntityAccountAuthzCreatedEvent",
+          "fullName": "ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent",
+          "description": "EntityAccountCreatedEvent is an event triggered on a entity account creation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "signer",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "account_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "granter",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "grantee",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "grant",
+              "description": "",
+              "label": "",
+              "type": "Grant",
+              "longType": "Grant",
+              "fullType": "ixo.entity.v1beta1.Grant",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EntityAccountCreatedEvent",
+          "longName": "EntityAccountCreatedEvent",
+          "fullName": "ixo.entity.v1beta1.EntityAccountCreatedEvent",
+          "description": "EntityAccountCreatedEvent is an event triggered on a entity account creation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "signer",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "account_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "account_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "EntityCreatedEvent",
           "longName": "EntityCreatedEvent",
@@ -9541,6 +9795,78 @@
           ]
         },
         {
+          "name": "MsgCreateEntityAccount",
+          "longName": "MsgCreateEntityAccount",
+          "fullName": "ixo.entity.v1beta1.MsgCreateEntityAccount",
+          "description": "create a module account for an entity, account details will be added as a\nlinkedEntity on entity iid doc where linkedEntity id is didfragment: did#name",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "entity id (did) to create account for",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "name of account",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner_address",
+              "description": "The owner_address used to sign this transaction.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreateEntityAccountResponse",
+          "longName": "MsgCreateEntityAccountResponse",
+          "fullName": "ixo.entity.v1beta1.MsgCreateEntityAccountResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account",
+              "description": "account address that was created for specific entity and account name",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "MsgCreateEntityResponse",
           "longName": "MsgCreateEntityResponse",
           "fullName": "ixo.entity.v1beta1.MsgCreateEntityResponse",
@@ -9587,6 +9913,89 @@
               "defaultValue": ""
             }
           ]
+        },
+        {
+          "name": "MsgGrantEntityAccountAuthz",
+          "longName": "MsgGrantEntityAccountAuthz",
+          "fullName": "ixo.entity.v1beta1.MsgGrantEntityAccountAuthz",
+          "description": "Create a authz grant from entity account (as grantor) to recipient in msg as\ngrantee for the specific authorization",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "entity id (did) to create account for",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "name of account",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "grantee_address",
+              "description": "the grantee address that will be able to execute the authz authorization",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "grant",
+              "description": "grant to be Authorized in authz grant",
+              "label": "",
+              "type": "Grant",
+              "longType": "Grant",
+              "fullType": "ixo.entity.v1beta1.Grant",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner_address",
+              "description": "the owner_address used to sign this transaction.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgGrantEntityAccountAuthzResponse",
+          "longName": "MsgGrantEntityAccountAuthzResponse",
+          "fullName": "ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
         },
         {
           "name": "MsgTransferEntity",
@@ -9891,6 +10300,30 @@
               "responseType": "MsgTransferEntityResponse",
               "responseLongType": "MsgTransferEntityResponse",
               "responseFullType": "ixo.entity.v1beta1.MsgTransferEntityResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "CreateEntityAccount",
+              "description": "Create a module account for an entity,",
+              "requestType": "MsgCreateEntityAccount",
+              "requestLongType": "MsgCreateEntityAccount",
+              "requestFullType": "ixo.entity.v1beta1.MsgCreateEntityAccount",
+              "requestStreaming": false,
+              "responseType": "MsgCreateEntityAccountResponse",
+              "responseLongType": "MsgCreateEntityAccountResponse",
+              "responseFullType": "ixo.entity.v1beta1.MsgCreateEntityAccountResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "GrantEntityAccountAuthz",
+              "description": "Create a authz grant from entity account",
+              "requestType": "MsgGrantEntityAccountAuthz",
+              "requestLongType": "MsgGrantEntityAccountAuthz",
+              "requestFullType": "ixo.entity.v1beta1.MsgGrantEntityAccountAuthz",
+              "requestStreaming": false,
+              "responseType": "MsgGrantEntityAccountAuthzResponse",
+              "responseLongType": "MsgGrantEntityAccountAuthzResponse",
+              "responseFullType": "ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse",
               "responseStreaming": false
             }
           ]

@@ -14,6 +14,8 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateEntity{}, "entity/UpdateEntity", nil)
 	cdc.RegisterConcrete(&MsgUpdateEntityVerified{}, "entity/UpdateEntityVerified", nil)
 	cdc.RegisterConcrete(&MsgTransferEntity{}, "entity/TransferEntity", nil)
+	cdc.RegisterConcrete(&MsgCreateEntityAccount{}, "entity/CreateEntityAccount", nil)
+	cdc.RegisterConcrete(&MsgGrantEntityAccountAuthz{}, "entity/GrantEntityAccountAuthz", nil)
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -22,6 +24,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgUpdateEntity{},
 		&MsgUpdateEntityVerified{},
 		&MsgTransferEntity{},
+		&MsgCreateEntityAccount{},
+		&MsgGrantEntityAccountAuthz{},
 	)
 
 	registry.RegisterImplementations(

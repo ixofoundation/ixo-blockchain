@@ -1156,11 +1156,12 @@ func NewLinkedClaim(id string, claimType string, description string, serviceEndp
 	}
 }
 
-func NewLinkedEntity(id string, entityType string, relationship string) *LinkedEntity {
+func NewLinkedEntity(id, entityType, relationship, service string) *LinkedEntity {
 	return &LinkedEntity{
 		Id:           id,
 		Type:         entityType,
 		Relationship: relationship,
+		Service:      service,
 	}
 }
 

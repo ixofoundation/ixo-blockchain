@@ -146,6 +146,9 @@
   
     - [Msg](#ixo.claims.v1beta1.Msg)
   
+- [ixo/entity/v1beta1/cosmos.proto](#ixo/entity/v1beta1/cosmos.proto)
+    - [Grant](#ixo.entity.v1beta1.Grant)
+  
 - [ixo/iid/v1beta1/types.proto](#ixo/iid/v1beta1/types.proto)
     - [AccordedRight](#ixo.iid.v1beta1.AccordedRight)
     - [Context](#ixo.iid.v1beta1.Context)
@@ -161,10 +164,13 @@
   
 - [ixo/entity/v1beta1/entity.proto](#ixo/entity/v1beta1/entity.proto)
     - [Entity](#ixo.entity.v1beta1.Entity)
+    - [EntityAccount](#ixo.entity.v1beta1.EntityAccount)
     - [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata)
     - [Params](#ixo.entity.v1beta1.Params)
   
 - [ixo/entity/v1beta1/event.proto](#ixo/entity/v1beta1/event.proto)
+    - [EntityAccountAuthzCreatedEvent](#ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent)
+    - [EntityAccountCreatedEvent](#ixo.entity.v1beta1.EntityAccountCreatedEvent)
     - [EntityCreatedEvent](#ixo.entity.v1beta1.EntityCreatedEvent)
     - [EntityTransferredEvent](#ixo.entity.v1beta1.EntityTransferredEvent)
     - [EntityUpdatedEvent](#ixo.entity.v1beta1.EntityUpdatedEvent)
@@ -239,7 +245,11 @@
   
 - [ixo/entity/v1beta1/tx.proto](#ixo/entity/v1beta1/tx.proto)
     - [MsgCreateEntity](#ixo.entity.v1beta1.MsgCreateEntity)
+    - [MsgCreateEntityAccount](#ixo.entity.v1beta1.MsgCreateEntityAccount)
+    - [MsgCreateEntityAccountResponse](#ixo.entity.v1beta1.MsgCreateEntityAccountResponse)
     - [MsgCreateEntityResponse](#ixo.entity.v1beta1.MsgCreateEntityResponse)
+    - [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz)
+    - [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse)
     - [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity)
     - [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse)
     - [MsgUpdateEntity](#ixo.entity.v1beta1.MsgUpdateEntity)
@@ -2065,6 +2075,7 @@ GenesisState defines the claims module&#39;s genesis state.
 | params | [Params](#ixo.claims.v1beta1.Params) |  |  |
 | collections | [Collection](#ixo.claims.v1beta1.Collection) | repeated |  |
 | claims | [Claim](#ixo.claims.v1beta1.Claim) | repeated |  |
+| disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
 
 
 
@@ -2505,6 +2516,39 @@ Msg defines the Msg service.
 
 
 
+<a name="ixo/entity/v1beta1/cosmos.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/entity/v1beta1/cosmos.proto
+
+
+
+<a name="ixo.entity.v1beta1.Grant"></a>
+
+### Grant
+Grant gives permissions to execute
+the provide method with expiration time.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authorization | [google.protobuf.Any](#google.protobuf.Any) |  |  |
+| expiration | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
 <a name="ixo/iid/v1beta1/types.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -2744,6 +2788,23 @@ relationship entity account
 | credentials | [string](#string) | repeated | Credentials of the enitity to be verified |
 | entity_verified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
 | metadata | [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata) |  | Metadata concerning the Entity such as versionId, created, updated and deactivated |
+| accounts | [EntityAccount](#ixo.entity.v1beta1.EntityAccount) | repeated | module accounts created for entity |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.EntityAccount"></a>
+
+### EntityAccount
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| address | [string](#string) |  |  |
 
 
 
@@ -2797,6 +2858,44 @@ EntityMetadata defines metadata associated to a entity
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/entity/v1beta1/event.proto
+
+
+
+<a name="ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent"></a>
+
+### EntityAccountAuthzCreatedEvent
+EntityAccountCreatedEvent is an event triggered on a entity account creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
+| account_name | [string](#string) |  |  |
+| granter | [string](#string) |  |  |
+| grantee | [string](#string) |  |  |
+| grant | [Grant](#ixo.entity.v1beta1.Grant) |  |  |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.EntityAccountCreatedEvent"></a>
+
+### EntityAccountCreatedEvent
+EntityAccountCreatedEvent is an event triggered on a entity account creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
+| account_name | [string](#string) |  |  |
+| account_address | [string](#string) |  |  |
+
+
+
 
 
 
@@ -3810,6 +3909,39 @@ Msg defines the identity Msg service.
 
 
 
+<a name="ixo.entity.v1beta1.MsgCreateEntityAccount"></a>
+
+### MsgCreateEntityAccount
+create a module account for an entity, account details will be added as a
+linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | entity id (did) to create account for |
+| name | [string](#string) |  | name of account |
+| owner_address | [string](#string) |  | The owner_address used to sign this transaction. |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgCreateEntityAccountResponse"></a>
+
+### MsgCreateEntityAccountResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [string](#string) |  | account address that was created for specific entity and account name |
+
+
+
+
+
+
 <a name="ixo.entity.v1beta1.MsgCreateEntityResponse"></a>
 
 ### MsgCreateEntityResponse
@@ -3821,6 +3953,36 @@ Msg defines the identity Msg service.
 | entity_id | [string](#string) |  |  |
 | entity_type | [string](#string) |  |  |
 | entity_status | [int32](#int32) |  |  |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgGrantEntityAccountAuthz"></a>
+
+### MsgGrantEntityAccountAuthz
+Create a authz grant from entity account (as grantor) to recipient in msg as
+grantee for the specific authorization
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | entity id (did) to create account for |
+| name | [string](#string) |  | name of account |
+| grantee_address | [string](#string) |  | the grantee address that will be able to execute the authz authorization |
+| grant | [Grant](#ixo.entity.v1beta1.Grant) |  | grant to be Authorized in authz grant |
+| owner_address | [string](#string) |  | the owner_address used to sign this transaction. |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse"></a>
+
+### MsgGrantEntityAccountAuthzResponse
+
 
 
 
@@ -3932,6 +4094,8 @@ Msg defines the project Msg service.
 | UpdateEntity | [MsgUpdateEntity](#ixo.entity.v1beta1.MsgUpdateEntity) | [MsgUpdateEntityResponse](#ixo.entity.v1beta1.MsgUpdateEntityResponse) | UpdateEntity defines a method for updating a entity |
 | UpdateEntityVerified | [MsgUpdateEntityVerified](#ixo.entity.v1beta1.MsgUpdateEntityVerified) | [MsgUpdateEntityVerifiedResponse](#ixo.entity.v1beta1.MsgUpdateEntityVerifiedResponse) | UpdateEntityVerified defines a method for updating if an entity is verified |
 | TransferEntity | [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity) | [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse) | Transfers an entity and its nft to the recipient |
+| CreateEntityAccount | [MsgCreateEntityAccount](#ixo.entity.v1beta1.MsgCreateEntityAccount) | [MsgCreateEntityAccountResponse](#ixo.entity.v1beta1.MsgCreateEntityAccountResponse) | Create a module account for an entity, |
+| GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create a authz grant from entity account |
 
  
 

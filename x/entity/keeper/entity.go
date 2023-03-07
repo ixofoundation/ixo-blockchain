@@ -1,13 +1,15 @@
 package keeper
 
 import (
+	"encoding/json"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	nft "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 	iidTypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
-
 
 func (k Keeper) SetEntity(ctx sdk.Context, key []byte, meta types.Entity) {
 	k.Set(ctx, key, types.EntityKey, meta, k.Marshal)
@@ -25,7 +27,7 @@ func (k Keeper) UnmarshalEntity(value []byte) (interface{}, bool) {
 }
 
 // ResolveEntity returns the Entity and IidDocument
-func (k Keeper) ResolveEntity(ctx sdk.Context, entityId string) (iidDocument iidTypes.IidDocument, entity types.Entity , err error) {
+func (k Keeper) ResolveEntity(ctx sdk.Context, entityId string) (iidDocument iidTypes.IidDocument, entity types.Entity, err error) {
 	iidDocument, err = k.IidKeeper.ResolveDid(ctx, iidTypes.DID(entityId))
 	if err != nil {
 		return
@@ -87,4 +89,55 @@ func (k Keeper) GetAllEntity(ctx sdk.Context) []types.Entity {
 		types.EntityKey,
 		func(did types.Entity) bool { return true },
 	)
+}
+
+// Create a module account for entity id and name of account as fragemnt in form: did#name
+func (k Keeper) CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.AccAddress, error) {
+	address := types.GetModuleAccountAddress(entityId, name)
+
+	if k.AccountKeeper.GetAccount(ctx, address) != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
+	}
+
+	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
+	k.AccountKeeper.SetAccount(ctx, account)
+
+	return account.GetAddress(), nil
+}
+
+// checks if the provided address is the owner on the smart contract
+func (k Keeper) CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) (bool, error) {
+	// get cw721 contract address
+	params := k.GetParams(ctx)
+	nftContractAddress, err := sdk.AccAddressFromBech32(params.NftContractAddress)
+	if err != nil {
+		return false, err
+	}
+
+	// create the nft cw721 query
+	queryMessage, err := nft.Marshal(nft.WasmQueryOwnerOf{
+		OwnerOf: nft.OwnerOf{
+			TokenId: entityId,
+		},
+	})
+	if err != nil {
+		return false, err
+	}
+
+	// query smart contract
+	ownerOfBytes, err := k.WasmViewKeeper.QuerySmart(ctx, nftContractAddress, queryMessage)
+	if err != nil {
+		return false, err
+	}
+	var ownerOf nft.OwnerOfResponse
+	if err := json.Unmarshal([]byte(ownerOfBytes), &ownerOf); err != nil {
+		return false, err
+	}
+
+	// check if token owner is owner provided
+	if ownerOf.Owner == ownerAddress {
+		return true, nil
+	}
+
+	return false, types.ErrEntityUnauthorized
 }

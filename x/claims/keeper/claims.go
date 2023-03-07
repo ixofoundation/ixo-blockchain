@@ -84,3 +84,54 @@ func (k Keeper) UnmarshalDispute(value []byte) (interface{}, bool) {
 	k.Unmarshal(value, &data)
 	return data, types.IsValidDispute(&data)
 }
+
+func (k Keeper) GetCollectionsIterator(ctx sdk.Context) sdk.Iterator {
+	return k.GetAll(ctx, types.CollectionKey)
+}
+
+func (k Keeper) GetCollections(ctx sdk.Context) []types.Collection {
+	iterator := k.GetCollectionsIterator(ctx)
+	collections := []types.Collection{}
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var c types.Collection
+		k.cdc.MustUnmarshal(iterator.Value(), &c)
+		collections = append(collections, c)
+	}
+
+	return collections
+}
+
+func (k Keeper) GetClaimsIterator(ctx sdk.Context) sdk.Iterator {
+	return k.GetAll(ctx, types.ClaimKey)
+}
+
+func (k Keeper) GetClaims(ctx sdk.Context) []types.Claim {
+	iterator := k.GetClaimsIterator(ctx)
+	claims := []types.Claim{}
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var c types.Claim
+		k.cdc.MustUnmarshal(iterator.Value(), &c)
+		claims = append(claims, c)
+	}
+
+	return claims
+}
+
+func (k Keeper) GetDisputesIterator(ctx sdk.Context) sdk.Iterator {
+	return k.GetAll(ctx, types.DisputeKey)
+}
+
+func (k Keeper) GetDisputes(ctx sdk.Context) []types.Dispute {
+	iterator := k.GetDisputesIterator(ctx)
+	disputes := []types.Dispute{}
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var d types.Dispute
+		k.cdc.MustUnmarshal(iterator.Value(), &d)
+		disputes = append(disputes, d)
+	}
+
+	return disputes
+}
