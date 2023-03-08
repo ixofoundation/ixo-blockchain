@@ -265,17 +265,31 @@ func (a WithdrawPaymentAuthorization) ValidateBasic() error {
 	}
 
 	for _, constraint := range a.Constraints {
-		if len(constraint.Inputs) == 0 {
-			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "inputs cannot be empty")
+		_, err := sdk.AccAddressFromBech32(constraint.FromAddress)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
 		}
-		if len(constraint.Outputs) == 0 {
-			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "inputs cannot be empty")
+		_, err = sdk.AccAddressFromBech32(constraint.ToAddress)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
 		}
 		if iidtypes.IsEmpty(constraint.PaymentType.String()) {
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "payment type cannot be empty")
 		}
 		if iidtypes.IsEmpty(constraint.ClaimId) {
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
+		}
+		if constraint.Contract_1155Payment != nil {
+			_, err = sdk.AccAddressFromBech32(constraint.Contract_1155Payment.Address)
+			if err != nil {
+				return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract address (%s)", err)
+			}
+			if iidtypes.IsEmpty(constraint.Contract_1155Payment.TokenId) {
+				return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token id cannot be empty")
+			}
+			// if constraint.Contract_1155Payment.Amount == 0 {
+			// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token amount cannot be 0")
+			// }
 		}
 	}
 
@@ -310,42 +324,60 @@ func (a WithdrawPaymentAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (auth
 			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("constraint release date not reached")
 		}
 
+		// check that from address is same
+		if mWith.FromAddress != constraint.FromAddress {
+			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("from address in msg does not match constraint")
+		}
+
+		// check that to address is same
+		if mWith.ToAddress != constraint.ToAddress {
+			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("to address in msg does not match constraint")
+		}
+
+		// check that withdraw contract payment is same
+		if !mWith.Contract_1155Payment.Equal(constraint.Contract_1155Payment) {
+			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("contract payments does not match")
+		}
+
 		// check that withdraw input and output lengths are the same
 		if len(constraint.Inputs) != len(mWith.Inputs) || len(constraint.Outputs) != len(mWith.Outputs) {
 			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("lengths of Input/Output in msg does not match constraint")
 		}
 
-		// for each msg input see if there corresponding constraint input
-		constraintInputs := constraint.Inputs
-		for _, mInput := range mWith.Inputs {
-			// state if this specific input is valid
-			valid := false
-			for i, cInput := range constraintInputs {
-				if cInput.Address == mInput.Address && mInput.Coins.IsEqual(cInput.Coins) {
-					constraintInputs = ixo.RemoveUnordered(constraintInputs, i)
-					valid = true
-					break
+		// if has input/output thenm check that valid
+		if len(mWith.Inputs) != 0 {
+			// for each msg input see if there corresponding constraint input
+			constraintInputs := constraint.Inputs
+			for _, mInput := range mWith.Inputs {
+				// state if this specific input is valid
+				valid := false
+				for i, cInput := range constraintInputs {
+					if cInput.Address == mInput.Address && mInput.Coins.IsEqual(cInput.Coins) {
+						constraintInputs = ixo.RemoveUnordered(constraintInputs, i)
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("msg inputs does not match constraint inputs")
 				}
 			}
-			if !valid {
-				return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("msg inputs does not match constraint inputs")
-			}
-		}
 
-		// for each msg output see if there corresponding constraint output
-		constraintOutputs := constraint.Outputs
-		for _, mOutput := range mWith.Outputs {
-			// state if this specific Output is valid
-			valid := false
-			for i, cOutput := range constraintOutputs {
-				if cOutput.Address == mOutput.Address && mOutput.Coins.IsEqual(cOutput.Coins) {
-					constraintOutputs = ixo.RemoveUnordered(constraintOutputs, i)
-					valid = true
-					break
+			// for each msg output see if there corresponding constraint output
+			constraintOutputs := constraint.Outputs
+			for _, mOutput := range mWith.Outputs {
+				// state if this specific Output is valid
+				valid := false
+				for i, cOutput := range constraintOutputs {
+					if cOutput.Address == mOutput.Address && mOutput.Coins.IsEqual(cOutput.Coins) {
+						constraintOutputs = ixo.RemoveUnordered(constraintOutputs, i)
+						valid = true
+						break
+					}
 				}
-			}
-			if !valid {
-				return authz.AcceptResponse{Accept: false}, sdkerrors.ErrInvalidRequest.Wrapf("msg outputs does not match constraint outputs")
+				if !valid {
+					return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("msg outputs does not match constraint outputs")
+				}
 			}
 		}
 
@@ -354,7 +386,7 @@ func (a WithdrawPaymentAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (auth
 	}
 
 	if !matched {
-		return authz.AcceptResponse{Accept: false}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
+		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
 	}
 
 	// set Auth constraints to the currently unhandled ones after the current msg constraint removed

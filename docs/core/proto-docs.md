@@ -77,6 +77,7 @@
     - [Claim](#ixo.claims.v1beta1.Claim)
     - [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments)
     - [Collection](#ixo.claims.v1beta1.Collection)
+    - [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment)
     - [Dispute](#ixo.claims.v1beta1.Dispute)
     - [DisputeData](#ixo.claims.v1beta1.DisputeData)
     - [Evaluation](#ixo.claims.v1beta1.Evaluation)
@@ -1576,6 +1577,23 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.Contract1155Payment"></a>
+
+### Contract1155Payment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| token_id | [string](#string) |  |  |
+| amount | [uint32](#uint32) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.Dispute"></a>
 
 ### Dispute
@@ -1663,6 +1681,7 @@ Msg defines the bonds Msg service.
 | ----- | ---- | ----- | ----------- |
 | account | [string](#string) |  | account is the entity account address from which the payment will be made |
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment, not allowed for Evaluation Payment |
 | timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immidiate direct payment |
 
 
@@ -1905,6 +1924,9 @@ Output models transaction outputs.
 | inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
 | outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
+| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
+| toAddress | [string](#string) |  | for contract payment |
+| fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments, if null then none |
 
 
@@ -2475,6 +2497,9 @@ Collection entity, or have authz cap, aka is agent
 | inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
 | outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
+| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
+| toAddress | [string](#string) |  | for contract payment |
+| fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
 

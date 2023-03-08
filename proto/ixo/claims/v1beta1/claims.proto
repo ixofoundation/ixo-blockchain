@@ -107,10 +107,20 @@ message Payment {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // if empty(nil) then no contract payment, not allowed for Evaluation Payment
+  Contract1155Payment contract_1155_payment = 3;
   // timeout after claim/evaluation to create authZ for payment, if 0 then
   // immidiate direct payment
-  google.protobuf.Duration timeout_ns = 3
+  google.protobuf.Duration timeout_ns = 4
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+}
+
+message Contract1155Payment {
+  option (gogoproto.equal) = true;
+
+  string address = 1;
+  string token_id = 2;
+  uint32 amount = 3;
 }
 
 message Claim {

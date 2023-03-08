@@ -1,7 +1,10 @@
 package types
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -67,4 +70,26 @@ func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.Ac
 	}
 
 	return true
+}
+
+func (p Payment) Validate() error {
+	_, err := sdk.AccAddressFromBech32(p.Account)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
+	}
+
+	if p.Contract_1155Payment != nil {
+		_, err := sdk.AccAddressFromBech32(p.Contract_1155Payment.Address)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
+		}
+		if iidtypes.IsEmpty(p.Contract_1155Payment.TokenId) {
+			return fmt.Errorf("token id cannot be empty")
+		}
+		// if p.Contract_1155Payment.Amount == 0 {
+		// 	return fmt.Errorf("token amount cannot be 0")
+		// }
+	}
+
+	return nil
 }

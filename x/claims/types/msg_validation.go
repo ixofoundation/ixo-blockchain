@@ -24,21 +24,21 @@ func (msg MsgCreateCollection) ValidateBasic() error {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Protocol)
 	}
 
-	_, err = sdk.AccAddressFromBech32(msg.Payments.Submission.Account)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid payments submission address (%s)", err)
+	if msg.Payments.Evaluation.Contract_1155Payment != nil {
+		return ErrCollectionEvalError
 	}
-	_, err = sdk.AccAddressFromBech32(msg.Payments.Evaluation.Account)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid payments evaluation address (%s)", err)
+
+	if err = msg.Payments.Submission.Validate(); err != nil {
+		return err
 	}
-	_, err = sdk.AccAddressFromBech32(msg.Payments.Approval.Account)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid payments approval address (%s)", err)
+	if err = msg.Payments.Evaluation.Validate(); err != nil {
+		return err
 	}
-	_, err = sdk.AccAddressFromBech32(msg.Payments.Rejection.Account)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid payments rejection address (%s)", err)
+	if err = msg.Payments.Approval.Validate(); err != nil {
+		return err
+	}
+	if err = msg.Payments.Rejection.Validate(); err != nil {
+		return err
 	}
 
 	return nil
@@ -127,14 +127,26 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
-
-	if len(msg.Inputs) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "inputs cannot be empty")
+	_, err = sdk.AccAddressFromBech32(msg.FromAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
 	}
-	if len(msg.Outputs) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "inputs cannot be empty")
+	_, err = sdk.AccAddressFromBech32(msg.ToAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
 	}
-
+	if msg.Contract_1155Payment != nil {
+		_, err = sdk.AccAddressFromBech32(msg.Contract_1155Payment.Address)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract address (%s)", err)
+		}
+		if iidtypes.IsEmpty(msg.Contract_1155Payment.TokenId) {
+			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token id cannot be empty")
+		}
+		// if msg.Contract_1155Payment.Amount == 0 {
+		// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token amount cannot be 0")
+		// }
+	}
 	if iidtypes.IsEmpty(msg.PaymentType.String()) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "payment type cannot be empty")
 	}

@@ -475,6 +475,10 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.Contract1155Payment"><span class="badge">M</span>Contract1155Payment</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.Dispute"><span class="badge">M</span>Dispute</a>
                 </li>
               
@@ -4648,6 +4652,44 @@ rejection </p></td>
 
         
       
+        <h3 id="ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>token_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint32">uint32</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.Dispute">Dispute</h3>
         <p></p>
 
@@ -4890,6 +4932,13 @@ use default by Collection </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contract_1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</a></td>
+                  <td></td>
+                  <td><p>if empty(nil) then no contract payment, not allowed for Evaluation Payment </p></td>
                 </tr>
               
                 <tr>
@@ -5408,6 +5457,27 @@ defined in Token payments </p></td>
                   <td></td>
                   <td><p>payment type to keep track what payment is for and mark claim payment
 accordingly </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contract_1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</a></td>
+                  <td></td>
+                  <td><p>if empty(nil) then no contract payment </p></td>
+                </tr>
+              
+                <tr>
+                  <td>toAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>for contract payment </p></td>
+                </tr>
+              
+                <tr>
+                  <td>fromAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>for contract payment </p></td>
                 </tr>
               
                 <tr>
@@ -6544,6 +6614,27 @@ use default by Collection </p></td>
                   <td></td>
                   <td><p>payment type to keep track what payment is for and mark claim payment
 accordingly </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contract_1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</a></td>
+                  <td></td>
+                  <td><p>if empty(nil) then no contract payment </p></td>
+                </tr>
+              
+                <tr>
+                  <td>toAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>for contract payment </p></td>
+                </tr>
+              
+                <tr>
+                  <td>fromAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>for contract payment </p></td>
                 </tr>
               
                 <tr>

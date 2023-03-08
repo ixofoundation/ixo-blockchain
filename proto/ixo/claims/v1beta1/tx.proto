@@ -126,11 +126,17 @@ message MsgWithdrawPayment {
   // payment type to keep track what payment is for and mark claim payment
   // accordingly
   PaymentType payment_type = 4;
+  // if empty(nil) then no contract payment
+  Contract1155Payment contract_1155_payment = 5;
+  // for contract payment
+  string toAddress = 6;
+  // for contract payment
+  string fromAddress = 7;
   // date that grantee can execute authorization, calculated from created date
   // plus the timeout on Collection payments
-  google.protobuf.Timestamp release_date = 5 [ (gogoproto.stdtime) = true ];
+  google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
   // admin address used to sign this message, validated against Collection Admin
-  string admin_address = 6;
+  string admin_address = 9;
 }
 
 message MsgWithdrawPaymentResponse {}

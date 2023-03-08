@@ -11,7 +11,7 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
 
 // Input models transaction input.
 message Input {
-  option (gogoproto.equal) = false;
+  option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
   string address = 1;
@@ -23,7 +23,7 @@ message Input {
 
 // Output models transaction outputs.
 message Output {
-  option (gogoproto.equal) = false;
+  option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
 
   string address = 1;

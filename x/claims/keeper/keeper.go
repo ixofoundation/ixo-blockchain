@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
@@ -30,6 +32,7 @@ type (
 		IidKeeper    iidkeeper.Keeper
 		BankKeeper   bankkeeper.Keeper
 		EntityKeeper entitykeeper.Keeper
+		WasmKeeper   wasmtypes.ContractOpsKeeper
 	}
 )
 
@@ -42,6 +45,7 @@ func NewKeeper(
 	authzKeeper authzkeeper.Keeper,
 	bankKeeper bankkeeper.Keeper,
 	entityKeeper entitykeeper.Keeper,
+	wasmKeeper wasmkeeper.Keeper,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -57,6 +61,7 @@ func NewKeeper(
 		AuthzKeeper:  authzKeeper,
 		BankKeeper:   bankKeeper,
 		EntityKeeper: entityKeeper,
+		WasmKeeper:   wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
 	}
 }
 

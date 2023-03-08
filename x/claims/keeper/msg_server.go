@@ -41,6 +41,11 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for protocol %s", msg.Protocol)
 	}
 
+	// check that Evaluation Payment does not have 1155 payment
+	if msg.Payments.Evaluation.Contract_1155Payment != nil {
+		return nil, types.ErrCollectionEvalError
+	}
+
 	// create and persist the Collection
 	var collection types.Collection
 	// only create colelction if admin/signer has auth on entity iid doc
@@ -402,7 +407,19 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
-	err = payout(ctx, s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate)
+	// get from address
+	fromAddress, err := sdk.AccAddressFromBech32(msg.FromAddress)
+	if err != nil {
+		return nil, err
+	}
+	// get to address
+	toAddress, err := sdk.AccAddressFromBech32(msg.ToAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// make payout
+	err = payout(ctx, s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate, msg.Contract_1155Payment, fromAddress, toAddress)
 	if err != nil {
 		return nil, err
 	}
