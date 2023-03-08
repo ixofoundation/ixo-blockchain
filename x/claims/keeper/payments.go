@@ -139,6 +139,30 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 }
 
 func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claimId string, releaseDate *time.Time, payment1155 *types.Contract1155Payment, fromAddress, toAddress sdk.AccAddress) error {
+	// get entity payout is for to validate if from address is valid entity module account
+	claim, err := k.GetClaim(ctx, claimId)
+	if err != nil {
+		return err
+	}
+	collection, err := k.GetCollection(ctx, claim.CollectionId)
+	if err != nil {
+		return err
+	}
+	_, entity, err := k.EntityKeeper.ResolveEntity(ctx, collection.Entity)
+	if err != nil {
+		return err
+	}
+
+	// check that fromAddress and input addresses is entity module accounts
+	if !entity.ContainsAccountAddress(fromAddress.String()) {
+		return types.ErrCollNotEntityAcc
+	}
+	for _, i := range inputs {
+		if !entity.ContainsAccountAddress(i.Address) {
+			return types.ErrCollNotEntityAcc
+		}
+	}
+
 	// distribute the payment according to the outputs for Cosmos Coins if has inputs and outputs
 	if len(inputs) != 0 && len(outputs) != 0 {
 		if err := k.BankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {

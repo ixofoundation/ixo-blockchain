@@ -8,7 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/x/claims/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -31,14 +30,20 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	params := s.Keeper.GetParams(ctx)
 
-	_, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.Entity))
-	if !found {
+	// check that entity exists
+	_, entity, err := s.Keeper.EntityKeeper.ResolveEntity(ctx, msg.Entity)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", msg.Entity)
 	}
 
-	_, found = s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.Protocol))
-	if !found {
+	// check that protocol exists
+	if _, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.Protocol)); !found {
 		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for protocol %s", msg.Protocol)
+	}
+
+	// check that signer is nft owner
+	if err = s.Keeper.EntityKeeper.CheckIfOwner(ctx, msg.Entity, msg.Signer); err != nil {
+		return nil, sdkerrors.Wrapf(err, "unauthorized")
 	}
 
 	// check that Evaluation Payment does not have 1155 payment
@@ -46,34 +51,35 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		return nil, types.ErrCollectionEvalError
 	}
 
+	// check that all payments accounts is part of entity module accounts
+	if !msg.Payments.AccountsIsEntityAccounts(entity) {
+		return nil, types.ErrCollNotEntityAcc
+	}
+
+	// get entity admin account
+	admin, err := entity.GetAdminAccount()
+	if err != nil {
+		return nil, sdkerrors.Wrapf(err, "for admin")
+	}
+
 	// create and persist the Collection
 	var collection types.Collection
-	// only create colelction if admin/signer has auth on entity iid doc
-	if err := iidkeeper.ExecuteOnDidWithRelationships(
-		ctx, &s.Keeper.IidKeeper,
-		[]string{iidtypes.Authentication},
-		msg.Entity, msg.Admin,
-		func(didDoc *iidtypes.IidDocument) error {
-			collectionId := fmt.Sprint(params.CollectionSequence)
-			collection = types.Collection{
-				Id:        collectionId,
-				Entity:    msg.Entity,
-				Admin:     msg.Admin,
-				Protocol:  msg.Protocol,
-				StartDate: msg.StartDate,
-				EndDate:   msg.EndDate,
-				Quota:     msg.Quota,
-				Count:     0,
-				Evaluated: 0,
-				Approved:  0,
-				Rejected:  0,
-				Disputed:  0,
-				State:     msg.State,
-				Payments:  msg.Payments,
-			}
-			return nil
-		}); err != nil {
-		return nil, err
+	collectionId := fmt.Sprint(params.CollectionSequence)
+	collection = types.Collection{
+		Id:        collectionId,
+		Entity:    msg.Entity,
+		Admin:     admin.Address,
+		Protocol:  msg.Protocol,
+		StartDate: msg.StartDate,
+		EndDate:   msg.EndDate,
+		Quota:     msg.Quota,
+		Count:     0,
+		Evaluated: 0,
+		Approved:  0,
+		Rejected:  0,
+		Disputed:  0,
+		State:     msg.State,
+		Payments:  msg.Payments,
 	}
 
 	s.Keeper.SetCollection(ctx, collection)

@@ -128,3 +128,30 @@ func (g Grant) UnpackInterfaces(unpacker cdctypes.AnyUnpacker) error {
 	var a authz.Authorization
 	return unpacker.UnpackAny(g.Authorization, &a)
 }
+
+func (e Entity) GetAdminAccount() (*EntityAccount, error) {
+	for _, acc := range e.Accounts {
+		if acc.Name == EntityAdminAccountName {
+			return acc, nil
+		}
+	}
+	return nil, ErrAccountNotFound
+}
+
+func (e Entity) ContainsAccountName(name string) bool {
+	for _, acc := range e.Accounts {
+		if acc.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func (e Entity) ContainsAccountAddress(address string) bool {
+	for _, acc := range e.Accounts {
+		if acc.Address == address {
+			return true
+		}
+	}
+	return false
+}

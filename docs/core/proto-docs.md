@@ -1571,6 +1571,7 @@ Msg defines the bonds Msg service.
 | disputed | [uint64](#uint64) |  | disputed is the number of claims that have disputed status (internally calculated) |
 | state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
+| signer | [string](#string) |  | signer address |
 
 
 
@@ -2369,7 +2370,7 @@ Query defines the gRPC querier service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | entity | [string](#string) |  | entity is the DID of the entity for which the claims are being created |
-| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor), signer for tx |
+| signer | [string](#string) |  | signer address |
 | protocol | [string](#string) |  | protocol is the DID of the claim protocol |
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |

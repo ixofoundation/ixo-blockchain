@@ -52,7 +52,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 		return nil, err
 	}
 
-	address, err := sdk.AccAddressFromBech32(params.NftContractMinter)
+	minterAddress, err := sdk.AccAddressFromBech32(params.NftContractMinter)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +85,17 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	}
 	s.Keeper.IidKeeper.SetDidDocument(ctx, []byte(entityId), did)
 
-	// create and persist the entity
+	// create admin module account
+	adminAddress, err := s.Keeper.CreateNewAccount(ctx, entityId, types.EntityAdminAccountName)
+	if err != nil {
+		return nil, err
+	}
+
+	// add admin module account to entities accounts
 	var enityAccounts []*types.EntityAccount
+	enityAccounts = append(enityAccounts, &types.EntityAccount{Name: types.EntityAdminAccountName, Address: adminAddress.String()})
+
+	// create and persist the entity
 	entityMeta := types.NewEntityMetadata(ctx.TxBytes(), ctx.BlockTime())
 	entity := types.Entity{
 		Id:          entityId,
@@ -118,7 +127,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 		return nil, err
 	}
 
-	_, err = s.Keeper.WasmKeeper.Execute(ctx, nftContractAddress, address, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	_, err = s.Keeper.WasmKeeper.Execute(ctx, nftContractAddress, minterAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
 	if err != nil {
 		return nil, err
 	}
@@ -329,15 +338,14 @@ func (s msgServer) CreateEntityAccount(goCtx context.Context, msg *types.MsgCrea
 	}
 
 	// check if entity account with name already exists
-	for _, acc := range entity.Accounts {
-		if acc.Name == msg.Name {
-			return nil, sdkerrors.Wrapf(types.ErrAccountDuplicate, "name %s", msg.Name)
-		}
+	nameExists := entity.ContainsAccountName(msg.Name)
+	if nameExists {
+		return nil, sdkerrors.Wrapf(types.ErrAccountDuplicate, "name %s", msg.Name)
 	}
 
-	// check that owner is admin
-	isOwner, err := s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
-	if !isOwner {
+	// check that owner is nft owner
+	err = s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(err, "unauthorized")
 	}
 
@@ -383,9 +391,9 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 		return nil, err
 	}
 
-	// check that owner is admin
-	isOwner, err := s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
-	if !isOwner {
+	// check that owner is entity owner
+	err = s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
+	if err != nil {
 		return nil, sdkerrors.Wrapf(err, "unauthorized")
 	}
 

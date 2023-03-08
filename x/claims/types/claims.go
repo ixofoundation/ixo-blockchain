@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -92,4 +93,11 @@ func (p Payment) Validate() error {
 	}
 
 	return nil
+}
+
+func (p Payments) AccountsIsEntityAccounts(entity entitytypes.Entity) bool {
+	if !entity.ContainsAccountAddress(p.Approval.Account) || !entity.ContainsAccountAddress(p.Submission.Account) || !entity.ContainsAccountAddress(p.Rejection.Account) || !entity.ContainsAccountAddress(p.Evaluation.Account) {
+		return false
+	}
+	return true
 }

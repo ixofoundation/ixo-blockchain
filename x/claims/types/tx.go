@@ -20,7 +20,7 @@ const TypeMsgCreateCollection = "create_collection"
 var _ sdk.Msg = &MsgCreateCollection{}
 
 func (msg MsgCreateCollection) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.Admin)
+	address, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
 		return []sdk.AccAddress{}
 	}

@@ -11,9 +11,9 @@ import (
 // CREATE COLLECTION
 // --------------------------
 func (msg MsgCreateCollection) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Admin)
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.Entity) {

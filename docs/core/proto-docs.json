@@ -3620,6 +3620,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "signer",
+              "description": "signer address",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5368,8 +5380,8 @@
               "defaultValue": ""
             },
             {
-              "name": "admin",
-              "description": "admin is the account address that will authorize or revoke agents and\npayments (the grantor), signer for tx",
+              "name": "signer",
+              "description": "signer address",
               "label": "",
               "type": "string",
               "longType": "string",

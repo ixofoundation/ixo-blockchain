@@ -22,9 +22,8 @@ service Msg {
 message MsgCreateCollection {
   // entity is the DID of the entity for which the claims are being created
   string entity = 1;
-  // admin is the account address that will authorize or revoke agents and
-  // payments (the grantor), signer for tx
-  string admin = 2;
+  // signer address
+  string signer = 2;
   // protocol is the DID of the claim protocol
   string protocol = 3;
   // startDate is the date after which claims may be submitted

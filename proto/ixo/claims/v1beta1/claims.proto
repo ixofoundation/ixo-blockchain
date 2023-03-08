@@ -90,6 +90,8 @@ message Collection {
   // payments is the amount paid for claim submission, evaluation, approval, or
   // rejection
   Payments payments = 14;
+  // signer address
+  string signer = 15;
 }
 
 message Payments {

@@ -16,3 +16,7 @@ func KeyPrefix(p string) []byte {
 var (
 	EntityKey = []byte{0x01}
 )
+
+var (
+	EntityAdminAccountName = "admin"
+)

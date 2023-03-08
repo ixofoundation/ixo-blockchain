@@ -9,6 +9,7 @@ var (
 	ErrCollectionNotFound  = sdkerrors.Register(ModuleName, 1001, "collection not found")
 	ErrCollectionNotOpen   = sdkerrors.Register(ModuleName, 1002, "collection is not in open state")
 	ErrCollectionEvalError = sdkerrors.Register(ModuleName, 1003, "evaluation payment is not allowed to have a Contract1155Payment")
+	ErrCollNotEntityAcc    = sdkerrors.Register(ModuleName, 1004, "collection payments accounts can only be entity accounts")
 
 	ErrClaimNotFound               = sdkerrors.Register(ModuleName, 1100, "claim not found")
 	ErrClaimUnauthorized           = sdkerrors.Register(ModuleName, 1101, "unauthorized, incorrect admin")
