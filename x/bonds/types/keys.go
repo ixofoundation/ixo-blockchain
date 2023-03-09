@@ -1,7 +1,5 @@
 package types
 
-import didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
-
 const (
 	// ModuleName is the name of this module
 	ModuleName = "bonds"
@@ -41,15 +39,15 @@ var (
 	BondDidsKeyPrefix    = []byte{0x03} // key for bond DIDs
 )
 
-func GetBondKey(bondDid didexported.Did) []byte {
+func GetBondKey(bondDid string) []byte {
 	return append(BondsKeyPrefix, []byte(bondDid)...)
 }
 
-func GetBatchKey(bondDid didexported.Did) []byte {
+func GetBatchKey(bondDid string) []byte {
 	return append(BatchesKeyPrefix, []byte(bondDid)...)
 }
 
-func GetLastBatchKey(bondDid didexported.Did) []byte {
+func GetLastBatchKey(bondDid string) []byte {
 	return append(LastBatchesKeyPrefix, []byte(bondDid)...)
 }
 

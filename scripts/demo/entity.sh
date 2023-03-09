@@ -33,10 +33,8 @@ MIGUEL_DID_FULL='{
 # Ledger DIDs
 echo "Ledgering DID 1/2..."
 # echo $MIGUEL_DID_FULL | jq -rc .
-# ixod_tx iid create-iid-from-legacy-did "$MIGUEL_DID_FULL"
 # yes $PASSWORD | ixod_tx iid create-iid "$(echo $MIGUEL_DID_FULL | jq -rc .)" --from miguel
 # echo "Ledgering DID 2/2..."
-# ixod_tx iid create-iid-from-legacy-did "$FRANCESCO_DID_FULL"
 
 ENTITY='{
 "entity_type": "assets",

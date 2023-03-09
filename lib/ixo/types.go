@@ -27,7 +27,7 @@ func RemoveOrdered[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
 }
 
-// check if trimmed string is empty (return true)
+// check if trimmed input is empty
 func IsEmpty(input string) bool {
 	return strings.TrimSpace(input) == ""
 }

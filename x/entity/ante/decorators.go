@@ -18,8 +18,8 @@ func NewBlockNftContractTransferForEntityDecorator(entityKeeper entitykeeper.Kee
 	}
 }
 
+// if MsgExecuteContract is for nft module contract then block direct MsgExecuteContract as must be done through entity module
 func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-
 	for _, msg := range tx.GetMsgs() {
 		wasmMsg, ok := msg.(*wasmtypes.MsgExecuteContract)
 		if !ok {
@@ -30,7 +30,7 @@ func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context
 		dec.entityKeeper.ParamSpace.GetParamSetIfExists(ctx, &params)
 
 		if wasmMsg.Contract == params.NftContractAddress {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Cant execute contract set as the nft contract address")
+			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot execute contract set as the entity nft contract address")
 		}
 	}
 

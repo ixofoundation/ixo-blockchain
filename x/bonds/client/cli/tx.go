@@ -8,10 +8,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ixotypes "github.com/ixofoundation/ixo-blockchain/lib/ixo"
-	didtypes "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
@@ -134,12 +133,6 @@ func NewCmdCreateBond() *cobra.Command {
 				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, "max batch blocks")
 			}
 
-			// Parse creator's ixo DID
-			creatorDid, err := didtypes.UnmarshalIxoDid(_creatorDid)
-			if err != nil {
-				return err
-			}
-
 			// Parse outcome payment
 			var outcomePayment sdk.Int
 			if len(_outcomePayment) == 0 {
@@ -152,20 +145,19 @@ func NewCmdCreateBond() *cobra.Command {
 				}
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			cliCtx = cliCtx.WithFromAddress(creatorDid.Address())
 
 			msg := types.NewMsgCreateBond(_token, _name, _description,
-				iidtypes.DIDFragment(creatorDid.Did), iidtypes.DIDFragment(_controllerDid), iidtypes.DIDFragment(_oracleDid), _functionType, functionParams,
+				iidtypes.DIDFragment(_creatorDid), iidtypes.DIDFragment(_controllerDid), iidtypes.DIDFragment(_oracleDid), _functionType, functionParams,
 				reserveTokens, txFeePercentage, exitFeePercentage, feeAddress,
 				reserveWithdrawalAddress, maxSupply, orderQuantityLimits,
 				sanityRate, sanityMarginPercentage, _allowSells,
 				_allowReserveWithdrawals, _alphaBond, batchBlocks,
-				outcomePayment, _bondDid, creatorDid.Address().String())
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), creatorDid, msg)
+				outcomePayment, _bondDid, clientCtx.GetFromAddress().String())
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -210,22 +202,15 @@ func NewCmdEditBond() *cobra.Command {
 			_bondDid, _ := cmd.Flags().GetString(FlagBondDid)
 			_editorDid, _ := cmd.Flags().GetString(FlagEditorDid)
 
-			// Parse editor's ixo DID
-			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
 
 			msg := types.NewMsgEditBond(_name, _description, _orderQuantityLimits,
-				_sanityRate, _sanityMarginPercentage, iidtypes.DIDFragment(editorDid.Did), _bondDid, editorDid.Address().String())
+				_sanityRate, _sanityMarginPercentage, iidtypes.DIDFragment(_editorDid), _bondDid, clientCtx.GetFromAddress().String())
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -255,21 +240,14 @@ func NewCmdSetNextAlpha() *cobra.Command {
 				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "alpha")
 			}
 
-			// Parse editor's ixo DID
-			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
+			msg := types.NewMsgSetNextAlpha(alpha, iidtypes.DIDFragment(_editorDid), _bondDid, clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgSetNextAlpha(alpha, iidtypes.DIDFragment(editorDid.Did), _bondDid, editorDid.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -288,21 +266,14 @@ func NewCmdUpdateBondState() *cobra.Command {
 			_bondDid := args[1]
 			_editorDid := args[2]
 
-			// Parse editor's ixo DID
-			editorDid, err := didtypes.UnmarshalIxoDid(_editorDid)
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(editorDid.Address())
+			msg := types.NewMsgUpdateBondState(types.BondState(_state), iidtypes.DIDFragment(_editorDid), _bondDid, clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgUpdateBondState(types.BondState(_state), iidtypes.DIDFragment(editorDid.Did), _bondDid, editorDid.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), editorDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -330,22 +301,15 @@ func NewCmdBuy() *cobra.Command {
 				return err
 			}
 
-			// Parse buyer's ixo DID
-			buyerDid, err := didtypes.UnmarshalIxoDid(args[3])
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(buyerDid.Address())
 
 			msg := types.NewMsgBuy(
-				iidtypes.DIDFragment(buyerDid.Did), bondCoinWithAmount, maxPrices, args[2], buyerDid.Address().String())
+				iidtypes.DIDFragment(args[3]), bondCoinWithAmount, maxPrices, args[2], clientCtx.GetFromAddress().String())
 
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), buyerDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -366,21 +330,14 @@ func NewCmdSell() *cobra.Command {
 				return err
 			}
 
-			// Parse seller's ixo DID
-			sellerDid, err := didtypes.UnmarshalIxoDid(args[2])
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(sellerDid.Address())
+			msg := types.NewMsgSell(iidtypes.DIDFragment(args[2]), bondCoinWithAmount, args[1], clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgSell(iidtypes.DIDFragment(sellerDid.Did), bondCoinWithAmount, args[1], sellerDid.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sellerDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -404,21 +361,14 @@ func NewCmdSwap() *cobra.Command {
 				return err
 			}
 
-			// Parse swapper's ixo DID
-			swapperDid, err := didtypes.UnmarshalIxoDid(args[4])
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(swapperDid.Address())
+			msg := types.NewMsgSwap(iidtypes.DIDFragment(args[4]), from, args[2], args[3], clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgSwap(iidtypes.DIDFragment(swapperDid.Did), from, args[2], args[3], swapperDid.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), swapperDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -433,27 +383,19 @@ func NewCmdMakeOutcomePayment() *cobra.Command {
 		Short:   "Make an outcome payment to a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			amount, ok := sdk.NewIntFromString(args[1])
 			if !ok {
 				return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
 			}
 
-			// Parse sender's ixo DID
-			sender, err := didtypes.UnmarshalIxoDid(args[2])
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(sender.Address())
+			msg := types.NewMsgMakeOutcomePayment(iidtypes.DIDFragment(args[2]), amount, args[0], clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgMakeOutcomePayment(iidtypes.DIDFragment(sender.Did), amount, args[0], sender.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), sender, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -468,22 +410,14 @@ func NewCmdWithdrawShare() *cobra.Command {
 		Short:   "Withdraw share from a bond that is in settlement state",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			// Parse recipient's ixo DID
-			recipientDid, err := didtypes.UnmarshalIxoDid(args[1])
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(recipientDid.Address())
+			msg := types.NewMsgWithdrawShare(iidtypes.DIDFragment(args[1]), args[0], clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgWithdrawShare(iidtypes.DIDFragment(recipientDid.Did), args[0], recipientDid.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), recipientDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
@@ -498,27 +432,19 @@ func NewCmdWithdrawReserve() *cobra.Command {
 		Short:   "Withdraw reserve from a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			amount, err := sdk.ParseCoinsNormalized(args[1])
 			if err != nil {
 				return err
 			}
 
-			// Parse withdrawer's ixo DID
-			withdrawerDid, err := didtypes.UnmarshalIxoDid(args[2])
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			cliCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-			cliCtx = cliCtx.WithFromAddress(withdrawerDid.Address())
+			msg := types.NewMsgWithdrawReserve(iidtypes.DIDFragment(args[2]), amount, args[0], clientCtx.GetFromAddress().String())
 
-			msg := types.NewMsgWithdrawReserve(iidtypes.DIDFragment(withdrawerDid.Did), amount, args[0], withdrawerDid.Address().String())
-
-			return ixotypes.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), withdrawerDid, msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 

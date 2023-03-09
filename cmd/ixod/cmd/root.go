@@ -28,7 +28,6 @@ import (
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/ixofoundation/ixo-blockchain/app"
 	"github.com/ixofoundation/ixo-blockchain/app/params"
-	"github.com/ixofoundation/ixo-blockchain/cmd/ixod/cmd/didsign"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
@@ -72,7 +71,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			// initClientCtx, err = clientconfig.ReadFromClientConfig(initClientCtx)
+			// initClientCtx, err = config.ReadFromClientConfig(initClientCtx)
 			// if err != nil {
 			// 	return err
 			// }
@@ -164,7 +163,6 @@ func txCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		didsign.GetSignCommand(),
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),

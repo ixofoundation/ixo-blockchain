@@ -45,7 +45,6 @@ func GetTxCmd() *cobra.Command {
 		NewAddIidContextCmd(),
 		NewDeleteIidContextCmd(),
 		NewDeactivateIIDCmd(),
-		NewCreateIidDocumentFormLegacyDidCmd(),
 	)
 
 	return cmd

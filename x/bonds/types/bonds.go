@@ -8,7 +8,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -229,7 +228,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid, orcaleD
 	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
 	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
 	allowSells, allowReserveWithdrawals, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int,
-	state BondState, bondDid didexported.Did) Bond {
+	state BondState, bondDid string) Bond {
 
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
