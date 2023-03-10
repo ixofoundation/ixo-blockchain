@@ -12,7 +12,7 @@ jobs:
       chain-binary: ixod
       chain-a-tag: 0.19.3
       chain-b-tag: 0.19.3
-      chain-upgrade-tag: v0.20.0-rc.1
+      chain-upgrade-tag: debug-v0.19.4.7
       upgrade-plan-name: "normal upgrade"
       test-entry-point:  "TestUpgradeTestSuite"
       test: "TestIBCChainUpgrade"
