@@ -2,8 +2,7 @@ name: Tests / E2E Upgrade
 on: 
   workflow_dispatch:
   push: 
-    branches:
-      - ibc-test-workflow
+    branches: [ibc-test-workflow]
 
 jobs:
   upgrade-v5:
