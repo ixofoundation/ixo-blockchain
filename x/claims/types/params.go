@@ -34,7 +34,7 @@ func NewParams(collectionSequence uint64, ixoAccount string,
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	defaultIxoAccount := "ixo1y0d7w5xfj9a0p7ygpx0uwvyrnmmqj3fd4sva7t"
+	defaultIxoAccount := "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
 	tenPercentFee := sdk.NewDec(10)
 
 	return NewParams(1, defaultIxoAccount, tenPercentFee, tenPercentFee)

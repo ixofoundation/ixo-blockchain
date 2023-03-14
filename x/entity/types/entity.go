@@ -83,7 +83,7 @@ func NewParams(nftContractAddress string, nftContractMinter string, createSequen
 func DefaultParams() Params {
 	return Params{
 		NftContractAddress: "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
-		NftContractMinter:  "ixo14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sqa3vn7",
+		NftContractMinter:  "ixo1g7xtrvc8ejkenee8a3gryvx6d4n9uu6gpsx63z",
 		CreateSequence:     0,
 	}
 }

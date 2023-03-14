@@ -51,7 +51,9 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 
 	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
 	if err != nil {
-		return err
+		// return nil as still want proposal to pass even though contractCode doest'n exist yet (for entity module bootstrap purposes)
+		// if error it means proposal is just like empty proposal, look into returning error in future
+		return nil
 	}
 
 	xx.NftContractAddress = contractAddr.String()
