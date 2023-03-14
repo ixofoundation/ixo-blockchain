@@ -10,6 +10,8 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	ibcante "github.com/cosmos/ibc-go/v4/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	entityante "github.com/ixofoundation/ixo-blockchain/x/entity/ante"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
@@ -23,7 +25,8 @@ type HandlerOptions struct {
 	FeegrantKeeper    authante.FeegrantKeeper
 	IidKeeper         iidkeeper.Keeper
 	EntityKeeper      entitykeeper.Keeper
-	wasmConfig        wasmtypes.WasmConfig
+	wasmConfig        *wasmtypes.WasmConfig
+	IBCKeeper         *ibckeeper.Keeper
 	txCounterStoreKey sdk.StoreKey
 	SignModeHandler   authsigning.SignModeHandler
 	SigGasConsumer    func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
@@ -69,6 +72,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewSigGasConsumeDecorator(options.AccountKeeper, sigGasConsumer),
 		authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		authante.NewIncrementSequenceDecorator(options.AccountKeeper),
+		ibcante.NewAnteDecorator(options.IBCKeeper),
 		// custom ixo handlers
 		iidante.NewIidResolutionDecorator(options.IidKeeper),
 		entityante.NewBlockNftContractTransferForEntityDecorator(options.EntityKeeper),

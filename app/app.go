@@ -665,7 +665,8 @@ func NewIxoApp(
 		FeegrantKeeper:    app.FeeGrantKeeper,
 		IidKeeper:         app.IidKeeper,
 		EntityKeeper:      app.EntityKeeper,
-		wasmConfig:        wasmConfig,
+		wasmConfig:        &wasmConfig,
+		IBCKeeper:         app.IBCKeeper,
 		txCounterStoreKey: keys[wasm.StoreKey],
 
 		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
