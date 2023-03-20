@@ -78,7 +78,7 @@ message TokenProperties {
   string id = 1;
   // index is the unique identifier hexstring that identifies the token
   string index = 2;
-  // index is the unique identifier hexstring that identifies the token
+  // name is the token name, which is same as Token name
   string name = 3;
   // did of collection (eg Supamoto Malawi)
   string collection = 4;
