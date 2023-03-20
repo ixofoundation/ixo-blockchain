@@ -6,27 +6,15 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ixofoundation/ixo-blockchain)](https://goreportcard.com/report/github.com/ixofoundation/ixo-blockchain)
 
-ixo is a Layer 1 blockchain running a Testnet and a Mainnet.
+The ixo Blockchain is a Layer 1 blockchain that runs on both Testnet and Mainnet. It is built using the [Cosmos SDK](https://docs.cosmos.network/main), [Tendermint](https://docs.tendermint.com/), and [IBC](https://ibc.cosmos.network/), and was one of the earliest networks to incorporate these technologies. The recent addition of [CosmWASM](https://github.com/CosmWasm/wasmd) in v0.19.3 demonstrates ixo's commitment to ongoing innovation and evolution.
 
-It is one of the first networks built with [Cosmos SDK](https://github.com/cosmos/cosmos-sdk), [Tendermint](https://github.com/tendermint/tendermint), and [IBC](https://ibc.cosmos.network/).
+Have a look at [go.mod](https://github.com/ixofoundation/ixo-blockchain/blob/main/go.mod) for specific dependencies and their most recent versions.
 
-[CosmWASM](https://github.com/CosmWasm/wasmd) was included with v0.19.3.
-
-## Infrastructure for Impact
-ixo Blockchain powers client applications - have a look.
-- [ixo Web Client]()
-- [ixo Mobile Client]()
-- [JAMBO Client]()
-
-## Where to start
-
-Documentation to get you [started](https://docs.ixo.foundation/ixo/developers/getting-started).
+The ixo Blockchain powers client applications that aim to have a global positive impact. The [Impact Wallet](https://github.com/ixofoundation/ixo-Mobile-dev), [JAMBO](https://github.com/ixofoundation/ixo-jambo-client), and [Launchpad](https://github.com/ixofoundation/ixo-webclient) are examples of the client applications that use the ixo Blockchain to enable social impact projects around the world. The [Impact SDK](https://www.npmjs.com/package/@ixo/impactxclient-sdk) makes it simple to interact with the ixo Blockchain.
 
 ## How to contribute
-Here are suggested ways:
-- Fork this repo and create a PR when you are ready to submit your changes for review.
-- Submit an Issue to start a conversation.
-- Run a validator node.
-- Reach out to our Community. 
+If you are interested in contributing to the ixo Blockchain, you can start by reviewing the documentation on our [website](https://docs.ixo.foundation/ixo/developers/getting-started). There are many opportunities to get involved, such as contributing code or participating in community discussions.
+
+Our community is passionate about using blockchain technology to create a positive impact on the world. We believe in the power of collaboration and innovation to drive change, and we welcome anyone who shares our vision to join us on Discord or Telegram.
 
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/ixo) [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/ixonetwork)
