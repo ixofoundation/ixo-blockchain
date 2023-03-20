@@ -1,0 +1,39 @@
+name: Tests / E2E Upgrade
+on:
+  workflow_dispatch:
+  push:
+    branches: [ibc_workflows]
+
+# flow used from https://github.com/chatton/ibc-go-e2e-demo/blob/master/.github/workflows/e2e-upgrade.yml
+jobs:
+  ibc-upgrade:
+    uses: cosmos/ibc-go/.github/workflows/e2e-test-workflow-call.yml@main
+    with:
+      chain-image: ghcr.io/ixofoundation/ixo-blockchain
+      chain-binary: ixod
+      chain-a-tag: 0.19.3
+      chain-b-tag: 0.19.3
+      # The chain A upgrade version
+      chain-upgrade-tag: debug-0.20.0.2
+      # The upgrade-plan-name must match the upgrade handler name registered and not be present in the starting tag
+      # Example: https://github.com/cosmos/ibc-go/blob/v5.2.0/testing/simapp/app.go#L855-L860
+      upgrade-plan-name: "normal upgrade"
+      test-entry-point: "TestUpgradeTestSuite"
+      # TestIBCChainUpgrade tests ibc transfer functionality before and after a chain upgrade
+      test: "TestIBCChainUpgrade"
+
+  regular-upgrade:
+    uses: cosmos/ibc-go/.github/workflows/e2e-test-workflow-call.yml@main
+    with:
+      chain-image: ghcr.io/ixofoundation/ixo-blockchain
+      chain-binary: ixod
+      chain-a-tag: 0.19.3
+      chain-b-tag: 0.19.3
+      # The chain A upgrade version
+      chain-upgrade-tag: debug-0.20.0.2
+      # The upgrade-plan-name must match the upgrade handler name registered and not be present in the starting tag
+      # Example: https://github.com/cosmos/cosmos-sdk/blob/release/v0.47.x/simapp/upgrades.go#L28
+      upgrade-plan-name: "v046-to-v047"
+      test-entry-point: "TestUpgradeTestSuite"
+      # TestChainUpgrade tests basic x/bank send functionality before and after a chain upgrade
+      test: "TestChainUpgrade"

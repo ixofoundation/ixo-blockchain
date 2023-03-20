@@ -1,0 +1,61 @@
+name: Run ibc-go E2E Tests
+on:
+  workflow_dispatch:
+  push:
+    branches: [ibc_workflows]
+
+# flow used from https://github.com/chatton/ibc-go-e2e-demo/blob/master/.github/workflows/run-ibc-go-e2e.yml
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # ensure that a single test failure doesn't cause all tests to fail
+      matrix:
+        # entrypoint corresponds to the test function in the test files which fall under the e2e directory.
+        # test is the name of the test function to be run.
+        # see the e2e docs https://github.com/cosmos/ibc-go/tree/main/e2e for more details.
+        include:
+          - test: TestClientUpdateProposal_Succeeds
+            entrypoint: TestClientTestSuite
+          - test: TestMsgTransfer_Succeeds_Nonincentivized
+            entrypoint: TestTransferTestSuite
+          - test: TestMsgTransfer_Fails_InvalidAddress
+            entrypoint: TestTransferTestSuite
+          - test: TestMsgTransfer_Timeout_Nonincentivized
+            entrypoint: TestTransferTestSuite
+          - test: TestSendEnabledParam
+            entrypoint: TestTransferTestSuite
+          - test: TestReceiveEnabledParam
+            entrypoint: TestTransferTestSuite
+          - test: TestMsgPayPacketFee_AsyncSingleSender_Succeeds
+            entrypoint: TestIncentivizedTransferTestSuite
+          - test: TestMsgPayPacketFee_InvalidReceiverAccount
+            entrypoint: TestIncentivizedTransferTestSuite
+          - test: TestMultiMsg_MsgPayPacketFeeSingleSender
+            entrypoint: TestIncentivizedTransferTestSuite
+          - test: TestMsgPayPacketFee_SingleSender_TimesOut
+            entrypoint: TestIncentivizedTransferTestSuite
+          - test: TestPayPacketFeeAsync_SingleSender_NoCounterPartyAddress
+            entrypoint: TestIncentivizedTransferTestSuite
+          - test: TestMsgPayPacketFee_AsyncMultipleSenders_Succeeds
+            entrypoint: TestIncentivizedTransferTestSuite
+    steps:
+      - name: Checkout the ibc-go repo.
+        uses: actions/checkout@v3
+        with:
+          repository: cosmos/ibc-go
+      - name: Install Go 1.18.
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Run E2E tests with custom chain image.
+        run: |
+          cd e2e
+          make e2e-test entrypoint=${{ matrix.entrypoint }} test=${{ matrix.test}}
+        env:
+          # Configure this however you like in order to specify your own custom image and tags.
+          CHAIN_IMAGE: ghcr.io/ixofoundation/ixo-blockchain
+          CHAIN_A_TAG: debug-0.20.0.2
+          CHAIN_B_TAG: debug-0.20.0.2
+          CHAIN_BINARY: ixod
+          RLY_TAG: v2.0.0
