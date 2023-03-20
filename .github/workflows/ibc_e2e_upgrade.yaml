@@ -21,7 +21,6 @@ jobs:
       test-entry-point: "TestUpgradeTestSuite"
       # TestIBCChainUpgrade tests ibc transfer functionality before and after a chain upgrade
       test: "TestIBCChainUpgrade"
-      RELAYER_TYPE: hermes
 
   regular-upgrade:
     uses: cosmos/ibc-go/.github/workflows/e2e-test-workflow-call.yml@main
@@ -38,4 +37,3 @@ jobs:
       test-entry-point: "TestUpgradeTestSuite"
       # TestChainUpgrade tests basic x/bank send functionality before and after a chain upgrade
       test: "TestChainUpgrade"
-      RELAYER_TYPE: hermes

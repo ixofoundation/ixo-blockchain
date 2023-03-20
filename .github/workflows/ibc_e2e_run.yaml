@@ -58,4 +58,4 @@ jobs:
           CHAIN_A_TAG: debug-0.20.0.2
           CHAIN_B_TAG: debug-0.20.0.2
           CHAIN_BINARY: ixod
-          RELAYER_TYPE: hermes
+          RLY_TAG: v2.0.0
