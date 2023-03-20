@@ -54,8 +54,8 @@ jobs:
           make e2e-test entrypoint=${{ matrix.entrypoint }} test=${{ matrix.test}}
         env:
           # Configure this however you like in order to specify your own custom image and tags.
-          CHAIN_IMAGE: ghcr.io/cosmos/ibc-go-simd
-          CHAIN_A_TAG: main
-          CHAIN_B_TAG: main
-          CHAIN_BINARY: simd
-          RLY_TAG: v2.0.0
+          CHAIN_IMAGE: ghcr.io/ixofoundation/ixo-blockchain
+          CHAIN_A_TAG: debug-0.20.0.2
+          CHAIN_B_TAG: debug-0.20.0.2
+          CHAIN_BINARY: ixod
+          RELAYER_TYPE: hermes
