@@ -6,7 +6,8 @@ COPY . .
 
 RUN make build
 
-FROM gcr.io/distroless/base-debian11 as run
+FROM ubuntu:20.04 as run
+# FROM gcr.io/distroless/base-debian11 as run
 
 COPY --from=build /app/build/ixod /bin/ixod
 COPY --from=build /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.1.1/internal/api/ /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.1.1/internal/api/

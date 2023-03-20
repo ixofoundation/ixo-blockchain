@@ -1,0 +1,141 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "ixo/claims/v1beta1/claims.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "ixo/claims/v1beta1/cosmos.proto";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc CreateCollection(MsgCreateCollection)
+      returns (MsgCreateCollectionResponse);
+  rpc SubmitClaim(MsgSubmitClaim) returns (MsgSubmitClaimResponse);
+  rpc EvaluateClaim(MsgEvaluateClaim) returns (MsgEvaluateClaimResponse);
+  rpc DisputeClaim(MsgDisputeClaim) returns (MsgDisputeClaimResponse);
+  rpc WithdrawPayment(MsgWithdrawPayment) returns (MsgWithdrawPaymentResponse);
+}
+
+message MsgCreateCollection {
+  // entity is the DID of the entity for which the claims are being created
+  string entity = 1;
+  // signer address
+  string signer = 2;
+  // protocol is the DID of the claim protocol
+  string protocol = 3;
+  // startDate is the date after which claims may be submitted
+  google.protobuf.Timestamp start_date = 4 [ (gogoproto.stdtime) = true ];
+  // endDate is the date after which no more claims may be submitted (no endDate
+  // is allowed)
+  google.protobuf.Timestamp end_date = 5 [ (gogoproto.stdtime) = true ];
+  // quota is the maximum number of claims that may be submitted, 0 is unlimited
+  uint64 quota = 6;
+  // state is the current state of this Collection (open, paused, closed)
+  CollectionState state = 7;
+  // payments is the amount paid for claim submission, evaluation, approval, or
+  // rejection
+  Payments payments = 8;
+}
+
+message MsgCreateCollectionResponse {}
+
+message MsgSubmitClaim {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  // claimID is the unique identifier of the claim in the cid hash format
+  string claim_id = 2;
+  // agent is the DID of the agent submitting the claim
+  string agent_did = 3
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_address = 4;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 5;
+}
+
+message MsgSubmitClaimResponse {}
+
+message MsgEvaluateClaim {
+  // claimID is the unique identifier of the claim to make evaluation against
+  string claim_id = 1;
+  // claimID is the unique identifier of the claim to make evaluation against
+  string collection_id = 2;
+  // oracle is the DID of the Oracle entity that evaluates the claim
+  string oracle = 3;
+  // agent is the DID of the agent that submits the evaluation
+  string agent_did = 4
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_address = 5;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 6;
+  // status is the evaluation status expressed as an integer (2=approved,
+  // 3=rejected, ...)
+  EvaluationStatus status = 7;
+  // reason is the code expressed as an integer, for why the evaluation result
+  // was given (codes defined by evaluator)
+  uint32 reason = 8;
+  // verificationProof is the cid of the evaluation Verfiable Credential
+  string verification_proof = 9;
+  // custom amount specified by evaluator for claim approval, if empty list then
+  // use default by Collection
+  repeated cosmos.base.v1beta1.Coin amount = 10 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message MsgEvaluateClaimResponse {}
+
+// Agent laying dispute must be admin for Collection, or controller on
+// Collection entity, or have authz cap, aka is agent
+message MsgDisputeClaim {
+  // subject_id for which this dispute is against, for now can only lay disputes
+  // against claims
+  string subject_id = 1;
+  // agent is the DID of the agent disputing the claim, agent detials wont be
+  // saved in kvStore
+  string agent_did = 2
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_address = 3;
+  // type is expressed as an integer, interpreted by the client
+  int32 dispute_type = 4;
+  DisputeData data = 5;
+}
+
+message MsgDisputeClaimResponse {}
+
+message MsgWithdrawPayment {
+  // claim_id the withdrawal is for
+  string claim_id = 1;
+  // Inputs to the multisend tx to run to withdraw payment
+  repeated Input inputs = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Input"
+  ];
+  // Outputs for the multisend tx to run to withdraw payment
+  repeated Output outputs = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Output"
+  ];
+  // payment type to keep track what payment is for and mark claim payment
+  // accordingly
+  PaymentType payment_type = 4;
+  // if empty(nil) then no contract payment
+  Contract1155Payment contract_1155_payment = 5;
+  // for contract payment
+  string toAddress = 6;
+  // for contract payment
+  string fromAddress = 7;
+  // date that grantee can execute authorization, calculated from created date
+  // plus the timeout on Collection payments
+  google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 9;
+}
+
+message MsgWithdrawPaymentResponse {}

@@ -1,0 +1,68 @@
+syntax = "proto3";
+package ixo.token.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+
+import "ixo/token/v1beta1/token.proto";
+import "ixo/token/v1beta1/tx.proto";
+import "gogoproto/gogo.proto";
+
+// TokenCreatedEvent is an event triggered on a Token creation
+message TokenCreatedEvent { Token token = 1; }
+
+// TokenUpdatedEvent is an event triggered on a Token update
+message TokenUpdatedEvent { Token token = 1; }
+
+// TokenMintedEvent is an event triggered on a Token mint execution
+message TokenMintedEvent {
+  // the contract address of token contract being initialized
+  string contract_address = 1;
+  // the token minter
+  string minter = 2;
+  // the new tokens owner
+  string owner = 3;
+  string amount = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  TokenProperties tokenProperties = 5;
+}
+
+// TokenTransferedEvent is an event triggered on a Token transfer execution
+message TokenTransferredEvent {
+  // the old token owner
+  string owner = 1;
+  // the new tokens owner
+  string recipient = 2;
+  repeated TokenBatch tokens = 3;
+}
+
+// TokenCancelledEvent is an event triggered on a Token cancel execution
+message TokenCancelledEvent {
+  // the token owner
+  string owner = 1;
+  repeated TokenBatch tokens = 2;
+}
+
+// TokenRetiredEvent is an event triggered on a Token retire execution
+message TokenRetiredEvent {
+  // the token owner
+  string owner = 1;
+  repeated TokenBatch tokens = 2;
+}
+
+// TokenPausedEvent is an event triggered on a Token pause/unpause execution
+message TokenPausedEvent {
+  // the minter address
+  string minter = 1;
+  string contract_address = 2;
+  bool paused = 3;
+}
+
+// TokenStoppedEvent is an event triggered on a Token stopped execution
+message TokenStoppedEvent {
+  // the minter address
+  string minter = 1;
+  string contract_address = 2;
+  bool stopped = 3;
+}

@@ -818,7 +818,8 @@ func (m *MsgSellResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSellResponse proto.InternalMessageInfo
 
-// MsgSwap defines a message for swapping from one reserve bond token to another.
+// MsgSwap defines a message for swapping from one reserve bond token to
+// another.
 type MsgSwap struct {
 	SwapperDid     github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=swapper_did,json=swapperDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"swapper_did,omitempty" yaml:"swapper_did"`
 	BondDid        string                                                          `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
@@ -932,7 +933,8 @@ func (m *MsgSwapResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 
-// MsgMakeOutcomePayment defines a message for making an outcome payment to a bond.
+// MsgMakeOutcomePayment defines a message for making an outcome payment to a
+// bond.
 type MsgMakeOutcomePayment struct {
 	SenderDid     github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"sender_did,omitempty" yaml:"sender_did"`
 	Amount        github_com_cosmos_cosmos_sdk_types.Int                          `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"amount" yaml:"amount"`
@@ -994,7 +996,8 @@ func (m *MsgMakeOutcomePayment) GetSenderAddress() string {
 	return ""
 }
 
-// MsgMakeOutcomePaymentResponse defines the Msg/MakeOutcomePayment response type.
+// MsgMakeOutcomePaymentResponse defines the Msg/MakeOutcomePayment response
+// type.
 type MsgMakeOutcomePaymentResponse struct {
 }
 
@@ -1031,7 +1034,8 @@ func (m *MsgMakeOutcomePaymentResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgMakeOutcomePaymentResponse proto.InternalMessageInfo
 
-// MsgWithdrawShare defines a message for withdrawing a share from a bond that is in the SETTLE stage.
+// MsgWithdrawShare defines a message for withdrawing a share from a bond that
+// is in the SETTLE stage.
 type MsgWithdrawShare struct {
 	RecipientDid     github_com_ixofoundation_ixo_blockchain_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" json:"recipient_did,omitempty" yaml:"recipient_did"`
 	BondDid          string                                                          `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty" yaml:"bond_did"`
@@ -1414,9 +1418,11 @@ type MsgClient interface {
 	Sell(ctx context.Context, in *MsgSell, opts ...grpc.CallOption) (*MsgSellResponse, error)
 	// Swap defines a method for swapping from one reserve bond token to another.
 	Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOption) (*MsgSwapResponse, error)
-	// MakeOutcomePayment defines a method for making an outcome payment to a bond.
+	// MakeOutcomePayment defines a method for making an outcome payment to a
+	// bond.
 	MakeOutcomePayment(ctx context.Context, in *MsgMakeOutcomePayment, opts ...grpc.CallOption) (*MsgMakeOutcomePaymentResponse, error)
-	// WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage.
+	// WithdrawShare defines a method for withdrawing a share from a bond that is
+	// in the SETTLE stage.
 	WithdrawShare(ctx context.Context, in *MsgWithdrawShare, opts ...grpc.CallOption) (*MsgWithdrawShareResponse, error)
 	// WithdrawReserve defines a method for withdrawing reserve from a bond.
 	WithdrawReserve(ctx context.Context, in *MsgWithdrawReserve, opts ...grpc.CallOption) (*MsgWithdrawReserveResponse, error)
@@ -1536,9 +1542,11 @@ type MsgServer interface {
 	Sell(context.Context, *MsgSell) (*MsgSellResponse, error)
 	// Swap defines a method for swapping from one reserve bond token to another.
 	Swap(context.Context, *MsgSwap) (*MsgSwapResponse, error)
-	// MakeOutcomePayment defines a method for making an outcome payment to a bond.
+	// MakeOutcomePayment defines a method for making an outcome payment to a
+	// bond.
 	MakeOutcomePayment(context.Context, *MsgMakeOutcomePayment) (*MsgMakeOutcomePaymentResponse, error)
-	// WithdrawShare defines a method for withdrawing a share from a bond that is in the SETTLE stage.
+	// WithdrawShare defines a method for withdrawing a share from a bond that is
+	// in the SETTLE stage.
 	WithdrawShare(context.Context, *MsgWithdrawShare) (*MsgWithdrawShareResponse, error)
 	// WithdrawReserve defines a method for withdrawing reserve from a bond.
 	WithdrawReserve(context.Context, *MsgWithdrawReserve) (*MsgWithdrawReserveResponse, error)

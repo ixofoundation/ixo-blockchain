@@ -2,96 +2,114 @@ package types
 
 import (
 	fmt "fmt"
-	"strconv"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/x/token/types/contracts/ixo1155"
 )
 
 var (
-	KeyCw20ContractCode    = []byte("Cw20ContractCode")
-	KeyCw721ContractCode   = []byte("Cw721ContractCode")
 	KeyIxo1155ContractCode = []byte("Ixo1155ContractCode")
 )
 
-func parseCode(stringCode string) (uint64, error) {
-	code, err := strconv.ParseUint(stringCode, 0, 64)
-	if err != nil {
-		return 0, err
-	}
-
-	return code, nil
-}
-
 func validateContractCode(i interface{}) error {
-	codeString, ok := i.(string)
+	_, ok := i.(uint64)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T expected string", i)
-	}
-	code, err := parseCode(codeString)
-	if err != nil {
-		return err
-	}
-
-	if code < 0 {
-		return fmt.Errorf("invalid contract code")
+		return fmt.Errorf("invalid parameter type: %T expected uint64", i)
 	}
 
 	return nil
 }
 
-// ParamTable for project module.
+// IsValidToken tells if a Token is valid,
+func IsValidToken(token *Token) bool {
+	if token == nil {
+		return false
+	}
+	if iidtypes.IsEmpty(token.Name) {
+		return false
+	}
+	_, err := sdk.AccAddressFromBech32(token.ContractAddress)
+	if err != nil {
+		return false
+	}
+	_, err = sdk.AccAddressFromBech32(token.Minter)
+	if err != nil {
+		return false
+	}
+	if !iidtypes.IsValidDID(token.Class) {
+		return false
+	}
+	return true
+}
+
+// IsValidTokenProperties tells if a TokenProperties is valid,
+func IsValidTokenProperties(tokenProperties *TokenProperties) bool {
+	if tokenProperties == nil {
+		return false
+	}
+	if iidtypes.IsEmpty(tokenProperties.Id) {
+		return false
+	}
+	if iidtypes.IsEmpty(tokenProperties.Name) {
+		return false
+	}
+	return true
+}
+
+// ParamTable for module.
 func ParamKeyTable() paramstypes.KeyTable {
 	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-func NewParams(nftContractAddress string, nftContractMinter string) Params {
+func NewParams(ixo1155ContractCode uint64) Params {
 	return Params{
-		Cw20ContractCode:    "0",
-		Cw721ContractCode:   "0",
-		Ixo1155ContractCode: "0",
+		Ixo1155ContractCode: ixo1155ContractCode,
 	}
 }
 
-// func (p Params) MustCw20ContractCode() (uint64, error) {
-
-// }
-
-// // default project module parameters
 func DefaultParams() Params {
 	return Params{
-		Cw20ContractCode:    "0",
-		Cw721ContractCode:   "0",
-		Ixo1155ContractCode: "0",
+		Ixo1155ContractCode: 0,
 	}
 }
 
-func (p *Params) GetCw20ContractCode() uint64 {
-	code, err := parseCode(p.Cw20ContractCode)
-	if err != nil {
-		panic(err)
-	}
-	return code
-}
-func (p *Params) GetCw721ContractCode() uint64 {
-	code, err := parseCode(p.Cw721ContractCode)
-	if err != nil {
-		panic(err)
-	}
-	return code
-}
-func (p *Params) GetIxo1155ContractCode() uint64 {
-	code, err := parseCode(p.Ixo1155ContractCode)
-	if err != nil {
-		panic(err)
-	}
-	return code
-}
-
-// // Implements params.ParamSet
+// Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
-		{KeyCw20ContractCode, &p.Cw20ContractCode, validateContractCode},
-		{KeyCw721ContractCode, &p.Cw721ContractCode, validateContractCode},
-		{KeyIxo1155ContractCode, &p.Ixo1155ContractCode, validateContractCode},
+		paramstypes.ParamSetPair{Key: KeyIxo1155ContractCode, Value: &p.Ixo1155ContractCode, ValidatorFn: validateContractCode},
 	}
+}
+
+type MintBatchData struct {
+	Id         string
+	Uri        string
+	Name       string
+	Index      string
+	Amount     sdk.Uint
+	Collection string
+	TokenData  []*TokenData
+}
+
+func (batch *MintBatchData) GetWasmMintBatch() ixo1155.Batch {
+	return []string{batch.Id, batch.Amount.String(), batch.Uri}
+}
+
+func (batch *MintBatchData) GetTokenMintedEventBatch() *TokenBatch {
+	return &TokenBatch{
+		Id:     batch.Id,
+		Amount: batch.Amount,
+	}
+}
+
+func (batch *TokenBatch) GetWasmTransferBatch() ixo1155.Batch {
+	return []string{batch.Id, batch.Amount.String(), ""}
+}
+func Map[T, V any](ts []T, fn func(T) V) []V {
+	result := make([]V, len(ts))
+	for i, t := range ts {
+		result[i] = fn(t)
+	}
+	return result
 }

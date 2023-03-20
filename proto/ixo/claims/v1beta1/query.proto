@@ -1,0 +1,86 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "ixo/claims/v1beta1/claims.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/ixo/claims/params";
+  }
+  rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
+    option (google.api.http).get = "/ixo/collection/{id}";
+  }
+  rpc CollectionList(QueryCollectionListRequest)
+      returns (QueryCollectionListResponse) {
+    option (google.api.http).get = "/ixo/collection";
+  }
+  rpc Claim(QueryClaimRequest) returns (QueryClaimResponse) {
+    option (google.api.http).get = "/ixo/claim/{id}";
+  }
+  rpc ClaimList(QueryClaimListRequest) returns (QueryClaimListResponse) {
+    option (google.api.http).get = "/ixo/claim";
+  }
+  rpc Dispute(QueryDisputeRequest) returns (QueryDisputeResponse) {
+    option (google.api.http).get = "/ixo/dispute/{proof}";
+  }
+  rpc DisputeList(QueryDisputeListRequest) returns (QueryDisputeListResponse) {
+    option (google.api.http).get = "/ixo/dispute";
+  }
+}
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryCollectionRequest { string id = 1; }
+
+message QueryCollectionResponse {
+  Collection collection = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryCollectionListRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryCollectionListResponse {
+  repeated Collection collections = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryClaimRequest { string id = 1; }
+
+message QueryClaimResponse { Claim claim = 1 [ (gogoproto.nullable) = false ]; }
+
+message QueryClaimListRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryClaimListResponse {
+  repeated Claim claims = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryDisputeRequest { string proof = 1; }
+
+message QueryDisputeResponse {
+  Dispute dispute = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryDisputeListRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryDisputeListResponse {
+  repeated Dispute disputes = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

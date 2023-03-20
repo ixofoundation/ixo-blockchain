@@ -2,13 +2,58 @@ syntax = "proto3";
 package ixo.entity.v1beta1;
 
 import "gogoproto/gogo.proto";
+import "ixo/iid/v1beta1/iid.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 message Params {
-  string NftContractAddress = 1 [(gogoproto.jsontag) = "NftContractAddress", (gogoproto.moretags) = "yaml:\"NftContractAddress\""];
-  string NftContractMinter = 2 [(gogoproto.jsontag) = "NftContractMinter", (gogoproto.moretags) = "yaml:\"NftContractMinter\""];
+  string nftContractAddress = 1;
+  string nftContractMinter = 2;
+  uint64 createSequence = 3;
 }
 
-// // ProjectDoc defines a project (or entity) type with all of its parameters.
-message EntityDoc {}
+message Entity {
+  option (gogoproto.equal) = true;
+
+  // id represents the id for the entity document.
+  string id = 1;
+  // Type of entity, eg protocol or asset
+  string type = 2;
+  // Start Date of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  google.protobuf.Timestamp start_date = 3 [ (gogoproto.stdtime) = true ];
+  // End Date of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  google.protobuf.Timestamp end_date = 4 [ (gogoproto.stdtime) = true ];
+  // Status of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  int32 status = 5;
+  // Address of the operator through which the Entity was created
+  string relayer_node = 6;
+  // Credentials of the enitity to be verified
+  repeated string credentials = 7;
+  // Used as check whether the credentials of entity is verified
+  bool entity_verified = 8;
+  // Metadata concerning the Entity such as versionId, created, updated and
+  // deactivated
+  EntityMetadata metadata = 9;
+  // module accounts created for entity
+  repeated EntityAccount accounts = 10;
+}
+
+message EntityAccount {
+  option (gogoproto.equal) = true;
+
+  string name = 1;
+  string address = 2;
+}
+
+// EntityMetadata defines metadata associated to a entity
+message EntityMetadata {
+  option (gogoproto.equal) = true;
+
+  string version_id = 1;
+  google.protobuf.Timestamp created = 2 [ (gogoproto.stdtime) = true ];
+  google.protobuf.Timestamp updated = 3 [ (gogoproto.stdtime) = true ];
+}

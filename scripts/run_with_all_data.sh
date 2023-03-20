@@ -1,44 +1,29 @@
 #!/usr/bin/env bash
 
-PASSWORD="12345678"
+# Must be run from root path inside ixo-blockchain for source to work
+source ./scripts/constants.sh
 
-ixod init local --chain-id pandora-4
+ixod init local --chain-id $CHAIN_ID
 
-# yes 'y' | ixod keys delete miguel --force
-# yes 'y' | ixod keys delete francesco --force
-# yes 'y' | ixod keys delete shaun --force
-# yes 'y' | ixod keys delete fee --force
-# yes 'y' | ixod keys delete fee2 --force
-# yes 'y' | ixod keys delete fee3 --force
-# yes 'y' | ixod keys delete fee4 --force
-# yes 'y' | ixod keys delete fee5 --force
-# yes 'y' | ixod keys delete reserveOut --force
+# When incorporating another genesis file
+# cp "$HOME"/.ixod/config/genesis.json "$HOME"/.ixod/config/genesis.json.backup #Backing up
+# cp genesis.json "$HOME"/.ixod/config/genesis.json #Copy over new genesis in root
 
-yes $PASSWORD | ixod keys add miguel
-yes $PASSWORD | ixod keys add francesco
-yes $PASSWORD | ixod keys add shaun
-yes $PASSWORD | ixod keys add fee
-yes $PASSWORD | ixod keys add fee2
-yes $PASSWORD | ixod keys add fee3
-yes $PASSWORD | ixod keys add fee4
-yes $PASSWORD | ixod keys add fee5
-yes $PASSWORD | ixod keys add reserveOut
+# first add and remove a dummy user so PASSWORD can be set in keychain
+yes $PASSWORD | ixod keys add dummy &>/dev/null
+yes $PASSWORD | ixod keys delete ${USERS[i]} -y &>/dev/null
 
-# Note: important to add 'miguel' as a genesis-account since this is the chain's validator
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show miguel -a)" 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show francesco -a)" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "$(ixod keys show shaun -a)" 1000000000000uixo,1000000000000res,1000000000000rez
-
-# Add pubkey-based genesis accounts
-MIGUEL_ADDR="ixo107pmtx9wyndup8f9lgj6d7dnfq5kuf3sapg0vx"    # address from did:ixo:4XJLBfGtWSGKSz4BeRxdun's pubkey
-FRANCESCO_ADDR="ixo1cpa6w2wnqyxpxm4rryfjwjnx75kn4xt372dp3y" # address from did:ixo:UKzkhVSHc3qEFva5EY2XHt's pubkey
-SHAUN_ADDR="ixo1d5u5ta7np7vefxa7ttpuy5aurg7q5regm0t2un"     # address from did:ixo:U4tSpzzv91HHqWW1YmFkHJ's pubkey
-yes $PASSWORD | ixod add-genesis-account "$MIGUEL_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "$FRANCESCO_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "$SHAUN_ADDR" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "ixo19h3lqj50uhzdrv8mkafnp55nqmz4ghc2sd3m48" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "ixo1ry6cr975sttlzxptakxs2tsygh2z56vgle88jc" 1000000000000uixo,1000000000000res,1000000000000rez
-yes $PASSWORD | ixod add-genesis-account "ixo1ky7wad4d7gjtcy5yklc83geev76cudcevmnhhn" 1000000000000uixo,1000000000000res,1000000000000rez
+for ((i = 0; i < ${#USERS[@]}; ++i)); do
+  # delete key if exists
+  yes $PASSWORD | ixod keys delete ${USERS[i]} -y 2>/dev/null
+  # create key with constant mnemonic in /scripts/constants.sh
+  (
+    echo ${MNEMONICS[i]}
+    echo $PASSWORD
+  ) | ixod keys add ${USERS[i]} --recover
+  # add as genesis-account with fees
+  yes $PASSWORD | ixod add-genesis-account $(ixod keys show ${USERS[i]} -a) 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
+done
 
 # Add ixo did
 IXO_DID="did:ixo:U4tSpzzv91HHqWW1YmFkHJ"
@@ -62,7 +47,7 @@ TO="\"$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
 # Set reserved bond tokens
-RESERVED_BOND_TOKENS=""  # example: " \"abc\", \"def\", \"ghi\" "
+RESERVED_BOND_TOKENS="" # example: " \"abc\", \"def\", \"ghi\" "
 FROM="\"reserved_bond_tokens\": \[\]"
 TO="\"reserved_bond_tokens\": \[$RESERVED_BOND_TOKENS\]"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
@@ -72,39 +57,33 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
-MAX_VOTING_PERIOD="90s"  # example: "172800s"
+MAX_VOTING_PERIOD="90s" # example: "172800s"
 FROM="\"voting_period\": \"172800s\""
 TO="\"voting_period\": \"$MAX_VOTING_PERIOD\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
-# TODO: config missing from new version (REF: https://github.com/cosmos/cosmos-sdk/issues/8529)
-#ixod config chain-id pandora-4
-#ixod config output json
-#ixod config indent true
-#ixod config trust-node true
-
-yes $PASSWORD | ixod gentx miguel 1000000uixo --chain-id pandora-4
-
+yes $PASSWORD | ixod gentx miguel 1000000uixo --chain-id $CHAIN_ID
 ixod collect-gentxs
 ixod validate-genesis
 
-# Enable REST API (assumed to be at line 104 of app.toml)
+# Enable REST API
 FROM="enable = false"
 TO="enable = true"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
-# Enable Swagger docs (assumed to be at line 107 of app.toml)
+# Enable Swagger docs
 FROM="swagger = false"
 TO="swagger = true"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
-# Uncomment the below to broadcast node RPC endpoint
+# Broadcast node RPC endpoint
 FROM="laddr = \"tcp:\/\/127.0.0.1:26657\""
 TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
-# Uncomment the below to set timeouts to 1s for shorter block times
-#sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
-#sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
+# Set timeouts to 1s for shorter block times
+sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
+sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
 
+# ixod start --pruning "nothing" --log_level "trace" --trace
 ixod start --pruning "nothing"

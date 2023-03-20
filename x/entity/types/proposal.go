@@ -3,6 +3,8 @@ package types
 import (
 	fmt "fmt"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	types "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
@@ -32,7 +34,13 @@ func (p *InitializeNftContract) GetTitle() string {
 func (sup *InitializeNftContract) ProposalRoute() string { return RouterKey }
 func (sup *InitializeNftContract) ProposalType() string  { return ProposalTypeInitializeNftContract }
 
-func (sup *InitializeNftContract) ValidateBasic() error { return nil }
+func (sup *InitializeNftContract) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(sup.NftMinterAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid minter address (%s)", err)
+	}
+	return nil
+}
 
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeInitializeNftContract)

@@ -20,4 +20,5 @@ var (
 	ErrVerificationMethodNotFound = sdkerrors.Register(ModuleName, 1109, "verification method not found")
 	ErrInvalidDidMethodFormat     = sdkerrors.Register(ModuleName, 1110, "invalid did method format")
 	ErrKeyFormatNotSupported      = sdkerrors.Register(ModuleName, 1111, "key format not supported")
+	ErrDidPubKeyMismatch		      = sdkerrors.Register(ModuleName, 1112, "did does not match public key in signiture")
 )

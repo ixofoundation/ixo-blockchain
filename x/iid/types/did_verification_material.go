@@ -92,15 +92,19 @@ func (baID BlockchainAccountID) MatchAddress(address string) bool {
 // TODO: this function shall return an error for invalid addresses
 func (baID BlockchainAccountID) GetAddress() string {
 	addrStart := strings.LastIndex(string(baID), ":")
-	if addrStart < 0 {
-		return ""
-	}
+	// if addrStart < 0 {
+	// 	return ""
+	// }
 	return string(baID)[addrStart+1:]
 }
 
 // NewBlockchainAccountID build a new blockchain account ID struct
-func NewBlockchainAccountID(chainID, account string) BlockchainAccountID {
-	return BlockchainAccountID(fmt.Sprint("cosmos:", chainID, ":", account))
+//
+//	func NewBlockchainAccountID(chainID, account string) BlockchainAccountID {
+//		return BlockchainAccountID(fmt.Sprint("cosmos:", chainID, ":", account))
+//	}
+func NewBlockchainAccountID(account string) BlockchainAccountID {
+	return BlockchainAccountID(account)
 }
 
 // PublicKeyMultibase formats an account address as per the CAIP-10 Account ID specification.

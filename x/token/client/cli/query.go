@@ -19,16 +19,112 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	tokenQueryCmd.AddCommand(
-		GetCmdTokenDocs(),
+		CmdQueryParams(),
+		CmdListTokens(),
+		CmdShowToken(),
+		CmdTokenMetadata(),
 	)
 
 	return tokenQueryCmd
 }
 
-func GetCmdTokenDocs() *cobra.Command {
+func CmdQueryParams() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-token-doc",
-		Short: "Query TokenDocs",
+		Use:   "params",
+		Short: "shows the parameters of the module",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdListTokens() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list-tokens [minter]",
+		Short: "List all token docs for a minter",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryTokenListRequest{
+				Pagination: pageReq,
+				Minter:     args[0],
+			}
+
+			res, err := queryClient.TokenList(context.Background(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdShowToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-token-doc [minter] [contract_address]",
+		Short: "Query for a token doc",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryTokenDocRequest{
+				Minter:          args[0],
+				ContractAddress: args[1],
+			}
+
+			res, err := queryClient.TokenDoc(context.Background(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdTokenMetadata() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get-token-metadata [id]",
+		Short: "Query minted token metadata",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -38,9 +134,11 @@ func GetCmdTokenDocs() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			minterDid := args[0]
+			params := &types.QueryTokenMetadataRequest{
+				Id: args[0],
+			}
 
-			res, err := queryClient.TokenList(context.Background(), &types.QueryTokenListRequest{MinterDid: minterDid})
+			res, err := queryClient.TokenMetadata(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -52,92 +150,3 @@ func GetCmdTokenDocs() *cobra.Command {
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
-
-// func GetCmdProjectAccounts() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "get-project-accounts [did]",
-// 	Short: "Get a Project accounts of a Project by Did",
-// 	Args:  cobra.ExactArgs(1),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		clientCtx, err := client.GetClientQueryContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		projectDid := args[0]
-
-// 		queryClient := types.NewQueryClient(clientCtx)
-
-// 		res, err := queryClient.ProjectAccounts(context.Background(), &types.QueryProjectAccountsRequest{ProjectDid: projectDid})
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		if len(res.GetAccountMap().Map) == 0 {
-// 			return errors.New("project does not exist")
-// 		}
-
-// 		return clientCtx.PrintProto(res)
-// 	},
-// }
-
-// 	flags.AddQueryFlagsToCmd(cmd)
-// 	return cmd
-// }
-
-// func GetCmdProjectTxs() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "get-project-txs [project-did]",
-// 	Short: "Get a Project txs for a projectDid",
-// 	Args:  cobra.ExactArgs(1),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		clientCtx, err := client.GetClientQueryContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		projectDid := args[0]
-
-// 		queryClient := types.NewQueryClient(clientCtx)
-
-// 		res, err := queryClient.ProjectTx(context.Background(), &types.QueryProjectTxRequest{ProjectDid: projectDid})
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		if len(res.GetTxs().DocsList) == 0 {
-// 			return errors.New("project does not have any transactions")
-// 		}
-
-// 		return clientCtx.PrintProto(res)
-// 	},
-// }
-
-// 	flags.AddQueryFlagsToCmd(cmd)
-// 	return cmd
-// }
-
-// func GetParamsRequestHandler() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "params",
-// 	Short: "Query params",
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		clientCtx, err := client.GetClientQueryContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		queryClient := types.NewQueryClient(clientCtx)
-
-// 		res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		return clientCtx.PrintProto(res)
-// 	},
-// }
-
-// 	flags.AddQueryFlagsToCmd(cmd)
-// 	return cmd
-// }

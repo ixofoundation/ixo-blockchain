@@ -1,0 +1,84 @@
+syntax = "proto3";
+package ixo.claims.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "ixo/claims/v1beta1/claims.proto";
+import "ixo/claims/v1beta1/cosmos.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+
+message SubmitClaimAuthorization {
+  option (cosmos_proto.implements_interface) = "Authorization";
+
+  // address of admin
+  string admin = 1;
+  repeated SubmitClaimConstraints constraints = 2;
+}
+
+message SubmitClaimConstraints {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  uint64 agent_quota = 2;
+}
+
+message EvaluateClaimAuthorization {
+  option (cosmos_proto.implements_interface) = "Authorization";
+
+  // address of admin
+  string admin = 1;
+  repeated EvaluateClaimConstraints constraints = 2;
+}
+
+message EvaluateClaimConstraints {
+  // collection_id indicates to which Collection this claim belongs
+  string collection_id = 1;
+  // either collection_id or claim_ids is needed
+  repeated string claim_ids = 2;
+  uint64 agent_quota = 3;
+  // if null then no before_date validation done
+  google.protobuf.Timestamp before_date = 4 [ (gogoproto.stdtime) = true ];
+  // max custom amount evaluator can change, if empty list must use amount
+  // defined in Token payments
+  repeated cosmos.base.v1beta1.Coin max_custom_amount = 10 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message WithdrawPaymentAuthorization {
+  option (cosmos_proto.implements_interface) = "Authorization";
+
+  // address of admin
+  string admin = 1;
+  repeated WithdrawPaymentConstraints constraints = 2;
+}
+
+message WithdrawPaymentConstraints {
+  // claim_id the withdrawal is for
+  string claim_id = 1;
+  // Inputs to the multisend tx to run to withdraw payment
+  repeated Input inputs = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Input"
+  ];
+  // Outputs for the multisend tx to run to withdraw payment
+  repeated Output outputs = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Output"
+  ];
+  // payment type to keep track what payment is for and mark claim payment
+  // accordingly
+  PaymentType payment_type = 4;
+  // if empty(nil) then no contract payment
+  Contract1155Payment contract_1155_payment = 5;
+  // for contract payment
+  string toAddress = 6;
+  // for contract payment
+  string fromAddress = 7;
+  // date that grantee can execute authorization, calculated from created date
+  // plus the timeout on Collection payments, if null then none
+  google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
+}

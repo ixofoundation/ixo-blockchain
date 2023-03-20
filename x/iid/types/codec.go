@@ -1,6 +1,6 @@
 package types
 
-import ( // this line is used by starport scaffolding # 1
+import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
@@ -20,17 +20,16 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeleteController{}, "iid/DeleteController", nil)
 	cdc.RegisterConcrete(&MsgAddLinkedResource{}, "iid/AddLinkedResource", nil)
 	cdc.RegisterConcrete(&MsgDeleteLinkedResource{}, "iid/DeleteLinkedResource", nil)
-	cdc.RegisterConcrete(&MsgAddLinkedEntity{}, "iid/AddLinkedEntity", nil)
-	cdc.RegisterConcrete(&MsgDeleteLinkedEntity{}, "iid/DeleteLinkedEntity", nil)
 	cdc.RegisterConcrete(&MsgAddAccordedRight{}, "iid/AddAccordedRight", nil)
 	cdc.RegisterConcrete(&MsgDeleteAccordedRight{}, "iid/DeleteAccordedRight", nil)
+	cdc.RegisterConcrete(&MsgAddLinkedEntity{}, "iid/AddLinkedEntity", nil)
+	cdc.RegisterConcrete(&MsgDeleteLinkedEntity{}, "iid/DeleteLinkedEntity", nil)
 	cdc.RegisterConcrete(&MsgAddIidContext{}, "iid/AddIidContext", nil)
 	cdc.RegisterConcrete(&MsgDeleteIidContext{}, "iid/DeleteIidContext", nil)
-	cdc.RegisterConcrete(&MsgUpdateIidMeta{}, "iid/UpdateIidMeta", nil)
+	cdc.RegisterConcrete(&MsgDeactivateIID{}, "iid/DeactivateIID", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
-	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateIidDocument{},
 		&MsgUpdateIidDocument{},
@@ -45,6 +44,11 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgDeleteLinkedResource{},
 		&MsgAddAccordedRight{},
 		&MsgDeleteAccordedRight{},
+		&MsgAddLinkedEntity{},
+		&MsgDeleteLinkedEntity{},
+		&MsgAddIidContext{},
+		&MsgDeleteIidContext{},
+		&MsgDeactivateIID{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

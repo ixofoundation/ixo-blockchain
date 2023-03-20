@@ -2,7 +2,6 @@ package cli
 
 import (
 	"encoding/json"
-
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -26,6 +25,12 @@ func NewTxCmd() *cobra.Command {
 
 	tokenTxCmd.AddCommand(
 		NewCmdCreateToken(),
+		NewCmdMintToken(),
+		NewCmdTransferToken(),
+		NewCmdCancelToken(),
+		NewCmdRetireToken(),
+		NewCmdPauseToken(),
+		NewCmdStopToken(),
 	)
 
 	return tokenTxCmd
@@ -34,8 +39,8 @@ func NewTxCmd() *cobra.Command {
 // NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-token-params [nft_contract_code] [nft_minter_address] [flags]",
-		Args:  cobra.ExactArgs(3),
+		Use:   "update-token-params [ixo1155-code-id] [flags]",
+		Args:  cobra.ExactArgs(1),
 		Short: "Submit a proposal to update token params",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -43,22 +48,12 @@ func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 				return err
 			}
 
-			cw20CodeId, err := strconv.ParseUint(args[0], 0, 64)
+			ixo1155CodeId, err := strconv.ParseUint(args[0], 0, 64)
 			if err != nil {
 				return err
 			}
 
-			cw721CodeId, err := strconv.ParseUint(args[1], 0, 64)
-			if err != nil {
-				return err
-			}
-
-			ixo1155CodeId, err := strconv.ParseUint(args[2], 0, 64)
-			if err != nil {
-				return err
-			}
-
-			content := types.NewSetTokenContract(cw20CodeId, cw721CodeId, ixo1155CodeId)
+			content := types.NewSetTokenContract(ixo1155CodeId)
 
 			from := clientCtx.GetFromAddress()
 
@@ -89,19 +84,12 @@ func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 
 func NewCmdCreateToken() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-token [token-iid]",
-		Short: "Create a new TokenDoc",
+		Use:   "create [create_token_doc]",
+		Short: "Create a new Token - flag is raw json with struct of MsgCreateToken",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			var msg types.MsgMint
-			err := json.Unmarshal([]byte(args[0]), &msg)
-			if err != nil {
-				return err
-			}
-
-			err = msg.ValidateBasic()
-			if err != nil {
+			var msg types.MsgCreateToken
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
 				return err
 			}
 
@@ -110,14 +98,9 @@ func NewCmdCreateToken() *cobra.Command {
 				return err
 			}
 
-			msg.MinterAddress = clientCtx.GetFromAddress().String()
+			msg.Minter = clientCtx.GetFromAddress().String()
 
-			err = tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 
@@ -125,285 +108,160 @@ func NewCmdCreateToken() *cobra.Command {
 	return cmd
 }
 
-// func NewCmdUpdateProjectStatus() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "update-project-status [sender-did] [status] [ixo-did]",
-// 	Short: "Update the status of a project signed by the ixoDid of the project",
-// 	Args:  cobra.ExactArgs(3),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		senderDid := args[0]
-// 		status := args[1]
-// 		ixoDid, err := didtypes.UnmarshalIxoDid(args[2])
-// 		if err != nil {
-// 			return err
-// 		}
+func NewCmdMintToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mint [mint_token_doc]",
+		Short: "Mint new Tokens - flag is raw json with struct of MsgMintToken",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgMintToken
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
 
-// 		projectStatus := types.ProjectStatus(status)
-// 		if projectStatus != types.CreatedProject &&
-// 			projectStatus != types.PendingStatus &&
-// 			projectStatus != types.FundedStatus &&
-// 			projectStatus != types.StartedStatus &&
-// 			projectStatus != types.StoppedStatus &&
-// 			projectStatus != types.PaidoutStatus {
-// 			return errors.New("The status must be one of 'CREATED', " +
-// 				"'PENDING', 'FUNDED', 'STARTED', 'STOPPED' or 'PAIDOUT'")
-// 		}
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-// 		updateProjectStatusDoc := types.NewUpdateProjectStatusDoc(
-// 			projectStatus, "")
+			msg.Minter = clientCtx.GetFromAddress().String()
 
-// 		clientCtx, err := client.GetClientTxContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
 
-// 		msg := types.NewMsgUpdateProjectStatus(senderDid, updateProjectStatusDoc, ixoDid.Did)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			return err
-// 		}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
 
-// 		return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 	},
-// }
+func NewCmdTransferToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "transfer [transfer_token_doc]",
+		Short: "Transfer Tokens - flag is raw json with struct of MsgTransferToken",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgTransferToken
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
 
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-// func NewCmdCreateAgent() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use: "create-agent [tx-hash] [sender-did] [agent-did] " +
-// 		"[role] [project-did]",
-// 	Short: "Create a new agent on a project signed by the ixoDid of the project",
-// 	Args:  cobra.ExactArgs(5),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		txHash := args[0]
-// 		senderDid := args[1]
-// 		agentDid := args[2]
-// 		role := args[3]
-// 		if role != "SA" && role != "EA" && role != "IA" {
-// 			return errors.New("The role must be one of 'SA', 'EA' or 'IA'")
-// 		}
+			msg.Owner = clientCtx.GetFromAddress().String()
 
-// 		createAgentDoc := types.NewCreateAgentDoc(agentDid, role)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
 
-// 		ixoDid, err := didtypes.UnmarshalIxoDid(args[4])
-// 		if err != nil {
-// 			return err
-// 		}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
 
-// 		clientCtx, err := client.GetClientTxContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+func NewCmdRetireToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "retire-token [retire_token_doc]",
+		Short: "Retire Tokens - flag is raw json with struct of MsgRetireToken",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgRetireToken
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
 
-// 		msg := types.NewMsgCreateAgent(txHash, senderDid, createAgentDoc, ixoDid.Did)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			return err
-// 		}
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-// 		return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 	},
-// }
+			msg.Owner = clientCtx.GetFromAddress().String()
 
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
 
-// func NewCmdUpdateAgent() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use: "update-agent [tx-hash] [sender-did] [agent-did] " +
-// 		"[status] [ixo-did]",
-// 	Short: "Update the status of an agent on a project signed by the ixoDid of the project",
-// 	Args:  cobra.ExactArgs(6),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		txHash := args[0]
-// 		senderDid := args[1]
-// 		agentDid := args[2]
-// 		agentRole := args[4]
-// 		agentStatus := types.AgentStatus(args[3])
-// 		if agentStatus != types.PendingAgent && agentStatus != types.ApprovedAgent && agentStatus != types.RevokedAgent {
-// 			return errors.New("The status must be one of '0' (Pending), '1' (Approved) or '2' (Revoked)")
-// 		}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
 
-// 		updateAgentDoc := types.NewUpdateAgentDoc(
-// 			agentDid, agentStatus, agentRole)
+func NewCmdCancelToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cancel-token [cancel_token_doc]",
+		Short: "Cancel Tokens - flag is raw json with struct of MsgCancelToken",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgCancelToken
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
 
-// 		ixoDid, err := didtypes.UnmarshalIxoDid(args[5])
-// 		if err != nil {
-// 			return err
-// 		}
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-// 		clientCtx, err := client.GetClientTxContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+			msg.Owner = clientCtx.GetFromAddress().String()
 
-// 		msg := types.NewMsgUpdateAgent(txHash, senderDid, updateAgentDoc, ixoDid.Did)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			return err
-// 		}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
 
-// 		return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 	},
-// }
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
 
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
+func NewCmdPauseToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pause-token [contract_address] [paused]",
+		Short: "Pause Tokens to temporarily suspend token minting",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-// func NewCmdCreateClaim() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "create-claim [tx-hash] [sender-did] [claim-id] [claim-template-id] [ixo-did]",
-// 	Short: "Create a new claim on a project signed by the ixoDid of the project",
-// 	Args:  cobra.ExactArgs(5),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		txHash := args[0]
-// 		senderDid := args[1]
-// 		claimId := args[2]
-// 		claimTemplateId := args[3]
-// 		createClaimDoc := types.NewCreateClaimDoc(claimId, claimTemplateId)
+			paused, err := strconv.ParseBool(args[1])
+			if err != nil {
+				return err
+			}
 
-// 		ixoDid, err := didtypes.UnmarshalIxoDid(args[4])
-// 		if err != nil {
-// 			return err
-// 		}
+			msg := types.MsgPauseToken{
+				Minter:          clientCtx.GetFromAddress().String(),
+				ContractAddress: args[0],
+				Paused:          paused,
+			}
 
-// 		clientCtx, err := client.GetClientTxContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
 
-// 		msg := types.NewMsgCreateClaim(txHash, senderDid, createClaimDoc, ixoDid.Did)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			return err
-// 		}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
 
-// 		return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 	},
-// }
+func NewCmdStopToken() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "stop-token [contract_address]",
+		Short: "Stop Tokens to permanently suspend token minting",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
+			msg := types.MsgStopToken{
+				Minter:          clientCtx.GetFromAddress().String(),
+				ContractAddress: args[0],
+			}
 
-// func NewCmdCreateEvaluation() *cobra.Command {
-// 	cmd := &cobra.Command{
-// 		Use: "create-evaluation [tx-hash] [sender-did] [claim-id] " +
-// 			"[status] [ixo-did]",
-// 		Short: "Create a new claim evaluation on a project signed by the ixoDid of the project",
-// 		Args:  cobra.ExactArgs(5),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			txHash := args[0]
-// 			senderDid := args[1]
-// 			claimId := args[2]
-// 			claimStatus := types.ClaimStatus(args[3])
-// 			if claimStatus != types.PendingClaim && claimStatus != types.ApprovedClaim && claimStatus != types.RejectedClaim {
-// 				return errors.New("The status must be one of '0' (Pending), '1' (Approved) or '2' (Rejected)")
-// 			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
 
-// 			createEvaluationDoc := types.NewCreateEvaluationDoc(
-// 				claimId, claimStatus)
-
-// 			ixoDid, err := didtypes.UnmarshalIxoDid(args[4])
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			clientCtx, err := client.GetClientTxContext(cmd)
-// 			if err != nil {
-// 				return err
-// 			}
-// 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
-
-// 			msg := types.NewMsgCreateEvaluation(txHash, senderDid, createEvaluationDoc, ixoDid.Did)
-// 			err = msg.ValidateBasic()
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 		},
-// 	}
-
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
-
-// func NewCmdWithdrawFunds() *cobra.Command {
-// 	cmd := &cobra.Command{
-// 		Use:   "withdraw-funds [sender-did] [iid]",
-// 		Short: "Withdraw funds.",
-// 		Args:  cobra.ExactArgs(2),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			ixoDid, err := didtypes.UnmarshalIxoDid(args[0])
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			var data types.WithdrawFundsDoc
-// 			err = json.Unmarshal([]byte(args[1]), &data)
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			clientCtx, err := client.GetClientTxContext(cmd)
-// 			if err != nil {
-// 				return err
-// 			}
-// 			clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
-
-// 			msg := types.NewMsgWithdrawFunds(ixoDid.Did, data)
-// 			err = msg.ValidateBasic()
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 		},
-// 	}
-
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
-
-// func NewCmdUpdateProjectDoc() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "update-project-doc [sender-did] [project-iid-json] [ixo-did]",
-// 	Short: "Update a project's iid signed by the ixoDid of the project",
-// 	Args:  cobra.ExactArgs(3),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		senderDid := args[0]
-// 		projectDataStr := args[1]
-// 		ixoDid, err := didtypes.UnmarshalIxoDid(args[2])
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		clientCtx, err := client.GetClientTxContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		clientCtx = clientCtx.WithFromAddress(ixoDid.Address())
-
-// 		msg := types.NewMsgUpdateProjectDoc(senderDid, json.RawMessage(projectDataStr), ixoDid.Did)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		return ixotypes.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), ixoDid, msg)
-// 	},
-// }
-
-// 	flags.AddTxFlagsToCmd(cmd)
-// 	return cmd
-// }
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}

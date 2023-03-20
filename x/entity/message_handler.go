@@ -20,12 +20,21 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgUpdateEntity:
 			res, err := msgServer.UpdateEntity(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgUpdateEntityVerified:
+			res, err := msgServer.UpdateEntityVerified(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgTransferEntity:
 			res, err := msgServer.TransferEntity(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgCreateEntityAccount:
+			res, err := msgServer.CreateEntityAccount(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgGrantEntityAccountAuthz:
+			res, err := msgServer.GrantEntityAccountAuthz(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		default:
 			// err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg type: %v", msg.Type())
-			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized entity Msg")
+			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized entity Msg type")
 			return nil, err
 		}
 	}

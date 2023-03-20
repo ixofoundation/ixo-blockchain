@@ -5,39 +5,96 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
-message Contract {
-  string id = 1 [(gogoproto.jsontag) = "id", (gogoproto.moretags) = "yaml:\"id\""]; 
-  string address = 2 [(gogoproto.jsontag) = "address", (gogoproto.moretags) = "yaml:\"address\""];
+message Params { uint64 ixo1155_contract_code = 1; }
+
+message Token {
+  option (gogoproto.equal) = true;
+
+  // address of minter
+  string minter = 1;
+  // generated on token intiation through MsgSetupMinter
+  string contract_address = 2;
+  // class is the token protocol entity DID (validated)
+  string class = 3;
+  // name is the token name, which must be unique (namespace)
+  string name = 4;
+  // description is any arbitrary description
+  string description = 5;
+  // image is the image url for the token
+  string image = 6;
+  // type is the token type (eg ixo1155)
+  string type = 7;
+  // cap is the maximum number of tokens with this name that can be minted, 0 is
+  // unlimited
+  string cap = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // how much has already been minted for this Token type, aka the supply
+  string supply = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // stop allowance of token minter temporarily
+  bool paused = 10;
+  // stop allowance of token minter permanently
+  bool stopped = 11;
+  // tokens that has been retired for this Token with specific name and contract
+  // address
+  repeated TokensRetired retired = 12;
+  // tokens that has been cancelled for this Token with specific name and
+  // contract address
+  repeated TokensCancelled cancelled = 13;
 }
 
-message Params {
-  option (gogoproto.goproto_getters)  = false;
+message TokensRetired {
+  option (gogoproto.equal) = true;
 
-  string cw20ContractCode = 1 [(gogoproto.jsontag) = "cw20_contract_code", (gogoproto.moretags) = "yaml:\"cw20_contract_code\""];
-  string cw721ContractCode = 2 [(gogoproto.jsontag) = "cw721_contract_code", (gogoproto.moretags) = "yaml:\"cw721_contract_code\""];
-  string ixo1155ContractCode = 3 [(gogoproto.jsontag) = "ixo1155_contract_code", (gogoproto.moretags) = "yaml:\"ixo1155_contract_code\""];
+  string id = 1;
+  string reason = 2;
+  string jurisdiction = 3;
+  string amount = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  string owner = 5;
 }
 
-// message TokenDoc {
-//   string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-//   repeated Contract cw20Contracts = 2 [(gogoproto.jsontag) = "cw20_contracts", (gogoproto.moretags) = "yaml:\"cw20_contracts\""];
-//   Contract cw721Contract = 3 [(gogoproto.jsontag) = "cw721_contract", (gogoproto.moretags) = "yaml:\"cw721_contract\""];
-//   Contract ixo1155Contract = 4 [(gogoproto.jsontag) = "ixo1155_contract", (gogoproto.moretags) = "yaml:\"ixo1155_contract\""];
-// }
+message TokensCancelled {
+  option (gogoproto.equal) = true;
 
-enum ContractType {
-  CW20 = 0;
-  CW721 = 1;
-  IXO1155 = 2;
+  string id = 1;
+  string reason = 2;
+  string amount = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  string owner = 4;
 }
 
-message TokenMinter {
-  option (gogoproto.goproto_getters)  = false;
-  
-  string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-  string minterAddress = 2 [(gogoproto.jsontag) = "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""];
-  string contractAddress = 3 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];
-  ContractType contractType = 4 [(gogoproto.jsontag) = "contract_type", (gogoproto.moretags) = "yaml:\"contract_type\""];
-  string name = 5 [(gogoproto.jsontag) = "name", (gogoproto.moretags) = "yaml:\"name\""];
-  string description = 6 [(gogoproto.jsontag) = "description", (gogoproto.moretags) = "yaml:\"description\""];
+message TokenProperties {
+  option (gogoproto.equal) = true;
+
+  string id = 1;
+  // index is the unique identifier hexstring that identifies the token
+  string index = 2;
+  // name is the token name, which is same as Token name
+  string name = 3;
+  // did of collection (eg Supamoto Malawi)
+  string collection = 4;
+  // tokenData is the linkedResources added to tokenMetadata when queried eg
+  // (credential link ***.ipfs)
+  repeated TokenData tokenData = 5;
+}
+
+message TokenData {
+  option (gogoproto.equal) = true;
+
+  // media type value should always be "application/json"
+  string uri = 1; // credential link ***.ipfs
+  bool encrypted = 2;
+  string proof = 3;
+  string type = 4;
+  // did of entity to map token to
+  string id = 5;
 }

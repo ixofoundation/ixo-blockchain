@@ -18,6 +18,7 @@ func (k Keeper) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.Que
 
 	var bondsList []string
 	iterator := k.GetBondIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		k.cdc.MustUnmarshal(iterator.Value(), &bond)
@@ -32,6 +33,7 @@ func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequ
 
 	var bondsList []*types.BondDetails
 	iterator := k.GetBondIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		k.cdc.MustUnmarshal(iterator.Value(), &bond)

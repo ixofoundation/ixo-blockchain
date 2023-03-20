@@ -19,16 +19,45 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	entityQueryCmd.AddCommand(
-		GetCmdEntityDocs(),
+		CmdQueryParams(),
+		CmdListEntity(),
+		CmdShowEntity(),
+		CmdShowEntityMetadata(),
+		CmdShowEntityIidDocument(),
+		CmdShowEntityVerified(),
 	)
 
 	return entityQueryCmd
 }
 
-func GetCmdEntityDocs() *cobra.Command {
+func CmdQueryParams() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get-entity-doc",
-		Short: "Query EntityDocs",
+		Use:   "params",
+		Short: "shows the parameters of the module",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdListEntity() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list-entity",
+		Short: "list all entity",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -36,107 +65,155 @@ func GetCmdEntityDocs() *cobra.Command {
 				return err
 			}
 
+			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.EntityList(context.Background(), &types.QueryEntityListRequest{})
+			params := &types.QueryEntityListRequest{
+				Pagination: pageReq,
+			}
+
+			res, err := queryClient.EntityList(context.Background(), params)
 			if err != nil {
 				return err
 			}
 
 			return clientCtx.PrintProto(res)
-			return nil
 		},
 	}
 
+	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
-// func GetCmdProjectAccounts() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "get-project-accounts [did]",
-// 	Short: "Get a Project accounts of a Project by Did",
-// 	Args:  cobra.ExactArgs(1),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		clientCtx, err := client.GetClientQueryContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
+func CmdShowEntity() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-entity [id]",
+		Short: "Query for an entity",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			if err != nil {
+				return err
+			}
 
-// 		projectDid := args[0]
+			queryClient := types.NewQueryClient(clientCtx)
+			argId := args[0]
 
-// 		queryClient := types.NewQueryClient(clientCtx)
+			params := &types.QueryEntityRequest{
+				Id: argId,
+			}
 
-// 		res, err := queryClient.ProjectAccounts(context.Background(), &types.QueryProjectAccountsRequest{ProjectDid: projectDid})
-// 		if err != nil {
-// 			return err
-// 		}
+			res, err := queryClient.Entity(context.Background(), params)
+			if err != nil {
+				return err
+			}
 
-// 		if len(res.GetAccountMap().Map) == 0 {
-// 			return errors.New("project does not exist")
-// 		}
+			return clientCtx.PrintProto(res)
+		},
+	}
 
-// 		return clientCtx.PrintProto(res)
-// 	},
-// }
+	flags.AddQueryFlagsToCmd(cmd)
 
-// 	flags.AddQueryFlagsToCmd(cmd)
-// 	return cmd
-// }
+	return cmd
+}
 
-// func GetCmdProjectTxs() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "get-project-txs [project-did]",
-// 	Short: "Get a Project txs for a projectDid",
-// 	Args:  cobra.ExactArgs(1),
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		clientCtx, err := client.GetClientQueryContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
+func CmdShowEntityMetadata() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-entity-metadata [id]",
+		Short: "Query for an entity metadata",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			if err != nil {
+				return err
+			}
 
-// 		projectDid := args[0]
+			queryClient := types.NewQueryClient(clientCtx)
+			argId := args[0]
 
-// 		queryClient := types.NewQueryClient(clientCtx)
+			params := &types.QueryEntityMetadataRequest{
+				Id: argId,
+			}
 
-// 		res, err := queryClient.ProjectTx(context.Background(), &types.QueryProjectTxRequest{ProjectDid: projectDid})
-// 		if err != nil {
-// 			return err
-// 		}
+			res, err := queryClient.EntityMetaData(context.Background(), params)
+			if err != nil {
+				return err
+			}
 
-// 		if len(res.GetTxs().DocsList) == 0 {
-// 			return errors.New("project does not have any transactions")
-// 		}
+			return clientCtx.PrintProto(res)
+		},
+	}
 
-// 		return clientCtx.PrintProto(res)
-// 	},
-// }
+	flags.AddQueryFlagsToCmd(cmd)
 
-// 	flags.AddQueryFlagsToCmd(cmd)
-// 	return cmd
-// }
+	return cmd
+}
 
-// func GetParamsRequestHandler() *cobra.Command {
-// cmd := &cobra.Command{
-// 	Use:   "params",
-// 	Short: "Query params",
-// 	RunE: func(cmd *cobra.Command, args []string) error {
-// 		clientCtx, err := client.GetClientQueryContext(cmd)
-// 		if err != nil {
-// 			return err
-// 		}
+func CmdShowEntityIidDocument() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-entity-iid-docuemnt [id]",
+		Short: "Query for an entity iid document",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			if err != nil {
+				return err
+			}
 
-// 		queryClient := types.NewQueryClient(clientCtx)
+			queryClient := types.NewQueryClient(clientCtx)
+			argId := args[0]
 
-// 		res, err := queryClient.Params(context.Background(), &types.QueryParamsRequest{})
-// 		if err != nil {
-// 			return err
-// 		}
+			params := &types.QueryEntityIidDocumentRequest{
+				Id: argId,
+			}
 
-// 		return clientCtx.PrintProto(res)
-// 	},
-// }
+			res, err := queryClient.EntityIidDocument(context.Background(), params)
+			if err != nil {
+				return err
+			}
 
-// 	flags.AddQueryFlagsToCmd(cmd)
-// 	return cmd
-// }
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdShowEntityVerified() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-entity-verified [id]",
+		Short: "Query for an entity verified",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			argId := args[0]
+
+			params := &types.QueryEntityVerifiedRequest{
+				Id: argId,
+			}
+
+			res, err := queryClient.EntityVerified(context.Background(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}

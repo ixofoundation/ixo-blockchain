@@ -5,131 +5,71 @@ import (
 	"encoding/json"
 )
 
-type Mint struct {
-	TokenId   string          `json:"token_id"`
-	Owner     string          `json:"owner"`
-	TokenUri  string          `json:"token_uri"`
-	Extension json.RawMessage `json:"extension"`
-}
-
-func (m Mint) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
-}
-
 type WasmMsgMint struct {
 	Mint Mint `json:"mint"`
 }
 
-func (m WasmMsgMint) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
+// / Mint a new NFT, can only be called by the contract minter
+type Mint struct {
+	/// Unique ID of the NFT
+	TokenId string `json:"token_id"`
+	/// The owner of the newly minter NFT
+	Owner string `json:"owner"`
+	/// Universal resource identifier for this NFT
+	/// Should point to a JSON file that conforms to the ERC721
+	/// Metadata JSON Schema
+	TokenUri string `json:"token_uri"`
+	/// Any custom extension used by this contract
+	Extension json.RawMessage `json:"extension"`
 }
 
+// / Transfer is a base message to move a token to another account without triggering actions
+type WasmMsgTransferNft struct {
+	TransferNft TransferNft `json:"transfer_nft"`
+}
 type TransferNft struct {
 	TokenId   string `json:"token_id"`
 	Recipient string `json:"recipient"`
 }
 
-func (m TransferNft) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
-}
-
-type WasmMsgTransferNft struct {
-	TransferNft TransferNft `json:"transfer_nft"`
-}
-
-func (m WasmMsgTransferNft) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
-}
-
-type InitiateNftContract struct {
-	Name   string `json:"name"`
-	Symbol string `json:"symbol"`
-	Minter string `json:"minter"`
-}
-
-func (m InitiateNftContract) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
-}
-
 type WasmMsgInitiateNftContract struct {
 	InstantiateMsg InitiateNftContract `json:"instantiate_msg"`
 }
-
-func (m WasmMsgInitiateNftContract) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
+type InitiateNftContract struct {
+	Name   string `json:"name"`
+	Symbol string `json:"symbol"`
+	/// The minter is the only one who can create new NFTs.
+	Minter string `json:"minter"`
 }
 
+// / Allows operator to transfer / send the token from the owner's account.
+// / If expiration is set, then this allowance has a time/height limit
+type WasmMsgApprove struct {
+	ApproveNftTransfer ApproveNftTransfer `json:"approve"`
+}
 type ApproveNftTransfer struct {
 	Spender string `json:"spender"`
 	TokenId string `json:"token_id"`
 	Expires string `json:"expires,omitempty"`
 }
 
-func (m ApproveNftTransfer) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
+// / Return the owner of the given token, error if token does not exist
+// #[returns(cw721::OwnerOfResponse)]
+type WasmQueryOwnerOf struct {
+	OwnerOf OwnerOf `json:"owner_of"`
 }
-
-type WasmMsgApprove struct {
-	ApproveNftTransfer ApproveNftTransfer `json:"approve"`
-}
-
-func (m WasmMsgApprove) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
-}
-
-type QueryNft struct {
-	Sender  string `json:"sender"`
+type OwnerOf struct {
 	TokenId string `json:"token_id"`
-	Expires string `json:"expires,omitempty"`
 }
 
-func (m QueryNft) Marshal() ([]byte, error) {
+type OwnerOfResponse struct {
+	Owner     string   `json:"owner"`
+	Approvals []string `json:"approvals"`
+}
+
+func Marshal(value interface{}) ([]byte, error) {
 	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
-		return nil, err
-	}
-	return jsonBuffer.Bytes(), nil
-}
-
-type WasmMsgQueryNft struct {
-	QueryNft QueryNft `json:"approve"`
-}
-
-func (m WasmMsgQueryNft) Marshal() ([]byte, error) {
-	jsonBuffer := new(bytes.Buffer)
-	if err := json.NewEncoder(jsonBuffer).Encode(m); err != nil {
+	if err := json.NewEncoder(jsonBuffer).Encode(value); err != nil {
 		return nil, err
 	}
 	return jsonBuffer.Bytes(), nil

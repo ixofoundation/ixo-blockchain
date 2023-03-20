@@ -92,6 +92,7 @@ func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk
 func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	var bondsList []string
 	iterator := keeper.GetBondIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
@@ -101,7 +102,7 @@ func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAm
 	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, bondsList)
 	if err != nil {
 		panic("could not marshal result to JSON")
-		return nil, err
+		// return nil, err
 	}
 
 	return bz, nil
@@ -110,6 +111,7 @@ func queryBonds(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAm
 func queryBondsDetailed(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) (res []byte, err error) {
 	var bondsList []*types.BondDetails
 	iterator := keeper.GetBondIterator(ctx)
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
 		keeper.cdc.MustUnmarshal(iterator.Value(), &bond)

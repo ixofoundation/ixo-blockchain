@@ -48,7 +48,7 @@ var VerificationRelationships = map[string]VerificationRelationship{
 	CapabilityDelegation: capabilityDelegation,
 }
 
-// verificationRelationships retrieve the pointer to the verification relationship
+// getRelationships retrieve the pointer to the verification relationship
 // if it exists, otherwise returns nil
 func (didDoc *IidDocument) getRelationships(rel VerificationRelationship) *[]string {
 	switch rel {
@@ -86,7 +86,7 @@ func parseRelationshipLabels(relNames ...string) (vrs []VerificationRelationship
 /**
 Regexp generated using this ABNF specs and using https://abnf.msweet.org/index.php
 
-did-url            = did path-abempty [ "?" query ] [ "#" fragment ]
+did-url            = (did | {id}) path-abempty [ "?" query ] [ "#" fragment ]
 did                = "did:" method-name ":" method-specific-id
 method-name        = 1*method-char
 method-char        = %x61-7A / DIGIT
@@ -105,8 +105,8 @@ sub-delims         = "!" / "$" / "&" / "'" / "(" / ")"
 
 const (
 	contextDIDBase            = "https://www.w3.org/ns/did/v1"
-	didValidationRegexpStr    = `^did\:[a-z0-9]+\:(([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])*\:)*([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])+$`
-	didURLValidationRegexpStr = `^did\:[a-z0-9]+\:(([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])*\:)*([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])+(/(([-A-Z._a-z0-9]|~)|%[0-9A-Fa-f][0-9A-Fa-f]|(\!|\$|&|'|\(|\)|\*|\+|,|;|\=)|\:|@)*)*(\?(((([-A-Z._a-z0-9]|~)|%[0-9A-Fa-f][0-9A-Fa-f]|(\!|\$|&|'|\(|\)|\*|\+|,|;|\=)|\:|@)|/|\?)*))?(#(((([-A-Z._a-z0-9]|~)|%[0-9A-Fa-f][0-9A-Fa-f]|(\!|\$|&|'|\(|\)|\*|\+|,|;|\=)|\:|@)|/|\?)*))?$`
+	didValidationRegexpStr    = `^(did\:[a-z0-9]+\:(([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])*\:)*([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])+)|\{id\}$`
+	didURLValidationRegexpStr = `^((did\:[a-z0-9]+\:(([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])*\:)*([A-Z.a-z0-9]|\-|_|%[0-9A-Fa-f][0-9A-Fa-f])+)|\{id\})(/(([-A-Z._a-z0-9]|~)|%[0-9A-Fa-f][0-9A-Fa-f]|(\!|\$|&|'|\(|\)|\*|\+|,|;|\=)|\:|@)*)*(\?(((([-A-Z._a-z0-9]|~)|%[0-9A-Fa-f][0-9A-Fa-f]|(\!|\$|&|'|\(|\)|\*|\+|,|;|\=)|\:|@)|/|\?)*))?(#(((([-A-Z._a-z0-9]|~)|%[0-9A-Fa-f][0-9A-Fa-f]|(\!|\$|&|'|\(|\)|\*|\+|,|;|\=)|\:|@)|/|\?)*))?$`
 	rfc3986RegexpStr          = `^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$`
 )
 
@@ -129,11 +129,6 @@ func UnmarshalMetadata(meta []byte) IidMetadata {
 	var metadata IidMetadata
 	json.Unmarshal(meta, &metadata)
 	return metadata
-}
-
-// NewKeyDID format a DID of type key
-func NewKeyDID(account string) DID {
-	return DID(fmt.Sprint(DidKeyPrefix, account))
 }
 
 // String return the string representation of the did
@@ -187,15 +182,6 @@ func IsValidDIDDocument(didDoc *IidDocument) bool {
 	//	}
 	//}
 
-	return true
-}
-
-// IsValidDIDKeyFormat verify that a did is compliant with the did:cosmos:key format
-// that is the ID must be a bech32 address no longer than 255 bytes
-func IsValidDIDKeyFormat(did string) bool {
-	if _, err := sdk.AccAddressFromBech32(strings.TrimPrefix(did, DidKeyPrefix)); err != nil {
-		return false
-	}
 	return true
 }
 
@@ -275,7 +261,7 @@ func ValidateVerification(v *Verification, allowedControllers ...string) (err er
 			return
 		}
 	default:
-		err = sdkerrors.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
+		err = sdkerrors.Wrapf(ErrInvalidInput, "verification material %s not set for verification method %s", x, v.Method.Id)
 		return
 	}
 
@@ -366,6 +352,13 @@ func WithResources(resources ...*LinkedResource) DidDocumentOption {
 	}
 }
 
+// WithClaims add optional claims
+func WithClaims(claims ...*LinkedClaim) DidDocumentOption {
+	return func(did *IidDocument) error {
+		return did.AddLinkedClaim(claims...)
+	}
+}
+
 func WithEntities(entities ...*LinkedEntity) DidDocumentOption {
 	return func(did *IidDocument) error {
 		return did.AddLinkedEntity(entities...)
@@ -379,16 +372,31 @@ func WithControllers(controllers ...string) DidDocumentOption {
 	}
 }
 
-// NewDidDocument constructs a new DidDocument
-func NewDidDocument(id string, options ...DidDocumentOption) (did IidDocument, err error) {
+// WithControllers add optional did controller
+func WithAlsoKnownAs(alsoKnownAs string) DidDocumentOption {
+	return func(did *IidDocument) (err error) {
+		return did.AddAlsoKnownAs(alsoKnownAs)
+	}
+}
 
+// WithControllers add optional did controller
+func WithContexts(contexts ...*Context) DidDocumentOption {
+	return func(did *IidDocument) (err error) {
+		return did.AddDidContext(contexts...)
+	}
+}
+
+// NewDidDocument constructs a new DidDocument
+func NewDidDocument(ctx sdk.Context, id string, options ...DidDocumentOption) (did IidDocument, err error) {
 	if !IsValidDID(id) {
 		err = sdkerrors.Wrapf(ErrInvalidDIDFormat, "did %s", id)
 		return
 	}
 
+	metadata := NewDidMetadata(ctx.TxBytes(), ctx.BlockTime())
 	did = IidDocument{
-		Id: id,
+		Id:       id,
+		Metadata: &metadata,
 	}
 	// apply all the options
 	for _, fn := range options {
@@ -397,6 +405,12 @@ func NewDidDocument(id string, options ...DidDocumentOption) (did IidDocument, e
 		}
 	}
 	return
+}
+
+// AddControllers add a controller to a did document if not exists
+func (didDoc *IidDocument) AddAlsoKnownAs(alsoKnownAs string) error {
+	didDoc.AlsoKnownAs = alsoKnownAs
+	return nil
 }
 
 // AddControllers add a controller to a did document if not exists
@@ -411,7 +425,6 @@ func (didDoc *IidDocument) AddControllers(controllers ...string) error {
 			return sdkerrors.Wrapf(ErrInvalidDIDFormat, "did document controller validation error '%s'", c)
 		}
 		if !IsValidIIDKeyFormat(c) {
-			// TODO: link to the documentation for the error
 			return sdkerrors.Wrapf(ErrInvalidInput, "did document controller '%s' must be of type key", c)
 		}
 	}
@@ -434,6 +447,12 @@ func (didDoc *IidDocument) DeleteControllers(controllers ...string) error {
 	}
 	// remove existing
 	didDoc.Controller = subtraction(didDoc.Controller, controllers)
+	return nil
+}
+
+// Deactivate sets the deactivated field in IidMetadata to true
+func (didDoc *IidDocument) Deactivate() error {
+	didDoc.Metadata.Deactivated = true
 	return nil
 }
 
@@ -469,10 +488,6 @@ func (didDoc *IidDocument) AddVerifications(verifications ...*Verification) (err
 			return err
 		}
 		didDoc.setRelationships(v.Method.Id, vrs...)
-
-		// update context
-		//didDoc.Context = union(didDoc.Context, v.Context)
-
 	}
 	return
 }
@@ -480,7 +495,6 @@ func (didDoc *IidDocument) AddVerifications(verifications ...*Verification) (err
 // RevokeVerification revoke a verification method
 // and all relationships associated with it
 func (didDoc *IidDocument) RevokeVerification(methodID string) error {
-
 	del := func(x int) {
 		lastIdx := len(didDoc.VerificationMethod) - 1
 		switch lastIdx {
@@ -548,7 +562,7 @@ func (didDoc *IidDocument) setRelationships(methodID string, relationships ...Ve
 			if vmID == methodID {
 				lastIdx := len(*vrs) - 1 // get the last index of the current relationship list
 				switch lastIdx {
-				case 0: // remove the relationships since there is no elements left
+				case 0: // remove the item since there is no elements left
 					*vrs = nil
 				case i: // if it's at the last position, just drop the last position
 					*vrs = (*vrs)[:lastIdx]
@@ -570,7 +584,6 @@ func (didDoc *IidDocument) setRelationships(methodID string, relationships ...Ve
 // GetVerificationMethodBlockchainAddress returns the verification method cosmos blockchain address of a verification method.
 // it fails if the verification method is not supported or if the verification method is not found
 func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string) (sdk.AccAddress, error) {
-
 	// switch m := verificationMethod.GetVerificationMaterial().(type) {
 	// case *iidtypes.VerificationMethod_PublicKeyHex:
 
@@ -602,30 +615,30 @@ func (didDoc IidDocument) GetVerificationMethodBlockchainAddress(methodID string
 				if VerificationMaterialType(vm.Type) == DIDVMethodTypeEd25519VerificationKey2018 {
 					address, err = toEd25519Address(k.PublicKeyMultibase[1:])
 				} else {
-					address, err = toAddress(k.PublicKeyMultibase[1:])
+					address, err = toSecp256k1Address(k.PublicKeyMultibase[1:])
 				}
 			case *VerificationMethod_PublicKeyHex:
 				if VerificationMaterialType(vm.Type) == DIDVMethodTypeEd25519VerificationKey2018 {
 					address, err = toEd25519Address(k.PublicKeyHex)
 				} else {
-					address, err = toAddress(k.PublicKeyHex)
+					address, err = toSecp256k1Address(k.PublicKeyHex)
 				}
 			case *VerificationMethod_PublicKeyBase58:
 				if VerificationMaterialType(vm.Type) == DIDVMethodTypeEd25519VerificationKey2018 {
 					address, err = toEd25519AddressFromBase58(k.PublicKeyBase58)
 				} else {
-					address, err = toAddressFromBase58(k.PublicKeyBase58)
+					address, err = toSecp256k1AddressFromBase58(k.PublicKeyBase58)
 				}
 			}
 
 			if err != nil {
-				return sdk.AccAddress{}, err
+				return nil, err
 			}
 
 			return sdk.AccAddressFromBech32(address)
 		}
 	}
-	return sdk.AccAddress{}, ErrVerificationMethodNotFound
+	return nil, ErrVerificationMethodNotFound
 }
 
 // GetVerificationRelationships returns the relationships associated with the
@@ -656,17 +669,17 @@ func (didDoc IidDocument) HasRelationship(
 				continue
 			}
 		case *VerificationMethod_PublicKeyMultibase:
-			addr, err := toAddress(k.PublicKeyMultibase[1:])
+			addr, err := toSecp256k1Address(k.PublicKeyMultibase[1:])
 			if err != nil || !signer.MatchAddress(addr) {
 				continue
 			}
 		case *VerificationMethod_PublicKeyHex:
-			addr, err := toAddress(k.PublicKeyHex)
+			addr, err := toSecp256k1Address(k.PublicKeyHex)
 			if err != nil || !signer.MatchAddress(addr) {
 				continue
 			}
 		case *VerificationMethod_PublicKeyBase58:
-			addr, err := toAddressFromBase58(k.PublicKeyBase58)
+			addr, err := toSecp256k1AddressFromBase58(k.PublicKeyBase58)
 			if err != nil || !signer.MatchAddress(addr) {
 				continue
 			}
@@ -742,7 +755,7 @@ func (didDoc *IidDocument) AddServices(services ...*Service) (err error) {
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated verification method id %s", s.Id)
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated service id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -773,7 +786,7 @@ func (didDoc *IidDocument) AddLinkedResource(linkedResources ...*LinkedResource)
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated verification method id %s", s.Id)
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated resource id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -783,11 +796,42 @@ func (didDoc *IidDocument) AddLinkedResource(linkedResources ...*LinkedResource)
 	return
 }
 
+func (didDoc *IidDocument) AddLinkedClaim(linkedClaims ...*LinkedClaim) (err error) {
+	if didDoc.LinkedClaim == nil {
+		didDoc.LinkedClaim = []*LinkedClaim{}
+	}
+
+	// used to check duplicates
+	index := make(map[string]struct{}, len(didDoc.LinkedClaim))
+
+	// load existing Claims
+	for _, s := range didDoc.LinkedClaim {
+		index[s.Id] = struct{}{}
+	}
+
+	// Claims must be unique
+	for _, s := range linkedClaims {
+		//if err = ValidateService(s); err != nil {
+		//	return
+		//}
+
+		// verify that there are no duplicates in method ids
+		if _, found := index[s.Id]; found {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated Claim id %s", s.Id)
+			return
+		}
+		index[s.Id] = struct{}{}
+
+		didDoc.LinkedClaim = append(didDoc.LinkedClaim, s)
+	}
+	return
+}
+
 func (didDoc *IidDocument) DeleteLinkedResource(resourceID string) {
 	del := func(x int) {
 		lastIdx := len(didDoc.LinkedResource) - 1
 		switch lastIdx {
-		case 0: // remove the relationships since there is no elements left
+		case 0: // remove the item since there is no elements left
 			didDoc.LinkedResource = nil
 		case x: // if it's at the last position, just drop the last position
 			didDoc.LinkedResource = didDoc.LinkedResource[:lastIdx]
@@ -799,6 +843,28 @@ func (didDoc *IidDocument) DeleteLinkedResource(resourceID string) {
 
 	for i, s := range didDoc.LinkedResource {
 		if s.Id == resourceID {
+			del(i)
+			break
+		}
+	}
+}
+
+func (didDoc *IidDocument) DeleteLinkedClaim(claimID string) {
+	del := func(x int) {
+		lastIdx := len(didDoc.LinkedClaim) - 1
+		switch lastIdx {
+		case 0: // remove the item since there is no elements left
+			didDoc.LinkedClaim = nil
+		case x: // if it's at the last position, just drop the last position
+			didDoc.LinkedClaim = didDoc.LinkedClaim[:lastIdx]
+		default: // swap and drop last position
+			didDoc.LinkedClaim[x] = didDoc.LinkedClaim[lastIdx]
+			didDoc.LinkedClaim = didDoc.LinkedClaim[:lastIdx]
+		}
+	}
+
+	for i, s := range didDoc.LinkedClaim {
+		if s.Id == claimID {
 			del(i)
 			break
 		}
@@ -826,7 +892,7 @@ func (didDoc *IidDocument) AddLinkedEntity(linkedEntities ...*LinkedEntity) (err
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated verification method id %s", s.Id)
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated linked entity id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -840,7 +906,7 @@ func (didDoc *IidDocument) DeleteLinkedEntity(entityID string) {
 	del := func(x int) {
 		lastIdx := len(didDoc.LinkedEntity) - 1
 		switch lastIdx {
-		case 0: // remove the relationships since there is no elements left
+		case 0: // remove the item since there is no elements left
 			didDoc.LinkedEntity = nil
 		case x: // if it's at the last position, just drop the last position
 			didDoc.LinkedEntity = didDoc.LinkedEntity[:lastIdx]
@@ -857,8 +923,6 @@ func (didDoc *IidDocument) DeleteLinkedEntity(entityID string) {
 		}
 	}
 }
-
-////Accorded Right
 
 func (didDoc *IidDocument) AddAccordedRight(accordedRights ...*AccordedRight) (err error) {
 	if didDoc.AccordedRight == nil {
@@ -881,7 +945,7 @@ func (didDoc *IidDocument) AddAccordedRight(accordedRights ...*AccordedRight) (e
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated verification method id %s", s.Id)
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated accorded right id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -895,7 +959,7 @@ func (didDoc *IidDocument) DeleteAccordedRight(rightID string) {
 	del := func(x int) {
 		lastIdx := len(didDoc.AccordedRight) - 1
 		switch lastIdx {
-		case 0: // remove the relationships since there is no elements left
+		case 0: // remove the item since there is no elements left
 			didDoc.AccordedRight = nil
 		case x: // if it's at the last position, just drop the last position
 			didDoc.AccordedRight = didDoc.AccordedRight[:lastIdx]
@@ -913,8 +977,6 @@ func (didDoc *IidDocument) DeleteAccordedRight(rightID string) {
 	}
 }
 
-////Contexts
-
 func (didDoc *IidDocument) AddDidContext(contexts ...*Context) (err error) {
 	if didDoc.Context == nil {
 		didDoc.Context = []*Context{}
@@ -924,22 +986,18 @@ func (didDoc *IidDocument) AddDidContext(contexts ...*Context) (err error) {
 	index := make(map[string]struct{}, len(didDoc.Context))
 
 	//load existing resources
-	for _, s := range didDoc.Context {
-		index[s.Key] = struct{}{}
+	for _, c := range didDoc.Context {
+		index[c.Key] = struct{}{}
 	}
 
 	// resources must be unique
-	for _, s := range contexts {
-		//if err = ValidateService(s); err != nil {
-		//	return
-		//}
-		if _, found := index[s.Key]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", s.Key)
+	for _, c := range contexts {
+		if _, found := index[c.Key]; found {
+			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", c.Key)
 			return
 		}
-		index[s.Key] = struct{}{}
-
-		didDoc.Context = append(didDoc.Context, s)
+		index[c.Key] = struct{}{}
+		didDoc.Context = append(didDoc.Context, c)
 	}
 	return
 }
@@ -948,7 +1006,7 @@ func (didDoc *IidDocument) DeleteDidContext(contextKey string) {
 	del := func(x int) {
 		lastIdx := len(didDoc.Context) - 1
 		switch lastIdx {
-		case 0: // remove the relationships since there is no elements left
+		case 0: // remove the item since there is no elements left
 			didDoc.Context = nil
 		case x: // if it's at the last position, just drop the last position
 			didDoc.Context = didDoc.Context[:lastIdx]
@@ -971,7 +1029,7 @@ func (didDoc *IidDocument) DeleteService(serviceID string) {
 	del := func(x int) {
 		lastIdx := len(didDoc.Service) - 1
 		switch lastIdx {
-		case 0: // remove the relationships since there is no elements left
+		case 0: // remove the item since there is no elements left
 			didDoc.Service = nil
 		case x: // if it's at the last position, just drop the last position
 			didDoc.Service = didDoc.Service[:lastIdx]
@@ -1016,17 +1074,17 @@ func NewVerification(
 }
 
 // NewAccountVerification is a shortcut to create a verification based on comsos address
-func NewAccountVerification(did DID, chainID, accountAddress string, verificationMethods ...string) *Verification {
-	return NewVerification(
-		NewVerificationMethod(
-			did.NewVerificationMethodID(accountAddress),
-			did,
-			NewBlockchainAccountID(chainID, accountAddress),
-		),
-		verificationMethods,
-		nil,
-	)
-}
+// func NewAccountVerification(did DID, chainID, accountAddress string, verificationMethods ...string) *Verification {
+// 	return NewVerification(
+// 		NewVerificationMethod(
+// 			did.NewVerificationMethodID(accountAddress),
+// 			did,
+// 			NewBlockchainAccountID(chainID, accountAddress),
+// 		),
+// 		verificationMethods,
+// 		nil,
+// 	)
+// }
 
 // NewVerificationMethod build a new verification method
 func NewVerificationMethod(id string, controller DID, vmr VerificationMaterial) VerificationMethod {
@@ -1085,10 +1143,25 @@ func NewLinkedResource(id string, resourceType string, description string, media
 		Right:           privacy,
 	}
 }
-func NewLinkedEntity(id string, relationship string) *LinkedEntity {
+
+func NewLinkedClaim(id string, claimType string, description string, serviceEndpoint string, proof string, encrypted string, privacy string) *LinkedClaim {
+	return &LinkedClaim{
+		Type:            claimType,
+		Id:              id,
+		Description:     description,
+		ServiceEndpoint: serviceEndpoint,
+		Proof:           proof,
+		Encrypted:       encrypted,
+		Right:           privacy,
+	}
+}
+
+func NewLinkedEntity(id, entityType, relationship, service string) *LinkedEntity {
 	return &LinkedEntity{
 		Id:           id,
+		Type:         entityType,
 		Relationship: relationship,
+		Service:      service,
 	}
 }
 
@@ -1116,37 +1189,10 @@ func UpdateDidMetadata(meta *IidMetadata, versionData []byte, updated time.Time)
 	meta.Updated = &updated
 }
 
-// ResolveAccountDID generates a DID document from an address
-func ResolveAccountDID(did, chainID string) (didDoc IidDocument, didMeta IidMetadata, err error) {
-	if !IsValidIIDKeyFormat(did) {
-		err = ErrInvalidDidMethodFormat
-		return
-	}
-	account := strings.TrimPrefix(did, DidKeyPrefix)
-	accountDID := DID(did)
-	// compose the metadata
-	didMeta = NewDidMetadata([]byte(account), time.Now())
-	// compose the did document
-	didDoc, err = NewDidDocument(did, WithVerifications(
-		NewVerification(
-			NewVerificationMethod(
-				accountDID.NewVerificationMethodID(account),
-				// account,
-				accountDID, // the controller is the same as the did subject
-				NewBlockchainAccountID(chainID, account),
-			),
-			[]string{
-				Authentication,
-				KeyAgreement,
-				AssertionMethod,
-				CapabilityInvocation,
-				CapabilityDelegation,
-			},
-			nil,
-		),
-	))
-	return
-}
+// // helper function to update the did metadata on IidDocument
+// func (didDoc *IidDocument) updateDidMetadata(ctx sdk.Context) {
+// 	UpdateDidMetadata(didDoc.Metadata, ctx.TxBytes(), ctx.BlockTime())
+// }
 
 func NewDidMetadata(versionData []byte, created time.Time) IidMetadata {
 	m := IidMetadata{
@@ -1158,7 +1204,7 @@ func NewDidMetadata(versionData []byte, created time.Time) IidMetadata {
 }
 
 // toAddress encode a kexKey string to cosmos based address
-func toAddress(hexKey string) (addr string, err error) {
+func toSecp256k1Address(hexKey string) (addr string, err error) {
 	// decode the hex string
 	pkb, err := hex.DecodeString(hexKey)
 	if err != nil {
@@ -1194,7 +1240,7 @@ func toEd25519Address(hexKey string) (addr string, err error) {
 	return
 }
 
-func toAddressFromBase58(base58Key string) (addr string, err error) {
+func toSecp256k1AddressFromBase58(base58Key string) (addr string, err error) {
 	// decode the base58 string
 	pkb := base58.Decode(base58Key)
 
@@ -1292,4 +1338,52 @@ func subtraction(a, b []string) []string {
 	}
 	sort.Strings(s)
 	return s
+}
+
+func GenerateVerificationsFromJson(json VerificationsJSON) ([]*Verification, error) {
+	verification := make([]*Verification, 0, len(json.Verifications))
+	for _, v := range json.Verifications {
+		var verificationMethodMaterial VerificationMaterial
+
+		if v.Method.BlockchainAccountID != "" {
+			verificationMethodMaterial = BlockchainAccountID(v.Method.BlockchainAccountID)
+		}
+		if v.Method.PublicKeyMultibase != "" {
+			verificationMethodMaterial, _ = NewPublicKeyMultibaseFromHex(v.Method.PublicKeyMultibase[1:], VerificationMaterialType(v.Method.Type))
+		}
+		if v.Method.PublicKeyHex != "" {
+			verificationMethodMaterial, _ = NewPublicKeyHexFromString(v.Method.PublicKeyHex, VerificationMaterialType(v.Method.Type))
+		}
+		if v.Method.PublicKeyBase58 != "" {
+			verificationMethodMaterial, _ = NewPublicKeyBase58FromString(v.Method.PublicKeyBase58, VerificationMaterialType(v.Method.Type))
+		}
+
+		verification = append(verification, NewVerification(
+			NewVerificationMethod(
+				v.Method.Id,
+				DID(v.Method.Controller),
+				verificationMethodMaterial,
+			),
+			v.Relationships,
+			v.Context,
+		))
+	}
+
+	return verification, nil
+}
+
+type VerificationsJSON struct {
+	Verifications []struct {
+		Relationships []string
+		Context       []string
+		Method        struct {
+			Id                  string
+			Type                string
+			Controller          string
+			PublicKeyBase58     string
+			BlockchainAccountID string
+			PublicKeyMultibase  string
+			PublicKeyHex        string
+		}
+	}
 }

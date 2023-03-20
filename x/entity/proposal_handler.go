@@ -7,7 +7,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
 	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	entitycontracts "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
+	nft "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
 )
 
 const (
@@ -38,32 +38,28 @@ func handleTokenParameterChangeProposal(ctx sdk.Context, k keeper.Keeper, p *typ
 		return err
 	}
 
-	initiateNftContractMsg := entitycontracts.InitiateNftContract{
+	initiateNftContractMsg := nft.InitiateNftContract{
 		Name:   EntityNftContractName,
 		Symbol: EntityNftContractSymbol,
 		Minter: adminAddr.String(),
 	}
 
-	encodedInitiateNftContractMsg, err := initiateNftContractMsg.Marshal()
-
+	encodedInitiateNftContractMsg, err := nft.Marshal(initiateNftContractMsg)
 	if err != nil {
 		return err
 	}
 
-	deposit := sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt()))
-
-	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", deposit)
+	contractAddr, _, err := k.WasmKeeper.Instantiate(ctx, p.NftContractCodeId, senderAddr, adminAddr, encodedInitiateNftContractMsg, "initiate_entity_nft_contract", sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
 	if err != nil {
-		return err
+		// return nil as still want proposal to pass even though contractCode doest'n exist yet (for entity module bootstrap purposes)
+		// if error it means proposal is just like empty proposal, look into returning error in future
+		return nil
 	}
 
 	xx.NftContractAddress = contractAddr.String()
 	xx.NftContractMinter = initiateNftContractMsg.Minter
 
 	k.ParamSpace.SetParamSet(ctx, &xx)
-
-	var yy types.Params
-	k.ParamSpace.GetParamSetIfExists(ctx, &yy)
 
 	return nil
 }

@@ -27,6 +27,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	var bonds []types.Bond
 	var batches []types.Batch
 	iterator := k.GetBondIterator(ctx)
+
+	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		bond := k.MustGetBondByKey(ctx, iterator.Key())
 		batch := k.MustGetBatch(ctx, bond.BondDid)

@@ -1,0 +1,29 @@
+# This module represents buf.build/ixofoundation/ixo-blockchain
+version: v1
+
+name: buf.build/ixofoundation/ixo-blockchain
+
+deps:
+  # Update these dependencies when our chain goes to Cosmos SDK v0.47.x
+  - buf.build/cosmos/cosmos-sdk # Cosmos SDK v0.46.7
+  - buf.build/cosmos/cosmos-proto # 29th November 2022
+  - buf.build/cosmos/gogo-proto # 29th August 2022
+  - buf.build/googleapis/googleapis
+
+breaking:
+  use:
+    - FILE
+
+lint:
+  use:
+    - DEFAULT
+    - COMMENTS
+    - FILE_LOWER_SNAKE_CASE
+  except:
+    - UNARY_RPC
+    - COMMENT_FIELD
+    - SERVICE_SUFFIX
+    - PACKAGE_VERSION_SUFFIX
+    - RPC_REQUEST_STANDARD_NAME
+  ignore:
+    - tendermint

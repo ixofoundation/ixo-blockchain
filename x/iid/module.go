@@ -4,8 +4,6 @@ import ( // this line is used by starport scaffolding # 1
 	"context"
 	"encoding/json"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -45,9 +43,9 @@ func (AppModuleBasic) Name() string {
 }
 
 // nolint
-func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
-	types.RegisterLegacyAminoCodec(cdc)
-}
+// func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
+// 	types.RegisterLegacyAminoCodec(cdc)
+// }
 
 // nolint
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
@@ -60,7 +58,9 @@ func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {
 }
 
 // DefaultGenesis returns the capability module's default genesis state.
-func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage { return nil }
+func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
+	return cdc.MustMarshalJSON(types.DefaultGenesisState())
+}
 
 // ValidateGenesis performs genesis state validation for the capability module.
 func (AppModuleBasic) ValidateGenesis(
@@ -68,7 +68,12 @@ func (AppModuleBasic) ValidateGenesis(
 	config client.TxEncodingConfig,
 	bz json.RawMessage,
 ) error {
-	return nil
+	var data types.GenesisState
+	err := cdc.UnmarshalJSON(bz, &data)
+	if err != nil {
+		return err
+	}
+	return nil //types.ValidateGenesis(data)
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
@@ -97,15 +102,13 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule implements the AppModule interface for the capability module.
 type AppModule struct {
 	AppModuleBasic
-	wasmKeeper *wasmkeeper.Keeper
-	keeper     keeper.Keeper
+	keeper keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, wasmKeeper *wasmkeeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
-		wasmKeeper:     wasmKeeper,
 	}
 }
 

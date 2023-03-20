@@ -14,17 +14,28 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		case *types.MsgSetupMinter:
-			res, err := msgServer.SetupMinter(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgCreateToken:
+			res, err := msgServer.CreateToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgMint:
+		case *types.MsgMintToken:
 			res, err := msgServer.MintToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgTransferToken:
 			res, err := msgServer.TransferToken(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgCancelToken:
+			res, err := msgServer.CancelToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgRetireToken:
+			res, err := msgServer.RetireToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgPauseToken:
+			res, err := msgServer.PauseToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+		case *types.MsgStopToken:
+			res, err := msgServer.StopToken(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
 		default:
-			// err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized bonds Msg type: %v", msg.Type())
 			err := sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unrecognized token Msg")
 			return nil, err
 		}

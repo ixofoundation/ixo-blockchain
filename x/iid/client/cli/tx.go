@@ -8,10 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/x/iid/types"
 	"github.com/spf13/cobra"
 )
@@ -26,103 +22,119 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	// this line is used by starport scaffolding # 1
 	cmd.AddCommand(
 		NewCreateIidDocumentCmd(),
+		NewUpdateIidDocumentCmd(),
 		NewAddVerificationCmd(),
 		NewAddServiceCmd(),
 		NewRevokeVerificationCmd(),
 		NewDeleteServiceCmd(),
 		NewSetVerificationRelationshipCmd(),
-		NewLinkAriesAgentCmd(),
+		// TODO check if need aries agent creation
+		// NewLinkAriesAgentCmd(),
 		NewAddControllerCmd(),
 		NewDeleteControllerCmd(),
 		NewAddLinkedResourceCmd(),
-		NewDeleteLinkedresourceCmd(),
+		NewDeleteLinkedResourceCmd(),
+		NewAddLinkedClaimCmd(),
+		NewDeleteLinkedClaimCmd(),
 		NewAddLinkedEntityCmd(),
 		NewDeleteLinkedEntityCmd(),
 		NewAddAccordedRightCmd(),
 		NewDeleteAccordedRightCmd(),
 		NewAddIidContextCmd(),
 		NewDeleteIidContextCmd(),
-		NewUpdateIidMetaCmd(),
 		NewDeactivateIIDCmd(),
-		NewCreateIidDocumentFormLegacyDidCmd(),
 	)
 
 	return cmd
 }
 
 // deriveVMType derive the verification method type from a public key
-func deriveVMType(pubKey cryptotypes.PubKey) (vmType types.VerificationMaterialType, err error) {
-	switch pubKey.(type) {
-	case *ed25519.PubKey:
-		vmType = types.DIDVMethodTypeEd25519VerificationKey2018
-	case *secp256k1.PubKey:
-		vmType = types.DIDVMethodTypeEcdsaSecp256k1VerificationKey2019
-	default:
-		err = types.ErrKeyFormatNotSupported
-	}
-	return
-}
+// func deriveVMType(pubKey cryptotypes.PubKey) (vmType types.VerificationMaterialType, err error) {
+// 	switch pubKey.(type) {
+// 	case *ed25519.PubKey:
+// 		vmType = types.DIDVMethodTypeEd25519VerificationKey2018
+// 	case *secp256k1.PubKey:
+// 		vmType = types.DIDVMethodTypeEcdsaSecp256k1VerificationKey2019
+// 	default:
+// 		err = types.ErrKeyFormatNotSupported
+// 	}
+// 	return
+// }
 
 // NewCreateDidDocumentCmd defines the command to create a new IBC light client.
 func NewCreateIidDocumentCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "create-iid [id] [chain name]",
-		Short:   "create decentralized did (did) document",
-		Example: "creates a did document for users",
-		Args:    cobra.ExactArgs(2),
+		Use:   "create-iid [did-doc]",
+		Short: "Create decentralized iid (did) document - flag is raw json with struct of MsgCreateIidDocument",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgCreateIidDocument
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+			var verJson types.VerificationsJSON
+			if err := json.Unmarshal([]byte(args[0]), &verJson); err != nil {
+				return err
+			}
+
+			// Manually gnerate verifications based of json values
+			verifications, err := types.GenerateVerificationsFromJson(verJson)
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// did
-			did := types.NewChainDID(args[1], args[0])
-			// verification
-			signer := clientCtx.GetFromAddress()
-			// pubkey
-			info, err := clientCtx.Keyring.KeyByAddress(signer)
+
+			msg.Verifications = verifications
+			msg.Signer = clientCtx.GetFromAddress().String()
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// NewUpdateIidDocumentCmd updates and iid document
+// When using this function it updates all fields, even if dopnt provide fields it will use the proto defaults
+func NewUpdateIidDocumentCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-iid [did-doc]",
+		Short: "updates and iid document - flag is raw json with struct of MsgUpdateIidDocument",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgUpdateIidDocument
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			pubKey := info.GetPubKey()
-			// verification method id
-			//NOTE: Removed this for consistency when using the rpc messages.
-			// vmID := did.NewVerificationMethodID(signer.String())
-			vmID := signer.String()
-			// understand the vmType
-			vmType, err := deriveVMType(pubKey)
+
+			var verJson types.VerificationsJSON
+			if err := json.Unmarshal([]byte(args[0]), &verJson); err != nil {
+				return err
+			}
+
+			// Manually generate verifications based of json values
+			verifications, err := types.GenerateVerificationsFromJson(verJson)
 			if err != nil {
 				return err
 			}
-			auth := types.NewVerification(
-				types.NewVerificationMethod(
-					vmID,
-					did,
-					types.NewPublicKeyMultibase(pubKey.Bytes(), vmType),
-				),
-				[]string{types.Authentication},
-				nil,
-			)
-			// create the message
-			msg := types.NewMsgCreateIidDocument(
-				did.String(),
-				types.Verifications{auth},
-				types.Services{},
-				types.AccordedRights{},
-				types.LinkedResources{},
-				types.LinkedEntities{},
-				signer.String(),
-				types.Contexts{},
-			)
-			// validate
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			// execute
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+
+			msg.Verifications = verifications
+			msg.Signer = clientCtx.GetFromAddress().String()
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 
@@ -133,85 +145,56 @@ func NewCreateIidDocumentCmd() *cobra.Command {
 
 // NewAddVerificationCmd define the command to add a verification message
 func NewAddVerificationCmd() *cobra.Command {
-
 	cmd := &cobra.Command{
-		Use:     "add-verification-method [id] [pubkey]",
-		Short:   "add an verification method to an (iid) document",
-		Example: "adds an verification method for an iid document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "add-verification-method [id] [verification]",
+		Short: "add an verification method to an iid document - verification is raw json of struct Verification",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// signer address
-			signer := clientCtx.GetFromAddress()
-			// public key
-			var pk cryptotypes.PubKey
-			err = clientCtx.Codec.UnmarshalInterfaceJSON([]byte(args[1]), &pk)
-			if err != nil {
-				return err
-			}
-			// derive the public key type
-			vmType, err := deriveVMType(pk)
-			if err != nil {
-				return err
-			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// verification method id
-			vmID := sdk.MustBech32ifyAddressBytes(
-				sdk.GetConfig().GetBech32AccountAddrPrefix(),
-				pk.Address().Bytes(),
-			)
 
-			verification := types.NewVerification(
-				types.NewVerificationMethod(
-					vmID,
-					did,
-					types.NewPublicKeyMultibase(pk.Bytes(), vmType),
-				),
-				[]string{types.Authentication},
-				nil,
-			)
-			// add verification
+			var verJson types.VerificationsJSON
+			if err := json.Unmarshal([]byte(args[0]), &verJson); err != nil {
+				return err
+			}
+
+			// Manually gnerate verifications based of json values
+			verifications, err := types.GenerateVerificationsFromJson(verJson)
+			if err != nil {
+				return err
+			}
+			if len(verifications) == 0 {
+				return fmt.Errorf("no verification provided")
+			}
+
 			msg := types.NewMsgAddVerification(
-				did.String(),
-				verification,
-				signer.String(),
+				args[0],
+				verifications[0],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewAddServiceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-service [id] [service_id] [type] [endpoint]",
-		Short:   "add a service to a decentralized did (did) document",
-		Example: "adds a service to a did document",
-		Args:    cobra.ExactArgs(4),
+		Use:   "add-service [id] [service-id] [type] [endpoint]",
+		Short: "add a service to an iid document",
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// tx signer
-			signer := clientCtx.GetFromAddress()
-			// service parameters
-			serviceID, serviceType, endpoint := args[1], args[2], args[3]
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			id, serviceID, serviceType, endpoint := args[0], args[1], args[2], args[3]
 
 			service := types.NewService(
 				serviceID,
@@ -220,128 +203,87 @@ func NewAddServiceCmd() *cobra.Command {
 			)
 
 			msg := types.NewMsgAddService(
-				did.String(),
+				id,
 				service,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
-			// broadcast
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewRevokeVerificationCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "revoke-verification-method [did_id] [verification_method_id_fragment]",
-		Short: "revoke a verification method from a decentralized did (did) document",
-		Example: `cosmos-cashd tx did revoke-verification-method 575d062c-d110-42a9-9c04-cb1ff8c01f06 \
- Z46DAL1MrJlVW_WmJ19WY8AeIpGeFOWl49Qwhvsnn2M \
- --from alice \
- --node https://rpc.cosmos-cash.app.beta.starport.cloud:443 --chain-id cosmoscash-testnet`,
-		Args: cobra.ExactArgs(2),
+		Use:   "revoke-verification-method [id] [method-id]",
+		Short: "revoke a verification method from an iid document",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// signer
-			signer := clientCtx.GetFromAddress()
-			// verification method id
-			vmID := args[1]
-			// build the message
+
 			msg := types.NewMsgRevokeVerification(
-				did.String(),
-				vmID,
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-			// validate
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			// broadcast
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 // NewDeleteServiceCmd deletes a service from a DID Document
 func NewDeleteServiceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-service [id] [service-id]",
-		Short:   "deletes a service from a decentralized did (did) document",
-		Example: "delete a service for a did document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "delete-service [id] [service-id]",
+		Short: "deletes a service from an iid document",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// signer
-			signer := clientCtx.GetFromAddress()
-			// service id
-			sID := args[1]
 
 			msg := types.NewMsgDeleteService(
-				did.String(),
-				sID,
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 // NewAddControllerCmd adds a controller to a did document
 func NewAddControllerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-controller [id] [controllerAddress]",
-		Short:   "updates a decentralized identifier (did) document to contain a controller",
-		Example: "add-controller vasp cosmos1kslgpxklq75aj96cz3qwsczr95vdtrd3p0fslp",
-		Args:    cobra.ExactArgs(2),
+		Use:   "add-controller [id] [controller-did]",
+		Short: "updates an iid document to contain a controller",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-
-			// did key to use as the controller
-			didKey := types.NewKeyDID(args[1])
-
-			// signer
-			signer := clientCtx.GetFromAddress()
 
 			msg := types.NewMsgAddController(
-				did.String(),
-				didKey.String(),
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -351,36 +293,23 @@ func NewAddControllerCmd() *cobra.Command {
 	return cmd
 }
 
-// NewDeleteControllerCmd adds a controller to a did document
+// NewDeleteControllerCmd removes a controller from a did document
 func NewDeleteControllerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-controller [id] [controllerAddress]",
-		Short:   "updates a decentralized identifier (did) document removing a controller",
-		Example: "delete-controller vasp cosmos1kslgpxklq75aj96cz3qwsczr95vdtrd3p0fslp",
-		Args:    cobra.ExactArgs(2),
+		Use:   "delete-controller [id] [controller-did]",
+		Short: "updates aan iid document by removing a controller",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-
-			// did key to use as the controller
-			didKey := types.NewKeyDID(args[1])
-
-			// signer
-			signer := clientCtx.GetFromAddress()
 
 			msg := types.NewMsgDeleteController(
-				did.String(),
-				didKey.String(),
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -392,38 +321,25 @@ func NewDeleteControllerCmd() *cobra.Command {
 
 // NewSetVerificationRelationshipCmd adds a verification relationship to a verification method
 func NewSetVerificationRelationshipCmd() *cobra.Command {
-
-	// relationships
 	var relationships []string
 	// if true do not add the default authentication relationship
 	var unsafe bool
 
 	cmd := &cobra.Command{
-		Use:     "set-verification-relationship [did_id] [verification_method_id_fragment] --relationship NAME [--relationship NAME ...]",
-		Short:   "sets one or more verification relationships to a key on a decentralized identifier (did) document.",
-		Example: "set-verification-relationship vasp 6f1e0700-6c86-41b6-9e05-ae3cf839cdd0 --relationship capabilityInvocation",
-		Args:    cobra.ExactArgs(2),
-
+		Use:   "set-verification-relationship [id] [method-id] --relationship NAME [--relationship NAME ...]",
+		Short: "sets one or more verification relationships to a key on an iid document.",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-
-			// method id
-			// vmID := did.NewVerificationMethodID(args[1])
-			vmID := args[1]
-
-			// signer
-			signer := clientCtx.GetFromAddress()
 
 			msg := types.NewMsgSetVerificationRelationships(
-				did.String(),
-				vmID,
+				args[0],
+				args[1],
 				relationships,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
 
 			// make sure that the authentication relationship is preserved
@@ -439,36 +355,25 @@ func NewSetVerificationRelationshipCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&unsafe, "unsafe", false, fmt.Sprint("do not ensure that '", types.Authentication, "' relationship is set"))
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
-////////////////////
-// IID Extension
-////////////////////
-
 func NewAddLinkedResourceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-linked-resource [id] [resource_id] [type] [description] [media_type] [service_endpoint] [proof] [encrypted] [privacy]",
-		Short:   "add a linked resource to a decentralized did (did/IID) document",
-		Example: "adds a linked resource to a did document",
-		Args:    cobra.ExactArgs(9),
+		Use:   "add-linked-resource [id] [resource-id] [type] [description] [media-type] [service-endpoint] [proof] [encrypted] [privacy]",
+		Short: "add a linked resource to an iid document",
+		Args:  cobra.ExactArgs(9),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// tx signer
-			signer := clientCtx.GetFromAddress()
-			// service parameters
-			resourceId, resourceType, desc, mediaType, endpoint, proof, encrypted, privacy := args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			id, resourceId, serviceType, desc, mediaType, endpoint, proof, encrypted, privacy := args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
 
 			resource := types.NewLinkedResource(
 				resourceId,
-				resourceType,
+				serviceType,
 				desc,
 				mediaType,
 				endpoint,
@@ -478,75 +383,118 @@ func NewAddLinkedResourceCmd() *cobra.Command {
 			)
 
 			msg := types.NewMsgAddLinkedResource(
-				did.String(),
+				id,
 				resource,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
-			// broadcast
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
-func NewDeleteLinkedresourceCmd() *cobra.Command {
+func NewDeleteLinkedResourceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-resource [id] [resource-id]",
-		Short:   "deletes a resource from a decentralized did (did) document",
-		Example: "delete a resource for a did document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "delete-resource [id] [resource-id]",
+		Short: "deletes a resource from an iid document",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// signer
-			signer := clientCtx.GetFromAddress()
-			// resource id
-			rID := args[1]
 
 			msg := types.NewMsgDeleteLinkedResource(
-				did.String(),
-				rID,
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
 
+func NewAddLinkedClaimCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "add-linked-claim [id] [claim-id] [type] [description] [service-endpoint] [proof] [encrypted] [privacy]",
+		Short: "add a linked claim to an iid document",
+		Args:  cobra.ExactArgs(8),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			id, claimId, serviceType, desc, endpoint, proof, encrypted, privacy := args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]
+
+			claim := types.NewLinkedClaim(
+				claimId,
+				serviceType,
+				desc,
+				endpoint,
+				proof,
+				encrypted,
+				privacy,
+			)
+
+			msg := types.NewMsgAddLinkedClaim(
+				id,
+				claim,
+				clientCtx.GetFromAddress().String(),
+			)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewDeleteLinkedClaimCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete-claim [id] [claim-id]",
+		Short: "deletes a claim from an iid document",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgDeleteLinkedClaim(
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
+			)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
 
 func NewAddAccordedRightCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-accorded-right [id] [right_id] [type] [mechanism] [message] [service_endpoint]",
-		Short:   "add an Accorded Right to a decentralized did (did/IID) document",
-		Example: "adds an accorded right to a did document",
-		Args:    cobra.ExactArgs(6),
+		Use:   "add-accorded-right [id] [right-id] [type] [mechanism] [message] [service-endpoint]",
+		Short: "add an Accorded Right to an iid document",
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// tx signer
-			signer := clientCtx.GetFromAddress()
-			// Right parameters
-			rightId, rightType, mechanism, message, endpoint := args[1], args[2], args[3], args[4], args[5]
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			id, rightId, rightType, mechanism, message, endpoint := args[0], args[1], args[2], args[3], args[4], args[5]
 
 			right := types.NewAccordedRight(
 				rightId,
@@ -557,286 +505,186 @@ func NewAddAccordedRightCmd() *cobra.Command {
 			)
 
 			msg := types.NewMsgAddAccordedRight(
-				did.String(),
+				id,
 				right,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
-			// broadcast
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewDeleteAccordedRightCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-accorded-right [id] [resource-id]",
-		Short:   "deletes a right from a decentralized did (did) document",
-		Example: "delete a right for a did document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "delete-accorded-right [id] [resource-id]",
+		Short: "deletes a right from an iid document",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// signer
-			signer := clientCtx.GetFromAddress()
-			// resource id
-			rID := args[1]
 
 			msg := types.NewMsgDeleteAccordedRight(
-				did.String(),
-				rID,
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewAddIidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-iid-context [iid-id] [key] [value]",
-		Short:   "add a context item to a decentralized (did/IID) document",
-		Example: "adds a context item to a iid document",
-		Args:    cobra.ExactArgs(3),
+		Use:   "add-iid-context [id] [key] [value]",
+		Short: "add a context item to an iid document",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// tx signer
-			signer := clientCtx.GetFromAddress()
-			// service parameters
-			key := args[1]
-			val := args[2]
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			id, key, value := args[0], args[1], args[2]
 
 			didContext := types.NewDidContext(
 				key,
-				val,
+				value,
 			)
 
 			msg := types.NewMsgAddDidContext(
-				did.String(),
+				id,
 				didContext,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
-			// broadcast
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewDeleteIidContextCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-context [iid-id] [key]",
-		Short:   "deletes a iid context from a decentralized iid document",
-		Example: "delete a context for a iid document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "delete-context [id] [key]",
+		Short: "deletes a iid context from an iid document",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// signer
-			signer := clientCtx.GetFromAddress()
-			// resource id
-			cID := args[1]
 
 			msg := types.NewMsgDeleteDidContext(
-				did.String(),
-				cID,
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
-func NewUpdateIidMetaCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "update-iid-meta [iid-id] [meta]",
-		Short:   "add a context item to a decentralized (did/IID) document",
-		Example: "adds a context item to a iid document",
-		Args:    cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			// tx signer
-			signer := clientCtx.GetFromAddress()
-			// service parameters
-			var metaData *types.IidMetadata
-
-			if err := json.Unmarshal([]byte(args[1]), &metaData); err != nil {
-				err = fmt.Errorf(err.Error())
-				panic(err)
-			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-
-			msg := types.NewMsgUpdateDidMetaData(
-				did.String(),
-				metaData,
-				signer.String(),
-			)
-
-			// broadcast
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
-// Linked Entity
 func NewAddLinkedEntityCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "add-linked-resource [id] [relationship id] [relationship]",
-		Short:   "add a linked entity to a decentralized did (did/IID) document",
-		Example: "adds a linked entity to a did document",
-		Args:    cobra.ExactArgs(3),
+		Use:   "add-linked-entity [id] [entity-id] [type] [relationship] [service]",
+		Short: "add a linked entity to an iid document",
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			// tx signer
-			signer := clientCtx.GetFromAddress()
-			// service parameters
-			relationshipId, relationship := args[1], args[2]
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
+			id, entityId, entityType, relationship, service := args[0], args[1], args[2], args[3], args[4]
 
 			entity := types.NewLinkedEntity(
-				relationshipId,
+				entityId,
+				entityType,
 				relationship,
+				service,
 			)
 
 			msg := types.NewMsgAddLinkedEntity(
-				did.String(),
+				id,
 				entity,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
-			// broadcast
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewDeleteLinkedEntityCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "delete-linked-entity [id] [entity-id]",
-		Short:   "deletes a entity from a decentralized did (did) document",
-		Example: "delete a entity for a did document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "delete-linked-entity [id] [entity-id]",
+		Short: "deletes an entity from an iid document",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-			// signer
-			signer := clientCtx.GetFromAddress()
-			// resource id
-			eID := args[1]
 
 			msg := types.NewMsgDeleteLinkedEntity(
-				did.String(),
-				eID,
-				signer.String(),
+				args[0],
+				args[1],
+				clientCtx.GetFromAddress().String(),
 			)
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }
 
 func NewDeactivateIIDCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "deactivate-iid [iid-id] [state]",
-		Short:   "add a context item to a decentralized (did/IID) document",
-		Example: "adds a context item to a iid document",
-		Args:    cobra.ExactArgs(2),
+		Use:   "deactivate-iid [id] [state]",
+		Short: "changes (deactivates) the deactivated field off iid metadata",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			// tx signer
-			signer := clientCtx.GetFromAddress()
 
 			newState, err := strconv.ParseBool(args[1])
 			if err != nil {
 				return err
 			}
 
-			// document did
-			did := types.NewChainDID(clientCtx.ChainID, args[0])
-
 			msg := types.NewMsgDeactivateIID(
-				did.String(),
+				args[0],
 				newState,
-				signer.String(),
+				clientCtx.GetFromAddress().String(),
 			)
 
-			// broadcast
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
 	return cmd
 }

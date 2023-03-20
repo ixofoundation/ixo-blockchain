@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	didexported "github.com/ixofoundation/ixo-blockchain/lib/legacydid"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
 )
 
@@ -12,7 +11,7 @@ func (b Batch) EqualBuysAndSells() bool { return b.TotalBuyAmount.IsEqual(b.Tota
 func (b Batch) HasNextAlpha() bool      { return !b.NextPublicAlpha.IsNegative() }
 func (b Batch) Empty() bool             { return len(b.Buys) == 0 && len(b.Sells) == 0 && len(b.Swaps) == 0 }
 
-func NewBatch(bondDid didexported.Did, token string, blocks sdk.Uint) Batch {
+func NewBatch(bondDid string, token string, blocks sdk.Uint) Batch {
 	return Batch{
 		BondDid:         bondDid,
 		BlocksRemaining: blocks,
@@ -32,7 +31,7 @@ func NewBaseOrder(accountDid iidtypes.DIDFragment, amount sdk.Coin) BaseOrder {
 }
 
 func (bo BaseOrder) IsCancelled() bool {
-	return bo.Cancelled == true
+	return bo.Cancelled
 }
 
 func NewBuyOrder(buyerDid iidtypes.DIDFragment, amount sdk.Coin, maxPrices sdk.Coins) BuyOrder {

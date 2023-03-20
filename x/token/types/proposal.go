@@ -9,10 +9,8 @@ var (
 	_                                 govtypes.Content = &SetTokenContractCodes{}
 )
 
-func NewSetTokenContract(cw20Code, cw721Code, ixo1155Code uint64) SetTokenContractCodes {
+func NewSetTokenContract(ixo1155Code uint64) SetTokenContractCodes {
 	return SetTokenContractCodes{
-		Cw20ContractCode:    cw20Code,
-		Cw721ContractCode:   cw721Code,
 		Ixo1155ContractCode: ixo1155Code,
 	}
 }

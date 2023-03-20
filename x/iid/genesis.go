@@ -8,33 +8,17 @@ import (
 )
 
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abci.ValidatorUpdate {
-	//save did docs to the store
-
-	go func() {
-		for _, iid := range gs.IidDocs {
-			k.SetDidDocument(ctx, []byte(iid.Id), iid)
-		}
-	}()
-
-	go func() {
-		for _, meta := range gs.IidMeta {
-			k.SetDidMetadata(ctx, []byte(meta.Id), meta)
-		}
-	}()
+	for _, iid := range gs.IidDocs {
+		k.SetDidDocument(ctx, []byte(iid.Id), iid)
+	}
 
 	return []abci.ValidatorUpdate{}
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	dds := k.GetAllDidDocuments(ctx)
-	var metas []types.IidMetadata
-	for _, iid := range dds {
-		meta, _ := k.GetDidMetadata(ctx, []byte(iid.Id))
-		metas = append(metas, meta)
-	}
+	iidDocs := k.GetAllDidDocuments(ctx)
 
 	return &types.GenesisState{
-		IidDocs: dds,
-		IidMeta: metas,
+		IidDocs: iidDocs,
 	}
 }

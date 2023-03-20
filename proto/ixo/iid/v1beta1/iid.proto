@@ -4,7 +4,7 @@ package ixo.iid.v1beta1;
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
 
 import "gogoproto/gogo.proto";
-import "google/protobuf/timestamp.proto";
+import "ixo/iid/v1beta1/types.proto";
 
 /*
 This represents a minimal self-managed did document
@@ -12,135 +12,61 @@ definition: https://w3c.github.io/did-core/
 */
 // DidDocument represents a dencentralised identifer.
 
-message Context{
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-  string key = 1;
-  string val = 2;
-}
-
 message IidDocument {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_getters) = false;
+
   // @context is spec for did document.
-  repeated ixo.iid.v1beta1.Context context = 1 [(gogoproto.jsontag) = "@context,omitempty"];
+  repeated Context context = 1 [ (gogoproto.jsontag) = "@context,omitempty" ];
   // id represents the id for the did document.
   string id = 2;
-  // A DID controller is an entity that is authorized to make changes to a DID document.
-  // cfr. https://www.w3.org/TR/did-core/#did-controller
+  // A DID controller is an entity that is authorized to make changes to a DID
+  // document. cfr. https://www.w3.org/TR/did-core/#did-controller
   repeated string controller = 3;
-  // A DID document can express verification methods, 
-  // such as cryptographic public keys, which can be used 
-  // to authenticate or authorize interactions with the DID subject or associated parties.
-  // https://www.w3.org/TR/did-core/#verification-methods
-  repeated ixo.iid.v1beta1.VerificationMethod verificationMethod = 4;
-  // Services are used in DID documents to express ways of communicating 
+  // A DID document can express verification methods,
+  // such as cryptographic public keys, which can be used
+  // to authenticate or authorize interactions with the DID subject or
+  // associated parties. https://www.w3.org/TR/did-core/#verification-methods
+  repeated VerificationMethod verificationMethod = 4;
+  // Services are used in DID documents to express ways of communicating
   // with the DID subject or associated entities.
   // https://www.w3.org/TR/did-core/#services
-  repeated ixo.iid.v1beta1.Service service = 5;
+  repeated Service service = 5;
   // NOTE: below this line there are the relationships
   // Authentication represents public key associated with the did document.
   // cfr. https://www.w3.org/TR/did-core/#authentication
   repeated string authentication = 6;
-  // Used to specify how the DID subject is expected to express claims, 
+  // Used to specify how the DID subject is expected to express claims,
   // such as for the purposes of issuing a Verifiable Credential.
   // cfr. https://www.w3.org/TR/did-core/#assertion
   repeated string assertionMethod = 7;
-  // used to specify how an entity can generate encryption material 
+  // used to specify how an entity can generate encryption material
   // in order to transmit confidential information intended for the DID subject.
   // https://www.w3.org/TR/did-core/#key-agreement
   repeated string keyAgreement = 8;
   // Used to specify a verification method that might be used by the DID subject
-  // to invoke a cryptographic capability, such as the authorization 
+  // to invoke a cryptographic capability, such as the authorization
   // to update the DID Document.
   // https://www.w3.org/TR/did-core/#capability-invocation
   repeated string capabilityInvocation = 9;
-  // Used to specify a mechanism that might be used by the DID subject 
+  // Used to specify a mechanism that might be used by the DID subject
   // to delegate a cryptographic capability to another party.
   // https://www.w3.org/TR/did-core/#capability-delegation
   repeated string capabilityDelegation = 10;
-  repeated ixo.iid.v1beta1.LinkedResource linkedResource = 11;
-  repeated ixo.iid.v1beta1.AccordedRight accordedRight = 12;
-  repeated ixo.iid.v1beta1.LinkedEntity linkedEntity = 13;
-  string alsoKnownAs = 14;
+  repeated LinkedResource linkedResource = 11;
+  repeated LinkedClaim linkedClaim = 12;
+  repeated AccordedRight accordedRight = 13;
+  repeated LinkedEntity linkedEntity = 14;
+  string alsoKnownAs = 15;
+  // Metadata concerning the IidDocument such as versionId, created, updated and
+  // deactivated
+  IidMetadata metadata = 16;
 }
+// type entity account
+// relationship entity account
 
-// A DID document can express verification methods, 
-// such as cryptographic public keys, which can be used 
-// to authenticate or authorize interactions 
-// with the DID subject or associated parties. 
+// A DID document can express verification methods,
+// such as cryptographic public keys, which can be used
+// to authenticate or authorize interactions
+// with the DID subject or associated parties.
 // https://www.w3.org/TR/did-core/#verification-methods
-
-message AccordedRight{
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-  string type = 1;
-  string id = 2;
-  string mechanism = 3;
-  string message = 4;
-  string service = 5;
-}
-
-message LinkedResource{
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-  string type = 1;
-  string id = 2;
-  string description = 3;
-  string mediaType = 4;
-  string serviceEndpoint = 5;
-  string proof = 6;
-  string encrypted = 7;
-  string right = 8;
-}
-message LinkedEntity{
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-  string id = 2;
-  string relationship =3;
-}
-
-message VerificationMethod {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-
-  string id = 1;
-  string type = 2;
-  string controller = 3;
-  oneof verificationMaterial {
-    string blockchainAccountID = 4;
-    string publicKeyHex = 5;
-    string publicKeyMultibase = 6;
-    string publicKeyBase58 = 7;
-  }
-}
-
-// Service defines how to find data associated with a identifer
-message Service {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-
-  string id = 1;
-  string type = 2;
-  string serviceEndpoint = 3;
-}
-
-// DidMetadata defines metadata associated to a did document such as 
-// the status of the DID document
-message IidMetadata {
-  option (gogoproto.equal) = true;
-  option (gogoproto.goproto_getters) = false;
-  string id = 1;
-  string versionId = 2;
-  google.protobuf.Timestamp created = 3 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated = 4 [(gogoproto.stdtime) = true];
-  bool deactivated = 5;
-  string entityType = 6;
-  google.protobuf.Timestamp startDate = 7 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp endDate = 8 [(gogoproto.stdtime) = true];
-  int32 status = 9;
-  string stage = 10;
-  string relayerNode = 11;
-  string verifiableCredential = 12;
-  repeated string credentials =13;
-}

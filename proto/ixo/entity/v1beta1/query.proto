@@ -4,47 +4,73 @@ package ixo.entity.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "ixo/entity/v1beta1/entity.proto";
+import "ixo/iid/v1beta1/iid.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  rpc EntityList(QueryEntityListRequest) returns (QueryEntityListResponse){
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/ixo/entity/params";
+  }
+  rpc Entity(QueryEntityRequest) returns (QueryEntityResponse) {
+    option (google.api.http).get = "/ixo/entity/{id}";
+  }
+  rpc EntityMetaData(QueryEntityMetadataRequest)
+      returns (QueryEntityMetadataResponse) {
+    option (google.api.http).get = "/ixo/entity/{id}/metadata";
+  }
+  rpc EntityIidDocument(QueryEntityIidDocumentRequest)
+      returns (QueryEntityIidDocumentResponse) {
+    option (google.api.http).get = "/ixo/entity/{id}/iiddocument";
+  }
+  rpc EntityVerified(QueryEntityVerifiedRequest)
+      returns (QueryEntityVerifiedResponse) {
+    option (google.api.http).get = "/ixo/entity/{id}/verified";
+  }
+  rpc EntityList(QueryEntityListRequest) returns (QueryEntityListResponse) {
     option (google.api.http).get = "/ixo/entity";
   }
-
-  rpc EntityDoc(QueryEntityDocRequest) returns (QueryEntityDocResponse){
-    option (google.api.http).get = "/ixo/entity/{entity_did}";
-  }
-
-  rpc EntityConfig(QueryEntityConfigRequest) returns (QueryEntityConfigResponse){
-    option (google.api.http).get = "/ixo/entity/config";
-  }
 }
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryEntityRequest { string id = 1; }
+
+message QueryEntityResponse {
+  Entity entity = 1 [ (gogoproto.nullable) = false ];
+  ixo.iid.v1beta1.IidDocument iidDocument = 2 [ (gogoproto.nullable) = false ];
+}
+
+message QueryEntityMetadataRequest { string id = 1; }
+
+message QueryEntityMetadataResponse {
+  Entity entity = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryEntityIidDocumentRequest { string id = 1; }
+
+message QueryEntityIidDocumentResponse {
+  ixo.iid.v1beta1.IidDocument iidDocument = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryEntityVerifiedRequest { string id = 1; }
+
+message QueryEntityVerifiedResponse { bool entity_verified = 1; }
 
 message QueryEntityListRequest {
-  string entity_type = 1 [(gogoproto.moretags) = "yaml:\"entity_type\""];
-  string entity_status = 2 [(gogoproto.moretags) = "yaml:\"entity_status\""];
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  // string type = 2;
+  // string status = 3;
 }
 
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
 message QueryEntityListResponse {
-  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
-}
-
-// QueryProjectDocRequest is the request type for the Query/ProjectDoc RPC method.
-message QueryEntityDocRequest {
-  string entity_did = 1 [(gogoproto.moretags) = "yaml:\"entity_did\""];
-}
-
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
-message QueryEntityDocResponse {
-  // ProjectDoc project_doc = 1 [(gogoproto.moretags) = "yaml:\"project_doc\""];
-}
-
-message QueryEntityConfigRequest {}
-
-// // QueryProjectDocResponse is the response type for the Query/ProjectDoc RPC method.
-message QueryEntityConfigResponse {
-  map<string, string> map = 1 [(gogoproto.moretags) = "yaml:\"config\""];
+  repeated Entity entities = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

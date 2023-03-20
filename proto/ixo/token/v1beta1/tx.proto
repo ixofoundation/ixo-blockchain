@@ -3,130 +3,147 @@ package ixo.token.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
-import "ixo/iid/v1beta1/tx.proto";
 import "ixo/token/v1beta1/token.proto";
 import "google/protobuf/timestamp.proto";
-
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
 
 // Msg defines the project Msg service.
 service Msg {
-
-   // CreateProject defines a method for creating a project.
-  rpc SetupMinter(MsgSetupMinter) returns (MsgSetupMinterResponse);
-
-  // rpc DelegateMintCapability() returns ();
-  
-  rpc MintToken(MsgMint) returns (MsgMintResponse);
-  
-  // Transfers an token and its nft to the recipient
+  rpc CreateToken(MsgCreateToken) returns (MsgCreateTokenResponse);
+  rpc MintToken(MsgMintToken) returns (MsgMintTokenResponse);
   rpc TransferToken(MsgTransferToken) returns (MsgTransferTokenResponse);
+  rpc RetireToken(MsgRetireToken) returns (MsgRetireTokenResponse);
+  rpc CancelToken(MsgCancelToken) returns (MsgCancelTokenResponse);
+  rpc PauseToken(MsgPauseToken) returns (MsgPauseTokenResponse);
+  rpc StopToken(MsgStopToken) returns (MsgStopTokenResponse);
 }
 
-// MsgCreateToken defines a message for creating a project.
-// message MsgSetupMinter {
-//   option (gogoproto.equal)            = false;
-//   option (gogoproto.goproto_getters)  = false;
+message MsgCreateToken {
+  // address of minter
+  string minter = 1;
+  // class is the token protocol entity DID (validated)
+  string class = 2
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  // name is the token name, which must be unique (namespace)
+  string name = 3;
+  // description is any arbitrary description
+  string description = 4;
+  // image is the image url for the token
+  string image = 5;
+  // type is the token type (eg ixo1155)
+  string token_type = 6;
+  // cap is the maximum number of tokens with this name that can be minted, 0 is
+  // unlimited
+  string cap = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+}
 
-//   // An Token Type as defined by the implementer
-//   string minterDid        = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""]; // Owner of the Token NFT | The ownersdid used to sign this transaction.
-//   string minterAddress    = 2 [(gogoproto.jsontag) = "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""]; // Owner of the Token NFT | The ownersdid used to sign this transaction.
-
-// }
-
-
-
-// MsgCreateProjectResponse defines the Msg/CreateProject response type.
 message MsgCreateTokenResponse {}
 
+message MsgMintToken {
+  // address of minter
+  string minter = 1;
+  string contract_address = 2;
+  // address of owner to mint for
+  string owner = 3;
+  repeated MintBatch mint_batch = 4;
+}
+
+message MintBatch {
+  option (gogoproto.equal) = true;
+
+  // name is the token name, which must be unique (namespace), will be verified
+  // against Token name provided on msgCreateToken
+  string name = 1;
+  // index is the unique identifier hexstring that identifies the token
+  string index = 2;
+  // amount is the number of tokens to mint
+  string amount = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
+  // did of collection (eg Supamoto Malawi)
+  string collection = 4;
+  // tokenData is the linkedResources added to tokenMetadata when queried eg
+  // (credential link ***.ipfs)
+  repeated TokenData token_data = 5;
+}
+
+message MsgMintTokenResponse {}
+
 message MsgTransferToken {
-  option (gogoproto.goproto_getters)  = false;
-  option (gogoproto.equal)      = false;
-
-  string tokenDid          = 1 [(gogoproto.jsontag) = "token_did", (gogoproto.moretags) = "yaml:\"token_did\""];
-  string ownerDid      = 2 [(gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
-  string ownerAddress  = 3 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
-  string recipientDid       = 4 [(gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
+  // address of owner
+  string owner = 1;
+  // address of receiver
+  string recipient = 2;
+  // all tokens must be in same smart contract
+  repeated TokenBatch tokens = 3;
 }
 
-// MsgUpdateProjectStatusResponse defines the Msg/UpdateTokenStatus response type.
-message MsgTransferTokenResponse{}
+message MsgTransferTokenResponse {}
 
-message Cw20Coin {
-  string address = 1[(gogoproto.jsontag) = "address", (gogoproto.moretags) = "yaml:\"address\""]; 
-  uint64 amount = 2[(gogoproto.jsontag) = "amount", (gogoproto.moretags) = "yaml:\"amount\""]; 
+message TokenBatch {
+  option (gogoproto.equal) = true;
+
+  // id that identifies the token
+  string id = 1;
+  // amount is the number of tokens to transfer
+  string amount = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = false
+  ];
 }
 
-message SetupCw20 {
-  string symbol = 1 [(gogoproto.jsontag) = "symbol", (gogoproto.moretags) = "yaml:\"symbol\""];
-  uint32 decimals = 2 [(gogoproto.jsontag) = "decimals", (gogoproto.moretags) = "yaml:\"decimals\""];
-  uint64 cap = 3 [(gogoproto.nullable) = true, (gogoproto.jsontag) = "cap", (gogoproto.moretags) = "yaml:\"cap\""];
-  repeated Cw20Coin instialBalances = 4 [(gogoproto.nullable) = true, (gogoproto.jsontag) = "instial_balances", (gogoproto.moretags) = "yaml:\"instial_balances\""];
+message MsgRetireToken {
+  // address of owner
+  string owner = 1;
+  // tokens to retire, all tokens must be in same smart contract
+  repeated TokenBatch tokens = 2;
+  // jurisdiction is the jurisdiction of the token owner. A jurisdiction has
+  // the format: <country-code>[-<sub-national-code>[ <postal-code>]]
+  // The country-code must be 2 alphabetic characters, the sub-national-code
+  // can be 1-3 alphanumeric characters, and the postal-code can be up to 64
+  // alphanumeric characters. Only the country-code is required, while the
+  // sub-national-code and postal-code are optional and can be added for
+  // increased precision. See the valid format for this below.
+  string jurisdiction = 3;
+  // reason is any arbitrary string that specifies the reason for retiring
+  // tokens.
+  string reason = 4;
 }
 
-message SetupCw721 {
-  string symbol = 1 [(gogoproto.jsontag) = "symbol", (gogoproto.moretags) = "yaml:\"symbol\""];
+message MsgRetireTokenResponse {}
+
+message MsgCancelToken {
+  // address of owner
+  string owner = 1;
+  // tokens to retire, all tokens must be in same smart contract
+  repeated TokenBatch tokens = 2;
+  // reason is any arbitrary string that specifies the reason for retiring
+  // tokens.
+  string reason = 3;
 }
 
-message SetupCw1155 {}
+message MsgCancelTokenResponse {}
 
-
-message MsgSetupMinter {
-  option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
-
-  string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-  string minterAddress = 2 [(gogoproto.jsontag) = "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""];
-  string name = 4 [(gogoproto.jsontag) = "name", (gogoproto.moretags) = "yaml:\"name\""];
-  string description = 5 [(gogoproto.jsontag) = "description", (gogoproto.moretags) = "yaml:\"description\""];
-  oneof contract_info {
-    SetupCw20 cw20 = 6 [(gogoproto.jsontag) = "cw20", (gogoproto.moretags) = "yaml:\"cw20\""];
-    SetupCw721 cw721 = 7 [(gogoproto.jsontag) = "cw721", (gogoproto.moretags) = "yaml:\"cw721\""];
-    SetupCw1155 cw1155 = 8 [(gogoproto.jsontag) = "cw1155", (gogoproto.moretags) = "yaml:\"cw1155\""];
-  }
-}
-message MsgSetupMinterResponse {}
-
-
-message MintCw20 {
-  uint64 amount = 1;
+message MsgPauseToken {
+  // address of minter
+  string minter = 1;
+  string contract_address = 2;
+  // pause or unpause Token Minting allowance
+  bool paused = 3;
 }
 
-message MintCw721 {
-  string id = 1; //An IID that identifies the asset that this token represents
-  oneof token_uri {
-    string image = 2; //A URI pointing to a resource with media type image/* representing the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.
-    string uri = 3; //Uri
-  }
-  bytes properties = 4 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""]; //"Arbitrary properties. Values may be strings, numbers, object or arrays."];
+message MsgPauseTokenResponse {}
+
+message MsgStopToken {
+  // address of minter
+  string minter = 1;
+  string contract_address = 2;
 }
 
-message MintCw1155 {
-  string id = 1; //An IID that identifies the asset that this token represents
-  oneof token_uri {
-    string image = 2; //A URI pointing to a resource with media type image/* representing the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.
-    string uri = 3; //Uri
-  }
-  uint64 value = 4;
-}
-
-message MsgMint {
-  option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
-
-  
-
-  string minterDid = 1 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-  string minterAddress = 2 [(gogoproto.jsontag) = "minter_address", (gogoproto.moretags) = "yaml:\"minter_address\""];
-  string contractAddress = 3 [(gogoproto.jsontag) = "contract_address", (gogoproto.moretags) = "yaml:\"contract_address\""];
-  string ownerDid = 4 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "minter_did", (gogoproto.moretags) = "yaml:\"minter_did\""];
-
-  oneof mint_contract {
-    MintCw20 cw20 = 5 [(gogoproto.jsontag) = "cw20", (gogoproto.moretags) = "yaml:\"cw20\""];
-    MintCw721 cw721 = 6 [(gogoproto.jsontag) = "cw721", (gogoproto.moretags) = "yaml:\"cw721\""];
-    MintCw1155 cw1155 = 7 [(gogoproto.jsontag) = "cw1155", (gogoproto.moretags) = "yaml:\"cw1155\""];
-  }
-}
-
-message MsgMintResponse {}
+message MsgStopTokenResponse {}

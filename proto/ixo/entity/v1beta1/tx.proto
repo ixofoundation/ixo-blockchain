@@ -4,98 +4,175 @@ package ixo.entity.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/tx.proto";
+import "ixo/iid/v1beta1/types.proto";
 import "ixo/entity/v1beta1/entity.proto";
+import "ixo/entity/v1beta1/cosmos.proto";
 import "google/protobuf/timestamp.proto";
-
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
 
 // Msg defines the project Msg service.
 service Msg {
-
-   // CreateProject defines a method for creating a project.
+  // CreateEntity defines a method for creating a entity.
   rpc CreateEntity(MsgCreateEntity) returns (MsgCreateEntityResponse);
 
-  // UpdateEntityStatus defines a method for updating a entity's current status.
+  // UpdateEntity defines a method for updating a entity
   rpc UpdateEntity(MsgUpdateEntity) returns (MsgUpdateEntityResponse);
-  
+
+  // UpdateEntityVerified defines a method for updating if an entity is verified
+  rpc UpdateEntityVerified(MsgUpdateEntityVerified)
+      returns (MsgUpdateEntityVerifiedResponse);
+
   // Transfers an entity and its nft to the recipient
   rpc TransferEntity(MsgTransferEntity) returns (MsgTransferEntityResponse);
+
+  // Create a module account for an entity,
+  rpc CreateEntityAccount(MsgCreateEntityAccount)
+      returns (MsgCreateEntityAccountResponse);
+
+  // Create a authz grant from entity account
+  rpc GrantEntityAccountAuthz(MsgGrantEntityAccountAuthz)
+      returns (MsgGrantEntityAccountAuthzResponse);
 }
 
-// MsgCreateEntity defines a message for creating a project.
 message MsgCreateEntity {
-  option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
-
   // An Entity Type as defined by the implementer
-  string entityType       = 1 [(gogoproto.jsontag) = "entity_type", (gogoproto.moretags) = "yaml:\"entity_type\""];
-  // Status of the Entity as defined by the implementer and interpreted by Client applications
-  int32 entityStatus        = 2 [(gogoproto.jsontag) = "entity_status", (gogoproto.moretags) = "yaml:\"entity_status\""];
+  string entity_type = 1;
+  // Status of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  int32 entity_status = 2;
   // the list of controller DIDs
-  repeated string controller   = 3 [(gogoproto.jsontag) = "controller", (gogoproto.moretags) = "yaml:\"controller\""]; 
-  repeated ixo.iid.v1beta1.Context context        = 4 [(gogoproto.jsontag) = "context", (gogoproto.moretags) = "yaml:\"context\""]; // JSON-LD contexts
-  repeated ixo.iid.v1beta1.Verification verification = 5 [(gogoproto.jsontag) = "verification", (gogoproto.moretags) = "yaml:\"verification\""]; // Verification Methods and Verification Relationships
-  repeated ixo.iid.v1beta1.Service service      = 6 [(gogoproto.jsontag) = "service", (gogoproto.moretags) = "yaml:\"service\""]; // Service endpoints
-  repeated ixo.iid.v1beta1.AccordedRight accordedRight = 7 [(gogoproto.jsontag) = "accorded_right", (gogoproto.moretags) = "yaml:\"accorded_right\""]; // Legal or Electronic Rights and associated Object Capabilities
-  repeated ixo.iid.v1beta1.LinkedResource linkedResource = 8 [(gogoproto.jsontag) = "linked_resource", (gogoproto.moretags) = "yaml:\"linked_resource\""]; // Digital resources associated with the Subject
-  repeated ixo.iid.v1beta1.LinkedEntity linkedEntity = 9 [(gogoproto.jsontag) = "linked_entity", (gogoproto.moretags) = "yaml:\"linked_entity\""]; // DID of a linked Entity and its relationship with the Subject
-  bool deactivated = 10 [(gogoproto.jsontag) = "deactivated", (gogoproto.moretags) = "yaml:\"deactivated\""]; // Operational status of the Entity
-  // Start Date of the Entity as defined by the implementer and interpreted by Client applications
-  google.protobuf.Timestamp startDate = 11 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "start_date", (gogoproto.moretags) = "yaml:\"start_date\""]; // address of the account signing the message
-  // End Date of the Entity as defined by the implementer and interpreted by Client applications
-  google.protobuf.Timestamp endDate = 12 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "end_date", (gogoproto.moretags) = "yaml:\"end_date\""]; // address of the account signing the message
-  string stage = 13; // State of the Entity as defined by the implementer and interpreted by Client applications
-  // DID of the operator through which the Entity was created
-  string relayerNode = 14 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
-  // Public proof that the Entity is verified
-  string verificationStatus = 15 [(gogoproto.jsontag) = "verification_status", (gogoproto.moretags) = "yaml:\"verification_status\""];
-  // Content ID or Hash of public Verifiable Credentials associated with the  subject
-  repeated string verifiableCredential = 16 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
-  string   ownerDid        = 17 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
-  string   ownerAddress        = 18 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid address used to sign this transaction.
-  bytes data         = 19 [(gogoproto.casttype) = "encoding/json.RawMessage", (gogoproto.moretags) = "yaml:\"data\""]; // Extention data
+  repeated string controller = 3;
+  repeated ixo.iid.v1beta1.Context context = 4; // JSON-LD contexts
+  repeated ixo.iid.v1beta1.Verification verification =
+      5; // Verification Methods and Verification Relationships
+  repeated ixo.iid.v1beta1.Service service = 6; // Service endpoints
+  repeated ixo.iid.v1beta1.AccordedRight accorded_right =
+      7; // Legal or Electronic Rights and associated Object Capabilities
+  repeated ixo.iid.v1beta1.LinkedResource linked_resource =
+      8; // Digital resources associated with the Subject
+  repeated ixo.iid.v1beta1.LinkedEntity linked_entity =
+      9; // DID of a linked Entity and its relationship with the Subject
+  // Start Date of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  google.protobuf.Timestamp start_date = 10 [ (gogoproto.stdtime) = true ];
+  // End Date of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  google.protobuf.Timestamp end_date = 11 [ (gogoproto.stdtime) = true ];
+  // Address of the operator through which the Entity was created
+  string relayer_node = 12;
+  // Content ID or Hash of public Verifiable Credentials associated with the
+  // subject
+  repeated string credentials = 13;
+  string owner_did = 14 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment"
+  ]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
+  string owner_address =
+      15; // The ownersdid address used to sign this transaction.
+  bytes data = 16
+      [ (gogoproto.casttype) = "encoding/json.RawMessage" ]; // Extention data
+  string alsoKnownAs = 17;
+  repeated ixo.iid.v1beta1.LinkedClaim linked_claim =
+      18; // Digital claims associated with the Subject
 }
 
-// MsgCreateProjectResponse defines the Msg/CreateProject response type.
 message MsgCreateEntityResponse {
-  string entityId = 1 [(gogoproto.jsontag) = "entity_id", (gogoproto.moretags) = "yaml:\"entity_id\""];
-  string entityType       = 2 [(gogoproto.jsontag) = "entity_type", (gogoproto.moretags) = "yaml:\"entity_type\""];
-  int32 entityStatus        = 3 [(gogoproto.jsontag) = "entity_status", (gogoproto.moretags) = "yaml:\"entity_status\""];
+  string entity_id = 1;
+  string entity_type = 2;
+  int32 entity_status = 3;
 }
 
-// MsgUpdateEntityStatus defines a message for updating a entity's current status.
+// Updates the entity with all the fields, so if field empty will be updated
+// with default go type, aka never null
 message MsgUpdateEntity {
-  option (gogoproto.equal)            = false;
-  option (gogoproto.goproto_getters)  = false;
-  // The status of the entity. Should represent an enum in the client.
-  int32 status = 1;
-  bool deactivated = 2 [(gogoproto.jsontag) = "deactivated", (gogoproto.moretags) = "yaml:\"deactivated\""]; // Whether this entity is enabled ot not, basically a soft delete.
-  // refer to iid module for more information
-  google.protobuf.Timestamp startDate = 3 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "start_date", (gogoproto.moretags) = "yaml:\"start_date\""]; // address of the account signing the message
-  // refer to iid module for more information
-  google.protobuf.Timestamp endDate = 4 [(gogoproto.stdtime) = true, (gogoproto.jsontag) = "end_date", (gogoproto.moretags) = "yaml:\"end_date\""]; // address of the account signing the message
-  string stage = 5; // refer to iid module meta data for more information
-  // refer to iid module for more information
-  string relayerNode = 6 [(gogoproto.jsontag) = "relayer_node", (gogoproto.moretags) = "yaml:\"relayer_node\""];
-  // refer to iid module for more information
-  string verifiableCredential = 7 [(gogoproto.jsontag) = "verifiable_credential", (gogoproto.moretags) = "yaml:\"verifiable_credential\""];
-  string   controllerDid        = 8 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "controller_did", (gogoproto.moretags) = "yaml:\"controller_did\""]; // The ownersdid used to sign this transaction.
-  string   controllerAddress        = 9 [(gogoproto.jsontag) = "controller_address", (gogoproto.moretags) = "yaml:\"controller_address\""]; // The ownersdid used to sign this transaction.
+  // Id of entity to be updated
+  string id = 1;
+  // Status of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  int32 entity_status = 2;
+  // Start Date of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  google.protobuf.Timestamp start_date = 3 [ (gogoproto.stdtime) = true ];
+  // End Date of the Entity as defined by the implementer and interpreted by
+  // Client applications
+  google.protobuf.Timestamp end_date = 4 [ (gogoproto.stdtime) = true ];
+  // Content ID or Hash of public Verifiable Credentials associated with the
+  // subject
+  repeated string credentials = 5;
+  string controller_did = 6 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment"
+  ]; // The controllerDid used to sign this transaction.
+  string controller_address =
+      7; // The controllerAddress used to sign this transaction.
 }
 
-// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
-message MsgUpdateEntityResponse{}
+message MsgUpdateEntityResponse {}
+
+// Only relayer nodes can update entity field 'entityVerified'
+message MsgUpdateEntityVerified {
+  // Id of entity to be updated
+  string id = 1;
+  // Whether entity is verified or not based on credentials
+  bool entity_verified = 2;
+  string relayer_node_did = 3 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment"
+  ]; // The relayer node's did used to sign this transaction.
+  string relayer_node_address =
+      4; // The relayer node's address used to sign this transaction.
+}
+
+message MsgUpdateEntityVerifiedResponse {}
 
 message MsgTransferEntity {
-  option (gogoproto.goproto_getters)  = false;
-  option (gogoproto.equal)      = false;
-
-  string entityDid          = 1 [(gogoproto.jsontag) = "entity_did", (gogoproto.moretags) = "yaml:\"entity_did\""];
-  string ownerDid      = 2 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "owner_did", (gogoproto.moretags) = "yaml:\"owner_did\""]; // The ownersdid used to sign this transaction.
-  string ownerAddress  = 3 [(gogoproto.jsontag) = "owner_address", (gogoproto.moretags) = "yaml:\"owner_address\""]; // The ownersdid used to sign this transaction.
-  string recipientDid       = 4 [(gogoproto.casttype) = "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment", (gogoproto.jsontag) = "recipient_did", (gogoproto.moretags) = "yaml:\"recipient_did\""];
+  string id = 1;
+  // The owner_did used to sign this transaction.
+  string owner_did = 2
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  // The owner_address used to sign this transaction.
+  string owner_address = 3;
+  string recipient_did = 4
+      [ (gogoproto.casttype) =
+            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
 }
 
-// MsgUpdateProjectStatusResponse defines the Msg/UpdateEntityStatus response type.
-message MsgTransferEntityResponse{}
+message MsgTransferEntityResponse {}
+
+// create a module account for an entity, account details will be added as a
+// linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+message MsgCreateEntityAccount {
+  // entity id (did) to create account for
+  string id = 1;
+  // name of account
+  string name = 2;
+  // The owner_address used to sign this transaction.
+  string owner_address = 3;
+}
+
+message MsgCreateEntityAccountResponse {
+  // account address that was created for specific entity and account name
+  string account = 1;
+}
+
+// Create a authz grant from entity account (as grantor) to recipient in msg as
+// grantee for the specific authorization
+message MsgGrantEntityAccountAuthz {
+  // entity id (did) to create account for
+  string id = 1;
+  // name of account
+  string name = 2;
+  // the grantee address that will be able to execute the authz authorization
+  string grantee_address = 3;
+  // grant to be Authorized in authz grant
+  Grant grant = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/authz.Grant"
+  ];
+  // the owner_address used to sign this transaction.
+  string owner_address = 5;
+}
+
+message MsgGrantEntityAccountAuthzResponse {}

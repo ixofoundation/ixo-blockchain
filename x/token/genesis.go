@@ -8,12 +8,14 @@ import (
 )
 
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abci.ValidatorUpdate {
-	//save did docs to the store
-	// for i, iid := range gs.IidDocs {
-	// 	k.SetDidDocument(ctx, []byte(iid.Id), iid)
-	// 	metadata := gs.IidMeta[i]
-	// 	k.SetDidMetadata(ctx, []byte(iid.Id), metadata)
-	// }
+	// save tokens to the store
+	for _, t := range gs.Tokens {
+		k.SetToken(ctx, t)
+	}
+	// save token properties to the store
+	for _, tp := range gs.TokenProperties {
+		k.SetTokenProperties(ctx, tp)
+	}
 
 	// Initialise params
 	k.SetParams(ctx, &gs.Params)
@@ -22,16 +24,15 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, gs *types.GenesisState) []abc
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	// dds := k.(ctx)
-	// var metas []types.IidMetadata
-	// for _, iid := range dds {
-	// 	meta, _ := k.GetDidMetadata(ctx, []byte(iid.Id))
-	// 	metas = append(metas, meta)
-	// }
+	tokens := k.GetTokens(ctx)
+
+	tokenProperties := k.GetTokenPropertiesAll(ctx)
 
 	params := k.GetParams(ctx)
 
 	return &types.GenesisState{
-		Params: params,
+		Params:          params,
+		Tokens:          tokens,
+		TokenProperties: tokenProperties,
 	}
 }

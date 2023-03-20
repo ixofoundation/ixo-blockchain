@@ -1,0 +1,53 @@
+syntax = "proto3";
+package ixo.entity.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
+
+import "gogoproto/gogo.proto";
+import "ixo/entity/v1beta1/entity.proto";
+import "ixo/entity/v1beta1/cosmos.proto";
+
+// EntityCreatedEvent is an event triggered on a Entity creation
+message EntityCreatedEvent {
+  Entity entity = 1;
+  string signer = 2;
+}
+
+// EntityUpdatedEvent is an event triggered on a entity document update
+message EntityUpdatedEvent {
+  Entity entity = 1;
+  string signer = 2;
+}
+
+// EntityVerifiedUpdatedEvent is an event triggered on a entity verified
+// document update
+message EntityVerifiedUpdatedEvent {
+  string id = 1;
+  string signer = 2;
+  bool entity_verified = 3;
+}
+
+// EntityTransferredEvent is an event triggered on a entity transfer
+message EntityTransferredEvent {
+  string id = 1;
+  string from = 2;
+  string to = 3;
+}
+
+// EntityAccountCreatedEvent is an event triggered on a entity account creation
+message EntityAccountCreatedEvent {
+  string id = 1;
+  string signer = 2;
+  string account_name = 3;
+  string account_address = 4;
+}
+
+// EntityAccountCreatedEvent is an event triggered on a entity account creation
+message EntityAccountAuthzCreatedEvent {
+  string id = 1;
+  string signer = 2;
+  string account_name = 3;
+  string granter = 4;
+  string grantee = 5;
+  Grant grant = 6;
+}
