@@ -10,7 +10,7 @@ The ixo Blockchain is a Layer 1 blockchain that runs on both Testnet and Mainnet
 
 Have a look at [go.mod](https://github.com/ixofoundation/ixo-blockchain/blob/main/go.mod) for specific dependencies and their most recent versions.
 
-The ixo Blockchain powers client applications that aim to have a global positive impact. The [Impact Wallet](https://github.com/ixofoundation/ixo-Mobile-dev), [JAMBO](https://github.com/ixofoundation/ixo-jambo-client), and [Launchpad](https://github.com/ixofoundation/ixo-webclient) are examples of the client applications that use the ixo Blockchain to enable social impact projects around the world. The [Impact SDK](https://www.npmjs.com/package/@ixo/impactxclient-sdk) makes it simple to interact with the ixo Blockchain.
+The ixo Blockchain powers client applications that aim to have a global positive impact. The [Impact Wallet](https://github.com/ixofoundation/ixo-Mobile-dev), [JAMBO](https://github.com/ixofoundation/jambo), and [Launchpad](https://github.com/ixofoundation/ixo-webclient) are examples of client applications that use the ixo Blockchain to enable social impact projects around the world. The [Impact SDK](https://www.npmjs.com/package/@ixo/impactxclient-sdk) makes it simple to interact with the ixo Blockchain.
 
 ## How to contribute
 If you are interested in contributing to the ixo Blockchain, you can start by reviewing the documentation on our [website](https://docs.ixo.foundation/ixo/developers/getting-started). There are many opportunities to get involved, such as contributing code or participating in community discussions.
