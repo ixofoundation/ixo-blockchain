@@ -13,7 +13,7 @@ Have a look at [go.mod](https://github.com/ixofoundation/ixo-blockchain/blob/mai
 The ixo Blockchain powers client applications that aim to have a global positive impact. The [Impact Wallet](https://github.com/ixofoundation/ixo-Mobile-dev), [JAMBO](https://github.com/ixofoundation/jambo), and [Launchpad](https://github.com/ixofoundation/ixo-webclient) are examples of client applications that use the ixo Blockchain to enable social impact projects around the world. The [Impact SDK](https://www.npmjs.com/package/@ixo/impactxclient-sdk) makes it simple to interact with the ixo Blockchain.
 
 ## How to contribute
-If you are interested in contributing to the ixo Blockchain, you can start by reviewing the documentation on our [website](https://docs.ixo.foundation/ixo/developers/getting-started). There are many opportunities to get involved, such as contributing code or participating in community discussions.
+If you are interested in contributing to the ixo Blockchain, you can start by reviewing the documentation on our [website](https://docs.ixo.foundation/ixo/developers). There are many opportunities to get involved, such as contributing code or participating in community discussions.
 
 Our community is passionate about using blockchain technology to create a positive impact on the world. We believe in the power of collaboration and innovation to drive change, and we welcome anyone who shares our vision to join us on Discord or Telegram.
 
