@@ -5,11 +5,7 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	ibcante "github.com/cosmos/ibc-go/v4/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	entityante "github.com/ixofoundation/ixo-blockchain/x/entity/ante"
@@ -20,16 +16,13 @@ import (
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 type HandlerOptions struct {
-	AccountKeeper     authante.AccountKeeper
-	BankKeeper        bankkeeper.Keeper
-	FeegrantKeeper    authante.FeegrantKeeper
+	authante.HandlerOptions
+
 	IidKeeper         iidkeeper.Keeper
 	EntityKeeper      entitykeeper.Keeper
-	wasmConfig        *wasmtypes.WasmConfig
+	WasmConfig        *wasmtypes.WasmConfig
 	IBCKeeper         *ibckeeper.Keeper
-	txCounterStoreKey sdk.StoreKey
-	SignModeHandler   authsigning.SignModeHandler
-	SigGasConsumer    func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
+	TxCounterStoreKey sdk.StoreKey
 }
 
 // IxoAnteHandler returns an AnteHandler that checks and increments sequence
@@ -37,15 +30,19 @@ type HandlerOptions struct {
 // signer.
 func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	if options.AccountKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for ante builder")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for AnteHandler")
 	}
-
 	if options.BankKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for AnteHandler")
 	}
-
 	if options.SignModeHandler == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
+	}
+	if options.WasmConfig == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "wasm config is required for ante builder")
+	}
+	if options.TxCounterStoreKey == nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "tx counter key is required for ante builder")
 	}
 
 	var sigGasConsumer = options.SigGasConsumer
@@ -57,8 +54,8 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		// outermost AnteDecorator. SetUpContext must be called first
 		authante.NewSetUpContextDecorator(),
 		// wasm ante handlers after setup context to enforce limits early
-		wasmkeeper.NewLimitSimulationGasDecorator(options.wasmConfig.SimulationGasLimit),
-		wasmkeeper.NewCountTXDecorator(options.txCounterStoreKey),
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
+		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
 		authante.NewRejectExtensionOptionsDecorator(),
 		authante.NewMempoolFeeDecorator(),
 		authante.NewValidateBasicDecorator(),

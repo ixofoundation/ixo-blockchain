@@ -26,6 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -134,6 +135,7 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
 
@@ -451,9 +453,26 @@ func NewIxoApp(
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
 
+	// Stargate Queries
+	accepted := wasmkeeper.AcceptedStargateQueries{
+		// token module
+		"/ixo.token.v1beta1.Query/Params":        &tokentypes.QueryParamsResponse{},
+		"/ixo.token.v1beta1.Query/TokenMetadata": &tokentypes.QueryTokenMetadataResponse{},
+		"/ixo.token.v1beta1.Query/TokenList":     &tokentypes.QueryTokenListResponse{},
+		"/ixo.token.v1beta1.Query/TokenDoc":      &tokentypes.QueryTokenDocResponse{},
+	}
+
+	querierOpts := wasmkeeper.WithQueryPlugins(
+		&wasmkeeper.QueryPlugins{
+			Stargate: wasmkeeper.AcceptListStargateQuerier(accepted, app.GRPCQueryRouter(), appCodec),
+		})
+	wasmOpts = append(wasmOpts, querierOpts)
+
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
-	supportedFeatures := "iterator,staking,stargate,cosmwasm_1_1"
+	// See https://github.com/CosmWasm/cosmwasm/blob/main/docs/CAPABILITIES-BUILT-IN.md
+	// !NOTE add cosmwasm_1_3 once updated to cosmwasm vm 1.3.0
+	supportedFeatures := "iterator,staking,stargate,cosmwasm_1_1,cosmwasm_1_2"
 	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -661,17 +680,18 @@ func NewIxoApp(
 
 	// initialize BaseApp
 	ixoAnteHandler, err := IxoAnteHandler(HandlerOptions{
-		AccountKeeper:     app.AccountKeeper,
-		BankKeeper:        app.BankKeeper,
-		FeegrantKeeper:    app.FeeGrantKeeper,
+		HandlerOptions: ante.HandlerOptions{
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:  ixo.IxoSigVerificationGasConsumer,
+		},
 		IidKeeper:         app.IidKeeper,
 		EntityKeeper:      app.EntityKeeper,
-		wasmConfig:        &wasmConfig,
+		WasmConfig:        &wasmConfig,
 		IBCKeeper:         app.IBCKeeper,
-		txCounterStoreKey: keys[wasm.StoreKey],
-
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  ixo.IxoSigVerificationGasConsumer,
+		TxCounterStoreKey: keys[wasm.StoreKey],
 	})
 	if err != nil {
 		panic(err)
@@ -682,6 +702,9 @@ func NewIxoApp(
 	app.SetAnteHandler(ixoAnteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
+	// must be before Loading version
+	// requires the snapshot store to be created and registered as a BaseAppOption
+	// see cmd/wasmd/root.go: 206 - 214 approx
 	if manager := app.SnapshotManager(); manager != nil {
 		err = manager.RegisterExtensions(
 			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
@@ -694,6 +717,12 @@ func NewIxoApp(
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
+		}
+
+		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
+		// Initialize pinned codes in wasmvm as they are not persisted there
+		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
+			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
 	}
 

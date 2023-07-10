@@ -13,15 +13,15 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/ixo/token/params";
   }
+  rpc TokenMetadata(QueryTokenMetadataRequest)
+      returns (QueryTokenMetadataResponse) {
+    option (google.api.http).get = "/ixo/token/metadata/{id}";
+  }
   rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse) {
     option (google.api.http).get = "/ixo/token/{minter}";
   }
   rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse) {
     option (google.api.http).get = "/ixo/token/{minter}/{contract_address}";
-  }
-  rpc TokenMetadata(QueryTokenMetadataRequest)
-      returns (QueryTokenMetadataResponse) {
-    option (google.api.http).get = "/ixo/token/metadata/{id}";
   }
 }
 

@@ -82,7 +82,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 			}
 			oracleFeePercentage := types.OneHundred.Sub(nodeFeePercentage).Sub(ixoFeePercentage)
 
-			// Get ixo netowrk address
+			// Get ixo network address
 			ixoAddress, err := sdk.AccAddressFromBech32(params.IxoAccount)
 			if err != nil {
 				return err
