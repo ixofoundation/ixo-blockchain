@@ -18,10 +18,11 @@ service Query {
     option (google.api.http).get = "/ixo/token/metadata/{id}";
   }
   rpc TokenList(QueryTokenListRequest) returns (QueryTokenListResponse) {
-    option (google.api.http).get = "/ixo/token/{minter}";
+    option (google.api.http).get = "/ixo/token/minter/{minter}";
   }
   rpc TokenDoc(QueryTokenDocRequest) returns (QueryTokenDocResponse) {
-    option (google.api.http).get = "/ixo/token/{minter}/{contract_address}";
+    option (google.api.http).get =
+        "/ixo/token/minter/{minter}/{contract_address}";
   }
 }
 

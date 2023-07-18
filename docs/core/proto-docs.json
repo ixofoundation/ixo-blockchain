@@ -11060,7 +11060,7 @@
             },
             {
               "name": "name",
-              "description": "index is the unique identifier hexstring that identifies the token",
+              "description": "name is the token name, which is same as Token name",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -12880,6 +12880,28 @@
               }
             },
             {
+              "name": "TokenMetadata",
+              "description": "",
+              "requestType": "QueryTokenMetadataRequest",
+              "requestLongType": "QueryTokenMetadataRequest",
+              "requestFullType": "ixo.token.v1beta1.QueryTokenMetadataRequest",
+              "requestStreaming": false,
+              "responseType": "QueryTokenMetadataResponse",
+              "responseLongType": "QueryTokenMetadataResponse",
+              "responseFullType": "ixo.token.v1beta1.QueryTokenMetadataResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/token/metadata/{id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "TokenList",
               "description": "",
               "requestType": "QueryTokenListRequest",
@@ -12895,7 +12917,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/{minter}"
+                      "pattern": "/ixo/token/minter/{minter}"
                     }
                   ]
                 }
@@ -12917,29 +12939,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/{minter}/{contract_address}"
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "TokenMetadata",
-              "description": "",
-              "requestType": "QueryTokenMetadataRequest",
-              "requestLongType": "QueryTokenMetadataRequest",
-              "requestFullType": "ixo.token.v1beta1.QueryTokenMetadataRequest",
-              "requestStreaming": false,
-              "responseType": "QueryTokenMetadataResponse",
-              "responseLongType": "QueryTokenMetadataResponse",
-              "responseFullType": "ixo.token.v1beta1.QueryTokenMetadataResponse",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "GET",
-                      "pattern": "/ixo/token/metadata/{id}"
+                      "pattern": "/ixo/token/minter/{minter}/{contract_address}"
                     }
                   ]
                 }

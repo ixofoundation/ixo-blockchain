@@ -10205,7 +10205,7 @@ credential link ***.ipfs </p></td>
                   <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>index is the unique identifier hexstring that identifies the token </p></td>
+                  <td><p>name is the token name, which is same as Token name </p></td>
                 </tr>
               
                 <tr>
@@ -11644,6 +11644,13 @@ tokens. </p></td>
               </tr>
             
               <tr>
+                <td>TokenMetadata</td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenMetadataRequest">QueryTokenMetadataRequest</a></td>
+                <td><a href="#ixo.token.v1beta1.QueryTokenMetadataResponse">QueryTokenMetadataResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
                 <td>TokenList</td>
                 <td><a href="#ixo.token.v1beta1.QueryTokenListRequest">QueryTokenListRequest</a></td>
                 <td><a href="#ixo.token.v1beta1.QueryTokenListResponse">QueryTokenListResponse</a></td>
@@ -11654,13 +11661,6 @@ tokens. </p></td>
                 <td>TokenDoc</td>
                 <td><a href="#ixo.token.v1beta1.QueryTokenDocRequest">QueryTokenDocRequest</a></td>
                 <td><a href="#ixo.token.v1beta1.QueryTokenDocResponse">QueryTokenDocResponse</a></td>
-                <td><p></p></td>
-              </tr>
-            
-              <tr>
-                <td>TokenMetadata</td>
-                <td><a href="#ixo.token.v1beta1.QueryTokenMetadataRequest">QueryTokenMetadataRequest</a></td>
-                <td><a href="#ixo.token.v1beta1.QueryTokenMetadataResponse">QueryTokenMetadataResponse</a></td>
                 <td><p></p></td>
               </tr>
             
@@ -11695,9 +11695,19 @@ tokens. </p></td>
               
               
               <tr>
+                <td>TokenMetadata</td>
+                <td>GET</td>
+                <td>/ixo/token/metadata/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
                 <td>TokenList</td>
                 <td>GET</td>
-                <td>/ixo/token/{minter}</td>
+                <td>/ixo/token/minter/{minter}</td>
                 <td></td>
               </tr>
               
@@ -11707,17 +11717,7 @@ tokens. </p></td>
               <tr>
                 <td>TokenDoc</td>
                 <td>GET</td>
-                <td>/ixo/token/{minter}/{contract_address}</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>TokenMetadata</td>
-                <td>GET</td>
-                <td>/ixo/token/metadata/{id}</td>
+                <td>/ixo/token/minter/{minter}/{contract_address}</td>
                 <td></td>
               </tr>
               

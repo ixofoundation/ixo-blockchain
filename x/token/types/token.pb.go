@@ -344,7 +344,7 @@ type TokenProperties struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// index is the unique identifier hexstring that identifies the token
 	Index string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
-	// index is the unique identifier hexstring that identifies the token
+	// name is the token name, which is same as Token name
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// did of collection (eg Supamoto Malawi)
 	Collection string `protobuf:"bytes,4,opt,name=collection,proto3" json:"collection,omitempty"`

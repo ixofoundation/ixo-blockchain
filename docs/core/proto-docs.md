@@ -4267,7 +4267,7 @@ credential link ***.ipfs |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  |  |
 | index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
-| name | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| name | [string](#string) |  | name is the token name, which is same as Token name |
 | collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
 | tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
 
@@ -5009,9 +5009,9 @@ Query defines the gRPC querier service.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Params | [QueryParamsRequest](#ixo.token.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.token.v1beta1.QueryParamsResponse) |  |
+| TokenMetadata | [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest) | [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse) |  |
 | TokenList | [QueryTokenListRequest](#ixo.token.v1beta1.QueryTokenListRequest) | [QueryTokenListResponse](#ixo.token.v1beta1.QueryTokenListResponse) |  |
 | TokenDoc | [QueryTokenDocRequest](#ixo.token.v1beta1.QueryTokenDocRequest) | [QueryTokenDocResponse](#ixo.token.v1beta1.QueryTokenDocResponse) |  |
-| TokenMetadata | [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest) | [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse) |  |
 
  
 
