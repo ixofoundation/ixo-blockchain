@@ -130,6 +130,7 @@ import (
 	// Local
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 	"github.com/ixofoundation/ixo-blockchain/lib/ixo"
+	wasmbinding "github.com/ixofoundation/ixo-blockchain/wasmbinding"
 	"github.com/ixofoundation/ixo-blockchain/x/bonds"
 	bondskeeper "github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
@@ -495,20 +496,7 @@ func NewIxoApp(
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
 
-	// Stargate Queries
-	accepted := wasmkeeper.AcceptedStargateQueries{
-		// token module
-		"/ixo.token.v1beta1.Query/Params":        &tokentypes.QueryParamsResponse{},
-		"/ixo.token.v1beta1.Query/TokenMetadata": &tokentypes.QueryTokenMetadataResponse{},
-		"/ixo.token.v1beta1.Query/TokenList":     &tokentypes.QueryTokenListResponse{},
-		"/ixo.token.v1beta1.Query/TokenDoc":      &tokentypes.QueryTokenDocResponse{},
-	}
-
-	querierOpts := wasmkeeper.WithQueryPlugins(
-		&wasmkeeper.QueryPlugins{
-			Stargate: wasmkeeper.AcceptListStargateQuerier(accepted, app.GRPCQueryRouter(), appCodec),
-		})
-	wasmOpts = append(wasmOpts, querierOpts)
+	wasmOpts = append(wasmbinding.RegisterStargateQueries(*bApp.GRPCQueryRouter(), appCodec), wasmOpts...)
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
