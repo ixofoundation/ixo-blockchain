@@ -20,7 +20,7 @@ type HandlerOptions struct {
 
 	IidKeeper         iidkeeper.Keeper
 	EntityKeeper      entitykeeper.Keeper
-	WasmConfig        *wasmtypes.WasmConfig
+	WasmConfig        wasmtypes.WasmConfig
 	IBCKeeper         *ibckeeper.Keeper
 	TxCounterStoreKey sdk.StoreKey
 }
@@ -37,9 +37,6 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 	if options.SignModeHandler == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
-	}
-	if options.WasmConfig == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "wasm config is required for ante builder")
 	}
 	if options.TxCounterStoreKey == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "tx counter key is required for ante builder")
@@ -76,4 +73,13 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
+}
+
+// NewIxoAnteHandler returns a new sdk.AnteHandler or panics if fail to create.
+func NewIxoAnteHandler(options HandlerOptions) sdk.AnteHandler {
+	ixoAnteHandler, err := IxoAnteHandler(options)
+	if err != nil {
+		panic(err)
+	}
+	return ixoAnteHandler
 }

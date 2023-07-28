@@ -3,7 +3,9 @@ module github.com/ixofoundation/ixo-blockchain
 go 1.19
 
 require (
+	cosmossdk.io/errors v1.0.0-beta.7
 	github.com/CosmWasm/wasmd v0.31.0
+	github.com/CosmWasm/wasmvm v1.2.4
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.45.14
 	github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.0.0-20230524151648-c02fa46c2860
@@ -34,11 +36,9 @@ require (
 	cosmossdk.io/api v0.2.6 // indirect
 	cosmossdk.io/core v0.5.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.3 // indirect
-	cosmossdk.io/errors v1.0.0-beta.7 // indirect
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/99designs/keyring v1.2.1 // indirect
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d // indirect
-	github.com/CosmWasm/wasmvm v1.2.4 // indirect
 	github.com/DataDog/zstd v1.4.5 // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/Workiva/go-datastructures v1.0.53 // indirect

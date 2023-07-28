@@ -5,8 +5,14 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/app/params"
 )
 
-// MakeTestEncodingConfig creates an EncodingConfig for testing
-func MakeTestEncodingConfig() params.EncodingConfig {
+var encodingConfig params.EncodingConfig = MakeEncodingConfig()
+
+func GetEncodingConfig() params.EncodingConfig {
+	return encodingConfig
+}
+
+// MakeEncodingConfig creates an EncodingConfig
+func MakeEncodingConfig() params.EncodingConfig {
 	encodingConfig := params.MakeTestEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
