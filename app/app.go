@@ -173,8 +173,6 @@ func NewIxoApp(
 	// Tell the app's module manager how to set the order of InitGenesis, which are run genesis initialization.
 	app.mm.SetOrderInitGenesis(orderInitBlockers()...)
 
-	// TODO check if need to RegisterInterfaces again as MakeEncodingConfig have it
-	// ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
