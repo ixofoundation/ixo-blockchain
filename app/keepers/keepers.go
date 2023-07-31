@@ -359,7 +359,6 @@ func (appKeepers *AppKeepers) InitKeepers(
 
 	// WASM Keepers
 	// =============================
-
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	// See https://github.com/CosmWasm/cosmwasm/blob/main/docs/CAPABILITIES-BUILT-IN.md
