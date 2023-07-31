@@ -1,8 +1,6 @@
 package v2
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -20,13 +18,12 @@ func CreateUpgradeHandler(
 	configurator module.Configurator,
 	keepers *keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("🚀 executing Ixo v2 upgrade 🚀")
 
-		// 1st-time running in-store migrations, using 1 as fromVersion to
-		// avoid running InitGenesis.
-		ctx.Logger().Info(fmt.Sprintf("pre set version map: %v", fromVM))
-		fromVM = map[string]uint64{
+		// 1st-time running in-store migrations, setting fromVersion to
+		// avoid running InitGenesis and migrations.
+		fromVM := map[string]uint64{
 			"auth":               2,
 			"authz":              1,
 			"bank":               2,
@@ -57,9 +54,7 @@ func CreateUpgradeHandler(
 		}
 
 		// Run migrations before applying any other state changes.
-		ctx.Logger().Info(fmt.Sprintf("pre migrate version map: %v", fromVM))
 		migrations, err := mm.RunMigrations(ctx, configurator, fromVM)
-		ctx.Logger().Info(fmt.Sprintf("post migrate version map: %v", migrations))
 
 		ctx.Logger().Info("set PacketForwardKeeper params")
 		keepers.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
