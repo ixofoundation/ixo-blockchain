@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -27,10 +26,10 @@ var _ types.MsgServer = msgServer{}
 
 func augmentedFunctionBuilder(msg *types.MsgCreateBond) error {
 	paramsMap := msg.FunctionParameters.AsMap()
-	d0, _ := paramsMap["d0"]
-	p0, _ := paramsMap["p0"]
-	theta, _ := paramsMap["theta"]
-	kappa, _ := paramsMap["kappa"]
+	d0 := paramsMap["d0"]
+	p0 := paramsMap["p0"]
+	theta := paramsMap["theta"]
+	kappa := paramsMap["kappa"]
 
 	R0 := d0.Mul(sdk.OneDec().Sub(theta))
 	S0 := d0.Quo(p0)
@@ -138,39 +137,14 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 	logger.Info(fmt.Sprintf("bond %s [%s] with reserve(s) [%s] created by %s", msg.Token,
 		msg.FunctionType, strings.Join(bond.ReserveTokens, ","), msg.CreatorDid))
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeCreateBond,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, msg.Token),
-			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
-			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
-			sdk.NewAttribute(types.AttributeKeyFunctionType, msg.FunctionType),
-			sdk.NewAttribute(types.AttributeKeyFunctionParameters, msg.FunctionParameters.String()),
-			sdk.NewAttribute(types.AttributeKeyCreatorDid, msg.CreatorDid.String()),
-			sdk.NewAttribute(types.AttributeKeyControllerDid, msg.ControllerDid.String()),
-			sdk.NewAttribute(types.AttributeKeyReserveTokens, types.StringsToString(msg.ReserveTokens)),
-			sdk.NewAttribute(types.AttributeKeyTxFeePercentage, msg.TxFeePercentage.String()),
-			sdk.NewAttribute(types.AttributeKeyExitFeePercentage, msg.ExitFeePercentage.String()),
-			sdk.NewAttribute(types.AttributeKeyFeeAddress, msg.FeeAddress),
-			sdk.NewAttribute(types.AttributeKeyReserveWithdrawalAddress, msg.ReserveWithdrawalAddress),
-			sdk.NewAttribute(types.AttributeKeyMaxSupply, msg.MaxSupply.String()),
-			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits.String()),
-			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate.String()),
-			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage.String()),
-			sdk.NewAttribute(types.AttributeKeyAllowSells, strconv.FormatBool(msg.AllowSells)),
-			sdk.NewAttribute(types.AttributeKeyAllowReserveWithdrawals, strconv.FormatBool(msg.AllowReserveWithdrawals)),
-			sdk.NewAttribute(types.AttributeKeyAlphaBond, strconv.FormatBool(msg.AlphaBond)),
-			sdk.NewAttribute(types.AttributeKeyBatchBlocks, msg.BatchBlocks.String()),
-			sdk.NewAttribute(types.AttributeKeyOutcomePayment, msg.OutcomePayment.String()),
-			sdk.NewAttribute(types.AttributeKeyState, string(state)),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.CreatorDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondCreatedEvent{
+			Bond: &bond,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgCreateBondResponse{}, nil
 }
@@ -233,22 +207,14 @@ func (k msgServer) EditBond(goCtx context.Context, msg *types.MsgEditBond) (*typ
 	logger.Info(fmt.Sprintf("bond %s edited by %s",
 		msg.BondDid, msg.EditorDid))
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeEditBond,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyName, msg.Name),
-			sdk.NewAttribute(types.AttributeKeyDescription, msg.Description),
-			sdk.NewAttribute(types.AttributeKeyOrderQuantityLimits, msg.OrderQuantityLimits),
-			sdk.NewAttribute(types.AttributeKeySanityRate, msg.SanityRate),
-			sdk.NewAttribute(types.AttributeKeySanityMarginPercentage, msg.SanityMarginPercentage),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondUpdatedEvent{
+			Bond: &bond,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgEditBondResponse{}, nil
 }
@@ -347,23 +313,6 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 		batch := k.MustGetBatch(ctx, bond.BondDid)
 		batch.NextPublicAlpha = newPublicAlpha
 		k.SetBatch(ctx, bond.BondDid, batch)
-
-		logger := k.Logger(ctx)
-		logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
-			msg.BondDid, msg.OracleDid.String()))
-
-		ctx.EventManager().EmitEvents(sdk.Events{
-			sdk.NewEvent(
-				types.EventTypeSetNextAlpha,
-				sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-				sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
-			),
-			sdk.NewEvent(
-				sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.OracleDid.String()),
-			),
-		})
 	} else if bond.FunctionType == types.BondingFunction {
 		// Get supply, reserve, outcome payment. Note that we get the adjusted
 		// supply in order to take into consideration the influence of the buys and
@@ -383,31 +332,29 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 		algoParams := algo.ExportToMap()
 
 		// Get batch to set new alpha
-		ap, err := types.ConvertFloat64ToDec(algoParams["ap"])
+		newPublicAlpha, err := types.ConvertFloat64ToDec(algoParams["ap"])
 		if err != nil {
 			return nil, err
 		}
 		batch := k.MustGetBatch(ctx, bond.BondDid)
-		batch.NextPublicAlpha = ap
+		batch.NextPublicAlpha = newPublicAlpha
 		// batch.NextPublicAlphaDelta = sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
 		k.SetBatch(ctx, bond.BondDid, batch)
+	}
 
-		logger := k.Logger(ctx)
-		logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
-			msg.BondDid, msg.OracleDid.String()))
+	logger := k.Logger(ctx)
+	logger.Info(fmt.Sprintf("bond %s next alpha set by %s",
+		msg.BondDid, msg.OracleDid.String()))
 
-		ctx.EventManager().EmitEvents(sdk.Events{
-			sdk.NewEvent(
-				types.EventTypeSetNextAlpha,
-				sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-				sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
-			),
-			sdk.NewEvent(
-				sdk.EventTypeMessage,
-				sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-				sdk.NewAttribute(sdk.AttributeKeySender, msg.OracleDid.String()),
-			),
-		})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondSetNextAlphaEvent{
+			BondDid:   msg.BondDid,
+			NextAlpha: newPublicAlpha.String(),
+			Signer:    msg.OracleDid.String(),
+		},
+	); err != nil {
+		return nil, err
 	}
 
 	return &types.MsgSetNextAlphaResponse{}, nil
@@ -449,14 +396,8 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 	// Update bond state
 	k.SetBondState(ctx, bond.BondDid, msg.State)
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		// No need to emit event/log for state change, as SetBondState does this
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.EditorDid.String()),
-		),
-	})
+	// emit the events
+	// No need to emit event/log for state change, as SetBondState does this
 
 	return &types.MsgUpdateBondStateResponse{}, nil
 }
@@ -520,19 +461,15 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	// Cancel unfulfillable orders
 	k.CancelUnfulfillableOrders(ctx, bond.BondDid)
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeBuy,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyMaxPrices, msg.MaxPrices.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.BuyerDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondBuyOrderEvent{
+			BondDid: msg.BondDid,
+			Order:   &order,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgBuyResponse{}, nil
 }
@@ -585,20 +522,6 @@ func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.Ms
 
 	// Update supply
 	keeper.SetCurrentSupply(ctx, bond.BondDid, bond.CurrentSupply.Add(msg.Amount))
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeInitSwapper,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyChargedPrices, msg.MaxPrices.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.BuyerDid.String()),
-		),
-	})
 
 	return &types.MsgBuyResponse{}, nil
 }
@@ -663,18 +586,15 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 	//// Cancel unfulfillable orders (Note: no need)
 	//keeper.CancelUnfulfillableOrders(ctx, bond.BondDid)
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeSell,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.Amount.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SellerDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondSellOrderEvent{
+			BondDid: msg.BondDid,
+			Order:   &order,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgSellResponse{}, nil
 }
@@ -730,20 +650,15 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	//// Cancel unfulfillable orders (Note: no need)
 	//keeper.CancelUnfulfillableOrders(ctx, bond.BondDid)
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeSwap,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.From.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeySwapFromToken, msg.From.Denom),
-			sdk.NewAttribute(types.AttributeKeySwapToToken, msg.ToToken),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SwapperDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondSwapOrderEvent{
+			BondDid: msg.BondDid,
+			Order:   &order,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgSwapResponse{}, nil
 }
@@ -776,19 +691,17 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeMakeOutcomePayment,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, outcomePayment.String()),
-			sdk.NewAttribute(types.AttributeKeyAddress, senderAddr.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.SenderDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondMakeOutcomePaymentEvent{
+			BondDid:        msg.BondDid,
+			SenderDid:      msg.SenderDid.Did(),
+			SenderAddress:  senderAddr.String(),
+			OutcomePayment: outcomePayment,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgMakeOutcomePaymentResponse{}, nil
 }
@@ -850,19 +763,17 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	// Update supply
 	k.SetCurrentSupply(ctx, bond.BondDid, bond.CurrentSupply.Sub(bondTokensOwned))
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeWithdrawShare,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyAddress, recipientAddr.String()),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, reserveOwed.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.RecipientDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondWithdrawShareEvent{
+			BondDid:          msg.BondDid,
+			RecipientDid:     msg.RecipientDid.Did(),
+			RecipientAddress: recipientAddr.String(),
+			WithdrawPayment:  reserveOwed,
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgWithdrawShareResponse{}, nil
 }
@@ -919,19 +830,18 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 	// CurrentReserve (virtual reserve) reported by the bond will be unchanged.
 	k.setAvailableReserve(ctx, bond.BondDid, bond.AvailableReserve.Sub(msg.Amount))
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			types.EventTypeWithdrawReserve,
-			sdk.NewAttribute(types.AttributeKeyBondDid, msg.BondDid),
-			sdk.NewAttribute(types.AttributeKeyAddress, bond.ReserveWithdrawalAddress),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.String()),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.WithdrawerDid.String()),
-		),
-	})
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondWithdrawReserveEvent{
+			BondDid:                  msg.BondDid,
+			WithdrawerDid:            msg.WithdrawerDid.Did(),
+			WithdrawerAddress:        msg.WithdrawerAddress,
+			WithdrawAmount:           msg.Amount,
+			ReserveWithdrawalAddress: reserveWithdrawalAddress.String(),
+		},
+	); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgWithdrawReserveResponse{}, nil
 }

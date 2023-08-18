@@ -222,6 +222,77 @@
         
           
           <li>
+            <a href="#ixo%2fbonds%2fv1beta1%2fevent.proto">ixo/bonds/v1beta1/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondBuyOrderCancelledEvent"><span class="badge">M</span>BondBuyOrderCancelledEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondBuyOrderEvent"><span class="badge">M</span>BondBuyOrderEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondBuyOrderFulfilledEvent"><span class="badge">M</span>BondBuyOrderFulfilledEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondCreatedEvent"><span class="badge">M</span>BondCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondEditAlphaFailedEvent"><span class="badge">M</span>BondEditAlphaFailedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondEditAlphaSuccessEvent"><span class="badge">M</span>BondEditAlphaSuccessEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondMakeOutcomePaymentEvent"><span class="badge">M</span>BondMakeOutcomePaymentEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondSellOrderEvent"><span class="badge">M</span>BondSellOrderEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondSellOrderFulfilledEvent"><span class="badge">M</span>BondSellOrderFulfilledEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondSetNextAlphaEvent"><span class="badge">M</span>BondSetNextAlphaEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondSwapOrderEvent"><span class="badge">M</span>BondSwapOrderEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondSwapOrderFulfilledEvent"><span class="badge">M</span>BondSwapOrderFulfilledEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondUpdatedEvent"><span class="badge">M</span>BondUpdatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondWithdrawReserveEvent"><span class="badge">M</span>BondWithdrawReserveEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.bonds.v1beta1.BondWithdrawShareEvent"><span class="badge">M</span>BondWithdrawShareEvent</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#ixo%2fbonds%2fv1beta1%2fgenesis.proto">ixo/bonds/v1beta1/genesis.proto</a>
             <ul>
               
@@ -2106,6 +2177,632 @@
     
       
       <div class="file-heading">
+        <h2 id="ixo/bonds/v1beta1/event.proto">ixo/bonds/v1beta1/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.bonds.v1beta1.BondBuyOrderCancelledEvent">BondBuyOrderCancelledEvent</h3>
+        <p>BondBuyOrderCancelledEvent is an event triggered on a Bond buy order</p><p>cancellation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.BuyOrder">BuyOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondBuyOrderEvent">BondBuyOrderEvent</h3>
+        <p>BondBuyOrderEvent is an event triggered on a Bond buy order</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.BuyOrder">BuyOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondBuyOrderFulfilledEvent">BondBuyOrderFulfilledEvent</h3>
+        <p>BondBuyOrderFulfilledEvent is an event triggered on a Bond buy order</p><p>fullfillment</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.BuyOrder">BuyOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>charged_prices</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>charged_fees</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>returned_to_address</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>new_bond_token_balance</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>charged_prices_of_which_reserve</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>charged_prices_of_which_funding</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondCreatedEvent">BondCreatedEvent</h3>
+        <p>BondCreatedEvent is an event triggered on a Bond creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond</td>
+                  <td><a href="#ixo.bonds.v1beta1.Bond">Bond</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondEditAlphaFailedEvent">BondEditAlphaFailedEvent</h3>
+        <p>BondEditAlphaFailedEvent is an event triggered on a failed attempt to edit of</p><p>Bond alpha value</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>token</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cancel_reason</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondEditAlphaSuccessEvent">BondEditAlphaSuccessEvent</h3>
+        <p>BondEditAlphaSuccessEvent is an event triggered on a successful edit of Bond</p><p>alpha value</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>token</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>public_alpha</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>system_alpha</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondMakeOutcomePaymentEvent">BondMakeOutcomePaymentEvent</h3>
+        <p>BondMakeOutcomePaymentEvent is an event triggered on a Bond make outcome</p><p>payment</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>outcome_payment</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sender_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondSellOrderEvent">BondSellOrderEvent</h3>
+        <p>BondSellOrderEvent is an event triggered on a Bond sell order</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.SellOrder">SellOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondSellOrderFulfilledEvent">BondSellOrderFulfilledEvent</h3>
+        <p>BondSellOrderFulfilledEvent is an event triggered on a Bond sell order</p><p>fullfillment</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.SellOrder">SellOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>charged_fees</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>returned_to_address</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>new_bond_token_balance</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondSetNextAlphaEvent">BondSetNextAlphaEvent</h3>
+        <p>BondSetNextAlphaEvent is an event triggered when next batch alpha is set</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>next_alpha</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondSwapOrderEvent">BondSwapOrderEvent</h3>
+        <p>BondSwapOrderEvent is an event triggered on a Bond swap order</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.SwapOrder">SwapOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondSwapOrderFulfilledEvent">BondSwapOrderFulfilledEvent</h3>
+        <p>BondSwapOrderFulfilledEvent is an event triggered on a Bond swap order</p><p>fullfillment</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>order</td>
+                  <td><a href="#ixo.bonds.v1beta1.SwapOrder">SwapOrder</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>charged_fee</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>returned_to_address</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokens_swapped</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondUpdatedEvent">BondUpdatedEvent</h3>
+        <p>BondUpdatedEvent is an event triggered on a Bond update</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond</td>
+                  <td><a href="#ixo.bonds.v1beta1.Bond">Bond</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondWithdrawReserveEvent">BondWithdrawReserveEvent</h3>
+        <p>BondWithdrawReserveEvent is an event triggered on a Bond reserve withdrawal</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>withdraw_amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>withdrawer_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>withdrawer_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>reserve_withdrawal_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.bonds.v1beta1.BondWithdrawShareEvent">BondWithdrawShareEvent</h3>
+        <p>BondWithdrawShareEvent is an event triggered on a Bond share withdrawal</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bond_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>withdraw_payment</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>recipient_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>recipient_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
         <h2 id="ixo/bonds/v1beta1/genesis.proto">ixo/bonds/v1beta1/genesis.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
@@ -3038,7 +3735,7 @@ curve.</p></td>
               <tr>
                 <td>Bonds</td>
                 <td>GET</td>
-                <td>/ixo/bonds</td>
+                <td>/ixo/bonds/bonds</td>
                 <td></td>
               </tr>
               
@@ -3048,7 +3745,7 @@ curve.</p></td>
               <tr>
                 <td>BondsDetailed</td>
                 <td>GET</td>
-                <td>/ixo/bonds_detailed</td>
+                <td>/ixo/bonds/bonds_detailed</td>
                 <td></td>
               </tr>
               

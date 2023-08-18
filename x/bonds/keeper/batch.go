@@ -205,7 +205,6 @@ func (k Keeper) GetUpdatedBatchPricesAfterSell(ctx sdk.Context, bondDid string, 
 
 func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyOrder, prices sdk.DecCoins) (err error) {
 	bond := k.MustGetBond(ctx, bondDid)
-	var extraEventAttributes []sdk.Attribute
 
 	// Get buyer address
 	buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid.Did()))
@@ -247,6 +246,8 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 			totalPrices.String(), bo.MaxPrices.String())
 	}
 
+	var coinsToFundingPool sdk.Coins
+	var toInitialReserve sdk.Int
 	// Add new reserve to reserve (reservePricesRounded should never be zero)
 	// TODO: investigate possibility of zero reservePricesRounded
 	if bond.FunctionType == types.AugmentedFunction &&
@@ -272,7 +273,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 			sdk.OneDec().Sub(theta)).Ceil().TruncateInt()
 
 		// Calculate amount that should go into initial reserve
-		toInitialReserve := newReserve.Sub(currentReserve)
+		toInitialReserve = newReserve.Sub(currentReserve)
 		if reservePricesRounded[0].Amount.LT(toInitialReserve) {
 			// Reserve supplied by buyer is insufficient
 			return types.ErrInsufficientReserveToBuy
@@ -281,7 +282,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 			toInitialReserve.ToDec()).TruncateDecimal()
 
 		// Calculate amount that should go into funding pool
-		coinsToFundingPool := reservePricesRounded.Sub(coinsToInitialReserve)
+		coinsToFundingPool = reservePricesRounded.Sub(coinsToInitialReserve)
 
 		// Send reserve tokens to initial reserve
 		err = k.DepositReserveFromModule(ctx, bond.BondDid,
@@ -297,10 +298,6 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 			return err
 		}
 
-		extraEventAttributes = append(extraEventAttributes,
-			sdk.NewAttribute(types.AttributeKeyChargedPricesReserve, toInitialReserve.String()),
-			sdk.NewAttribute(types.AttributeKeyChargedPricesFunding, coinsToFundingPool.String()),
-		)
 	} else {
 		err = k.DepositReserveFromModule(
 			ctx, bond.BondDid, types.BatchesIntermediaryAccount, reservePricesRounded)
@@ -337,21 +334,21 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 	// Get new bond token balance
 	bondTokenBalance := k.BankKeeper.GetBalance(ctx, buyerAddr, bond.Token).Amount
 
-	event := sdk.NewEvent(
-		types.EventTypeOrderFulfill,
-		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, bo.BaseOrder.AccountDid.String()),
-		sdk.NewAttribute(types.AttributeKeyTokensMinted, bo.BaseOrder.Amount.Amount.String()),
-		sdk.NewAttribute(types.AttributeKeyChargedPrices, reservePricesRounded.String()),
-		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
-		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, returnToBuyer.String()),
-		sdk.NewAttribute(types.AttributeKeyNewBondTokenBalance, bondTokenBalance.String()),
-	)
-	if len(extraEventAttributes) > 0 {
-		event = event.AppendAttributes(extraEventAttributes...)
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondBuyOrderFulfilledEvent{
+			BondDid:                     bond.BondDid,
+			Order:                       &bo,
+			ChargedPrices:               reservePricesRounded,
+			ChargedFees:                 txFees,
+			ReturnedToAddress:           returnToBuyer,
+			NewBondTokenBalance:         bondTokenBalance,
+			ChargedPricesOfWhichFunding: coinsToFundingPool,
+			ChargedPricesOfWhichReserve: &toInitialReserve,
+		},
+	); err != nil {
+		return err
 	}
-	ctx.EventManager().EmitEvent(event)
 
 	return nil
 }
@@ -406,16 +403,18 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid string, so types.Sel
 	// Get new bond token balance
 	bondTokenBalance := k.BankKeeper.GetBalance(ctx, sellerAddr, bond.Token).Amount
 
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
-		types.EventTypeOrderFulfill,
-		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSellOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, so.BaseOrder.AccountDid.String()),
-		sdk.NewAttribute(types.AttributeKeyTokensBurned, so.BaseOrder.Amount.Amount.String()),
-		sdk.NewAttribute(types.AttributeKeyChargedFees, txFees.String()),
-		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, totalReturns.String()),
-		sdk.NewAttribute(types.AttributeKeyNewBondTokenBalance, bondTokenBalance.String()),
-	))
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondSellOrderFulfilledEvent{
+			BondDid:             bond.BondDid,
+			Order:               &so,
+			ChargedFees:         txFees,
+			ReturnedToAddress:   totalReturns,
+			NewBondTokenBalance: bondTokenBalance,
+		},
+	); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -480,15 +479,18 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid string, so types.SwapOrder)
 	logger.Info(fmt.Sprintf("performed swap order for %s to %s from %s",
 		so.BaseOrder.Amount.String(), reserveReturns, so.BaseOrder.AccountDid))
 
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
-		types.EventTypeOrderFulfill,
-		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueSwapOrder),
-		sdk.NewAttribute(types.AttributeKeyAddress, so.BaseOrder.AccountDid.String()),
-		sdk.NewAttribute(types.AttributeKeyTokensSwapped, adjustedInput.String()),
-		sdk.NewAttribute(types.AttributeKeyChargedFees, txFee.String()),
-		sdk.NewAttribute(types.AttributeKeyReturnedToAddress, reserveReturns.String()),
-	))
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.BondSwapOrderFulfilledEvent{
+			BondDid:           bond.BondDid,
+			Order:             &so,
+			ChargedFee:        txFee,
+			ReturnedToAddress: reserveReturns,
+			TokensSwapped:     adjustedInput,
+		},
+	); err != nil {
+		return err, false
+	}
 
 	return nil, true
 }
@@ -617,13 +619,13 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid string) (cancel
 				logger.Info(fmt.Sprintf("cancelled buy order for %s from %s", bo.BaseOrder.Amount.String(), bo.BaseOrder.AccountDid.String()))
 				logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
-				ctx.EventManager().EmitEvent(sdk.NewEvent(
-					types.EventTypeOrderCancel,
-					sdk.NewAttribute(types.AttributeKeyBondDid, bondDid),
-					sdk.NewAttribute(types.AttributeKeyOrderType, types.AttributeValueBuyOrder),
-					sdk.NewAttribute(types.AttributeKeyAddress, bo.BaseOrder.AccountDid.String()),
-					sdk.NewAttribute(types.AttributeKeyCancelReason, bo.BaseOrder.CancelReason),
-				))
+				// emit the events
+				ctx.EventManager().EmitTypedEvents(
+					&types.BondBuyOrderCancelledEvent{
+						BondDid: bondDid,
+						Order:   &batch.Buys[i],
+					},
+				)
 
 				// Return reserve to buyer
 				buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid.Did()))
@@ -680,12 +682,13 @@ func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid string
 
 	var algo types.AugmentedBondRevision1
 	if err := algo.Init(bond); err != nil {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: err.Error(),
+			},
+		)
 		return
 	}
 
@@ -697,12 +700,13 @@ func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid string
 	})
 
 	if !valueOrError.IsRight() {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason, valueOrError.Left().Error()),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: valueOrError.Left().Error(),
+			},
+		)
 		return
 	}
 
@@ -715,14 +719,14 @@ func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid string
 	algo.ExportToBond(&bond)
 	k.SetBond(ctx, bond.BondDid, bond)
 
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
-		types.EventTypeEditAlphaSuccess,
-		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-		sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
-		// sdk.NewAttribute(types.AttributeKeySystemAlpha, newSystemAlpha.String()),
-	))
-
+	ctx.EventManager().EmitTypedEvents(
+		&types.BondEditAlphaSuccessEvent{
+			BondDid:     bond.BondDid,
+			Token:       bond.Token,
+			PublicAlpha: newPublicAlpha.String(),
+			// SystemAlpha:  newSystemAlpha.String(),
+		},
+	)
 }
 
 func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
@@ -747,12 +751,13 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
 		sdk.MustNewDecFromStr("2"))
 	if err != nil {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: err.Error(),
+			},
+		)
 		return
 	}
 	//fmt.Println("temp: ", temp)
@@ -785,35 +790,35 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 
 	// Check 1 (newSystemAlpha != prevSystemAlpha)
 	if newSystemAlpha.Equal(prevSystemAlpha) {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason,
-				"resultant system alpha based on public alpha is unchanged"),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: "resultant system alpha based on public alpha is unchanged",
+			},
+		)
 		return
 	}
 	// Check 2 (I > C * newSystemAlpha)
 	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason,
-				"cannot change alpha to that value due to violated restriction [1]"),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: "cannot change alpha to that value due to violated restriction [1]",
+			},
+		)
 		return
 	}
 	// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
 	if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason,
-				"cannot change alpha to that value due to violated restriction [2]"),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: "cannot change alpha to that value due to violated restriction [2]",
+			},
+		)
 		return
 	}
 
@@ -825,12 +830,13 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	newV0, err := types.Invariant(R, S, newKappa)
 	//fmt.Println("newV0: ", newV0)
 	if err != nil {
-		ctx.EventManager().EmitEvent(sdk.NewEvent(
-			types.EventTypeEditAlphaFailed,
-			sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-			sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-			sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
-		))
+		ctx.EventManager().EmitTypedEvents(
+			&types.BondEditAlphaFailedEvent{
+				BondDid:      bond.BondDid,
+				Token:        bond.Token,
+				CancelReason: err.Error(),
+			},
+		)
 		return
 	}
 
@@ -846,11 +852,13 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	bond.FunctionParameters.ReplaceParam("systemAlpha", newSystemAlpha)
 	k.SetBond(ctx, bond.BondDid, bond)
 
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
-		types.EventTypeEditAlphaSuccess,
-		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-		sdk.NewAttribute(types.AttributeKeyPublicAlpha, newPublicAlpha.String()),
-		sdk.NewAttribute(types.AttributeKeySystemAlpha, newSystemAlpha.String()),
-	))
+	// emit the events
+	ctx.EventManager().EmitTypedEvents(
+		&types.BondEditAlphaSuccessEvent{
+			BondDid:     bond.BondDid,
+			Token:       bond.Token,
+			PublicAlpha: newPublicAlpha.String(),
+			SystemAlpha: newSystemAlpha.String(),
+		},
+	)
 }

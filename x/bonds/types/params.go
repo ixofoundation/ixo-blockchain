@@ -46,6 +46,6 @@ func validateReservedBondTokens(i interface{}) error {
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 	return paramstypes.ParamSetPairs{
-		{KeyReservedBondTokens, &p.ReservedBondTokens, validateReservedBondTokens},
+		paramstypes.ParamSetPair{Key: KeyReservedBondTokens, Value: &p.ReservedBondTokens, ValidatorFn: validateReservedBondTokens},
 	}
 }

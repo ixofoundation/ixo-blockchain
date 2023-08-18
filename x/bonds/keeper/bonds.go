@@ -220,12 +220,12 @@ func (k Keeper) SetBondState(ctx sdk.Context, bondDid string, newState string) {
 	logger := k.Logger(ctx)
 	logger.Info(fmt.Sprintf("updated state for %s from %s to %s", bond.Token, previousState, newState))
 
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
-		types.EventTypeStateChange,
-		sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-		sdk.NewAttribute(types.AttributeKeyOldState, previousState),
-		sdk.NewAttribute(types.AttributeKeyNewState, newState),
-	))
+	// emit the events
+	ctx.EventManager().EmitTypedEvents(
+		&types.BondUpdatedEvent{
+			Bond: &bond,
+		},
+	)
 }
 
 func (k Keeper) ReservedBondToken(ctx sdk.Context, bondToken string) bool {

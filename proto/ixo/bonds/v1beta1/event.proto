@@ -1,0 +1,161 @@
+syntax = "proto3";
+package ixo.bonds.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+
+import "gogoproto/gogo.proto";
+import "ixo/bonds/v1beta1/bonds.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+// BondCreatedEvent is an event triggered on a Bond creation
+message BondCreatedEvent { Bond bond = 1; }
+
+// BondUpdatedEvent is an event triggered on a Bond update
+message BondUpdatedEvent { Bond bond = 1; }
+
+// BondSetNextAlphaEvent is an event triggered when next batch alpha is set
+message BondSetNextAlphaEvent {
+  string bond_did = 1;
+  string next_alpha = 2;
+  string signer = 3;
+}
+
+// BondBuyOrderEvent is an event triggered on a Bond buy order
+message BondBuyOrderEvent {
+  BuyOrder order = 1;
+  string bond_did = 2;
+}
+
+// BondSellOrderEvent is an event triggered on a Bond sell order
+message BondSellOrderEvent {
+  SellOrder order = 1;
+  string bond_did = 2;
+}
+
+// BondSwapOrderEvent is an event triggered on a Bond swap order
+message BondSwapOrderEvent {
+  SwapOrder order = 1;
+  string bond_did = 2;
+}
+
+// BondMakeOutcomePaymentEvent is an event triggered on a Bond make outcome
+// payment
+message BondMakeOutcomePaymentEvent {
+  string bond_did = 1;
+  repeated cosmos.base.v1beta1.Coin outcome_payment = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string sender_did = 3;
+  string sender_address = 4;
+}
+
+// BondWithdrawShareEvent is an event triggered on a Bond share withdrawal
+message BondWithdrawShareEvent {
+  string bond_did = 1;
+  repeated cosmos.base.v1beta1.Coin withdraw_payment = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string recipient_did = 3;
+  string recipient_address = 4;
+}
+
+// BondWithdrawReserveEvent is an event triggered on a Bond reserve withdrawal
+message BondWithdrawReserveEvent {
+  string bond_did = 1;
+  repeated cosmos.base.v1beta1.Coin withdraw_amount = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string withdrawer_did = 3;
+  string withdrawer_address = 4;
+  string reserve_withdrawal_address = 5;
+}
+
+// BondEditAlphaSuccessEvent is an event triggered on a successful edit of Bond
+// alpha value
+message BondEditAlphaSuccessEvent {
+  string bond_did = 1;
+  string token = 2;
+  string public_alpha = 3;
+  string system_alpha = 4;
+}
+
+// BondEditAlphaFailedEvent is an event triggered on a failed attempt to edit of
+// Bond alpha value
+message BondEditAlphaFailedEvent {
+  string bond_did = 1;
+  string token = 2;
+  string cancel_reason = 3;
+}
+
+// BondBuyOrderFulfilledEvent is an event triggered on a Bond buy order
+// fullfillment
+message BondBuyOrderFulfilledEvent {
+  string bond_did = 1;
+  BuyOrder order = 2;
+  repeated cosmos.base.v1beta1.Coin charged_prices = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  repeated cosmos.base.v1beta1.Coin charged_fees = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  repeated cosmos.base.v1beta1.Coin returned_to_address = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string new_bond_token_balance = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+  ];
+  string charged_prices_of_which_reserve = 7 [
+    (gogoproto.nullable) = true,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+  ];
+  repeated cosmos.base.v1beta1.Coin charged_prices_of_which_funding = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// BondSellOrderFulfilledEvent is an event triggered on a Bond sell order
+// fullfillment
+message BondSellOrderFulfilledEvent {
+  string bond_did = 1;
+  SellOrder order = 2;
+  repeated cosmos.base.v1beta1.Coin charged_fees = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  repeated cosmos.base.v1beta1.Coin returned_to_address = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  string new_bond_token_balance = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+  ];
+}
+
+// BondSwapOrderFulfilledEvent is an event triggered on a Bond swap order
+// fullfillment
+message BondSwapOrderFulfilledEvent {
+  string bond_did = 1;
+  SwapOrder order = 2;
+  cosmos.base.v1beta1.Coin charged_fee = 3 [ (gogoproto.nullable) = false ];
+  repeated cosmos.base.v1beta1.Coin returned_to_address = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  cosmos.base.v1beta1.Coin tokens_swapped = 5 [ (gogoproto.nullable) = false ];
+}
+
+// BondBuyOrderCancelledEvent is an event triggered on a Bond buy order
+// cancellation
+message BondBuyOrderCancelledEvent {
+  string bond_did = 1;
+  BuyOrder order = 2;
+}
