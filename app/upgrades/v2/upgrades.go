@@ -62,7 +62,7 @@ func CreateUpgradeHandler(
 		ctx.Logger().Info("set ICQKeeper params")
 		setICQParams(ctx, keepers.ICQKeeper)
 
-		ctx.Logger().Info("set ICAHostKeeper params to allow all messages")
+		ctx.Logger().Info("update ICAHostKeeper params to allow all messages")
 		setICAHostParams(ctx, &keepers.ICAHostKeeper)
 
 		return migrations, err

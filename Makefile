@@ -12,7 +12,9 @@ HTTPS_GIT := https://github.com/ixofoundation/ixo-blockchain.git
 export GO111MODULE = on
 export COSMOS_SDK_TEST_KEYRING = n
 
-# process build tags
+###############################################################################
+###                            Build Tags/Flags                             ###
+###############################################################################
 
 build_tags =
 ifeq ($(WITH_CLEVELDB),yes)
@@ -68,19 +70,43 @@ ldflags := $(strip $(ldflags))
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
 ###############################################################################
+###                               Go Version                                ###
+###############################################################################
+
+GO_MAJOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1)
+GO_MINOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
+MIN_GO_MAJOR_VERSION = 1
+MIN_GO_MINOR_VERSION = 19
+GO_VERSION_ERR_MSG = ❌ ERROR: Golang version $(MIN_GO_MAJOR_VERSION).$(MIN_GO_MINOR_VERSION)+ is required
+
+check-go-version:
+	@echo "Verifying go version..."
+	@if [ $(GO_MAJOR_VERSION) -gt $(MIN_GO_MAJOR_VERSION) ]; then \
+		exit 0; \
+	elif [ $(GO_MAJOR_VERSION) -lt $(MIN_GO_MAJOR_VERSION) ]; then \
+		echo $(GO_VERSION_ERR_MSG); \
+		exit 1; \
+	elif [ $(GO_MINOR_VERSION) -lt $(MIN_GO_MINOR_VERSION) ]; then \
+		echo $(GO_VERSION_ERR_MSG); \
+		exit 1; \
+	fi
+
+.PHONY: check-go-version
+
+###############################################################################
 ###                             Build / Install                             ###
 ###############################################################################
 
-all: lint install
+all: check-go-version lint install
 
-build: go.sum
+build: check-go-version go.sum
 ifeq ($(OS),Windows_NT)
 	go build -mod=readonly $(BUILD_FLAGS) -o build/ixod.exe ./cmd/ixod
 else
 	go build -mod=readonly $(BUILD_FLAGS) -o build/ixod ./cmd/ixod
 endif
 
-install: go.sum
+install: check-go-version go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/ixod
 
 ###############################################################################
