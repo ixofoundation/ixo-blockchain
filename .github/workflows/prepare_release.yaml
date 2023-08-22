@@ -146,14 +146,14 @@ jobs:
 
       - name: Upload Docker Image
         if: matrix.build.outputs.type == 'image'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.build.artifact }}
           path: /tmp/${{ matrix.build.artifact }}.tar
 
       - name: Upload File
         if: matrix.build.outputs.type == 'file'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.build.artifact }}
           path: ${{ steps.extracted-files.outputs.destination }}
