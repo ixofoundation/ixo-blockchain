@@ -9,6 +9,11 @@ DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 HTTPS_GIT := https://github.com/ixofoundation/ixo-blockchain.git
 
+GO_VERSION := $(shell cat go.mod | grep -E 'go [0-9].[0-9]+' | cut -d ' ' -f 2)
+GO_MODULE := $(shell cat go.mod | grep "module " | cut -d ' ' -f 2)
+GO_MAJOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1)
+GO_MINOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
+
 export GO111MODULE = on
 export COSMOS_SDK_TEST_KEYRING = n
 
@@ -16,7 +21,7 @@ export COSMOS_SDK_TEST_KEYRING = n
 ###                            Build Tags/Flags                             ###
 ###############################################################################
 
-build_tags =
+build_tags = netgo
 ifeq ($(WITH_CLEVELDB),yes)
   build_tags += gcc
 endif
@@ -187,3 +192,55 @@ proto-docs:
 	@echo "Generating Protobuf docs"
 	docker rm $(containerProtoGen) || true
 	docker run --name $(containerProtoGen) -v $(CURDIR):/workspace --workdir /workspace $(containerProtoImage) sh ./scripts/protoc-docs-gen.sh
+
+###############################################################################
+###                                Release                                  ###
+###############################################################################
+
+GORELEASER_IMAGE := ghcr.io/goreleaser/goreleaser-cross:v$(GO_VERSION)
+COSMWASM_VERSION := $(shell go list -m github.com/CosmWasm/wasmvm | sed 's/.* //')
+
+ifdef GITHUB_TOKEN
+release:
+	docker run \
+		--rm \
+		-e GITHUB_TOKEN=$(GITHUB_TOKEN) \
+		-e COSMWASM_VERSION=$(COSMWASM_VERSION) \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v `pwd`:/go/src/ixod \
+		-w /go/src/ixod \
+		$(GORELEASER_IMAGE) \
+		release \
+		--clean
+else
+release:
+	@echo "Error: GITHUB_TOKEN is not defined. Please define it before running 'make release'."
+endif
+
+release-dry-run:
+	docker run \
+		--rm \
+		-e COSMWASM_VERSION=$(COSMWASM_VERSION) \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v `pwd`:/go/src/ixod \
+		-w /go/src/ixod \
+		$(GORELEASER_IMAGE) \
+		release \
+		--clean \
+		--skip-publish
+
+release-snapshot:
+	docker run \
+		--rm \
+		-e COSMWASM_VERSION=$(COSMWASM_VERSION) \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v `pwd`:/go/src/ixod \
+		-w /go/src/ixod \
+		$(GORELEASER_IMAGE) \
+		release \
+		--clean \
+		--snapshot \
+		--skip-validate \
+		--skip-publish
+
+.PHONY: release release-dry-run release-snapshot
