@@ -3,6 +3,7 @@ package token
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -51,6 +52,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	if err != nil {
 		return err
 	}
+	// TODO add validation
 	return nil //types.ValidateGenesis(data)
 }
 
@@ -115,13 +117,15 @@ func (AppModule) QuerierRoute() string {
 
 // LegacyQuerierHandler returns the module sdk.Querier.
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
+	return func(sdk.Context, []string, abci.RequestQuery) ([]byte, error) {
+		return nil, fmt.Errorf("legacy querier not supported for the x/%s module", types.ModuleName)
+	}
 }
 
 // RegisterServices registers module services.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQuerier(am.keeper))
 }
 
 // InitGenesis performs genesis initialization for the token module. It returns

@@ -1,8 +1,11 @@
 name: Tests / E2E Upgrade
-on: 
+
+on:
   workflow_dispatch:
-  push: 
-    branches: [master]
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches: [main]
 
 jobs:
   upgrade-v5:
@@ -14,5 +17,5 @@ jobs:
       chain-b-tag: 0.19.3
       chain-upgrade-tag: debug-v0.19.4.7
       upgrade-plan-name: "normal upgrade"
-      test-entry-point:  "TestUpgradeTestSuite"
+      test-entry-point: "TestUpgradeTestSuite"
       test: "TestIBCChainUpgrade"

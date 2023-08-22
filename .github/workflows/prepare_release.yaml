@@ -1,9 +1,11 @@
 name: Prepare Release
 
 on:
-  push:
-    tags:
-      - v*
+  workflow_dispatch:
+# on:
+#   push:
+#     tags:
+#       - v*
 
 jobs:
   gather-build-info:
@@ -142,14 +144,14 @@ jobs:
           image: ${{ matrix.build.artifact }}:tmp
           path: ${{ matrix.build.outputs.path }}
 
-      - name: Upload Docker Image 
+      - name: Upload Docker Image
         if: matrix.build.outputs.type == 'image'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.build.artifact }}
           path: /tmp/${{ matrix.build.artifact }}.tar
 
-      - name: Upload File 
+      - name: Upload File
         if: matrix.build.outputs.type == 'file'
         uses: actions/upload-artifact@v2
         with:
@@ -181,7 +183,7 @@ jobs:
         exclude:
           - test:
               enabled: false
-    steps: 
+    steps:
       - uses: actions/checkout@v2
       - name: Download artifact
         uses: actions/download-artifact@v2
@@ -191,14 +193,14 @@ jobs:
       - name: Load image
         run: docker load --input ${{ matrix.test.artifact }}.tar
 
-      - name: Run ${{matrix.test.name }} 
+      - name: Run ${{matrix.test.name }}
         run: ${{ matrix.test.command }}
 
   publish-release:
     name: ${{ matrix.release.name }}
     runs-on: ubuntu-latest
     outputs:
-      upload-url: ${{ steps.release.outputs.upload_url}} 
+      upload-url: ${{ steps.release.outputs.upload_url}}
     needs:
       - gather-build-info
       - test-code
@@ -246,7 +248,7 @@ jobs:
             artifact: ixo-chain
             enabled: true
             type: docker
-            docker: 
+            docker:
               registry: ghcr.io
               owner: ${{ github.repository_owner }}
               image: ${{ github.event.repository.name }}
@@ -259,16 +261,16 @@ jobs:
             artifact: "ixod_linux_amd64"
             enabled: true
             type: file
-            file: 
+            file:
               path: ixo-blockchain_linux_amd64.tar.gz
               extention: .tar.gz
-            
+
           - name: Publish Darwin Binary
             os: ubuntu-latest
             artifact: "ixod_darwin_amd64"
             enabled: true
             type: file
-            file: 
+            file:
               path: ixo-blockchain_darwin_amd64.tar.gz
               extention: .tar.gz
 
@@ -279,7 +281,7 @@ jobs:
     steps:
       - name: Login to DockerHub
         if: matrix.artifact.type == 'docker'
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v1
         with:
           registry: ${{ matrix.artifact.docker.registry }}
           username: ${{ matrix.artifact.docker.username }}
@@ -292,12 +294,12 @@ jobs:
 
       - name: Upload Release Asset
         if: matrix.artifact.type == 'file'
-        id: upload-release-asset 
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./${{ matrix.artifact.file.path }}
           asset_name: ${{ matrix.artifact.artifact }}.${{ matrix.artifact.file.extention }}
           asset_content_type: application/tar+gzip
@@ -306,7 +308,7 @@ jobs:
         if: matrix.artifact.type == 'docker'
         env:
           image: ${{ matrix.artifact.docker.registry }}/${{ matrix.artifact.docker.owner }}/${{ matrix.artifact.docker.image }}:${{ matrix.artifact.docker.tag }}
-        run: |  
+        run: |
           docker load --input ${{ matrix.artifact.artifact }}.tar
           docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.image }}
           docker push ${{ env.image }}

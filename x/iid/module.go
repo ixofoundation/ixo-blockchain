@@ -3,6 +3,7 @@ package iid
 import ( // this line is used by starport scaffolding # 1
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -29,32 +30,16 @@ var (
 // ----------------------------------------------------------------------------
 
 // AppModuleBasic implements the AppModuleBasic interface for the capability module.
-type AppModuleBasic struct {
-	cdc codec.Codec
-}
-
-func NewAppModuleBasic(cdc codec.Codec) AppModuleBasic {
-	return AppModuleBasic{cdc: cdc}
-}
+type AppModuleBasic struct{}
 
 // Name returns the capability module's name.
 func (AppModuleBasic) Name() string {
 	return types.ModuleName
 }
 
-// nolint
-// func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
-// 	types.RegisterLegacyAminoCodec(cdc)
-// }
-
-// nolint
+// RegisterLegacyAminoCodec registers the module's types for the given codec.
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	types.RegisterLegacyAminoCodec(cdc)
-}
-
-// RegisterInterfaces registers the module's interface types
-func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {
-	types.RegisterInterfaces(reg)
 }
 
 // DefaultGenesis returns the capability module's default genesis state.
@@ -73,16 +58,18 @@ func (AppModuleBasic) ValidateGenesis(
 	if err != nil {
 		return err
 	}
+	// TODO add validation
 	return nil //types.ValidateGenesis(data)
 }
 
+// RegisterRESTRoutes registers the REST routes for the module.
+func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
+	// rest.RegisterHandlers(ctx, rtr)
+}
+
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
-func (AppModuleBasic) RegisterGRPCGatewayRoutes(
-	clientCtx client.Context,
-	mux *runtime.ServeMux,
-) {
-	_ = types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
-	// this line is used by starport scaffolding # 2
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(ctx client.Context, mux *runtime.ServeMux) {
+	_ = types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(ctx))
 }
 
 // GetTxCmd returns the capability module's root tx command.
@@ -93,6 +80,11 @@ func (a AppModuleBasic) GetTxCmd() *cobra.Command {
 // GetQueryCmd returns the capability module's root query command.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 	return cli.GetQueryCmd(types.StoreKey)
+}
+
+// RegisterInterfaces registers the module's interface types
+func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {
+	types.RegisterInterfaces(reg)
 }
 
 // ----------------------------------------------------------------------------
@@ -107,7 +99,7 @@ type AppModule struct {
 
 func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 	return AppModule{
-		AppModuleBasic: NewAppModuleBasic(cdc),
+		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,
 	}
 }
@@ -125,11 +117,18 @@ func (am AppModule) Route() sdk.Route {
 // QuerierRoute returns the capability module's query routing key.
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
+// LegacyQuerierHandler returns the capability module's Querier.
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+	return func(sdk.Context, []string, abci.RequestQuery) ([]byte, error) {
+		return nil, fmt.Errorf("legacy querier not supported for the x/%s module", types.ModuleName)
+	}
+}
+
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQuerier(am.keeper))
 }
 
 // RegisterInvariants registers the capability module's invariants.
@@ -165,18 +164,3 @@ func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Valid
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return 1 }
-
-// ----------------------------------------------------------------------------
-// Deprecation notice
-// ----------------------------------------------------------------------------
-
-// RegisterRESTRoutes registers the capability module's REST service handlers.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-
-}
-
-// nolint
-// LegacyQuerierHandler returns the capability module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return nil
-}

@@ -70,6 +70,13 @@ ixod validate-genesis
 FROM="enable = false"
 TO="enable = true"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+# Enable cors
+FROM="enabled-unsafe-cors = false"
+TO="enabled-unsafe-cors = true"
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+FROM="cors_allowed_origins = \[\]"
+TO="cors_allowed_origins = \[\"*\"\]"
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 # Enable Swagger docs
 FROM="swagger = false"

@@ -14,6 +14,23 @@
     - [SellOrder](#ixo.bonds.v1beta1.SellOrder)
     - [SwapOrder](#ixo.bonds.v1beta1.SwapOrder)
   
+- [ixo/bonds/v1beta1/event.proto](#ixo/bonds/v1beta1/event.proto)
+    - [BondBuyOrderCancelledEvent](#ixo.bonds.v1beta1.BondBuyOrderCancelledEvent)
+    - [BondBuyOrderEvent](#ixo.bonds.v1beta1.BondBuyOrderEvent)
+    - [BondBuyOrderFulfilledEvent](#ixo.bonds.v1beta1.BondBuyOrderFulfilledEvent)
+    - [BondCreatedEvent](#ixo.bonds.v1beta1.BondCreatedEvent)
+    - [BondEditAlphaFailedEvent](#ixo.bonds.v1beta1.BondEditAlphaFailedEvent)
+    - [BondEditAlphaSuccessEvent](#ixo.bonds.v1beta1.BondEditAlphaSuccessEvent)
+    - [BondMakeOutcomePaymentEvent](#ixo.bonds.v1beta1.BondMakeOutcomePaymentEvent)
+    - [BondSellOrderEvent](#ixo.bonds.v1beta1.BondSellOrderEvent)
+    - [BondSellOrderFulfilledEvent](#ixo.bonds.v1beta1.BondSellOrderFulfilledEvent)
+    - [BondSetNextAlphaEvent](#ixo.bonds.v1beta1.BondSetNextAlphaEvent)
+    - [BondSwapOrderEvent](#ixo.bonds.v1beta1.BondSwapOrderEvent)
+    - [BondSwapOrderFulfilledEvent](#ixo.bonds.v1beta1.BondSwapOrderFulfilledEvent)
+    - [BondUpdatedEvent](#ixo.bonds.v1beta1.BondUpdatedEvent)
+    - [BondWithdrawReserveEvent](#ixo.bonds.v1beta1.BondWithdrawReserveEvent)
+    - [BondWithdrawShareEvent](#ixo.bonds.v1beta1.BondWithdrawShareEvent)
+  
 - [ixo/bonds/v1beta1/genesis.proto](#ixo/bonds/v1beta1/genesis.proto)
     - [GenesisState](#ixo.bonds.v1beta1.GenesisState)
   
@@ -526,6 +543,290 @@ bond.
 | ----- | ---- | ----- | ----------- |
 | base_order | [BaseOrder](#ixo.bonds.v1beta1.BaseOrder) |  |  |
 | to_token | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/bonds/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/bonds/v1beta1/event.proto
+
+
+
+<a name="ixo.bonds.v1beta1.BondBuyOrderCancelledEvent"></a>
+
+### BondBuyOrderCancelledEvent
+BondBuyOrderCancelledEvent is an event triggered on a Bond buy order
+cancellation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| order | [BuyOrder](#ixo.bonds.v1beta1.BuyOrder) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondBuyOrderEvent"></a>
+
+### BondBuyOrderEvent
+BondBuyOrderEvent is an event triggered on a Bond buy order
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| order | [BuyOrder](#ixo.bonds.v1beta1.BuyOrder) |  |  |
+| bond_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondBuyOrderFulfilledEvent"></a>
+
+### BondBuyOrderFulfilledEvent
+BondBuyOrderFulfilledEvent is an event triggered on a Bond buy order
+fullfillment
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| order | [BuyOrder](#ixo.bonds.v1beta1.BuyOrder) |  |  |
+| charged_prices | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| charged_fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| returned_to_address | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| new_bond_token_balance | [string](#string) |  |  |
+| charged_prices_of_which_reserve | [string](#string) |  |  |
+| charged_prices_of_which_funding | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondCreatedEvent"></a>
+
+### BondCreatedEvent
+BondCreatedEvent is an event triggered on a Bond creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond | [Bond](#ixo.bonds.v1beta1.Bond) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondEditAlphaFailedEvent"></a>
+
+### BondEditAlphaFailedEvent
+BondEditAlphaFailedEvent is an event triggered on a failed attempt to edit of
+Bond alpha value
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| token | [string](#string) |  |  |
+| cancel_reason | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondEditAlphaSuccessEvent"></a>
+
+### BondEditAlphaSuccessEvent
+BondEditAlphaSuccessEvent is an event triggered on a successful edit of Bond
+alpha value
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| token | [string](#string) |  |  |
+| public_alpha | [string](#string) |  |  |
+| system_alpha | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondMakeOutcomePaymentEvent"></a>
+
+### BondMakeOutcomePaymentEvent
+BondMakeOutcomePaymentEvent is an event triggered on a Bond make outcome
+payment
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| outcome_payment | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| sender_did | [string](#string) |  |  |
+| sender_address | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondSellOrderEvent"></a>
+
+### BondSellOrderEvent
+BondSellOrderEvent is an event triggered on a Bond sell order
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| order | [SellOrder](#ixo.bonds.v1beta1.SellOrder) |  |  |
+| bond_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondSellOrderFulfilledEvent"></a>
+
+### BondSellOrderFulfilledEvent
+BondSellOrderFulfilledEvent is an event triggered on a Bond sell order
+fullfillment
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| order | [SellOrder](#ixo.bonds.v1beta1.SellOrder) |  |  |
+| charged_fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| returned_to_address | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| new_bond_token_balance | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondSetNextAlphaEvent"></a>
+
+### BondSetNextAlphaEvent
+BondSetNextAlphaEvent is an event triggered when next batch alpha is set
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| next_alpha | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondSwapOrderEvent"></a>
+
+### BondSwapOrderEvent
+BondSwapOrderEvent is an event triggered on a Bond swap order
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| order | [SwapOrder](#ixo.bonds.v1beta1.SwapOrder) |  |  |
+| bond_did | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondSwapOrderFulfilledEvent"></a>
+
+### BondSwapOrderFulfilledEvent
+BondSwapOrderFulfilledEvent is an event triggered on a Bond swap order
+fullfillment
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| order | [SwapOrder](#ixo.bonds.v1beta1.SwapOrder) |  |  |
+| charged_fee | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| returned_to_address | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| tokens_swapped | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondUpdatedEvent"></a>
+
+### BondUpdatedEvent
+BondUpdatedEvent is an event triggered on a Bond update
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond | [Bond](#ixo.bonds.v1beta1.Bond) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondWithdrawReserveEvent"></a>
+
+### BondWithdrawReserveEvent
+BondWithdrawReserveEvent is an event triggered on a Bond reserve withdrawal
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| withdraw_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| withdrawer_did | [string](#string) |  |  |
+| withdrawer_address | [string](#string) |  |  |
+| reserve_withdrawal_address | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.bonds.v1beta1.BondWithdrawShareEvent"></a>
+
+### BondWithdrawShareEvent
+BondWithdrawShareEvent is an event triggered on a Bond share withdrawal
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bond_did | [string](#string) |  |  |
+| withdraw_payment | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| recipient_did | [string](#string) |  |  |
+| recipient_address | [string](#string) |  |  |
 
 
 
@@ -4267,7 +4568,7 @@ credential link ***.ipfs |
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  |  |
 | index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
-| name | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| name | [string](#string) |  | name is the token name, which is same as Token name |
 | collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
 | tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
 
@@ -5009,9 +5310,9 @@ Query defines the gRPC querier service.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | Params | [QueryParamsRequest](#ixo.token.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.token.v1beta1.QueryParamsResponse) |  |
+| TokenMetadata | [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest) | [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse) |  |
 | TokenList | [QueryTokenListRequest](#ixo.token.v1beta1.QueryTokenListRequest) | [QueryTokenListResponse](#ixo.token.v1beta1.QueryTokenListResponse) |  |
 | TokenDoc | [QueryTokenDocRequest](#ixo.token.v1beta1.QueryTokenDocRequest) | [QueryTokenDocResponse](#ixo.token.v1beta1.QueryTokenDocResponse) |  |
-| TokenMetadata | [QueryTokenMetadataRequest](#ixo.token.v1beta1.QueryTokenMetadataRequest) | [QueryTokenMetadataResponse](#ixo.token.v1beta1.QueryTokenMetadataResponse) |  |
 
  
 

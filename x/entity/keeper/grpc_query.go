@@ -11,24 +11,34 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ types.QueryServer = Keeper{}
+var _ types.QueryServer = Querier{}
 
-func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+// Querier defines a wrapper around the x/entity keeper providing gRPC method
+// handlers.
+type Querier struct {
+	Keeper
+}
+
+func NewQuerier(k Keeper) Querier {
+	return Querier{Keeper: k}
+}
+
+func (q Querier) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
 
-	return &types.QueryParamsResponse{Params: k.GetParams(ctx)}, nil
+	return &types.QueryParamsResponse{Params: q.Keeper.GetParams(ctx)}, nil
 }
 
-func (k Keeper) Entity(c context.Context, req *types.QueryEntityRequest) (*types.QueryEntityResponse, error) {
+func (q Querier) Entity(c context.Context, req *types.QueryEntityRequest) (*types.QueryEntityResponse, error) {
 	if req == nil || req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	doc, entity, err := k.ResolveEntity(ctx, req.Id)
+	doc, entity, err := q.Keeper.ResolveEntity(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
@@ -36,13 +46,13 @@ func (k Keeper) Entity(c context.Context, req *types.QueryEntityRequest) (*types
 	return &types.QueryEntityResponse{IidDocument: doc, Entity: entity}, nil
 }
 
-func (k Keeper) EntityMetaData(c context.Context, req *types.QueryEntityMetadataRequest) (*types.QueryEntityMetadataResponse, error) {
+func (q Querier) EntityMetaData(c context.Context, req *types.QueryEntityMetadataRequest) (*types.QueryEntityMetadataResponse, error) {
 	if req == nil || req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	_, entity, err := k.ResolveEntity(ctx, req.Id)
+	_, entity, err := q.Keeper.ResolveEntity(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
@@ -50,13 +60,13 @@ func (k Keeper) EntityMetaData(c context.Context, req *types.QueryEntityMetadata
 	return &types.QueryEntityMetadataResponse{Entity: entity}, nil
 }
 
-func (k Keeper) EntityIidDocument(c context.Context, req *types.QueryEntityIidDocumentRequest) (*types.QueryEntityIidDocumentResponse, error) {
+func (q Querier) EntityIidDocument(c context.Context, req *types.QueryEntityIidDocumentRequest) (*types.QueryEntityIidDocumentResponse, error) {
 	if req == nil || req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	doc, _, err := k.ResolveEntity(ctx, req.Id)
+	doc, _, err := q.Keeper.ResolveEntity(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
@@ -64,13 +74,13 @@ func (k Keeper) EntityIidDocument(c context.Context, req *types.QueryEntityIidDo
 	return &types.QueryEntityIidDocumentResponse{IidDocument: doc}, nil
 }
 
-func (k Keeper) EntityVerified(c context.Context, req *types.QueryEntityVerifiedRequest) (*types.QueryEntityVerifiedResponse, error) {
+func (q Querier) EntityVerified(c context.Context, req *types.QueryEntityVerifiedRequest) (*types.QueryEntityVerifiedResponse, error) {
 	if req == nil || req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	_, entity, err := k.ResolveEntity(ctx, req.Id)
+	_, entity, err := q.Keeper.ResolveEntity(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
@@ -78,18 +88,18 @@ func (k Keeper) EntityVerified(c context.Context, req *types.QueryEntityVerified
 	return &types.QueryEntityVerifiedResponse{EntityVerified: entity.EntityVerified}, nil
 }
 
-func (k Keeper) EntityList(c context.Context, req *types.QueryEntityListRequest) (*types.QueryEntityListResponse, error) {
+func (q Querier) EntityList(c context.Context, req *types.QueryEntityListRequest) (*types.QueryEntityListResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	var entities []types.Entity
 	ctx := sdk.UnwrapSDKContext(c)
-	entityStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.EntityKey)
+	entityStore := prefix.NewStore(ctx.KVStore(q.Keeper.storeKey), types.EntityKey)
 
 	pageRes, err := query.Paginate(entityStore, req.Pagination, func(key []byte, value []byte) error {
 		var entity types.Entity
-		if err := k.cdc.Unmarshal(value, &entity); err != nil {
+		if err := q.Keeper.cdc.Unmarshal(value, &entity); err != nil {
 			return err
 		}
 
@@ -100,7 +110,7 @@ func (k Keeper) EntityList(c context.Context, req *types.QueryEntityListRequest)
 	// pageRes, err := query.FilteredPaginate(entityStore, req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
 	// 	if accumulate {
 	// 		var e types.EntityDoc
-	// 		if err := k.cdc.Unmarshal(value, &e); err != nil {
+	// 		if err := q.Keeper.cdc.Unmarshal(value, &e); err != nil {
 	// 			return false, err
 	// 		}
 	// 		entities = append(entities, e)

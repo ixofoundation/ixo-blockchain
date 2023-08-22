@@ -26,8 +26,8 @@ type Keeper struct {
 	cdc codec.BinaryCodec
 }
 
-func NewKeeper(bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper, stakingKeeper stakingkeeper.Keeper,
-	iidKeeper iidkeeper.Keeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace, cdc codec.BinaryCodec) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, bankKeeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper, stakingKeeper stakingkeeper.Keeper,
+	iidKeeper iidkeeper.Keeper, storeKey sdk.StoreKey, paramSpace paramstypes.Subspace) Keeper {
 
 	// ensure batches module account is set
 	if addr := accountKeeper.GetModuleAddress(types.BatchesIntermediaryAccount); addr == nil {

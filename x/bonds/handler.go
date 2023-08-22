@@ -148,12 +148,13 @@ func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) []abci.ValidatorUpdate {
 
 				newV0, err := types.Invariant(R.ToDec(), S.ToDec(), newKappa)
 				if err != nil {
-					ctx.EventManager().EmitEvent(sdk.NewEvent(
-						types.EventTypeEditAlphaFailed,
-						sdk.NewAttribute(types.AttributeKeyBondDid, bond.BondDid),
-						sdk.NewAttribute(types.AttributeKeyToken, bond.Token),
-						sdk.NewAttribute(types.AttributeKeyCancelReason, err.Error()),
-					))
+					ctx.EventManager().EmitTypedEvents(
+						&types.BondEditAlphaFailedEvent{
+							BondDid:      bond.BondDid,
+							Token:        bond.Token,
+							CancelReason: err.Error(),
+						},
+					)
 					//fmt.Println(err)
 					continue
 				}
