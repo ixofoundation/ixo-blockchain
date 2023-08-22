@@ -1,312 +1,314 @@
-# name: Prepare Release
+name: Prepare Release
 
+on:
+  workflow_dispatch:
 # on:
 #   push:
 #     tags:
 #       - v*
 
-# jobs:
-#   gather-build-info:
-#     name: Gather Build Info
-#     runs-on: ubuntu-latest
-#     outputs:
-#       is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, 'rc') }}
-#       version: ${{ steps.get_version.outputs.version }}
-#     steps:
-#       - id: get_version
-#         uses: battila7/get-version-action@master
+jobs:
+  gather-build-info:
+    name: Gather Build Info
+    runs-on: ubuntu-latest
+    outputs:
+      is-prerelease: ${{ startsWith(steps.get_version.outputs.prerelease, 'rc') }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - id: get_version
+        uses: battila7/get-version-action@master
 
-#   test-code:
-#     name: ${{ matrix.test.name }}
-#     runs-on: ubuntu-latest
-#     continue-on-error: ${{ matrix.test.experimental }}
-#     needs:
-#       - gather-build-info
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         test:
-#           - name: Unit Tests (Code)
-#             command: npm run test:code
-#             experimental: true
-#             artifact: ""
-#             enabled: true
+  test-code:
+    name: ${{ matrix.test.name }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.test.experimental }}
+    needs:
+      - gather-build-info
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - name: Unit Tests (Code)
+            command: npm run test:code
+            experimental: true
+            artifact: ""
+            enabled: true
 
-#           - name: Snyk (Security)
-#             command: npm run test:security
-#             experimental: true
-#             enabled: true
+          - name: Snyk (Security)
+            command: npm run test:security
+            experimental: true
+            enabled: true
 
-#           - name: Lint (Quality)
-#             command: npm run lint
-#             experimental: true
-#             enabled: true
+          - name: Lint (Quality)
+            command: npm run lint
+            experimental: true
+            enabled: true
 
-#           - name: Coverage (Quality)
-#             command: npm run test:coverage
-#             experimental: true
-#             enabled: false
+          - name: Coverage (Quality)
+            command: npm run test:coverage
+            experimental: true
+            enabled: false
 
-#         exclude:
-#           - test:
-#               enabled: false
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Install Npm Dependencies
-#         run: npm install --ignore-scripts
-#       - name: Run Test
-#         run: ${{ matrix.test.command }}
+        exclude:
+          - test:
+              enabled: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Npm Dependencies
+        run: npm install --ignore-scripts
+      - name: Run Test
+        run: ${{ matrix.test.command }}
 
-#   build:
-#     name: ${{ matrix.build.name }}
-#     runs-on: ubuntu-latest
-#     needs:
-#       - gather-build-info
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         build:
-#           - name: Build docker image
-#             os: ubuntu-latest
-#             enabled: true
-#             artifact: ixo-chain
-#             docker:
-#               file: .infra/dockerfiles/Dockerfile
-#               target: dist-stable
-#             outputs:
-#               type: "image"
-#             # post-build:
-#             #   enabled: false
+  build:
+    name: ${{ matrix.build.name }}
+    runs-on: ubuntu-latest
+    needs:
+      - gather-build-info
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - name: Build docker image
+            os: ubuntu-latest
+            enabled: true
+            artifact: ixo-chain
+            docker:
+              file: .infra/dockerfiles/Dockerfile
+              target: dist-stable
+            outputs:
+              type: "image"
+            # post-build:
+            #   enabled: false
 
-#           - name: Build debian package
-#             os: ubuntu-latest
-#             artifact: "ixod_linux_amd64"
-#             enabled: true
-#             docker:
-#               file: .infra/dockerfiles/Dockerfile
-#               target: build-binary
-#             outputs:
-#               type: file
-#               path: /dist/app/ixo-blockchain_linux_amd64.tar.gz
-#             # post-build:
-#             #   enabled: false
+          - name: Build debian package
+            os: ubuntu-latest
+            artifact: "ixod_linux_amd64"
+            enabled: true
+            docker:
+              file: .infra/dockerfiles/Dockerfile
+              target: build-binary
+            outputs:
+              type: file
+              path: /dist/app/ixo-blockchain_linux_amd64.tar.gz
+            # post-build:
+            #   enabled: false
 
-#           - name: Build darwin binary
-#             os: ubuntu-latest
-#             artifact: "ixod_darwin_amd64"
-#             enabled: true
-#             docker:
-#               file: .infra/dockerfiles/Dockerfile
-#               target: build-binary
-#             outputs:
-#               type: file
-#               path: /dist/app/ixo-blockchain_darwin_amd64.tar.gz
+          - name: Build darwin binary
+            os: ubuntu-latest
+            artifact: "ixod_darwin_amd64"
+            enabled: true
+            docker:
+              file: .infra/dockerfiles/Dockerfile
+              target: build-binary
+            outputs:
+              type: file
+              path: /dist/app/ixo-blockchain_darwin_amd64.tar.gz
 
-#         exclude:
-#           - build:
-#               enabled: false
+        exclude:
+          - build:
+              enabled: false
 
-#     steps:
-#       - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-#       - name: Set up Docker Buildx
-#         if: matrix.build.outputs.type == 'image'
-#         uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        if: matrix.build.outputs.type == 'image'
+        uses: docker/setup-buildx-action@v1
 
-#       - name: Build Docker Image and Save
-#         if: matrix.build.outputs.type == 'image'
-#         uses: docker/build-push-action@v2
-#         with:
-#           push: false
-#           context: .
-#           tags: ${{ matrix.build.artifact }}:tmp
-#           target: ${{ matrix.build.docker.target }}
-#           file: ${{ matrix.build.docker.file }}
-#           outputs: type=docker,dest=/tmp/${{ matrix.build.artifact }}.tar
+      - name: Build Docker Image and Save
+        if: matrix.build.outputs.type == 'image'
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          context: .
+          tags: ${{ matrix.build.artifact }}:tmp
+          target: ${{ matrix.build.docker.target }}
+          file: ${{ matrix.build.docker.file }}
+          outputs: type=docker,dest=/tmp/${{ matrix.build.artifact }}.tar
 
-#       - name: Build Docker Image
-#         if: matrix.build.outputs.type == 'file'
-#         uses: docker/build-push-action@v2
-#         with:
-#           push: false
-#           context: .
-#           tags: ${{ matrix.build.artifact }}:tmp
-#           target: ${{ matrix.build.docker.target }}
-#           file: ${{ matrix.build.docker.file }}
+      - name: Build Docker Image
+        if: matrix.build.outputs.type == 'file'
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          context: .
+          tags: ${{ matrix.build.artifact }}:tmp
+          target: ${{ matrix.build.docker.target }}
+          file: ${{ matrix.build.docker.file }}
 
-#       - name: Extract files from Docker Image
-#         id: extracted-files
-#         if: matrix.build.outputs.type == 'file'
-#         uses: shrink/actions-docker-extract@v1
-#         with:
-#           image: ${{ matrix.build.artifact }}:tmp
-#           path: ${{ matrix.build.outputs.path }}
+      - name: Extract files from Docker Image
+        id: extracted-files
+        if: matrix.build.outputs.type == 'file'
+        uses: shrink/actions-docker-extract@v1
+        with:
+          image: ${{ matrix.build.artifact }}:tmp
+          path: ${{ matrix.build.outputs.path }}
 
-#       - name: Upload Docker Image
-#         if: matrix.build.outputs.type == 'image'
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: ${{ matrix.build.artifact }}
-#           path: /tmp/${{ matrix.build.artifact }}.tar
+      - name: Upload Docker Image
+        if: matrix.build.outputs.type == 'image'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.build.artifact }}
+          path: /tmp/${{ matrix.build.artifact }}.tar
 
-#       - name: Upload File
-#         if: matrix.build.outputs.type == 'file'
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: ${{ matrix.build.artifact }}
-#           path: ${{ steps.extracted-files.outputs.destination }}
+      - name: Upload File
+        if: matrix.build.outputs.type == 'file'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.build.artifact }}
+          path: ${{ steps.extracted-files.outputs.destination }}
 
-#   test-artifact:
-#     name: ${{ matrix.test.name }}
-#     runs-on: ubuntu-latest
-#     continue-on-error: ${{ matrix.test.experimental }}
-#     needs:
-#       - build
-#     strategy:
-#       matrix:
-#         test:
-#           - name: Scan Docker image (Security)
-#             os: ubuntu-latest
-#             artifact: ixo-chain
-#             enabled: true
-#             experimental: true
-#             command: docker scan --file .infra/dockerfiles/Dockerfile ixo-chain:tmp
+  test-artifact:
+    name: ${{ matrix.test.name }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.test.experimental }}
+    needs:
+      - build
+    strategy:
+      matrix:
+        test:
+          - name: Scan Docker image (Security)
+            os: ubuntu-latest
+            artifact: ixo-chain
+            enabled: true
+            experimental: true
+            command: docker scan --file .infra/dockerfiles/Dockerfile ixo-chain:tmp
 
-#           - name: Integration Tests (Quality)
-#             os: ubuntu-latest
-#             artifact: ixo-chain
-#             enabled: false
-#             experimental: true
+          - name: Integration Tests (Quality)
+            os: ubuntu-latest
+            artifact: ixo-chain
+            enabled: false
+            experimental: true
 
-#         exclude:
-#           - test:
-#               enabled: false
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Download artifact
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: ${{ matrix.test.artifact }}
+        exclude:
+          - test:
+              enabled: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.test.artifact }}
 
-#       - name: Load image
-#         run: docker load --input ${{ matrix.test.artifact }}.tar
+      - name: Load image
+        run: docker load --input ${{ matrix.test.artifact }}.tar
 
-#       - name: Run ${{matrix.test.name }}
-#         run: ${{ matrix.test.command }}
+      - name: Run ${{matrix.test.name }}
+        run: ${{ matrix.test.command }}
 
-#   publish-release:
-#     name: ${{ matrix.release.name }}
-#     runs-on: ubuntu-latest
-#     outputs:
-#       upload-url: ${{ steps.release.outputs.upload_url}}
-#     needs:
-#       - gather-build-info
-#       - test-code
-#       - build
-#       - test-artifact
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         release:
-#           - name: Publish Release
-#             enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
-#             config: release-config.yaml
+  publish-release:
+    name: ${{ matrix.release.name }}
+    runs-on: ubuntu-latest
+    outputs:
+      upload-url: ${{ steps.release.outputs.upload_url}}
+    needs:
+      - gather-build-info
+      - test-code
+      - build
+      - test-artifact
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - name: Publish Release
+            enabled: ${{ !needs.gather-build-info.outputs.is-prerelease }}
+            config: release-config.yaml
 
-#           - name: Publish Pre-Release
-#             enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
-#             config: prerelease-config.yaml
+          - name: Publish Pre-Release
+            enabled: ${{ needs.gather-build-info.outputs.is-prerelease }}
+            config: prerelease-config.yaml
 
-#         exclude:
-#           - release:
-#               enabled: false
-#     steps:
-#       - name: Create Release
-#         id: release
-#         uses: release-drafter/release-drafter@v5
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           config-name: ${{ matrix.release.config }}
-#           tag: ${{ needs.gather-build-info.outputs.version }}
-#           publish: true
-#           commitish: ${{ github.sha }}
+        exclude:
+          - release:
+              enabled: false
+    steps:
+      - name: Create Release
+        id: release
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: ${{ matrix.release.config }}
+          tag: ${{ needs.gather-build-info.outputs.version }}
+          publish: true
+          commitish: ${{ github.sha }}
 
-#   publish-release-artifacts:
-#     name: ${{ matrix.artifact.name }}
-#     runs-on: ubuntu-latest
-#     needs:
-#       - gather-build-info
-#       - build
-#       - publish-release
-#     strategy:
-#       matrix:
-#         artifact:
-#           - name: Publish Docker Image
-#             os: ubuntu-latest
-#             artifact: ixo-chain
-#             enabled: true
-#             type: docker
-#             docker:
-#               registry: ghcr.io
-#               owner: ${{ github.repository_owner }}
-#               image: ${{ github.event.repository.name }}
-#               username: ${{ github.actor }}
-#               # password: ${{ secrets.GITHUB_TOKEN }}
-#               tag: ${{ needs.gather-build-info.outputs.version }}
+  publish-release-artifacts:
+    name: ${{ matrix.artifact.name }}
+    runs-on: ubuntu-latest
+    needs:
+      - gather-build-info
+      - build
+      - publish-release
+    strategy:
+      matrix:
+        artifact:
+          - name: Publish Docker Image
+            os: ubuntu-latest
+            artifact: ixo-chain
+            enabled: true
+            type: docker
+            docker:
+              registry: ghcr.io
+              owner: ${{ github.repository_owner }}
+              image: ${{ github.event.repository.name }}
+              username: ${{ github.actor }}
+              # password: ${{ secrets.GITHUB_TOKEN }}
+              tag: ${{ needs.gather-build-info.outputs.version }}
 
-#           - name: Publish Linux Binary
-#             os: ubuntu-latest
-#             artifact: "ixod_linux_amd64"
-#             enabled: true
-#             type: file
-#             file:
-#               path: ixo-blockchain_linux_amd64.tar.gz
-#               extention: .tar.gz
+          - name: Publish Linux Binary
+            os: ubuntu-latest
+            artifact: "ixod_linux_amd64"
+            enabled: true
+            type: file
+            file:
+              path: ixo-blockchain_linux_amd64.tar.gz
+              extention: .tar.gz
 
-#           - name: Publish Darwin Binary
-#             os: ubuntu-latest
-#             artifact: "ixod_darwin_amd64"
-#             enabled: true
-#             type: file
-#             file:
-#               path: ixo-blockchain_darwin_amd64.tar.gz
-#               extention: .tar.gz
+          - name: Publish Darwin Binary
+            os: ubuntu-latest
+            artifact: "ixod_darwin_amd64"
+            enabled: true
+            type: file
+            file:
+              path: ixo-blockchain_darwin_amd64.tar.gz
+              extention: .tar.gz
 
-#         exclude:
-#           - artifact:
-#               enabled: false
+        exclude:
+          - artifact:
+              enabled: false
 
-#     steps:
-#       - name: Login to DockerHub
-#         if: matrix.artifact.type == 'docker'
-#         uses: docker/login-action@v1
-#         with:
-#           registry: ${{ matrix.artifact.docker.registry }}
-#           username: ${{ matrix.artifact.docker.username }}
-#           password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Login to DockerHub
+        if: matrix.artifact.type == 'docker'
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ matrix.artifact.docker.registry }}
+          username: ${{ matrix.artifact.docker.username }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-#       - name: Download artifact
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: ${{ matrix.artifact.artifact }}
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.artifact.artifact }}
 
-#       - name: Upload Release Asset
-#         if: matrix.artifact.type == 'file'
-#         id: upload-release-asset
-#         uses: actions/upload-release-asset@v1
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-#           asset_path: ./${{ matrix.artifact.file.path }}
-#           asset_name: ${{ matrix.artifact.artifact }}.${{ matrix.artifact.file.extention }}
-#           asset_content_type: application/tar+gzip
+      - name: Upload Release Asset
+        if: matrix.artifact.type == 'file'
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.publish-release.outputs.upload-url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./${{ matrix.artifact.file.path }}
+          asset_name: ${{ matrix.artifact.artifact }}.${{ matrix.artifact.file.extention }}
+          asset_content_type: application/tar+gzip
 
-#       - name: Publish Docker Image
-#         if: matrix.artifact.type == 'docker'
-#         env:
-#           image: ${{ matrix.artifact.docker.registry }}/${{ matrix.artifact.docker.owner }}/${{ matrix.artifact.docker.image }}:${{ matrix.artifact.docker.tag }}
-#         run: |
-#           docker load --input ${{ matrix.artifact.artifact }}.tar
-#           docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.image }}
-#           docker push ${{ env.image }}
+      - name: Publish Docker Image
+        if: matrix.artifact.type == 'docker'
+        env:
+          image: ${{ matrix.artifact.docker.registry }}/${{ matrix.artifact.docker.owner }}/${{ matrix.artifact.docker.image }}:${{ matrix.artifact.docker.tag }}
+        run: |
+          docker load --input ${{ matrix.artifact.artifact }}.tar
+          docker tag ${{ matrix.artifact.artifact }}:tmp ${{ env.image }}
+          docker push ${{ env.image }}

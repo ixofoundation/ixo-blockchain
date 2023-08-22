@@ -1,4 +1,6 @@
-# name: golangci-lint
+name: golangci-lint
+on:
+  workflow_dispatch:
 # on:
 #   push:
 #     tags:
@@ -7,26 +9,26 @@
 #       - main
 #   pull_request:
 
-# env:
-#   GO_VERSION: 1.20.7
+env:
+  GO_VERSION: 1.20.7
 
-# permissions:
-#   contents: read
+permissions:
+  contents: read
 
-# jobs:
-#   golangci:
-#     name: Run golangci-lint
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Check out repository code
-#         uses: actions/checkout@v3
-#       - name: 🐿 Setup Golang
-#         uses: actions/setup-go@v4
-#         with:
-#           go-version: ${{env.GO_VERSION}}
-#       - name: golangci-lint
-#         uses: golangci/golangci-lint-action@v3
-#         with:
-#           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-#           version: latest
-#           args: --timeout 10m
+jobs:
+  golangci:
+    name: Run golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: 🐿 Setup Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{env.GO_VERSION}}
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+          version: latest
+          args: --timeout 10m

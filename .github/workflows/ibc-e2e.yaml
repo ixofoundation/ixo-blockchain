@@ -1,18 +1,21 @@
-# name: Tests / E2E Upgrade
+name: Tests / E2E Upgrade
+
+on:
+  workflow_dispatch:
 # on:
 #   workflow_dispatch:
 #   push:
-#     branches: [master]
+#     branches: [main]
 
-# jobs:
-#   upgrade-v5:
-#     uses: cosmos/ibc-go/.github/workflows/e2e-test-workflow-call.yml@main
-#     with:
-#       chain-image: ghcr.io/ixofoundation/ixo-blockchain
-#       chain-binary: ixod
-#       chain-a-tag: 0.19.3
-#       chain-b-tag: 0.19.3
-#       chain-upgrade-tag: debug-v0.19.4.7
-#       upgrade-plan-name: "normal upgrade"
-#       test-entry-point:  "TestUpgradeTestSuite"
-#       test: "TestIBCChainUpgrade"
+jobs:
+  upgrade-v5:
+    uses: cosmos/ibc-go/.github/workflows/e2e-test-workflow-call.yml@main
+    with:
+      chain-image: ghcr.io/ixofoundation/ixo-blockchain
+      chain-binary: ixod
+      chain-a-tag: 0.19.3
+      chain-b-tag: 0.19.3
+      chain-upgrade-tag: debug-v0.19.4.7
+      upgrade-plan-name: "normal upgrade"
+      test-entry-point: "TestUpgradeTestSuite"
+      test: "TestIBCChainUpgrade"
