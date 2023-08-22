@@ -1,0 +1,11 @@
+# https://github.com/Arkweid/lefthook/blob/master/docs/full_guide.md
+
+commit-msg:
+  parallel: true
+  commands:
+    validate-commit-message:
+      run: npx --no-install commitlint -e
+
+pre-push:
+  parallel: true
+  commands: {}
