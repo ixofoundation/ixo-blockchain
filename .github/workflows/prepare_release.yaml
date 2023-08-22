@@ -281,7 +281,7 @@ jobs:
     steps:
       - name: Login to DockerHub
         if: matrix.artifact.type == 'docker'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ matrix.artifact.docker.registry }}
           username: ${{ matrix.artifact.docker.username }}
