@@ -139,7 +139,7 @@ jobs:
       - name: Extract files from Docker Image
         id: extracted-files
         if: matrix.build.outputs.type == 'file'
-        uses: shrink/actions-docker-extract@v1
+        uses: shrink/actions-docker-extract@v2
         with:
           image: ${{ matrix.build.artifact }}:tmp
           path: ${{ matrix.build.outputs.path }}
