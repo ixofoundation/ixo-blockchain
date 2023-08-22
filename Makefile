@@ -227,7 +227,8 @@ release-dry-run:
 		$(GORELEASER_IMAGE) \
 		release \
 		--clean \
-		--skip-publish
+		--skip-publish \
+		--skip-validate
 
 release-snapshot:
 	docker run \

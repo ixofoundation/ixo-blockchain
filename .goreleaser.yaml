@@ -74,6 +74,7 @@ builds:
       - amd64
     env:
       - CC=x86_64-linux-gnu-gcc
+      - CXX=x86_64-linux-gnu-g++
     flags:
       - -mod=readonly
       - -trimpath
@@ -85,7 +86,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,muslc,osusergo
       - -w -s
       - -linkmode=external
-      - -extldflags '-Wl,-z,muldefs -static -lm'
+      - -extldflags '-Wl,-z,muldefs --static -lm'
     tags:
       - netgo
       - ledger
@@ -104,6 +105,7 @@ builds:
       - arm64
     env:
       - CC=aarch64-linux-gnu-gcc
+      - CXX=aarch64-linux-gnu-g++
     flags:
       - -mod=readonly
       - -trimpath
@@ -115,7 +117,7 @@ builds:
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,muslc,osusergo
       - -w -s
       - -linkmode=external
-      - -extldflags '-Wl,-z,muldefs -static -lm'
+      - -extldflags '-Wl,-z,muldefs --static -lm'
     tags:
       - netgo
       - ledger
