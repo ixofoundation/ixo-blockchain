@@ -771,6 +771,812 @@
       "services": []
     },
     {
+      "name": "ixo/bonds/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.bonds.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "BondBuyOrderCancelledEvent",
+          "longName": "BondBuyOrderCancelledEvent",
+          "fullName": "ixo.bonds.v1beta1.BondBuyOrderCancelledEvent",
+          "description": "BondBuyOrderCancelledEvent is an event triggered on a Bond buy order\ncancellation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "BuyOrder",
+              "longType": "BuyOrder",
+              "fullType": "ixo.bonds.v1beta1.BuyOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondBuyOrderEvent",
+          "longName": "BondBuyOrderEvent",
+          "fullName": "ixo.bonds.v1beta1.BondBuyOrderEvent",
+          "description": "BondBuyOrderEvent is an event triggered on a Bond buy order",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "BuyOrder",
+              "longType": "BuyOrder",
+              "fullType": "ixo.bonds.v1beta1.BuyOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondBuyOrderFulfilledEvent",
+          "longName": "BondBuyOrderFulfilledEvent",
+          "fullName": "ixo.bonds.v1beta1.BondBuyOrderFulfilledEvent",
+          "description": "BondBuyOrderFulfilledEvent is an event triggered on a Bond buy order\nfullfillment",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "BuyOrder",
+              "longType": "BuyOrder",
+              "fullType": "ixo.bonds.v1beta1.BuyOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "charged_prices",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "charged_fees",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "returned_to_address",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "new_bond_token_balance",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "charged_prices_of_which_reserve",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "charged_prices_of_which_funding",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondCreatedEvent",
+          "longName": "BondCreatedEvent",
+          "fullName": "ixo.bonds.v1beta1.BondCreatedEvent",
+          "description": "BondCreatedEvent is an event triggered on a Bond creation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond",
+              "description": "",
+              "label": "",
+              "type": "Bond",
+              "longType": "Bond",
+              "fullType": "ixo.bonds.v1beta1.Bond",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondEditAlphaFailedEvent",
+          "longName": "BondEditAlphaFailedEvent",
+          "fullName": "ixo.bonds.v1beta1.BondEditAlphaFailedEvent",
+          "description": "BondEditAlphaFailedEvent is an event triggered on a failed attempt to edit of\nBond alpha value",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cancel_reason",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondEditAlphaSuccessEvent",
+          "longName": "BondEditAlphaSuccessEvent",
+          "fullName": "ixo.bonds.v1beta1.BondEditAlphaSuccessEvent",
+          "description": "BondEditAlphaSuccessEvent is an event triggered on a successful edit of Bond\nalpha value",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "public_alpha",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "system_alpha",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondMakeOutcomePaymentEvent",
+          "longName": "BondMakeOutcomePaymentEvent",
+          "fullName": "ixo.bonds.v1beta1.BondMakeOutcomePaymentEvent",
+          "description": "BondMakeOutcomePaymentEvent is an event triggered on a Bond make outcome\npayment",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "outcome_payment",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "sender_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "sender_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondSellOrderEvent",
+          "longName": "BondSellOrderEvent",
+          "fullName": "ixo.bonds.v1beta1.BondSellOrderEvent",
+          "description": "BondSellOrderEvent is an event triggered on a Bond sell order",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "SellOrder",
+              "longType": "SellOrder",
+              "fullType": "ixo.bonds.v1beta1.SellOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondSellOrderFulfilledEvent",
+          "longName": "BondSellOrderFulfilledEvent",
+          "fullName": "ixo.bonds.v1beta1.BondSellOrderFulfilledEvent",
+          "description": "BondSellOrderFulfilledEvent is an event triggered on a Bond sell order\nfullfillment",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "SellOrder",
+              "longType": "SellOrder",
+              "fullType": "ixo.bonds.v1beta1.SellOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "charged_fees",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "returned_to_address",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "new_bond_token_balance",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondSetNextAlphaEvent",
+          "longName": "BondSetNextAlphaEvent",
+          "fullName": "ixo.bonds.v1beta1.BondSetNextAlphaEvent",
+          "description": "BondSetNextAlphaEvent is an event triggered when next batch alpha is set",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "next_alpha",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "signer",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondSwapOrderEvent",
+          "longName": "BondSwapOrderEvent",
+          "fullName": "ixo.bonds.v1beta1.BondSwapOrderEvent",
+          "description": "BondSwapOrderEvent is an event triggered on a Bond swap order",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "SwapOrder",
+              "longType": "SwapOrder",
+              "fullType": "ixo.bonds.v1beta1.SwapOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondSwapOrderFulfilledEvent",
+          "longName": "BondSwapOrderFulfilledEvent",
+          "fullName": "ixo.bonds.v1beta1.BondSwapOrderFulfilledEvent",
+          "description": "BondSwapOrderFulfilledEvent is an event triggered on a Bond swap order\nfullfillment",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "",
+              "label": "",
+              "type": "SwapOrder",
+              "longType": "SwapOrder",
+              "fullType": "ixo.bonds.v1beta1.SwapOrder",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "charged_fee",
+              "description": "",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "returned_to_address",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens_swapped",
+              "description": "",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondUpdatedEvent",
+          "longName": "BondUpdatedEvent",
+          "fullName": "ixo.bonds.v1beta1.BondUpdatedEvent",
+          "description": "BondUpdatedEvent is an event triggered on a Bond update",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond",
+              "description": "",
+              "label": "",
+              "type": "Bond",
+              "longType": "Bond",
+              "fullType": "ixo.bonds.v1beta1.Bond",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondWithdrawReserveEvent",
+          "longName": "BondWithdrawReserveEvent",
+          "fullName": "ixo.bonds.v1beta1.BondWithdrawReserveEvent",
+          "description": "BondWithdrawReserveEvent is an event triggered on a Bond reserve withdrawal",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "withdraw_amount",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "withdrawer_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "withdrawer_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reserve_withdrawal_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "BondWithdrawShareEvent",
+          "longName": "BondWithdrawShareEvent",
+          "fullName": "ixo.bonds.v1beta1.BondWithdrawShareEvent",
+          "description": "BondWithdrawShareEvent is an event triggered on a Bond share withdrawal",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "bond_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "withdraw_payment",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "recipient_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "recipient_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "ixo/bonds/v1beta1/genesis.proto",
       "description": "",
       "package": "ixo.bonds.v1beta1",
@@ -1692,7 +2498,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/bonds"
+                      "pattern": "/ixo/bonds/bonds"
                     }
                   ]
                 }
@@ -1714,7 +2520,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/bonds_detailed"
+                      "pattern": "/ixo/bonds/bonds_detailed"
                     }
                   ]
                 }
@@ -11060,7 +11866,7 @@
             },
             {
               "name": "name",
-              "description": "index is the unique identifier hexstring that identifies the token",
+              "description": "name is the token name, which is same as Token name",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -12880,6 +13686,28 @@
               }
             },
             {
+              "name": "TokenMetadata",
+              "description": "",
+              "requestType": "QueryTokenMetadataRequest",
+              "requestLongType": "QueryTokenMetadataRequest",
+              "requestFullType": "ixo.token.v1beta1.QueryTokenMetadataRequest",
+              "requestStreaming": false,
+              "responseType": "QueryTokenMetadataResponse",
+              "responseLongType": "QueryTokenMetadataResponse",
+              "responseFullType": "ixo.token.v1beta1.QueryTokenMetadataResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/token/metadata/{id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
               "name": "TokenList",
               "description": "",
               "requestType": "QueryTokenListRequest",
@@ -12895,7 +13723,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/{minter}"
+                      "pattern": "/ixo/token/minter/{minter}"
                     }
                   ]
                 }
@@ -12917,29 +13745,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/token/{minter}/{contract_address}"
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "name": "TokenMetadata",
-              "description": "",
-              "requestType": "QueryTokenMetadataRequest",
-              "requestLongType": "QueryTokenMetadataRequest",
-              "requestFullType": "ixo.token.v1beta1.QueryTokenMetadataRequest",
-              "requestStreaming": false,
-              "responseType": "QueryTokenMetadataResponse",
-              "responseLongType": "QueryTokenMetadataResponse",
-              "responseFullType": "ixo.token.v1beta1.QueryTokenMetadataResponse",
-              "responseStreaming": false,
-              "options": {
-                "google.api.http": {
-                  "rules": [
-                    {
-                      "method": "GET",
-                      "pattern": "/ixo/token/metadata/{id}"
+                      "pattern": "/ixo/token/minter/{minter}/{contract_address}"
                     }
                   ]
                 }

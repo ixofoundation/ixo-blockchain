@@ -1,7 +1,0 @@
-on:
-  push:
-    tag:
-     
-jobs:
-  test:
-  

@@ -34,5 +34,5 @@ func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context
 		}
 	}
 
-	return next(newCtx, tx, simulate)
+	return next(ctx, tx, simulate)
 }
