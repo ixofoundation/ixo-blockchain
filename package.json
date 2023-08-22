@@ -10,7 +10,7 @@
 	},
 	"devDependencies": {
 		"@arkweid/lefthook": "0.7.7",
-		"@commitlint/cli": "17.4.4",
+		"@commitlint/cli": "17.7.1",
 		"@commitlint/config-conventional": "17.4.4",
 		"concurrently": "7.6.0",
 		"snyk": "1.1118.0"
