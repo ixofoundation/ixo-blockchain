@@ -28,7 +28,7 @@ FROM build-dependencies AS build-devel
 
 COPY ./ .
 
-ENTRYPOINT [ "starport", "chain", "serve" ]
+# ENTRYPOINT [ "starport", "chain", "serve" ]
 
 # Build Golang files
 FROM --platform=linux/amd64 build-dependencies AS build-binary
