@@ -24,4 +24,4 @@ The ixo Blockchain powers client applications for coordinating, financing and ve
 
 If you are interested in contributing to the ixo Blockchain, you can start by reviewing the documentation on our [website](https://docs.ixo.foundation/ixo/developers). There are many opportunities to get involved, such as contributing code or participating in community discussions.
 
-Our community is passionate about using blockchain technology to create positive impacts in the world. We believe in the power of collaboration and innovation to drive change, and we welcome anyone who shares our vision to join us on Discord or Telegram
+Our community is passionate about using blockchain technology to create positive impacts in the world. We believe in the power of collaboration and innovation to drive change, and we welcome anyone who shares our vision to join us on Discord or Telegram.
