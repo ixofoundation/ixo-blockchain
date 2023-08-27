@@ -173,6 +173,9 @@ func NewIxoApp(
 	// Tell the app's module manager how to set the order of InitGenesis, which are run genesis initialization.
 	app.mm.SetOrderInitGenesis(orderInitBlockers()...)
 
+	// TODO check if needed
+	ModuleBasics.RegisterInterfaces(app.interfaceRegistry)
+
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
@@ -384,7 +387,7 @@ func (app *IxoApp) setupUpgradeHandlers() {
 	for _, upgrade := range Upgrades {
 		app.UpgradeKeeper.SetUpgradeHandler(
 			upgrade.UpgradeName,
-			upgrade.CreateUpgradeHandler(app.mm, app.configurator, &app.AppKeepers),
+			upgrade.CreateUpgradeHandler(app.mm, app.configurator),
 		)
 	}
 }
@@ -393,7 +396,7 @@ func (app *IxoApp) setupUpgradeHandlers() {
 func (app *IxoApp) beginBlockForks(ctx sdk.Context) {
 	for _, fork := range Forks {
 		if ctx.BlockHeight() == fork.UpgradeHeight {
-			fork.BeginForkLogic(ctx, &app.AppKeepers)
+			fork.BeginForkLogic(ctx)
 			return
 		}
 	}
