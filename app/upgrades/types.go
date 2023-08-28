@@ -5,7 +5,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/ixofoundation/ixo-blockchain/app/keepers"
 )
 
 // Upgrade defines a struct containing necessary fields that a
@@ -19,7 +18,7 @@ type Upgrade struct {
 	UpgradeName string
 
 	// CreateUpgradeHandler defines the function that creates an upgrade handler
-	CreateUpgradeHandler func(*module.Manager, module.Configurator, *keepers.AppKeepers) upgradetypes.UpgradeHandler
+	CreateUpgradeHandler func(*module.Manager, module.Configurator) upgradetypes.UpgradeHandler
 
 	// used for any new modules introduced, new modules deleted, or store names renamed
 	StoreUpgrades store.StoreUpgrades
@@ -41,5 +40,5 @@ type Fork struct {
 	UpgradeHeight int64
 
 	// function that runs some custom state transition code at the beginning of a fork
-	BeginForkLogic func(ctx sdk.Context, keepers *keepers.AppKeepers)
+	BeginForkLogic func(ctx sdk.Context)
 }
