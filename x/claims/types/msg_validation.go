@@ -3,8 +3,8 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ixo "github.com/ixofoundation/ixo-blockchain/lib/ixo"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	ixo "github.com/ixofoundation/ixo-blockchain/v2/lib/ixo"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 // --------------------------

@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/types.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types";
 
 // Msg defines the identity Msg service.
 service Msg {

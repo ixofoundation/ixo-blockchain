@@ -4,7 +4,7 @@ package ixo.iid.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/iid/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types";
 
 // GenesisState defines the did module's genesis state.
 message GenesisState {

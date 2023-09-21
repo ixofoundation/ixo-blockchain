@@ -4,7 +4,7 @@ package ixo.bonds.v1beta1;
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types";
 
 // FunctionParam is a key-value pair used for specifying a specific bond
 // parameter.
@@ -35,12 +35,14 @@ message Bond {
   string token = 1;
   string name = 2;
   string description = 3;
-  string creator_did = 4
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
-  string controller_did = 5
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string creator_did = 4 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
+  string controller_did = 5 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string function_type = 6;
   repeated FunctionParam function_parameters = 7 [
     (gogoproto.nullable) = false,
@@ -96,17 +98,19 @@ message Bond {
   ];
   string state = 26;
   string bond_did = 27;
-  string oracle_did = 28
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string oracle_did = 28 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
 }
 
 // BaseOrder defines a base order type. It contains all the necessary fields for
 // specifying the general details about a buy, sell, or swap order.
 message BaseOrder {
-  string account_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string account_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
   bool cancelled = 3;
   string cancel_reason = 4;

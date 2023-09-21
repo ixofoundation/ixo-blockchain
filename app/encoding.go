@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/ixofoundation/ixo-blockchain/app/params"
+	"github.com/ixofoundation/ixo-blockchain/v2/app/params"
 )
 
 var encodingConfig params.EncodingConfig = MakeEncodingConfig()

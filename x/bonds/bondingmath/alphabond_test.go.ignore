@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
 )
 
 type simFunc func(*AugmentedBondRevision1, AugmentedBondRevision1) (AugmentedBondRevision1, error)

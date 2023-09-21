@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types";
 
 // Msg defines the bonds Msg service.
 service Msg {
@@ -54,15 +54,18 @@ message MsgCreateBond {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "FunctionParams"
   ];
-  string creator_did = 7
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
-  string controller_did = 8
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
-  string oracle_did = 9
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string creator_did = 7 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
+  string controller_did = 8 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
+  string oracle_did = 9 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   repeated string reserve_tokens = 10;
   string tx_fee_percentage = 11 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -112,9 +115,10 @@ message MsgEditBond {
   string order_quantity_limits = 4;
   string sanity_rate = 5;
   string sanity_margin_percentage = 6;
-  string editor_did = 7
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string editor_did = 7 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string editor_address = 8;
 }
 
@@ -132,9 +136,10 @@ message MsgSetNextAlpha {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = true
   ];
-  string oracle_did = 4
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string oracle_did = 4 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string oracle_address = 5;
 }
 
@@ -144,9 +149,10 @@ message MsgSetNextAlphaResponse {}
 message MsgUpdateBondState {
   string bond_did = 1;
   string state = 2;
-  string editor_did = 3
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string editor_did = 3 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string editor_address = 4;
 }
 
@@ -155,9 +161,10 @@ message MsgUpdateBondStateResponse {}
 
 // MsgBuy defines a message for buying from a bond.
 message MsgBuy {
-  string buyer_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string buyer_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
   repeated cosmos.base.v1beta1.Coin max_prices = 3 [
     (gogoproto.nullable) = false,
@@ -172,9 +179,10 @@ message MsgBuyResponse {}
 
 // MsgSell defines a message for selling from a bond.
 message MsgSell {
-  string seller_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string seller_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
   string bond_did = 3;
   string seller_address = 4;
@@ -186,9 +194,10 @@ message MsgSellResponse {}
 // MsgSwap defines a message for swapping from one reserve bond token to
 // another.
 message MsgSwap {
-  string swapper_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string swapper_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string bond_did = 2;
   cosmos.base.v1beta1.Coin from = 3 [ (gogoproto.nullable) = false ];
   string to_token = 4;
@@ -201,9 +210,10 @@ message MsgSwapResponse {}
 // MsgMakeOutcomePayment defines a message for making an outcome payment to a
 // bond.
 message MsgMakeOutcomePayment {
-  string sender_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string sender_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string amount = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
@@ -219,9 +229,10 @@ message MsgMakeOutcomePaymentResponse {}
 // MsgWithdrawShare defines a message for withdrawing a share from a bond that
 // is in the SETTLE stage.
 message MsgWithdrawShare {
-  string recipient_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string recipient_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string bond_did = 2;
   string recipient_address = 3;
 }
@@ -231,9 +242,10 @@ message MsgWithdrawShareResponse {}
 
 // MsgWithdrawReserve defines a message for withdrawing reserve from a bond.
 message MsgWithdrawReserve {
-  string withdrawer_did = 1
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string withdrawer_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   repeated cosmos.base.v1beta1.Coin amount = 2 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"

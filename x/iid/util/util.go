@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 func GetAccountForVerificationMethod(ctx sdk.Context, accountKeeper authante.AccountKeeper, iidDoc iidtypes.IidDocument, methodId string) (authtypes.AccountI, error) {

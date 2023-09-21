@@ -5,9 +5,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	nft "github.com/ixofoundation/ixo-blockchain/x/entity/types/contracts"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
+	nft "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types/contracts"
 )
 
 const (

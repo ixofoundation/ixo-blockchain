@@ -3,7 +3,7 @@ package ixo.token.v1beta1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/token/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/token/types";
 
 message Params { uint64 ixo1155_contract_code = 1; }
 

@@ -29,5 +29,7 @@ done
 # Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. ./testutil/testdata/*.proto
 
 # move proto files to the right places
-cp -r github.com/ixofoundation/ixo-blockchain/* ./
+#
+# Note: Proto files are suffixed with the current binary version.
+cp -r github.com/ixofoundation/ixo-blockchain/v2/* ./
 rm -rf github.com

@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 func (k Keeper) MustGetBatch(ctx sdk.Context, bondDid string) types.Batch {

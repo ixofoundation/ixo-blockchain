@@ -3,8 +3,8 @@ package token
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/token/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/token/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/token/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
