@@ -2,8 +2,8 @@ package bonds
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
 )
 
 func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, data *types.GenesisState) {

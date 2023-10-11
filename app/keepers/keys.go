@@ -33,11 +33,11 @@ import (
 	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 
 	// Local
-	bondstypes "github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/x/token/types"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v2/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v2/x/token/types"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {

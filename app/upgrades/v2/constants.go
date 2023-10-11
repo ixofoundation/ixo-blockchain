@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/app/upgrades"
+	"github.com/ixofoundation/ixo-blockchain/v2/app/upgrades"
 
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v4/types"

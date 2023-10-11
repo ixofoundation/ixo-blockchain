@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	types "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	types "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 var (

@@ -10,9 +10,9 @@ package rest
 // 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 // 	"github.com/cosmos/cosmos-sdk/types/rest"
 // 	"github.com/gorilla/mux"
-// 	bondsclient "github.com/ixofoundation/ixo-blockchain/x/bonds/client"
-// 	"github.com/ixofoundation/ixo-blockchain/x/bonds/types"
-// 	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+// 	bondsclient "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/client"
+// 	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
+// 	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 // )
 
 // func registerTxHandlers(clientCtx client.Context, r *mux.Router) {

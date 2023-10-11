@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/token/types"
 )
 
 func tokenKey(minter, contract_address string) []byte {

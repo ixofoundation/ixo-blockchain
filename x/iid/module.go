@@ -15,9 +15,9 @@ import ( // this line is used by starport scaffolding # 1
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/ixofoundation/ixo-blockchain/x/iid/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/x/iid/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/iid/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 var (

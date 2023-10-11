@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 // IsValidCollection tells if a Claim Collection is valid,

@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ixo.claims.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/claims/types";
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
@@ -48,9 +48,10 @@ message MsgSubmitClaim {
   // claimID is the unique identifier of the claim in the cid hash format
   string claim_id = 2;
   // agent is the DID of the agent submitting the claim
-  string agent_did = 3
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_did = 3 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string agent_address = 4;
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 5;
@@ -66,9 +67,10 @@ message MsgEvaluateClaim {
   // oracle is the DID of the Oracle entity that evaluates the claim
   string oracle = 3;
   // agent is the DID of the agent that submits the evaluation
-  string agent_did = 4
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_did = 4 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string agent_address = 5;
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 6;
@@ -98,9 +100,10 @@ message MsgDisputeClaim {
   string subject_id = 1;
   // agent is the DID of the agent disputing the claim, agent detials wont be
   // saved in kvStore
-  string agent_did = 2
-      [ (gogoproto.casttype) =
-            "github.com/ixofoundation/ixo-blockchain/x/iid/types.DIDFragment" ];
+  string agent_did = 2 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+  ];
   string agent_address = 3;
   // type is expressed as an integer, interpreted by the client
   int32 dispute_type = 4;

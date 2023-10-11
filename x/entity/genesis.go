@@ -2,8 +2,8 @@ package entity
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -24,6 +24,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	return &types.GenesisState{
 		Entities: entities,
-		Params: params,
+		Params:   params,
 	}
 }

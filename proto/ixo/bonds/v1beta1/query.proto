@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types";
 
 // Query defines the gRPC querier service.
 service Query {

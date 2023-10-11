@@ -6,7 +6,7 @@ import "cosmos_proto/cosmos.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/x/entity/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types";
 
 // Cosmos authz module types, creating here for ease of use
 

@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	iidante "github.com/ixofoundation/ixo-blockchain/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v2/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
 )
 
 const (

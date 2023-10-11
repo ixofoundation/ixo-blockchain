@@ -1,16 +1,16 @@
-version: "3.7"
+version: '3.7'
 services:
   # nginx:
-    # image: nginx
-    # container_name: ixo_nginx
-    # restart: unless-stopped
-    # ports:
-    #   - "80:8081"
-    # volumes:
-    #   - .infra/nginx/devel.conf:/etc/nginx/conf.d/devel.conf
-    # links:
-    #   - ixo-blockchain
-    #   - ixo-swagger
+  # image: nginx
+  # container_name: ixo_nginx
+  # restart: unless-stopped
+  # ports:
+  #   - "80:8081"
+  # volumes:
+  #   - .infra/nginx/devel.conf:/etc/nginx/conf.d/devel.conf
+  # links:
+  #   - ixo-blockchain
+  #   - ixo-swagger
 
   # ixo-swagger:
   #   container_name: ixo_swagger
@@ -19,8 +19,8 @@ services:
   #   environment:
   #     - BASE_URL=/swagger
   #     - SWAGGER_JSON=/api-docs/swagger.yaml
-  #   ports: 
-  #    - "8090:8080" 
+  #   ports:
+  #    - "8090:8080"
   #   volumes:
   #     - "./docs/static/openapi.yml:/api-docs/swagger.yaml"
 
@@ -35,7 +35,8 @@ services:
     image: ixo-chain:devel
     restart: unless-stopped
     volumes:
-      - "./:/app"
+      - './:/app'
+      - '.data/:/root/.ixod'
     ports:
-      - "1317:1317" # API
-      - "26658:26657" # 
+      - '1317:1317' # API
+      - '26658:26657' #
