@@ -143,8 +143,7 @@ message MsgTransferEntity {
 
 message MsgTransferEntityResponse {}
 
-// create a module account for an entity, account details will be added as a
-// linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+// create a module account for an entity
 message MsgCreateEntityAccount {
   // entity id (did) to create account for
   string id = 1;

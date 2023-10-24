@@ -6,21 +6,22 @@ Bonding curves are continuous liquidity mechanisms which are used in market desi
 
 Token Bonding Curves are therefore an important crypto-economic mechanism for building a wide range of capabilities directly into decentralised applications. They can function simultaneously as means of decentralised capital formation, liquidity provision and autonomous market maker.
 Bonding curves are powerful tools because the tokens they issue can represent rights - including
-* rights of access
-* rights of use
-* rights of ownership, and 
-* voting rights. 
 
-In the case of continuous organizations, tokens issued through bonding curves embody rights to the future revenues of a startup. 
-In the augmented bonding curve, tokens can embody the rights to govern how funds are spent by a not-for-profit organization. 
+- rights of access
+- rights of use
+- rights of ownership, and
+- voting rights.
+
+In the case of continuous organizations, tokens issued through bonding curves embody rights to the future revenues of a startup.
+In the augmented bonding curve, tokens can embody the rights to govern how funds are spent by a not-for-profit organization.
 In an Alpha-Bond, tokens can give holders the rights to future outcomes payments and performance incentive bonuses.
 
 ## Token Bonds Module
 
-The Token Bonds Cosmos SDK Module enables applications that use token bonding curves to be created on-the-fly. 
+The Token Bonds Cosmos SDK Module enables applications that use token bonding curves to be created on-the-fly.
 Each new Token B instance declares a new token denomination in the application, with a set of parameters.
 The module stores the current state of all tokens that have been created using this module.
-Changes in state occur through transactions that are instructed by valid *buy, sell, and swap* messages.
+Changes in state occur through transactions that are instructed by valid _buy, sell, and swap_ messages.
 
 **Buy** instructions cause bond tokens to be minted during a state transition. This increases the total supply balance of tokens.
 **Sell** instructions burn bond tokens during a state transition that decreases the total supply balance of tokens.
@@ -30,10 +31,10 @@ Bond Tokens trade against pairings in their Bond Reserve.
 
 The bonding curve forms an interface between the reserve token quantity and the bond token price (in the Reserve currency).
 
-Bonding curves are defined by their mathematical properties. This is determined by the type of curve function and by the function parameters that are set. Generally these parameters are chosen to best-fit empiricially-observed market dynamics of supply and demand. 
-External parameters, such as market supply and demand, are complex and typically hard to predict. 
+Bonding curves are defined by their mathematical properties. This is determined by the type of curve function and by the function parameters that are set. Generally these parameters are chosen to best-fit empiricially-observed market dynamics of supply and demand.
+External parameters, such as market supply and demand, are complex and typically hard to predict.
 
-*****
+---
 
 Pricing is defined by the function type and function parameters, which can define either the pricing function of the bond as a function of the supply, or simply indicate that the bond is a token swapper, where pricing is instead defined by the first buyer and any swaps performed thereafter.
 
@@ -41,36 +42,38 @@ A bond may also specify non-zero fees, which are calculated based on the size of
 
 ```go
 type Bond struct {
-    Token                        string                                   
-    Name                         string                                   
-    Description                  string                                   
-    CreatorDid                   string                                   
-    ControllerDid                string                                   
-    FunctionType                 string                                   
-    FunctionParameters           FunctionParams                           
-    ReserveTokens                []string                                 
-    TxFeePercentage              sdk.Dec   
-    ExitFeePercentage            sdk.Dec   
+    Token                        string
+    Name                         string
+    Description                  string
+    CreatorDid                   string
+    ControllerDid                string
+    FunctionType                 string
+    FunctionParameters           FunctionParams
+    ReserveTokens                []string
+    TxFeePercentage              sdk.Dec
+    ExitFeePercentage            sdk.Dec
     FeeAddress                   string
     ReserveWithdrawalAddress     string
-    MaxSupply                    sdk.Coin                               
-    OrderQuantityLimits          sdk.Coins 
-    SanityRate                   sdk.Dec   
-    SanityMarginPercentage       sdk.Dec   
-    CurrentSupply                sdk.Coin                               
+    MaxSupply                    sdk.Coin
+    OrderQuantityLimits          sdk.Coins
+    SanityRate                   sdk.Dec
+    SanityMarginPercentage       sdk.Dec
+    CurrentSupply                sdk.Coin
     CurrentReserve               sdk.Coins
     AvailableReserve             sdk.Coins
-    CurrentOutcomePaymentReserve sdk.Coins 
+    CurrentOutcomePaymentReserve sdk.Coins
     AllowSells                   bool
     AllowReserveWithdrawals      bool
-    AlphaBond                    bool                                     
-    BatchBlocks                  sdk.Uint  
-    OutcomePayment               sdk.Int   
-    State                        string                                   
-    BondDid                      string                                   
+    AlphaBond                    bool
+    BatchBlocks                  sdk.Uint
+    OutcomePayment               sdk.Int
+    State                        string
+    BondDid                      string
 }
 ```
+
 The following is a list of all possible bond states:
+
 - `"HATCH"`
 - `"OPEN"`
 - `"SETTLED"`
@@ -78,10 +81,12 @@ The following is a list of all possible bond states:
 
 By default, a newly created bond will be in state OPEN, unless the bond is an augmented bonding curve, in which case the initial state is HATCH.
 The following are the valid transitions between bond states.
+
 <pre>
 - HATCH -> OPEN or FAILED
 - OPEN  -> SETTLE or FAILED
 </pre>
+
 No valid transitions exist from the SETTLE and FAILED states.
 
 ## Batching
