@@ -6,30 +6,30 @@ In this section we describe the processing of the bonds messages and the corresp
 
 Bonds can be created by any address using `MsgCreateBond`.
 
-| **Field**                | **Type**         | **Description** |
-|:-------------------------|:-----------------|:----------------|
-| BondDid                  | `did.Did`        | DID of the bond (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Token                    | `string`         | The denomination of the bond's tokens (e.g. `abc`, `mytoken1`)
-| Name                     | `string`         | A friendly name as a title for the bond (e.g. `A B C`, `My Token`)
-| Description              | `string`         | A description of what the bond represents or its purpose
-| FunctionType             | `string`         | The type of function that will define the bonding curve (`power_function`, `sigmoid_function`, or `swapper_function`)
-| FunctionParameters       | `FunctionParams` | The parameters of the function defining the bonding curve (e.g. `m:12,n:2,c:100`)
-| CreatorDid               | `did.Did`        | DID of the bond creator (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| ControllerDid            | `did.Did`        | DID of the bond controller (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| ReserveTokens            | `[]string`       | The token denominations that will be used as reserve (e.g. `res,rez`)
-| TxFeePercentage          | `sdk.Dec`        | The percentage fee charged for buys/sells/swaps (e.g. `0.3`)
-| ExitFeePercentage        | `sdk.Dec`        | The percentage fee charged for sells on top of the tx fee (e.g. `0.2`)
-| FeeAddress               | `sdk.AccAddress` | The address of the account that will store charged fees
-| ReserveWithdrawalAddress | `sdk.AccAddress` | The address of the account that will receive any reserve withdrawn by the controller
-| MaxSupply                | `sdk.Coin`       | The maximum number of bond tokens that can be minted
-| OrderQuantityLimits      | `sdk.Coins`      | The maximum number of tokens that one can buy/sell/swap in a single order (e.g. `100abc,200res,300rez`)
-| SanityRate               | `sdk.Dec`        | For a swapper, restricts conversion rate (`r1/r2`) to `sanity rate ± sanity margin percentage`. `0` for no sanity checks.
-| SanityMarginPercentage   | `sdk.Dec`        | Used as described above. `0` for no sanity checks
-| AllowSells               | `bool`           | Whether or not selling is allowed (cannot be True if AllowReserveWithdrawals is True)
-| AllowReserveWithdrawals  | `bool`           | Whether or not reserve withdrawals are allowed (cannot be True if AllowSells is True)
-| AlphaBond                | `bool`           | Whether or not bond is an alpha bond
-| BatchBlocks              | `sdk.Uint`       | The lifespan of each orders batch in blocks
-| OutcomePayment           | `sdk.Int`        | The approximate total payment required to be made in order to transition a bond from OPEN to SETTLE
+| **Field**                | **Type**         | **Description**                                                                                                           |
+| :----------------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| BondDid                  | `did.Did`        | DID of the bond (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                                                                   |
+| Token                    | `string`         | The denomination of the bond's tokens (e.g. `abc`, `mytoken1`)                                                            |
+| Name                     | `string`         | A friendly name as a title for the bond (e.g. `A B C`, `My Token`)                                                        |
+| Description              | `string`         | A description of what the bond represents or its purpose                                                                  |
+| FunctionType             | `string`         | The type of function that will define the bonding curve (`power_function`, `sigmoid_function`, or `swapper_function`)     |
+| FunctionParameters       | `FunctionParams` | The parameters of the function defining the bonding curve (e.g. `m:12,n:2,c:100`)                                         |
+| CreatorDid               | `did.Did`        | DID of the bond creator (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                                                           |
+| ControllerDid            | `did.Did`        | DID of the bond controller (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                                                        |
+| ReserveTokens            | `[]string`       | The token denominations that will be used as reserve (e.g. `res,rez`)                                                     |
+| TxFeePercentage          | `sdk.Dec`        | The percentage fee charged for buys/sells/swaps (e.g. `0.3`)                                                              |
+| ExitFeePercentage        | `sdk.Dec`        | The percentage fee charged for sells on top of the tx fee (e.g. `0.2`)                                                    |
+| FeeAddress               | `sdk.AccAddress` | The address of the account that will store charged fees                                                                   |
+| ReserveWithdrawalAddress | `sdk.AccAddress` | The address of the account that will receive any reserve withdrawn by the controller                                      |
+| MaxSupply                | `sdk.Coin`       | The maximum number of bond tokens that can be minted                                                                      |
+| OrderQuantityLimits      | `sdk.Coins`      | The maximum number of tokens that one can buy/sell/swap in a single order (e.g. `100abc,200res,300rez`)                   |
+| SanityRate               | `sdk.Dec`        | For a swapper, restricts conversion rate (`r1/r2`) to `sanity rate ± sanity margin percentage`. `0` for no sanity checks. |
+| SanityMarginPercentage   | `sdk.Dec`        | Used as described above. `0` for no sanity checks                                                                         |
+| AllowSells               | `bool`           | Whether or not selling is allowed (cannot be True if AllowReserveWithdrawals is True)                                     |
+| AllowReserveWithdrawals  | `bool`           | Whether or not reserve withdrawals are allowed (cannot be True if AllowSells is True)                                     |
+| AlphaBond                | `bool`           | Whether or not bond is an alpha bond                                                                                      |
+| BatchBlocks              | `sdk.Uint`       | The lifespan of each orders batch in blocks                                                                               |
+| OutcomePayment           | `sdk.Int`        | The approximate total payment required to be made in order to transition a bond from OPEN to SETTLE                       |
 
 ```go
 type MsgCreateBond struct {
@@ -59,6 +59,7 @@ type MsgCreateBond struct {
 ```
 
 This message is expected to fail if:
+
 - another bond with this bond DID is already registered
 - another bond with this token is already registered, the token is the staking token, or the token is not a valid denomination
 - name or description is an empty string
@@ -101,17 +102,18 @@ This message creates and stores the `Bond` object at appropriate indexes. Note t
 
 The owner of a bond can edit some of the bond's parameters using `MsgEditBond`.
 
-| **Field**              | **Type**  | **Description** |
-|:-----------------------|:----------|:----------------|
-| BondDid                | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Name                   | `string`  | Refer to MsgCreateBond
-| Description            | `string`  | Refer to MsgCreateBond
-| OrderQuantityLimits    | `string`  | Refer to MsgCreateBond
-| SanityRate             | `string`  | Refer to MsgCreateBond
-| SanityMarginPercentage | `string`  | Refer to MsgCreateBond
-| EditorDid              | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field**              | **Type**  | **Description**                                                                 |
+| :--------------------- | :-------- | :------------------------------------------------------------------------------ |
+| BondDid                | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
+| Name                   | `string`  | Refer to MsgCreateBond                                                          |
+| Description            | `string`  | Refer to MsgCreateBond                                                          |
+| OrderQuantityLimits    | `string`  | Refer to MsgCreateBond                                                          |
+| SanityRate             | `string`  | Refer to MsgCreateBond                                                          |
+| SanityMarginPercentage | `string`  | Refer to MsgCreateBond                                                          |
+| EditorDid              | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                  |
 
 This message is expected to fail if:
+
 - bond does not exist
 - any editable field violates the restrictions set for the same field in `MsgCreateBond`
 - all editable fields are `"[do-not-modify]"`
@@ -136,13 +138,14 @@ This message stores the updated `Bond` object.
 
 The controller of a bond can set the next public alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
 
-| **Field** | **Type**  | **Description** |
-|:----------|:----------|:----------------|
-| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Alpha     | `sdk.Dec` | Public alpha value to be set (e.g. `0.5`)
-| EditorDid | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field** | **Type**  | **Description**                                                                 |
+| :-------- | :-------- | :------------------------------------------------------------------------------ |
+| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
+| Alpha     | `sdk.Dec` | Public alpha value to be set (e.g. `0.5`)                                       |
+| EditorDid | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                  |
 
 This message is expected to fail if:
+
 - bond does not exist
 - public alpha value falls outside of 0.0001 <= alpha <= 0.9999
 - public alpha value violates any of the below rules
@@ -168,13 +171,14 @@ This message stores the next alpha value in the current `Batch` object, where it
 
 The controller of a bond can change a bond's state to SETTLE or FAILED using `MsgUpdateBondState`.
 
-| **Field** | **Type**    | **Description** |
-|:----------|:------------|:----------------|
-| BondDid   | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| State     | `BondState` | Bond state to be set (e.g. `SETTLE`)
-| EditorDid | `did.Did`   | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field** | **Type**    | **Description**                                                                 |
+| :-------- | :---------- | :------------------------------------------------------------------------------ |
+| BondDid   | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
+| State     | `BondState` | Bond state to be set (e.g. `SETTLE`)                                            |
+| EditorDid | `did.Did`   | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                  |
 
 This message is expected to fail if:
+
 - bond does not exist
 - state is not SETTLE or FAILED
 - state is not a valid transition from the current bond state
@@ -199,14 +203,15 @@ A buy order is cancelled if the max prices are exceeded at any point during the 
 
 In the case of `augmented_function` bonds, if the bond state is `HATCH`, a fixed price-per-token `p0` is used. This value (`p0`) is one of the function parameters required for this function type.
 
-| **Field** | **Type**    | **Description** |
-|:----------|:------------|:----------------|
-| BuyerDid  | `did.Did`   | DID of the buyer (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | `sdk.Coin`  | The amount of bond tokens to be bought
-| MaxPrices | `sdk.Coins` | The max price to pay in reserve tokens
-| BondDid   | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field** | **Type**    | **Description**                                                                 |
+| :-------- | :---------- | :------------------------------------------------------------------------------ |
+| BuyerDid  | `did.Did`   | DID of the buyer (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                        |
+| Amount    | `sdk.Coin`  | The amount of bond tokens to be bought                                          |
+| MaxPrices | `sdk.Coins` | The max price to pay in reserve tokens                                          |
+| BondDid   | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 
 This message is expected to fail if:
+
 - bond does not exist or bond state is not HATCH or OPEN
 - amount is not an amount of an existing bond
 - max prices is greater than the balance of the buyer
@@ -217,7 +222,7 @@ This message is expected to fail if:
 - amount violates an order quantity limit defined by the bond
 - bond DID or buyer DID is not a valid DID
 
-The batch-adjusted current supply in the case of buys is the current supply of the bond plus any uncancelled buy amounts in the current batch. 
+The batch-adjusted current supply in the case of buys is the current supply of the bond plus any uncancelled buy amounts in the current batch.
 
 ```go
 type MsgBuy struct {
@@ -246,13 +251,14 @@ Once the sell order is fulfilled, the number of tokens to be sold are burned on 
 
 In general, but especially in the case of swapper function bonds, buying tokens from a bond can be seen as adding liquidity for that bond. To add liquidity to a swapper function, the current exchange rate is used to determine how much of each reserve token makes up the price. Otherwise, the price is an equal number of each of the reserve tokens according to the function type.
 
-| **Field** | **Type**   | **Description** |
-|:----------|:-----------|:----------------|
-| SellerDid | `did.Did`  | DID of the seller (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | `sdk.Coin` | The amount of bond tokens to be sold
-| BondDid   | `did.Did`  | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field** | **Type**   | **Description**                                                                 |
+| :-------- | :--------- | :------------------------------------------------------------------------------ |
+| SellerDid | `did.Did`  | DID of the seller (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                       |
+| Amount    | `sdk.Coin` | The amount of bond tokens to be sold                                            |
+| BondDid   | `did.Did`  | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 
 This message is expected to fail if:
+
 - bond does not exist or bond state is not OPEN
 - amount is not an amount of an existing bond
 - amount is greater than the balance of the seller
@@ -278,14 +284,15 @@ This message adds the sell order to the current batch.
 
 Any address that holds tokens (_t1_) that a swapper function bond uses as one of its two reserves (_t1_ and _t2_) can swap the tokens in exchange for reserve tokens of the other type (_t2_). Similar to the `MsgBuy` and `MsgSell`, the `MsgSwap` handler just registers a swap order in the current orders batch which then gets fulfilled at the end of the batch's lifespan.
 
-| **Field**  | **Type**   | **Description** |
-|:-----------|:-----------|:----------------|
-| SwapperDid | `did.Did`  | DID of the swapper (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| BondDid    | `did.Did`  | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| From       | `sdk.Coin` | The amount of reserve tokens to be swapped
-| ToToken    | `string`   | The token denomination that will be given in return
+| **Field**  | **Type**   | **Description**                                                                 |
+| :--------- | :--------- | :------------------------------------------------------------------------------ |
+| SwapperDid | `did.Did`  | DID of the swapper (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                      |
+| BondDid    | `did.Did`  | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
+| From       | `sdk.Coin` | The amount of reserve tokens to be swapped                                      |
+| ToToken    | `string`   | The token denomination that will be given in return                             |
 
 This message is expected to fail if:
+
 - bond does not exist, is not swapper function, or bond state is not OPEN
 - from amount is greater than the balance of the swapper
 - from and to tokens are the same token
@@ -308,13 +315,14 @@ This message adds the swap order to the current batch.
 
 If a bond was created with an outcome payment field, then any token holder can make an outcome payment to the bond. If the token holder has enough tokens to pay the outcome payment, the tokens are sent to the bond's reserve and the bond's state gets set to SETTLE. The only action possible by bond token holders after the outcome payment has been made is a share withdrawal (using [MsgWithdrawShare](#MsgWithdrawShare)).
 
-| **Field** | **Type**  | **Description** |
-|:----------|:----------|:----------------|
-| SenderDid | `did.Did` | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount    | `sdk.Int` | Amount of payment sender is making (e.g. `100000`)
-| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field** | **Type**  | **Description**                                                                 |
+| :-------- | :-------- | :------------------------------------------------------------------------------ |
+| SenderDid | `did.Did` | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                       |
+| Amount    | `sdk.Int` | Amount of payment sender is making (e.g. `100000`)                              |
+| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 
 This message is expected to fail if:
+
 - bond does not exist or bond state is not OPEN
 - bond outcome payment is zero or negative
 - bond outcome payment is greater than the balance of the sender
@@ -338,12 +346,13 @@ If a bond's outcome payment was paid, any bond token holder can use this message
   - The second token holder to withdraw gets `667/2 = 333 tokens` (notice the current supply is now 2)
   - The third token holder to withdraw gets `334/1 = 334 tokens` (because of rounding, the last holder got an extra token)
 
-| **Field**    | **Type**  | **Description** |
-|:-------------|:----------|:----------------|
-| RecipientDid | `did.Did` | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| BondDid      | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field**    | **Type**  | **Description**                                                                 |
+| :----------- | :-------- | :------------------------------------------------------------------------------ |
+| RecipientDid | `did.Did` | DID of the recipient (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                    |
+| BondDid      | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 
 This message is expected to fail if:
+
 - bond does not exist or bond state is not SETTLE
 - recipient does not own any bond tokens
 - bond DID or recipient DID is not a valid DID
@@ -359,13 +368,14 @@ type MsgWithdrawShare struct {
 
 If the bond allows it, i.e. if the `AllowReserveWithdrawals` flag is set to True, then the bond's controller has the ability to withdraw reserve out of the bond's reserve, for usage outside of the bond. This will not affect the `CurrentReserve` reported by the bond but will update the `AvailableReserve` value.
 
-| **Field**     | **Type**    | **Description** |
-|:--------------|:------------|:----------------|
-| WithdrawerDid | `did.Did`   | DID of the withdrawer (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
-| Amount        | `sdk.Coins` | The amount of reserve tokens to be withdrawn
-| BondDid       | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)
+| **Field**     | **Type**    | **Description**                                                                 |
+| :------------ | :---------- | :------------------------------------------------------------------------------ |
+| WithdrawerDid | `did.Did`   | DID of the withdrawer (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                   |
+| Amount        | `sdk.Coins` | The amount of reserve tokens to be withdrawn                                    |
+| BondDid       | `did.Did`   | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 
 This message is expected to fail if:
+
 - bond does not exist or bond state is not OPEN
 - withdrawer is not the bond's controller
 - bond DID or withdrawer DID is not a valid DID

@@ -1,6 +1,7 @@
 # End-Block
 
 At the end of each block, any batch of orders that has reached the end of its lifespan, measured in number of blocks, is cleared. For the rest of the batches, their blocks remaining value is decremented by 1. Orders are performed in the following order:
+
 1. Buys
 2. Sells
 3. Swaps
@@ -12,6 +13,7 @@ In the case of `augmented_function` bonds, if the new bond supply after performi
 ## Buys
 
 Using the buy price stored in the batch, the following steps are followed for each buy order:
+
 1. Mint and send `n` bond tokens to the buyer
 2. Calculate total price`total = r + f` in reserve tokens
    1. `r` is the price of buying `n` bond tokens
@@ -26,6 +28,7 @@ Note: the `maxPrices` reserve tokens were locked upon submitting the buy order.
 ## Sells
 
 Using the sell price stored in the batch, the following steps are followed for each sell order:
+
 1. Calculate total returns `total = r - f` in reserve tokens
    1. `r` is the return for selling `n` bond tokens
    2. `f` is the transactional and exit fees based on `r`
@@ -38,6 +41,7 @@ Note: the `n` bond tokens were burned upon submitting the sell order.
 ## Swaps
 
 The following steps are followed for each swap order:
+
 1. Calculate the transactional fee `f` based on `t1` reserve tokens
 2. Calculate the return `t2` for swapping `t1-f` reserve tokens
 3. Check whether the swap violates the sanity rate
