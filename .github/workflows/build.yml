@@ -74,7 +74,7 @@ jobs:
           GOWRK=off go build cmd/ixod/main.go
       - name: Upload ixod artifact
         if: env.GIT_DIFF
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ixod-${{ matrix.targetos }}-${{ matrix.arch }}
           path: cmd/ixod/ixod
