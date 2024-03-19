@@ -30,9 +30,13 @@ service Msg {
   rpc CreateEntityAccount(MsgCreateEntityAccount)
       returns (MsgCreateEntityAccountResponse);
 
-  // Create a authz grant from entity account
+  // Create an authz grant from entity account
   rpc GrantEntityAccountAuthz(MsgGrantEntityAccountAuthz)
       returns (MsgGrantEntityAccountAuthzResponse);
+
+  // Revoke an authz grant from entity account
+  rpc RevokeEntityAccountAuthz(MsgRevokeEntityAccountAuthz)
+      returns (MsgRevokeEntityAccountAuthzResponse);
 }
 
 message MsgCreateEntity {
@@ -161,7 +165,7 @@ message MsgCreateEntityAccountResponse {
 // Create a authz grant from entity account (as grantor) to recipient in msg as
 // grantee for the specific authorization
 message MsgGrantEntityAccountAuthz {
-  // entity id (did) to create account for
+  // entity id (did) which has the account
   string id = 1;
   // name of account
   string name = 2;
@@ -177,3 +181,19 @@ message MsgGrantEntityAccountAuthz {
 }
 
 message MsgGrantEntityAccountAuthzResponse {}
+
+// Revoke an existing authz grant from entity account (as grantor) to recipient
+message MsgRevokeEntityAccountAuthz {
+  // entity id (did) which has the account
+  string id = 1;
+  // name of account
+  string name = 2;
+  // the grantee address for which the authz grant will be revoked
+  string grantee_address = 3;
+  // the msg type url of the grant to be revoked for the specific grantee
+  string msg_type_url = 4;
+  // the owner_address used to sign this transaction.
+  string owner_address = 5;
+}
+
+message MsgRevokeEntityAccountAuthzResponse {}

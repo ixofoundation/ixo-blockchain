@@ -139,3 +139,27 @@ func (msg MsgGrantEntityAccountAuthz) ValidateBasic() error {
 	// return msg.Grant.ValidateBasic()
 	return nil
 }
+
+// --------------------------
+// REVOKE ENTITY ACCOUNT AUTHZ
+// --------------------------
+func (msg MsgRevokeEntityAccountAuthz) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	}
+	_, err = sdk.AccAddressFromBech32(msg.GranteeAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid grantee address (%s)", err)
+	}
+	if !iidtypes.IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+	}
+	if ixo.IsEmpty(msg.Name) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
+	}
+	if ixo.IsEmpty(msg.MsgTypeUrl) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "msgTypeUrl cannot be empty")
+	}
+	return nil
+}

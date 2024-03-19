@@ -42,7 +42,8 @@ message EntityAccountCreatedEvent {
   string account_address = 4;
 }
 
-// EntityAccountCreatedEvent is an event triggered on a entity account creation
+// EntityAccountCreatedEvent is an event triggered on a entity account authz
+// creation
 message EntityAccountAuthzCreatedEvent {
   string id = 1;
   string signer = 2;
@@ -50,4 +51,15 @@ message EntityAccountAuthzCreatedEvent {
   string granter = 4;
   string grantee = 5;
   Grant grant = 6;
+}
+
+// EntityAccountAuthzRevokedEvent is an event triggered on a entity account
+// authz revocation
+message EntityAccountAuthzRevokedEvent {
+  string id = 1;
+  string signer = 2;
+  string account_name = 3;
+  string granter = 4;
+  string grantee = 5;
+  string msg_type_url = 6;
 }

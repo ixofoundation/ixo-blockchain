@@ -188,6 +188,7 @@
   
 - [ixo/entity/v1beta1/event.proto](#ixo/entity/v1beta1/event.proto)
     - [EntityAccountAuthzCreatedEvent](#ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent)
+    - [EntityAccountAuthzRevokedEvent](#ixo.entity.v1beta1.EntityAccountAuthzRevokedEvent)
     - [EntityAccountCreatedEvent](#ixo.entity.v1beta1.EntityAccountCreatedEvent)
     - [EntityCreatedEvent](#ixo.entity.v1beta1.EntityCreatedEvent)
     - [EntityTransferredEvent](#ixo.entity.v1beta1.EntityTransferredEvent)
@@ -268,6 +269,8 @@
     - [MsgCreateEntityResponse](#ixo.entity.v1beta1.MsgCreateEntityResponse)
     - [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz)
     - [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse)
+    - [MsgRevokeEntityAccountAuthz](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz)
+    - [MsgRevokeEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse)
     - [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity)
     - [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse)
     - [MsgUpdateEntity](#ixo.entity.v1beta1.MsgUpdateEntity)
@@ -3086,7 +3089,8 @@ EntityMetadata defines metadata associated to a entity
 <a name="ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent"></a>
 
 ### EntityAccountAuthzCreatedEvent
-EntityAccountCreatedEvent is an event triggered on a entity account creation
+EntityAccountCreatedEvent is an event triggered on a entity account authz
+creation
 
 
 | Field | Type | Label | Description |
@@ -3097,6 +3101,27 @@ EntityAccountCreatedEvent is an event triggered on a entity account creation
 | granter | [string](#string) |  |  |
 | grantee | [string](#string) |  |  |
 | grant | [Grant](#ixo.entity.v1beta1.Grant) |  |  |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.EntityAccountAuthzRevokedEvent"></a>
+
+### EntityAccountAuthzRevokedEvent
+EntityAccountAuthzRevokedEvent is an event triggered on a entity account
+authz revocation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
+| account_name | [string](#string) |  |  |
+| granter | [string](#string) |  |  |
+| grantee | [string](#string) |  |  |
+| msg_type_url | [string](#string) |  |  |
 
 
 
@@ -4134,8 +4159,7 @@ Msg defines the identity Msg service.
 <a name="ixo.entity.v1beta1.MsgCreateEntityAccount"></a>
 
 ### MsgCreateEntityAccount
-create a module account for an entity, account details will be added as a
-linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+create a module account for an entity
 
 
 | Field | Type | Label | Description |
@@ -4190,7 +4214,7 @@ grantee for the specific authorization
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | entity id (did) to create account for |
+| id | [string](#string) |  | entity id (did) which has the account |
 | name | [string](#string) |  | name of account |
 | grantee_address | [string](#string) |  | the grantee address that will be able to execute the authz authorization |
 | grant | [Grant](#ixo.entity.v1beta1.Grant) |  | grant to be Authorized in authz grant |
@@ -4204,6 +4228,35 @@ grantee for the specific authorization
 <a name="ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse"></a>
 
 ### MsgGrantEntityAccountAuthzResponse
+
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz"></a>
+
+### MsgRevokeEntityAccountAuthz
+Revoke an existing authz grant from entity account (as grantor) to recipient
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | entity id (did) which has the account |
+| name | [string](#string) |  | name of account |
+| grantee_address | [string](#string) |  | the grantee address for which the authz grant will be revoked |
+| msg_type_url | [string](#string) |  | the msg type url of the grant to be revoked for the specific grantee |
+| owner_address | [string](#string) |  | the owner_address used to sign this transaction. |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse"></a>
+
+### MsgRevokeEntityAccountAuthzResponse
 
 
 
@@ -4317,7 +4370,8 @@ Msg defines the project Msg service.
 | UpdateEntityVerified | [MsgUpdateEntityVerified](#ixo.entity.v1beta1.MsgUpdateEntityVerified) | [MsgUpdateEntityVerifiedResponse](#ixo.entity.v1beta1.MsgUpdateEntityVerifiedResponse) | UpdateEntityVerified defines a method for updating if an entity is verified |
 | TransferEntity | [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity) | [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse) | Transfers an entity and its nft to the recipient |
 | CreateEntityAccount | [MsgCreateEntityAccount](#ixo.entity.v1beta1.MsgCreateEntityAccount) | [MsgCreateEntityAccountResponse](#ixo.entity.v1beta1.MsgCreateEntityAccountResponse) | Create a module account for an entity, |
-| GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create a authz grant from entity account |
+| GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create an authz grant from entity account |
+| RevokeEntityAccountAuthz | [MsgRevokeEntityAccountAuthz](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz) | [MsgRevokeEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse) | Revoke an authz grant from entity account |
 
  
 
@@ -4519,7 +4573,7 @@ Query defines the gRPC querier service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | minter | [string](#string) |  | address of minter |
-| contract_address | [string](#string) |  | generated on token intiation through MsgSetupMinter |
+| contract_address | [string](#string) |  | generated on token initiation |
 | class | [string](#string) |  | class is the token protocol entity DID (validated) |
 | name | [string](#string) |  | name is the token name, which must be unique (namespace) |
 | description | [string](#string) |  | description is any arbitrary description |
