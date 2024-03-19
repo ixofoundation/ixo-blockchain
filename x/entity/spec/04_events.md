@@ -113,3 +113,27 @@ The field's descriptions is as follows:
 - `granter` - a string containing the address of the entity account the authz was granted.
 - `grantee` - a string containing the address of the grantee towards who the authz was granted.
 - `grant` - the [Grant](https://docs.cosmos.network/main/build/modules/authz#grant) that was granted.
+
+### EntityAccountAuthzRevokedEvent
+
+Emitted after a successfull `MsgRevokeEntityAccountAuthz`
+
+```go
+type EntityAccountAuthzRevokedEvent struct {
+	Id          string
+	Signer      string
+	AccountName string
+	Granter     string
+	Grantee     string
+	MsgTypeUrl  string
+}
+```
+
+The field's descriptions is as follows:
+
+- `id` - a string containing the unique identifier of the entity.
+- `signer` - a string containing the address of the signer.
+- `accountName` - a string containing the name of the entity account the authz was granted before.
+- `granter` - a string containing the address of the entity account the authz was granted before.
+- `grantee` - a string containing the address of the grantee towards who the authz was granted before.
+- `msgTypeUrl` - a string containing the message type url for the specific authz that was revoked.

@@ -113,7 +113,7 @@ The field's descriptions is as follows:
 
 - `id` - a string containing the unique identifier of the entity.
 - `recipientDid` - a string containing the recipient IidDocument Id (Did).
-- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction
+- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction.
 - `ownerDid` - a string containing the signers IidDocument Id. Must be in the IidDocument's controllers list to allow update and the `ownerAddress` must be authorized to sign on behalf of the `ownerDid`
 
 ## MsgCreateEntityAccount
@@ -132,7 +132,7 @@ The field's descriptions is as follows:
 
 - `id` - a string containing the unique identifier of the entity.
 - `name` - a string containing the name for the new entity account.
-- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction
+- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction.
 
 ## MsgGrantEntityAccountAuthz
 
@@ -154,4 +154,26 @@ The field's descriptions is as follows:
 - `name` - a string containing the name for the entity account to use as granter for the authz grant.
 - `granteeAddress` - a string containing the grantee address for the authz grant.
 - `grant` - a [Grant](https://docs.cosmos.network/main/build/modules/authz#grant) that will be created.
-- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction
+- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction.
+
+## MsgRevokeEntityAccountAuthz
+
+The `MsgRevokeEntityAccountAuthz` is used to revoke an [Authz](https://docs.cosmos.network/main/build/modules/authz) grant from entity account (as granter) to the msg `GranteeAddress` for the specific `MsgTypeUrl`
+
+```go
+type MsgRevokeEntityAccountAuthz struct {
+	Id string
+	Name string
+	GranteeAddress string
+	MsgTypeUrl string
+	OwnerAddress string
+}
+```
+
+The field's descriptions is as follows:
+
+- `id` - a string containing the unique identifier of the entity.
+- `name` - a string containing the name for the entity account to use as granter for the authz grant.
+- `granteeAddress` - a string containing the grantee address for the authz grant.
+- `msgTypeUrl` - a string containing the message type url for the specific authz to revoke.
+- `ownerAddress` - a string containing the cosmos address of the private key signing the transaction.
